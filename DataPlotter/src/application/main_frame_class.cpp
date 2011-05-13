@@ -297,6 +297,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idContextPlotIntegral,					MainFrame::ContextPlotIntegralEvent)
 	EVT_MENU(idContextPlotRMS,						MainFrame::ContextPlotRMSEvent)
 	EVT_MENU(idContextPlotFFT,						MainFrame::ContextPlotFFTEvent)
+	EVT_MENU(idButtonRemoveCurve,					MainFrame::ButtonRemoveCurveClickedEvent)
 
 	EVT_MENU(idPlotContextToggleGridlines,			MainFrame::ContextToggleGridlines)
 	EVT_MENU(idPlotContextAutoScale,				MainFrame::ContextAutoScale)
@@ -569,6 +570,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idContextPlotIntegral, _T("Plot Integral"));
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
+		contextMenu->Append(idButtonRemoveCurve, _T("Remove Curve"));
 	}
 
 	// Show the menu
