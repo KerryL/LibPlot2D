@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\application">
+      <UniqueIdentifier>{8423ccae-66d0-447b-b6a2-c3542bd96fd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\application">
+      <UniqueIdentifier>{02b3349d-68d7-4b1f-82ac-59c518458cf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\renderer">
+      <UniqueIdentifier>{30484aef-30da-45cd-97c9-f8841ba3789c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\renderer\primitives">
+      <UniqueIdentifier>{8b37301a-d18b-4055-a9dc-383f509f8962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\renderer">
+      <UniqueIdentifier>{9c7e3aaa-40f3-412d-ab1a-943c7ed360d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\renderer\primitives">
+      <UniqueIdentifier>{3d2a68c3-6565-4a36-a7b7-81d79f67588a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utilities">
+      <UniqueIdentifier>{fdc99ff9-4f1b-4920-949f-8c4c8cf053ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utilities">
+      <UniqueIdentifier>{c77b9fea-4d41-4d7d-931c-ef06ce66cd5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utilities\math">
+      <UniqueIdentifier>{8d3661e1-b4c3-4430-80b9-df8a59be9ac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utilities\signals">
+      <UniqueIdentifier>{a05bc548-68e3-4043-b7a0-424dcc3b4018}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utilities\math">
+      <UniqueIdentifier>{99c1704b-81c9-404b-b967-ff64780835d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utilities\signals">
+      <UniqueIdentifier>{61ee11d1-4439-45b7-bd60-5002528e8066}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\application\plotter_app_class.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\drop_target_class.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\main_frame_class.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\render_window_class.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\color_class.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\plot_renderer_class.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\primitives\text_class.h">
+      <Filter>Header Files\renderer\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\primitives\axis.h">
+      <Filter>Header Files\renderer\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\primitives\plot_curve.h">
+      <Filter>Header Files\renderer\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\primitives\primitive.h">
+      <Filter>Header Files\renderer\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\managed_list_class.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\object_list_class.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\math\complex_class.h">
+      <Filter>Header Files\utilities\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\math\matrix_class.h">
+      <Filter>Header Files\utilities\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\math\plot_math.h">
+      <Filter>Header Files\utilities\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\math\vector_class.h">
+      <Filter>Header Files\utilities\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\rms.h">
+      <Filter>Header Files\utilities\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\curve_fit.h">
+      <Filter>Header Files\utilities\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\derivative.h">
+      <Filter>Header Files\utilities\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\fft.h">
+      <Filter>Header Files\utilities\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\integral.h">
+      <Filter>Header Files\utilities\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\plot_object_class.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\dataset2D.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\primitives\zoom_box_class.h">
+      <Filter>Header Files\renderer\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\primitives\cursor_class.h">
+      <Filter>Header Files\renderer\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\math\expression_tree_class.h">
+      <Filter>Header Files\utilities\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\range_limits_dialog_class.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\application\drop_target_class.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\main_frame_class.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\plotter_app_class.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\color_class.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\plot_renderer_class.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\render_window_class.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\primitives\axis.cpp">
+      <Filter>Source Files\renderer\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\primitives\plot_curve.cpp">
+      <Filter>Source Files\renderer\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\primitives\primitive.cpp">
+      <Filter>Source Files\renderer\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\primitives\text_class.cpp">
+      <Filter>Source Files\renderer\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\math\complex_class.cpp">
+      <Filter>Source Files\utilities\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\math\vector_class.cpp">
+      <Filter>Source Files\utilities\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\math\matrix_class.cpp">
+      <Filter>Source Files\utilities\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\math\plot_math.cpp">
+      <Filter>Source Files\utilities\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\curve_fit.cpp">
+      <Filter>Source Files\utilities\signals</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\derivative.cpp">
+      <Filter>Source Files\utilities\signals</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\fft.cpp">
+      <Filter>Source Files\utilities\signals</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\integral.cpp">
+      <Filter>Source Files\utilities\signals</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\rms.cpp">
+      <Filter>Source Files\utilities\signals</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\plot_object_class.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\dataset2D.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\primitives\cursor_class.cpp">
+      <Filter>Source Files\renderer\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\primitives\zoom_box_class.cpp">
+      <Filter>Source Files\renderer\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\math\expression_tree_class.cpp">
+      <Filter>Source Files\utilities\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\range_limits_dialog_class.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

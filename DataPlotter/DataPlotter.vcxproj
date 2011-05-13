@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>DataPlotter</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="DataPlotter.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="DataPlotter.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_dll\mswd;$(WXWIN)\include;$(FTGL)\src;./src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_dll;$(FTGL)\msvc\Build;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase28d.lib;wxmsw28d_adv.lib;wxbase28d_xml.lib;wxmsw28d_core.lib;wxmsw28d_gl.lib;wxzlibd.lib;opengl32.lib;ftgl_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_lib\msw;$(WXWIN)\include;$(FTGL)\src;./src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_lib;$(FREETYPE)\objs\win32\vc2008;$(FTGL)\msvc\Build</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase28.lib;wxmsw28_adv.lib;wxbase28_xml.lib;wxmsw28_core.lib;wxmsw28_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;freetype244MT.lib;ftgl.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\application\drop_target_class.h" />
+    <ClInclude Include="src\application\main_frame_class.h" />
+    <ClInclude Include="src\application\plotter_app_class.h" />
+    <ClInclude Include="src\application\plot_object_class.h" />
+    <ClInclude Include="src\application\range_limits_dialog_class.h" />
+    <ClInclude Include="src\renderer\color_class.h" />
+    <ClInclude Include="src\renderer\plot_renderer_class.h" />
+    <ClInclude Include="src\renderer\primitives\axis.h" />
+    <ClInclude Include="src\renderer\primitives\cursor_class.h" />
+    <ClInclude Include="src\renderer\primitives\plot_curve.h" />
+    <ClInclude Include="src\renderer\primitives\primitive.h" />
+    <ClInclude Include="src\renderer\primitives\text_class.h" />
+    <ClInclude Include="src\renderer\primitives\zoom_box_class.h" />
+    <ClInclude Include="src\renderer\render_window_class.h" />
+    <ClInclude Include="src\utilities\dataset2D.h" />
+    <ClInclude Include="src\utilities\managed_list_class.h" />
+    <ClInclude Include="src\utilities\math\complex_class.h" />
+    <ClInclude Include="src\utilities\math\expression_tree_class.h" />
+    <ClInclude Include="src\utilities\math\matrix_class.h" />
+    <ClInclude Include="src\utilities\math\plot_math.h" />
+    <ClInclude Include="src\utilities\math\vector_class.h" />
+    <ClInclude Include="src\utilities\object_list_class.h" />
+    <ClInclude Include="src\utilities\signals\curve_fit.h" />
+    <ClInclude Include="src\utilities\signals\derivative.h" />
+    <ClInclude Include="src\utilities\signals\fft.h" />
+    <ClInclude Include="src\utilities\signals\integral.h" />
+    <ClInclude Include="src\utilities\signals\rms.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\application\drop_target_class.cpp" />
+    <ClCompile Include="src\application\main_frame_class.cpp" />
+    <ClCompile Include="src\application\plotter_app_class.cpp" />
+    <ClCompile Include="src\application\plot_object_class.cpp" />
+    <ClCompile Include="src\application\range_limits_dialog_class.cpp" />
+    <ClCompile Include="src\renderer\color_class.cpp" />
+    <ClCompile Include="src\renderer\plot_renderer_class.cpp" />
+    <ClCompile Include="src\renderer\primitives\axis.cpp" />
+    <ClCompile Include="src\renderer\primitives\cursor_class.cpp" />
+    <ClCompile Include="src\renderer\primitives\plot_curve.cpp" />
+    <ClCompile Include="src\renderer\primitives\primitive.cpp" />
+    <ClCompile Include="src\renderer\primitives\text_class.cpp" />
+    <ClCompile Include="src\renderer\primitives\zoom_box_class.cpp" />
+    <ClCompile Include="src\renderer\render_window_class.cpp" />
+    <ClCompile Include="src\utilities\dataset2D.cpp" />
+    <ClCompile Include="src\utilities\math\complex_class.cpp" />
+    <ClCompile Include="src\utilities\math\expression_tree_class.cpp" />
+    <ClCompile Include="src\utilities\math\matrix_class.cpp" />
+    <ClCompile Include="src\utilities\math\plot_math.cpp" />
+    <ClCompile Include="src\utilities\math\vector_class.cpp" />
+    <ClCompile Include="src\utilities\signals\curve_fit.cpp" />
+    <ClCompile Include="src\utilities\signals\derivative.cpp" />
+    <ClCompile Include="src\utilities\signals\fft.cpp" />
+    <ClCompile Include="src\utilities\signals\integral.cpp" />
+    <ClCompile Include="src\utilities\signals\rms.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
