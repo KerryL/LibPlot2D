@@ -372,7 +372,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 							newSet = GetSetFromList(set) * -1.0;
 						else
 						{
-							errorString.Printf("Dataset ID %i is invalid!", set);
+							errorString.Printf("Dataset ID %li is invalid!", set);
 							return node;
 						}
 					}
@@ -483,7 +483,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						newSet = GetSetFromList(i);
 					else
 					{
-						errorString.Printf("Dataset ID %i is invalid!", i);
+						errorString.Printf("Dataset ID %li is invalid!", i);
 						return node;
 					}
 				}

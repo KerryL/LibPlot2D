@@ -12,6 +12,7 @@
 // Author:  K. Loux
 // Description:  Represents an oscilloscope cursor on-screen.
 // History:
+//  5/12/2011 - Renamed to PlotCursor from Cursor due to conflict in X.h, K. Loux
 
 #ifndef _CURSOR_H_
 #define _CURSOR_H_
@@ -22,11 +23,11 @@
 // Local forward declarations
 class Axis;
 
-class Cursor : public Primitive
+class PlotCursor : public Primitive
 {
 public:
 	// Constructor
-	Cursor(RenderWindow &_renderWindow, const Axis &_axis);
+	PlotCursor(RenderWindow &_renderWindow, const Axis &_axis);
 
 	// Mandatory overloads from PRIMITIVE - for creating geometry and testing the
 	// validity of this object's parameters
@@ -39,7 +40,7 @@ public:
 	bool IsUnder(const unsigned int &pixel);
 
 	// Assignment operator (to avoid Warning C4512 due to const reference member)
-	Cursor& operator=(const Cursor &target);
+	PlotCursor& operator=(const PlotCursor &target);
 
 private:
 	// The axis we are associated with (perpendicular to)

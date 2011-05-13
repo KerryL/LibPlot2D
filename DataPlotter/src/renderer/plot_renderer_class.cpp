@@ -161,8 +161,8 @@ void PlotRenderer::CreateActors(void)
 
 	// Also create the zoom box and cursors, even though they aren't drawn yet
 	zoomBox = new ZoomBox(*this);
-	leftCursor = new Cursor(*this, *plot->GetXAxis());
-	rightCursor = new Cursor(*this, *plot->GetXAxis());
+	leftCursor = new PlotCursor(*this, *plot->GetXAxis());
+	rightCursor = new PlotCursor(*this, *plot->GetXAxis());
 
 	return;
 }

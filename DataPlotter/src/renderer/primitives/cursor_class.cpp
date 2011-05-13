@@ -12,6 +12,7 @@
 // Author:  K. Loux
 // Description:  Represents an oscilloscope cursor on-screen.
 // History:
+//  5/12/2011 - Renamed to PlotCursor from Cursor due to conflict in X.h, K. Loux
 
 // Local headers
 #include "renderer/primitives/cursor_class.h"
@@ -19,10 +20,10 @@
 #include "renderer/render_window_class.h"
 
 //==========================================================================
-// Class:			Cursor
-// Function:		Cursor
+// Class:			PlotCursor
+// Function:		PlotCursor
 //
-// Description:		Constructor for the Cursor class.
+// Description:		Constructor for the PlotCursor class.
 //
 // Input Argurments:
 //		_renderWindow	= RenderWindow&
@@ -35,7 +36,7 @@
 //		None
 //
 //==========================================================================
-Cursor::Cursor(RenderWindow &_renderWindow, const Axis &_axis) : Primitive(_renderWindow), axis(_axis)
+PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis) : Primitive(_renderWindow), axis(_axis)
 {
 	// Start out invisible
 	isVisible = false;
@@ -44,7 +45,7 @@ Cursor::Cursor(RenderWindow &_renderWindow, const Axis &_axis) : Primitive(_rend
 }
 
 //==========================================================================
-// Class:			Cursor
+// Class:			PlotCursor
 // Function:		GenerateGeometry
 //
 // Description:		Generates OpenGL commands to draw the cursor.
@@ -59,7 +60,7 @@ Cursor::Cursor(RenderWindow &_renderWindow, const Axis &_axis) : Primitive(_rend
 //		None
 //
 //==========================================================================
-void Cursor::GenerateGeometry(void)
+void PlotCursor::GenerateGeometry(void)
 {
 	// The on-screen representation of the cursor is just a line, either horizontal
 	// or vertical, whichever the axis we're associated with is not
@@ -99,7 +100,7 @@ void Cursor::GenerateGeometry(void)
 }
 
 //==========================================================================
-// Class:			Cursor
+// Class:			PlotCursor
 // Function:		HasValidParameters
 //
 // Description:		Checks to see if we're OK to drawy the cursor.
@@ -114,7 +115,7 @@ void Cursor::GenerateGeometry(void)
 //		None
 //
 //==========================================================================
-bool Cursor::HasValidParameters(void)
+bool PlotCursor::HasValidParameters(void)
 {
 	// Make sure the value is within the axis limits
 	if (value >= axis.GetMinimum() && value <= axis.GetMaximum())
@@ -127,7 +128,7 @@ bool Cursor::HasValidParameters(void)
 }
 
 //==========================================================================
-// Class:			Cursor
+// Class:			PlotCursor
 // Function:		RescalePoint
 //
 // Description:		Rescales the onscreen position of the point according to
@@ -143,7 +144,7 @@ bool Cursor::HasValidParameters(void)
 //		None
 //
 //==========================================================================
-void Cursor::RescalePoint(unsigned int &point)
+void PlotCursor::RescalePoint(unsigned int &point)
 {
 	int plotDimension;
 	if (axis.IsHorizontal())
@@ -159,7 +160,7 @@ void Cursor::RescalePoint(unsigned int &point)
 }
 
 //==========================================================================
-// Class:			Cursor
+// Class:			PlotCursor
 // Function:		IsUnder
 //
 // Description:		Checks to see if the cursor is located under the specified
@@ -176,7 +177,7 @@ void Cursor::RescalePoint(unsigned int &point)
 //		True is the cursor is under the specified point, false otherwise
 //
 //==========================================================================
-bool Cursor::IsUnder(const unsigned int &pixel)
+bool PlotCursor::IsUnder(const unsigned int &pixel)
 {
 	// Apparent line width for clicking
 	int width = 2;// [pixels]
@@ -188,7 +189,7 @@ bool Cursor::IsUnder(const unsigned int &pixel)
 }
 
 //==========================================================================
-// Class:			Cursor
+// Class:			PlotCursor
 // Function:		SetValue
 //
 // Description:		Sets the x-value where the cursor should appear on the plot.
@@ -203,7 +204,7 @@ bool Cursor::IsUnder(const unsigned int &pixel)
 //		None
 //
 //==========================================================================
-void Cursor::SetValue(const double& _value)
+void PlotCursor::SetValue(const double& _value)
 {
 	value = _value;
 	RescalePoint(locationAlongAxis);
@@ -213,7 +214,7 @@ void Cursor::SetValue(const double& _value)
 }
 
 //==========================================================================
-// Class:			Cursor
+// Class:			PlotCursor
 // Function:		operator=
 //
 // Description:		Sets the x-value where the cursor should appear on the plot.
@@ -225,10 +226,10 @@ void Cursor::SetValue(const double& _value)
 //		None
 //
 // Return Value:
-//		Cursor& reference to this object
+//		PlotCursor& reference to this object
 //
 //==========================================================================
-Cursor& Cursor::operator=(const Cursor &target)
+PlotCursor& PlotCursor::operator=(const PlotCursor &target)
 {
 	if (&target == this)
 		return *this;

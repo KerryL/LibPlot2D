@@ -28,7 +28,7 @@ class PlotObject;
 class MainFrame;
 class Dataset2D;
 class ZoomBox;
-class Cursor;
+class PlotCursor;
 
 class PlotRenderer : public RenderWindow
 {
@@ -111,8 +111,8 @@ private:
 	void OnDoubleClickEvent(wxMouseEvent &event);
 
 	ZoomBox *zoomBox;
-	Cursor *leftCursor;
-	Cursor *rightCursor;
+	PlotCursor *leftCursor;
+	PlotCursor *rightCursor;
 
 	bool draggingLeftCursor;
 	bool draggingRightCursor;
