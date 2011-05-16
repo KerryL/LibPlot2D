@@ -49,6 +49,12 @@
     <Filter Include="Header Files\utilities\signals">
       <UniqueIdentifier>{61ee11d1-4439-45b7-bd60-5002528e8066}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\utilities\signals\filters">
+      <UniqueIdentifier>{18a484e4-060b-4f0f-bc5b-813c7f8e8200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utilities\signals\filters">
+      <UniqueIdentifier>{470ade42-4f64-4f7b-a029-59870c1cc4ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\application\plotter_app_class.h">
@@ -132,6 +138,18 @@
     <ClInclude Include="src\application\range_limits_dialog_class.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
+    <ClInclude Include="src\utilities\signals\filters\low_pass_order2_class.h">
+      <Filter>Header Files\utilities\signals\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\filters\low_pass_order1_class.h">
+      <Filter>Header Files\utilities\signals\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\filters\filter_base_class.h">
+      <Filter>Header Files\utilities\signals\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\signals\filters\high_pass_order1_class.h">
+      <Filter>Header Files\utilities\signals\filters</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application\drop_target_class.cpp">
@@ -208,6 +226,18 @@
     </ClCompile>
     <ClCompile Include="src\application\range_limits_dialog_class.cpp">
       <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\filters\low_pass_order2_class.cpp">
+      <Filter>Source Files\utilities\signals\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\filters\low_pass_order1_class.cpp">
+      <Filter>Source Files\utilities\signals\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\filters\filter_base_class.cpp">
+      <Filter>Source Files\utilities\signals\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\signals\filters\high_pass_order1_class.cpp">
+      <Filter>Source Files\utilities\signals\filters</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

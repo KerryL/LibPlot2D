@@ -108,6 +108,10 @@
     <ClInclude Include="src\utilities\signals\curve_fit.h" />
     <ClInclude Include="src\utilities\signals\derivative.h" />
     <ClInclude Include="src\utilities\signals\fft.h" />
+    <ClInclude Include="src\utilities\signals\filters\filter_base_class.h" />
+    <ClInclude Include="src\utilities\signals\filters\high_pass_order1_class.h" />
+    <ClInclude Include="src\utilities\signals\filters\low_pass_order1_class.h" />
+    <ClInclude Include="src\utilities\signals\filters\low_pass_order2_class.h" />
     <ClInclude Include="src\utilities\signals\integral.h" />
     <ClInclude Include="src\utilities\signals\rms.h" />
   </ItemGroup>
@@ -135,6 +139,10 @@
     <ClCompile Include="src\utilities\signals\curve_fit.cpp" />
     <ClCompile Include="src\utilities\signals\derivative.cpp" />
     <ClCompile Include="src\utilities\signals\fft.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\filter_base_class.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\high_pass_order1_class.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\low_pass_order1_class.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\low_pass_order2_class.cpp" />
     <ClCompile Include="src\utilities\signals\integral.cpp" />
     <ClCompile Include="src\utilities\signals\rms.cpp" />
   </ItemGroup>
