@@ -8,9 +8,9 @@
 ===================================================================================*/
 
 // File:  curve_fit.h
-// Created:  5/3/2011
+// Created:  5/16/2011
 // Author:  K. Loux
-// Description:  Computes best-fit trends for data sets.
+// Description:  Contains methods for fitting curves to datasets.
 // History:
 
 #ifndef _CURVE_FIT_H_
@@ -22,13 +22,19 @@ class Dataset2D;
 class CurveFit
 {
 public:
-	struct CoefficientSet
+	struct PolynomialFit
 	{
 		unsigned int order;
 		double *coefficients;
+
+		double rSquared;
 	};
 
-	static CoefficientSet Compute(const Dataset2D &data, const unsigned int &order);
+	static PolynomialFit DoPolynomialFit(const Dataset2D &data, const unsigned int &order);
+	static double EvaluateFit(const double &x, const PolynomialFit& fit);
+
+private:
+	static void ComputeRSquared(const Dataset2D &data, PolynomialFit& fit);
 };
 
 #endif// _CURVE_FIT_H_

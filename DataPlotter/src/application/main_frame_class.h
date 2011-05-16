@@ -65,7 +65,6 @@ private:
 	// Functions that do some of the frame initialization and control positioning
 	void DoLayout(void);
 	void SetProperties(void);
-	void CreateMenuBar(void);
 
 	// Controls
 	wxButton *openButton;
@@ -104,11 +103,7 @@ private:
 	enum MainFrameEventID
 	{
 		// Menu bar
-		idMenuFileOpen = wxID_HIGHEST + 100,
-		idMenuFileWriteImageFile,
-		idMenuFileExit,
-
-		idButtonOpen,
+		idButtonOpen = wxID_HIGHEST + 100,
 		idButtonAutoScale,
 		idButtonRemoveCurve,
 
@@ -118,8 +113,14 @@ private:
 		idContextPlotRMS,
 		idContextPlotFFT,
 
+		idContextFilterLowPass,
+		idContextFilterHighPass,
+
+		idContextFitCurve,
+
 		idPlotContextToggleGridlines,
 		idPlotContextAutoScale,
+		idPlotContextWriteImageFile,
 
 		idPlotContextToggleBottomGridlines,
 		idPlotContextSetBottomRange,
@@ -139,18 +140,9 @@ private:
 	};
 
 	// Event handlers-----------------------------------------------------
-	// Frame top level
-	void WindowCloseEvent(wxCloseEvent &event);
-
-	// For the menu bar
-	void FileOpenEvent(wxCommandEvent &event);
-	void FileWriteImageFileEvent(wxCommandEvent &event);
-	void FileExitEvent(wxCommandEvent &event);
-	void HelpAboutEvent(wxCommandEvent &event);
-
 	// Buttons
+	void ButtonOpenClickedEvent(wxCommandEvent &event);
 	void ButtonAutoScaleClickedEvent(wxCommandEvent &event);
-	void ButtonAddCurveClickedEvent(wxCommandEvent &event);
 	void ButtonRemoveCurveClickedEvent(wxCommandEvent &event);
 
 	// Grid events
@@ -165,8 +157,14 @@ private:
 	void ContextPlotRMSEvent(wxCommandEvent &event);
 	void ContextPlotFFTEvent(wxCommandEvent &event);
 
+	void ContextFilterLowPassEvent(wxCommandEvent &event);
+	void ContextFilterHighPassEvent(wxCommandEvent &event);
+
+	void ContextFitCurve(wxCommandEvent &event);
+
 	void ContextToggleGridlines(wxCommandEvent &event);
 	void ContextAutoScale(wxCommandEvent &event);
+	void ContextWriteImageFile(wxCommandEvent &event);
 
 	void ContextToggleGridlinesBottom(wxCommandEvent &event);
 	void ContextAutoScaleBottom(wxCommandEvent &event);

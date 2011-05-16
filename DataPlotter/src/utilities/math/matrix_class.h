@@ -22,16 +22,16 @@ class wxString;
 // vMath forward declarations
 class VECTOR;
 
-class MATRIX
+class Matrix
 {
 public:
 	// Constructors
-	MATRIX(const int &_Rows, const int &_Columns);
-	MATRIX(const int &_Rows, const int &_Columns, double Element1, ...);
-	MATRIX(const MATRIX &Matrix);
+	Matrix(const unsigned int &_Rows, const unsigned int &_Columns);
+	Matrix(const unsigned int &_Rows, const unsigned int &_Columns, double Element1, ...);
+	Matrix(const Matrix &matrix);
 
 	// Destructor
-	~MATRIX();
+	~Matrix();
 
 	// Sets the values of all of the elements
 	void Set(double Element1, ...);
@@ -40,55 +40,63 @@ public:
 	void Zero(void);
 
 	// Makes this matrix an identity matrix
-	MATRIX& MakeIdentity(void);
+	Matrix& MakeIdentity(void);
 
 	// Transposition function
-	MATRIX& Transpose(void);
+	Matrix GetTranspose(void) const;
+
+	// Inverse functions
+	Matrix GetInverse(void) const;
+	Matrix GetPsuedoInverse(void) const;
 
 	// Returns a matrix containing a sub-set of the contents of this matrix
-	MATRIX GetSubMatrix(const int &StartRow, const int &StartColumn,
-		const int &SubRows, const int &SubColumns) const;
+	Matrix GetSubMatrix(const unsigned int &startRow, const unsigned int &startColumn,
+		const unsigned int &subRows, const unsigned int &subColumns) const;
 
 	// Retrieve properties of this matrix
-	inline int GetNumberOfRows(void) const { return Rows; };
-	inline int GetNumberOfColumns(void) const { return Columns; };
-	double GetElement(const int &Row, const int &Column) const;
-
-	// Returns a pointer to the start of the array
-	inline double *GetFirstElementPointer(void) const { return Elements; };
+	inline unsigned int GetNumberOfRows(void) const { return rows; };
+	inline unsigned int GetNumberOfColumns(void) const { return columns; };
+	double GetElement(const int &row, const int &column) const;
 
 	// Set value of element at the specified location
-	void SetElement(const int &Row, const int &Column, const double &Value);
+	void SetElement(const unsigned int &row, const unsigned int &column, const double &value);
 
 	// Print this object to a string
 	wxString Print(void) const;
 
 	// Operators
-	MATRIX& operator += (const MATRIX &Matrix);
-	MATRIX& operator -= (const MATRIX &Matrix);
-	MATRIX& operator *= (const MATRIX &Matrix);
-	MATRIX& operator *= (const double &Double);
-	MATRIX& operator /= (const double &Double);
-	MATRIX& operator = (const MATRIX &Matrix);
-	double &operator () (const int &Row, const int &Column);
-	const MATRIX operator + (const MATRIX &Matrix) const;
-	const MATRIX operator - (const MATRIX &Matrix) const;
-	const MATRIX operator * (const MATRIX &Matrix) const;
-	const MATRIX operator * (const double &Double) const;
-	const VECTOR operator * (const VECTOR &Vector) const;
-	const MATRIX operator / (const double &Double) const;
-	const double &operator () (const int &Row, const int &Column) const;
+	Matrix& operator += (const Matrix &target);
+	Matrix& operator -= (const Matrix &target);
+	Matrix& operator *= (const Matrix &target);
+	Matrix& operator *= (const double &target);
+	Matrix& operator /= (const double &target);
+	Matrix& operator = (const Matrix &target);
+	double &operator () (const unsigned int &row, const unsigned int &column);
+	const Matrix operator + (const Matrix &target) const;
+	const Matrix operator - (const Matrix &target) const;
+	const Matrix operator * (const Matrix &target) const;
+	const Matrix operator * (const double &target) const;
+	const VECTOR operator * (const VECTOR &target) const;
+	const Matrix operator / (const double &target) const;
+	const double &operator () (const unsigned int &row, const unsigned int &column) const;
 
-	//VECTOR UnderVector (VECTOR Vector);// Left divide in MATLAB -> x = A\b where x and b are VECTORs
-	MATRIX& RowReduce(void);
+	Matrix LeftDivide(const Matrix& b) const;// x = A \ b
+	Matrix GetRowReduced(void) const;
+	unsigned int GetRank(void) const;
 
 private:
 	// The size of this matrix
-	int Rows;
-	int Columns;
+	unsigned int rows;
+	unsigned int columns;
 
 	// The array of elements of this matrix
-	double *Elements;
+	double **elements;
+
+	void FreeElements(void);
+	void AllocateElements(void);
+
+	// Helper function for SVD algorithm
+	double pythag(const double& a, const double &b) const;
 };
 
 #endif// _MATRIX_CLASS_H_

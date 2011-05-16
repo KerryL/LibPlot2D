@@ -132,9 +132,9 @@ void VECTOR::Rotate (const VECTOR &CoR, const VECTOR &Rotations,
 
 	// Define the rotation matricies using the sine and cosines computed above.  There will be three
 	// (one for each rotation).
-	MATRIX FirstRotation(3, 3);
-	MATRIX SecondRotation(3, 3);
-	MATRIX ThirdRotation(3, 3);
+	Matrix FirstRotation(3, 3);
+	Matrix SecondRotation(3, 3);
+	Matrix ThirdRotation(3, 3);
 
 	// Create the first rotation matrix
 	if (First == AxisX)
@@ -179,7 +179,7 @@ void VECTOR::Rotate (const VECTOR &CoR, const VECTOR &Rotations,
 							0.0,	0.0,	1.0);
 
 	// Combine all three to create the complete rotation matrix
-	MATRIX RotationMatrix(3, 3);
+	Matrix RotationMatrix(3, 3);
 	RotationMatrix = ThirdRotation * SecondRotation * FirstRotation;
 
 	// Now we can apply the rotations and translate the vector back
@@ -245,7 +245,7 @@ void VECTOR::Rotate(const double &Angle, const AXIS &About)
 	double C = cos(Angle);
 
 	// Define the rotation matrix using the sine and cosines computed above.
-	MATRIX RotationMatrix(3, 3);
+	Matrix RotationMatrix(3, 3);
 
 	// Create the first rotation matrix
 	if (About == AxisX)
@@ -289,7 +289,7 @@ void VECTOR::Rotate(const double &Angle, const AXIS &About)
 void VECTOR::Rotate(const double &Angle, const VECTOR &RotationAxis)
 {
 	// To rotate this vector about an arbitrary axis, we use the following matrix
-	MATRIX RotationMatrix(3, 3);
+	Matrix RotationMatrix(3, 3);
 
 	// For the sake of readability
 	double U = RotationAxis.X;
@@ -541,9 +541,9 @@ VECTOR VECTOR::Normalize(void) const
 //		MATRIX(3, 3)
 //
 //==========================================================================
-MATRIX VECTOR::OuterProduct(const VECTOR &Vector) const
+Matrix VECTOR::OuterProduct(const VECTOR &Vector) const
 {
-	MATRIX Temp(3, 3,
+	Matrix Temp(3, 3,
 		X * Vector.X, X * Vector.Y, X * Vector.Z,
 		Y * Vector.X, Y * Vector.Y, Y * Vector.Z,
 		Z * Vector.X, Z * Vector.Y, Z * Vector.Z);

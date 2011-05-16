@@ -24,7 +24,7 @@
 class wxString;
 
 // Local forward declarations
-class MATRIX;
+class Matrix;
 
 using namespace std;
 
@@ -79,7 +79,7 @@ public:
 	VECTOR Normalize(void) const;
 
 	// Multiplication that results in a 3x3 matrix
-	MATRIX OuterProduct(const VECTOR &Vector) const;
+	Matrix OuterProduct(const VECTOR &Vector) const;
 
 	// Operators
 	VECTOR operator + (const VECTOR &Vector) const;

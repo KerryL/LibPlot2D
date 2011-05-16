@@ -64,10 +64,10 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id,
 	AutoSetFrustum();
 
 	// Initialize the transformation matricies
-	modelToView = new MATRIX(3, 3);
+	modelToView = new Matrix(3, 3);
 	modelToView->MakeIdentity();
 
-	viewToModel = new MATRIX(3, 3);
+	viewToModel = new Matrix(3, 3);
 	viewToModel->MakeIdentity();
 
 	// Initialize the camera position
@@ -431,49 +431,49 @@ void RenderWindow::Initialize()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Set the viewing projection matrix
-	MATRIX projectionMatrix(4, 4);
+	Matrix projectionMatrix(4, 4);
 	if (view3D)
 	{
 		double halfHeight = tan(verticalFOV) * nearClip;
 		if (viewOrthogonal)
 		{
 			// Set up the elements for the orthogonal projection matrix (parallel projection)
-			projectionMatrix.SetElement(1, 1, 1.0 / (aspectRatio * halfHeight));
-			projectionMatrix.SetElement(2, 2, 1.0 / halfHeight);
-			projectionMatrix.SetElement(3, 3, 2.0 / (nearClip - farClip));
-			projectionMatrix.SetElement(3, 4, (nearClip + farClip) / (nearClip - farClip));
-			//ProjectionMatrix.SetElement(4, 3, -1.0);// Removing this line does not give you a true orthographic projection, but it is necessary for dollying
-			projectionMatrix.SetElement(4, 4, 1.0);
+			projectionMatrix.SetElement(0, 0, 1.0 / (aspectRatio * halfHeight));
+			projectionMatrix.SetElement(1, 1, 1.0 / halfHeight);
+			projectionMatrix.SetElement(2, 2, 2.0 / (nearClip - farClip));
+			projectionMatrix.SetElement(2, 3, (nearClip + farClip) / (nearClip - farClip));
+			//ProjectionMatrix.SetElement(3, 2, -1.0);// Removing this line does not give you a true orthographic projection, but it is necessary for dollying
+			projectionMatrix.SetElement(3, 3, 1.0);
 		}
 		else
 		{
 			// Set up the elements for the perspective projection matrix
-			projectionMatrix.SetElement(1, 1, nearClip / (aspectRatio * halfHeight));
-			projectionMatrix.SetElement(2, 2, nearClip / halfHeight);
-			projectionMatrix.SetElement(3, 3, (nearClip + farClip) / (nearClip - farClip));
-			projectionMatrix.SetElement(3, 4, 2.0 * farClip * nearClip / (nearClip - farClip));
-			projectionMatrix.SetElement(4, 3, -1.0);
+			projectionMatrix.SetElement(0, 0, nearClip / (aspectRatio * halfHeight));
+			projectionMatrix.SetElement(1, 1, nearClip / halfHeight);
+			projectionMatrix.SetElement(2, 2, (nearClip + farClip) / (nearClip - farClip));
+			projectionMatrix.SetElement(2, 3, 2.0 * farClip * nearClip / (nearClip - farClip));
+			projectionMatrix.SetElement(3, 2, -1.0);
 		}
 	}
 	else
 	{
 		// Set up an orthogonal 2D projection matrix (this puts (0,0) at the lower left-hand corner of the window)
-		projectionMatrix.SetElement(1, 1, 2.0 / GetSize().GetWidth());
-		projectionMatrix.SetElement(2, 2, 2.0 / GetSize().GetHeight());
-		projectionMatrix.SetElement(3, 3, -2.0);
-		projectionMatrix.SetElement(1, 4, -1.0);
-		projectionMatrix.SetElement(2, 4, -1.0);
-		projectionMatrix.SetElement(3, 4, -1.0);
-		projectionMatrix.SetElement(4, 4, 1.0);
+		projectionMatrix.SetElement(0, 0, 2.0 / GetSize().GetWidth());
+		projectionMatrix.SetElement(1, 1, 2.0 / GetSize().GetHeight());
+		projectionMatrix.SetElement(2, 2, -2.0);
+		projectionMatrix.SetElement(0, 3, -1.0);
+		projectionMatrix.SetElement(1, 3, -1.0);
+		projectionMatrix.SetElement(2, 3, -1.0);
+		projectionMatrix.SetElement(3, 3, 1.0);
 	}
-
-	// OpenGL matricies are "column-major" and ours are "row-major" which
-	// means a transposition is necessary before sending the matrix to openGL
-	projectionMatrix.Transpose();
 
 	// Assign the matrix
 	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixd(projectionMatrix.GetFirstElementPointer());
+
+	// Convert from double** to double* where rows are appended to create the single vector representing the matrix
+	double glMatrix[16];
+	ConvertMatrixToGL(projectionMatrix, glMatrix);
+	glLoadMatrixd(glMatrix);
 
 	// Reset the modified flag
 	modified = false;
@@ -962,16 +962,15 @@ void RenderWindow::SetCameraView(const VECTOR &position, const VECTOR &lookAt, c
 	if (!PlotMath::IsZero(S))
 	{
 		VECTOR U = S.Cross(F);
-		MATRIX modelViewMatrix(4, 4, S.X, S.Y, S.Z, 0.0,
+		Matrix modelViewMatrix(4, 4, S.X, S.Y, S.Z, 0.0,
 									 U.X, U.Y, U.Z, 0.0,
 									 -F.X, -F.Y, -F.Z, 0.0,
 									 0.0, 0.0, 0.0, 1.0);
 
-		// Transpose the matrix to make it column-major
-		modelViewMatrix.Transpose();
-
 		// Assign it to the open GL modelview matrix
-		glLoadMatrixd(modelViewMatrix.GetFirstElementPointer());
+		double glMatrix[16];
+		ConvertMatrixToGL(modelViewMatrix, glMatrix);
+		glLoadMatrixd(glMatrix);
 	}
 
 	// Apply the translation
@@ -1049,19 +1048,20 @@ VECTOR RenderWindow::TransformToModel(const VECTOR &viewVector) const
 //==========================================================================
 void RenderWindow::UpdateTransformationMatricies(void)
 {
-	MATRIX modelViewMatrix(4, 4);
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelViewMatrix.GetFirstElementPointer());
-	modelViewMatrix.Transpose();// For row-major to column-major
+	Matrix modelViewMatrix(4, 4);
+	double glMatrix[16];
+	glGetDoublev(GL_MODELVIEW_MATRIX, glMatrix);
+	ConvertGLToMatrix(modelViewMatrix, glMatrix);
 
 	// Extract the orientation matricies
-	(*modelToView) = modelViewMatrix.GetSubMatrix(1, 1, 3, 3);
+	(*modelToView) = modelViewMatrix.GetSubMatrix(0, 0, 3, 3);
 	(*viewToModel) = (*modelToView);
-	viewToModel->Transpose();
+	viewToModel->GetTranspose();
 
 	// Get the last column of the modelview matrix, which contains the translation information
-	cameraPosition.X = modelViewMatrix.GetElement(1, 4);
-	cameraPosition.Y = modelViewMatrix.GetElement(2, 4);
-	cameraPosition.Z = modelViewMatrix.GetElement(3, 4);
+	cameraPosition.X = modelViewMatrix.GetElement(0, 3);
+	cameraPosition.Y = modelViewMatrix.GetElement(1, 3);
+	cameraPosition.Z = modelViewMatrix.GetElement(2, 3);
 
 	// Transfrom the camera position into model coordinates
 	cameraPosition = TransformToModel(cameraPosition);
@@ -1290,6 +1290,65 @@ void RenderWindow::SortPrimitivesByAlpha(void)
 	// Clean up memory
 	delete [] Order;
 	Order = NULL;
+
+	return;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		ConvertMatrixToGL
+//
+// Description:		Converts from Matrix type to a row-appended vector that
+//					represents the matrix.  Converts to array as required by
+//					OpenGL.
+//
+// Input Argurments:
+//		matrix	= const Matrix& containing the original data
+//
+// Output Arguments:
+//		gl		= double[] in the form expected by OpenGL
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, double gl[])
+{
+	unsigned int i, j;
+	for (i = 0; i < matrix.GetNumberOfRows(); i++)
+	{
+		for (j = 0; j < matrix.GetNumberOfColumns(); j++)
+			gl[i * matrix.GetNumberOfColumns() + j] = matrix(j, i);
+	}
+
+	return;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		ConvertGLToMatrix
+//
+// Description:		Converts from OpenGL array to Matrix type.  Size of matrix
+//					must be set before this call.
+//
+// Input Argurments:
+//		gl		= double[] in the form expected by OpenGL
+//
+// Output Arguments:
+//		matrix	= const Matrix& containing the original data
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const double gl[])
+{
+	unsigned int i, j;
+	for (i = 0; i < matrix.GetNumberOfRows(); i++)
+	{
+		for (j = 0; j < matrix.GetNumberOfColumns(); j++)
+			matrix(j, i) = gl[i * matrix.GetNumberOfColumns() + j];
+	}
 
 	return;
 }

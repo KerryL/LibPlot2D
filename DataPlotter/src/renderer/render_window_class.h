@@ -138,8 +138,8 @@ private:
 	void UpdateTransformationMatricies(void);
 
 	// The transformation matricies
-	MATRIX *modelToView;
-	MATRIX *viewToModel;
+	Matrix *modelToView;
+	Matrix *viewToModel;
 
 	// The camera position
 	VECTOR cameraPosition;
@@ -169,6 +169,9 @@ protected:
 
 	// Flag indicating whether or not we should select a new focal point for the interactions
 	bool isInteracting;
+
+	static void ConvertMatrixToGL(const Matrix& matrix, double gl[]);
+	static void ConvertGLToMatrix(Matrix& matrix, const double gl[]);
 
 	// For the event table
 	DECLARE_EVENT_TABLE()

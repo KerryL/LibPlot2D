@@ -36,6 +36,9 @@
 #include "utilities/signals/rms.h"
 #include "utilities/signals/fft.h"
 #include "utilities/math/expression_tree_class.h"
+#include "utilities/signals/filters/low_pass_order1_class.h"
+#include "utilities/signals/filters/high_pass_order1_class.h"
+#include "utilities/signals/curve_fit.h"
 
 //==========================================================================
 // Class:			MainFrame
@@ -57,7 +60,6 @@
 MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPosition,
 								 wxDefaultSize, wxDEFAULT_FRAME_STYLE)
 {
-	CreateMenuBar();
 	DoLayout();
 	SetProperties();
 }
@@ -223,41 +225,6 @@ void MainFrame::SetProperties(void)
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		CreateMenuBar
-//
-// Description:		Creates the menu bar and all of the sub-menus.
-//
-// Input Argurments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::CreateMenuBar(void)
-{
-	menuBar = new wxMenuBar();
-
-	// File menu
-	wxMenu *mnuFile = new wxMenu();
-	mnuFile->Append(idMenuFileOpen, _T("&Open\tCtrl+O"), _T("Open saved files"), wxITEM_NORMAL);
-	mnuFile->Append(idMenuFileWriteImageFile, _T("&Write Image File\tCtrl+W"),
-		_T("Save window contents to image file"), wxITEM_NORMAL);
-	mnuFile->AppendSeparator();
-	mnuFile->Append(idMenuFileExit, _T("E&xit\tAlt+F4"), _T("Exit application"), wxITEM_NORMAL);
-	menuBar->Append(mnuFile, _T("&File"));
-
-	// Now make it official
-	SetMenuBar(menuBar);
-
-	return;
-}
-
-//==========================================================================
-// Class:			MainFrame
 // Function:		Event Table
 //
 // Description:		Links GUI events with event handler functions.
@@ -273,16 +240,8 @@ void MainFrame::CreateMenuBar(void)
 //
 //==========================================================================
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-	// Frame top level
-	EVT_CLOSE(MainFrame::WindowCloseEvent)
-
-	// Menu bar
-	EVT_MENU(idMenuFileOpen,						MainFrame::FileOpenEvent)
-	EVT_MENU(idMenuFileWriteImageFile,				MainFrame::FileWriteImageFileEvent)
-	EVT_MENU(idMenuFileExit,						MainFrame::FileExitEvent)
-
 	// Buttons
-	EVT_BUTTON(idButtonOpen,						MainFrame::FileOpenEvent)
+	EVT_BUTTON(idButtonOpen,						MainFrame::ButtonOpenClickedEvent)
 	EVT_BUTTON(idButtonAutoScale,					MainFrame::ButtonAutoScaleClickedEvent)
 	EVT_BUTTON(idButtonRemoveCurve,					MainFrame::ButtonRemoveCurveClickedEvent)
 
@@ -299,8 +258,14 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idContextPlotFFT,						MainFrame::ContextPlotFFTEvent)
 	EVT_MENU(idButtonRemoveCurve,					MainFrame::ButtonRemoveCurveClickedEvent)
 
+	EVT_MENU(idContextFilterLowPass,				MainFrame::ContextFilterLowPassEvent)
+	EVT_MENU(idContextFilterHighPass,				MainFrame::ContextFilterHighPassEvent)
+
+	EVT_MENU(idContextFitCurve,						MainFrame::ContextFitCurve)
+
 	EVT_MENU(idPlotContextToggleGridlines,			MainFrame::ContextToggleGridlines)
 	EVT_MENU(idPlotContextAutoScale,				MainFrame::ContextAutoScale)
+	EVT_MENU(idPlotContextWriteImageFile,			MainFrame::ContextWriteImageFile)
 
 	EVT_MENU(idPlotContextToggleBottomGridlines,	MainFrame::ContextToggleGridlinesBottom)
 	EVT_MENU(idPlotContextSetBottomRange,			MainFrame::ContextSetRangeBottom)
@@ -321,7 +286,7 @@ END_EVENT_TABLE();
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		FileOpenEvent
+// Function:		ButtonOpenClickedEvent
 //
 // Description:		Displays a dialog asking the user to specify the file to
 //					read from.
@@ -336,7 +301,7 @@ END_EVENT_TABLE();
 //		None
 //
 //==========================================================================
-void MainFrame::FileOpenEvent(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
 	// Set up the wildcard specifications
 	// (Done here for readability)
@@ -362,7 +327,7 @@ void MainFrame::FileOpenEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		FileWriteImageFileEvent
+// Function:		ContextWriteImageFile
 //
 // Description:		Calls the object of interest's write image file method.
 //
@@ -376,7 +341,7 @@ void MainFrame::FileOpenEvent(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void MainFrame::FileWriteImageFileEvent(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 {
 	// Get the file name to open from the user
 	wxArrayString pathAndFileName = GetFileNameFromUser(_T("Save Image File"), wxEmptyString, wxEmptyString,
@@ -389,93 +354,6 @@ void MainFrame::FileWriteImageFileEvent(wxCommandEvent& WXUNUSED(event))
 
 	// Call the object's write image file method
 	plotArea->WriteImageToFile(pathAndFileName[0]);
-
-	return;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		FileExitEvent
-//
-// Description:		Attempts to close this form.
-//
-// Input Argurments:
-//		event	= wxCommandEvent&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::FileExitEvent(wxCommandEvent& WXUNUSED(event))
-{
-	// Shut down this application
-	// User confirmation, etc. is handled by the CloseEvent method,
-	// which is called when the form tries to close.  If we put our own
-	// code here, the user is asked for confirmation twice.
-	Close(true);
-
-	return;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		HelpAboutEvent
-//
-// Description:		Displays an about message box with some information
-//					about the application.
-//
-// Input Argurments:
-//		event	= wxCommandEvent&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::HelpAboutEvent(wxCommandEvent& WXUNUSED(event))
-{
-	/*wxAboutDialogInfo AppInfo;
-
-	// Fill in the information
-	AppInfo.SetName();
-	AppInfo.SetVersion();
-	AppInfo.SetDescription(_T("\n\
-A work in progress...\n\
-This is an ... .  Please see the\n\
-readme.txt file for licensing and other information."));
-	AppInfo.SetCopyright(_T("(C) 2008-2010 Kerry Loux"));
-
-	// Display the information
-	wxAboutBox(AppInfo);*/
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		WindowCloseEvent
-//
-// Description:		Calls CloseThisForm and depending on whether or not the
-//					user confirms the close, it allows or prevents the form
-//					closing.
-//
-// Input Argurments:
-//		event	= &wxCloseEvent
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::WindowCloseEvent(wxCloseEvent& WXUNUSED(event))
-{
-	// Kill this window
-	Destroy();
 
 	return;
 }
@@ -571,6 +449,13 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
 		contextMenu->Append(idButtonRemoveCurve, _T("Remove Curve"));
+
+		wxMenu *filterMenu = new wxMenu();
+		filterMenu->Append(idContextFilterLowPass, _T("Low-Pass"));
+		filterMenu->Append(idContextFilterHighPass, _T("High-Pass"));
+		contextMenu->AppendSubMenu(filterMenu, _T("Filter"));
+
+		contextMenu->Append(idContextFitCurve, _T("Fit Curve"));
 	}
 
 	// Show the menu
@@ -631,6 +516,7 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 	case plotContextPlotArea:
 		contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
 		contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
+		contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
 		break;
 	}
 
@@ -1372,6 +1258,166 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
+
+	return;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextFilterLowPassEvent
+//
+// Description:		Adds a curve showing the filtered signal to the plot.
+//
+// Input Argurments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
+{
+	// Create new dataset containing the FFT of dataset and add it to the plot
+	unsigned int row = optionsGrid->GetSelectedRows()[0];
+	const Dataset2D *currentData = plotList[row - 1];
+	Dataset2D *newData = new Dataset2D(*currentData);
+
+	// Display a dialog asking for the cutoff frequency
+	wxString cutoffString = ::wxGetTextFromUser(_T("Specify the cutoff frequency in Hertz:"),
+		_T("Filter Cutoff Frequency"), _T("1.0"), this);
+	double cutoff;
+	if (!cutoffString.ToDouble(&cutoff))
+	{
+		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"));
+		return;
+	}
+
+	// Create the filter
+	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
+	// Multiply by 1000 in order to have Hz instead of kHz
+	//FIXME:  Only true for Baumuller data where time is in msec!
+	sampleRate *= 1000.0;
+	LowPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
+
+	// Apply the filter
+	unsigned int i;
+	for (i = 0; i < newData->GetNumberOfPoints(); i++)
+		newData->GetYPointer()[i] = filter.Apply(currentData->GetYData(i));
+
+	wxString name = cutoffString.Trim() + _T(" Hz low-pass(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+	AddCurve(newData, name);
+
+	return;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextFilterHighPassEvent
+//
+// Description:		Adds a curve showing the filtered signal to the plot.
+//
+// Input Argurments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
+{
+	// Create new dataset containing the FFT of dataset and add it to the plot
+	unsigned int row = optionsGrid->GetSelectedRows()[0];
+	const Dataset2D *currentData = plotList[row - 1];
+	Dataset2D *newData = new Dataset2D(*currentData);
+
+	// Display a dialog asking for the cutoff frequency
+	wxString cutoffString = ::wxGetTextFromUser(_T("Specify the cutoff frequency in Hertz:"),
+		_T("Filter Cutoff Frequency"), _T("1.0"), this);
+	double cutoff;
+	if (!cutoffString.ToDouble(&cutoff))
+	{
+		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"));
+		return;
+	}
+
+	// Create the filter
+	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
+	// Multiply by 1000 in order to have Hz instead of kHz
+	//FIXME:  Only true for Baumuller data where time is in msec!
+	sampleRate *= 1000.0;
+	HighPassFirstOrderFilter filter(cutoff, sampleRate);// High-pass, initialize to zero instead of first data value
+
+	// Apply the filter
+	unsigned int i;
+	for (i = 0; i < newData->GetNumberOfPoints(); i++)
+		newData->GetYPointer()[i] = filter.Apply(currentData->GetYData(i));
+
+	wxString name = cutoffString.Trim() + _T(" Hz high-pass(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+	AddCurve(newData, name);
+
+	return;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextFitCurve
+//
+// Description:		Fits a curve to the dataset selected in the grid control.
+//					User is asked to specify the order of the fit.
+//
+// Input Argurments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
+{
+	// Ask the user what order to use for the polynomial
+	unsigned long order;
+	wxString orderString = ::wxGetTextFromUser(_T("Specify the order of the polynomial fit:"),
+		_T("Polynomial Curve Fit"), _T("2"), this);
+
+	if (!orderString.ToULong(&order))
+	{
+		::wxMessageBox(_T("ERROR:  Order must be a positive integer!"), _T("Error Fitting Curve"));
+		return;
+	}
+
+	// Fit the data
+	unsigned int row = optionsGrid->GetSelectedRows()[0];
+	CurveFit::PolynomialFit fitData = CurveFit::DoPolynomialFit(*plotList[row - 1], order);
+
+	// Create a data set to draw the fit and add it to the plot
+	Dataset2D *newData = new Dataset2D(*plotList[row - 1]);
+	unsigned int i;
+	for (i = 0; i < newData->GetNumberOfPoints(); i++)
+		newData->GetYPointer()[i] = CurveFit::EvaluateFit(newData->GetXData(i), fitData);
+
+	wxString name;
+	name.Printf("Order %lu Fit([%i]), R^2 = %0.2f", order, row, fitData.rSquared);
+	AddCurve(newData, name);
+
+	wxString t,v;
+	for (i = 0; i < order + 1; i++)
+	{
+		v.Printf("%f", fitData.coefficients[i]);
+		t.Append(v + _T("\n"));
+	}
+	// FIXME: Temporary
+
+	// Free the coefficient data
+	delete [] fitData.coefficients;
 
 	return;
 }
