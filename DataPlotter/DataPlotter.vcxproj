@@ -61,6 +61,9 @@
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_dll;$(FTGL)\msvc\Build;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>wxbase28d.lib;wxmsw28d_adv.lib;wxbase28d_xml.lib;wxmsw28d_core.lib;wxmsw28d_gl.lib;wxzlibd.lib;opengl32.lib;ftgl_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -81,6 +84,9 @@
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_lib;$(FREETYPE)\objs\win32\vc2008;$(FTGL)\msvc\Build</AdditionalLibraryDirectories>
       <AdditionalDependencies>wxbase28.lib;wxmsw28_adv.lib;wxbase28_xml.lib;wxmsw28_core.lib;wxmsw28_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;freetype244MT.lib;ftgl.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\application\drop_target_class.h" />
@@ -145,6 +151,9 @@
     <ClCompile Include="src\utilities\signals\filters\low_pass_order2_class.cpp" />
     <ClCompile Include="src\utilities\signals\integral.cpp" />
     <ClCompile Include="src\utilities\signals\rms.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\DataPlotter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

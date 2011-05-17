@@ -30,6 +30,30 @@
 // Class:			Matrix
 // Function:		Matrix
 //
+// Description:		Constructor for the Matrix class.  Does not allocate any
+//					memory.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Matrix::Matrix()
+{
+	rows = 0;
+	columns = 0;
+	elements = NULL;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		Matrix
+//
 // Description:		Constructor for the Matrix class.  Allocates memory for
 //					a matix of the specified size.
 //
@@ -265,20 +289,13 @@ double Matrix::GetElement(const int &row, const int &column) const
 //==========================================================================
 Matrix& Matrix::MakeIdentity(void)
 {
-	// Determine the smaller dimension
-	int minDimension;
-	if (rows < columns)
-		minDimension = rows;
-	else
-		minDimension = columns;
-
 	// Set everything to zero
 	Zero();
 
 	// Make the diagonal elements 1.0
-	int i;
-	for (i = 0; i < minDimension; i++)
-		SetElement(i, i, 1.0);
+	unsigned int i;
+	for (i = 0; i < GetMinimumDimension(); i++)
+		elements[i][i] = 1.0;
 
 	return *this;
 }
@@ -402,7 +419,31 @@ Matrix Matrix::GetTranspose(void) const
 //==========================================================================
 Matrix Matrix::LeftDivide(const Matrix &b) const
 {
-	return GetInverse() * b;
+	// Normal equations solution (not very robust?)
+	//return GetInverse() * b;
+
+	// Use singular value decomposition
+	Matrix U;
+	Matrix V;
+	Matrix W;
+
+	if (!GetSingularValueDecomposition(U, V, W))
+	{
+		// FIXME:  Generate an error?
+		return *this;
+	}
+
+	// Invert the components of W along the diagonal, or leave them alone if equal to zero
+	unsigned int i;
+	for (i = 0; i < W.GetMinimumDimension(); i++)
+	{
+		if (!PlotMath::IsZero(W.elements[i][i]))
+			W.elements[i][i] = 1.0 / W.elements[i][i];
+		else
+			W.elements[i][i] = 0.0;
+	}
+
+	return V * W.GetTranspose() * U.GetTranspose() * b;
 }
 
 //==========================================================================
@@ -499,13 +540,7 @@ Matrix& Matrix::operator = (const Matrix &target)
 	if (this == &target)
 		return *this;
 
-	FreeElements();
-
-	// Make sure the row and column dimensions are correct
-	rows = target.rows;
-	columns = target.columns;
-
-	AllocateElements();
+	Resize(target.rows, target.columns);
 
 	// Now assign the elements one by one
 	unsigned int i, j;
@@ -701,16 +736,10 @@ wxString Matrix::Print(void) const
 Matrix Matrix::GetRowReduced(void) const
 {
 	unsigned int curCol, curRow, pivotCol(0), pivotRow;
-	unsigned int minDimension;
 	double factor;
 	Matrix reduced(*this);
 
-	if (rows < columns)
-		minDimension = rows;
-	else
-		minDimension = columns;
-
-	for (pivotRow = 0; pivotRow < minDimension; pivotRow++)
+	for (pivotRow = 0; pivotRow < GetMinimumDimension(); pivotRow++)
 	{
 		// Make sure the pivot is non-zero
 		// If it is zero, move the row to the bottom and start over
@@ -989,7 +1018,7 @@ const double &Matrix::operator () (const unsigned int &row, const unsigned int &
 //==========================================================================
 Matrix Matrix::GetInverse(void) const
 {
-	if (rows != columns || GetRank() != rows)
+	if (!IsSquare() || GetRank() != rows)
 		return GetPsuedoInverse();
 
 	// FIXME:  Calculate the real inverse!
@@ -1016,346 +1045,19 @@ Matrix Matrix::GetPsuedoInverse(void) const
 {
 	// Use singular value decomposition to compute the inverse
 	// SVD algorithm interpreted from Numerical Recipies in C
-	Matrix U(rows, columns);
-	Matrix W(columns, columns);
-	Matrix V(columns, columns);
+	Matrix U;
+	Matrix W;
+	Matrix V;
 
-	// Copy target to U
-	int i, j;
-	for (i = 0; i < (int)U.rows; i++)
+	if (!GetSingularValueDecomposition(U, V, W))
 	{
-		for (j = 0; j < (int)U.columns; j++)
-			U.elements[i][j] = elements[i][j];
+		// FIXME:  Generate an error?
+		return *this;
 	}
-
-	// Reduce to bidiagonal form
-	int its, jj, k, l, nm;
-	double *rv1 = new double[U.columns];// FIXME:  clean up memory here
-	double anorm, c, f, g, h, s, scale, x, y, z;
-	anorm = 0.0;
-	g = 0.0;
-	scale = 0.0;
-	for (i = 0; i < (int)U.columns; i++)
-	{
-		l = i + 2;
-		rv1[i] = scale * g;
-		g = 0.0;
-		scale = 0.0;
-		s = 0.0;
-		if (i < (int)U.rows)
-		{
-			for (k = i; k < (int)U.rows; k++)
-				scale += fabs(U.elements[k][i]);
-
-			if (scale != 0.0)
-			{
-				for (k = i; k < (int)U.rows; k++)
-				{
-					U.elements[k][i] /= scale;
-					s += U.elements[k][i] * U.elements[k][i];
-				}
-
-				f = U.elements[i][i];
-				if (f >= 0.0)
-					g = -sqrt(s);
-				else
-					g = sqrt(s);
-
-				h = f * g - s;
-				U.elements[i][i] = f - g;
-
-				for (j = l - 1; j < (int)U.columns; j++)
-				{
-					s = 0.0;
-					for (k = i; k < (int)U.rows; k++)
-						s += U.elements[k][i] * U.elements[k][j];
-					f = s / h;
-					for (k = i; k < (int)U.rows; k++)
-						U.elements[k][j] += f * U.elements[k][i];
-				}
-				for (k = i; k < (int)U.rows; k++)
-					U.elements[k][i] *= scale;
-			}
-		}
-
-		W.elements[i][i] = scale * g;
-		g = 0.0;
-		s = 0.0;
-		scale = 0.0;
-
-		if (i < (int)U.rows && i != (int)U.columns - 1)
-		{
-			for (k = l - 1; k < (int)U.columns; k++)
-				scale += fabs(U.elements[i][k]);
-
-			if (scale != 0.0)
-			{
-				for (k = l - 1; k < (int)U.columns; k++)
-				{
-					U.elements[i][k] /= scale;
-					s += U.elements[i][k] * U.elements[i][k];
-				}
-
-				f = U.elements[i][l - 1];
-				if (f >= 0.0)
-					g = -sqrt(s);
-				else
-					g =sqrt(s);
-
-				h = f * g - s;
-				U.elements[i][l - 1] = f - g;
-                    
-				for (k = l - 1; k < (int)U.columns; k++)
-					rv1[k] = U.elements[i][k] / h;
-
-				for (j = l - 1; j < (int)U.rows; j++)
-				{
-					s = 0.0;
-					for (k = l - 1; k < (int)U.columns; k++)
-						s += U.elements[j][k] * U.elements[i][k];
-					for (k = l - 1; k < (int)U.columns; k++)
-						U.elements[j][k] += s * rv1[k];
-				}
-
-				for (k = l - 1; k < (int)U.columns; k++)
-					U.elements[i][k] *= scale;
-			}
-		}
-
-		if (anorm < fabs((W.elements[i][i]) + fabs(rv1[i])))
-			anorm = fabs(W.elements[i][i]) + fabs(rv1[i]);
-	}
-
-	// Accumulation of right-hand transforms
-	l = 0;// This value isn't used, but it avoids a java compiler warning
-	for (i = U.columns - 1; i >= 0; i--)
-	{
-		if (i < (int)U.columns - 1)
-		{
-			if (g != 0.0)
-			{
-				for (j = l; j < (int)U.columns; j++)
-					V.elements[j][i] =
-							(U.elements[i][j] / U.elements[i][l])
-							/ g;
-
-				for (j = l; j < (int)U.columns; j++)
-				{
-					s = 0.0;
-					for (k = l; k < (int)U.columns; k++)
-						s += U.elements[i][k] * V.elements[k][j];
-
-					for (k = l; k < (int)U.columns; k++)
-						V.elements[k][j] += s * V.elements[k][i];
-				}
-			}
-
-			for (j = l; j < (int)U.columns; j++)
-			{
-				V.elements[i][j] = 0.0;
-				V.elements[j][i] = 0.0;
-			}
-		}
-		V.elements[i][i] = 1.0;
-		g = rv1[i];
-		l = i;
-	}
-
-	// Accumulation of left-hand transforms
-	int minDimension;
-	if (U.rows < U.columns)
-		minDimension = U.rows;
-	else
-		minDimension = U.columns;
-	for (i = minDimension - 1; i >= 0; i--)
-	{
-		l = i + 1;
-		g = W.elements[i][i];
-		for (j = l; j < (int)U.columns; j++)
-			U.elements[i][j] = 0.0;
-
-		if (g != 0.0)
-		{
-			g = 1.0 / g;
-			for (j = l; j < (int)U.columns; j++)
-			{
-				s = 0.0;
-				for (k = l; k < (int)U.rows; k++)
-					s += U.elements[k][i] * U.elements[k][j];
-
-				f = (s / U.elements[i][i]) * g;
-
-				for (k = i; k < (int)U.rows; k++)
-					U.elements[k][j] += f * U.elements[k][i];
-			}
-
-			for (j = i; j < (int)U.rows; j++)
-				U.elements[j][i] *= g;
-		}
-		else
-		{
-			for (j = i; j < (int)U.rows; j++)
-				U.elements[j][i] = 0.0;
-		}
-		U.elements[i][i]++;
-	}
-
-	// Diagonalization of the bidiagonal form
-	bool finished;
-	double eps = 1e-6;
-	for (k = U.columns - 1; k >= 0; k--)
-	{
-		for (its = 0; its < 30; its++)
-		{
-			finished = false;
-			nm = 0;// This value isn't used, but it avoids compiler warnings
-			for (l = k; l >= 0; l--)
-			{
-				nm = l - 1;
-				if (l == 0 || fabs(rv1[l]) <= eps * anorm)
-				{
-					finished = true;
-					break;
-				}
-
-				if (fabs(W.elements[nm][nm]) <= eps * anorm)
-					break;
-			}
-
-			if (!finished)
-			{
-				c = 0.0;
-				s = 1.0;
-				for (i = l; i <= k; i++)
-				{
-					f = s * rv1[i];
-					rv1[i] = c * rv1[i];
-
-					if (fabs(f) <= eps * anorm)
-						break;
-
-					g = W.elements[i][i];
-					h = pythag(f, g);
-					W.elements[i][i] = h;
-					h = 1.0 / h;
-					c = g * h;
-					s = -f * h;
-					for (j = 0; j < (int)U.rows; j++)
-					{
-						y = U.elements[j][nm];
-						z = U.elements[j][i];
-						U.elements[j][nm] = y * c + z * s;
-						U.elements[j][i] = z * c - y * s;
-					}
-				}
-			}
-
-			z = W.elements[k][k];
-			if (l == k)
-			{
-				if (z < 0.0)
-				{
-					W.elements[k][k] = -z;
-					for (j = 0; j < (int)U.columns; j++)
-						V.elements[j][k] = -V.elements[j][k];
-				}
-				break;
-			}
-
-			// Print an error if we've hit the iteration limit
-			if (its == 29)
-			{
-				// FIXME:  Print error message?
-			}
-
-			x = W.elements[l][l];
-			nm = k - 1;
-			y = W.elements[nm][nm];
-			g = rv1[nm];
-			h = rv1[k];
-			f = ((y-z) * (y+z) + (g-h) * (g+h)) / (2.0 * h * y);
-			g = pythag(f, 1.0);
-			if (f >= 0.0)
-				f = ((x-z) * (x+z) + h * ((y / (f + fabs(g))) - h)) / x;
-			else
-				f = ((x-z) * (x+z) + h * ((y / (f - fabs(g))) - h)) / x;
-
-			c = 1.0;
-			s = 1.0;
-			for (j = l; j <= nm; j++)
-			{
-				i = j + 1;
-				g = rv1[i];
-				y = W.elements[i][i];
-				h = s * g;
-				g = c * g;
-				z = pythag(f,h);
-				rv1[j] = z;
-				c = f / z;
-				s = h / z;
-				f = x * c + g * s;
-				g = g * c - x * s;
-				h = y * s;
-				y *= c;
-
-				for (jj = 0; jj < (int)U.columns; jj++)
-				{
-					x = V.elements[jj][j];
-					z = V.elements[jj][i];
-					V.elements[jj][j] = x * c + z * s;
-					V.elements[jj][i] = z * c - x * s;
-				}
-
-				z = pythag(f, h);
-				W.elements[j][j] = z;
-
-				if (z != 0.0)
-				{
-					z = 1.0 / z;
-					c = f * z;
-					s = h * z;
-				}
-
-				f = c * g + s * y;
-				x = c * y - s * g;
-
-				for (jj = 0; jj < (int)U.rows; jj++)
-				{
-					y = U.elements[jj][j];
-					z = U.elements[jj][i];
-					U.elements[jj][j] = y * c + z * s;
-					U.elements[jj][i] = z * c - y * s;
-				}
-			}
-
-			rv1[l] = 0.0;
-			rv1[k] = f;
-			W.elements[k][k] = x;
-		}
-	}
-
-	// Remove zero-value singular values and the corresponding columns and
-	// rows from the U and V matrices
-	// Without this, the results are close, but this makes them much better
-	for (i = 0; i < (int)W.columns; i++)
-	{
-		// No need to use Math.abs - we've already ensured positive values
-		if (PlotMath::IsZero(W.elements[i][i]))
-		{
-			W.elements[i][i] = 1.0;
-			U.elements[i][i] = 0.0;
-			V.elements[i][i] = 0.0;
-		}
-	}
-
-	// Some testing aids
-	/*Matrix IfromU = U.GetTranspose() * U;
-	Matrix IfromV = V.GetTranspose() * V;
-	Matrix IfromV2 = V * V.GetTranspose();
-	Matrix originalAgain = U * W * V.GetTranspose();*/
 
 	// Invert the components of W along the diagonal
-	for (i = 0; i < (int)W.columns; i++)
+	unsigned int i;
+	for (i = 0; i < W.columns; i++)
 		W.elements[i][i] = 1.0 / W.elements[i][i];
 
 	return V * W * U.GetTranspose();
@@ -1479,4 +1181,569 @@ void Matrix::AllocateElements(void)
 		elements[i] = new double[columns];
 
 	return;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		Resize
+//
+// Description:		Resizes the dynamic memory for this object to accommodate
+//					the specified size.
+//
+// Input Argurments:
+//		_rows		= const unsigned int& specifying new vertical dimension
+//		_columns	= const unsigned int& specifying new horizontal dimension
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Matrix::Resize(const unsigned int &_rows, const unsigned int &_columns)
+{
+	FreeElements();
+
+	rows = _rows;
+	columns = _columns;
+
+	AllocateElements();
+
+	return;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		GetSingularValueDecomposition
+//
+// Description:		Computes singular value decomposition of this matrix.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		U	= Matrix&
+//		V	= Matrix&
+//		W	= Matrix& containing the singular values along its diagonal
+//
+// Return Value:
+//		true if success, false if iteration limit was reached
+//
+//==========================================================================
+bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) const
+{
+	// SVD algorithm interpreted from Numerical Recipies in C
+	//U.Resize(rows, columns);
+	//W.Resize(columns, columns);
+	U.Resize(rows, columns);
+	W.Resize(columns, columns);
+	W.Zero();
+	V.Resize(columns, columns);
+
+	// Copy target to U
+	int i, j;
+	for (i = 0; i < (int)U.rows; i++)
+	{
+		for (j = 0; j < (int)V.rows; j++)
+			U.elements[i][j] = elements[i][j];
+	}
+
+	// Reduce to bidiagonal form
+	int its, jj, k, l(0), nm(0);
+	double *rv1 = new double[V.rows];
+	double anorm, c, f, g, h, s, scale, x, y, z;
+	anorm = 0.0;
+	g = 0.0;
+	scale = 0.0;
+	for (i = 0; i < (int)V.rows; i++)
+	{
+		l = i + 2;
+		rv1[i] = scale * g;
+		g = 0.0;
+		scale = 0.0;
+		s = 0.0;
+		if (i < (int)U.rows)
+		{
+			for (k = i; k < (int)U.rows; k++)
+				scale += fabs(U.elements[k][i]);
+
+			if (scale != 0.0)
+			{
+				for (k = i; k < (int)U.rows; k++)
+				{
+					U.elements[k][i] /= scale;
+					s += U.elements[k][i] * U.elements[k][i];
+				}
+
+				f = U.elements[i][i];
+				if (f >= 0.0)
+					g = -sqrt(s);
+				else
+					g = sqrt(s);
+
+				h = f * g - s;
+				U.elements[i][i] = f - g;
+
+				for (j = l - 1; j < (int)V.rows; j++)
+				{
+					s = 0.0;
+					for (k = i; k < (int)U.rows; k++)
+						s += U.elements[k][i] * U.elements[k][j];
+					f = s / h;
+					for (k = i; k < (int)U.rows; k++)
+						U.elements[k][j] += f * U.elements[k][i];
+				}
+				for (k = i; k < (int)U.rows; k++)
+					U.elements[k][i] *= scale;
+			}
+		}
+
+		W.elements[i][i] = scale * g;
+		g = 0.0;
+		s = 0.0;
+		scale = 0.0;
+
+		if (i < (int)U.rows && i != (int)V.rows - 1)
+		{
+			for (k = l - 1; k < (int)V.rows; k++)
+				scale += fabs(U.elements[i][k]);
+
+			if (scale != 0.0)
+			{
+				for (k = l - 1; k < (int)V.rows; k++)
+				{
+					U.elements[i][k] /= scale;
+					s += U.elements[i][k] * U.elements[i][k];
+				}
+
+				f = U.elements[i][l - 1];
+				if (f >= 0.0)
+					g = -sqrt(s);
+				else
+					g =sqrt(s);
+
+				h = f * g - s;
+				U.elements[i][l - 1] = f - g;
+                    
+				for (k = l - 1; k < (int)V.rows; k++)
+					rv1[k] = U.elements[i][k] / h;
+
+				for (j = l - 1; j < (int)U.rows; j++)
+				{
+					s = 0.0;
+					for (k = l - 1; k < (int)V.rows; k++)
+						s += U.elements[j][k] * U.elements[i][k];
+					for (k = l - 1; k < (int)V.rows; k++)
+						U.elements[j][k] += s * rv1[k];
+				}
+
+				for (k = l - 1; k < (int)V.rows; k++)
+					U.elements[i][k] *= scale;
+			}
+		}
+
+		if (anorm < fabs((W.elements[i][i]) + fabs(rv1[i])))
+			anorm = fabs(W.elements[i][i]) + fabs(rv1[i]);
+	}
+
+	// Accumulation of right-hand transforms
+	for (i = V.rows - 1; i >= 0; i--)
+	{
+		if (i < (int)V.rows - 1)
+		{
+			if (g != 0.0)
+			{
+				for (j = l; j < (int)V.rows; j++)
+					V.elements[j][i] =
+							(U.elements[i][j] / U.elements[i][l])
+							/ g;
+
+				for (j = l; j < (int)V.rows; j++)
+				{
+					s = 0.0;
+					for (k = l; k < (int)V.rows; k++)
+						s += U.elements[i][k] * V.elements[k][j];
+
+					for (k = l; k < (int)V.rows; k++)
+						V.elements[k][j] += s * V.elements[k][i];
+				}
+			}
+
+			for (j = l; j < (int)V.rows; j++)
+			{
+				V.elements[i][j] = 0.0;
+				V.elements[j][i] = 0.0;
+			}
+		}
+		V.elements[i][i] = 1.0;
+		g = rv1[i];
+		l = i;
+	}
+
+	// Accumulation of left-hand transforms
+	for (i = GetMinimumDimension() - 1; i >= 0; i--)
+	{
+		l = i + 1;
+		g = W.elements[i][i];
+		for (j = l; j < (int)V.rows; j++)
+			U.elements[i][j] = 0.0;
+
+		if (g != 0.0)
+		{
+			g = 1.0 / g;
+			for (j = l; j < (int)V.rows; j++)
+			{
+				s = 0.0;
+				for (k = l; k < (int)U.rows; k++)
+					s += U.elements[k][i] * U.elements[k][j];
+
+				f = (s / U.elements[i][i]) * g;
+
+				for (k = i; k < (int)U.rows; k++)
+					U.elements[k][j] += f * U.elements[k][i];
+			}
+
+			for (j = i; j < (int)U.rows; j++)
+				U.elements[j][i] *= g;
+		}
+		else
+		{
+			for (j = i; j < (int)U.rows; j++)
+				U.elements[j][i] = 0.0;
+		}
+		U.elements[i][i]++;
+	}
+
+	// Diagonalization of the bidiagonal form
+	bool finished;
+	double eps = 1e-6;
+	int its_limit = 30;
+	for (k = V.rows - 1; k >= 0; k--)
+	{
+		for (its = 0; its < its_limit; its++)
+		{
+			finished = false;
+			for (l = k; l >= 0; l--)
+			{
+				nm = l - 1;
+				if (l == 0 || fabs(rv1[l]) <= eps * anorm)
+				{
+					finished = true;
+					break;
+				}
+
+				if (fabs(W.elements[nm][nm]) <= eps * anorm)
+					break;
+			}
+
+			if (!finished)
+			{
+				c = 0.0;
+				s = 1.0;
+				for (i = l; i <= k; i++)
+				{
+					f = s * rv1[i];
+					rv1[i] = c * rv1[i];
+
+					if (fabs(f) <= eps * anorm)
+						break;
+
+					g = W.elements[i][i];
+					h = pythag(f, g);
+					W.elements[i][i] = h;
+					h = 1.0 / h;
+					c = g * h;
+					s = -f * h;
+					for (j = 0; j < (int)U.rows; j++)
+					{
+						y = U.elements[j][nm];
+						z = U.elements[j][i];
+						U.elements[j][nm] = y * c + z * s;
+						U.elements[j][i] = z * c - y * s;
+					}
+				}
+			}
+
+			z = W.elements[k][k];
+			if (l == k)
+			{
+				if (z < 0.0)
+				{
+					W.elements[k][k] = -z;
+					for (j = 0; j < (int)V.rows; j++)
+						V.elements[j][k] = -V.elements[j][k];
+				}
+				break;
+			}
+
+			// Print an error if we've hit the iteration limit
+			if (its == its_limit - 1)
+				return false;
+
+			x = W.elements[l][l];
+			nm = k - 1;
+			y = W.elements[nm][nm];
+			g = rv1[nm];
+			h = rv1[k];
+			f = ((y-z) * (y+z) + (g-h) * (g+h)) / (2.0 * h * y);
+			g = pythag(f, 1.0);
+			if (f >= 0.0)
+				f = ((x-z) * (x+z) + h * ((y / (f + fabs(g))) - h)) / x;
+			else
+				f = ((x-z) * (x+z) + h * ((y / (f - fabs(g))) - h)) / x;
+
+			c = 1.0;
+			s = 1.0;
+			for (j = l; j <= nm; j++)
+			{
+				i = j + 1;
+				g = rv1[i];
+				y = W.elements[i][i];
+				h = s * g;
+				g = c * g;
+				z = pythag(f,h);
+				rv1[j] = z;
+				c = f / z;
+				s = h / z;
+				f = x * c + g * s;
+				g = g * c - x * s;
+				h = y * s;
+				y *= c;
+
+				for (jj = 0; jj < (int)V.rows; jj++)
+				{
+					x = V.elements[jj][j];
+					z = V.elements[jj][i];
+					V.elements[jj][j] = x * c + z * s;
+					V.elements[jj][i] = z * c - x * s;
+				}
+
+				z = pythag(f, h);
+				W.elements[j][j] = z;
+
+				if (z != 0.0)
+				{
+					z = 1.0 / z;
+					c = f * z;
+					s = h * z;
+				}
+
+				f = c * g + s * y;
+				x = c * y - s * g;
+
+				for (jj = 0; jj < (int)U.rows; jj++)
+				{
+					y = U.elements[jj][j];
+					z = U.elements[jj][i];
+					U.elements[jj][j] = y * c + z * s;
+					U.elements[jj][i] = z * c - y * s;
+				}
+			}
+
+			rv1[l] = 0.0;
+			rv1[k] = f;
+			W.elements[k][k] = x;
+		}
+	}
+
+	delete [] rv1;
+
+	// Remove zero-value singular values and the corresponding columns and
+	// rows from the U and V matrices
+	// Without this, the results are close, but this makes them much better
+	for (i = 0; i < (int)GetMinimumDimension(); i++)
+	{
+		// No need to use Math.abs - we've already ensured positive values
+		if (PlotMath::IsZero(W.elements[i][i]))
+		{
+			W.elements[i][i] = 0.0;
+			U.elements[i][i] = 0.0;
+		}
+	}
+
+	// Sort singular values (and corresponding columns of U and V) by decreasing magnitude
+	its = 1;
+	double sw;
+	double *su = new double[U.rows];
+	double *sv = new double[V.rows];
+
+	do
+	{
+		its *= 3;
+		its++;
+	} while (its <= (int)V.rows);
+
+	do
+	{
+		its /= 3;
+		for (i = its; i < (int)V.rows; i++)
+		{
+			sw = W.elements[i][i];
+			for (k = 0; k < (int)U.rows; k++)
+				su[k] = U.elements[k][i];
+
+			for (k = 0; k < (int)V.rows; k++)
+				sv[k] = V.elements[k][i];
+
+			j = i;
+			while (W.elements[j - its][j - its] < sw)
+			{
+				W.elements[j][j] = W.elements[j - its][j - its];
+				for (k = 0; k < (int)U.rows; k++)
+					U.elements[k][j] = U.elements[k][j - its];
+
+				for (k = 0; k < (int)V.rows; k++)
+					V.elements[k][j] = V.elements[k][j - its];
+
+				j -= its;
+				if (j < its)
+					break;
+			}
+
+			W.elements[j][j] = sw;
+
+			for (k = 0; k < (int)U.rows; k++)
+				U.elements[k][j] = su[k];
+
+			for (k = 0; k < (int)V.rows; k++)
+				V.elements[k][j] = sv[k];
+		}
+	} while (its > 1);
+
+	for (k = 0; k < (int)V.rows; k++)
+	{
+		s = 0.0;
+		for (i = 0; i < (int)U.rows; i++)
+		{
+			if (U.elements[i][k] < 0.0)
+				s++;
+		}
+
+		for (j = 0; j < (int)V.rows; j++)
+		{
+			if (V.elements[j][k] < 0.0)
+				s++;
+		}
+
+		if (s > (U.rows + V.rows) / 2)
+		{
+			for (i = 0; i < (int)U.rows; i++)
+				U.elements[i][k] = -U.elements[i][k];
+
+			for (j = 0; j < (int)V.rows; j++)
+				V.elements[j][k] = -V.elements[j][k];
+		}
+	}
+
+	delete [] su;
+	delete [] sv;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		RemoveRow
+//
+// Description:		Removes the specified row from the matrix
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		row	= const unsigned int& specifying the row to remove
+//
+// Return Value:
+//		Matrix&, reference to this
+//
+//==========================================================================
+Matrix& Matrix::RemoveRow(const unsigned int &row)
+{
+	assert(row < rows);
+
+	Matrix original(*this);
+	Resize(rows - 1, columns);
+
+	unsigned int i, j;
+	for (i = 0; i < rows; i++)
+	{
+		for (j = 0; j < columns; j++)
+		{
+			if (i < row)
+				elements[i][j] = original.elements[i][j];
+			else
+				elements[i][j] = original.elements[i + 1][j];
+		}
+	}
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		RemoveColumn
+//
+// Description:		Removes the specified column from the matrix.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		column	= const unsigned int& specifying the column to remove
+//
+// Return Value:
+//		Matrix&, reference to this
+//
+//==========================================================================
+Matrix& Matrix::RemoveColumn(const unsigned int &column)
+{
+	assert(column < columns);
+
+	Matrix original(*this);
+	Resize(rows, columns - 1);
+
+	unsigned int i, j;
+	for (i = 0; i < rows; i++)
+	{
+		for (j = 0; j < columns; j++)
+		{
+			if (j < column)
+				elements[i][j] = original.elements[i][j];
+			else
+				elements[i][j] = original.elements[i][j + 1];
+		}
+	}
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		GetIdentity
+//
+// Description:		Returns an identity matrix of the specified dimension.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		_rows	= const unsigned int& specifying the number of rows
+//		_column	= const unsigned int& specifying the number of columns; zero
+//				  is interpreted as square (set equal to _rows)
+//
+// Return Value:
+//		Matrix containing 1s along diagonal and zeros elsewhere
+//
+//==========================================================================
+Matrix Matrix::GetIdentity(const unsigned int &_rows, const unsigned int &_columns)
+{
+	Matrix identity;
+
+	if (_columns == 0)
+		identity.Resize(_rows, _rows);
+	else
+		identity.Resize(_rows, _columns);
+
+	return identity.MakeIdentity();
 }

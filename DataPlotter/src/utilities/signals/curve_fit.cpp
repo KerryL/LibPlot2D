@@ -49,19 +49,21 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 	fit.coefficients = new double[order + 1];
 	fit.order = order;
 
+	// Create the matrix and vector we need (we're solving the matrix equation Ax = b)
 	Matrix A(data.GetNumberOfPoints(), order + 1);
 	Matrix b(data.GetNumberOfPoints(), 1);
 	unsigned int i, j;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
 	{
-		for (j = 0; j <= order; j++)
-			A(i,j) = pow(data.GetXData(i), (int)j);
 		b(i,0) = data.GetYData(i);
+		A(i,0) = 1.0;
+		for (j = 0; j < order; j++)
+			A(i,j+1) = data.GetXData(i) * A(i,j);
 	}
 
-	Matrix coefficients((A.GetTranspose() * A).LeftDivide(A.GetTranspose() * b));
+	Matrix coefficients(A.LeftDivide(b));
 
-	assert(coefficients.GetNumberOfColumns() == 1 && coefficients.GetNumberOfRows() == order + 1);
+	// Assign the coefficients to our PolynomialFit data
 	for (i = 0; i <= order; i++)
 		fit.coefficients[i] = coefficients(i,0);
 

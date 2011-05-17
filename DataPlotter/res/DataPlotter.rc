@@ -1,0 +1,23 @@
+/*===================================================================================
+                                    DataPlotter
+                           Copyright Kerry R. Loux 2011
+
+     No requirement for distribution of wxWidgets libraries, source, or binaries.
+                             (http://www.wxwidgets.org/)
+
+===================================================================================*/
+
+// File:  DataPlotter.rc
+// Created:  5/17/2011
+// Author:  K. Loux
+// Description:  Defines all of the resources for the application (icons, graphics, etc.)
+// History:
+
+// Main application icon (MUST be first alphabetically)
+ICON_ID_MAIN			ICON		"res\\icons\\plots.ico"
+
+// wxWidgets definitions
+#define wxUSE_NO_MANIFEST 1
+
+// wxWidgets resource files (MUST come at the end of the list)
+#include <wx\msw\wx.rc>

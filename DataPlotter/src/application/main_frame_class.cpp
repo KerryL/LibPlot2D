@@ -212,10 +212,10 @@ void MainFrame::SetProperties(void)
 	Center();
 
 	// Add the icon
-/*#ifdef __WXMSW__
+#ifdef __WXMSW__
     SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE, 16, 16));
-#endif*/
-	// FIXME:  Create Icons
+#endif
+	// FIXME:  Linux icons
 
 	// Allow draging-and-dropping of files onto this window to open them
 	SetDropTarget(dynamic_cast<wxDropTarget*>(new DropTarget(*this)));
@@ -856,7 +856,7 @@ void MainFrame::AddCurve(wxString mathString)
 	}
 
 	// Then, add the new dataset to the plot
-	AddCurve(mathChannel, mathString);// FIXME:  Get better name from user
+	AddCurve(mathChannel, mathString.Upper());// FIXME:  Get better name from user
 
 	return;
 }
@@ -890,6 +890,7 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	if (optionsGrid->GetNumberRows() == 0)
 	{
 		optionsGrid->AppendRows();
+		// FIXME:  This is only true for Baumuller datasets
 		optionsGrid->SetCellValue(0, colName, _T("Time [msec]"));
 
 		for (i = 0; i < colCount; i++)
@@ -1404,17 +1405,29 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 	for (i = 0; i < newData->GetNumberOfPoints(); i++)
 		newData->GetYPointer()[i] = CurveFit::EvaluateFit(newData->GetXData(i), fitData);
 
-	wxString name;
-	name.Printf("Order %lu Fit([%i]), R^2 = %0.2f", order, row, fitData.rSquared);
-	AddCurve(newData, name);
-
-	wxString t,v;
-	for (i = 0; i < order + 1; i++)
+	// Create discriptive string to use as the name
+	wxString name, termString;
+	//name.Printf("Order %lu Fit([%i]), R^2 = %0.2f", order, row, fitData.rSquared);
+	name.Printf("Fit [%i] (R^2 = %0.2f): ", row, fitData.rSquared);
+	for (i = 0; i <= order; i++)
 	{
-		v.Printf("%f", fitData.coefficients[i]);
-		t.Append(v + _T("\n"));
+		if (i == 0)
+			termString.Printf("%1.2e", fitData.coefficients[i]);
+		else if (i == 1)
+			termString.Printf("%0.2ex", fabs(fitData.coefficients[i]));
+		else
+			termString.Printf("%0.2ex^%i", fabs(fitData.coefficients[i]), i);
+
+		if (i < order)
+		{
+			if (fitData.coefficients[i] > 0.0)
+				termString.Append(_T(" + "));
+			else
+				termString.Append(_T(" - "));
+		}
+		name.Append(termString);
 	}
-	// FIXME: Temporary
+	AddCurve(newData, name);
 
 	// Free the coefficient data
 	delete [] fitData.coefficients;

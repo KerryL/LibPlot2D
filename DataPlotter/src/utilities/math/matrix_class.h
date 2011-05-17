@@ -26,6 +26,7 @@ class Matrix
 {
 public:
 	// Constructors
+	Matrix();
 	Matrix(const unsigned int &_Rows, const unsigned int &_Columns);
 	Matrix(const unsigned int &_Rows, const unsigned int &_Columns, double Element1, ...);
 	Matrix(const Matrix &matrix);
@@ -41,13 +42,14 @@ public:
 
 	// Makes this matrix an identity matrix
 	Matrix& MakeIdentity(void);
+	static Matrix GetIdentity(const unsigned int &_rows, const unsigned int &_columns = 0);
 
-	// Transposition function
-	Matrix GetTranspose(void) const;
+	bool IsSquare(void) const { return rows == columns; };
+	void Resize(const unsigned int &_rows, const unsigned int &_columns);
+	Matrix& RemoveRow(const unsigned int &row);
+	Matrix& RemoveColumn(const unsigned int &column);
 
-	// Inverse functions
-	Matrix GetInverse(void) const;
-	Matrix GetPsuedoInverse(void) const;
+	unsigned int GetMinimumDimension(void) const { return (rows < columns) ? rows : columns; };
 
 	// Returns a matrix containing a sub-set of the contents of this matrix
 	Matrix GetSubMatrix(const unsigned int &startRow, const unsigned int &startColumn,
@@ -79,6 +81,13 @@ public:
 	const VECTOR operator * (const VECTOR &target) const;
 	const Matrix operator / (const double &target) const;
 	const double &operator () (const unsigned int &row, const unsigned int &column) const;
+
+	// Common matrix operations ------------------------------------
+	bool GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) const;
+
+	Matrix GetTranspose(void) const;
+	Matrix GetInverse(void) const;
+	Matrix GetPsuedoInverse(void) const;
 
 	Matrix LeftDivide(const Matrix& b) const;// x = A \ b
 	Matrix GetRowReduced(void) const;
