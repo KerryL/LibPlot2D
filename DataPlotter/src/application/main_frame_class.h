@@ -190,9 +190,22 @@ private:
 	// Load file methods
 	bool LoadTxtFile(wxString pathAndFileName);
 	bool LoadCsvFile(wxString pathAndFileName);
+	bool LoadGenericDelimitedFile(wxString pathAndFileName);
 	wxArrayString ParseLineIntoColumns(const std::string& line, const wxString &delimiter);
 
+	enum FileFormat
+	{
+		FormatBaumuller,
+		FormatFFT,
+		FormatGeneric
+	};
+
+	FileFormat currentFileFormat;
+
 	void SetTitleFromFileName(wxString pathAndFileName);
+	void SetXDataLabel(wxString label);
+	void SetXDataLabel(const FileFormat &format);
+	wxString genericXAxisLabel;
 
 	// For the event table
 	DECLARE_EVENT_TABLE();

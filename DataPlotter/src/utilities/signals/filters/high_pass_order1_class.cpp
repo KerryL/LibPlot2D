@@ -80,8 +80,8 @@ HighPassFirstOrderFilter::HighPassFirstOrderFilter(const double& cutoffFrequency
 //==========================================================================
 void HighPassFirstOrderFilter::Initialize(const double &initialValue)
 {
-	y[0] = initialValue;
-	y[1] = initialValue;
+	y[0] = 0.0;
+	y[1] = 0.0;
 
 	u[0] = initialValue;
 	u[1] = initialValue;

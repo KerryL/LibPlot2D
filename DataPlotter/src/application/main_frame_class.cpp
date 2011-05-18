@@ -63,6 +63,9 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 {
 	DoLayout();
 	SetProperties();
+
+	// Initialize the file format flag
+	currentFileFormat = FormatGeneric;
 }
 
 //==========================================================================
@@ -449,7 +452,8 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idContextPlotIntegral, _T("Plot Integral"));
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
-		contextMenu->Append(idButtonRemoveCurve, _T("Remove Curve"));
+
+		contextMenu->AppendSeparator();
 
 		wxMenu *filterMenu = new wxMenu();
 		filterMenu->Append(idContextFilterLowPass, _T("Low-Pass"));
@@ -457,6 +461,10 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->AppendSubMenu(filterMenu, _T("Filter"));
 
 		contextMenu->Append(idContextFitCurve, _T("Fit Curve"));
+
+		contextMenu->AppendSeparator();
+
+		contextMenu->Append(idButtonRemoveCurve, _T("Remove Curve"));
 	}
 
 	// Show the menu
@@ -614,14 +622,24 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 	fileExtension = pathAndFileName.Mid(startOfExtension);
 
 	// Create the appropriate object
+	bool loadedOK(false);
 	if (fileExtension.CmpNoCase("csv") == 0)
-		return LoadCsvFile(pathAndFileName);
+		loadedOK = LoadCsvFile(pathAndFileName);
 	else if (fileExtension.CmpNoCase("txt") == 0)
-		return LoadTxtFile(pathAndFileName);
+		loadedOK = LoadTxtFile(pathAndFileName);
+	else
+		// Attempt to load the file, even if we don't recognize its extension
+		//::wxMessageBox(_T("ERROR:  Unrecognized file extension '") + fileExtension + _T("'!"), _T("Error Loading File"));
+		loadedOK = LoadGenericDelimitedFile(pathAndFileName);
 
-	::wxMessageBox(_T("ERROR:  Unrecognized file extension '") + fileExtension + _T("'!"), _T("Error Loading File"));
+	// If we couldn't load the file, tell the user
+	if (!loadedOK)
+		::wxMessageBox(_T("ERROR:  Unable to open file!"), _T("Error Loading File"));
 
-	return false;
+	SetTitleFromFileName(pathAndFileName);
+	SetXDataLabel(currentFileFormat);
+
+	return loadedOK;
 }
 
 //==========================================================================
@@ -642,14 +660,17 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 //==========================================================================
 bool MainFrame::LoadTxtFile(wxString pathAndFileName)
 {
-	return false;
+	// TODO:  Add any specific file formats here
+
+	// Try to load the file as a generic delimited file
+	return LoadGenericDelimitedFile(pathAndFileName);
 }
 
 //==========================================================================
 // Class:			MainFrame
 // Function:		LoadCsvFile
 //
-// Description:		Public method for loading a single object from file.
+// Description:		Loads specific .csv file formats.
 //
 // Input Argurments:
 //		pathAndFileName	= wxString
@@ -676,9 +697,6 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 	std::getline(file, nextLine);
 	if (nextLine.compare(_T("WinBASS_II_Oscilloscope_Data")) == 0)// Baumuller oscilloscope trace
 	{
-		// Baumuller plots have integer time values representing milliseconds
-		plotArea->SetXLabel(_T("Time [msec]"));
-
 		// Throw out everything up to "Par.number:"
 		// This will give us the number of datasets we need
 		while (nextLine.substr(0, 11).compare(_T("Par.number:")) != 0)
@@ -713,7 +731,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 				{
 					delete [] data;
 
-					// FIXME:  Better error message here
+					::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Reading File"));
 					return false;
 				}
 
@@ -743,27 +761,241 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 		delete [] data;
 		file.close();
 
-		SetTitleFromFileName(pathAndFileName);
+		// Set the file format flag
+		currentFileFormat = FormatBaumuller;
 
 		return true;
 	}
-
-	::wxMessageBox(_T("ERROR:  Unrecognized file format!"), _T("Error Reading File"));
+	// TODO:  Add any other specific file formats here
 
 	file.close();
 
-	return false;
+	// Try to open the file as a generic delimited file
+	return LoadGenericDelimitedFile(pathAndFileName);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		LoadGenericDelimitedFile
+//
+// Description:		Attempts to load a generic delimited file by following a
+//					standard set of rules:
+//					- Assume first column is X-data
+//					- Assume there are some non-delimited rows at the top of the
+//					  file (skip these)
+//					- Assume that once the delimited rows begin, there may be
+//					  column headers (sometimes multiple rows)
+//
+// Input Argurments:
+//		pathAndFileName	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true for file successfully loaded, false otherwise
+//
+//==========================================================================
+bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
+{
+	// Open the file
+	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
+
+	if (!file.is_open())
+		return false;
+
+	// Create a list of acceptable delimiting characters
+	// Don't use periods ('.') because we're going to have those in regular numbers
+	wxArrayString delimiterList;
+	delimiterList.Add(_T(" "));
+	delimiterList.Add(_T(","));
+	delimiterList.Add(_T("\t"));
+	delimiterList.Add(_T(";"));
+
+	// Use std::string to read the file line-by-line
+	std::string nextLine;
+	std::getline(file, nextLine);
+
+	// Determine which character is the most likely delimiting character
+	// Determine how many file descriptor rows there are (and skip them)
+	wxString delimiter;
+	wxArrayString delimitedLine, plotNameList, previousLines;
+	unsigned int i, j;
+	double value;
+	while (!file.eof())
+	{
+		// Look for the first row starting with a number that contains at least one
+		// delimiting character (check all delimiters in our list)
+		for (i = 0; i < delimiterList.size(); i++)
+		{
+			delimitedLine = ParseLineIntoColumns(nextLine, delimiterList[i]);
+			if (delimitedLine.size() > 1)// Delimiters were found
+			{
+				// If all columns are numeric, this is probably the first row of data
+				delimiter = delimiterList[i];
+				for (j = 0; j < delimitedLine.size(); j++)
+				{
+					// Try to convert the string to a double
+					if (!delimitedLine[j].ToDouble(&value))
+					{
+						// Not the row we're looking for if the data isn't numeric
+						delimiter.Empty();
+						break;
+					}
+				}
+
+				// If we've found our delimiter, generate names for each plot
+				if (!delimiter.IsEmpty())
+				{
+					// Work backwards line-by-line
+					int line;
+					wxArrayString delimitedPreviousLine;
+					for (line = previousLines.size() - 1; line >= 0; line--)
+					{
+						delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
+
+						// Stop when the number of columns is different
+						if (delimitedPreviousLine.size() != delimitedLine.size())
+							break;
+
+						// If none of the entries on the line are numeric, prepend the plot name with this text
+						bool prependText(true);
+						for (j = 0; j < delimitedPreviousLine.size(); j++)
+						{
+							prependText = !delimitedPreviousLine[j].ToDouble(&value);
+							if (!prependText)
+								break;
+						}
+
+						if (prependText)
+						{
+							for (j = 0; j < delimitedPreviousLine.size(); j++)
+							{
+								if (plotNameList.size() < j + 1)
+									plotNameList.Add(delimitedPreviousLine[j]);
+								else
+									plotNameList[j].Prepend(delimitedPreviousLine[j] + _T(", "));
+							}
+						}
+					}
+				}
+
+				// Store this line for later (for creating plot names)
+				previousLines.Add(nextLine);
+			}
+
+			// Have we determined what the delimiter is?
+			if (!delimiter.IsEmpty())
+				break;
+		}
+
+		// Have we determined what the delimiter is?
+		if (!delimiter.IsEmpty())
+			break;
+
+		// Read the next line
+		std::getline(file, nextLine);
+	}
+
+	// Find the header rows (if any) and use them to construct plot names
+	if (plotNameList.size() == 0)
+	{
+		wxString dummyPlotName;
+		for (i = 0; i < delimitedLine.size(); i++)
+		{
+			dummyPlotName.Printf("[%i]", i);
+			plotNameList.Add(dummyPlotName);
+		}
+	}
+	genericXAxisLabel = plotNameList[0];
+	plotNameList.RemoveAt(0);
+
+	// Display a choice dialog allowing the user to specify which plots to import (only if there are more than 6 channels?)
+	wxMultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"), plotNameList);
+	if (dialog.ShowModal() == wxID_CANCEL)
+	{
+		file.close();
+		return true;// Return true without loading any data to prevent message boxes from appearing
+	}
+
+	// Get the selections and make sure the user selected something
+	wxArrayInt choices = dialog.GetSelections();
+	if (choices.size() == 0)
+	{
+		file.close();
+		return true;// Return true without loading any data to prevent message boxes from appearing
+	}
+
+	// Add the selected datasets to the plot
+	// Allocate datasets
+	std::vector<double> *data = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
+
+	// Start reading data
+	while (!file.eof() && !nextLine.empty())
+	{
+		// Get the X-data
+		if (!delimitedLine[0].ToDouble(&value))
+		{
+			delete [] data;
+
+			::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Reading File"));
+			return false;
+		}
+		data[0].push_back(value);
+
+		// Get the Y-data
+		for (i = 0; i < choices.size(); i++)
+		{
+			if (!delimitedLine[choices[i] + 1].ToDouble(&value))
+			{
+				delete [] data;
+
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Reading File"));
+				return false;
+			}
+			data[i + 1].push_back(value);
+		}
+
+		// Read the next line
+		std::getline(file, nextLine);
+		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
+	}
+
+	// Put the data in datasets and add them to the plot
+	Dataset2D *dataSet;
+	for (i = 0; i < choices.size(); i++)
+	{
+		dataSet = new Dataset2D(data[0].size());
+		for (j = 0; j < data[0].size(); j++)
+		{
+			dataSet->GetXPointer()[j] = data[0].at(j);
+			dataSet->GetYPointer()[j] = data[i + 1].at(j);
+		}
+
+		AddCurve(dataSet, plotNameList[choices[i]]);
+	}
+
+	// Clean up memory
+	// Don't delete dataSet -> this is handled by the MANAGED_LIST object
+	delete [] data;
+	file.close();
+
+	// Set the file format flag
+	currentFileFormat = FormatGeneric;
+
+	return true;
 }
 
 //==========================================================================
 // Class:			MainFrame
 // Function:		ParseLineIntoColumns
 //
-// Description:		Public method for loading a single object from file.
+// Description:		Parses the specified line into pieces based on encountering
+//					the specified delimiting character (or characters).
 //
 // Input Argurments:
 //		line		= const std::string& containing the line to parse
-//		delimiter	= const wxString& specifying the character to assume for
+//		delimiter	= const wxString& specifying the characters to assume for
 //					  delimiting columns
 //
 // Output Arguments:
@@ -771,25 +1003,38 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 //
 // Return Value:
 //		wxArrayString containing one item for every column contained in the
-//		original lint
+//		original line
 //
 //==========================================================================
 wxArrayString MainFrame::ParseLineIntoColumns(const std::string& line, const wxString &delimiter)
 {
 	wxArrayString parsed;
 
-	unsigned int start = 0;
-	unsigned int end = line.find(delimiter.c_str(), start);
+	unsigned int start(0);
+	unsigned int end(0);
 
-	while (end > start && end != std::string::npos)
+	while (end != std::string::npos && start < line.length())
 	{
-		wxString temp(line.substr(start, end - start));
-		parsed.Add(line.substr(start, end - start));
-		start = end + 1;
+		// Find the next delimiting character
 		end = line.find(delimiter.c_str(), start);
-	}
 
-	// NOTE:  Last column must be followed by a delimiter in order for this to capture all the data!
+		// If the next delimiting character is right next to the previous character
+		// (empty string between), ignore it (that is to say, we treat consecutive
+		// delimiters as one)
+		if (end == start)
+		{
+			start++;
+			continue;
+		}
+
+		// If no character was found, add the rest of the line to the list
+		if (end == std::string::npos)
+			parsed.Add(line.substr(start));
+		else
+			parsed.Add(line.substr(start, end - start));
+
+		start = end + 1;
+	}
 
 	return parsed;
 }
@@ -846,6 +1091,66 @@ void MainFrame::ClearAllCurves(void)
 	// Remove the curves locally
 	while (plotList.GetCount() > 0)
 		RemoveCurve(0);
+
+	return;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		SetXDataLabel
+//
+// Description:		Sets the x-data labels to the specified string.
+//
+// Input Argurments:
+//		label	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::SetXDataLabel(wxString label)
+{
+	optionsGrid->SetCellValue(0, colName, label);
+	plotArea->SetXLabel(label);
+
+	return;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		SetXDataLabel
+//
+// Description:		Removes all curves from the plot.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::SetXDataLabel(const FileFormat &format)
+{
+	switch (format)
+	{
+	case FormatBaumuller:
+		SetXDataLabel(_T("Time [msec]"));
+		break;
+
+	case FormatFFT:
+		SetXDataLabel(_T("Frequency [Hz]"));
+		break;
+
+	default:
+	case FormatGeneric:
+		SetXDataLabel(genericXAxisLabel);
+	}
 
 	return;
 }
@@ -924,8 +1229,8 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	if (optionsGrid->GetNumberRows() == 0)
 	{
 		optionsGrid->AppendRows();
-		// FIXME:  This is only true for Baumuller datasets
-		optionsGrid->SetCellValue(0, colName, _T("Time [msec]"));
+		
+		SetXDataLabel(currentFileFormat);
 
 		for (i = 0; i < colCount; i++)
 			optionsGrid->SetReadOnly(0, i, true);
@@ -1094,6 +1399,7 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
 	colorData.SetColour(optionsGrid->GetCellBackgroundColour(row, colColor));
 
 	wxColourDialog dialog(this, &colorData);
+	dialog.CenterOnParent();
     dialog.SetTitle(_T("Choose Line Color"));
     if (dialog.ShowModal() == wxID_OK)
     {
@@ -1142,8 +1448,26 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 	else
 		optionsGrid->SetCellValue(row, event.GetCol(), _T("1"));
 
-	// If the only visible curve is an FFT, change the x-lable
-	// FIXME: Handle X-label for FFT curves
+	// If the only visible curves are FFTs, change the x-label
+	int i;
+	bool showFFTLabel(false);
+	for (i = 1; i < optionsGrid->GetRows(); i++)
+	{
+		if (optionsGrid->GetCellValue(i, colVisible).Cmp(_T("1")) == 0)
+		{
+			if (optionsGrid->GetCellValue(i, colName).Mid(0, 3).CmpNoCase(_T("FFT")) == 0)
+				showFFTLabel = true;
+			else
+			{
+				showFFTLabel = false;
+				break;
+			}
+		}
+	}
+	if (showFFTLabel)
+		SetXDataLabel(FormatFFT);
+	else
+		SetXDataLabel(currentFileFormat);
 
 	Color color;
 	color.Set(optionsGrid->GetCellBackgroundColour(row, colColor));
@@ -1287,9 +1611,13 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
 	Dataset2D *newData = new Dataset2D(FastFourierTransform::Compute(*plotList[row - 1]));
 
-	// Multiply x data by 1000 in order to have Hz
-	//FIXME:  Only true for Baumuller data where time is in msec!
-	newData->MultiplyXData(1000.0);
+	// For Baumulelr datasets, multiply x data by 1000 in order to have Hz
+	if (currentFileFormat == FormatBaumuller)
+		newData->MultiplyXData(1000.0);
+	else
+	{
+		// FIXME:  Use time series label to determine units and decide if scaling is necessary?
+	}
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
@@ -1332,9 +1660,13 @@ void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	// Create the filter
 	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
-	// Multiply by 1000 in order to have Hz instead of kHz
-	//FIXME:  Only true for Baumuller data where time is in msec!
-	sampleRate *= 1000.0;
+	// For Baumuller datasets, multiply by 1000 in order to have Hz instead of kHz
+	if (currentFileFormat == FormatBaumuller)
+		sampleRate *= 1000.0;
+	else
+	{
+		// FIXME:  Determine if something similar is needed for generic datasets?
+	}
 	LowPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
 
 	// Apply the filter
@@ -1383,10 +1715,14 @@ void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	// Create the filter
 	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
-	// Multiply by 1000 in order to have Hz instead of kHz
-	//FIXME:  Only true for Baumuller data where time is in msec!
-	sampleRate *= 1000.0;
-	HighPassFirstOrderFilter filter(cutoff, sampleRate);// High-pass, initialize to zero instead of first data value
+	// For Baumuller datasets, multiply by 1000 in order to have Hz instead of kHz
+	if (currentFileFormat == FormatBaumuller)
+		sampleRate *= 1000.0;
+	else
+	{
+		// FIXME:  Determine if something similar is required for generic data
+	}
+	HighPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
 
 	// Apply the filter
 	unsigned int i;
