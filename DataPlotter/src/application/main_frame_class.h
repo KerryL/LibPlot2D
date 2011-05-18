@@ -192,6 +192,8 @@ private:
 	bool LoadCsvFile(wxString pathAndFileName);
 	wxArrayString ParseLineIntoColumns(const std::string& line, const wxString &delimiter);
 
+	void SetTitleFromFileName(wxString pathAndFileName);
+
 	// For the event table
 	DECLARE_EVENT_TABLE();
 

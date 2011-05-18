@@ -29,6 +29,11 @@ public:
 	// Initialization function
 	bool OnInit();
 
+	// The name of the application
+	static const wxString dataPlotterTitle;// As displayed
+	static const wxString dataPlotterName;// Internal
+	static const wxString creator;
+
 private:
 	// The main class for the application - this object is the parent for all other objects
 	MainFrame *mainFrame;

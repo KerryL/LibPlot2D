@@ -119,9 +119,15 @@ Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns, double e
 	// Fill all of the elements with the arguments
 	// FIXME:  There is no check to make sure the correct number of elements was
 	// passed!  This could result in runtime crash or wrong calculations!
-	unsigned int i;
-	for (i = 1; i < rows * columns; i++)
-		elements[i][i % columns] = va_arg(argumentList, double);
+	unsigned int i, j;
+	for (i = 0; i < rows; i++)
+	{
+		for (j = 0; j < columns; j++)
+		{
+			if (i != 0 || j != 0)// Already assigned element [0][0]
+				elements[i][j] = va_arg(argumentList, double);
+		}
+	}
 
 	// Terminate the variable argument list
 	va_end(argumentList);
@@ -198,7 +204,7 @@ Matrix::~Matrix()
 void Matrix::SetElement(const unsigned int &row, const unsigned int &column, const double &value)
 {
 	// Check to make sure it is a valid index
-	assert(row <= rows && column <= columns);
+	assert(row < rows && column < columns);
 
 	// Set the element as requested
 	elements[row][column] = value;
@@ -238,9 +244,15 @@ void Matrix::Set(double element1, ...)
 	// Fill all of the elements with the arguments
 	// FIXME:  There is no check to make sure the correct number of elements was
 	// passed!  This could result in runtime crash or wrong calculations!
-	unsigned int i;
-	for (i = 1; i < rows * columns; i++)
-		elements[i][i % rows] = va_arg(argumentList, double);
+	unsigned int i, j;
+	for (i = 0; i < rows; i++)
+	{
+		for (j = 0; j < columns; j++)
+		{
+			if (i != 0 || j != 0)// Already assigned element [0][0]
+				elements[i][j] = va_arg(argumentList, double);
+		}
+	}
 
 	// Terminate the variable argument list
 	va_end(argumentList);
@@ -433,17 +445,7 @@ Matrix Matrix::LeftDivide(const Matrix &b) const
 		return *this;
 	}
 
-	// Invert the components of W along the diagonal, or leave them alone if equal to zero
-	unsigned int i;
-	for (i = 0; i < W.GetMinimumDimension(); i++)
-	{
-		if (!PlotMath::IsZero(W.elements[i][i]))
-			W.elements[i][i] = 1.0 / W.elements[i][i];
-		else
-			W.elements[i][i] = 0.0;
-	}
-
-	return V * W.GetTranspose() * U.GetTranspose() * b;
+	return V * W.GetDiagonalInverse().GetTranspose() * U.GetTranspose() * b;
 }
 
 //==========================================================================
@@ -1021,7 +1023,7 @@ Matrix Matrix::GetInverse(void) const
 	if (!IsSquare() || GetRank() != rows)
 		return GetPsuedoInverse();
 
-	// FIXME:  Calculate the real inverse!
+	// FIXME:  I'm not sure there is a point to having two inverse methods?
 	return GetPsuedoInverse();
 }
 
@@ -1055,12 +1057,43 @@ Matrix Matrix::GetPsuedoInverse(void) const
 		return *this;
 	}
 
+	return V * W.GetDiagonalInverse() * U.GetTranspose();
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		GetDiagonalInverse
+//
+// Description:		Returns the inverse of a diagonal matrix.  Calling this
+//					on a non-diagonal matrix will return a result, but it
+//					will be meaningless.  There is no check to ensure this
+//					is only called on diagonal matrices.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Matrix, inverse of this (as long as this is a diagonal matrix)
+//
+//==========================================================================
+Matrix Matrix::GetDiagonalInverse(void) const
+{
+	Matrix inverse(*this);
+
 	// Invert the components of W along the diagonal
 	unsigned int i;
-	for (i = 0; i < W.columns; i++)
-		W.elements[i][i] = 1.0 / W.elements[i][i];
+	for (i = 0; i < inverse.GetMinimumDimension(); i++)
+	{
+		if (PlotMath::IsZero(elements[i][i]))
+			inverse.elements[i][i] = 0.0;
+		else
+			inverse.elements[i][i] = 1.0 / elements[i][i];
+	}
 
-	return V * W * U.GetTranspose();
+	return inverse;
 }
 
 //==========================================================================
@@ -1111,6 +1144,7 @@ double Matrix::pythag(const double& a, const double &b) const
 //==========================================================================
 unsigned int Matrix::GetRank(void) const
 {
+	// FIXME:  Is it better to use SVD for this?  Rank = # of non-zero singular values
 	Matrix reduced = GetRowReduced();
 
 	unsigned int rank(0), curRow, curCol;
@@ -1234,10 +1268,10 @@ void Matrix::Resize(const unsigned int &_rows, const unsigned int &_columns)
 bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) const
 {
 	// SVD algorithm interpreted from Numerical Recipies in C
-	//U.Resize(rows, columns);
-	//W.Resize(columns, columns);
 	U.Resize(rows, columns);
 	W.Resize(columns, columns);
+	//U.Resize(rows, rows);// Minimal solution has these dimensions, but
+	//W.Resize(rows, columns);// apparently this algorithm does not compute this solution
 	W.Zero();
 	V.Resize(columns, columns);
 

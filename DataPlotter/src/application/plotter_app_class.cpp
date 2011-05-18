@@ -25,6 +25,26 @@ IMPLEMENT_APP(DataPlotterApp);
 
 //==========================================================================
 // Class:			DataPlotterApp
+// Function:		Constant Declarations
+//
+// Description:		Constant declarations for the DataPlotterApp class.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const wxString DataPlotterApp::dataPlotterTitle = _T("Data Plotter");
+const wxString DataPlotterApp::dataPlotterName = _T("DataPlotterApplication");
+const wxString DataPlotterApp::creator = _T("Kerry Loux");
+
+//==========================================================================
+// Class:			DataPlotterApp
 // Function:		OnInit
 //
 // Description:		Initializes the application window.
@@ -42,8 +62,8 @@ IMPLEMENT_APP(DataPlotterApp);
 bool DataPlotterApp::OnInit()
 {
 	// Set the application's name and the vendor's name
-	SetAppName(_T("Data Plotter"));
-	SetVendorName(_T("Kerry Loux"));
+	SetAppName(dataPlotterName);
+	SetVendorName(creator);
 
 	// Create the MainFrame object - this is the parent for all other objects
 	mainFrame = new MainFrame();

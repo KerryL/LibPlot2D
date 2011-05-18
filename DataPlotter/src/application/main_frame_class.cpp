@@ -25,6 +25,7 @@
 
 // Local headers
 #include "application/main_frame_class.h"
+#include "application/plotter_app_class.h"
 #include "application/drop_target_class.h"
 #include "application/range_limits_dialog_class.h"
 #include "renderer/plot_renderer_class.h"
@@ -207,8 +208,8 @@ void MainFrame::DoLayout(void)
 //==========================================================================
 void MainFrame::SetProperties(void)
 {
-	SetTitle(_T("Data Plotter"));
-	SetName(_T("DataPlotterApplication"));
+	SetTitle(DataPlotterApp::dataPlotterTitle);
+	SetName(DataPlotterApp::dataPlotterName);
 	Center();
 
 	// Add the icon
@@ -742,6 +743,8 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 		delete [] data;
 		file.close();
 
+		SetTitleFromFileName(pathAndFileName);
+
 		return true;
 	}
 
@@ -789,6 +792,37 @@ wxArrayString MainFrame::ParseLineIntoColumns(const std::string& line, const wxS
 	// NOTE:  Last column must be followed by a delimiter in order for this to capture all the data!
 
 	return parsed;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		SetTitleFromFileName
+//
+// Description:		Sets the frame's title according to the specified file name.
+//
+// Input Argurments:
+//		pathAndFileName	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::SetTitleFromFileName(wxString pathAndFileName)
+{
+	// Set the name of the form to contain the file name
+	unsigned int start;
+#ifdef __WXMSW__
+	start = pathAndFileName.find_last_of(_T("\\")) + 1;
+#else
+	start = pathAndFileName.find_last_of(_T("/")) + 1;
+#endif
+	unsigned int end(pathAndFileName.find_last_of(_T(".")));
+	SetTitle(pathAndFileName.Mid(start, end - start) + _T(" - ") + DataPlotterApp::dataPlotterTitle);
+
+	return;
 }
 
 //==========================================================================

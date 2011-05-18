@@ -88,6 +88,7 @@ public:
 	Matrix GetTranspose(void) const;
 	Matrix GetInverse(void) const;
 	Matrix GetPsuedoInverse(void) const;
+	Matrix GetDiagonalInverse(void) const;
 
 	Matrix LeftDivide(const Matrix& b) const;// x = A \ b
 	Matrix GetRowReduced(void) const;
