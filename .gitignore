@@ -1,0 +1,6 @@
+# Ignore MSVC++ binary and object directories
+Debug/
+Release/
+ipch/
+DataPlotter/Debug
+DataPlotter/Release
