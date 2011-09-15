@@ -132,7 +132,6 @@ void PlotRenderer::UpdateDisplay(void)
 	// Update the plot
 	plot->Update();
 
-	// Re-draw the image
 	Render();
 
 	return;
@@ -730,6 +729,7 @@ void PlotRenderer::SetRightGrid(const bool &grid)
 //					  be drawn
 //		rightAxis	= const bool& indicating whether the curve should be tied
 //					  to the left or right axis
+//		size		= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -739,9 +739,10 @@ void PlotRenderer::SetRightGrid(const bool &grid)
 //
 //==========================================================================
 void PlotRenderer::SetCurveProperties(const unsigned int &index, const Color &color,
-									  const bool &visible, const bool &rightAxis)
+									  const bool &visible, const bool &rightAxis,
+									  const unsigned int &size)
 {
-	plot->SetCurveProperties(index, color, visible, rightAxis);
+	plot->SetCurveProperties(index, color, visible, rightAxis, size);
 	UpdateDisplay();
 
 	return;
@@ -1064,8 +1065,9 @@ void PlotRenderer::SetXLabel(wxString text)
 //==========================================================================
 void PlotRenderer::OnMouseLeaveWindowEvent(wxMouseEvent& WXUNUSED(event))
 {
-	// Hide the zoom box
-	zoomBox->SetVisibility(false);
+	// Hide the zoom box (but only if it's not already hidden!)
+	if (zoomBox->GetIsVisible())
+		zoomBox->SetVisibility(false);
 
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
@@ -1458,4 +1460,46 @@ double PlotRenderer::GetRightYMin(void) const
 double PlotRenderer::GetRightYMax(void) const
 {
 	return plot->GetRightYAxis()->GetMaximum();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetGridColor
+//
+// Description:		Returns the color of the gridlines for this plot.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Color
+//
+//==========================================================================
+Color PlotRenderer::GetGridColor(void) const
+{
+	return plot->GetGridColor();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetGridColor
+//
+// Description:		Sets the color of the gridlines for this plot.
+//
+// Input Argurments:
+//		color	= const Color&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetGridColor(const Color &color)
+{
+	plot->SetGridColor(color);
 }

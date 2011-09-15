@@ -165,6 +165,7 @@ void MainFrame::DoLayout(void)
 
 	optionsGrid->CreateGrid(0, colCount, wxGrid::wxGridSelectRows);
 	optionsGrid->SetRowLabelSize(0);
+	optionsGrid->SetColFormatNumber(colSize);
 	optionsGrid->SetColFormatFloat(colLeftCursor);
 	optionsGrid->SetColFormatFloat(colRightCursor);
 	optionsGrid->SetColFormatFloat(colDifference);
@@ -173,6 +174,7 @@ void MainFrame::DoLayout(void)
 
 	optionsGrid->SetColLabelValue(colName, _T("Curve"));
 	optionsGrid->SetColLabelValue(colColor, _T("Color"));
+	optionsGrid->SetColLabelValue(colSize, _T("Size"));
 	optionsGrid->SetColLabelValue(colLeftCursor, _T("Left Cursor"));
 	optionsGrid->SetColLabelValue(colRightCursor, _T("Right Cursor"));
 	optionsGrid->SetColLabelValue(colDifference, _T("Difference"));
@@ -253,6 +255,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_GRID_CELL_RIGHT_CLICK(MainFrame::GridRightClickEvent)
 	EVT_GRID_CELL_LEFT_DCLICK(MainFrame::GridDoubleClickEvent)
 	EVT_GRID_CELL_LEFT_CLICK(MainFrame::GridLeftClickEvent)
+	EVT_GRID_CELL_CHANGE(MainFrame::GridCellChangeEvent)
 
 	// Context menu
 	EVT_MENU(idContextAddMathChannel,				MainFrame::ContextAddMathChannelEvent)
@@ -270,6 +273,9 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idPlotContextToggleGridlines,			MainFrame::ContextToggleGridlines)
 	EVT_MENU(idPlotContextAutoScale,				MainFrame::ContextAutoScale)
 	EVT_MENU(idPlotContextWriteImageFile,			MainFrame::ContextWriteImageFile)
+
+	EVT_MENU(idPlotContextBGColor,					MainFrame::ContextPlotBGColor)
+	EVT_MENU(idPlotContextGridColor,				MainFrame::ContextGridColor)
 
 	EVT_MENU(idPlotContextToggleBottomGridlines,	MainFrame::ContextToggleGridlinesBottom)
 	EVT_MENU(idPlotContextSetBottomRange,			MainFrame::ContextSetRangeBottom)
@@ -403,7 +409,9 @@ void MainFrame::ButtonAutoScaleClickedEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
-	wxArrayInt rows = optionsGrid->GetSelectedRows();
+	// Known bug with wxGrid::GetSelectedRows() - returns empty set
+	// This is the cleanest way to do it, after the bug is fixed
+	/*wxArrayInt rows = optionsGrid->GetSelectedRows();
 
 	// Must have row selected
 	unsigned int i;
@@ -414,6 +422,14 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 			continue;
 
 		RemoveCurve(rows[i] - 1);
+	}*/
+
+	// Workaround for now
+	int i;
+	for (i = 1; i < optionsGrid->GetRows(); i++)
+	{
+		if (optionsGrid->IsInSelection(i, 0))
+			RemoveCurve(i - 1);
 	}
 
 	plotArea->UpdateDisplay();
@@ -526,6 +542,9 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 		contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
 		contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
 		contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
+		contextMenu->AppendSeparator();
+		contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
+		contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));
 		break;
 	}
 
@@ -633,11 +652,15 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 		loadedOK = LoadGenericDelimitedFile(pathAndFileName);
 
 	// If we couldn't load the file, tell the user
-	if (!loadedOK)
-		::wxMessageBox(_T("ERROR:  Unable to open file!"), _T("Error Loading File"));
+	// Changed 8/4/2011 - Specific messages are displayed in LoadXXXFile() methods
+	//if (!loadedOK && displayDialogOnError)
+	//	::wxMessageBox(_T("ERROR:  Unable to read data from file!"), _T("Error Loading File"));
 
-	SetTitleFromFileName(pathAndFileName);
-	SetXDataLabel(currentFileFormat);
+	if (loadedOK)
+	{
+		SetTitleFromFileName(pathAndFileName);
+		SetXDataLabel(currentFileFormat);
+	}
 
 	return loadedOK;
 }
@@ -688,19 +711,29 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
 
 	if (!file.is_open())
+	{
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
 		return false;
+	}
 
 	wxString delimiter(';');
 
 	// Determine if this is a Baumuller osiclloscope export file
 	std::string nextLine;
 	std::getline(file, nextLine);
-	if (nextLine.compare(_T("WinBASS_II_Oscilloscope_Data")) == 0)// Baumuller oscilloscope trace
+
+	// For compatability with GTK - getline returns string ending with \r under GTK, which we can't have
+	wxString compatableNextLine(nextLine);
+
+	if (compatableNextLine.Trim().compare(_T("WinBASS_II_Oscilloscope_Data")) == 0)// Baumuller oscilloscope trace
 	{
 		// Throw out everything up to "Par.number:"
 		// This will give us the number of datasets we need
-		while (nextLine.substr(0, 11).compare(_T("Par.number:")) != 0)
+		while (compatableNextLine.Trim().substr(0, 11).compare(_T("Par.number:")) != 0)
+		{
 			std::getline(file, nextLine);
+			compatableNextLine = nextLine;
+		}
 		wxArrayString parameterNumbers = ParseLineIntoColumns(nextLine, delimiter);
 
 		std::getline(file, nextLine);
@@ -731,7 +764,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 				{
 					delete [] data;
 
-					::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Reading File"));
+					::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Generating Plot"));
 					return false;
 				}
 
@@ -766,6 +799,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 
 		return true;
 	}
+	// FIXME:  Add Siemens format here?  Useful for assigning readable names instead of .rXX
 	// TODO:  Add any other specific file formats here
 
 	file.close();
@@ -802,7 +836,10 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
 
 	if (!file.is_open())
+	{
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
 		return false;
+	}
 
 	// Create a list of acceptable delimiting characters
 	// Don't use periods ('.') because we're going to have those in regular numbers
@@ -879,9 +916,6 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 						}
 					}
 				}
-
-				// Store this line for later (for creating plot names)
-				previousLines.Add(nextLine);
 			}
 
 			// Have we determined what the delimiter is?
@@ -892,6 +926,9 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 		// Have we determined what the delimiter is?
 		if (!delimiter.IsEmpty())
 			break;
+
+		// Store this line for later (for creating plot names)
+		previousLines.Add(nextLine);
 
 		// Read the next line
 		std::getline(file, nextLine);
@@ -910,12 +947,21 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	genericXAxisLabel = plotNameList[0];
 	plotNameList.RemoveAt(0);
 
+	// If there are no names in the list at this point, it's because we didn't find any plottable data
+	if (plotNameList.size() == 0)
+	{
+		file.close();
+		::wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"));
+		return false;
+	}
+
 	// Display a choice dialog allowing the user to specify which plots to import (only if there are more than 6 channels?)
 	wxMultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"), plotNameList);
 	if (dialog.ShowModal() == wxID_CANCEL)
 	{
 		file.close();
-		return true;// Return true without loading any data to prevent message boxes from appearing
+		// No message box - user canceled
+		return false;
 	}
 
 	// Get the selections and make sure the user selected something
@@ -923,7 +969,8 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	if (choices.size() == 0)
 	{
 		file.close();
-		return true;// Return true without loading any data to prevent message boxes from appearing
+		::wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"));
+		return false;
 	}
 
 	// Add the selected datasets to the plot
@@ -994,7 +1041,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 //					the specified delimiting character (or characters).
 //
 // Input Argurments:
-//		line		= const std::string& containing the line to parse
+//		line		= wxString containing the line to parse
 //		delimiter	= const wxString& specifying the characters to assume for
 //					  delimiting columns
 //
@@ -1006,8 +1053,11 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 //		original line
 //
 //==========================================================================
-wxArrayString MainFrame::ParseLineIntoColumns(const std::string& line, const wxString &delimiter)
+wxArrayString MainFrame::ParseLineIntoColumns(wxString line, const wxString &delimiter)
 {
+	// Remove \r character from end of line (required for GTK, etc.)
+	line.Trim();
+
 	wxArrayString parsed;
 
 	unsigned int start(0);
@@ -1182,7 +1232,14 @@ void MainFrame::AddCurve(wxString mathString)
 	ExpressionTree expression(plotList);
 	Dataset2D *mathChannel = new Dataset2D;
 
-	wxString errors = expression.Solve(mathString, *mathChannel);
+	double xAxisFactor;
+	if (!GetXAxisScalingFactor(xAxisFactor))
+	{
+		// FIXME:  Do we warn the user or not?  This is really only a problem if the user
+		// specified FFT or a filter
+	}
+
+	wxString errors = expression.Solve(mathString, *mathChannel, xAxisFactor);
 
 	// Check to see if there were any problems solving the tree
 	if (!errors.IsEmpty())
@@ -1237,12 +1294,17 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	}
 	unsigned int index = optionsGrid->GetNumberRows();
 	optionsGrid->AppendRows();
+
+	unsigned int maxLineSize(5);
+
 	optionsGrid->SetCellEditor(index, colVisible, new wxGridCellBoolEditor);
 	optionsGrid->SetCellEditor(index, colRightAxis, new wxGridCellBoolEditor);
+	optionsGrid->SetCellEditor(index, colSize, new wxGridCellNumberEditor(1, maxLineSize));
 
 	// Don't allow the user to change the contents of anything except the boolean cells
 	for (i = 0; i < colDifference; i++)
-		optionsGrid->SetReadOnly(index, i, true);
+			optionsGrid->SetReadOnly(index, i, true);
+	optionsGrid->SetReadOnly(index, colSize, false);
 
 	// Populate cell values
 	optionsGrid->SetCellValue(index, colName, name);
@@ -1286,7 +1348,9 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 		break;
 	}
 
-	optionsGrid->SetCellBackgroundColour(index, 1, color.ToWxColor());
+	optionsGrid->SetCellBackgroundColour(index, colColor, color.ToWxColor());
+
+	optionsGrid->SetCellValue(index, colSize, _T("1"));
 
 	// Set default boolean values
 	optionsGrid->SetCellValue(index, colVisible, _T("1"));
@@ -1297,7 +1361,9 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 
 	// Add the curve to the plot
 	plotArea->AddCurve(*data);
-	plotArea->SetCurveProperties(index - 1, color, true, false);
+	unsigned long size;
+	optionsGrid->GetCellValue(index, colSize).ToULong(&size);
+	plotArea->SetCurveProperties(index - 1, color, true, false, size);
 
 	plotArea->UpdateDisplay();
 
@@ -1393,7 +1459,10 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
 		return;
 
 	if (event.GetCol() != colColor)
+	{
+		event.Skip();
 		return;
+	}
 
 	wxColourData colorData;
 	colorData.SetColour(optionsGrid->GetCellBackgroundColour(row, colColor));
@@ -1407,12 +1476,12 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
 		optionsGrid->SetCellBackgroundColour(row, colColor, colorData.GetColour());
 		Color color;
 		color.Set(colorData.GetColour());
+		unsigned long size;
+		optionsGrid->GetCellValue(row, colSize).ToULong(&size);
 		plotArea->SetCurveProperties(row - 1, color,
 			!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
-			!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty());
+			!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
     }
-
-	// FIXME:  Also allow user to specify line width?
 
 	return;
 }
@@ -1437,7 +1506,13 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 {
 	unsigned int row = event.GetRow();
 
-	optionsGrid->SelectRow(row);
+	// This stuff may be necessary after bug is fixed with wxGrid::GetSelectedRows()?
+	// See ButtonRemoveCurveClickedEvent() for details
+	//optionsGrid->SetSelectionMode(wxGrid::wxGridSelectRows);
+	//optionsGrid->SelectRow(row, event.ControlDown());
+
+	// Skip to handle row selection (with SHIFT and CTRL) and also boolean column click handlers
+	event.Skip();
 
 	// Was this click in one of the boolean columns and not in the time row?
 	if (row == 0 || (event.GetCol() != colVisible && event.GetCol() != colRightAxis))
@@ -1471,11 +1546,152 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 
 	Color color;
 	color.Set(optionsGrid->GetCellBackgroundColour(row, colColor));
+	unsigned long size;
+	optionsGrid->GetCellValue(row, colSize).ToULong(&size);
 	plotArea->SetCurveProperties(row - 1, color,
 		!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
-		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty());
+		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
 
 	return;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GridLeftClickEvent
+//
+// Description:		Handles grid cell change events (for text controls).
+//
+// Input Argurments:
+//		event	= wxGridEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::GridCellChangeEvent(wxGridEvent &event)
+{
+	// This event is only valid for one column, and then not in the first row
+	unsigned int row(event.GetRow());
+	if (row == 0 || event.GetCol() != colSize)
+		event.Skip();
+
+	// Update all of the line parameters
+	Color color;
+	color.Set(optionsGrid->GetCellBackgroundColour(row, colColor));
+	unsigned long size;
+	optionsGrid->GetCellValue(row, colSize).ToULong(&size);
+	plotArea->SetCurveProperties(row - 1, color,
+		!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
+		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetXAxisScalingFactor
+//
+// Description:		Attempts to determine the scaling factor required to convert
+//					the X-axis into seconds (assuming X-axis has units of time).
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		factor	= double&, scaling factor
+//
+// Return Value:
+//		bool; true for success, false otherwise
+//
+//==========================================================================
+bool MainFrame::GetXAxisScalingFactor(double &factor)
+{
+	// Put known file formats here (at the top), to save time and eliminate possibility for error
+
+	// For Baumulelr datasets, multiply x data by 1000 in order to have seconds
+	if (currentFileFormat == FormatBaumuller)
+		factor = 1000.0;
+	else
+	{
+		// Use time series label to determine units and decide if scaling is necessary
+		wxString xSeriesLabel(genericXAxisLabel);
+
+		// We'll recognize the following label formats:
+		// X Series Name [unit]
+		// X Series Name (unit)
+		// X Series Name *delimiter* unit
+
+		// Can we find an appropriate label format?
+		unsigned int i;
+		wxString unit;
+		if (xSeriesLabel.Last() == ']')
+		{
+			// Step backwards until we find the matching bracket
+			for (i = xSeriesLabel.Len() - 2; i >= 0; i--)
+			{
+				if (xSeriesLabel.at(i) == '[')
+				{
+					unit = xSeriesLabel.Mid(i + 1, xSeriesLabel.Len() - i - 2);
+					break;
+				}
+			}
+		}
+		else if (xSeriesLabel.Last() == ')')
+		{
+			// Step backwards until we find the matching parenthese
+			for (i = xSeriesLabel.Len() - 2; i >= 0; i--)
+			{
+				if (xSeriesLabel.at(i) == '(')
+				{
+					unit = xSeriesLabel.Mid(i + 1, xSeriesLabel.Len() - i - 2);
+					break;
+				}
+			}
+		}
+		else// Check for delimiters
+		{
+			wxArrayString delimiters;
+			delimiters.Add(_T(","));
+			delimiters.Add(_T(";"));
+			delimiters.Add(_T("-"));
+			delimiters.Add(_T(":"));
+
+			int location;
+			for (i = 0; i < delimiters.size(); i++)
+			{
+				location = xSeriesLabel.Find(delimiters[i].c_str());
+				if (location != wxNOT_FOUND && location < (int)xSeriesLabel.Len() - 1)
+				{
+					unit = xSeriesLabel.Mid(location + 1);
+					break;
+				}
+			}
+		}
+
+		// We'll recognize the following units:
+		// h, hr, hours -> factor = 1.0 / 3600.0
+		// m, min, minutes -> factor = 1.0 / 60.0
+		// s, sec, seconds -> factor = 1.0
+		// ms, msec, milliseconds -> factor = 1000.0
+		// us, usec, microseconds -> factor = 1000000.0
+
+		// Do we recognize the units?
+		if (unit.CmpNoCase(_T("h")) == 0 || unit.CmpNoCase(_T("hr")) == 0 || unit.CmpNoCase(_T("hours")) == 0)
+			factor = 1.0 / 3600.0;
+		else if (unit.CmpNoCase(_T("m")) == 0 || unit.CmpNoCase(_T("min")) == 0 || unit.CmpNoCase(_T("minutes")) == 0)
+			factor = 1.0 / 60.0;
+		else if (unit.CmpNoCase(_T("s")) == 0 || unit.CmpNoCase(_T("sec")) == 0 || unit.CmpNoCase(_T("seconds")) == 0)
+			factor = 1.0;
+		else if (unit.CmpNoCase(_T("ms")) == 0 || unit.CmpNoCase(_T("msec")) == 0 || unit.CmpNoCase(_T("milliseconds")) == 0)
+			factor = 1000.0;
+		else if (unit.CmpNoCase(_T("us")) == 0 || unit.CmpNoCase(_T("usec")) == 0 || unit.CmpNoCase(_T("microseconds")) == 0)
+			factor = 1000000.0;
+		else
+			return false;
+	}
+
+	return true;
 }
 
 //==========================================================================
@@ -1607,17 +1823,17 @@ void MainFrame::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 {
+	double factor;
+	if (!GetXAxisScalingFactor(factor))
+		// Warn the user if we cannot determine the time units, but create the plot anyway
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"), _T("Accuracy Warning"));
+
 	// Create new dataset containing the FFT of dataset and add it to the plot
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
 	Dataset2D *newData = new Dataset2D(FastFourierTransform::Compute(*plotList[row - 1]));
 
-	// For Baumulelr datasets, multiply x data by 1000 in order to have Hz
-	if (currentFileFormat == FormatBaumuller)
-		newData->MultiplyXData(1000.0);
-	else
-	{
-		// FIXME:  Use time series label to determine units and decide if scaling is necessary?
-	}
+	// Scale as required
+	newData->MultiplyXData(factor);
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
@@ -1660,13 +1876,12 @@ void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	// Create the filter
 	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
-	// For Baumuller datasets, multiply by 1000 in order to have Hz instead of kHz
-	if (currentFileFormat == FormatBaumuller)
-		sampleRate *= 1000.0;
-	else
-	{
-		// FIXME:  Determine if something similar is needed for generic datasets?
-	}
+
+	double factor;
+	if (!GetXAxisScalingFactor(factor))
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"), _T("Accuracy Warning"));
+
+	sampleRate *= factor;
 	LowPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
 
 	// Apply the filter
@@ -1698,7 +1913,7 @@ void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
 {
-	// Create new dataset containing the FFT of dataset and add it to the plot
+	// Create new dataset containing the filtered dataset and add it to the plot
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
 	const Dataset2D *currentData = plotList[row - 1];
 	Dataset2D *newData = new Dataset2D(*currentData);
@@ -1715,13 +1930,12 @@ void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	// Create the filter
 	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
-	// For Baumuller datasets, multiply by 1000 in order to have Hz instead of kHz
-	if (currentFileFormat == FormatBaumuller)
-		sampleRate *= 1000.0;
-	else
-	{
-		// FIXME:  Determine if something similar is required for generic data
-	}
+
+	double factor;
+	if (!GetXAxisScalingFactor(factor))
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"), _T("Accuracy Warning"));
+
+	sampleRate *= factor;
 	HighPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
 
 	// Apply the filter
@@ -1914,6 +2128,10 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 		{
 			optionsGrid->SetCellValue(0, colLeftCursor, wxEmptyString);
 			optionsGrid->SetCellValue(i, colLeftCursor, wxEmptyString);
+
+			// The difference column only exists if both cursors are visible
+			optionsGrid->SetCellValue(0, colDifference, wxEmptyString);
+			optionsGrid->SetCellValue(i, colDifference, wxEmptyString);
 		}
 
 		if (rightVisible)
@@ -1949,6 +2167,10 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 		{
 			optionsGrid->SetCellValue(0, colRightCursor, wxEmptyString);
 			optionsGrid->SetCellValue(i, colRightCursor, wxEmptyString);
+
+			// The difference column only exists if both cursors are visible
+			optionsGrid->SetCellValue(0, colDifference, wxEmptyString);
+			optionsGrid->SetCellValue(i, colDifference, wxEmptyString);
 		}
 	}
 
@@ -2279,6 +2501,74 @@ void MainFrame::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 	DisplayAxisRangeDialog(plotContextRightYAxis);
 
 	return;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextPlotBGColor
+//
+// Description:		Displays a dialog allowing the user to specify the plot's
+//					background color.
+//
+// Input Argurments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextPlotBGColor(wxCommandEvent& WXUNUSED(event))
+{
+	wxColourData colorData;
+	colorData.SetColour(plotArea->GetBackgroundColor().ToWxColor());
+
+	wxColourDialog dialog(this, &colorData);
+	dialog.CenterOnParent();
+    dialog.SetTitle(_T("Choose Background Color"));
+    if (dialog.ShowModal() == wxID_OK)
+    {
+		Color color;
+		color.Set(dialog.GetColourData().GetColour());
+		plotArea->SetBackgroundColor(color);
+		plotArea->UpdateDisplay();
+    }
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextGridColor
+//
+// Description:		Dispalys a dialog box allowing the user to specify the
+//					gridline color.
+//
+// Input Argurments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextGridColor(wxCommandEvent& WXUNUSED(event))
+{
+	wxColourData colorData;
+	colorData.SetColour(plotArea->GetGridColor().ToWxColor());
+
+	wxColourDialog dialog(this, &colorData);
+	dialog.CenterOnParent();
+    dialog.SetTitle(_T("Choose Background Color"));
+    if (dialog.ShowModal() == wxID_OK)
+    {
+		Color color;
+		color.Set(dialog.GetColourData().GetColour());
+		plotArea->SetGridColor(color);
+		plotArea->UpdateDisplay();
+    }
 }
 
 //==========================================================================

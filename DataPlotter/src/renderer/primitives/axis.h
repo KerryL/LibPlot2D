@@ -76,6 +76,7 @@ public:
 	bool IsHorizontal(void) const;
 	static unsigned int GetOffsetFromWindowEdge(void) { return offsetFromWindowEdge; };
 	bool GetGrid(void) const { return grid; };
+	Color GetGridColor(void) const { return gridColor; };
 
 private:
 	// This object's orientation

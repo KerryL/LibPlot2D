@@ -90,6 +90,9 @@ PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 
 	// Initialize auto-scaling to true
 	ResetAutoScaling();
+
+	// Set the background color (establish the default)
+	renderer.SetBackgroundColor(Color::ColorWhite);
 }
 
 //==========================================================================
@@ -318,9 +321,6 @@ void PlotObject::AddCurve(const Dataset2D &data)
 //==========================================================================
 void PlotObject::FormatPlot(void)
 {
-	// Set the background color
-	renderer.SetBackgroundColor(Color::ColorWhite);
-
 	if (dataList.GetCount() == 0)
 		return;
 
@@ -994,7 +994,11 @@ void PlotObject::ResetAutoScaling(void)
 // Description:		Sets properties for the specified curve.
 //
 // Input Argurments:
-//		None
+//		index		= const unsigned int&
+//		color		= const Color&
+//		visible		= const bool&
+//		rightAxis	= const bool&
+//		size		= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -1004,10 +1008,11 @@ void PlotObject::ResetAutoScaling(void)
 //
 //==========================================================================
 void PlotObject::SetCurveProperties(const unsigned int &index, const Color &color,
-	const bool &visible, const bool &rightAxis)
+	const bool &visible, const bool &rightAxis, const unsigned int &size)
 {
 	plotList[index]->SetColor(color);
 	plotList[index]->SetVisibility(visible);
+	plotList[index]->SetSize(size);
 
 	if (rightAxis)
 		plotList[index]->BindToYAxis(axisRight);
@@ -1090,4 +1095,49 @@ void PlotObject::SetXLabel(wxString text)
 	axisBottom->SetLabel(text);
 
 	return;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetGridColor
+//
+// Description:		Sets gridline color.
+//
+// Input Argurments:
+//		color	= const color&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetGridColor(const Color &color)
+{
+	axisBottom->SetGridColor(color);
+	axisTop->SetGridColor(color);
+	axisLeft->SetGridColor(color);
+	axisRight->SetGridColor(color);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetGridColor
+//
+// Description:		Resets auto-scaling for all axes.
+//
+// Input Argurments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Color PlotObject::GetGridColor(void) const
+{
+	return axisBottom->GetGridColor();
 }

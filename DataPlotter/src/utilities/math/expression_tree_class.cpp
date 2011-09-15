@@ -50,17 +50,20 @@ ExpressionTree::ExpressionTree(const MANAGED_LIST<const Dataset2D> &_list) : lis
 // Description:		Main solving method for the tree.
 //
 // Input Argurments:
-//		expression	= wxString containing the expression to parse
+//		expression		= wxString containing the expression to parse
+//		_xAxisFactor	= const double& specifying the factor required to convert
+//						  X-axis data into seconds (for FFT or filtering operations)
 //
 // Output Arguments:
-//		solvedData	= Dataset2D& containing the evaluated data
+//		solvedData		= Dataset2D& containing the evaluated data
 //
 // Return Value:
 //		wxString, empty for success, error string if unsuccessful
 //
 //==========================================================================
-wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData)
+wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const double &_xAxisFactor)
 {
+	xAxisFactor = _xAxisFactor;
 	wxString errorString;
 	expression = Parenthesize(expression, errorString);
 
@@ -266,8 +269,8 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 				{
 					node.set = FastFourierTransform::Compute(newNode.set);
 
-					//FIXME:  Only true for Baumuller data where time is in msec!
-					node.set.MultiplyXData(1000.0);
+					// Scale the X-axis as required
+					node.set.MultiplyXData(xAxisFactor);
 				}
 				else if (node.set.GetNumberOfPoints() > 0 && newNode.set.GetNumberOfPoints() > 0)
 				{

@@ -55,6 +55,8 @@ public:
 		plotContextPlotArea
 	};
 
+	bool GetXAxisScalingFactor(double &factor);
+
 	void CreatePlotContextMenu(const wxPoint &position, const PlotContext &context);
 	void DisplayAxisRangeDialog(const PlotContext &axis);
 
@@ -77,6 +79,7 @@ private:
 	{
 		colName = 0,
 		colColor,
+		colSize,
 		colLeftCursor,
 		colRightCursor,
 		colDifference,
@@ -122,6 +125,9 @@ private:
 		idPlotContextAutoScale,
 		idPlotContextWriteImageFile,
 
+		idPlotContextBGColor,
+		idPlotContextGridColor,
+
 		idPlotContextToggleBottomGridlines,
 		idPlotContextSetBottomRange,
 		idPlotContextAutoScaleBottom,
@@ -149,6 +155,7 @@ private:
 	void GridRightClickEvent(wxGridEvent &event);
 	void GridDoubleClickEvent(wxGridEvent &event);
 	void GridLeftClickEvent(wxGridEvent &event);
+	void GridCellChangeEvent(wxGridEvent &event);
 
 	// Context menu events
 	void ContextAddMathChannelEvent(wxCommandEvent &event);
@@ -165,6 +172,9 @@ private:
 	void ContextToggleGridlines(wxCommandEvent &event);
 	void ContextAutoScale(wxCommandEvent &event);
 	void ContextWriteImageFile(wxCommandEvent &event);
+
+	void ContextPlotBGColor(wxCommandEvent &event);
+	void ContextGridColor(wxCommandEvent &event);
 
 	void ContextToggleGridlinesBottom(wxCommandEvent &event);
 	void ContextAutoScaleBottom(wxCommandEvent &event);
@@ -191,7 +201,7 @@ private:
 	bool LoadTxtFile(wxString pathAndFileName);
 	bool LoadCsvFile(wxString pathAndFileName);
 	bool LoadGenericDelimitedFile(wxString pathAndFileName);
-	wxArrayString ParseLineIntoColumns(const std::string& line, const wxString &delimiter);
+	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter);
 
 	enum FileFormat
 	{

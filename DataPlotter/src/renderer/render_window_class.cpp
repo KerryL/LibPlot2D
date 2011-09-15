@@ -18,7 +18,8 @@
 // History:
 
 // Standard C++ headers
-#include <map>
+#include <vector>
+#include <algorithm>
 
 // wxWidgets headers
 #include <wx/dcclient.h>
@@ -77,8 +78,8 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id,
 	focalPoint.Set(0.0, 0.0, 0.0);
 	isInteracting = false;
 
-	// Initialize the openGL settings
-	Initialize();
+	// Initialize the openGL settings first time we try to render
+	modified = true;
 }
 
 //==========================================================================
@@ -161,13 +162,18 @@ END_EVENT_TABLE()
 //==========================================================================
 void RenderWindow::Render()
 {
-	// Make this the current open GL object
-	if (IsShownOnScreen())
-		SetCurrent();
+	if (!GetContext() || !IsShownOnScreen())
+		return;
+
+	SetCurrent();
 
 	// If modified, re-initialize
 	if (modified)
 		Initialize();
+
+	// Background color
+	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
+		(float)backgroundColor.GetBlue(), (float)backgroundColor.GetAlpha());
 
 	// Clear color and depth buffers
 	if (view3D)
@@ -175,17 +181,11 @@ void RenderWindow::Render()
 	else
 		glClear(GL_COLOR_BUFFER_BIT);
 
-	// Background color
-	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
-		(float)backgroundColor.GetBlue(), (float)backgroundColor.GetAlpha());
-
 	// Set the matrix mode to modelview
 	glMatrixMode(GL_MODELVIEW);
 
 	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-	//SortPrimitivesByAlpha();
-	// FIXME:  This was removed because all of our primitives have alpha = 1.  We could leave it, but it re-orders
-	// the plots with each pass, and screen appears to flicker.  This can be fixed!
+	SortPrimitivesByAlpha();
 
 	// Draw all of the primitives
 	int i;
@@ -247,12 +247,14 @@ void RenderWindow::OnSize(wxSizeEvent& event)
     wxGLCanvas::OnSize(event);
 
     // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
-	// FIXME:  KRL has not reviewed this code - it came from an example
     int w, h;
     GetClientSize(&w, &h);
-	if (IsShownOnScreen())
+
+	if (GetContext() && IsShownOnScreen())
+	{
 		SetCurrent();
-    glViewport(0, 0, (GLint) w, (GLint) h);
+		glViewport(0, 0, (GLint) w, (GLint) h);
+	}
 
 	// This takes care of any change in aspect ratio
 	AutoSetFrustum();
@@ -281,7 +283,6 @@ void RenderWindow::OnSize(wxSizeEvent& event)
 void RenderWindow::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 {
 	// Do nothing to avoid flashing
-	return;
 }
 
 //==========================================================================
@@ -291,7 +292,7 @@ void RenderWindow::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 // Description:		Event handler for the enter window event.
 //
 // Input Argurments:
-//		event	= wxEraseEvent& (UNUSED)
+//		event	= wxEraseEvent&
 //
 // Output Arguments:
 //		None
@@ -303,9 +304,6 @@ void RenderWindow::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 {
 	// Bring focus to the render window
-	// FIXME:  This accomplishes what it was meant to (making mouse clicks work the first time),
-	// but it also makes other things a nuisance (like editing the kinematic state through the
-	// toolbar and loosing focus when the mouse drifts over the render window).
 	//SetFocus();
 	event.Skip();
 
@@ -370,9 +368,10 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 //==========================================================================
 void RenderWindow::Initialize()
 {
-	// Make this the current open GL window, but only if the window is visible
-	if (IsShownOnScreen())
-		SetCurrent();
+	if (!GetContext() || !IsShownOnScreen())
+		return;
+
+	SetCurrent();
 
 	// Set the openGL parameters depending on whether or not we're in 3D mode
 	if (view3D)
@@ -395,12 +394,18 @@ void RenderWindow::Initialize()
 		// Disable alpha blending (this is enabled as-needed when rendering objects)
 		glDisable(GL_BLEND);
 
-		// FIXME:  Enable anti-aliasing for polygons
+		// Enable anti-aliasing for polygons
+		glEnable(GL_POLYGON_SMOOTH);
+		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+		// FIXME:  Note in opengl.org samples, 9.2 Polygon Antialising
+		// destination alpha is required for this algorithm to work?
 	}
 	else// 2D
 	{
-		// Disable Z-buffering
-		glDisable(GL_DEPTH_TEST);
+		// Disable Z-buffering, but allow testing
+		//glEnable(GL_DEPTH_TEST);// FIXME:  Can't uncomment this line or the app fails to paint on any target machine (don't know why)
+		glDepthMask(GL_FALSE);
 
 		// Turn lighting off
 		glDisable(GL_LIGHTING);
@@ -1087,6 +1092,13 @@ void RenderWindow::UpdateTransformationMatricies(void)
 //==========================================================================
 void RenderWindow::AutoSetFrustum(void)
 {
+	// This method is really for 3D renderers - for 2D, we just re-initialize to handle change in aspect ratio/size
+	if (!view3D)
+	{
+		modified = true;
+		return;
+	}
+
 	// Get this window's size
 	wxSize WindowSize = GetSize();
 
@@ -1268,28 +1280,26 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 //==========================================================================
 void RenderWindow::SortPrimitivesByAlpha(void)
 {
-	// FIXME:  There has to be a more efficient way to do this...
-
 	// Check to see if re-ordering is necessary
 	int i;
-	std::multimap<double, int> primitiveOrder;
+	std::vector< ListItem > primitiveOrder;
 	for (i = 0; i < primitiveList.GetCount(); i++)
-		primitiveOrder.insert(std::pair<double, int>(primitiveList[i]->GetColor().GetAlpha(), i));
+		primitiveOrder.insert(primitiveOrder.end(), ListItem(primitiveList[i]->GetColor().GetAlpha(), i));
+
+	// Do the sorting with the standard libraries method
+	std::stable_sort(primitiveOrder.begin(), primitiveOrder.end());
 
 	// Convert from the list to an array
-	int *Order = new int[primitiveList.GetCount()];
+	int *order = new int[primitiveList.GetCount()];
 	for (i = 0; i < primitiveList.GetCount(); i++)
-	{
-		Order[primitiveList.GetCount() - i - 1] = primitiveOrder.begin()->second;
-		primitiveOrder.erase(primitiveOrder.begin());
-	}
+		order[i] = primitiveOrder[i].i;
 
 	// Re-order the list
-	primitiveList.ReorderObjects(Order);
+	primitiveList.ReorderObjects(order);
 
 	// Clean up memory
-	delete [] Order;
-	Order = NULL;
+	delete [] order;
+	order = NULL;
 
 	return;
 }

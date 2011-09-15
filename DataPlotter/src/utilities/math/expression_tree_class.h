@@ -30,10 +30,12 @@ public:
 	ExpressionTree(const MANAGED_LIST<const Dataset2D> &_list);
 
 	// Main solver method
-	wxString Solve(wxString expression, Dataset2D &solvedData);
+	wxString Solve(wxString expression, Dataset2D &solvedData, const double &_xAxisFactor);
 
 private:
 	const MANAGED_LIST<const Dataset2D> &list;
+
+	double xAxisFactor;
 
 	struct Node
 	{

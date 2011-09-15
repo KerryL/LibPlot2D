@@ -41,6 +41,8 @@ public:
 
 	void SetModified(void) { modified = true; };
 
+	void SetSize(const unsigned int &_size) { size = _size; modified = true; };
+
 	// Remove all data from the plot
 	void SetData(const Dataset2D *_data);
 	void ClearData(void) { data = NULL; };
@@ -61,6 +63,8 @@ private:
 	// The axes with which this object is associated
 	Axis *xAxis;
 	Axis *yAxis;
+
+	unsigned int size;
 
 	// For use when the axis scale changes
 	void RescalePoint(const double *xyPoint, int *point);

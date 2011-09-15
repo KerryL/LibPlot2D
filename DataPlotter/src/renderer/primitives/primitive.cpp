@@ -119,6 +119,9 @@ void Primitive::Draw(void)
 	// Check to see if we need to re-create the geometry for this object
 	if (modified || listIndex == 0)
 	{
+		// Reset the modified flag
+		modified = false;
+
 		// If the list index is zero, try and get a valid index
 		if (listIndex == 0)
 			listIndex = glGenLists(1);
@@ -140,32 +143,29 @@ void Primitive::Draw(void)
 		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 
 		// If the object is transparent, enable alpha blending
-		if (color.GetAlpha() != 1.0)
+		/*if (color.GetAlpha() != 1.0)
 		{
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			// Also disable the Z-buffer
 			glDepthMask(GL_FALSE);
-		}
+		}*/// FIXME:  Let this be handled by anti-aliasing controls?
 
 		// Generate the object's geometry
 		GenerateGeometry();
 
 		// Turn off alpha blending, if we turned it on to render this object
-		if (color.GetAlpha() != 1.0)
+		/*if (color.GetAlpha() != 1.0)
 		{
 			glDisable(GL_BLEND);
 
 			// And re-enable the z-buffer
 			glDepthMask(GL_TRUE);
-		}
-
+		}*/// FIXME:  Let this be handled by anti-aliasing controls?
+		
 		// End the glList
 		glEndList();
-
-		// Reset the modified flag
-		modified = false;
 	}
 
 	// Call the list we created for this object (if it has a valid index)

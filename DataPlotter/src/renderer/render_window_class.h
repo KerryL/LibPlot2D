@@ -76,9 +76,11 @@ public:
 	inline void SetView3D(bool _view3D) { view3D = _view3D; modified = true; };
 
 	inline void SetBackgroundColor(Color _backgroundColor) { backgroundColor = _backgroundColor; modified = true; };
+	inline Color GetBackgroundColor(void) { return backgroundColor; };
 
 	inline bool GetWireFrame(void) const { return wireFrame; };
 	inline bool GetViewOrthogonal(void) const { return viewOrthogonal; };
+	inline bool GetView3D(void) const { return view3D; };
 
 	// Returns a string containing any OpenGL errors
 	wxString GetGLError(void) const;
@@ -102,6 +104,24 @@ private:
 
 	// The background color
 	Color backgroundColor;
+
+	// List of item indexes and alphas for sorting by alpha
+	struct ListItem
+	{
+		ListItem(const double& _alpha, const int &_i)
+		{
+			alpha = _alpha;
+			i = _i;
+		};
+
+		double alpha;
+		int i;
+
+		bool operator< (const ListItem &right) const
+		{
+			return alpha < right.alpha;
+		};
+	};
 
 	// Event handlers-----------------------------------------------------
 	// Interactor events

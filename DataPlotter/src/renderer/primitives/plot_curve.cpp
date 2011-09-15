@@ -40,6 +40,8 @@ PlotCurve::PlotCurve(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 {
 	xAxis = NULL;
 	yAxis = NULL;
+
+	size = 1;
 }
 
 //==========================================================================
@@ -123,7 +125,7 @@ const int PlotCurve::offsetFromWindowEdge = 75;
 void PlotCurve::GenerateGeometry(void)
 {
 	// Set the line width
-	glLineWidth(1.0f);
+	glLineWidth((float)size);
 
 	// Create the plot
 	glBegin(GL_LINE_STRIP);

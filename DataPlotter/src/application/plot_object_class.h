@@ -72,12 +72,15 @@ public:
 	void SetRightYMax(const double &_yMax);
 
 	void SetCurveProperties(const unsigned int &index, const Color &color,
-		const bool &visible, const bool &rightAxis);
+		const bool &visible, const bool &rightAxis, const unsigned int &size);
 	void SetGrid(const bool &gridOn);
 	void SetXGrid(const bool &gridOn);
 	void SetLeftYGrid(const bool &gridOn);
 	void SetRightYGrid(const bool &gridOn);
 	void SetXLabel(wxString text);
+
+	void SetGridColor(const Color &color);
+	Color GetGridColor(void) const;
 
 	void ResetAutoScaling(void);
 	void SetAutoScaleBottom(void) { autoScaleX = true; };

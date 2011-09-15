@@ -44,6 +44,8 @@ public:
 	bool GetLeftGrid(void) const;
 	bool GetRightGrid(void) const;
 
+	Color GetGridColor(void) const;
+
 	double GetXMin(void) const;
 	double GetXMax(void) const;
 	double GetLeftYMin(void) const;
@@ -58,8 +60,10 @@ public:
 	void SetLeftGrid(const bool &grid);
 	void SetRightGrid(const bool &grid);
 
+	void SetGridColor(const Color &color);
+
 	void SetCurveProperties(const unsigned int &index, const Color &color,
-		const bool &visible, const bool &rightAxis);
+		const bool &visible, const bool &rightAxis, const unsigned int &size);
 	void SetXLimits(const double &min, const double &max);
 	void SetLeftYLimits(const double &min, const double &max);
 	void SetRightYLimits(const double &min, const double &max);
