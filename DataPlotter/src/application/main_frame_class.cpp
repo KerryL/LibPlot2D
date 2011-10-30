@@ -800,6 +800,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 		return true;
 	}
 	// FIXME:  Add Siemens format here?  Useful for assigning readable names instead of .rXX
+	// FIXME:  Add Kollmorgen format here (needed because Kollmorgen's format is incompatible with ReadGeneric...)
 	// TODO:  Add any other specific file formats here
 
 	file.close();
@@ -1173,7 +1174,7 @@ void MainFrame::SetXDataLabel(wxString label)
 // Class:			MainFrame
 // Function:		SetXDataLabel
 //
-// Description:		Removes all curves from the plot.
+// Description:		Sets the x-data labels according to the opened file type.
 //
 // Input Argurments:
 //		None
