@@ -5,5 +5,3 @@ z-order should be (back to front - draw in this order):
 	axes
 	cursors
 	zoom box
-Reading Siemens files, X axis labels is X (ms), should be Time (ms)
-Add ability to read Kollmorgen csv files
