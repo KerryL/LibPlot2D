@@ -953,12 +953,8 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 
 		AddCurve(dataSet, descriptions[i]);
 	}
-<<<<<<< HEAD
-=======
 	// FIXME:  Add Siemens format here?  Useful for assigning readable names instead of .rXX
-	// FIXME:  Add Kollmorgen format here (needed because Kollmorgen's format is incompatible with ReadGeneric...)
 	// TODO:  Add any other specific file formats here
->>>>>>> ce35c0bb40f7d9d459fa5b8c575ff017f4755b0e
 
 	// Clean up memory
 	// Don't delete dataSet -> this is handled by the MANAGED_LIST object
