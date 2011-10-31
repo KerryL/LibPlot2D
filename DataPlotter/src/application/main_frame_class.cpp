@@ -1775,6 +1775,8 @@ bool MainFrame::GetXAxisScalingFactor(double &factor)
 	// For Baumulelr datasets, multiply x data by 1000 in order to have seconds
 	if (currentFileFormat == FormatBaumuller)
 		factor = 1000.0;
+	else if (currentFileFormat == FormatKollmorgen)
+		factor = 1.0;
 	else
 	{
 		// Use time series label to determine units and decide if scaling is necessary
