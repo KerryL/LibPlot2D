@@ -201,11 +201,14 @@ private:
 	bool LoadTxtFile(wxString pathAndFileName);
 	bool LoadCsvFile(wxString pathAndFileName);
 	bool LoadGenericDelimitedFile(wxString pathAndFileName);
+	bool LoadBaumullerFile(wxString pathAndFileName);
+	bool LoadKollmorgenFile(wxString pathAndFileName);
 	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter);
 
 	enum FileFormat
 	{
 		FormatBaumuller,
+		FormatKollmorgen,
 		FormatFFT,
 		FormatGeneric
 	};

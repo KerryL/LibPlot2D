@@ -716,9 +716,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 		return false;
 	}
 
-	wxString delimiter(';');
-
-	// Determine if this is a Baumuller osiclloscope export file
+	// Determine the type of the file we're trying to open
 	std::string nextLine;
 	std::getline(file, nextLine);
 
@@ -727,86 +725,250 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 
 	if (compatableNextLine.Trim().compare(_T("WinBASS_II_Oscilloscope_Data")) == 0)// Baumuller oscilloscope trace
 	{
-		// Throw out everything up to "Par.number:"
-		// This will give us the number of datasets we need
-		while (compatableNextLine.Trim().substr(0, 11).compare(_T("Par.number:")) != 0)
-		{
-			std::getline(file, nextLine);
-			compatableNextLine = nextLine;
-		}
-		wxArrayString parameterNumbers = ParseLineIntoColumns(nextLine, delimiter);
-
-		std::getline(file, nextLine);
-		wxArrayString descriptions = ParseLineIntoColumns(nextLine, delimiter);
-
-		std::getline(file, nextLine);
-		wxArrayString units = ParseLineIntoColumns(nextLine, delimiter);
-
-		// Throw out the max and min rows
-		std::getline(file, nextLine);
-		std::getline(file, nextLine);
-
-		// Allocate datasets
-		std::vector<double> *data = new std::vector<double>[parameterNumbers.size()];
-
-		// Start reading data
-		wxArrayString parsed;
-		unsigned int i;
-		double tempDouble;
-		while (!file.eof())
-		{
-			std::getline(file, nextLine);
-			parsed = ParseLineIntoColumns(nextLine, delimiter);
-
-			for (i = 0; i < parsed.size(); i++)
-			{
-				if (!parsed[i].ToDouble(&tempDouble))
-				{
-					delete [] data;
-
-					::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Generating Plot"));
-					return false;
-				}
-
-				data[i].push_back(tempDouble);
-			}
-		}
-
-		// Put the data in datasets and add them to the plot
-		Dataset2D *dataSet;
-		unsigned int j;
-		for (i = 0; i < parameterNumbers.size() - 1; i++)
-		{
-			dataSet = new Dataset2D(data[0].size());
-			for (j = 0; j < data[0].size(); j++)
-			{
-				dataSet->GetXPointer()[j] = data[0].at(j);
-				dataSet->GetYPointer()[j] = data[i + 1].at(j);
-			}
-
-			AddCurve(dataSet, descriptions[i + 1]
-				+ _T(" (") + parameterNumbers[i + 1] + _T(") [")
-				+ units[i + 1] + _T("]"));
-		}
-
-		// Clean up memory
-		// Don't delete dataSet -> this is handled by the MANAGED_LIST object
-		delete [] data;
 		file.close();
+		return LoadBaumullerFile(pathAndFileName);
+	}
+	else// Formats the require reading further into the file than the first line
+	{
+		std::getline(file, nextLine);
+		compatableNextLine = nextLine;
+		// Formats requiring reading to the second line
 
-		// Set the file format flag
-		currentFileFormat = FormatBaumuller;
-
-		return true;
+		// Kollmorgen format from S600 series drives
+		// There may be a better way to check this, but I haven't found it
+		if (compatableNextLine.compare(0, 7, _T("MMI vom")) == 0)
+		{
+			file.close();
+			return LoadKollmorgenFile(pathAndFileName);
+		}
 	}
 	// FIXME:  Add Siemens format here?  Useful for assigning readable names instead of .rXX
-	// FIXME:  Add Kollmorgen format here (needed because Kollmorgen's format is incompatible with ReadGeneric...)
 	// TODO:  Add any other specific file formats here
 
 	file.close();
 
 	// Try to open the file as a generic delimited file
 	return LoadGenericDelimitedFile(pathAndFileName);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		LoadBaumullerFile
+//
+// Description:		Loads Baumuller data trace (from BM4x00 series drive).
+//
+// Input Argurments:
+//		pathAndFileName	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true for file successfully loaded, false otherwise
+//
+//==========================================================================
+bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
+{
+	// Open the file
+	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
+
+	if (!file.is_open())
+	{
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
+		return false;
+	}
+
+	wxString delimiter(';');
+
+	std::string nextLine;
+	std::getline(file, nextLine);
+
+	// For compatability with GTK - getline returns string ending with \r under GTK, which we can't have
+	wxString compatableNextLine(nextLine);// FIXME:  I don't think this is used
+
+	// Throw out everything up to "Par.number:"
+	// This will give us the number of datasets we need
+	while (compatableNextLine.Trim().substr(0, 11).compare(_T("Par.number:")) != 0)
+	{
+		std::getline(file, nextLine);
+		compatableNextLine = nextLine;
+	}
+	wxArrayString parameterNumbers = ParseLineIntoColumns(nextLine, delimiter);
+
+	std::getline(file, nextLine);
+	wxArrayString descriptions = ParseLineIntoColumns(nextLine, delimiter);
+
+	std::getline(file, nextLine);
+	wxArrayString units = ParseLineIntoColumns(nextLine, delimiter);
+
+	// Throw out the max and min rows
+	std::getline(file, nextLine);
+	std::getline(file, nextLine);
+
+	// Allocate datasets
+	std::vector<double> *data = new std::vector<double>[parameterNumbers.size()];
+
+	// Start reading data
+	wxArrayString parsed;
+	unsigned int i;
+	double tempDouble;
+	while (!file.eof())
+	{
+		std::getline(file, nextLine);
+		parsed = ParseLineIntoColumns(nextLine, delimiter);
+
+		for (i = 0; i < parsed.size(); i++)
+		{
+			if (!parsed[i].ToDouble(&tempDouble))
+			{
+				delete [] data;
+
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Generating Plot"));
+				return false;
+			}
+
+			data[i].push_back(tempDouble);
+		}
+	}
+
+	// Put the data in datasets and add them to the plot
+	Dataset2D *dataSet;
+	unsigned int j;
+	for (i = 0; i < parameterNumbers.size() - 1; i++)
+	{
+		dataSet = new Dataset2D(data[0].size());
+		for (j = 0; j < data[0].size(); j++)
+		{
+			dataSet->GetXPointer()[j] = data[0].at(j);
+			dataSet->GetYPointer()[j] = data[i + 1].at(j);
+		}
+
+		AddCurve(dataSet, descriptions[i + 1]
+			+ _T(" (") + parameterNumbers[i + 1] + _T(") [")
+			+ units[i + 1] + _T("]"));
+	}
+
+	// Clean up memory
+	// Don't delete dataSet -> this is handled by the MANAGED_LIST object
+	delete [] data;
+	file.close();
+
+	// Set the file format flag
+	currentFileFormat = FormatBaumuller;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		LoadKollmorgenFile
+//
+// Description:		Loads Kollmorgen data trace (from S600 series drive).
+//
+// Input Argurments:
+//		pathAndFileName	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true for file successfully loaded, false otherwise
+//
+//==========================================================================
+bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
+{
+	// Open the file
+	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
+
+	if (!file.is_open())
+	{
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
+		return false;
+	}
+
+	wxString delimiter(',');
+
+	std::string nextLine;
+	std::getline(file, nextLine);
+
+	// For compatability with GTK - getline returns string ending with \r under GTK, which we can't have
+	wxString compatableNextLine(nextLine);// FIXME:  I don't think this is used...
+
+	// Throw out the first two lines
+	std::getline(file, nextLine);
+	std::getline(file, nextLine);
+	compatableNextLine = nextLine;
+
+	// The third line contains the number of datapoints and the samling period in msec
+	// We use this information to generate the time series (file does not contain a time series)
+	//unsigned int rows = atoi(nextLine.substr(0, nextLine.find_first_of(delimiter)).c_str());
+	double samplingPeriod = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
+
+	// The fourth line contains the data set labels (which also gives us the number of datasets we need)
+	std::getline(file, nextLine);
+	wxArrayString descriptions = ParseLineIntoColumns(nextLine, delimiter);
+
+	// Allocate datasets
+	std::vector<double> *data = new std::vector<double>[descriptions.size()];
+
+	// Start reading data
+	wxArrayString parsed;
+	unsigned int i;
+	double tempDouble;
+	while (!file.eof())
+	{
+		std::getline(file, nextLine);
+		parsed = ParseLineIntoColumns(nextLine, delimiter);
+
+		for (i = 0; i < parsed.size(); i++)
+		{
+			if (!parsed[i].ToDouble(&tempDouble))
+			{
+				delete [] data;
+
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Generating Plot"));
+				return false;
+			}
+
+			data[i].push_back(tempDouble);
+		}
+	}
+
+	// Put the data in datasets and add them to the plot
+	Dataset2D *dataSet;
+	unsigned int j;
+	double time;
+	for (i = 0; i < descriptions.size(); i++)
+	{
+		dataSet = new Dataset2D(data[0].size());
+		time = 0.0;
+
+		for (j = 0; j < data[0].size(); j++)
+		{
+			dataSet->GetXPointer()[j] = time;
+			dataSet->GetYPointer()[j] = data[i].at(j);
+
+			time += samplingPeriod;
+		}
+
+		AddCurve(dataSet, descriptions[i]);
+	}
+<<<<<<< HEAD
+=======
+	// FIXME:  Add Siemens format here?  Useful for assigning readable names instead of .rXX
+	// FIXME:  Add Kollmorgen format here (needed because Kollmorgen's format is incompatible with ReadGeneric...)
+	// TODO:  Add any other specific file formats here
+>>>>>>> ce35c0bb40f7d9d459fa5b8c575ff017f4755b0e
+
+	// Clean up memory
+	// Don't delete dataSet -> this is handled by the MANAGED_LIST object
+	delete [] data;
+	file.close();
+
+	// Set the file format flag
+	currentFileFormat = FormatKollmorgen;
+
+	return true;
 }
 
 //==========================================================================
@@ -1192,6 +1354,10 @@ void MainFrame::SetXDataLabel(const FileFormat &format)
 	{
 	case FormatBaumuller:
 		SetXDataLabel(_T("Time [msec]"));
+		break;
+
+	case FormatKollmorgen:
+		SetXDataLabel(_T("Time [sec]"));
 		break;
 
 	case FormatFFT:
