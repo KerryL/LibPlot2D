@@ -149,14 +149,12 @@ void MainFrame::DoLayout(void)
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxVERTICAL);
 	lowerSizer->Add(buttonSizer, 0, wxGROW | wxALL, 5);
 
-	unsigned int buttonWidth = 80;
-	unsigned int buttonHeight = 25;
-	openButton = new wxButton(this, idButtonOpen, _T("Open"), wxDefaultPosition, wxSize(buttonWidth, buttonHeight));
-	autoScaleButton = new wxButton(this, idButtonAutoScale, _T("Auto Scale"), wxDefaultPosition, wxSize(buttonWidth, buttonHeight));
-	removeCurveButton = new wxButton(this, idButtonRemoveCurve, _T("Remove"), wxDefaultPosition, wxSize(buttonWidth, buttonHeight));
-	buttonSizer->Add(openButton, 0, 0, 0);
-	buttonSizer->Add(autoScaleButton, 0, 0, 0);
-	buttonSizer->Add(removeCurveButton, 0, 0, 0);
+	openButton = new wxButton(this, idButtonOpen, _T("Open"));
+	autoScaleButton = new wxButton(this, idButtonAutoScale, _T("Auto Scale"));
+	removeCurveButton = new wxButton(this, idButtonRemoveCurve, _T("Remove"));
+	buttonSizer->Add(openButton, 0, wxEXPAND);
+	buttonSizer->Add(autoScaleButton, 0, wxEXPAND);
+	buttonSizer->Add(removeCurveButton, 0, wxEXPAND);
 
 	optionsGrid = new wxGrid(this, wxID_ANY);
 	lowerSizer->Add(optionsGrid, 1, wxGROW | wxALL, 5);
