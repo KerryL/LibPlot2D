@@ -133,6 +133,8 @@ void PlotRenderer::UpdateDisplay(void)
 	// Update the plot
 	plot->Update();
 
+	Refresh();
+
 	return;
 }
 
