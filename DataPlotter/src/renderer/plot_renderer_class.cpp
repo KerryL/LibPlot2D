@@ -34,6 +34,7 @@
 // Input Argurments:
 //		_mainFrame	= MainFrame& reference to this object's parent window
 //		id			= wxWindowID
+//		args		= int[]
 //
 // Output Arguments:
 //		None
@@ -42,8 +43,8 @@
 //		None
 //
 //==========================================================================
-PlotRenderer::PlotRenderer(MainFrame &_mainFrame, wxWindowID id)
-							 : RenderWindow(_mainFrame, id, wxDefaultPosition,
+PlotRenderer::PlotRenderer(MainFrame &_mainFrame, wxWindowID id, int args[])
+							 : RenderWindow(_mainFrame, id, args, wxDefaultPosition,
 							 wxDefaultSize), mainFrame(_mainFrame)
 {
 	// Create the actors
@@ -131,8 +132,6 @@ void PlotRenderer::UpdateDisplay(void)
 {
 	// Update the plot
 	plot->Update();
-
-	Render();
 
 	return;
 }

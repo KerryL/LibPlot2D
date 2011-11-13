@@ -136,7 +136,8 @@ void MainFrame::DoLayout(void)
 
 	// Create the main control
 	optionsGrid = NULL;// To avoid crashing in UpdateCursors
-	plotArea = new PlotRenderer(*this, wxID_ANY);
+	int args[] = {WX_GL_DOUBLEBUFFER, 0};
+	plotArea = new PlotRenderer(*this, wxID_ANY, args);
 	plotArea->SetSize(480, 320);
 	plotArea->SetGridOn();
 	mainSizer->Add(plotArea, 1, wxGROW);

@@ -41,6 +41,7 @@
 // Input Argurments:
 //		parent		= wxWindow& reference to the owner of this object
 //		id			= wxWindowID to identify this window
+//		args		= int[]
 //		position	= const wxPoint& specifying this object's position
 //		size		= const wxSize& specifying this object's size
 //		style		= long specifying this object's style flags
@@ -52,9 +53,9 @@
 //		None
 //
 //==========================================================================
-RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id,
+RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
+	&parent, id, position, size, style | wxFULL_REPAINT_ON_RESIZE, wxEmptyString, args)
 {
 	// Initialize the private data
 	wireFrame = false;
@@ -193,7 +194,6 @@ void RenderWindow::Render()
 		primitiveList[i]->Draw();
 
 	// Flush and swap the buffers to update the image
-    glFlush();
     SwapBuffers();
 }
 

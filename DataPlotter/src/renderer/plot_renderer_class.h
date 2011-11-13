@@ -34,7 +34,7 @@ class PlotRenderer : public RenderWindow
 {
 public:
 	// Constructor
-	PlotRenderer(MainFrame &_mainFrame, wxWindowID id);
+	PlotRenderer(MainFrame &_mainFrame, wxWindowID id, int args[]);
 
 	// Destructor
 	~PlotRenderer();

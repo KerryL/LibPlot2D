@@ -36,14 +36,11 @@ class RenderWindow : public wxGLCanvas
 {
 public:
 	// Constructor
-	RenderWindow(wxWindow &parent, wxWindowID id,
+	RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 		const wxPoint& position, const wxSize& size, long style = 0);
 
 	// Destructor
 	virtual ~RenderWindow();
-
-	// The main render method - re-draws the scene
-    void Render();
 
 	// Sets up all of the open GL parameters
     void Initialize();
@@ -135,6 +132,9 @@ private:
     void OnEraseBackground(wxEraseEvent& event);
 	void OnEnterWindow(wxMouseEvent &event);
 	// End event handlers-------------------------------------------------
+
+	// The main render method - re-draws the scene
+    void Render();
 
 	// The type of ineraction to perform
 	enum InteractionType
