@@ -136,8 +136,15 @@ void MainFrame::DoLayout(void)
 
 	// Create the main control
 	optionsGrid = NULL;// To avoid crashing in UpdateCursors
+#ifdef __WXGTK__
+	// Under GTK, we get a segmentation fault or X error on call to SwapBuffers in RenderWindow.
+	// Adding the double-buffer arugment fixes this.  Under windows, the double-buffer argument
+	// causes the colors to go funky.  So we have this #if.
 	int args[] = {WX_GL_DOUBLEBUFFER, 0};
 	plotArea = new PlotRenderer(*this, wxID_ANY, args);
+#else
+	plotArea = new PlotRenderer(*this, wxID_ANY, NULL);
+#endif
 	plotArea->SetSize(480, 320);
 	plotArea->SetGridOn();
 	mainSizer->Add(plotArea, 1, wxGROW);
