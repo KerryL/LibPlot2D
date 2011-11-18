@@ -26,7 +26,7 @@
 //
 // Description:		Constructor for the VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -46,7 +46,7 @@ VECTOR::VECTOR()
 //
 // Description:		Constructor for the VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_X	= const double& specifying first component of the vector
 //		_Y	= const double& specifying second component of the vector
 //		_Z	= const double& specifying third component of the vector
@@ -72,7 +72,7 @@ VECTOR::VECTOR(const double &_X, const double &_Y, const double &_Z)
 //
 // Description:		Destructor for the VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -99,7 +99,7 @@ VECTOR::~VECTOR()
 //					in setting these arguments, as results will not be
 //					accurate unless they are correct.
 //
-// Input Argurments:
+// Input Arguments:
 //		CoR			= const VECTOR& specifying the point which this will be rotated
 //					  about
 //		Rotations	= const VECTOR& specifying the angles which this will be rotated
@@ -195,7 +195,7 @@ void VECTOR::Rotate (const VECTOR &CoR, const VECTOR &Rotations,
 // Description:		Performs rotation of this object around point CoR.  This
 //					version only performs rotation about one specified axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		CoR		= const VECTOR& specifying the point which this will be rotated about
 //		Angle	= const double& specifying the angle which this will be rotated through
 //		About	= const AXIS& specifying the axis of rotation
@@ -228,7 +228,7 @@ void VECTOR::Rotate(const VECTOR &CoR, const double &Angle, const AXIS &About)
 // Description:		Rotates this object about the specified axis by the
 //					the specified angle.
 //
-// Input Argurments:
+// Input Arguments:
 //		Angle	= const double& specifying the distance to rotate this object [rad]
 //		About	= const AXIS& specifying the axis of rotation
 //
@@ -275,7 +275,7 @@ void VECTOR::Rotate(const double &Angle, const AXIS &About)
 //					the specified angle.  This assumes the rotation axis
 //					passes through the origin.
 //
-// Input Argurments:
+// Input Arguments:
 //		Angle			= const double& specifying the distance to rotate this object [rad]
 //		RotationAxis	= const VECTOR& specifying the axis of rotation
 //
@@ -326,7 +326,7 @@ void VECTOR::Rotate(const double &Angle, const VECTOR &RotationAxis)
 //
 // Description:		Returns the name of the specified axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		Axis	= const AXIS& specifying the axis name we want
 //
 // Output Arguments:
@@ -371,7 +371,7 @@ wxString VECTOR::GetAxisName(AXIS Axis)
 //					returned in radians with the convention that the angles
 //					go from this to Target.
 //
-// Input Argurments:
+// Input Arguments:
 //		Target	= const VECTOR& to reference for angle computations
 //
 // Output Arguments:
@@ -418,7 +418,7 @@ VECTOR VECTOR::AnglesTo(const VECTOR &Target) const
 // Description:		Prints the contents of the specified object to an
 //					ostream object.
 //
-// Input Argurments:
+// Input Arguments:
 //		Target	= const VECTOR& to be printed
 //
 // Output Arguments:
@@ -442,7 +442,7 @@ ostream &operator << (ostream &WriteOut, const VECTOR &Target)
 //
 // Description:		Prints the contents of this object to a string.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -467,7 +467,7 @@ wxString VECTOR::Print(void) const
 //
 // Description:		Sets the contents of this vector as specified.
 //
-// Input Argurments:
+// Input Arguments:
 //		_X	= const double& specifying first component of the vector
 //		_Y	= const double& specifying second component of the vector
 //		_Z	= const double& specifying third component of the vector
@@ -497,7 +497,7 @@ void VECTOR::Set(const double &_X, const double &_Y, const double &_Z)
 //					Const version (returns a normalized vector, but doesn't
 //					modify this object).
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -531,7 +531,7 @@ VECTOR VECTOR::Normalize(void) const
 //
 // Description:		Performs the multiplication that results in a 3x3 matrix.
 //
-// Input Argurments:
+// Input Arguments:
 //		Vector	= const VECTOR& to be multiplied
 //
 // Output Arguments:
@@ -557,7 +557,7 @@ Matrix VECTOR::OuterProduct(const VECTOR &Vector) const
 //
 // Description:		Addition operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Vector	= const VECTOR& to be added to this
 //
 // Output Arguments:
@@ -584,7 +584,7 @@ VECTOR VECTOR::operator + (const VECTOR &Vector) const
 //
 // Description:		Subtraction operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Vector	= const VECTOR& to be subtracted from this
 //
 // Output Arguments:
@@ -611,7 +611,7 @@ VECTOR VECTOR::operator - (const VECTOR &Vector) const
 //
 // Description:		Scalar multiplication operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Double	= const double& to multiply each element of this
 //
 // Output Arguments:
@@ -638,7 +638,7 @@ VECTOR VECTOR::operator * (const double &Double) const
 //
 // Description:		Scalar division operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Double	= const double& to divide each element of this
 //
 // Output Arguments:
@@ -665,7 +665,7 @@ VECTOR VECTOR::operator / (const double &Double) const
 //
 // Description:		Vector cross product.
 //
-// Input Argurments:
+// Input Arguments:
 //		Target	= const VECTOR& to multiply this object
 //
 // Output Arguments:
@@ -693,7 +693,7 @@ VECTOR VECTOR::Cross(const VECTOR &Vector) const
 //
 // Description:		Addition assignment operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Vector	= const VECTOR& to be added to this
 //
 // Output Arguments:
@@ -719,7 +719,7 @@ VECTOR& VECTOR::operator += (const VECTOR &Vector)
 //
 // Description:		Subtraction assignment operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Vector	= const VECTOR& to be subtracted from this
 //
 // Output Arguments:
@@ -745,7 +745,7 @@ VECTOR& VECTOR::operator -= (const VECTOR &Vector)
 //
 // Description:		Equal comparison operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Vector	= const VECTOR& to be compared to this
 //
 // Output Arguments:
@@ -770,7 +770,7 @@ bool VECTOR::operator == (const VECTOR &Vector) const
 //
 // Description:		Unequal comparison operator for VECTOR class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Vector	= const VECTOR& to be compared to this
 //
 // Output Arguments:

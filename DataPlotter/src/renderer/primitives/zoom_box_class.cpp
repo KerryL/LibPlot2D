@@ -23,7 +23,7 @@
 //
 // Description:		Constructor for ZoomBox class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_renderWindow	= RenderWindow&
 //
 // Output Arguments:
@@ -53,7 +53,7 @@ ZoomBox::ZoomBox(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 //
 // Description:		Generates OpenGL commands to draw the box.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -89,7 +89,7 @@ void ZoomBox::GenerateGeometry(void)
 //
 // Description:		Checks to see if we're OK to draw the box.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -115,7 +115,7 @@ bool ZoomBox::HasValidParameters(void)
 //
 // Description:		Sets the location of the box's fixed corner.
 //
-// Input Argurments:
+// Input Arguments:
 //		_xAnchor	= const unsigned int& (pixels)
 //		_yAnchor	= const unsigned int& (pixels)
 //
@@ -142,7 +142,7 @@ void ZoomBox::SetAnchorCorner(const unsigned int &_xAnchor, const unsigned int &
 //
 // Description:		Sets the location of the box's floating corner.
 //
-// Input Argurments:
+// Input Arguments:
 //		_xFloat	= const unsigned int& (pixels)
 //		_yFloat	= const unsigned int& (pixels)
 //

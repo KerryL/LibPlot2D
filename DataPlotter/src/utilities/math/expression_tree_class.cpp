@@ -28,7 +28,7 @@
 //
 // Description:		Constructor for ExpressionTree class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_list		= const MANAGED_LIST<const Dataset2D>& reference to the
 //					  other datasets which may be required to complete the calculation
 //
@@ -49,7 +49,7 @@ ExpressionTree::ExpressionTree(const MANAGED_LIST<const Dataset2D> &_list) : lis
 //
 // Description:		Main solving method for the tree.
 //
-// Input Argurments:
+// Input Arguments:
 //		expression		= wxString containing the expression to parse
 //		_xAxisFactor	= const double& specifying the factor required to convert
 //						  X-axis data into seconds (for FFT or filtering operations)
@@ -84,7 +84,7 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const
 //					and still the original order of operations holds.  Also
 //					removes spaces from the string.
 //
-// Input Argurments:
+// Input Arguments:
 //		expression	= wxString containing the expression as entered by the user
 //
 // Output Arguments:
@@ -221,7 +221,7 @@ wxString ExpressionTree::Parenthesize(wxString expression, wxString &errorString
 // Description:		Evaluates single node.  Removes children from the node
 //					in the process.
 //
-// Input Argurments:
+// Input Arguments:
 //		expression	= wxString& containing the remaining portion of the expression
 //
 // Output Arguments:
@@ -587,7 +587,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 // Description:		Retrieves the proper set from the list.  Handles i=0
 //					where 0 indicates time series instead of data.
 //
-// Input Argurments:
+// Input Arguments:
 //		i	= const unsigned int&
 //
 // Output Arguments:

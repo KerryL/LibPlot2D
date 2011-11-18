@@ -29,7 +29,7 @@ IMPLEMENT_APP(DataPlotterApp);
 //
 // Description:		Constant declarations for the DataPlotterApp class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -49,7 +49,7 @@ const wxString DataPlotterApp::creator = _T("Kerry Loux");
 //
 // Description:		Initializes the application window.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:

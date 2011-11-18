@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                         Copyright Kerry R. Loux 2011
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -10,14 +10,14 @@
 // File:  axis.cpp
 // Created:  5/2/2011
 // Author:  K. Loux
-// Description:  Derived from PRIMITIVE for creating axis objects on a plot.
+// Description:  Derived from Primitive for creating axis objects on a plot.
 // History:
 //	11/17/2010	- Fixed some bugs related to rendering of ticks and grid lines, K. Loux.
 
 // Local headers
 #include "renderer/primitives/axis.h"
-#include "renderer/render_window_class.h"
-#include "utilities/math/plot_math.h"
+#include "renderer/renderWindow.h"
+#include "utilities/math/plotMath.h"
 
 // FTGL headers
 #include <FTGL/ftgl.h>
@@ -28,7 +28,7 @@
 //
 // Description:		Constructor for the Axis class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_renderWindow	= RenderWindow& reference to the object that owns this
 //
 // Output Arguments:
@@ -52,9 +52,15 @@ Axis::Axis(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 	majorResolution = 1.0;
 	minorResolution = 1.0;
 
+	offsetFromWindowEdge = 75;// [pixels]
+
 	grid = false;
 
 	font = NULL;
+	
+	minAxis = NULL;
+	maxAxis = NULL;
+	oppositeAxis = NULL;
 
 	gridColor.Set(0.8, 0.8, 0.8, 1.0);
 }
@@ -65,7 +71,7 @@ Axis::Axis(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 //
 // Description:		Destructor for the Axis class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -81,30 +87,12 @@ Axis::~Axis()
 
 //==========================================================================
 // Class:			Axis
-// Function:		Constant Definitions
-//
-// Description:		Constants for Axis class are defined here.
-//
-// Input Argurments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-const unsigned int Axis::offsetFromWindowEdge = 75;// [pixels]
-
-//==========================================================================
-// Class:			Axis
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -116,8 +104,6 @@ const unsigned int Axis::offsetFromWindowEdge = 75;// [pixels]
 //==========================================================================
 void Axis::GenerateGeometry(void)
 {
-	// Use glLineWidth() and store it in member variable?
-
 	// Preliminary calculations
 	int axisLength, tick;
 	double outsideTick = 0.0, insideTick = 0.0;
@@ -128,7 +114,7 @@ void Axis::GenerateGeometry(void)
 	int numberOfGridLines = int((maximum - minimum) / majorResolution + 0.5) - 1;
 	int mainAxisLocation;
 
-	// Determine where the ticks should be drawns
+	// Determine where the ticks should be drawn
 	if (tickStyle == TickStyleInside)
 		insideTick = 1.0;
 	else if (tickStyle == TickStyleOutside)
@@ -143,7 +129,7 @@ void Axis::GenerateGeometry(void)
 	if (orientation == OrientationTop || orientation == OrientationRight)
 		sign = -1.0;
 
-	// Compute the MainAxisLocation (X for vertical axis, Y for horizontal axis)
+	// Compute the mainAxisLocation (X for vertical axis, Y for horizontal axis)
 	if (orientation == OrientationBottom || orientation == OrientationLeft)
 		mainAxisLocation = offsetFromWindowEdge;
 	else if (orientation == OrientationRight)
@@ -160,15 +146,19 @@ void Axis::GenerateGeometry(void)
 	// Draw the axis
 	if (IsHorizontal())
 	{
-		axisLength = renderWindow.GetSize().GetWidth() - 2 * offsetFromWindowEdge;
-		glVertex2i(offsetFromWindowEdge, mainAxisLocation);
-		glVertex2i(axisLength + offsetFromWindowEdge, mainAxisLocation);
+		axisLength = renderWindow.GetSize().GetWidth() -
+				minAxis->GetOffsetFromWindowEdge() - maxAxis->GetOffsetFromWindowEdge();
+		glVertex2i(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
+		glVertex2i(renderWindow.GetSize().GetWidth()
+				- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
 	}
 	else
 	{
-		axisLength = renderWindow.GetSize().GetHeight() - 2 * offsetFromWindowEdge;
-		glVertex2i(mainAxisLocation, offsetFromWindowEdge);
-		glVertex2i(mainAxisLocation, axisLength + offsetFromWindowEdge);
+		axisLength = renderWindow.GetSize().GetHeight() -
+				minAxis->GetOffsetFromWindowEdge() - maxAxis->GetOffsetFromWindowEdge();
+		glVertex2i(mainAxisLocation, minAxis->GetOffsetFromWindowEdge());
+		glVertex2i(mainAxisLocation, renderWindow.GetSize().GetHeight() -
+				maxAxis->GetOffsetFromWindowEdge());
 	}
 
 	// Compute the spacing for grids and ticks
@@ -178,16 +168,17 @@ void Axis::GenerateGeometry(void)
 	// Draw the grids and tick marks
 	if (IsHorizontal())
 	{
-		// Draw the grid
-		if (grid)
+		// Draw the grid (and check to make sure the opposite axis pointer was provided)
+		if (grid && oppositeAxis)
 		{
 			glColor4d(gridColor.GetRed(), gridColor.GetGreen(), gridColor.GetBlue(), gridColor.GetAlpha());
 
 			for (tick = 0; tick < numberOfGridLines; tick++)
 			{
-				glVertex2i(offsetFromWindowEdge + (tick + 1) * gridSpacing, offsetFromWindowEdge);
-				glVertex2i(offsetFromWindowEdge + (tick + 1) * gridSpacing,
-					renderWindow.GetSize().GetHeight() - offsetFromWindowEdge);
+				glVertex2i(minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing,
+						offsetFromWindowEdge);
+				glVertex2i(minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing,
+					renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
 			}
 
 			glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
@@ -199,23 +190,25 @@ void Axis::GenerateGeometry(void)
 			// The first and last inside ticks do not need to be drawn, thus we start this loop with Tick = 1.
 			for (tick = 1; tick <= numberOfTicks; tick++)
 			{
-				glVertex2i(offsetFromWindowEdge + tick * tickSpacing, mainAxisLocation - tickSize * outsideTick * sign);
-				glVertex2i(offsetFromWindowEdge + tick * tickSpacing, mainAxisLocation + tickSize * insideTick * sign);
+				glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing,
+						mainAxisLocation - tickSize * outsideTick * sign);
+				glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing,
+						mainAxisLocation + tickSize * insideTick * sign);
 			}
 		}
 	}
 	else
 	{
 		// Draw the grid
-		if (grid)
+		if (grid && oppositeAxis)
 		{
 			glColor4d(gridColor.GetRed(), gridColor.GetGreen(), gridColor.GetBlue(), gridColor.GetAlpha());
 
 			for (tick = 0; tick < numberOfGridLines; tick++)
 			{
-				glVertex2i(offsetFromWindowEdge, offsetFromWindowEdge + (tick + 1) * gridSpacing);
-				glVertex2i(renderWindow.GetSize().GetWidth() - offsetFromWindowEdge,
-					offsetFromWindowEdge + (tick + 1) * gridSpacing);
+				glVertex2i(offsetFromWindowEdge, minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing);
+				glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(),
+					minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing);
 			}
 
 			glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
@@ -226,8 +219,10 @@ void Axis::GenerateGeometry(void)
 		{
 			for (tick = 1; tick <= numberOfTicks; tick++)
 			{
-				glVertex2i(mainAxisLocation - tickSize * outsideTick * sign, offsetFromWindowEdge + tick * tickSpacing);
-				glVertex2i(mainAxisLocation + tickSize * insideTick * sign, offsetFromWindowEdge + tick * tickSpacing);
+				glVertex2i(mainAxisLocation - tickSize * outsideTick * sign,
+						minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing);
+				glVertex2i(mainAxisLocation + tickSize * insideTick * sign,
+						minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing);
 			}
 		}
 	}
@@ -236,6 +231,7 @@ void Axis::GenerateGeometry(void)
 	glEnd();
 
 	// Add the text
+	// FIXME:  Should add something here to center text over the plot area, not the render window
 	if (font)
 	{
 		FTBBox boundingBox;
@@ -246,7 +242,7 @@ void Axis::GenerateGeometry(void)
 		{
 			double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 
-			// Vertical axis need more space for the numbers
+			// Vertical axes need more space for the numbers
 			if (!IsHorizontal())
 				fontOffsetFromWindowEdge /= 2.0;
 
@@ -344,7 +340,7 @@ void Axis::GenerateGeometry(void)
 					else
 						yTranslation = renderWindow.GetSize().GetHeight() - valueOffsetFromEdge;
 
-					xTranslation = offsetFromWindowEdge + tick * gridSpacing -
+					xTranslation = minAxis->GetOffsetFromWindowEdge() + tick * gridSpacing -
 						(boundingBox.Upper().X() - boundingBox.Lower().X()) / 2.0;
 				}
 				else
@@ -354,7 +350,7 @@ void Axis::GenerateGeometry(void)
 					else
 						xTranslation = renderWindow.GetSize().GetWidth() - valueOffsetFromEdge;
 
-					yTranslation = offsetFromWindowEdge + tick * gridSpacing -
+					yTranslation = minAxis->GetOffsetFromWindowEdge() + tick * gridSpacing -
 						(boundingBox.Upper().Y() - boundingBox.Lower().Y()) / 2.0;
 				}
 
@@ -370,8 +366,6 @@ void Axis::GenerateGeometry(void)
 			// FIXME:  Warn the user
 		}
 	}
-
-	return;
 }
 
 //==========================================================================
@@ -380,7 +374,7 @@ void Axis::GenerateGeometry(void)
 //
 // Description:		Checks to see if this object has horizontal orientation.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -405,7 +399,7 @@ bool Axis::IsHorizontal(void) const
 // Description:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -418,7 +412,11 @@ bool Axis::IsHorizontal(void) const
 bool Axis::HasValidParameters(void)
 {
 	// Don't draw if any of the limits are not numbers
-	if (PlotMath::IsNaN(minimum) || PlotMath::IsNaN(maximum))
+	if (VVASEMath::IsNaN(minimum) || VVASEMath::IsNaN(maximum))
+		return false;
+	
+	// Make sure the pointers to the perpendicular axes have been provided
+	if (!minAxis || !maxAxis)
 		return false;
 
 	return true;

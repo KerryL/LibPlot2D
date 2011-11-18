@@ -25,7 +25,7 @@
 //
 // Description:		Constructor for the FilterBase class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_sampleRate		= const double& specifying the sampling rate in Hz
 //
 // Output Arguments:
@@ -50,7 +50,7 @@ FilterBase::FilterBase(const double &_sampleRate) : sampleRate(_sampleRate)
 //
 // Description:		Destructor for the FilterBase class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:

@@ -23,7 +23,7 @@
 //
 // Description:		Constructor for the LowPassSecondOrderFilter class.
 //
-// Input Argurments:
+// Input Arguments:
 //		cutoffFrequency	= const double& specifying the cutoff frequency [Hz]
 //		dampingRatio	= const double& specifying the damping ratio [-]
 //		_sampleRate		= const double& specifying the sampling rate [Hz]
@@ -72,7 +72,7 @@ LowPassSecondOrderFilter::LowPassSecondOrderFilter(const double& cutoffFrequency
 //
 // Description:		Initialized (or re-initializes) the filter to the specified value.
 //
-// Input Argurments:
+// Input Arguments:
 //		initialValue	= const double& specifying initial conditions for this filter
 //
 // Output Arguments:
@@ -101,7 +101,7 @@ void LowPassSecondOrderFilter::Initialize(const double &initialValue)
 //
 // Description:		Applies the filter.
 //
-// Input Argurments:
+// Input Arguments:
 //		_u	= const double& specifying the raw data input to the filter
 //
 // Output Arguments:

@@ -30,7 +30,7 @@
 //					programmer is responsible for freeing memory associated with
 //					the array of coefficients.
 //
-// Input Argurments:
+// Input Arguments:
 //		data	= const Dataset2D& to fit
 //		order	= const unsigned int& specifying the order of the polynomial
 //
@@ -118,7 +118,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 // Description:		Computes the coefficient of determination value for the
 //					specified fit.
 //
-// Input Argurments:
+// Input Arguments:
 //		data	= const Dataset2D& of original data
 //		fit		= PolynomialFit& containing the information required to draw
 //				  the best-fit curve
@@ -162,7 +162,7 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 // Description:		Returns the calculated y-value at the specified x-value
 //					for the specified fit.
 //
-// Input Argurments:
+// Input Arguments:
 //		x	= const double& at which point to evaluate the fit
 //		fit	= PolynomialFit& containing the information required to draw
 //				  the best-fit curve

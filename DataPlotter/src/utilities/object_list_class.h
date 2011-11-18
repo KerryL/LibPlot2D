@@ -60,7 +60,7 @@ protected:
 //
 // Description:		Constructor for the OBJECT_LIST class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -84,7 +84,7 @@ OBJECT_LIST<T>::OBJECT_LIST()
 //
 // Description:		Destructor for the OBJECT_LIST class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -108,7 +108,7 @@ OBJECT_LIST<T>::~OBJECT_LIST()
 // Description:		Adds objects to the list.  Performs the necessary memory
 //					allocating and transferring routines.
 //
-// Input Argurments:
+// Input Arguments:
 //		ToAdd	= const T*, pointing to the object to add
 //
 // Output Arguments:
@@ -162,7 +162,7 @@ int OBJECT_LIST<T>::Add(T *ToAdd)
 //
 // Description:		Removes the object at the specified index from the list
 //
-// Input Argurments:
+// Input Arguments:
 //		Index	= const int& specifying the object to remove
 //
 // Output Arguments:
@@ -220,7 +220,7 @@ void OBJECT_LIST<T>::Remove(const int &Index)
 //
 // Description:		Returns a pointer to the object with the specified index.
 //
-// Input Argurments:
+// Input Arguments:
 //		Index	= const int& specifying which object we want to retrieve
 //
 // Output Arguments:
@@ -245,7 +245,7 @@ T *OBJECT_LIST<T>::GetObject(const int &Index) const
 //
 // Description:		Returns a pointer to the object with the specified index.
 //
-// Input Argurments:
+// Input Arguments:
 //		Index	= const int& specifying which object we want to retrieve
 //
 // Output Arguments:
@@ -270,7 +270,7 @@ T *OBJECT_LIST<T>::operator[](const int &Index) const
 //
 // Description:		Removes all items in the list.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -298,7 +298,7 @@ void OBJECT_LIST<T>::Clear(void)
 // Description:		Re-organizes all of the objects in the list according to
 //					the specified order.
 //
-// Input Argurments:
+// Input Arguments:
 //		NewOrder	= const int* pointing to an array (MUST contain exactly
 //					  the number of elements of this list) specifying the new
 //					  order.  If the list were {3, 2, 1}, then the three element

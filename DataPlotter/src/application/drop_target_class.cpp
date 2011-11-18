@@ -24,7 +24,7 @@
 //
 // Description:		Constructor for DROP_TARGET class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_MainFrame	= &MAIN_FRAME, reference to main application window
 //
 // Output Arguments:
@@ -44,7 +44,7 @@ DropTarget::DropTarget(MainFrame &_mainFrame) : mainFrame(_mainFrame)
 //
 // Description:		Destructor for DropTarget class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -64,7 +64,7 @@ DropTarget::~DropTarget()
 //
 // Description:		Overloaded virtual method from wxFileDropTarget.
 //
-// Input Argurments:
+// Input Arguments:
 //		x			= wxCoord (unused)
 //		y			= wxCoord (unused)
 //		filenames	= const &wxArrayString containing the list of filenames

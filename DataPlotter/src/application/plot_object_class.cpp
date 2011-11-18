@@ -33,7 +33,7 @@
 //
 // Description:		Constructor for PlotObject class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_renderer	= PlotRenderer& reference to the object that handles the
 //					  drawing operations
 //
@@ -101,7 +101,7 @@ PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 //
 // Description:		Destructor for PlotObject class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -127,7 +127,7 @@ PlotObject::~PlotObject()
 // Description:		Updates the data in the plot and re-sets the fonts, sizes
 //					and positions.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -158,7 +158,7 @@ void PlotObject::Update(void)
 //
 // Description:		Sets the status of the x-axis grid.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -181,7 +181,7 @@ void PlotObject::SetXGrid(const bool &gridOn)
 //
 // Description:		Sets the status of the left y-axis grid.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -204,7 +204,7 @@ void PlotObject::SetLeftYGrid(const bool &gridOn)
 //
 // Description:		Sets the status of the right y-axis grid.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -227,7 +227,7 @@ void PlotObject::SetRightYGrid(const bool &gridOn)
 //
 // Description:		Deletes the existing plots.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -252,7 +252,7 @@ void PlotObject::RemoveExistingPlots(void)
 //
 // Description:		Deletes the specified plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		index	= const unsigned int& specifying the curve to be removed
 //
 // Output Arguments:
@@ -280,7 +280,7 @@ void PlotObject::RemovePlot(const unsigned int &index)
 //
 // Description:		Adds a curve to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		data	= const Dataset2D& to plot
 //
 // Output Arguments:
@@ -309,7 +309,7 @@ void PlotObject::AddCurve(const Dataset2D &data)
 //
 // Description:		Formats the plot actor.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -593,7 +593,7 @@ void PlotObject::FormatPlot(void)
 //					and make the plot look nice.  Also responsible for ensuring
 //					accuracy of tick, grid line and label locations.
 //
-// Input Argurments:
+// Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
 //		maxTicks	= int specifying the maximum number of ticks to use
@@ -685,7 +685,7 @@ double PlotObject::AutoScaleAxis(double &min, double &max, int maxTicks, const b
 //
 // Description:		Sets the lower X limit.
 //
-// Input Argurments:
+// Input Arguments:
 //		_xMin	= const double& describing desired minimum X limit
 //
 // Output Arguments:
@@ -732,7 +732,7 @@ void PlotObject::SetXMin(const double &_xMin)
 //
 // Description:		Sets the upper X limit.
 //
-// Input Argurments:
+// Input Arguments:
 //		_xMax	= const double& describing desired maximum X limit
 //
 // Output Arguments:
@@ -779,7 +779,7 @@ void PlotObject::SetXMax(const double &_xMax)
 //
 // Description:		Sets the lower Y limit.
 //
-// Input Argurments:
+// Input Arguments:
 //		_yMin	= const double& describing desired minimum Y limit
 //
 // Output Arguments:
@@ -826,7 +826,7 @@ void PlotObject::SetLeftYMin(const double &_yMin)
 //
 // Description:		Sets the upper Y limit.
 //
-// Input Argurments:
+// Input Arguments:
 //		_yMax	= const double& describing desired maximum Y limit
 //
 // Output Arguments:
@@ -873,7 +873,7 @@ void PlotObject::SetLeftYMax(const double &_yMax)
 //
 // Description:		Sets the lower Y limit.
 //
-// Input Argurments:
+// Input Arguments:
 //		_yMin	= const double& describing desired minimum Y limit
 //
 // Output Arguments:
@@ -920,7 +920,7 @@ void PlotObject::SetRightYMin(const double &_yMin)
 //
 // Description:		Sets the upper Y limit.
 //
-// Input Argurments:
+// Input Arguments:
 //		_yMax	= const double& describing desired maximum Y limit
 //
 // Output Arguments:
@@ -967,7 +967,7 @@ void PlotObject::SetRightYMax(const double &_yMax)
 //
 // Description:		Resets auto-scaling for all axes.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -993,7 +993,7 @@ void PlotObject::ResetAutoScaling(void)
 //
 // Description:		Sets properties for the specified curve.
 //
-// Input Argurments:
+// Input Arguments:
 //		index		= const unsigned int&
 //		color		= const Color&
 //		visible		= const bool&
@@ -1028,7 +1028,7 @@ void PlotObject::SetCurveProperties(const unsigned int &index, const Color &colo
 //
 // Description:		Resets auto-scaling for all axes.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1056,7 +1056,7 @@ void PlotObject::SetGrid(const bool &gridOn)
 //
 // Description:		Returns status of gridlines.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1080,7 +1080,7 @@ bool PlotObject::GetGrid(void)
 //
 // Description:		Resets auto-scaling for all axes.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1103,7 +1103,7 @@ void PlotObject::SetXLabel(wxString text)
 //
 // Description:		Sets gridline color.
 //
-// Input Argurments:
+// Input Arguments:
 //		color	= const color&
 //
 // Output Arguments:
@@ -1127,7 +1127,7 @@ void PlotObject::SetGridColor(const Color &color)
 //
 // Description:		Resets auto-scaling for all axes.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:

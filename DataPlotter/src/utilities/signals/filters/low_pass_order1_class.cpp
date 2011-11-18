@@ -23,7 +23,7 @@
 //
 // Description:		Constructor for the LowPassFirstOrderFilter class.
 //
-// Input Argurments:
+// Input Arguments:
 //		cutoffFrequency	= const double& specifying the cutoff frequency [Hz]
 //		_sampleRate		= const double& specifying the sampling rate [Hz]
 //		initialValue	= const double& specifying initial conditions for this filter
@@ -68,7 +68,7 @@ LowPassFirstOrderFilter::LowPassFirstOrderFilter(const double& cutoffFrequency,
 //
 // Description:		Initialized (or re-initializes) the filter to the specified value.
 //
-// Input Argurments:
+// Input Arguments:
 //		initialValue	= const double& specifying initial conditions for this filter
 //
 // Output Arguments:
@@ -95,7 +95,7 @@ void LowPassFirstOrderFilter::Initialize(const double &initialValue)
 //
 // Description:		Applies the filter.
 //
-// Input Argurments:
+// Input Arguments:
 //		_u	= const double& specifying the raw data input to the filter
 //
 // Output Arguments:

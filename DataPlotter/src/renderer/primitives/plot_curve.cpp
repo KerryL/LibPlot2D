@@ -26,7 +26,7 @@
 //
 // Description:		Constructor for the PLOT_CURVE class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_RenderWindow	= RENDER_WINDOW* pointing to the object that owns this
 //
 // Output Arguments:
@@ -50,7 +50,7 @@ PlotCurve::PlotCurve(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 //
 // Description:		Copy constructor for the PlotCurve class.
 //
-// Input Argurments:
+// Input Arguments:
 //		plotCurve	= const PlotCurve& to copy to this object
 //
 // Output Arguments:
@@ -73,7 +73,7 @@ PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve)
 //
 // Description:		Destructor for the PlotCurve class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -93,7 +93,7 @@ PlotCurve::~PlotCurve()
 //
 // Description:		Declare class constants for the PlotCurve class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -112,7 +112,7 @@ const int PlotCurve::offsetFromWindowEdge = 75;
 // Description:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -299,7 +299,7 @@ void PlotCurve::GenerateGeometry(void)
 // Description:		Rescales the onscreen position of the point according to
 //					the size of the axis with which this object is associated.
 //
-// Input Argurments:
+// Input Arguments:
 //		xyPoint	= const double* containing the location of the point in plot
 //					  coordinates
 //
@@ -335,7 +335,7 @@ void PlotCurve::RescalePoint(const double *xyPoint, int *point)
 // Description:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -362,7 +362,7 @@ bool PlotCurve::HasValidParameters(void)
 //
 // Description:		Assignment operator for PLOT_CURVE class.
 //
-// Input Argurments:
+// Input Arguments:
 //		plotCurve	= const PlotCurve& to assign to this object
 //
 // Output Arguments:
@@ -392,7 +392,7 @@ PlotCurve& PlotCurve::operator = (const PlotCurve &plotCurve)
 //
 // Description:		Assigns data to the curve.
 //
-// Input Argurments:
+// Input Arguments:
 //		_data	= const Dataset2D* to plot
 //
 // Output Arguments:

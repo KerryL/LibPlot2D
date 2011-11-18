@@ -45,7 +45,7 @@ public:
 //
 // Description:		Removes the object at the specified index from the list.
 //
-// Input Argurments:
+// Input Arguments:
 //		Index	= const int& specifying the object to remove
 //
 // Output Arguments:
@@ -110,7 +110,7 @@ void MANAGED_LIST<T>::Remove(const int &Index)
 //
 // Description:		Removes all items in the list.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:

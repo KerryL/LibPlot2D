@@ -22,7 +22,7 @@
 //
 // Description:		Constructor for RangeLimitsDialog class.
 //
-// Input Argurments:
+// Input Arguments:
 //		parent	= wxWindow* that owns this object
 //		min		= const double& specifying current minimum axis limit
 //		max		= const double& specifying current maximum axis limit
@@ -83,7 +83,7 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 //
 // Description:		Specifies event handlers for dialog events.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -103,7 +103,7 @@ END_EVENT_TABLE()
 //
 // Description:		Returns the value entered in the minimum box.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -128,7 +128,7 @@ double RangeLimitsDialog::GetMinimum(void) const
 //
 // Description:		Returns the value entered in the maximum box.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -153,7 +153,7 @@ double RangeLimitsDialog::GetMaximum(void) const
 //
 // Description:		Validates min and max values when the user chooses OK.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:

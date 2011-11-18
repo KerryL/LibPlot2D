@@ -33,7 +33,7 @@
 // Description:		Constructor for the Matrix class.  Does not allocate any
 //					memory.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -57,7 +57,7 @@ Matrix::Matrix()
 // Description:		Constructor for the Matrix class.  Allocates memory for
 //					a matix of the specified size.
 //
-// Input Argurments:
+// Input Arguments:
 //		_rows		= const unsigned int& specifying the vertical size of the matrix
 //		_columns	= const unsigned int& specifying the horizontal size of the matrix
 //
@@ -88,7 +88,7 @@ Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns)
 //					a matix of the specified size and fills the matrix with
 //					the specified elements.
 //
-// Input Argurments:
+// Input Arguments:
 //		_rows		= const unsigned int& specifying the vertical size of the matrix
 //		_columns	= const unsigned int& specifying the horizontal size of the matrix
 //		element1	= double specifying the first element of the matrix
@@ -139,7 +139,7 @@ Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns, double e
 //
 // Description:		Copy constructor for the Matrix class.  Performs deep copy.
 //
-// Input Argurments:
+// Input Arguments:
 //		matrix	= Matrix& to copy form
 //
 // Output Arguments:
@@ -166,7 +166,7 @@ Matrix::Matrix(const Matrix &matrix)
 //
 // Description:		Destructor for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -189,7 +189,7 @@ Matrix::~Matrix()
 // Description:		Changes the element at the specified location to the
 //					specified value.
 //
-// Input Argurments:
+// Input Arguments:
 //		row		= const unsigned int& specifying the vertical position in the matrix
 //		column	= const unsigned int& specifying the horizontal position in the matrix
 //		value	= const double& specifying the new value of the element
@@ -219,7 +219,7 @@ void Matrix::SetElement(const unsigned int &row, const unsigned int &column, con
 // Description:		Sets the values of this matrix to the arguments passed
 //					to this function.
 //
-// Input Argurments:
+// Input Arguments:
 //		element1	= double representing the first element
 //		..			= doubles representing the other elements.  Elements are
 //					  read by filling each column of a row before moving on
@@ -266,7 +266,7 @@ void Matrix::Set(double element1, ...)
 //
 // Description:		Returns the element at the specified location.
 //
-// Input Argurments:
+// Input Arguments:
 //		Row		= const int& specifying the row
 //		Column = const int& specifying the column
 //
@@ -289,7 +289,7 @@ double Matrix::GetElement(const int &row, const int &column) const
 //
 // Description:		Makes this matrix an identity matrix.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -318,7 +318,7 @@ Matrix& Matrix::MakeIdentity(void)
 //
 // Description:		Sets all elements of this matrix to zero.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -348,7 +348,7 @@ void Matrix::Zero(void)
 // Description:		Returns a sub-matrix made up of the specified portion of
 //					this matrix.
 //
-// Input Argurments:
+// Input Arguments:
 //		StartRow	= const unsigned int& specifying the starting row
 //		StartColumn	= const unsigned int& specifying the starting column
 //		SubRows		= const unsigned int& specifying the number of rows
@@ -386,7 +386,7 @@ Matrix Matrix::GetSubMatrix(const unsigned int &startRow, const unsigned int &st
 //
 // Description:		Transposes this matrix.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -419,7 +419,7 @@ Matrix Matrix::GetTranspose(void) const
 //					Ax=b for x, left divide x = A \ b, where this matrix is A.
 //					Same as A^-1 * b.
 //
-// Input Argurments:
+// Input Arguments:
 //		b	= const Matrix& vector to divide this into
 //
 // Output Arguments:
@@ -454,7 +454,7 @@ Matrix Matrix::LeftDivide(const Matrix &b) const
 //
 // Description:		Multiplication operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const VECTOR& to multiply by
 //
 // Output Arguments:
@@ -484,7 +484,7 @@ const VECTOR Matrix::operator * (const VECTOR &target) const
 //
 // Description:		Multiplication assignment operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Matrix& to multiply
 //
 // Output Arguments:
@@ -526,7 +526,7 @@ Matrix& Matrix::operator *= (const Matrix &target)
 //
 // Description:		Assignment operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Matrix& to assign to this
 //
 // Output Arguments:
@@ -561,7 +561,7 @@ Matrix& Matrix::operator = (const Matrix &target)
 //
 // Description:		Addition assignment operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Matrix& to add
 //
 // Output Arguments:
@@ -593,7 +593,7 @@ Matrix& Matrix::operator += (const Matrix &target)
 //
 // Description:		Subrtaction assignment operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Matrix& to subtract
 //
 // Output Arguments:
@@ -626,7 +626,7 @@ Matrix& Matrix::operator -= (const Matrix &target)
 // Description:		Element-wise multiplication assignment operator for the
 //					Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to multiply by
 //
 // Output Arguments:
@@ -656,7 +656,7 @@ Matrix& Matrix::operator *=(const double &target)
 // Description:		Element-wise division assignment operator for the
 //					Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		Double	= const double& to divide by
 //
 // Output Arguments:
@@ -685,7 +685,7 @@ Matrix& Matrix::operator /=(const double &target)
 //
 // Description:		Prints the contents of this object to a wxString.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -725,7 +725,7 @@ wxString Matrix::Print(void) const
 // Description:		Performs row-reduction on this object until the matrix
 //					is upper-triangular.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -813,7 +813,7 @@ Matrix Matrix::GetRowReduced(void) const
 //
 // Description:		Addition operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= Matrix to add
 //
 // Output Arguments:
@@ -841,7 +841,7 @@ const Matrix Matrix::operator + (const Matrix &target) const
 //
 // Description:		Subtraction operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Matrix& to subtract
 //
 // Output Arguments:
@@ -869,7 +869,7 @@ const Matrix Matrix::operator - (const Matrix &target) const
 //
 // Description:		Multiplication operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Matrix& to multiply by
 //
 // Output Arguments:
@@ -897,7 +897,7 @@ const Matrix Matrix::operator * (const Matrix &target) const
 //
 // Description:		Element-wise multiplication operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to multiply by
 //
 // Output Arguments:
@@ -925,7 +925,7 @@ const Matrix Matrix::operator * (const double &target) const
 //
 // Description:		Element-wise division operator for the Matrix class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to divide by
 //
 // Output Arguments:
@@ -954,7 +954,7 @@ const Matrix Matrix::operator / (const double &target) const
 // Description:		Overload of the () operator for this object.  Permits accessing
 //					class data by using Matrix(row, column).  Non-const version.
 //
-// Input Argurments:
+// Input Arguments:
 //		row		= const unsigned int& specifying the row of the desired element (0-based)
 //		column	= const unsigned int& specifying the column of the desired element (0-based)
 //
@@ -981,7 +981,7 @@ double &Matrix::operator () (const unsigned int &row, const unsigned int &column
 // Description:		Overload of the () operator for this object.  Permits accessing
 //					class data by using Matrix(Row, Column).  Const version.
 //
-// Input Argurments:
+// Input Arguments:
 //		row		= const unsigned int& specifying the row of the desired element (0-based)
 //		column	= const unsigned int& specifying the column of the desired element (0-based)
 //
@@ -1008,7 +1008,7 @@ const double &Matrix::operator () (const unsigned int &row, const unsigned int &
 // Description:		Returns the inverse of this matrix.  If this matrix is badly
 //					scaled or is rectangular, the psuedo-inverse is returned.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1033,7 +1033,7 @@ Matrix Matrix::GetInverse(void) const
 //
 // Description:		Returns the pseudo-inverse of this matrix.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1069,7 +1069,7 @@ Matrix Matrix::GetPsuedoInverse(void) const
 //					will be meaningless.  There is no check to ensure this
 //					is only called on diagonal matrices.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1102,7 +1102,7 @@ Matrix Matrix::GetDiagonalInverse(void) const
 //
 // Description:		Helper method for SVD calculation (used in psuedo-inverse).
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1132,7 +1132,7 @@ double Matrix::pythag(const double& a, const double &b) const
 // Description:		Returns the inverse of this matrix.  If this matrix is badly
 //					scaled or is rectangular, the psuedo-inverse is returned.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1171,7 +1171,7 @@ unsigned int Matrix::GetRank(void) const
 //
 // Description:		Frees memory associated with this object.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1197,7 +1197,7 @@ void Matrix::FreeElements(void)
 // Description:		Allocates memory for the elements according to the number
 //					of rows and columns that make up this object.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1224,7 +1224,7 @@ void Matrix::AllocateElements(void)
 // Description:		Resizes the dynamic memory for this object to accommodate
 //					the specified size.
 //
-// Input Argurments:
+// Input Arguments:
 //		_rows		= const unsigned int& specifying new vertical dimension
 //		_columns	= const unsigned int& specifying new horizontal dimension
 //
@@ -1253,7 +1253,7 @@ void Matrix::Resize(const unsigned int &_rows, const unsigned int &_columns)
 //
 // Description:		Computes singular value decomposition of this matrix.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1682,7 +1682,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 //
 // Description:		Removes the specified row from the matrix
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1720,7 +1720,7 @@ Matrix& Matrix::RemoveRow(const unsigned int &row)
 //
 // Description:		Removes the specified column from the matrix.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1758,7 +1758,7 @@ Matrix& Matrix::RemoveColumn(const unsigned int &column)
 //
 // Description:		Returns an identity matrix of the specified dimension.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:

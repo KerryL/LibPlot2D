@@ -33,7 +33,7 @@
 //
 // Description:		Constructor for the Dataset class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -57,7 +57,7 @@ Dataset2D::Dataset2D()
 //
 // Description:		Constructor for the Dataset class.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& top copy into this object
 //
 // Output Arguments:
@@ -80,7 +80,7 @@ Dataset2D::Dataset2D(const Dataset2D& target)
 //
 // Description:		Constructor for the Dataset class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_numberOfPoints = const unsigned int &
 //
 // Output Arguments:
@@ -103,7 +103,7 @@ Dataset2D::Dataset2D(const unsigned int &_numberOfPoints)
 //
 // Description:		Destructor for the Dataset class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -129,7 +129,7 @@ Dataset2D::~Dataset2D()
 // Description:		Resizes the arrays.  Deletes all existing data before
 //					resizing.
 //
-// Input Argurments:
+// Input Arguments:
 //		_numberOfPoints = const unsigned int &
 //
 // Output Arguments:
@@ -157,7 +157,7 @@ void Dataset2D::Resize(const unsigned int &_numberOfPoints)
 // Description:		Exports the data for this object to a comma or tab-delimited
 //					text file.
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString pointing to the location where the file is
 //						  to be saved
 //
@@ -208,7 +208,7 @@ void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 //					if the X-value is not exactly on a point.  Returns true if
 //					it interpolated.
 //
-// Input Argurments:
+// Input Arguments:
 //		value	= double& specifying the X-value
 //
 // Output Arguments:
@@ -249,7 +249,7 @@ bool Dataset2D::GetYAt(double &x) const
 //
 // Description:		Overloaded assignment operator.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to assign to this
 //
 // Output Arguments:
@@ -284,7 +284,7 @@ Dataset2D& Dataset2D::operator=(const Dataset2D &target)
 //
 // Description:		Overloaded operator (+=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to add to this
 //
 // Output Arguments:
@@ -311,7 +311,7 @@ Dataset2D& Dataset2D::operator+=(const Dataset2D &target)
 //
 // Description:		Overloaded operator (-=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to subtract from this
 //
 // Output Arguments:
@@ -338,7 +338,7 @@ Dataset2D& Dataset2D::operator-=(const Dataset2D &target)
 //
 // Description:		Overloaded operator (*=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to multiply by this
 //
 // Output Arguments:
@@ -365,7 +365,7 @@ Dataset2D& Dataset2D::operator*=(const Dataset2D &target)
 //
 // Description:		Overloaded operator (/=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& divide into this
 //
 // Output Arguments:
@@ -392,7 +392,7 @@ Dataset2D& Dataset2D::operator/=(const Dataset2D &target)
 //
 // Description:		Overloaded operator (+).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to add to this
 //
 // Output Arguments:
@@ -416,7 +416,7 @@ const Dataset2D Dataset2D::operator+(const Dataset2D &target) const
 //
 // Description:		Overloaded operator (-).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to subtract from this
 //
 // Output Arguments:
@@ -440,7 +440,7 @@ const Dataset2D Dataset2D::operator-(const Dataset2D &target) const
 //
 // Description:		Overloaded operator (*).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to multiply with this
 //
 // Output Arguments:
@@ -464,7 +464,7 @@ const Dataset2D Dataset2D::operator*(const Dataset2D &target) const
 //
 // Description:		Overloaded operator (/).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const Dataset2D& to divide into this
 //
 // Output Arguments:
@@ -488,7 +488,7 @@ const Dataset2D Dataset2D::operator/(const Dataset2D &target) const
 //
 // Description:		Overloaded operator (+=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to add to this
 //
 // Output Arguments:
@@ -513,7 +513,7 @@ Dataset2D& Dataset2D::operator+=(const double &target)
 //
 // Description:		Overloaded operator (-=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to subract from this
 //
 // Output Arguments:
@@ -538,7 +538,7 @@ Dataset2D& Dataset2D::operator-=(const double &target)
 //
 // Description:		Overloaded operator (*=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to multiply with this
 //
 // Output Arguments:
@@ -563,7 +563,7 @@ Dataset2D& Dataset2D::operator*=(const double &target)
 //
 // Description:		Overloaded operator (/=).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to divide into this
 //
 // Output Arguments:
@@ -588,7 +588,7 @@ Dataset2D& Dataset2D::operator/=(const double &target)
 //
 // Description:		Overloaded operator (+).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to add to this
 //
 // Output Arguments:
@@ -612,7 +612,7 @@ const Dataset2D Dataset2D::operator+(const double &target) const
 //
 // Description:		Overloaded operator (-).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to subtract from this
 //
 // Output Arguments:
@@ -636,7 +636,7 @@ const Dataset2D Dataset2D::operator-(const double &target) const
 //
 // Description:		Overloaded operator (*).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to multiply with this
 //
 // Output Arguments:
@@ -660,7 +660,7 @@ const Dataset2D Dataset2D::operator*(const double &target) const
 //
 // Description:		Overloaded operator (/).
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to divide into this
 //
 // Output Arguments:
@@ -684,7 +684,7 @@ const Dataset2D Dataset2D::operator/(const double &target) const
 //
 // Description:		Multiplies specified value with X vector.
 //
-// Input Argurments:
+// Input Arguments:
 //		target	= const double& to multiply with this
 //
 // Output Arguments:

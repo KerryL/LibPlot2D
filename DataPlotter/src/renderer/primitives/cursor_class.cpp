@@ -25,7 +25,7 @@
 //
 // Description:		Constructor for the PlotCursor class.
 //
-// Input Argurments:
+// Input Arguments:
 //		_renderWindow	= RenderWindow&
 //		_axis			= Axis& with which we are associated
 //
@@ -50,7 +50,7 @@ PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis) : Primiti
 //
 // Description:		Generates OpenGL commands to draw the cursor.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -105,7 +105,7 @@ void PlotCursor::GenerateGeometry(void)
 //
 // Description:		Checks to see if we're OK to drawy the cursor.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -134,7 +134,7 @@ bool PlotCursor::HasValidParameters(void)
 // Description:		Rescales the onscreen position of the point according to
 //					the size of the axis with which this object is associated.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -166,7 +166,7 @@ void PlotCursor::RescalePoint(unsigned int &point)
 // Description:		Checks to see if the cursor is located under the specified
 //					point.
 //
-// Input Argurments:
+// Input Arguments:
 //		pixel	= const unsigned int& describing the location of the point
 //				  in screen coordinates
 //
@@ -194,7 +194,7 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 //
 // Description:		Sets the x-value where the cursor should appear on the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		_value	= const double& value to set
 //
 // Output Arguments:
@@ -219,7 +219,7 @@ void PlotCursor::SetValue(const double& _value)
 //
 // Description:		Sets the x-value where the cursor should appear on the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		_value	= const double& value to set
 //
 // Output Arguments:

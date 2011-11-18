@@ -30,7 +30,7 @@
 //
 // Description:		Returns true if a number is small enough to regard as zero.
 //
-// Input Argurments:
+// Input Arguments:
 //		toCheck	= const double& to be checked for being close to zero
 //
 // Output Arguments:
@@ -55,7 +55,7 @@ bool PlotMath::IsZero(const double &toCheck)
 // Description:		Returns true if a number is small enough to regard as zero.
 //					This function checks the magnitude of the VECTOR.
 //
-// Input Argurments:
+// Input Arguments:
 //		toCheck	= const VECTOR& to be checked for being close to zero
 //
 // Output Arguments:
@@ -80,7 +80,7 @@ bool PlotMath::IsZero(const VECTOR &toCheck)
 //
 // Description:		Determines if the specified number is or is not a number.
 //
-// Input Argurments:
+// Input Arguments:
 //		toCheck	= const double& to check
 //
 // Output Arguments:
@@ -102,7 +102,7 @@ bool PlotMath::IsNaN(const double &toCheck)
 // Description:		Determines if the specified number is or is not a number.
 //					Vector version - returns false if any component is NaN.
 //
-// Input Argurments:
+// Input Arguments:
 //		ToCheck	= VECTOR& to be checked for containing valid numbers
 //
 // Output Arguments:
@@ -126,7 +126,7 @@ bool PlotMath::IsNaN(const VECTOR &toCheck)
 //					value that is returned is equal to the limit that the value
 //					has exceeded.
 //
-// Input Argurments:
+// Input Arguments:
 //		value		= const double& reference to the value which we want to clamp
 //		lowerLimit	= const double& lower bound of allowable values
 //		upperLimit	= const double& upper bound of allowable values
@@ -158,7 +158,7 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit, const doub
 // Description:		Adds or subtracts 2 * PI to the specified angle until the
 //					angle is between -pi and pi.
 //
-// Input Argurments:
+// Input Arguments:
 //		angle		= const double& reference to the angle we want to bound
 //
 // Output Arguments:
@@ -185,7 +185,7 @@ double PlotMath::RangeToPlusMinusPi(const double &_angle)
 //
 // Description:		Returns 1 for positive, -1 for negative and 0 for zero.
 //
-// Input Argurments:
+// Input Arguments:
 //		value		= const double&
 //
 // Output Arguments:

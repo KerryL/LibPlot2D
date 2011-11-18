@@ -27,7 +27,7 @@
 // Description:		Computes the root-mean-square time history for the given
 //					signal.  Assumes y contains data and x is time.
 //
-// Input Argurments:
+// Input Arguments:
 //		_data	= const Dataset2D& referring to the data of interest
 //
 // Output Arguments:

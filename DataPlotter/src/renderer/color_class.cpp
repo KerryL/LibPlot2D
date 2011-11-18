@@ -28,7 +28,7 @@
 //
 // Description:		Constructor for the Color class (default).
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -54,7 +54,7 @@ Color::Color()
 // Description:		Constructor for the Color class.  Sets the class contents
 //					as specified by the arguments.
 //
-// Input Argurments:
+// Input Arguments:
 //		_Red	= const double& specifying the amount of red in this color (0.0 - 1.0)
 //		_Green	= const double& specifying the amount of green in this color (0.0 - 1.0)
 //		_Blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
@@ -84,7 +84,7 @@ Color::Color(const double &_Red, const double &_Green, const double &_Blue, doub
 //
 // Description:		Destructor for the Color class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -104,7 +104,7 @@ Color::~Color()
 //
 // Description:		Constants for the Color class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -130,7 +130,7 @@ const Color Color::ColorGray(0.5, 0.5, 0.5);
 //
 // Description:		Sets the RGBA values for this color.
 //
-// Input Argurments:
+// Input Arguments:
 //		_Red	= const double& specifying the amount of red in this color (0.0 - 1.0)
 //		_Green	= const double& specifying the amount of green in this color (0.0 - 1.0)
 //		_Blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
@@ -163,7 +163,7 @@ void Color::Set(const double &_Red, const double &_Green, const double &_Blue, d
 // Description:		Sets the RGBA values for this color.  Overload taking
 //					wxColor argument.
 //
-// Input Argurments:
+// Input Arguments:
 //		Color	= wxColor& to match
 //
 // Output Arguments:
@@ -192,7 +192,7 @@ void Color::Set(const wxColor &Color)
 //
 // Description:		Sets the alpha value for this object.
 //
-// Input Argurments:
+// Input Arguments:
 //		_Alpha = const double&
 //
 // Output Arguments:
@@ -217,7 +217,7 @@ void Color::SetAlpha(const double &_Alpha)
 //
 // Description:		Returns a wxColor object that matches this object's color.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -245,7 +245,7 @@ wxColor Color::ToWxColor(void) const
 // Description:		Forces all componenets of the color to be between 0 and 1
 //					if they are not already.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:

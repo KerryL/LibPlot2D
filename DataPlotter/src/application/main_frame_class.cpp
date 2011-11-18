@@ -48,7 +48,7 @@
 // Description:		Constructor for MainFrame class.  Initializes the form
 //					and creates the controls, etc.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -75,7 +75,7 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 // Description:		Denstructor for MainFrame class.  Frees memory and
 //					releases GUI object managers.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -95,7 +95,7 @@ MainFrame::~MainFrame()
 //
 // Description:		Constant declarations for the MainFrame class.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -117,7 +117,7 @@ const wxString MainFrame::pathToConfigFile = _T("dataplotter.ini");
 //
 // Description:		Creates sizers and controls and lays them out in the window.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -207,7 +207,7 @@ void MainFrame::DoLayout(void)
 // Description:		Sets the window properties for this window.  Includes
 //					title, frame size, and default fonts.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -241,7 +241,7 @@ void MainFrame::SetProperties(void)
 //
 // Description:		Links GUI events with event handler functions.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -307,7 +307,7 @@ END_EVENT_TABLE();
 // Description:		Displays a dialog asking the user to specify the file to
 //					read from.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -347,7 +347,7 @@ void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Calls the object of interest's write image file method.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -380,7 +380,7 @@ void MainFrame::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Event fires when user clicks "AutoScale" button.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= &wxCommandEvent
 //
 // Output Arguments:
@@ -403,7 +403,7 @@ void MainFrame::ButtonAutoScaleClickedEvent(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Event fires when user clicks "RemoveCurve" button.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= &wxCommandEvent
 //
 // Output Arguments:
@@ -449,7 +449,7 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Displays a context menu for the grid control.
 //
-// Input Argurments:
+// Input Arguments:
 //		position	= const wxPoint& specifying the position to display the menu
 //		row			= const unsigned int& specifying the row that was clicked
 //
@@ -505,7 +505,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 //
 // Description:		Displays a context menu for the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		position	= const wxPoint& specifying the position to display the menu
 //		context		= const PlotContext& describing the area of the plot
 //					  on which the click occured
@@ -572,7 +572,7 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 //					Arguments allow this to be for opening or saving files,
 //					with different options for the wildcards.
 //
-// Input Argurments:
+// Input Arguments:
 //		dialogTitle			= wxString containing the title for the dialog
 //		defaultDirectory	= wxString specifying the initial directory
 //		defaultFileName		= wxString specifying the default file name
@@ -623,7 +623,7 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //
 // Description:		Public method for loading a single object from file.
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString
 //
 // Output Arguments:
@@ -677,7 +677,7 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 //
 // Description:		Public method for loading a single object from file.
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString
 //
 // Output Arguments:
@@ -701,7 +701,7 @@ bool MainFrame::LoadTxtFile(wxString pathAndFileName)
 //
 // Description:		Loads specific .csv file formats.
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString
 //
 // Output Arguments:
@@ -763,7 +763,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 //
 // Description:		Loads Baumuller data trace (from BM4x00 series drive).
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString
 //
 // Output Arguments:
@@ -871,7 +871,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 //
 // Description:		Loads Kollmorgen data trace (from S600 series drive).
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString
 //
 // Output Arguments:
@@ -985,7 +985,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 //					- Assume that once the delimited rows begin, there may be
 //					  column headers (sometimes multiple rows)
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString
 //
 // Output Arguments:
@@ -1205,7 +1205,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 // Description:		Parses the specified line into pieces based on encountering
 //					the specified delimiting character (or characters).
 //
-// Input Argurments:
+// Input Arguments:
 //		line		= wxString containing the line to parse
 //		delimiter	= const wxString& specifying the characters to assume for
 //					  delimiting columns
@@ -1260,7 +1260,7 @@ wxArrayString MainFrame::ParseLineIntoColumns(wxString line, const wxString &del
 //
 // Description:		Sets the frame's title according to the specified file name.
 //
-// Input Argurments:
+// Input Arguments:
 //		pathAndFileName	= wxString
 //
 // Output Arguments:
@@ -1291,7 +1291,7 @@ void MainFrame::SetTitleFromFileName(wxString pathAndFileName)
 //
 // Description:		Removes all curves from the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1316,7 +1316,7 @@ void MainFrame::ClearAllCurves(void)
 //
 // Description:		Sets the x-data labels to the specified string.
 //
-// Input Argurments:
+// Input Arguments:
 //		label	= wxString
 //
 // Output Arguments:
@@ -1340,7 +1340,7 @@ void MainFrame::SetXDataLabel(wxString label)
 //
 // Description:		Sets the x-data labels according to the opened file type.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1381,7 +1381,7 @@ void MainFrame::SetXDataLabel(const FileFormat &format)
 // Description:		Adds a new dataset to the plot, created by operating on
 //					existing datasets.
 //
-// Input Argurments:
+// Input Arguments:
 //		mathString	= wxString describing the desired math operations
 //
 // Output Arguments:
@@ -1432,7 +1432,7 @@ void MainFrame::AddCurve(wxString mathString)
 //
 // Description:		Adds an existing dataset to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		data	= Dataset2D* to add
 //		name	= wxString specifying the label for the curve
 //
@@ -1548,7 +1548,7 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 //
 // Description:		Removes a curve from the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		i	= const unsigned int& specifying curve to remove
 //
 // Output Arguments:
@@ -1585,7 +1585,7 @@ void MainFrame::RemoveCurve(const unsigned int &i)
 // Description:		Handles right-click events on the grid control.  Displays
 //					context menu.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxGridEvent&
 //
 // Output Arguments:
@@ -1610,7 +1610,7 @@ void MainFrame::GridRightClickEvent(wxGridEvent &event)
 // Description:		Handles double click event for the grid control.  If the
 //					click occurs on the color box, display the color dialog.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxGridEvent&
 //
 // Output Arguments:
@@ -1661,7 +1661,7 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
 //
 // Description:		Handles grid cell change events (for boolean controls).
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxGridEvent&
 //
 // Output Arguments:
@@ -1730,7 +1730,7 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 //
 // Description:		Handles grid cell change events (for text controls).
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxGridEvent&
 //
 // Output Arguments:
@@ -1764,7 +1764,7 @@ void MainFrame::GridCellChangeEvent(wxGridEvent &event)
 // Description:		Attempts to determine the scaling factor required to convert
 //					the X-axis into seconds (assuming X-axis has units of time).
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
@@ -1871,7 +1871,7 @@ bool MainFrame::GetXAxisScalingFactor(double &factor)
 //
 // Description:		Adds a user-defined math channel to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -1895,7 +1895,7 @@ void MainFrame::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 // Description:		Adds a curve showing the derivative of the selected grid
 //					row to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -1924,7 +1924,7 @@ void MainFrame::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 // Description:		Adds a curve showing the integral of the selected grid
 //					row to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -1953,7 +1953,7 @@ void MainFrame::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 // Description:		Adds a curve showing the RMS of the selected grid
 //					row to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -1982,7 +1982,7 @@ void MainFrame::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 // Description:		Adds a curve showing the FFT of the selected grid
 //					row to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2018,7 +2018,7 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Adds a curve showing the filtered signal to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2072,7 +2072,7 @@ void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Adds a curve showing the filtered signal to the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2127,7 +2127,7 @@ void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
 // Description:		Fits a curve to the dataset selected in the grid control.
 //					User is asked to specify the order of the fit.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2196,7 +2196,7 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Toggles gridlines for the entire plot on and off.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2224,7 +2224,7 @@ void MainFrame::ContextToggleGridlines(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Autoscales the plot.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2249,7 +2249,7 @@ void MainFrame::ContextAutoScale(wxCommandEvent& WXUNUSED(event))
 // Description:		Updates the values for the cursors and their differences
 //					in the options grid.
 //
-// Input Argurments:
+// Input Arguments:
 //		leftVisible		= const bool& indicating whether or not the left
 //						  cursor is visible
 //		rightVisible	= const bool& indicating whether or not the right
@@ -2356,7 +2356,7 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 //					math expression.  If an expression is entered, it attempts
 //					to add the channel.
 //
-// Input Argurments:
+// Input Arguments:
 //		defaultInput	= wxString (optional)
 //
 // Output Arguments:
@@ -2386,7 +2386,7 @@ void MainFrame::DisplayMathChannelDialog(wxString defaultInput)
 // Description:		Displays an input dialog that allows the user to set the
 //					range for an axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		axis	= const PlotContext& specifying the axis which is to be resized
 //
 // Output Arguments:
@@ -2473,7 +2473,7 @@ void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 //
 // Description:		Toggles gridlines for the bottom axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2496,7 +2496,7 @@ void MainFrame::ContextToggleGridlinesBottom(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Auto-scales the bottom axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2519,7 +2519,7 @@ void MainFrame::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Dispalys a dialog box for setting the axis range.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2542,7 +2542,7 @@ void MainFrame::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Toggles gridlines for the bottom axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2565,7 +2565,7 @@ void MainFrame::ContextToggleGridlinesLeft(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Toggles gridlines for the bottom axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2588,7 +2588,7 @@ void MainFrame::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Dispalys a dialog box for setting the axis range.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2611,7 +2611,7 @@ void MainFrame::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Toggles gridlines for the bottom axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2634,7 +2634,7 @@ void MainFrame::ContextToggleGridlinesRight(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Toggles gridlines for the bottom axis.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2657,7 +2657,7 @@ void MainFrame::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Dispalys a dialog box for setting the axis range.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2681,7 +2681,7 @@ void MainFrame::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 // Description:		Displays a dialog allowing the user to specify the plot's
 //					background color.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2715,7 +2715,7 @@ void MainFrame::ContextPlotBGColor(wxCommandEvent& WXUNUSED(event))
 // Description:		Dispalys a dialog box allowing the user to specify the
 //					gridline color.
 //
-// Input Argurments:
+// Input Arguments:
 //		event	= wxCommandEvent&
 //
 // Output Arguments:
@@ -2748,7 +2748,7 @@ void MainFrame::ContextGridColor(wxCommandEvent& WXUNUSED(event))
 //
 // Description:		Performs tests on signal operation classes.
 //
-// Input Argurments:
+// Input Arguments:
 //		None
 //
 // Output Arguments:
