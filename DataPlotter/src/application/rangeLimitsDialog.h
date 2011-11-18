@@ -7,14 +7,14 @@
 
 ===================================================================================*/
 
-// File:  range_limits_dialog_class.h
+// File:  rangeLimitsDialog.h
 // Created:  5/12/2011
 // Author:  K. Loux
 // Description:  Dialog box for entering a minimum and maximum value for an axis.
 // History:
 
-#ifndef _RANGE_LIMITS_DIALOG_CLASS_H_
-#define _RANGE_LIMITS_DIALOG_CLASS_H_
+#ifndef _RANGE_LIMITS_DIALOG_H_
+#define _RANGE_LIMITS_DIALOG_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -39,4 +39,4 @@ private:
 	DECLARE_EVENT_TABLE();
 };
 
-#endif// _RANGE_LIMITS_DIALOG_CLASS_H_
+#endif// _RANGE_LIMITS_DIALOG_H_

@@ -7,14 +7,14 @@
 
 ===================================================================================*/
 
-// File:  text_class.h
+// File:  text.h
 // Created:  5/2/2011
 // Author:  K. Loux
-// Description:  Derived from PRIMITVE, this class is used to draw text.
+// Description:  Derived from Primitive, this class is used to draw text.
 // History:
 
-#ifndef _TEXT_CLASS_H_
-#define _TEXT_CLASS_H_
+#ifndef _TEXT_H_
+#define _TEXT_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -49,6 +49,8 @@ public:
 	double GetTextHeight(void) const;
 	double GetTextWidth(void) const;
 
+	wxString GetText(void) const { return text; };
+
 private:
 	// The angle at which this text is inclined
 	double angle;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen
@@ -65,4 +67,4 @@ private:
 	double x, y;
 };
 
-#endif// _TEXT_CLASS_H_
+#endif// _TEXT_H_

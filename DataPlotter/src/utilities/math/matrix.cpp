@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  matrix_class.cpp
+// File:  matrix.cpp
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class functionality for matrix class.
@@ -22,9 +22,9 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/math/matrix_class.h"
-#include "utilities/math/vector_class.h"
-#include "utilities/math/plot_math.h"
+#include "utilities/math/matrix.h"
+#include "utilities/math/vector.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			Matrix
@@ -455,25 +455,25 @@ Matrix Matrix::LeftDivide(const Matrix &b) const
 // Description:		Multiplication operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const VECTOR& to multiply by
+//		target	= const Vector& to multiply by
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const VECTOR result of the matrix multiplication
+//		const Vector result of the matrix multiplication
 //
 //==========================================================================
-const VECTOR Matrix::operator * (const VECTOR &target) const
+const Vector Matrix::operator * (const Vector &target) const
 {
 	assert(rows == 3 && columns == 3);
 
-	VECTOR temp(0.0, 0.0, 0.0);
+	Vector temp(0.0, 0.0, 0.0);
 
 	// Check to make sure we're a 3x3 matrix
-	temp.X = target.X * elements[0][0] + target.Y * elements[0][1] + target.Z * elements[0][2];
-	temp.Y = target.X * elements[1][0] + target.Y * elements[1][1] + target.Z * elements[1][2];
-	temp.Z = target.X * elements[2][0] + target.Y * elements[2][1] + target.Z * elements[2][2];
+	temp.x = target.x * elements[0][0] + target.y * elements[0][1] + target.z * elements[0][2];
+	temp.y = target.x * elements[1][0] + target.y * elements[1][1] + target.z * elements[1][2];
+	temp.z = target.x * elements[2][0] + target.y * elements[2][1] + target.z * elements[2][2];
 
 	return temp;
 }

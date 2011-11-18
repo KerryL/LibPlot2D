@@ -7,8 +7,8 @@
 
 ===================================================================================*/
 
-// File:  render_window_class.cpp
-// Created:  5/2/2011
+// File:  renderWindow.cpp
+// Created:  5/14/2009
 // Author:  K. Loux
 // Description:  Class for creating OpenGL scenes, derived from wxGLCanvas.  Contains
 //				 event handlers for various mouse and keyboard interactions.  All objects
@@ -16,6 +16,7 @@
 //				 Objects in the PrimitivesList become managed by this object and are
 //				 deleted automatically.
 // History:
+//	4/25/2010	- Fixed anti-aliasing for 2D plots, K. Loux.
 
 // Standard C++ headers
 #include <vector>
@@ -26,10 +27,10 @@
 #include <wx/image.h>
 
 // Local headers
-#include "renderer/render_window_class.h"
-#include "utilities/math/matrix_class.h"
-#include "utilities/math/vector_class.h"
-#include "utilities/math/plot_math.h"
+#include "renderer/renderWindow.h"
+#include "utilities/math/matrix.h"
+#include "utilities/math/vector.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			RenderWindow
@@ -41,7 +42,7 @@
 // Input Arguments:
 //		parent		= wxWindow& reference to the owner of this object
 //		id			= wxWindowID to identify this window
-//		args		= int[]
+//		args		= int[] NOTE: Must contain WX_GL_DOUBLEBUFFER at minimum (BUG somewhere)
 //		position	= const wxPoint& specifying this object's position
 //		size		= const wxSize& specifying this object's size
 //		style		= long specifying this object's style flags
@@ -55,7 +56,8 @@
 //==========================================================================
 RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, id, position, size, style | wxFULL_REPAINT_ON_RESIZE, wxEmptyString, args)
+	&parent, id, position, size, style | wxFULL_REPAINT_ON_RESIZE, wxEmptyString,
+	args)
 {
 	// Initialize the private data
 	wireFrame = false;
@@ -65,7 +67,7 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 	// Initialize the frustum parameters
 	AutoSetFrustum();
 
-	// Initialize the transformation matricies
+	// Initialize the transformation matrices
 	modelToView = new Matrix(3, 3);
 	modelToView->MakeIdentity();
 
@@ -78,6 +80,9 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 	// Initialize the focal point parameters
 	focalPoint.Set(0.0, 0.0, 0.0);
 	isInteracting = false;
+	
+	// To avoid flashing on MSW
+	SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 
 	// Initialize the openGL settings first time we try to render
 	modified = true;
@@ -105,7 +110,7 @@ RenderWindow::~RenderWindow()
 	// Clear out the list of primitives
 	primitiveList.Clear();
 
-	// Delete the transformation matricies
+	// Delete the transformation matrices
 	delete modelToView;
 	modelToView = NULL;
 
@@ -133,7 +138,6 @@ BEGIN_EVENT_TABLE(RenderWindow, wxGLCanvas)
 	// Window events
 	EVT_SIZE(				RenderWindow::OnSize)
 	EVT_PAINT(				RenderWindow::OnPaint)
-	EVT_ERASE_BACKGROUND(	RenderWindow::OnEraseBackground)
 	EVT_ENTER_WINDOW(		RenderWindow::OnEnterWindow)
 
 	// Interaction events
@@ -167,6 +171,7 @@ void RenderWindow::Render()
 		return;
 
 	SetCurrent();
+    wxPaintDC(this);
 
 	// If modified, re-initialize
 	if (modified)
@@ -186,15 +191,16 @@ void RenderWindow::Render()
 	glMatrixMode(GL_MODELVIEW);
 
 	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-	SortPrimitivesByAlpha();
+	if (!view3D)// For 3D views, we need to render back-to-front
+		SortPrimitivesByAlpha();
 
 	// Draw all of the primitives
 	int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 		primitiveList[i]->Draw();
 
-	// Flush and swap the buffers to update the image
-    SwapBuffers();
+	// Swap the buffers to update the image
+	SwapBuffers();
 }
 
 //==========================================================================
@@ -216,13 +222,8 @@ void RenderWindow::Render()
 //==========================================================================
 void RenderWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
-	// Get the device context from this object
-	wxPaintDC dc(this);
-
 	// Render the scene
     Render();
-
-	return;
 }
 
 //==========================================================================
@@ -255,34 +256,12 @@ void RenderWindow::OnSize(wxSizeEvent& event)
 		SetCurrent();
 		glViewport(0, 0, (GLint) w, (GLint) h);
 	}
+	Refresh();
 
 	// This takes care of any change in aspect ratio
 	AutoSetFrustum();
 
 	return;
-}
-
-//==========================================================================
-// Class:			RenderWindow
-// Function:		OnEraseBackground
-//
-// Description:		Event handler for the erase background event.  This is
-//					simply here to override default behaviour which would
-//					cause the screen to flicker.
-//
-// Input Arguments:
-//		event	= wxEraseEvent& (UNUSED)
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void RenderWindow::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
-{
-	// Do nothing to avoid flashing
 }
 
 //==========================================================================
@@ -329,11 +308,11 @@ void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 //==========================================================================
 bool RenderWindow::RemoveActor(Primitive *toRemove)
 {
-	// Make sure the arguement is valid
+	// Make sure the argument is valid
 	if (!toRemove)
 		return false;
 
-	// Check every entry in the primtiives list to see if it matches the argument
+	// Check every entry in the primitives list to see if it matches the argument
 	int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 	{
@@ -368,11 +347,6 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 //==========================================================================
 void RenderWindow::Initialize()
 {
-	if (!GetContext() || !IsShownOnScreen())
-		return;
-
-	SetCurrent();
-
 	// Set the openGL parameters depending on whether or not we're in 3D mode
 	if (view3D)
 	{
@@ -392,11 +366,16 @@ void RenderWindow::Initialize()
 		glShadeModel(GL_SMOOTH);
 
 		// Disable alpha blending (this is enabled as-needed when rendering objects)
-		glDisable(GL_BLEND);
+		//glDisable(GL_BLEND);// FIXME:  Must leave this on?
 
 		// Enable anti-aliasing for polygons
 		glEnable(GL_POLYGON_SMOOTH);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+		
+		// FIXME:  I think this used to work without these next two lines, but
+		// somehow they're needed now?
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// FIXME:  Note in opengl.org samples, 9.2 Polygon Antialising
 		// destination alpha is required for this algorithm to work?
@@ -608,7 +587,7 @@ void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent 
 	// Make this the current open GL window
 	SetCurrent();
 
-	// Update the transformation matricies
+	// Update the transformation matrices
 	UpdateTransformationMatricies();
 
 	// Set the matrix mode to the modelview matrix
@@ -652,7 +631,7 @@ void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent 
 	}
 
 	// Update the view
-	Render();
+	Refresh();
 
 	return;
 }
@@ -730,23 +709,23 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 		return;
 
 	// Convert up and normal vectors from openGL coordinates to model coordinates
-	VECTOR upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
+	Vector upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
 	upDirection = TransformToModel(upDirection);
 	normal = TransformToModel(normal);
 	leftDirection = normal.Cross(upDirection);
 
 	// Get a vector that represents the mouse position relative to the center of the screen
-	VECTOR mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
+	Vector mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
 		+ leftDirection * double(GetSize().GetWidth() / 2 - event.GetX());
-	VECTOR lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
+	Vector lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
 		+ leftDirection * double(GetSize().GetWidth() / 2 - lastMousePosition[0]);
 
 	// Get a vector that represents the mouse motion (projected onto a plane with the camera
 	// position as a normal)
-	VECTOR mouseMotion = mouseVector - lastMouseVector;
+	Vector mouseMotion = mouseVector - lastMouseVector;
 
 	// Find the axis of rotation
-	VECTOR axisOfRotation = normal.Cross(mouseMotion);
+	Vector axisOfRotation = normal.Cross(mouseMotion);
 
 	// Preliminary calculations
 	long xDistance = GetSize().GetWidth() / 2 - event.GetX();
@@ -754,7 +733,7 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 	long lastXDistance = GetSize().GetWidth() / 2 - lastMousePosition[0];
 	long lastYDistance = GetSize().GetHeight() / 2 - lastMousePosition[1];
 
-	// The angle is determined by how much the mouse moved.  1000 pixels of movement will result in
+	// The angle is determined by how much the mouse moved.  800 pixels of movement will result in
 	// a full 360 degrees rotation of the car.
 	// FIXME:  Add adjustable rotation sensitivity (actually, all of the interactions can be adjustable)
 	double angle = sqrt(fabs(double((xDistance - lastXDistance) * (xDistance - lastXDistance))
@@ -762,13 +741,13 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 
 	// Translate to the focal point before performing the rotation to make the focal point
 	// the center of rotation
-	glTranslated(focalPoint.X, focalPoint.Y, focalPoint.Z);
+	glTranslated(focalPoint.x, focalPoint.y, focalPoint.z);
 
 	// Perform the rotation
-	glRotated(angle, axisOfRotation.X, axisOfRotation.Y, axisOfRotation.Z);
+	glRotated(angle, axisOfRotation.x, axisOfRotation.y, axisOfRotation.z);
 
 	// Translate back from the focal point
-	glTranslated(-focalPoint.X, -focalPoint.Y, -focalPoint.Z);
+	glTranslated(-focalPoint.x, -focalPoint.y, -focalPoint.z);
 
 	return;
 }
@@ -800,14 +779,14 @@ void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 		// FIXME:  Adjust the dolly distance so it is slower closer to the focal point and slower farther away
 
 		// Get the normal direction (along which we will translate)
-		VECTOR normal(0.0, 0.0, 1.0);
+		Vector normal(0.0, 0.0, 1.0);
 		normal = TransformToModel(normal);
 
 		// Apply the dolly distance and flip the distance depending on whether we're wheeling in or out
 		normal *= dollyDistance * event.GetWheelRotation();
 
 		// Apply the translation
-		glTranslated(normal.X, normal.Y, normal.Z);
+		glTranslated(normal.x, normal.y, normal.z);
 	}
 	else
 	{
@@ -835,36 +814,36 @@ void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 //==========================================================================
 void RenderWindow::DoDragDolly(wxMouseEvent &event)
 {
-	// Handle 3D dollying differntly from 2D dollying
+	// Handle 3D dollying differently from 2D dollying
 	if (view3D)
 	{
 		// Always dolly a constant distance
 		double dollyDistance = 0.1;
 
 		// Convert up and normal vectors from openGL coordinates to model coordinates
-		VECTOR upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
+		Vector upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
 		upDirection = TransformToModel(upDirection);
 		normal = TransformToModel(normal);
 		leftDirection = normal.Cross(upDirection);
 
 		// Get a vector that represents the mouse position relative to the center of the screen
-		VECTOR mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
+		Vector mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
 			+ leftDirection * double(GetSize().GetWidth() / 2 - event.GetX());
-		VECTOR lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
+		Vector lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
 			+ leftDirection * double(GetSize().GetWidth() / 2 - lastMousePosition[0]);
 
 		// Get a vector that represents the mouse motion (projected onto a plane with the camera
 		// position as a normal)
-		VECTOR mouseMotion = mouseVector - lastMouseVector;
+		Vector mouseMotion = mouseVector - lastMouseVector;
 
 		// Transform mouse motion to open GL coordinates
 		mouseMotion = TransformToView(mouseMotion);
 
 		// Apply the dolly distance and flip the distance depending on whether we're wheeling in or out
-		normal *= dollyDistance * mouseMotion.Y;
+		normal *= dollyDistance * mouseMotion.y;
 
 		// Apply the translation
-		glTranslated(normal.X, normal.Y, normal.Z);
+		glTranslated(normal.x, normal.y, normal.z);
 	}
 	else
 	{
@@ -896,27 +875,27 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 	if (view3D)
 	{
 		// Convert up and normal vectors from openGL coordinates to model coordinates
-		VECTOR upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
+		Vector upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
 		upDirection = TransformToModel(upDirection);
 		normal = TransformToModel(normal);
 		leftDirection = normal.Cross(upDirection);
 
 		// Get a vector that represents the mouse position relative to the center of the screen
-		VECTOR mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
+		Vector mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
 			+ leftDirection * double(GetSize().GetWidth() / 2 - event.GetX());
-		VECTOR lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
+		Vector lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
 			+ leftDirection * double(GetSize().GetWidth() / 2 - lastMousePosition[0]);
 
 		// Get a vector that represents the mouse motion (projected onto a plane with the camera
 		// position as a normal)
-		VECTOR mouseMotion = mouseVector - lastMouseVector;
+		Vector mouseMotion = mouseVector - lastMouseVector;
 
 		// Determine and apply the motion factor
 		double motionFactor = 0.15;
 		mouseMotion *= motionFactor;
 
 		// Apply the translation
-		glTranslated(mouseMotion.X, mouseMotion.Y, mouseMotion.Z);
+		glTranslated(mouseMotion.x, mouseMotion.y, mouseMotion.z);
 
 		// Update the focal point
 		focalPoint -= mouseMotion;
@@ -936,10 +915,10 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 // Description:		Sets the camera view as specified.
 //
 // Input Arguments:
-//		position	= const VECTOR& specifying the camera position
-//		lookAt		= const VECTOR& specifying the object at which the camera
+//		position	= const Vector& specifying the camera position
+//		lookAt		= const Vector& specifying the object at which the camera
 //					  is to be pointed
-//		upDirection	= const VECTOR& used to specify the final camera orientation DOF
+//		upDirection	= const Vector& used to specify the final camera orientation DOF
 //
 // Output Arguments:
 //		None
@@ -948,7 +927,7 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 //		None
 //
 //==========================================================================
-void RenderWindow::SetCameraView(const VECTOR &position, const VECTOR &lookAt, const VECTOR &upDirection)
+void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection)
 {
 	// Make this the current open GL window, but only if the parent window is visible
 	SetCurrent();
@@ -961,15 +940,15 @@ void RenderWindow::SetCameraView(const VECTOR &position, const VECTOR &lookAt, c
 
 	// Compute the MODELVIEW matrix
 	// (Use calculations from gluLookAt documentation)
-	VECTOR F = (lookAt - position).Normalize();
-	VECTOR up = upDirection.Normalize();
-	VECTOR S = F.Cross(up);
-	if (!PlotMath::IsZero(S))
+	Vector f = (lookAt - position).Normalize();
+	Vector up = upDirection.Normalize();
+	Vector s = f.Cross(up);
+	if (!PlotMath::IsZero(s))
 	{
-		VECTOR U = S.Cross(F);
-		Matrix modelViewMatrix(4, 4, S.X, S.Y, S.Z, 0.0,
-									 U.X, U.Y, U.Z, 0.0,
-									 -F.X, -F.Y, -F.Z, 0.0,
+		Vector u = s.Cross(f);
+		Matrix modelViewMatrix(4, 4, s.x, s.y, s.z, 0.0,
+									 u.x, u.y, u.z, 0.0,
+									 -f.x, -f.y, -f.z, 0.0,
 									 0.0, 0.0, 0.0, 1.0);
 
 		// Assign it to the open GL modelview matrix
@@ -979,7 +958,7 @@ void RenderWindow::SetCameraView(const VECTOR &position, const VECTOR &lookAt, c
 	}
 
 	// Apply the translation
-	glTranslated(-position.X, -position.Y, -position.Z);
+	glTranslated(-position.x, -position.y, -position.z);
 
 	// Set the focal point
 	focalPoint = lookAt;
@@ -997,16 +976,16 @@ void RenderWindow::SetCameraView(const VECTOR &position, const VECTOR &lookAt, c
 //					(assumed to be in model coordinates) in view coordinates.
 //
 // Input Arguments:
-//		ModelVector	= const VECTOR& to be transformed
+//		ModelVector	= const Vector& to be transformed
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		None
+//		Vector
 //
 //==========================================================================
-VECTOR RenderWindow::TransformToView(const VECTOR &modelVector) const
+Vector RenderWindow::TransformToView(const Vector &modelVector) const
 {
 	return (*modelToView) * modelVector;
 }
@@ -1019,16 +998,16 @@ VECTOR RenderWindow::TransformToView(const VECTOR &modelVector) const
 //					(assumed to be in view coordinates) in model coordinates.
 //
 // Input Arguments:
-//		viewVector	= const VECTOR& to be transformed
+//		viewVector	= const Vector& to be transformed
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		None
+//		Vector
 //
 //==========================================================================
-VECTOR RenderWindow::TransformToModel(const VECTOR &viewVector) const
+Vector RenderWindow::TransformToModel(const Vector &viewVector) const
 {
 	return (*viewToModel) * viewVector;
 }
@@ -1037,7 +1016,7 @@ VECTOR RenderWindow::TransformToModel(const VECTOR &viewVector) const
 // Class:			RenderWindow
 // Function:		UpdateTransformationMatricies
 //
-// Description:		Updates the matricies for transforming from model coordinates
+// Description:		Updates the matrices for transforming from model coordinates
 //					to view coordinates and vice-versa.  Also updates the camera
 //					position variable.
 //
@@ -1058,15 +1037,15 @@ void RenderWindow::UpdateTransformationMatricies(void)
 	glGetDoublev(GL_MODELVIEW_MATRIX, glMatrix);
 	ConvertGLToMatrix(modelViewMatrix, glMatrix);
 
-	// Extract the orientation matricies
+	// Extract the orientation matrices
 	(*modelToView) = modelViewMatrix.GetSubMatrix(0, 0, 3, 3);
 	(*viewToModel) = (*modelToView);
 	viewToModel->GetTranspose();
 
 	// Get the last column of the modelview matrix, which contains the translation information
-	cameraPosition.X = modelViewMatrix.GetElement(0, 3);
-	cameraPosition.Y = modelViewMatrix.GetElement(1, 3);
-	cameraPosition.Z = modelViewMatrix.GetElement(2, 3);
+	cameraPosition.x = modelViewMatrix.GetElement(0, 3);
+	cameraPosition.y = modelViewMatrix.GetElement(1, 3);
+	cameraPosition.z = modelViewMatrix.GetElement(2, 3);
 
 	// Transfrom the camera position into model coordinates
 	cameraPosition = TransformToModel(cameraPosition);
@@ -1106,7 +1085,7 @@ void RenderWindow::AutoSetFrustum(void)
 	aspectRatio = (double)WindowSize.GetWidth() / (double)WindowSize.GetHeight();
 
 	// Set the vertical FOV
-	verticalFOV = 20.0 * PlotMath::PI / 180.0;
+	verticalFOV = 20.0 * PlotMath::Pi / 180.0;
 
 	// Set the clipping plane distances to something reasonable
 	// FIXME:  Should this be smarter (distance between camera and focal point?)

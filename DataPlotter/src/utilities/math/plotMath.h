@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  plot_math.h
+// File:  plotMath.h
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains useful functions that don't fit better in another class.  Hopefully this
@@ -22,7 +22,7 @@
 #include <limits>// For QNaN
 
 // Local forward declarations
-class VECTOR;
+class Vector;
 
 namespace PlotMath
 {
@@ -30,16 +30,16 @@ namespace PlotMath
 	// Constant declarations
 	const double NEARLY_ZERO = 1.0e-12;
 	const double QNAN = std::numeric_limits<double>::quiet_NaN();
-	const double PI = 3.141592653589793238462643;
+	const double Pi = 3.141592653589793238462643;
 
 	// Prototypes =====================================================
 	// For determining if a number is close enough to zero to regard as zero
 	bool IsZero(const double &toCheck);
-	bool IsZero(const VECTOR &toCheck);
+	bool IsZero(const Vector &toCheck);
 
 	// Checks to see if a value is not a number
 	bool IsNaN(const double &toCheck);
-	bool IsNaN(const VECTOR &toCheck);
+	bool IsNaN(const Vector &toCheck);
 
 	// Ensure the value is between two definined limits
 	double Clamp(const double &value, const double &lowerLimit, const double &upperLimit);

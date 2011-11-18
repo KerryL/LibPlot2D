@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  plot_math.cpp
+// File:  plotMath.cpp
 // Created:  3/24/2008
 // Author:  K. Loux
 // Description:  Contains useful functions that don't fit better in another class.  Hopefully this
@@ -20,9 +20,9 @@
 #include <assert.h>
 
 // Local headers
-#include "utilities/math/plot_math.h"
-#include "utilities/math/vector_class.h"
-#include "utilities/math/matrix_class.h"
+#include "utilities/math/plotMath.h"
+#include "utilities/math/vector.h"
+#include "utilities/math/matrix.h"
 
 //==========================================================================
 // Namespace:		PlotMath
@@ -56,7 +56,7 @@ bool PlotMath::IsZero(const double &toCheck)
 //					This function checks the magnitude of the VECTOR.
 //
 // Input Arguments:
-//		toCheck	= const VECTOR& to be checked for being close to zero
+//		toCheck	= const Vector& to be checked for being close to zero
 //
 // Output Arguments:
 //		None
@@ -65,7 +65,7 @@ bool PlotMath::IsZero(const double &toCheck)
 //		bool, true if the magnitude is less than NEARLY_ZERO
 //
 //==========================================================================
-bool PlotMath::IsZero(const VECTOR &toCheck)
+bool PlotMath::IsZero(const Vector &toCheck)
 {
 	// Check each component of the vector
 	if (toCheck.Length() < NEARLY_ZERO)
@@ -103,7 +103,7 @@ bool PlotMath::IsNaN(const double &toCheck)
 //					Vector version - returns false if any component is NaN.
 //
 // Input Arguments:
-//		ToCheck	= VECTOR& to be checked for containing valid numbers
+//		ToCheck	= Vector& to be checked for containing valid numbers
 //
 // Output Arguments:
 //		None
@@ -112,9 +112,9 @@ bool PlotMath::IsNaN(const double &toCheck)
 //		bool, true if the argument is NOT a number
 //
 //==========================================================================
-bool PlotMath::IsNaN(const VECTOR &toCheck)
+bool PlotMath::IsNaN(const Vector &toCheck)
 {
-	return IsNaN(toCheck.X) || IsNaN(toCheck.Y) || IsNaN(toCheck.Z);
+	return IsNaN(toCheck.x) || IsNaN(toCheck.y) || IsNaN(toCheck.z);
 }
 
 //==========================================================================
@@ -171,10 +171,10 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit, const doub
 double PlotMath::RangeToPlusMinusPi(const double &_angle)
 {
 	double angle = _angle;
-	while (angle <= PI)
-		angle += 2 * PI;
-	while (angle > PI)
-		angle -= 2 * PI;
+	while (angle <= Pi)
+		angle += 2 * Pi;
+	while (angle > Pi)
+		angle -= 2 * Pi;
 
 	return angle;
 }

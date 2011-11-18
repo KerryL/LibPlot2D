@@ -7,17 +7,17 @@
 
 ===================================================================================*/
 
-// File:  expression_tree_class.h
+// File:  expressionTree.h
 // Created:  5/6/2011
 // Author:  K. Loux
 // Description:  Handles user-specified mathematical operations on datasets.
 // History:
 
-#ifndef _EXPRESSION_TREE_CLASS_H_
-#define _EXPRESSION_TREE_CLASS_H_
+#ifndef _EXPRESSION_TREE_H_
+#define _EXPRESSION_TREE_H_
 
 // Local headers
-#include "utilities/managed_list_class.h"
+#include "utilities/managedList.h"
 #include "utilities/dataset2D.h"
 
 // wxWidgets forward declarations
@@ -27,13 +27,13 @@ class ExpressionTree
 {
 public:
 	// Constructor
-	ExpressionTree(const MANAGED_LIST<const Dataset2D> &_list);
+	ExpressionTree(const ManagedList<const Dataset2D> &_list);
 
 	// Main solver method
 	wxString Solve(wxString expression, Dataset2D &solvedData, const double &_xAxisFactor);
 
 private:
-	const MANAGED_LIST<const Dataset2D> &list;
+	const ManagedList<const Dataset2D> &list;
 
 	double xAxisFactor;
 
@@ -50,4 +50,4 @@ private:
 	Dataset2D GetSetFromList(const unsigned int &i);
 };
 
-#endif// _EXPRESSION_TREE_CLASS_H_
+#endif// _EXPRESSION_TREE_H_

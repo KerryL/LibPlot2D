@@ -7,15 +7,15 @@
 
 ===================================================================================*/
 
-// File:  zoom_box_class.cpp
+// File:  zoomBox.cpp
 // Created:  5/5/2011
 // Author:  K. Loux
 // Description:  Logic for drawing the zoom box as the user moves the mouse.
 // History:
 
 // Local headers
-#include "renderer/primitives/zoom_box_class.h"
-#include "renderer/render_window_class.h"
+#include "renderer/primitives/zoomBox.h"
+#include "renderer/renderWindow.h"
 
 //==========================================================================
 // Class:			ZoomBox

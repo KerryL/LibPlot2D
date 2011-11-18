@@ -412,7 +412,7 @@ bool Axis::IsHorizontal(void) const
 bool Axis::HasValidParameters(void)
 {
 	// Don't draw if any of the limits are not numbers
-	if (VVASEMath::IsNaN(minimum) || VVASEMath::IsNaN(maximum))
+	if (PlotMath::IsNaN(minimum) || PlotMath::IsNaN(maximum))
 		return false;
 	
 	// Make sure the pointers to the perpendicular axes have been provided

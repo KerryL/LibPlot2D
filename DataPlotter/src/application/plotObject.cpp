@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  plot_object_class.cpp
+// File:  plotObject.cpp
 // Created:  5/4/2011
 // Author:  K. Loux
 // Description:  Intermediate class for creating plots from arrays of data.
@@ -17,15 +17,16 @@
 #include <FTGL/ftgl.h>
 
 // Local headers
-#include "application/plot_object_class.h"
-#include "application/main_frame_class.h"
-#include "renderer/plot_renderer_class.h"
-#include "renderer/color_class.h"
-#include "renderer/primitives/plot_curve.h"
+#include "application/plotObject.h"
+#include "application/mainFrame.h"
+#include "renderer/plotRenderer.h"
+#include "renderer/color.h"
+#include "renderer/primitives/plotCurve.h"
 #include "renderer/primitives/axis.h"
-#include "renderer/primitives/text_class.h"
-#include "utilities/math/plot_math.h"
+#include "renderer/primitives/text.h"
+#include "utilities/math/plotMath.h"
 #include "utilities/dataset2D.h"
+#include "utilities/fontFinder.h"
 
 //==========================================================================
 // Class:			PlotObject
@@ -53,37 +54,70 @@ PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 	axisRight = new Axis(renderer);
 	titleObject = new TextRendering(renderer);
 
-	// Find the location of the fonts directory
+	// Tell each axis how they relate to other axes
+	axisTop->SetAxisAtMaxEnd(axisRight);
+	axisTop->SetAxisAtMinEnd(axisLeft);
+	axisTop->SetOppositeAxis(axisBottom);
+	
+	axisBottom->SetAxisAtMaxEnd(axisRight);
+	axisBottom->SetAxisAtMinEnd(axisLeft);
+	axisBottom->SetOppositeAxis(axisTop);
+	
+	axisLeft->SetAxisAtMaxEnd(axisTop);
+	axisLeft->SetAxisAtMinEnd(axisBottom);
+	axisLeft->SetOppositeAxis(axisRight);
+	
+	axisRight->SetAxisAtMaxEnd(axisTop);
+	axisRight->SetAxisAtMinEnd(axisBottom);
+	axisRight->SetOppositeAxis(axisLeft);
+
+	// Find the name of the font that we want to use
+	// FIXME:  Write this to config file so we don't have to do this every time?
 	wxString fontFile;
-#ifdef __WXMSW__
-	fontFile = wxGetOSDirectory() + _T("\\fonts\\arial.ttf");
-#elif defined __WXGTK__
-	// FIXME:  This probably isn't very portable...
-	fontFile = _T("/usr/share/fonts/dejavu/DejaVuSans.ttf");
-#else
-	// Unknown platfrom - warn the user
-#	warning "Unrecognized platform - unable to locate font files!"
-	fontFile = wxEmptyString;
-#endif
+	wxArrayString preferredFonts;
+
+	preferredFonts.Add(_T("DejaVu Sans"));// GTK preference
+	preferredFonts.Add(_T("Arial"));// MSW preference
+
+	bool foundFont = FontFinder::GetPreferredFontFileName(wxFONTENCODING_SYSTEM,
+		preferredFonts, false, fontFile);
+
+	// Tell the user if we're unsure of the font
+	if (!foundFont)
+	{
+		if (!fontFile.IsEmpty())
+			wxMessageBox(_T("Could not find preferred plot font; using ") + fontFile);
+		else
+			wxMessageBox(_T("Could not find any *.ttf files - cannot generate plot fonts"));
+	}
 
 	// Create the fonts
 	axisFont = new FTGLTextureFont(fontFile.c_str());
 	titleFont = new FTGLTextureFont(fontFile.c_str());
 
 	// Make sure the fonts loaded OK
-	if (axisFont->Error() || titleFont->Error())
+	if (axisFont->Error())
 	{
 		delete axisFont;
 		axisFont = NULL;
 
-		delete titleFont;
-		titleFont = NULL;
+		wxMessageBox(_T("Error loading axis font"));// FIXME:  If this is settable by some configuration option, tell the user here
 	}
 	else
 	{
 		axisFont->FaceSize(12);
 		axisFont->CharMap(FT_ENCODING_UNICODE);
+	}
 
+	if (titleFont->Error())
+	{
+		delete titleFont;
+		titleFont = NULL;
+
+		wxMessageBox(_T("Error loading title font"));// FIXME:  If this is settable by some configuration option, tell the user here
+	}
+	else
+	{
 		titleFont->FaceSize(18);
 		titleFont->CharMap(FT_ENCODING_UNICODE);
 	}
@@ -148,8 +182,6 @@ void PlotObject::Update(void)
 	dynamic_cast<MainFrame*>(renderer.GetParent())->UpdateCursorValues(
 		renderer.GetLeftCursorVisible(), renderer.GetRightCursorVisible(),
 		renderer.GetLeftCursorValue(), renderer.GetRightCursorValue());
-
-	return;
 }
 
 //==========================================================================
@@ -171,8 +203,6 @@ void PlotObject::Update(void)
 void PlotObject::SetXGrid(const bool &gridOn)
 {
 	axisBottom->SetGrid(gridOn);
-
-	return;
 }
 
 //==========================================================================
@@ -194,8 +224,6 @@ void PlotObject::SetXGrid(const bool &gridOn)
 void PlotObject::SetLeftYGrid(const bool &gridOn)
 {
 	axisLeft->SetGrid(gridOn);
-
-	return;
 }
 
 //==========================================================================
@@ -217,8 +245,6 @@ void PlotObject::SetLeftYGrid(const bool &gridOn)
 void PlotObject::SetRightYGrid(const bool &gridOn)
 {
 	axisRight->SetGrid(gridOn);
-
-	return;
 }
 
 //==========================================================================
@@ -242,8 +268,6 @@ void PlotObject::RemoveExistingPlots(void)
 	// Remove all existing plots from the list
 	while (plotList.GetCount() > 0)
 		RemovePlot(0);
-
-	return;
 }
 
 //==========================================================================
@@ -270,8 +294,6 @@ void PlotObject::RemovePlot(const unsigned int &index)
 	// Remove it from the local list
 	plotList.Remove(index);
 	dataList.Remove(index);
-
-	return;
 }
 
 //==========================================================================
@@ -299,8 +321,6 @@ void PlotObject::AddCurve(const Dataset2D &data)
 	newPlot->BindToXAxis(axisBottom);
 	newPlot->BindToYAxis(axisLeft);
 	newPlot->SetData(&data);
-
-	return;
 }
 
 //==========================================================================
@@ -321,6 +341,61 @@ void PlotObject::AddCurve(const Dataset2D &data)
 //==========================================================================
 void PlotObject::FormatPlot(void)
 {
+	// Perform the basic stuff first - we do this whether or not we have data to display
+	Axis::TickStyle tickStyle = Axis::TickStyleInside;
+
+	axisBottom->SetOrientation(Axis::OrientationBottom);
+	axisBottom->SetFont(axisFont);
+	axisBottom->SetTickStyle(tickStyle);
+	
+	if (axisBottom->GetLabel().IsEmpty())
+		axisBottom->SetOffsetFromWindowEdge(50);
+	else
+		axisBottom->SetOffsetFromWindowEdge(75);
+
+	axisTop->SetOrientation(Axis::OrientationTop);
+	axisTop->SetTickStyle(tickStyle);
+	
+	if (axisTop->GetLabel().IsEmpty())
+		axisTop->SetOffsetFromWindowEdge(50);
+	else
+		axisTop->SetOffsetFromWindowEdge(75);
+
+	if (!titleObject->GetText().IsEmpty())
+		axisTop->SetOffsetFromWindowEdge(axisTop->GetOffsetFromWindowEdge() + titleObject->GetTextHeight());
+
+	axisLeft->SetOrientation(Axis::OrientationLeft);
+	axisLeft->SetFont(axisFont);
+	axisLeft->SetTickStyle(tickStyle);
+	
+	if (axisLeft->GetLabel().IsEmpty())
+		axisLeft->SetOffsetFromWindowEdge(75);
+	else
+		axisLeft->SetOffsetFromWindowEdge(100);
+
+	axisRight->SetOrientation(Axis::OrientationRight);
+	axisRight->SetFont(axisFont);
+	axisRight->SetTickStyle(tickStyle);
+	
+	if (axisRight->GetLabel().IsEmpty())
+		axisRight->SetOffsetFromWindowEdge(75);
+	else
+		axisRight->SetOffsetFromWindowEdge(100);
+
+	// Set the title properties
+	titleObject->SetFont(titleFont);
+	titleObject->SetCentered(true);
+	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
+		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);
+
+	// Set the axis colors
+	Color color = Color::ColorBlack;
+	axisBottom->SetColor(color);
+	axisTop->SetColor(color);
+	axisLeft->SetColor(color);
+	axisRight->SetColor(color);
+
+	// If we don't have any data, we don't want stop before getting into the details
 	if (dataList.GetCount() == 0)
 		return;
 
@@ -393,7 +468,7 @@ void PlotObject::FormatPlot(void)
 		yLeftMaxOriginal = yRightMaxOriginal;
 	}
 
-	// Apply limits
+	// Apply range limits
 
 	// Tell the curves they will need to be re-drawn
 	for (i = 0; i < (unsigned int)plotList.GetCount(); i++)
@@ -519,70 +594,39 @@ void PlotObject::FormatPlot(void)
 		yRightMaxOriginal = yRightMax;
 	}
 
-	// Apply the desired properties to each axis
-	Axis::TickStyle tickStyle = Axis::TickStyleInside;
-
-	axisBottom->SetOrientation(Axis::OrientationBottom);
+	// Apply the desired range and resolution to each axis
 	axisBottom->SetMinimum(xMin);
 	axisBottom->SetMaximum(xMax);
 	axisBottom->SetMinorResolution(xMinorResolution);
 	axisBottom->SetMajorResolution(xMajorResolution);
-	axisBottom->SetFont(axisFont);
-	axisBottom->SetTickStyle(tickStyle);
 
-	axisTop->SetOrientation(Axis::OrientationTop);
 	axisTop->SetMinimum(xMin);
 	axisTop->SetMaximum(xMax);
 	axisTop->SetMinorResolution(xMinorResolution);
 	axisTop->SetMajorResolution(xMajorResolution);
-	axisTop->SetTickStyle(tickStyle);
-
-	axisLeft->SetOrientation(Axis::OrientationLeft);
+	
 	axisLeft->SetMinimum(yLeftMin);
 	axisLeft->SetMaximum(yLeftMax);
 	axisLeft->SetMinorResolution(yLeftMinorResolution);
 	axisLeft->SetMajorResolution(yLeftMajorResolution);
-	axisLeft->SetFont(axisFont);
-	//axisLeft->SetLabel(wxEmptyString);// FIXME
-	axisLeft->SetTickStyle(tickStyle);
-
-	axisRight->SetOrientation(Axis::OrientationRight);
+	
 	axisRight->SetMinimum(yRightMin);
 	axisRight->SetMaximum(yRightMax);
 	axisRight->SetMinorResolution(yRightMinorResolution);
 	axisRight->SetMajorResolution(yRightMajorResolution);
-	axisRight->SetFont(axisFont);
-	//axisRight->SetLabel(wxEmptyString);// FIXME
-	axisRight->SetTickStyle(tickStyle);
-
-	// Set the title properties
-	/*titleObject->SetFont(titleFont);
-	titleObject->SetCentered(true);
-	titleObject->SetText(wxEmptyString);
-	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
-		renderer.GetSize().GetHeight() - 75.0 / 2.0);// 75.0 is from OffsetFromWindowEdge in axis.cpp*/
-
-	// Set the axis colors
-	Color color = Color::ColorBlack;
-	axisBottom->SetColor(color);
-	axisTop->SetColor(color);
-	axisLeft->SetColor(color);
-	axisRight->SetColor(color);
 
 	// Update the axis limits so they are exactly the same as what is displayed on screen
-	axisBottom->GenerateGeometry();
+	axisBottom->Draw();
 	xMin = axisBottom->GetMinimum();
 	xMax = axisBottom->GetMaximum();
 
-	axisLeft->GenerateGeometry();
+	axisLeft->Draw();
 	yLeftMin = axisLeft->GetMinimum();
 	yLeftMax = axisLeft->GetMaximum();
 
-	axisRight->GenerateGeometry();
+	axisRight->Draw();
 	yRightMin = axisRight->GetMinimum();
 	yRightMax = axisRight->GetMaximum();
-
-	return;
 }
 
 //==========================================================================
@@ -1078,10 +1122,10 @@ bool PlotObject::GetGrid(void)
 // Class:			PlotObject
 // Function:		SetXLabel
 //
-// Description:		Resets auto-scaling for all axes.
+// Description:		Sets the x-axis text.
 //
 // Input Arguments:
-//		None
+//		text	= wxString
 //
 // Output Arguments:
 //		None
@@ -1095,6 +1139,69 @@ void PlotObject::SetXLabel(wxString text)
 	axisBottom->SetLabel(text);
 
 	return;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetLeftYLabel
+//
+// Description:		Sets the left y-axis text.
+//
+// Input Arguments:
+//		text	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetLeftYLabel(wxString text)
+{
+	axisLeft->SetLabel(text);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetRightYLabel
+//
+// Description:		Sets the title text.
+//
+// Input Arguments:
+//		text	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetRightYLabel(wxString text)
+{
+	axisRight->SetLabel(text);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetTitle
+//
+// Description:		Sets the title text.
+//
+// Input Arguments:
+//		text	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetTitle(wxString text)
+{
+	titleObject->SetText(text);
 }
 
 //==========================================================================

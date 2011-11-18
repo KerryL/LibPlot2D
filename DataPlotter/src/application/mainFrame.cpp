@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  main_frame_class.cpp
+// File:  mainFrame.cpp
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains the class functionality (event handlers, etc.) for the
@@ -24,22 +24,28 @@
 #include <wx/colordlg.h>
 
 // Local headers
-#include "application/main_frame_class.h"
-#include "application/plotter_app_class.h"
-#include "application/drop_target_class.h"
-#include "application/range_limits_dialog_class.h"
-#include "renderer/plot_renderer_class.h"
-#include "renderer/color_class.h"
+#include "application/mainFrame.h"
+#include "application/plotterApp.h"
+#include "application/dropTarget.h"
+#include "application/rangeLimitsDialog.h"
+#include "renderer/plotRenderer.h"
+#include "renderer/color.h"
 #include "utilities/dataset2D.h"
-#include "utilities/math/plot_math.h"
+#include "utilities/math/plotMath.h"
 #include "utilities/signals/integral.h"
 #include "utilities/signals/derivative.h"
 #include "utilities/signals/rms.h"
 #include "utilities/signals/fft.h"
-#include "utilities/math/expression_tree_class.h"
-#include "utilities/signals/filters/low_pass_order1_class.h"
-#include "utilities/signals/filters/high_pass_order1_class.h"
-#include "utilities/signals/curve_fit.h"
+#include "utilities/math/expressionTree.h"
+#include "utilities/signals/filters/lowPassOrder1.h"
+#include "utilities/signals/filters/highPassOrder1.h"
+#include "utilities/signals/curveFit.h"
+
+// *nix Icons
+#ifdef __WXGTK__
+#include "../../res/plots16.xpm"
+#include "../../res/plots32.xpm"
+#endif
 
 //==========================================================================
 // Class:			MainFrame
@@ -106,6 +112,7 @@ MainFrame::~MainFrame()
 //
 //==========================================================================
 /*#ifdef __WXGTK__
+// FIXME:  Include preferences
 const wxString MainFrame::pathToConfigFile = _T("dataplotter.rc");
 #else
 const wxString MainFrame::pathToConfigFile = _T("dataplotter.ini");
@@ -226,8 +233,11 @@ void MainFrame::SetProperties(void)
 	// Add the icon
 #ifdef __WXMSW__
     SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE, 16, 16));
+	SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE, 32, 32));
+#elif __WXGTK__
+	SetIcon(wxIcon(plots16_xpm, wxBITMAP_TYPE_XPM));
+	SetIcon(wxIcon(plots32_xpm, wxBITMAP_TYPE_XPM));
 #endif
-	// FIXME:  Linux icons
 
 	// Allow draging-and-dropping of files onto this window to open them
 	SetDropTarget(dynamic_cast<wxDropTarget*>(new DropTarget(*this)));

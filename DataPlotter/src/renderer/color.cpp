@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  color_class.cpp
+// File:  color.cpp
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class definition for the Color class.  This class contains
@@ -20,7 +20,7 @@
 #include <wx/colour.h>
 
 // Local headers
-#include "renderer/color_class.h"
+#include "renderer/color.h"
 
 //==========================================================================
 // Class:			Color

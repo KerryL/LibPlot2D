@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  filter_base_class.cpp
+// File:  filterBase.cpp
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Base class (abstract) for digital filters.
@@ -17,7 +17,7 @@
 #include <cstdlib>
 
 // Local headers
-#include "utilities/signals/filters/filter_base_class.h"
+#include "utilities/signals/filters/filterBase.h"
 
 //==========================================================================
 // Class:			FilterBase

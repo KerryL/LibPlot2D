@@ -7,15 +7,15 @@
 
 ===================================================================================*/
 
-// File:  drop_target_class.h
+// File:  dropTarget.h
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
 //				 when the user drags-and-drops them onto the main window.
 // History:
 
-#ifndef _DROP_TARGET_CLASS_H_
-#define _DROP_TARGET_CLASS_H_
+#ifndef _DROP_TARGET_H_
+#define _DROP_TARGET_H_
 
 // wxWidgets headers
 #include <wx/dnd.h>
@@ -41,4 +41,4 @@ private:
 	virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString &filenames);
 };
 
-#endif//  _DROP_TARGET_CLASS_H_
+#endif//  _DROP_TARGET_H_

@@ -7,14 +7,14 @@
 
 ===================================================================================*/
 
-// File:  filter_base_class.h
+// File:  filterBase.h
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Base class (abstract) for digital filters.
 // History:
 
-#ifndef _FILTER_BASE_CLASS_H_
-#define _FILTER_BASE_CLASS_H_
+#ifndef _FILTER_BASE_H_
+#define _FILTER_BASE_H_
 
 class FilterBase
 {
@@ -48,4 +48,4 @@ protected:
 	const double sampleRate;// [Hz]
 };
 
-#endif// _FILTER_BASE_CLASS_H_
+#endif// _FILTER_BASE_H_

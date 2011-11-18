@@ -7,15 +7,15 @@
 
 ===================================================================================*/
 
-// File:  low_pass_order1_class.cpp
+// File:  lowPassOrder1.cpp
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  First order low-pass digital filter.
 // History:
 
 // Local headers
-#include "utilities/signals/filters/low_pass_order1_class.h"
-#include "utilities/math/plot_math.h"
+#include "utilities/signals/filters/lowPassOrder1.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			LowPassFirstOrderFilter
@@ -46,7 +46,7 @@ LowPassFirstOrderFilter::LowPassFirstOrderFilter(const double& cutoffFrequency,
 	b = new double[1];
 
 	double sampleTime = 1.0 / sampleRate;// [sec]
-	double cutoffRadians = 2.0 * PlotMath::PI * cutoffFrequency;// [rad/sec]
+	double cutoffRadians = 2.0 * PlotMath::Pi * cutoffFrequency;// [rad/sec]
 
 	a[0] = sampleTime * cutoffRadians;
 	// a1 = a0, so we don't store it

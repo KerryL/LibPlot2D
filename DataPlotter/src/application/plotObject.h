@@ -7,20 +7,20 @@
 
 ===================================================================================*/
 
-// File:  plot_object_class.h
+// File:  plotObject.h
 // Created:  5/4/2011
 // Author:  K. Loux
 // Description:  Intermediate class for creating plots from arrays of data.
 // History:
 
-#ifndef _PLOT_OBJECT_CLASS_H_
-#define _PLOT_OBJECT_CLASS_H_
+#ifndef _PLOT_OBJECT_H_
+#define _PLOT_OBJECT_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/object_list_class.h"
+#include "utilities/objectList.h"
 
 // Local forward declarations
 class PlotRenderer;
@@ -77,7 +77,11 @@ public:
 	void SetXGrid(const bool &gridOn);
 	void SetLeftYGrid(const bool &gridOn);
 	void SetRightYGrid(const bool &gridOn);
+
 	void SetXLabel(wxString text);
+	void SetLeftYLabel(wxString text);
+	void SetRightYLabel(wxString text);
+	void SetTitle(wxString text);
 
 	void SetGridColor(const Color &color);
 	Color GetGridColor(void) const;
@@ -87,7 +91,8 @@ public:
 	void SetAutoScaleLeft(void) { autoScaleLeftY = true; };
 	void SetAutoScaleRight(void) { autoScaleRightY = true; };
 
-	const Axis* GetXAxis(void) const { return axisBottom; };
+	const Axis* GetBottomAxis(void) const { return axisBottom; };
+	const Axis* GetTopAxis(void) const { return axisTop; };
 	const Axis* GetLeftYAxis(void) const { return axisLeft; };
 	const Axis* GetRightYAxis(void) const { return axisRight; };
 	bool GetGrid(void);
@@ -119,14 +124,15 @@ private:
 	bool autoScaleRightY;
 
 	// The actual plot objects
-	OBJECT_LIST<PlotCurve> plotList;
-	OBJECT_LIST<const Dataset2D> dataList;
+	ObjectList<PlotCurve> plotList;
+	ObjectList<const Dataset2D> dataList;
 
 	// Handles all of the formatting for the plot
 	void FormatPlot(void);
 
 	// Handles the spacing of the axis ticks
-	double AutoScaleAxis(double &min, double &max, int maxTicks, const bool &forceLimits = false);
+	double AutoScaleAxis(double &min, double &max, int maxTicks,
+		const bool &forceLimits = false);
 };
 
-#endif// _PLOT_OBJECT_CLASS_H_
+#endif// _PLOT_OBJECT_H_

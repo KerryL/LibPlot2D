@@ -7,17 +7,17 @@
 
 ===================================================================================*/
 
-// File:  low_pass_order2_class.h
+// File:  lowPassOrder2.h
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Second order low-pass digital filter.
 // History:
 
-#ifndef _LOW_PASS_ORDER2_CLASS_H_
-#define _LOW_PASS_ORDER2_CLASS_H_
+#ifndef _LOW_PASS_ORDER2_H_
+#define _LOW_PASS_ORDER2_H_
 
 // Local headers
-#include "utilities/signals/filters/filter_base_class.h"
+#include "utilities/signals/filters/filterBase.h"
 
 class LowPassSecondOrderFilter : public FilterBase
 {
@@ -34,4 +34,4 @@ public:
 	virtual double Apply(const double &_u);
 };
 
-#endif// _LOW_PASS_ORDER2_CLASS_H_
+#endif// _LOW_PASS_ORDER2_H_

@@ -7,20 +7,20 @@
 
 ===================================================================================*/
 
-// File:  matrix_class.h
+// File:  matrix.h
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class declaration for MATRIX classes.
 // History:
 
-#ifndef _MATRIX_CLASS_H_
-#define _MATRIX_CLASS_H_
+#ifndef _MATRIX_H_
+#define _MATRIX_H_
 
 // wxWidgets forward declarations
 class wxString;
 
-// vMath forward declarations
-class VECTOR;
+// Local forward declarations
+class Vector;
 
 class Matrix
 {
@@ -78,7 +78,7 @@ public:
 	const Matrix operator - (const Matrix &target) const;
 	const Matrix operator * (const Matrix &target) const;
 	const Matrix operator * (const double &target) const;
-	const VECTOR operator * (const VECTOR &target) const;
+	const Vector operator * (const Vector &target) const;
 	const Matrix operator / (const double &target) const;
 	const double &operator () (const unsigned int &row, const unsigned int &column) const;
 
@@ -109,4 +109,4 @@ private:
 	double pythag(const double& a, const double &b) const;
 };
 
-#endif// _MATRIX_CLASS_H_
+#endif// _MATRIX_H_

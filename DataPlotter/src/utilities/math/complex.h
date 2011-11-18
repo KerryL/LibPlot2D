@@ -7,14 +7,14 @@
 
 ===================================================================================*/
 
-// File:  complex_class.h
+// File:  complex.h
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class declaration for complex number class.
 // History:
 
-#ifndef _COMPLEX_CLASS_H_
-#define _COMPLEX_CLASS_H_
+#ifndef _COMPLEX_H_
+#define _COMPLEX_H_
 
 using namespace std;
 
@@ -64,4 +64,4 @@ public:
 	static const COMPLEX I;
 };
 
-#endif// _COMPLEX_CLASS_H_
+#endif// _COMPLEX_H_

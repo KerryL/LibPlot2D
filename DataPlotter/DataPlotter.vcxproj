@@ -51,7 +51,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_DATAPLOTTER_64_BIT_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_dll\mswd;$(WXWIN)\include;$(FTGL)\src;./src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -73,7 +73,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;_DATAPLOTTER_64_BIT_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_lib\msw;$(WXWIN)\include;$(FTGL)\src;./src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -89,66 +89,69 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\application\drop_target_class.h" />
-    <ClInclude Include="src\application\main_frame_class.h" />
-    <ClInclude Include="src\application\plotter_app_class.h" />
-    <ClInclude Include="src\application\plot_object_class.h" />
-    <ClInclude Include="src\application\range_limits_dialog_class.h" />
-    <ClInclude Include="src\renderer\color_class.h" />
-    <ClInclude Include="src\renderer\plot_renderer_class.h" />
+    <ClInclude Include="src\application\dropTarget.h" />
+    <ClInclude Include="src\application\mainFrame.h" />
+    <ClInclude Include="src\application\plotObject.h" />
+    <ClInclude Include="src\application\plotterApp.h" />
+    <ClInclude Include="src\application\rangeLimitsDialog.h" />
+    <ClInclude Include="src\renderer\color.h" />
+    <ClInclude Include="src\renderer\plotRenderer.h" />
     <ClInclude Include="src\renderer\primitives\axis.h" />
-    <ClInclude Include="src\renderer\primitives\cursor_class.h" />
-    <ClInclude Include="src\renderer\primitives\plot_curve.h" />
+    <ClInclude Include="src\renderer\primitives\plotCursor.h" />
+    <ClInclude Include="src\renderer\primitives\plotCurve.h" />
     <ClInclude Include="src\renderer\primitives\primitive.h" />
-    <ClInclude Include="src\renderer\primitives\text_class.h" />
-    <ClInclude Include="src\renderer\primitives\zoom_box_class.h" />
-    <ClInclude Include="src\renderer\render_window_class.h" />
+    <ClInclude Include="src\renderer\primitives\text.h" />
+    <ClInclude Include="src\renderer\primitives\zoomBox.h" />
+    <ClInclude Include="src\renderer\renderWindow.h" />
     <ClInclude Include="src\utilities\dataset2D.h" />
-    <ClInclude Include="src\utilities\managed_list_class.h" />
-    <ClInclude Include="src\utilities\math\complex_class.h" />
-    <ClInclude Include="src\utilities\math\expression_tree_class.h" />
-    <ClInclude Include="src\utilities\math\matrix_class.h" />
-    <ClInclude Include="src\utilities\math\plot_math.h" />
-    <ClInclude Include="src\utilities\math\vector_class.h" />
-    <ClInclude Include="src\utilities\object_list_class.h" />
-    <ClInclude Include="src\utilities\signals\curve_fit.h" />
+    <ClInclude Include="src\utilities\fontFinder.h" />
+    <ClInclude Include="src\utilities\machineDefinitions.h" />
+    <ClInclude Include="src\utilities\managedList.h" />
+    <ClInclude Include="src\utilities\math\complex.h" />
+    <ClInclude Include="src\utilities\math\expressionTree.h" />
+    <ClInclude Include="src\utilities\math\matrix.h" />
+    <ClInclude Include="src\utilities\math\plotMath.h" />
+    <ClInclude Include="src\utilities\math\vector.h" />
+    <ClInclude Include="src\utilities\objectList.h" />
+    <ClInclude Include="src\utilities\signals\curveFit.h" />
     <ClInclude Include="src\utilities\signals\derivative.h" />
     <ClInclude Include="src\utilities\signals\fft.h" />
-    <ClInclude Include="src\utilities\signals\filters\filter_base_class.h" />
-    <ClInclude Include="src\utilities\signals\filters\high_pass_order1_class.h" />
-    <ClInclude Include="src\utilities\signals\filters\low_pass_order1_class.h" />
-    <ClInclude Include="src\utilities\signals\filters\low_pass_order2_class.h" />
+    <ClInclude Include="src\utilities\signals\filters\filterBase.h" />
+    <ClInclude Include="src\utilities\signals\filters\highPassOrder1.h" />
+    <ClInclude Include="src\utilities\signals\filters\lowPassOrder1.h" />
+    <ClInclude Include="src\utilities\signals\filters\lowPassOrder2.h" />
     <ClInclude Include="src\utilities\signals\integral.h" />
     <ClInclude Include="src\utilities\signals\rms.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\application\drop_target_class.cpp" />
-    <ClCompile Include="src\application\main_frame_class.cpp" />
-    <ClCompile Include="src\application\plotter_app_class.cpp" />
-    <ClCompile Include="src\application\plot_object_class.cpp" />
-    <ClCompile Include="src\application\range_limits_dialog_class.cpp" />
-    <ClCompile Include="src\renderer\color_class.cpp" />
-    <ClCompile Include="src\renderer\plot_renderer_class.cpp" />
+    <ClCompile Include="src\application\dropTarget.cpp" />
+    <ClCompile Include="src\application\mainFrame.cpp" />
+    <ClCompile Include="src\application\plotObject.cpp" />
+    <ClCompile Include="src\application\plotterApp.cpp" />
+    <ClCompile Include="src\application\rangeLimitsDialog.cpp" />
+    <ClCompile Include="src\renderer\color.cpp" />
+    <ClCompile Include="src\renderer\plotRenderer.cpp" />
     <ClCompile Include="src\renderer\primitives\axis.cpp" />
-    <ClCompile Include="src\renderer\primitives\cursor_class.cpp" />
-    <ClCompile Include="src\renderer\primitives\plot_curve.cpp" />
+    <ClCompile Include="src\renderer\primitives\plotCursor.cpp" />
+    <ClCompile Include="src\renderer\primitives\plotCurve.cpp" />
     <ClCompile Include="src\renderer\primitives\primitive.cpp" />
-    <ClCompile Include="src\renderer\primitives\text_class.cpp" />
-    <ClCompile Include="src\renderer\primitives\zoom_box_class.cpp" />
-    <ClCompile Include="src\renderer\render_window_class.cpp" />
+    <ClCompile Include="src\renderer\primitives\text.cpp" />
+    <ClCompile Include="src\renderer\primitives\zoomBox.cpp" />
+    <ClCompile Include="src\renderer\renderWindow.cpp" />
     <ClCompile Include="src\utilities\dataset2D.cpp" />
-    <ClCompile Include="src\utilities\math\complex_class.cpp" />
-    <ClCompile Include="src\utilities\math\expression_tree_class.cpp" />
-    <ClCompile Include="src\utilities\math\matrix_class.cpp" />
-    <ClCompile Include="src\utilities\math\plot_math.cpp" />
-    <ClCompile Include="src\utilities\math\vector_class.cpp" />
-    <ClCompile Include="src\utilities\signals\curve_fit.cpp" />
+    <ClCompile Include="src\utilities\fontFinder.cpp" />
+    <ClCompile Include="src\utilities\math\complex.cpp" />
+    <ClCompile Include="src\utilities\math\expressionTree.cpp" />
+    <ClCompile Include="src\utilities\math\matrix.cpp" />
+    <ClCompile Include="src\utilities\math\plotMath.cpp" />
+    <ClCompile Include="src\utilities\math\vector.cpp" />
+    <ClCompile Include="src\utilities\signals\curveFit.cpp" />
     <ClCompile Include="src\utilities\signals\derivative.cpp" />
     <ClCompile Include="src\utilities\signals\fft.cpp" />
-    <ClCompile Include="src\utilities\signals\filters\filter_base_class.cpp" />
-    <ClCompile Include="src\utilities\signals\filters\high_pass_order1_class.cpp" />
-    <ClCompile Include="src\utilities\signals\filters\low_pass_order1_class.cpp" />
-    <ClCompile Include="src\utilities\signals\filters\low_pass_order2_class.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\filterBase.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\highPassOrder1.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\lowPassOrder1.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\lowPassOrder2.cpp" />
     <ClCompile Include="src\utilities\signals\integral.cpp" />
     <ClCompile Include="src\utilities\signals\rms.cpp" />
   </ItemGroup>

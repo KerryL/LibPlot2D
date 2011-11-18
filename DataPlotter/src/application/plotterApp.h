@@ -7,14 +7,14 @@
 
 ===================================================================================*/
 
-// File:  plotter_app_class.h
+// File:  plotterApp.h
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  The application class.
 // History:
 
-#ifndef _PLOTTER_APP_CLASS_H_
-#define _PLOTTER_APP_CLASS_H_
+#ifndef _PLOTTER_APP_H_
+#define _PLOTTER_APP_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -42,4 +42,4 @@ private:
 // Declare the application object (have wxWidgets create the wxGetApp() function)
 DECLARE_APP(DataPlotterApp);
 
-#endif// _PLOTTER_APP_CLASS_H_
+#endif// _PLOTTER_APP_H_

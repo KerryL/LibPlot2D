@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  curve_fit.cpp
+// File:  curveFit.cpp
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Contains methods for fitting curves to datasets.
@@ -17,9 +17,9 @@
 #include <cmath>
 
 // Local headers
-#include "utilities/signals/curve_fit.h"
+#include "utilities/signals/curveFit.h"
 #include "utilities/dataset2D.h"
-#include "utilities/math/matrix_class.h"
+#include "utilities/math/matrix.h"
 
 //==========================================================================
 // Class:			CurveFit

@@ -7,15 +7,15 @@
 
 ===================================================================================*/
 
-// File:  high_pass_order1_class.cpp
+// File:  highPassOrder1.cpp
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  First order high-pass digital filter.
 // History:
 
 // Local headers
-#include "utilities/signals/filters/high_pass_order1_class.h"
-#include "utilities/math/plot_math.h"
+#include "utilities/signals/filters/highPassOrder1.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			HighPassFirstOrderFilter
@@ -46,7 +46,7 @@ HighPassFirstOrderFilter::HighPassFirstOrderFilter(const double& cutoffFrequency
 	b = new double[1];
 
 	double sampleTime = 1.0 / sampleRate;// [sec]
-	double cutoffRadians = 2.0 * PlotMath::PI * cutoffFrequency;// [rad/sec]
+	double cutoffRadians = 2.0 * PlotMath::Pi * cutoffFrequency;// [rad/sec]
 
 	a[0] = 2.0;
 	// a1 = a0, so we don't store it

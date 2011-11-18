@@ -7,18 +7,18 @@
 
 ===================================================================================*/
 
-// File:  plot_renderer_class.h
+// File:  plotRenderer.h
 // Created:  5/4/2011
 // Author:  K. Loux
 // Description:  Derived from RenderWindow, this class is used to display plots on
 //				 the screen.
 // History:
 
-#ifndef _PLOT_RENDERER_CLASS_H_
-#define _PLOT_RENDERER_CLASS_H_
+#ifndef _PLOT_RENDERER_H_
+#define _PLOT_RENDERER_H_
 
 // Local headers
-#include "renderer/render_window_class.h"
+#include "renderer/renderWindow.h"
 
 // wxWidgets forward declarations
 class wxString;
@@ -69,6 +69,9 @@ public:
 	void SetRightYLimits(const double &min, const double &max);
 
 	void SetXLabel(wxString text);
+	void SetLeftYLabel(wxString text);
+	void SetRightYLabel(wxString text);
+	void SetTitle(wxString text);
 
 	void AddCurve(const Dataset2D &data);
 	void RemoveAllCurves(void);
@@ -128,4 +131,4 @@ protected:
 	DECLARE_EVENT_TABLE()
 };
 
-#endif// _PLOT_RENDERER_CLASS_H_
+#endif// _PLOT_RENDERER_H_

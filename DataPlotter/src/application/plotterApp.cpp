@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  plotter_app_class.cpp
+// File:  plotterApp.cpp
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  The application class.
@@ -17,8 +17,8 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "application/plotter_app_class.h"
-#include "application/main_frame_class.h"
+#include "application/plotterApp.h"
+#include "application/mainFrame.h"
 
 // Implement the application (have wxWidgets set up the appropriate entry points, etc.)
 IMPLEMENT_APP(DataPlotterApp);

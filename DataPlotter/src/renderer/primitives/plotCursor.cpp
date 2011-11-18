@@ -1,13 +1,13 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                         Copyright Kerry R. Loux 2011
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
 
 ===================================================================================*/
 
-// File:  cursor_class.cpp
+// File:  plotCursor.cpp
 // Created:  5/5/2011
 // Author:  K. Loux
 // Description:  Represents an oscilloscope cursor on-screen.
@@ -15,9 +15,9 @@
 //  5/12/2011 - Renamed to PlotCursor from Cursor due to conflict in X.h, K. Loux
 
 // Local headers
-#include "renderer/primitives/cursor_class.h"
+#include "renderer/primitives/plotCursor.h"
 #include "renderer/primitives/axis.h"
-#include "renderer/render_window_class.h"
+#include "renderer/renderWindow.h"
 
 //==========================================================================
 // Class:			PlotCursor
@@ -36,7 +36,8 @@
 //		None
 //
 //==========================================================================
-PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis) : Primitive(_renderWindow), axis(_axis)
+PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis)
+	: Primitive(_renderWindow), axis(_axis)
 {
 	// Start out invisible
 	isVisible = false;
@@ -71,32 +72,35 @@ void PlotCursor::GenerateGeometry(void)
 	// Create the axis
 	glBegin(GL_LINES);
 
-	// Draw the axis
-	unsigned int length;// [pixels]
+	// Draw the cursor
 	unsigned int dimension;// [pixels]
 
 	if (axis.IsHorizontal())
 	{
-		length = renderWindow.GetSize().GetHeight() - 2 * Axis::GetOffsetFromWindowEdge();
-		dimension = renderWindow.GetSize().GetWidth() - 2 * Axis::GetOffsetFromWindowEdge();
-		glVertex2i(locationAlongAxis, Axis::GetOffsetFromWindowEdge());
-		glVertex2i(locationAlongAxis, length + Axis::GetOffsetFromWindowEdge());
+		dimension = renderWindow.GetSize().GetWidth()
+				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
+				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
+		glVertex2i(locationAlongAxis, axis.GetOffsetFromWindowEdge());
+		glVertex2i(locationAlongAxis, renderWindow.GetSize().GetHeight()
+				- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
 	}
 	else
 	{
-		length = renderWindow.GetSize().GetWidth() - 2 * Axis::GetOffsetFromWindowEdge();
-		dimension = renderWindow.GetSize().GetHeight() - 2 * Axis::GetOffsetFromWindowEdge();
-		glVertex2i(Axis::GetOffsetFromWindowEdge(), locationAlongAxis);
-		glVertex2i(length + Axis::GetOffsetFromWindowEdge(), locationAlongAxis);
+		dimension = renderWindow.GetSize().GetHeight()
+				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
+				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
+		glVertex2i(axis.GetOffsetFromWindowEdge(), locationAlongAxis);
+		glVertex2i(renderWindow.GetSize().GetWidth()
+				- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
 	}
 
 	glEnd();
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
-	value = axis.GetMinimum() + double(locationAlongAxis - Axis::GetOffsetFromWindowEdge()) /
-		(double)dimension * (axis.GetMaximum() - axis.GetMinimum());
-
-	return;
+	// This is the value where the cursor meets its associated axis
+	value = axis.GetMinimum() + double(locationAlongAxis
+			- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) /
+			(double)dimension * (axis.GetMaximum() - axis.GetMinimum());
 }
 
 //==========================================================================
@@ -118,7 +122,8 @@ void PlotCursor::GenerateGeometry(void)
 bool PlotCursor::HasValidParameters(void)
 {
 	// Make sure the value is within the axis limits
-	if (value >= axis.GetMinimum() && value <= axis.GetMaximum())
+	if (value >= axis.GetMinimum() && value <= axis.GetMaximum() &&
+		axis.GetAxisAtMaxEnd() && axis.GetAxisAtMinEnd())
 		return true;
 
 	// If the parameters aren't valid, also hide this to prevent the cursor values from updating
@@ -146,15 +151,22 @@ bool PlotCursor::HasValidParameters(void)
 //==========================================================================
 void PlotCursor::RescalePoint(unsigned int &point)
 {
+	if (!axis.GetAxisAtMaxEnd() || !axis.GetAxisAtMinEnd())
+		return;
+			
 	int plotDimension;
 	if (axis.IsHorizontal())
-		plotDimension = renderWindow.GetSize().GetWidth() - 2 * Axis::GetOffsetFromWindowEdge();
+		plotDimension = renderWindow.GetSize().GetWidth()
+				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
+				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
 	else
-		plotDimension = renderWindow.GetSize().GetHeight() - 2 * Axis::GetOffsetFromWindowEdge();
+		plotDimension = renderWindow.GetSize().GetHeight()
+				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
+				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
 
 	// Do the scaling
-	point = Axis::GetOffsetFromWindowEdge() + (value - axis.GetMinimum()) /
-		(axis.GetMaximum() - axis.GetMinimum()) * plotDimension;
+	point = axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
+			+ (value - axis.GetMinimum()) / (axis.GetMaximum() - axis.GetMinimum()) * plotDimension;
 
 	return;
 }

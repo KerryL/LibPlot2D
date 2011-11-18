@@ -7,21 +7,21 @@
 
 ===================================================================================*/
 
-// File:  main_frame_class.h
+// File:  mainFrame.h
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Main frame for the application.
 // History:
 
-#ifndef _MAIN_FRAME_CLASS_H_
-#define _MAIN_FRAME_CLASS_H_
+#ifndef _MAIN_FRAME_H_
+#define _MAIN_FRAME_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
 
 // Local headers
 #include "utilities/dataset2D.h"
-#include "utilities/managed_list_class.h"
+#include "utilities/managedList.h"
 
 // wxWidgets forward declarations
 class wxGrid;
@@ -100,7 +100,7 @@ private:
 	void AddCurve(Dataset2D *data, wxString name);
 	void RemoveCurve(const unsigned int &i);
 
-	MANAGED_LIST<const Dataset2D> plotList;
+	ManagedList<const Dataset2D> plotList;
 
 	// The event IDs
 	enum MainFrameEventID
@@ -227,4 +227,4 @@ private:
 	//void TestSignalOperations(void);
 };
 
-#endif// _MAIN_FRAME_CLASS_H_
+#endif// _MAIN_FRAME_H_

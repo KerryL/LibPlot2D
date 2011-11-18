@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  expression_tree_class.cpp
+// File:  expressionTree.cpp
 // Created:  5/6/2011
 // Author:  K. Loux
 // Description:  Handles user-specified mathematical operations on datasets.
@@ -17,7 +17,7 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/math/expression_tree_class.h"
+#include "utilities/math/expressionTree.h"
 #include "utilities/signals/derivative.h"
 #include "utilities/signals/integral.h"
 #include "utilities/signals/fft.h"
@@ -29,7 +29,7 @@
 // Description:		Constructor for ExpressionTree class.
 //
 // Input Arguments:
-//		_list		= const MANAGED_LIST<const Dataset2D>& reference to the
+//		_list		= const ManagedList<const Dataset2D>& reference to the
 //					  other datasets which may be required to complete the calculation
 //
 // Output Arguments:
@@ -39,7 +39,7 @@
 //		None
 //
 //==========================================================================
-ExpressionTree::ExpressionTree(const MANAGED_LIST<const Dataset2D> &_list) : list(_list)
+ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> &_list) : list(_list)
 {
 }
 

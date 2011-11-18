@@ -1,30 +1,39 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                         Copyright Kerry R. Loux 2011
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
 
 ===================================================================================*/
 
-// File:  vector_class.cpp
-// Created:  5/2/2011
+// File:  vector.cpp
+// Created:  11/3/2007
 // Author:  K. Loux
 // Description:  Contains class functionality for vector class.
 // History:
+//	2/26/2008	- Gave additional arguments to rotation member for choice of rotation order, K. Loux.
+//	3/3/2008	- Made functions take address arguments to reduce overhead, K. Loux.
+//	3/9/2008	- Removed dependency on MFC class CString by switching to wxString, K. Loux.
+//	3/14/2008	- Added AnglesTo function, K. Loux.
+//	3/23/2008	- Changed arguments for class functions from degrees to radians, K. Loux.
+//	4/11/2009	- Changed all functions to take addresses of and use const, K. Loux.
+//	4/17/2009	- Renamed ROTATION_Axis enumeration to Axis, K. Loux
+//	6/15/2009	- Corrected function signatures for overloaded operators, K. Loux.
+//	11/7/2011	- Corrected camelCase, K. Loux.
 
 // wxWidgets headers
 #include <wx/wx.h>
 
-// Local headers
-#include "utilities/math/vector_class.h"
-#include "utilities/math/matrix_class.h"
+// VVASE headers
+#include "utilities/math/vector.h"
+#include "utilities/math/matrix.h"
 
 //==========================================================================
-// Class:			VECTOR
-// Function:		VECTOR
+// Class:			Vector
+// Function:		Vector
 //
-// Description:		Constructor for the VECTOR class.
+// Description:		Constructor for the Vector class.
 //
 // Input Arguments:
 //		None
@@ -36,20 +45,20 @@
 //		None
 //
 //==========================================================================
-VECTOR::VECTOR()
+Vector::Vector()
 {
 }
 
 //==========================================================================
-// Class:			VECTOR
-// Function:		VECTOR
+// Class:			Vector
+// Function:		Vector
 //
-// Description:		Constructor for the VECTOR class.
+// Description:		Constructor for the Vector class.
 //
 // Input Arguments:
-//		_X	= const double& specifying first component of the vector
-//		_Y	= const double& specifying second component of the vector
-//		_Z	= const double& specifying third component of the vector
+//		_x	= const double& specifying first component of the vector
+//		_y	= const double& specifying second component of the vector
+//		_z	= const double& specifying third component of the vector
 //
 // Output Arguments:
 //		None
@@ -58,19 +67,19 @@ VECTOR::VECTOR()
 //		None
 //
 //==========================================================================
-VECTOR::VECTOR(const double &_X, const double &_Y, const double &_Z)
+Vector::Vector(const double &_x, const double &_y, const double &_z)
 {
 	// Assign the arguments to the class members
-	X = _X;
-	Y = _Y;
-	Z = _Z;
+	x = _x;
+	y = _y;
+	z = _z;
 }
 
 //==========================================================================
-// Class:			VECTOR
-// Function:		~VECTOR
+// Class:			Vector
+// Function:		~Vector
 //
-// Description:		Destructor for the VECTOR class.
+// Description:		Destructor for the Vector class.
 //
 // Input Arguments:
 //		None
@@ -82,12 +91,12 @@ VECTOR::VECTOR(const double &_X, const double &_Y, const double &_Z)
 //		None
 //
 //==========================================================================
-VECTOR::~VECTOR()
+Vector::~Vector()
 {
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Rotate
 //
 // Description:		Performs Euler rotation of this object around point CoR.
@@ -100,13 +109,13 @@ VECTOR::~VECTOR()
 //					accurate unless they are correct.
 //
 // Input Arguments:
-//		CoR			= const VECTOR& specifying the point which this will be rotated
+//		cor			= const Vector& specifying the point which this will be rotated
 //					  about
-//		Rotations	= const VECTOR& specifying the angles which this will be rotated
+//		rotations	= const Vector& specifying the angles which this will be rotated
 //					  through [rad]
-//		First		= AXIS specifying the first axis of rotation
-//		Second		= AXIS specifying the second axis of rotation
-//		Third		= AXIS specifying the third axis of rotation
+//		first		= Axis specifying the first axis of rotation
+//		second		= Axis specifying the second axis of rotation
+//		third		= Axis specifying the third axis of rotation
 //
 // Output Arguments:
 //		None
@@ -115,90 +124,90 @@ VECTOR::~VECTOR()
 //		None
 //
 //==========================================================================
-void VECTOR::Rotate (const VECTOR &CoR, const VECTOR &Rotations,
-					 AXIS First, AXIS Second, AXIS Third)
+void Vector::Rotate (const Vector &cor, const Vector &rotations,
+					 Axis first, Axis second, Axis third)
 {
 	// Rotate self around point CoR with rotations in Rotations vector
-	VECTOR temp;
-	double S1 = sin(Rotations.X);
-	double C1 = cos(Rotations.X);
-	double S2 = sin(Rotations.Y);
-	double C2 = cos(Rotations.Y);
-	double S3 = sin(Rotations.Z);
-	double C3 = cos(Rotations.Z);
+	Vector temp;
+	double s1 = sin(rotations.x);
+	double c1 = cos(rotations.x);
+	double s2 = sin(rotations.y);
+	double c2 = cos(rotations.y);
+	double s3 = sin(rotations.z);
+	double c3 = cos(rotations.z);
 
 	// First do the translation
-	temp = *this - CoR;
+	temp = *this - cor;
 
-	// Define the rotation matricies using the sine and cosines computed above.  There will be three
+	// Define the rotation matrices using the sine and cosines computed above.  There will be three
 	// (one for each rotation).
-	Matrix FirstRotation(3, 3);
-	Matrix SecondRotation(3, 3);
-	Matrix ThirdRotation(3, 3);
+	Matrix firstRotation(3, 3);
+	Matrix secondRotation(3, 3);
+	Matrix thirdRotation(3, 3);
 
 	// Create the first rotation matrix
-	if (First == AxisX)
-		FirstRotation.Set(	1.0,	0.0,	0.0,
-							0.0,	C1,		-S1,
-							0.0,	S1,		C1);
-	else if (First == AxisY)
-		FirstRotation.Set(	C1,		0.0,	S1,
+	if (first == AxisX)
+		firstRotation.Set(	1.0,	0.0,	0.0,
+							0.0,	c1,		-s1,
+							0.0,	s1,		c1);
+	else if (first == AxisY)
+		firstRotation.Set(	c1,		0.0,	s1,
 							0.0,	1.0,	0.0,
-							-S1,	0.0,	C1);
-	else// if (First == AxisZ)
-		FirstRotation.Set(	C1,		-S1,	0.0,
-							S1,		C1,		0.0,
+							-s1,	0.0,	c1);
+	else// if (first == AxisZ)
+		firstRotation.Set(	c1,		-s1,	0.0,
+							s1,		c1,		0.0,
 							0.0,	0.0,	1.0);
 
 	// Create the second rotation matrix
-	if (Second == AxisX)
-		SecondRotation.Set(	1.0,	0.0,	0.0,
-							0.0,	C2,		-S2,
-							0.0,	S2,		C2);
-	else if (Second == AxisY)
-		SecondRotation.Set(	C2,		0.0,	S2,
+	if (second == AxisX)
+		secondRotation.Set(	1.0,	0.0,	0.0,
+							0.0,	c2,		-s2,
+							0.0,	s2,		c2);
+	else if (second == AxisY)
+		secondRotation.Set(	c2,		0.0,	s2,
 							0.0,	1.0,	0.0,
-							-S2,	0.0,	C2);
-	else// if (Second == AxisZ)
-		SecondRotation.Set(	C2,		-S2,	0.0,
-							S2,		C2,		0.0,
+							-s2,	0.0,	c2);
+	else// if (second == AxisZ)
+		secondRotation.Set(	c2,		-s2,	0.0,
+							s2,		c2,		0.0,
 							0.0,	0.0,	1.0);
 
 	// Create the third rotation matrix
-	if (Third == AxisX)
-		ThirdRotation.Set(	1.0,	0.0,	0.0,
-							0.0,	C3,		-S3,
-							0.0,	S3,		C3);
-	else if (Third == AxisY)
-		ThirdRotation.Set(	C3,		0.0,	S3,
+	if (third == AxisX)
+		thirdRotation.Set(	1.0,	0.0,	0.0,
+							0.0,	c3,		-s3,
+							0.0,	s3,		c3);
+	else if (third == AxisY)
+		thirdRotation.Set(	c3,		0.0,	s3,
 							0.0,	1.0,	0.0,
-							-S3,	0.0,	C3);
-	else// if (Third == AxisZ)
-		ThirdRotation.Set(	C3,		-S3,	0.0,
-							S3,		C3,		0.0,
+							-s3,	0.0,	c3);
+	else// if (third == AxisZ)
+		thirdRotation.Set(	c3,		-s3,	0.0,
+							s3,		c3,		0.0,
 							0.0,	0.0,	1.0);
 
 	// Combine all three to create the complete rotation matrix
-	Matrix RotationMatrix(3, 3);
-	RotationMatrix = ThirdRotation * SecondRotation * FirstRotation;
+	Matrix rotationMatrix(3, 3);
+	rotationMatrix = thirdRotation * secondRotation * firstRotation;
 
 	// Now we can apply the rotations and translate the vector back
-	*this = RotationMatrix * temp + CoR;
+	*this = rotationMatrix * temp + cor;
 
 	return;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Rotate
 //
 // Description:		Performs rotation of this object around point CoR.  This
 //					version only performs rotation about one specified axis.
 //
 // Input Arguments:
-//		CoR		= const VECTOR& specifying the point which this will be rotated about
-//		Angle	= const double& specifying the angle which this will be rotated through
-//		About	= const AXIS& specifying the axis of rotation
+//		cor		= const Vector& specifying the point which this will be rotated about
+//		angle	= const double& specifying the angle which this will be rotated through
+//		about	= const Axis& specifying the axis of rotation
 //
 // Output Arguments:
 //		None
@@ -207,30 +216,30 @@ void VECTOR::Rotate (const VECTOR &CoR, const VECTOR &Rotations,
 //		None
 //
 //==========================================================================
-void VECTOR::Rotate(const VECTOR &CoR, const double &Angle, const AXIS &About)
+void Vector::Rotate(const Vector &cor, const double &angle, const Axis &about)
 {
 	// Translate the vector to the origin
-	VECTOR TranslatedVector = *this - CoR;
+	Vector translatedVector = *this - cor;
 
 	// Perform the rotation
-	TranslatedVector.Rotate(Angle, About);
+	translatedVector.Rotate(angle, about);
 
 	// Translate the vector back to its original position
-	*this = TranslatedVector + CoR;
+	*this = translatedVector + cor;
 
 	return;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Rotate
 //
 // Description:		Rotates this object about the specified axis by the
 //					the specified angle.
 //
 // Input Arguments:
-//		Angle	= const double& specifying the distance to rotate this object [rad]
-//		About	= const AXIS& specifying the axis of rotation
+//		angle	= const double& specifying the distance to rotate this object [rad]
+//		about	= const Axis& specifying the axis of rotation
 //
 // Output Arguments:
 //		None
@@ -239,36 +248,36 @@ void VECTOR::Rotate(const VECTOR &CoR, const double &Angle, const AXIS &About)
 //		None
 //
 //==========================================================================
-void VECTOR::Rotate(const double &Angle, const AXIS &About)
+void Vector::Rotate(const double &angle, const Axis &about)
 {
-	double S = sin(Angle);
-	double C = cos(Angle);
+	double s = sin(angle);
+	double c = cos(angle);
 
 	// Define the rotation matrix using the sine and cosines computed above.
-	Matrix RotationMatrix(3, 3);
+	Matrix rotationMatrix(3, 3);
 
 	// Create the first rotation matrix
-	if (About == AxisX)
-		RotationMatrix.Set(	1.0,	0.0,	0.0,
-							0.0,	C,		-S,
-							0.0,	S,		C);
-	else if (About == AxisY)
-		RotationMatrix.Set(	C,		0.0,	S,
+	if (about == AxisX)
+		rotationMatrix.Set(	1.0,	0.0,	0.0,
+							0.0,	c,		-s,
+							0.0,	s,		c);
+	else if (about == AxisY)
+		rotationMatrix.Set(	c,		0.0,	s,
 							0.0,	1.0,	0.0,
-							-S,		0.0,	C);
-	else// if (About == AxisZ)
-		RotationMatrix.Set(	C,		-S,		0.0,
-							S,		C,		0.0,
+							-s,		0.0,	c);
+	else// if (about == AxisZ)
+		rotationMatrix.Set(	c,		-s,		0.0,
+							s,		c,		0.0,
 							0.0,	0.0,	1.0);
 
 	// Now we can apply the rotations
-	*this = RotationMatrix * *this;
+	*this = rotationMatrix * *this;
 
 	return;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Rotate
 //
 // Description:		Rotates this object about the specified axis by the
@@ -277,7 +286,7 @@ void VECTOR::Rotate(const double &Angle, const AXIS &About)
 //
 // Input Arguments:
 //		Angle			= const double& specifying the distance to rotate this object [rad]
-//		RotationAxis	= const VECTOR& specifying the axis of rotation
+//		RotationAxis	= const Vector& specifying the axis of rotation
 //
 // Output Arguments:
 //		None
@@ -286,48 +295,48 @@ void VECTOR::Rotate(const double &Angle, const AXIS &About)
 //		None
 //
 //==========================================================================
-void VECTOR::Rotate(const double &Angle, const VECTOR &RotationAxis)
+void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 {
 	// To rotate this vector about an arbitrary axis, we use the following matrix
-	Matrix RotationMatrix(3, 3);
+	Matrix rotationMatrix(3, 3);
 
 	// For the sake of readability
-	double U = RotationAxis.X;
-	double V = RotationAxis.Y;
-	double W = RotationAxis.Z;
+	double u = rotationAxis.x;
+	double v = rotationAxis.y;
+	double w = rotationAxis.z;
 
 	// Calculate the elements of the matrix
-	double Norm = RotationAxis.Length();
-	double NormSqrd = Norm * Norm;
-	double Term11 = (U * U + (V * V + W * W) * cos(Angle)) / NormSqrd;
-	double Term12 = (U * V * (1 - cos(Angle)) - W * sin(Angle) * Norm) / NormSqrd;
-	double Term13 = (U * W * (1 - cos(Angle)) + V * sin(Angle) * Norm) / NormSqrd;
-	double Term21 = (U * V * (1 - cos(Angle)) + W * sin(Angle) * Norm) / NormSqrd;
-	double Term22 = (V * V + (U * U + W * W) * cos(Angle)) / NormSqrd;
-	double Term23 = (V * W * (1 - cos(Angle)) - U * sin(Angle) * Norm) / NormSqrd;
-	double Term31 = (U * W * (1 - cos(Angle)) - V * sin(Angle) * Norm) / NormSqrd;
-	double Term32 = (V * W * (1 - cos(Angle)) + U * sin(Angle) * Norm) / NormSqrd;
-	double Term33 = (W * W + (U * U + V * V) * cos(Angle)) / NormSqrd;
+	double norm = rotationAxis.Length();
+	double normSqrd = norm * norm;
+	double term11 = (u * u + (v * v + w * w) * cos(angle)) / normSqrd;
+	double term12 = (u * v * (1 - cos(angle)) - w * sin(angle) * norm) / normSqrd;
+	double term13 = (u * w * (1 - cos(angle)) + v * sin(angle) * norm) / normSqrd;
+	double term21 = (u * v * (1 - cos(angle)) + w * sin(angle) * norm) / normSqrd;
+	double term22 = (v * v + (u * u + w * w) * cos(angle)) / normSqrd;
+	double term23 = (v * w * (1 - cos(angle)) - u * sin(angle) * norm) / normSqrd;
+	double term31 = (u * w * (1 - cos(angle)) - v * sin(angle) * norm) / normSqrd;
+	double term32 = (v * w * (1 - cos(angle)) + u * sin(angle) * norm) / normSqrd;
+	double term33 = (w * w + (u * u + v * v) * cos(angle)) / normSqrd;
 
 	// Assign the elements of the vector
-	RotationMatrix.Set(Term11, Term12, Term13,
-		Term21, Term22, Term23,
-		Term31, Term32, Term33);
+	rotationMatrix.Set(term11, term12, term13,
+		term21, term22, term23,
+		term31, term32, term33);
 
 	// Apply the rotation
-	*this = RotationMatrix * *this;
+	*this = rotationMatrix * *this;
 
 	return;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		GetAxisName
 //
 // Description:		Returns the name of the specified axis.
 //
 // Input Arguments:
-//		Axis	= const AXIS& specifying the axis name we want
+//		Axis	= const Axis& specifying the axis name we want
 //
 // Output Arguments:
 //		None
@@ -336,9 +345,9 @@ void VECTOR::Rotate(const double &Angle, const VECTOR &RotationAxis)
 //		wxString containing the axis name
 //
 //==========================================================================
-wxString VECTOR::GetAxisName(AXIS Axis)
+wxString Vector::GetAxisName(Axis axis)
 {
-	switch (Axis)
+	switch (axis)
 	{
 	case AxisX:
 		return _T("X");
@@ -361,7 +370,7 @@ wxString VECTOR::GetAxisName(AXIS Axis)
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		AnglesTo
 //
 // Description:		Returns the angles between this and Target projected
@@ -372,20 +381,20 @@ wxString VECTOR::GetAxisName(AXIS Axis)
 //					go from this to Target.
 //
 // Input Arguments:
-//		Target	= const VECTOR& to reference for angle computations
+//		v	= const Vector& to reference for angle computations
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR containing the angles between this and Target [rad]
+//		Vector containing the angles between this and v [rad]
 //
 //==========================================================================
-VECTOR VECTOR::AnglesTo(const VECTOR &Target) const
+Vector Vector::AnglesTo(const Vector &v) const
 {
-	VECTOR Temp;
-	double ThisAngle;
-	double TargetAngle;
+	Vector temp;
+	double thisAngle;
+	double vAngle;
 
 	// When projected onto one of the planes, we ignore the component
 	// of the vectors in the normal-to-the-plane direction.
@@ -394,32 +403,32 @@ VECTOR VECTOR::AnglesTo(const VECTOR &Target) const
 	// The difference is the angle between the vectors.
 
 	// Y-Z Plane
-	ThisAngle = atan2(Y, Z);
-	TargetAngle = atan2(Target.Y, Target.Z);
-	Temp.X = TargetAngle - ThisAngle;
+	thisAngle = atan2(y, z);
+	vAngle = atan2(v.y, v.z);
+	temp.x = vAngle - thisAngle;
 
 	// X-Z Plane
-	ThisAngle = atan2(X, Z);
-	TargetAngle = atan2(Target.X, Target.Z);
-	Temp.Y = TargetAngle - ThisAngle;
+	thisAngle = atan2(x, z);
+	vAngle = atan2(v.x, v.z);
+	temp.y = vAngle - thisAngle;
 
 	// X-Y Plane
-	ThisAngle = atan2(X, Y);
-	TargetAngle = atan2(Target.X, Target.Y);
-	Temp.Z = TargetAngle - ThisAngle;
+	thisAngle = atan2(x, y);
+	vAngle = atan2(v.x, v.y);
+	temp.z = vAngle - thisAngle;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			friend of VECTOR
+// Class:			friend of Vector
 // Function:		operator <<
 //
 // Description:		Prints the contents of the specified object to an
 //					ostream object.
 //
 // Input Arguments:
-//		Target	= const VECTOR& to be printed
+//		v	= const Vector& to be printed
 //
 // Output Arguments:
 //		WriteOut	= &ostream to which the vector will be printed
@@ -428,16 +437,16 @@ VECTOR VECTOR::AnglesTo(const VECTOR &Target) const
 //		&ostream containing the printed vector
 //
 //==========================================================================
-ostream &operator << (ostream &WriteOut, const VECTOR &Target)
+ostream &operator << (ostream &writeOut, const Vector &v)
 {
 	// Add the string to the stream
-	WriteOut << Target.Print();
+	writeOut << v.Print();
 
-	return WriteOut;
+	return writeOut;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Print
 //
 // Description:		Prints the contents of this object to a string.
@@ -452,25 +461,25 @@ ostream &operator << (ostream &WriteOut, const VECTOR &Target)
 //		wxString containing the formatted vector data
 //
 //==========================================================================
-wxString VECTOR::Print(void) const
+wxString Vector::Print(void) const
 {
 	// Format and fill the string
-	wxString Temp;
-	Temp.Printf("[%0.3lf, %0.3lf, %0.3lf]", X, Y, Z);
+	wxString temp;
+	temp.Printf("[%0.3lf, %0.3lf, %0.3lf]", x, y, z);
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Set
 //
 // Description:		Sets the contents of this vector as specified.
 //
 // Input Arguments:
-//		_X	= const double& specifying first component of the vector
-//		_Y	= const double& specifying second component of the vector
-//		_Z	= const double& specifying third component of the vector
+//		_x	= const double& specifying first component of the vector
+//		_y	= const double& specifying second component of the vector
+//		_z	= const double& specifying third component of the vector
 //
 // Output Arguments:
 //		None
@@ -479,18 +488,18 @@ wxString VECTOR::Print(void) const
 //		None
 //
 //==========================================================================
-void VECTOR::Set(const double &_X, const double &_Y, const double &_Z)
+void Vector::Set(const double &_x, const double &_y, const double &_z)
 {
 	// Assign the arguments to the class members
-	X = _X;
-	Y = _Y;
-	Z = _Z;
+	x = _x;
+	y = _y;
+	z = _z;
 
 	return;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Normalize
 //
 // Description:		Turns this vector into a unit vector (magnitude of 1).
@@ -504,249 +513,249 @@ void VECTOR::Set(const double &_X, const double &_Y, const double &_Z)
 //		None
 //
 // Return Value:
-//		VECTOR representing the normalized object
+//		Vector representing the normalized object
 //
 //==========================================================================
-VECTOR VECTOR::Normalize(void) const
+Vector Vector::Normalize(void) const
 {
 	// Get the length of the vector
-	double Magnitude = Length();
+	double magnitude = Length();
 
 	// Avoid divide by zero
-	if (Magnitude == 0.0)
+	if (magnitude == 0.0)
 		return *this;
 
 	// Normalize the components to this length
-	VECTOR Temp;
-	Temp.X = X / Magnitude;
-	Temp.Y = Y / Magnitude;
-	Temp.Z = Z / Magnitude;
+	Vector temp;
+	temp.x = x / magnitude;
+	temp.y = y / magnitude;
+	temp.z = z / magnitude;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		OuterProduct
 //
 // Description:		Performs the multiplication that results in a 3x3 matrix.
 //
 // Input Arguments:
-//		Vector	= const VECTOR& to be multiplied
+//		v	= const Vector& to be multiplied
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		MATRIX(3, 3)
+//		Matrix(3, 3)
 //
 //==========================================================================
-Matrix VECTOR::OuterProduct(const VECTOR &Vector) const
+Matrix Vector::OuterProduct(const Vector &v) const
 {
-	Matrix Temp(3, 3,
-		X * Vector.X, X * Vector.Y, X * Vector.Z,
-		Y * Vector.X, Y * Vector.Y, Y * Vector.Z,
-		Z * Vector.X, Z * Vector.Y, Z * Vector.Z);
+	Matrix temp(3, 3,
+		x * v.x, x * v.y, x * v.z,
+		y * v.x, y * v.y, y * v.z,
+		z * v.x, z * v.y, z * v.z);
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator +
 //
-// Description:		Addition operator for VECTOR class.
+// Description:		Addition operator for Vector class.
 //
 // Input Arguments:
-//		Vector	= const VECTOR& to be added to this
+//		v	= const Vector& to be added to this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR result of the addition
+//		Vector result of the addition
 //
 //==========================================================================
-VECTOR VECTOR::operator + (const VECTOR &Vector) const
+Vector Vector::operator + (const Vector &v) const
 {
 	// Make a copy of this
-	VECTOR Temp = *this;
+	Vector temp = *this;
 
 	// Do the addition
-	Temp += Vector;
+	temp += v;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator -
 //
-// Description:		Subtraction operator for VECTOR class.
+// Description:		Subtraction operator for Vector class.
 //
 // Input Arguments:
-//		Vector	= const VECTOR& to be subtracted from this
+//		v	= const Vector& to be subtracted from this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR result of the subtraction
+//		Vector result of the subtraction
 //
 //==========================================================================
-VECTOR VECTOR::operator - (const VECTOR &Vector) const
+Vector Vector::operator - (const Vector &v) const
 {
 	// Make a copy of this
-	VECTOR Temp = *this;
+	Vector temp = *this;
 
 	// Do the subtraction
-	Temp -= Vector;
+	temp -= v;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator *
 //
-// Description:		Scalar multiplication operator for VECTOR class.
+// Description:		Scalar multiplication operator for Vector class.
 //
 // Input Arguments:
-//		Double	= const double& to multiply each element of this
+//		n	= const double& to multiply each element of this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR result of the multiplication
+//		Vector result of the multiplication
 //
 //==========================================================================
-VECTOR VECTOR::operator * (const double &Double) const
+Vector Vector::operator * (const double &n) const
 {
 	// Make a copy of this
-	VECTOR Temp = *this;
+	Vector temp = *this;
 
 	// Do the multiplication
-	Temp *= Double;
+	temp *= n;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator /
 //
-// Description:		Scalar division operator for VECTOR class.
+// Description:		Scalar division operator for Vector class.
 //
 // Input Arguments:
-//		Double	= const double& to divide each element of this
+//		n	= const double& to divide each element of this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR result of the division
+//		Vector result of the division
 //
 //==========================================================================
-VECTOR VECTOR::operator / (const double &Double) const
+Vector Vector::operator / (const double &n) const
 {
 	// Make a copy of this
-	VECTOR Temp = *this;
+	Vector temp = *this;
 
 	// Do the division
-	Temp /= Double;
+	temp /= n;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		Cross
 //
 // Description:		Vector cross product.
 //
 // Input Arguments:
-//		Target	= const VECTOR& to multiply this object
+//		v	= const Vector& to multiply this object
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR result of the cross product
+//		Vector result of the cross product
 //
 //==========================================================================
-VECTOR VECTOR::Cross(const VECTOR &Vector) const
+Vector Vector::Cross(const Vector &v) const
 {
-	VECTOR Temp;
+	Vector temp;
 
 	// Perform the cross product operation
-	Temp.X = Y * Vector.Z - Z * Vector.Y;
-	Temp.Y = Z * Vector.X - X * Vector.Z;
-	Temp.Z = X * Vector.Y - Y * Vector.X;
+	temp.x = y * v.z - z * v.y;
+	temp.y = z * v.x - x * v.z;
+	temp.z = x * v.y - y * v.x;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator +=
 //
-// Description:		Addition assignment operator for VECTOR class.
+// Description:		Addition assignment operator for Vector class.
 //
 // Input Arguments:
-//		Vector	= const VECTOR& to be added to this
+//		v	= const Vector& to be added to this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR& result of the addition
+//		Vector& result of the addition
 //
 //==========================================================================
-VECTOR& VECTOR::operator += (const VECTOR &Vector)
+Vector& Vector::operator += (const Vector &v)
 {
 	// Perform the addition
-	X += Vector.X;
-	Y += Vector.Y;
-	Z += Vector.Z;
+	x += v.x;
+	y += v.y;
+	z += v.z;
 
 	return *this;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator -=
 //
-// Description:		Subtraction assignment operator for VECTOR class.
+// Description:		Subtraction assignment operator for Vector class.
 //
 // Input Arguments:
-//		Vector	= const VECTOR& to be subtracted from this
+//		v	= const Vector& to be subtracted from this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		VECTOR& result of the subtraction
+//		Vector& result of the subtraction
 //
 //==========================================================================
-VECTOR& VECTOR::operator -= (const VECTOR &Vector)
+Vector& Vector::operator -= (const Vector &v)
 {
 	// Perform the subtraction
-	X -= Vector.X;
-	Y -= Vector.Y;
-	Z -= Vector.Z;
+	x -= v.x;
+	y -= v.y;
+	z -= v.z;
 
 	return *this;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator ==
 //
-// Description:		Equal comparison operator for VECTOR class.
+// Description:		Equal comparison operator for Vector class.
 //
 // Input Arguments:
-//		Vector	= const VECTOR& to be compared to this
+//		v	= const Vector& to be compared to this
 //
 // Output Arguments:
 //		None
@@ -755,23 +764,23 @@ VECTOR& VECTOR::operator -= (const VECTOR &Vector)
 //		bool, true for is equal to, false for is not equal to
 //
 //==========================================================================
-bool VECTOR::operator == (const VECTOR &Vector) const
+bool Vector::operator == (const Vector &v) const
 {
 	// Make the comparison
-	if (X == Vector.X && Y == Vector.Y && Z == Vector.Z)
+	if (x == v.x && y == v.y && z == v.z)
 		return true;
 	else
 		return false;
 }
 
 //==========================================================================
-// Class:			VECTOR
+// Class:			Vector
 // Function:		operator !=
 //
-// Description:		Unequal comparison operator for VECTOR class.
+// Description:		Unequal comparison operator for Vector class.
 //
 // Input Arguments:
-//		Vector	= const VECTOR& to be compared to this
+//		v	= const Vector& to be compared to this
 //
 // Output Arguments:
 //		None
@@ -780,7 +789,7 @@ bool VECTOR::operator == (const VECTOR &Vector) const
 //		bool, false for is equal to, true for is not equal to
 //
 //==========================================================================
-bool VECTOR::operator != (const VECTOR &Vector) const
+bool Vector::operator != (const Vector &v) const
 {
-	return !(*this == Vector);
+	return !(*this == v);
 }

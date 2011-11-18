@@ -6,7 +6,8 @@
                              (http://www.wxwidgets.org/)
 
 ===================================================================================*/
-// File:  render_window_class.h
+
+// File:  renderWindow.h
 // Created:  5/14/2009
 // Author:  K. Loux
 // Description:  Class for creating OpenGL scenes, derived from wxGLCanvas.  Contains
@@ -15,22 +16,21 @@
 //				 Objects in the PrimitivesList become managed by this object and are
 //				 deleted automatically.
 // History:
-//	11/22/2009	- Moved to vRenderer.lib, K. Loux.
 
-#ifndef _RENDER_WINDOW_CLASS_H_
-#define _RENDER_WINDOW_CLASS_H_
+#ifndef _RENDER_WINDOW_H_
+#define _RENDER_WINDOW_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 
 // Local headers
-#include "utilities/managed_list_class.h"
-#include "utilities/math/vector_class.h"
+#include "utilities/managedList.h"
+#include "utilities/math/vector.h"
 #include "renderer/primitives/primitive.h"
 
 // Local forward declarations
-class MATRIX;
+class Matrix;
 
 class RenderWindow : public wxGLCanvas
 {
@@ -46,12 +46,12 @@ public:
     void Initialize();
 
 	// Sets up the camera
-	void SetCameraView(const VECTOR &position, const VECTOR &lookAt, const VECTOR &upDirection);
+	void SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection);
 
 	// Transforms between the model coordinate system and the view (openGL) coordinate system
-	VECTOR TransformToView(const VECTOR &modelVector) const;
-	VECTOR TransformToModel(const VECTOR &viewVector) const;
-	VECTOR GetCameraPosition(void) const;
+	Vector TransformToView(const Vector &modelVector) const;
+	Vector TransformToModel(const Vector &viewVector) const;
+	Vector GetCameraPosition(void) const;
 
 	// Sets the viewing frustum to match the current size of the window
 	void AutoSetFrustum(void);
@@ -129,14 +129,13 @@ private:
 	// Window events
 	void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
-    void OnEraseBackground(wxEraseEvent& event);
 	void OnEnterWindow(wxMouseEvent &event);
 	// End event handlers-------------------------------------------------
-
+	
 	// The main render method - re-draws the scene
     void Render();
 
-	// The type of ineraction to perform
+	// The type of interaction to perform
 	enum InteractionType
 	{
 		interactionDollyDrag,// zoom
@@ -145,7 +144,7 @@ private:
 		interactionRotate
 	};
 
-	// Perfoms the computations and transformations associated with the specified interaction
+	// Performs the computations and transformations associated with the specified interaction
 	void PerformInteraction(InteractionType interaction, wxMouseEvent &event);
 
 	// The interaction events (called from within the real event handlers)
@@ -154,18 +153,18 @@ private:
 	void DoDragDolly(wxMouseEvent &event);
 	void DoPan(wxMouseEvent &event);
 
-	// Updates the transformation matricies according to the current modelview matrix
+	// Updates the transformation matrices according to the current modelview matrix
 	void UpdateTransformationMatricies(void);
 
-	// The transformation matricies
+	// The transformation matrices
 	Matrix *modelToView;
 	Matrix *viewToModel;
 
 	// The camera position
-	VECTOR cameraPosition;
+	Vector cameraPosition;
 
 	// The focal point for performing interactions
-	VECTOR focalPoint;
+	Vector focalPoint;
 
 	// Method for re-organizing the PrimitiveList so opaque objects are at the beginning and
 	// transparent objects are at the end
@@ -177,9 +176,9 @@ protected:
 
 	// Flag indicating whether or not we need to re-initialize this object
 	bool modified;
-
+	
 	// The list of objects to create in this scene
-	MANAGED_LIST<Primitive> primitiveList;
+	ManagedList<Primitive> primitiveList;
 
 	// Some interactions require the previous mouse position (window coordinates)
 	long lastMousePosition[2];
@@ -197,4 +196,4 @@ protected:
 	DECLARE_EVENT_TABLE()
 };
 
-#endif// _RENDER_WINDOW_CLASS_H_
+#endif// _RENDER_WINDOW_H_

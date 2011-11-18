@@ -7,7 +7,7 @@
 
 ===================================================================================*/
 
-// File:  zoom_box_class.h
+// File:  zoomBox.h
 // Created:  5/5/2011
 // Author:  K. Loux
 // Description:  Logic for drawing the zoom box as the user moves the mouse.

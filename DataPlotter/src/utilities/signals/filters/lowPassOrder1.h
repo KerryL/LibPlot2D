@@ -7,17 +7,17 @@
 
 ===================================================================================*/
 
-// File:  low_pass_order1_class.h
+// File:  lowPassOrder1.h
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  First order low-pass digital filter.
 // History:
 
-#ifndef _LOW_PASS_ORDER1_CLASS_H_
-#define _LOW_PASS_ORDER1_CLASS_H_
+#ifndef _LOW_PASS_ORDER1_H_
+#define _LOW_PASS_ORDER1_H_
 
 // Local headers
-#include "utilities/signals/filters/filter_base_class.h"
+#include "utilities/signals/filters/filterBase.h"
 
 class LowPassFirstOrderFilter : public FilterBase
 {
@@ -34,4 +34,4 @@ public:
 	virtual double Apply(const double &_u);
 };
 
-#endif// _LOW_PASS_ORDER1_CLASS_H_
+#endif// _LOW_PASS_ORDER1_H_

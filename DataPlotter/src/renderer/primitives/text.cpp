@@ -7,16 +7,16 @@
 
 ===================================================================================*/
 
-// File:  text_class.cpp
+// File:  text.cpp
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive for creating text objects on a plot.
 // History:
 
 // Local headers
-#include "renderer/primitives/text_class.h"
-#include "renderer/render_window_class.h"
-#include "utilities/math/plot_math.h"
+#include "renderer/primitives/text.h"
+#include "renderer/renderWindow.h"
+#include "utilities/math/plotMath.h"
 
 // FTGL headers
 #include <FTGL/ftgl.h>
@@ -98,10 +98,10 @@ void TextRendering::GenerateGeometry(void)
 
 			// Position the text
 			if (centered)
-				glTranslated(x - GetTextWidth() / 2.0 * cos(angle * PlotMath::PI / 180.0)
-					+ GetTextHeight() / 2.0 * sin(angle * PlotMath::PI / 180.0),
-					y - GetTextWidth() / 2.0 * sin(angle * PlotMath::PI / 180.0)
-					- GetTextHeight() / 2.0 * cos(angle * PlotMath::PI / 180.0), 0.0);
+				glTranslated(x - GetTextWidth() / 2.0 * cos(angle * PlotMath::Pi / 180.0)
+					+ GetTextHeight() / 2.0 * sin(angle * PlotMath::Pi / 180.0),
+					y - GetTextWidth() / 2.0 * sin(angle * PlotMath::Pi / 180.0)
+					- GetTextHeight() / 2.0 * cos(angle * PlotMath::Pi / 180.0), 0.0);
 			else
 				glTranslated(x, y, 0.0);
 			glRotated(angle, 0.0, 0.0, 1.0);
