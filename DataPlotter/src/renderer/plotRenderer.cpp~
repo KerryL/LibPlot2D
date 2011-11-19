@@ -437,7 +437,6 @@ void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 		abs(int(zoomBox->GetYAnchor() - zoomBox->GetYFloat())) > limit)
 	{
 		// Determine the new zoom range by interpolation
-		// Remember: OpenGL uses Bottom Left as origin, normal windows use Top Left as origin
 		int xCoordLeft = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
 		int xCoordRight = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
 		int yCoordBottom = plot->GetBottomAxis()->GetOffsetFromWindowEdge();
