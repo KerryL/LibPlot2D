@@ -43,8 +43,8 @@
 
 // *nix Icons
 #ifdef __WXGTK__
-#include "../../res/plots16.xpm"
-#include "../../res/plots32.xpm"
+#include "../../res/icons/plots16.xpm"
+#include "../../res/icons/plots32.xpm"
 #endif
 
 //==========================================================================

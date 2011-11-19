@@ -29,7 +29,7 @@
 #elif _DATAPLOTTER_64_BIT_
 #define DP_ULONG unsigned int
 #else
-#error "Must define preprocessor flags _DATAPLOTTER_32_BIT__ or _DATAPLOTTER_64_BIT_"
+#error "Must define preprocessor flags _DATAPLOTTER_32_BIT_ or _DATAPLOTTER_64_BIT_"
 #endif
 
 // Conversion to signed 32-bit integers
