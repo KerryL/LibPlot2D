@@ -1235,8 +1235,8 @@ wxArrayString MainFrame::ParseLineIntoColumns(wxString line, const wxString &del
 
 	wxArrayString parsed;
 
-	unsigned int start(0);
-	unsigned int end(0);
+	size_t start(0);
+	size_t end(0);
 
 	while (end != std::string::npos && start < line.length())
 	{
