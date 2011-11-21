@@ -1124,8 +1124,8 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 	// If the click is within the plot area, move a cursor there and make it visible
 	if (x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
-		y < plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-		y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
 	{
 		double value = GetCursorValue(x);
 
