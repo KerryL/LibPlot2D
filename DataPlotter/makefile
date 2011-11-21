@@ -36,4 +36,4 @@ $(OBJDIR)%.o: %.cpp
 
 clean:
 	$(RM) -r $(OBJDIR)
-	$(RM) $(BINDIR)/$(TARGET)
+	$(RM) $(BINDIR)$(TARGET)
