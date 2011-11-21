@@ -34,7 +34,7 @@
 // Input Arguments:
 //		_mainFrame	= MainFrame& reference to this object's parent window
 //		id			= wxWindowID
-//		args		= int[]
+//		args		= int[] NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
 //
 // Output Arguments:
 //		None
@@ -328,12 +328,22 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 			zoomBox->SetAnchorCorner(lastMousePosition[0], GetSize().GetHeight() - lastMousePosition[1]);
 		}
 
-		// Make sure we're still over the plot area
-		unsigned int xFloat = event.GetX();
-		unsigned int yFloat = GetSize().GetHeight() - event.GetY();
-		// FIXME:  Limit zoom box to plot area
+		unsigned int x = event.GetX();
+		unsigned int y = event.GetY();
 
-		zoomBox->SetFloatingCorner(xFloat, yFloat);
+		// Make sure we're still over the plot area - if we're not, draw the box as if we were
+		if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge())
+			x = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
+		else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
+			x = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
+
+		if (y < plot->GetTopAxis()->GetOffsetFromWindowEdge())
+			y = plot->GetTopAxis()->GetOffsetFromWindowEdge();
+		else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+			y = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge();
+
+		// Tell the zoom box where to draw the floaing corner
+		zoomBox->SetFloatingCorner(x, GetSize().GetHeight() - y);
 	}
 	// PAN:  Left mouse button (includes with any buttons not caught above)
 	else if (event.LeftIsDown())
@@ -1222,8 +1232,6 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 		draggingLeftCursor = true;
 	else if (rightCursor->IsUnder(event.GetX()))
 		draggingRightCursor = true;
-
-	return;
 }
 
 //==========================================================================

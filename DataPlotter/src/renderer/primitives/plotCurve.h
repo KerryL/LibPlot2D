@@ -69,9 +69,6 @@ private:
 	// For use when the axis scale changes
 	void RescalePoint(const double *xyPoint, int *point);
 
-	// For appearance
-	static const int offsetFromWindowEdge;
-
 	// The data to be plotted
 	const Dataset2D *data;
 };

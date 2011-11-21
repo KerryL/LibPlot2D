@@ -1026,7 +1026,6 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 
 	// Use std::string to read the file line-by-line
 	std::string nextLine;
-	std::getline(file, nextLine);
 
 	// Determine which character is the most likely delimiting character
 	// Determine how many file descriptor rows there are (and skip them)
@@ -1036,6 +1035,9 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	double value;
 	while (!file.eof())
 	{
+		// Read the next line
+		std::getline(file, nextLine);
+
 		// Look for the first row starting with a number that contains at least one
 		// delimiting character (check all delimiters in our list)
 		for (i = 0; i < delimiterList.size(); i++)
@@ -1104,9 +1106,6 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 
 		// Store this line for later (for creating plot names)
 		previousLines.Add(nextLine);
-
-		// Read the next line
-		std::getline(file, nextLine);
 	}
 
 	// Find the header rows (if any) and use them to construct plot names
@@ -1152,9 +1151,21 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	// Allocate datasets
 	std::vector<double> *data = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
 
+	// Our first time through this loop, we've already populated the nextLine variable, and we
+	// don't want to read from the file again, or we'll lose our first point.  Catch this with
+	// a boolean (I know it's not clean, but it works)
+	bool firstTime(true);
+
 	// Start reading data
 	while (!file.eof() && !nextLine.empty())
 	{
+		// Read the next line
+		if (!firstTime)
+			std::getline(file, nextLine);
+		else
+			firstTime = false;
+		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
+
 		// Get the X-data
 		if (!delimitedLine[0].ToDouble(&value))
 		{
@@ -1177,10 +1188,6 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 			}
 			data[i + 1].push_back(value);
 		}
-
-		// Read the next line
-		std::getline(file, nextLine);
-		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 	}
 
 	// Put the data in datasets and add them to the plot

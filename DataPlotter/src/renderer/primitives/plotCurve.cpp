@@ -27,7 +27,7 @@
 // Description:		Constructor for the PLOT_CURVE class.
 //
 // Input Arguments:
-//		_RenderWindow	= RENDER_WINDOW* pointing to the object that owns this
+//		_RenderWindow	= RenderWindow* pointing to the object that owns this
 //
 // Output Arguments:
 //		None
@@ -62,7 +62,6 @@ PlotCurve::PlotCurve(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 //==========================================================================
 PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve)
 {
-	// FIXME:  Need to copy the PlotData?
 	// Do the copy
 	*this = plotCurve;
 }
@@ -89,24 +88,6 @@ PlotCurve::~PlotCurve()
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		Constant Declarations
-//
-// Description:		Declare class constants for the PlotCurve class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-const int PlotCurve::offsetFromWindowEdge = 75;
-
-//==========================================================================
-// Class:			PlotCurve
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
@@ -128,14 +109,18 @@ void PlotCurve::GenerateGeometry(void)
 	glLineWidth((float)size);
 
 	// Create the plot
-	glBegin(GL_LINE_STRIP);
-
-	// Create the plot
 	unsigned int i;
 	int point[2];
 	double doubPoint[2];
+	double interpolatedPoint[2];
+	double interpolatedPoint2[2];
+	double temp[2];
+
+	glBegin(GL_LINE_STRIP);
+
 	// FIXME:  If there are more points than pixels, we should avoid sending single pixel
-	// line-draw commands to openGL
+	// line-draw commands to OpenGL (doesn't seem to affect quality, but may affect performance - of course, if we
+	// don't do this intelligently it'll end up being better just to let OpenGL deal with this)
 	for (i = 0; i < data->GetNumberOfPoints(); i++)
 	{
 		doubPoint[0] = data->GetXData(i);
@@ -152,7 +137,8 @@ void PlotCurve::GenerateGeometry(void)
 				if (data->GetXData(i - 1) < xAxis->GetMinimum() || data->GetXData(i - 1) > xAxis->GetMaximum() ||
 					data->GetYData(i - 1) < yAxis->GetMinimum() || data->GetYData(i - 1) > yAxis->GetMaximum())
 				{
-					double interpolatedPoint[2] = { data->GetXData(i - 1), data->GetYData(i - 1) };
+					interpolatedPoint[0] = data->GetXData(i - 1);
+					interpolatedPoint[1] = data->GetYData(i - 1);
 
 					// Interpolate to find the correct point
 					if (interpolatedPoint[0] < xAxis->GetMinimum())
@@ -185,6 +171,7 @@ void PlotCurve::GenerateGeometry(void)
 							(data->GetXData(i - 1) - doubPoint[0]);
 					}
 
+					glBegin(GL_LINE_STRIP);
 					RescalePoint(interpolatedPoint, point);
 					glVertex2iv(point);
 				}
@@ -193,16 +180,17 @@ void PlotCurve::GenerateGeometry(void)
 			RescalePoint(doubPoint, point);
 			glVertex2iv(point);
 		}
-		else
+		else// Outside the plot area
 		{
-			// If the next point in the series (or the previous point in the series) is within
-			// the valid drawing area, interpolate on one end, otherwise, interpolate on both ends
+			// If the next point in the series is within the valid drawing area, interpolate
 			if (i > 0)
 			{
+				// Check previous point
 				if (data->GetXData(i - 1) >= xAxis->GetMinimum() && data->GetXData(i - 1) <= xAxis->GetMaximum() &&
 					data->GetYData(i - 1) >= yAxis->GetMinimum() && data->GetYData(i - 1) <= yAxis->GetMaximum())
 				{
-					double interpolatedPoint[2] = { doubPoint[0], doubPoint[1] };
+					interpolatedPoint[0] = doubPoint[0];
+					interpolatedPoint[1] = doubPoint[1];
 
 					// Interpolate to find the correct point
 					if (interpolatedPoint[0] < xAxis->GetMinimum())
@@ -237,59 +225,155 @@ void PlotCurve::GenerateGeometry(void)
 
 					RescalePoint(interpolatedPoint, point);
 					glVertex2iv(point);
+					glEnd();
 					continue;
 				}
 			}
-			if (i < data->GetNumberOfPoints() - 1)
-			{
-				if (data->GetXData(i + 1) >= xAxis->GetMinimum() && data->GetXData(i + 1) <= xAxis->GetMaximum() &&
-					data->GetYData(i + 1) >= yAxis->GetMinimum() && data->GetYData(i + 1) <= yAxis->GetMaximum())
-				{
-					double interpolatedPoint[2] = { doubPoint[0], doubPoint[1] };
 
-					// Interpolate to find the correct point
-					if (interpolatedPoint[0] < xAxis->GetMinimum())
-					{
-						interpolatedPoint[0] = xAxis->GetMinimum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i + 1) - doubPoint[0]) *
-							(data->GetYData(i + 1) - doubPoint[1]);
-					}
-					else if (interpolatedPoint[0] > xAxis->GetMaximum())
+			// If we get here, the current point and the previous point were outside the plot area
+			// were all outside the plot area
+
+			// Check to see if we've "jumped" the plot area - if so, interpolate between
+			// two points to draw a straight line on the screen
+			if (i > 0)
+			{
+				// Check for plot "jumping" - defined by a stright line between two points crossing
+				// any two plot axes within the range of the axes
+				unsigned int crossings(0);
+
+				// Left Y-Axis
+				if ((data->GetXData(i - 1) < xAxis->GetMinimum() && doubPoint[0] > xAxis->GetMinimum()) ||// Crossed from left-to-right
+					(data->GetXData(i - 1) > xAxis->GetMinimum() && doubPoint[0] < xAxis->GetMinimum()))// Crossed from right-to-left
+				{
+					// Find the interpolated point
+					interpolatedPoint[0] = xAxis->GetMinimum();
+					interpolatedPoint[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
+						(doubPoint[0] - data->GetXData(i - 1)) * (interpolatedPoint[0] - data->GetXData(i - 1));
+
+					// Check that the interpolated point is within the axis limits
+					if (interpolatedPoint[1] >= yAxis->GetMinimum() && interpolatedPoint[1] <= yAxis->GetMaximum())
+						crossings++;
+				}
+
+				// Right Y-Axis
+				if ((data->GetXData(i - 1) < xAxis->GetMaximum() && doubPoint[0] > xAxis->GetMaximum()) ||// Crossed from left-to-right
+					(data->GetXData(i - 1) > xAxis->GetMaximum() && doubPoint[0] < xAxis->GetMaximum()))// Crossed from right-to-left
+				{
+					// Find the interpolated point
+					if (crossings == 0)
 					{
 						interpolatedPoint[0] = xAxis->GetMaximum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i + 1) - doubPoint[0]) *
-							(data->GetYData(i + 1) - doubPoint[1]);
+						interpolatedPoint[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
+							(doubPoint[0] - data->GetXData(i - 1)) * (interpolatedPoint[0] - data->GetXData(i - 1));
+
+						// Check that the interpolated point is within the axis limits
+						if (interpolatedPoint[1] >= yAxis->GetMinimum() && interpolatedPoint[1] <= yAxis->GetMaximum())
+							crossings++;
 					}
-					
-					if (interpolatedPoint[1] < yAxis->GetMinimum())
+					else
+					{
+						temp[0] = xAxis->GetMaximum();
+						temp[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
+							(doubPoint[0] - data->GetXData(i - 1)) * (temp[0] - data->GetXData(i - 1));
+
+						// Check that the interpolated point is within the axis limits
+						if (temp[1] >= yAxis->GetMinimum() && temp[1] <= yAxis->GetMaximum())
+						{
+							crossings++;
+							interpolatedPoint2[0] = temp[0];
+							interpolatedPoint2[1] = temp[1];
+						}
+					}
+				}
+
+				// Bottom X-Axis
+				if ((data->GetYData(i - 1) < yAxis->GetMinimum() && doubPoint[1] > yAxis->GetMinimum()) ||// Crossed from bottom-to-top
+					(data->GetYData(i - 1) > yAxis->GetMinimum() && doubPoint[1] < yAxis->GetMinimum()))// Crossed from top-to-bottom
+				{
+					// Find the interpolated point
+					if (crossings == 0)
 					{
 						interpolatedPoint[1] = yAxis->GetMinimum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i + 1) - doubPoint[1]) *
-							(data->GetXData(i + 1) - doubPoint[0]);
+						interpolatedPoint[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
+							(doubPoint[1] - data->GetYData(i - 1)) * (interpolatedPoint[1] - data->GetYData(i - 1));
+
+						// Check that the interpolated point is within the axis limits
+						if (interpolatedPoint[0] >= xAxis->GetMinimum() && interpolatedPoint[0] <= xAxis->GetMaximum())
+							crossings++;
 					}
-					else if (interpolatedPoint[1] > yAxis->GetMaximum())
+					else
+					{
+						temp[1] = yAxis->GetMinimum();
+						temp[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
+							(doubPoint[1] - data->GetYData(i - 1)) * (temp[1] - data->GetYData(i - 1));
+
+						// Check that the interpolated point is within the axis limits
+						if (temp[0] >= xAxis->GetMinimum() && temp[0] <= xAxis->GetMaximum())
+						{
+							crossings++;
+							interpolatedPoint2[0] = temp[0];
+							interpolatedPoint2[1] = temp[1];
+						}
+					}
+				}
+
+				// Top X-Axis
+				if ((data->GetYData(i - 1) < yAxis->GetMaximum() && doubPoint[1] > yAxis->GetMaximum()) ||// Crossed from bottom-to-top
+					(data->GetYData(i - 1) > yAxis->GetMaximum() && doubPoint[1] < yAxis->GetMaximum()))// Crossed from top-to-bottom
+				{
+					// Find the interpolated point
+					if (crossings == 0)
 					{
 						interpolatedPoint[1] = yAxis->GetMaximum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i + 1) - doubPoint[1]) *
-							(data->GetXData(i + 1) - doubPoint[0]);
-					}
+						interpolatedPoint[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
+							(doubPoint[1] - data->GetYData(i - 1)) * (interpolatedPoint[1] - data->GetYData(i - 1));
 
+						// Check that the interpolated point is within the axis limits
+						if (interpolatedPoint[0] >= xAxis->GetMinimum() && interpolatedPoint[0] <= xAxis->GetMaximum())
+							crossings++;
+					}
+					else
+					{
+						temp[1] = yAxis->GetMaximum();
+						temp[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
+							(doubPoint[1] - data->GetYData(i - 1)) * (temp[1] - data->GetYData(i - 1));
+
+						// Check that the interpolated point is within the axis limits
+						if (temp[0] >= xAxis->GetMinimum() && temp[0] <= xAxis->GetMaximum())
+						{
+							crossings++;
+							interpolatedPoint2[0] = temp[0];
+							interpolatedPoint2[1] = temp[1];
+						}
+					}
+				}
+
+				// Impossible to have a number of crossings other than zero or two
+				assert(crossings == 0 || crossings == 2);
+
+				// If we have two crossings, we have a jump
+				if (crossings == 2)
+				{
+					// Depending on where the previously drawn point was, it is possible for the order of these
+					// points to be opposite from the proper order of "connectin the dots."
+					glEnd();
+					glBegin(GL_LINE_STRIP);
+
+					// Connect the points
 					RescalePoint(interpolatedPoint, point);
 					glVertex2iv(point);
+
+					RescalePoint(interpolatedPoint2, point);
+					glVertex2iv(point);
+
+					glEnd();
+					glBegin(GL_LINE_STRIP);
 				}
 			}
-			// FIXME:  If the user zooms in too much, the plot disappears - there must be some way to
-			// interpolate between just two points to draw a representative line
 		}
 	}
 
 	glEnd();
-
-	return;
 }
 
 //==========================================================================
@@ -316,16 +400,20 @@ void PlotCurve::RescalePoint(const double *xyPoint, int *point)
 		return;
 
 	// Get the plot size
-	int plotHeight = renderWindow.GetSize().GetHeight() - 2 * offsetFromWindowEdge;
-	int plotWidth = renderWindow.GetSize().GetWidth() - 2 * offsetFromWindowEdge;
+	int plotHeight = renderWindow.GetSize().GetHeight() -
+		xAxis->GetOffsetFromWindowEdge() -
+		xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+	int plotWidth = renderWindow.GetSize().GetWidth() -
+		yAxis->GetOffsetFromWindowEdge() -
+		yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 
 	// Do the scaling
-	point[0] = offsetFromWindowEdge + (xyPoint[0] - xAxis->GetMinimum()) /
+	point[0] = xAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
+		+ (xyPoint[0] - xAxis->GetMinimum()) /
 		(xAxis->GetMaximum() - xAxis->GetMinimum()) * plotWidth;
-	point[1] = offsetFromWindowEdge + (xyPoint[1]- yAxis->GetMinimum()) /
+	point[1] = xAxis->GetOffsetFromWindowEdge()
+		+ (xyPoint[1]- yAxis->GetMinimum()) /
 		(yAxis->GetMaximum() - yAxis->GetMinimum()) * plotHeight;
-
-	return;
 }
 
 //==========================================================================
@@ -381,8 +469,6 @@ PlotCurve& PlotCurve::operator = (const PlotCurve &plotCurve)
 	// Copy the important information using the base class's assignment operator
 	this->Primitive::operator=(plotCurve);
 
-	// FIMXE:  Need to handle copy of PlotData?
-
 	return *this;
 }
 
@@ -406,6 +492,4 @@ void PlotCurve::SetData(const Dataset2D *_data)
 {
 	data = _data;
 	modified = true;
-
-	return;
 }
