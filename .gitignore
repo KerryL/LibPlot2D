@@ -17,3 +17,4 @@ DataPlotter/DataPlotter.props
 # Ignore GKT directories
 bin/
 .obj/
+/DataPlotter/nbproject/private/

@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="79">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df name="DataPlotter" root=".">
+      <df name="bin">
+      </df>
+      <df name="res">
+        <df name="icons">
+        </df>
+      </df>
+      <df name="src">
+        <df name="application">
+          <in>dropTarget.cpp</in>
+          <in>dropTarget.h</in>
+          <in>mainFrame.cpp</in>
+          <in>mainFrame.h</in>
+          <in>plotObject.cpp</in>
+          <in>plotObject.h</in>
+          <in>plotterApp.cpp</in>
+          <in>plotterApp.h</in>
+          <in>rangeLimitsDialog.cpp</in>
+          <in>rangeLimitsDialog.h</in>
+        </df>
+        <df name="renderer">
+          <df name="primitives">
+            <in>axis.cpp</in>
+            <in>axis.h</in>
+            <in>plotCursor.cpp</in>
+            <in>plotCursor.h</in>
+            <in>plotCurve.cpp</in>
+            <in>plotCurve.h</in>
+            <in>primitive.cpp</in>
+            <in>primitive.h</in>
+            <in>text.cpp</in>
+            <in>text.h</in>
+            <in>zoomBox.cpp</in>
+            <in>zoomBox.h</in>
+          </df>
+          <in>color.cpp</in>
+          <in>color.h</in>
+          <in>plotRenderer.cpp</in>
+          <in>plotRenderer.h</in>
+          <in>renderWindow.cpp</in>
+          <in>renderWindow.h</in>
+        </df>
+        <df name="utilities">
+          <df name="math">
+            <in>complex.cpp</in>
+            <in>complex.h</in>
+            <in>expressionTree.cpp</in>
+            <in>expressionTree.h</in>
+            <in>matrix.cpp</in>
+            <in>matrix.h</in>
+            <in>plotMath.cpp</in>
+            <in>plotMath.h</in>
+            <in>vector.cpp</in>
+            <in>vector.h</in>
+          </df>
+          <df name="signals">
+            <df name="filters">
+              <in>filterBase.cpp</in>
+              <in>filterBase.h</in>
+              <in>highPassOrder1.cpp</in>
+              <in>highPassOrder1.h</in>
+              <in>lowPassOrder1.cpp</in>
+              <in>lowPassOrder1.h</in>
+              <in>lowPassOrder2.cpp</in>
+              <in>lowPassOrder2.h</in>
+            </df>
+            <in>curveFit.cpp</in>
+            <in>curveFit.h</in>
+            <in>derivative.cpp</in>
+            <in>derivative.h</in>
+            <in>fft.cpp</in>
+            <in>fft.h</in>
+            <in>integral.cpp</in>
+            <in>integral.h</in>
+            <in>rms.cpp</in>
+            <in>rms.h</in>
+          </df>
+          <in>dataset2D.cpp</in>
+          <in>dataset2D.h</in>
+          <in>fontFinder.cpp</in>
+          <in>fontFinder.h</in>
+          <in>machineDefinitions.h</in>
+          <in>managedList.h</in>
+          <in>objectList.h</in>
+        </df>
+      </df>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE}</buildCommand>
+          <cleanCommand>${MAKE} clean</cleanCommand>
+          <executablePath>bin/DataPlotter</executablePath>
+          <ccTool>
+            <incDir>
+              <pElem>.</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>_DATAPLOTTER_64_BIT_</Elem>
+              <Elem>_WXDEBUB_</Elem>
+              <Elem>wxUSE_GUI=1</Elem>
+            </preprocessorList>
+          </ccTool>
+        </makeTool>
+      </makefileType>
+      <item path="src/application/dropTarget.cpp" ex="false" tool="1" flavor="0">
+        <ccTool>
+          <incDir>
+            <pElem>../../../src</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/application/mainFrame.cpp" ex="false" tool="1" flavor="0">
+        <ccTool>
+          <incDir>
+            <pElem>/usr/local/lib/wx/include/gtk2-ansi-debug-2.8</pElem>
+            <pElem>/usr/local/include/wx-2.8</pElem>
+            <pElem>/usr/include/freetype2</pElem>
+            <pElem>src</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>_FILE_OFFSET_BITS=64</Elem>
+            <Elem>_LARGE_FILES</Elem>
+            <Elem>__WXDEBUG__</Elem>
+            <Elem>__WXGTK__</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/application/plotObject.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/application/plotObject.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/application/plotterApp.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/application/plotterApp.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/application/rangeLimitsDialog.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/application/rangeLimitsDialog.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/color.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/renderer/color.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/plotRenderer.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/renderer/plotRenderer.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/axis.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/axis.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/plotCursor.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/renderer/primitives/plotCursor.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/plotCurve.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/renderer/primitives/plotCurve.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/primitive.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/renderer/primitives/primitive.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/text.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/text.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/zoomBox.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/renderer/primitives/zoomBox.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/renderer/renderWindow.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/renderer/renderWindow.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/dataset2D.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/fontFinder.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/fontFinder.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/machineDefinitions.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/math/complex.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/math/complex.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/math/expressionTree.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/utilities/math/expressionTree.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/math/matrix.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/math/matrix.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/math/plotMath.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/math/plotMath.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/math/vector.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/math/vector.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/signals/curveFit.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/signals/curveFit.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/signals/derivative.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/signals/derivative.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/signals/fft.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/signals/fft.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/filterBase.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/filterBase.h"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/highPassOrder1.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/highPassOrder1.h"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/lowPassOrder1.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/lowPassOrder1.h"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/lowPassOrder2.cpp"
+            ex="true"
+            tool="1"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/filters/lowPassOrder2.h"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="src/utilities/signals/integral.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/signals/integral.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="src/utilities/signals/rms.cpp" ex="true" tool="1" flavor="0">
+      </item>
+      <item path="src/utilities/signals/rms.h" ex="true" tool="3" flavor="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

@@ -915,7 +915,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 	std::getline(file, nextLine);
 	compatableNextLine = nextLine;
 
-	// The third line contains the number of datapoints and the samling period in msec
+	// The third line contains the number of data points and the sampling period in msec
 	// We use this information to generate the time series (file does not contain a time series)
 	//unsigned int rows = atoi(nextLine.substr(0, nextLine.find_first_of(delimiter)).c_str());
 	double samplingPeriod = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
@@ -973,7 +973,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 	// TODO:  Add any other specific file formats here
 
 	// Clean up memory
-	// Don't delete dataSet -> this is handled by the MANAGED_LIST object
+	// Don't delete dataSet -> this is handled by the ManagedList object
 	delete [] data;
 	file.close();
 
@@ -1157,13 +1157,18 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	bool firstTime(true);
 
 	// Start reading data
-	while (!file.eof() && !nextLine.empty())
+	while (!file.eof())
 	{
 		// Read the next line
 		if (!firstTime)
 			std::getline(file, nextLine);
 		else
 			firstTime = false;
+		
+		// Make sure we're not trying to process a blank line at the end of a file
+		if (nextLine.empty())
+			break;
+		
 		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 
 		// Get the X-data
@@ -1171,7 +1176,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 		{
 			delete [] data;
 
-			::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Reading File"));
+			::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"));
 			return false;
 		}
 		data[0].push_back(value);
@@ -1183,7 +1188,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 			{
 				delete [] data;
 
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Reading File"));
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"));
 				return false;
 			}
 			data[i + 1].push_back(value);
