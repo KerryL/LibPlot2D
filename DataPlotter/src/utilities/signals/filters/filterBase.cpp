@@ -46,6 +46,28 @@ FilterBase::FilterBase(const double &_sampleRate) : sampleRate(_sampleRate)
 
 //==========================================================================
 // Class:			FilterBase
+// Function:		FilterBase
+//
+// Description:		Copy constructor for the FilterBase class.
+//
+// Input Arguments:
+//		f	= const FilterBase&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+FilterBase::FilterBase(const FilterBase &f) : sampleRate(f.sampleRate)
+{
+	// Assign argument to this object
+	*this = f;
+}
+
+//==========================================================================
+// Class:			FilterBase
 // Function:		~FilterBase
 //
 // Description:		Destructor for the FilterBase class.
@@ -74,4 +96,32 @@ FilterBase::~FilterBase()
 
 	delete [] y;
 	y = NULL;
+}
+
+//==========================================================================
+// Class:			FilterBase
+// Function:		operator=
+//
+// Description:		Assignment operator.
+//
+// Input Arguments:
+//		f	=	const FilterBase&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		FilterBase&, reference to this
+//
+//==========================================================================
+FilterBase& FilterBase::operator = (const FilterBase &f)
+{
+	// Check for self assignment (not really any need to do this, but it
+	// avoids the compiler warning for unreference formal parameters)
+	if (this == &f)
+		return *this;
+
+	// Doesn't actually do any assigning - this is handeled by derived classes
+
+	return *this;
 }

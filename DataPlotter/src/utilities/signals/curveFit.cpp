@@ -151,8 +151,6 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 
 	// Assign the R^2 value
 	fit.rSquared = 1.0 - ssResidual / ssTotal;
-
-	return;
 }
 
 //==========================================================================

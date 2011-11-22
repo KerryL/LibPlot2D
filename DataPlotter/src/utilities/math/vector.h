@@ -42,9 +42,10 @@ using namespace std;
 class Vector
 {
 public:
-	// Constructor
+	// Constructors
 	Vector();
 	Vector(const double &_x, const double &_y, const double &_z);
+	Vector(const Vector &v);
 
 	// Destructor
 	~Vector();

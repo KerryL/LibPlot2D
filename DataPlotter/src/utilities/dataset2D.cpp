@@ -196,8 +196,6 @@ void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 
 	// Close the file
 	exportFile.close();
-
-	return;
 }
 
 //==========================================================================

@@ -101,8 +101,6 @@ void ManagedList<T>::Remove(const int &index)
 
 	// Decrement the number of objects in the list
 	ObjectList<T>::count--;
-
-	return;
 }
 
 //==========================================================================
@@ -136,8 +134,6 @@ void ManagedList<T>::Clear(void)
 	delete [] ObjectList<T>::objectList;
 	ObjectList<T>::objectList = NULL;
 	ObjectList<T>::count = 0;
-
-	return;
 }
 
 #endif// _MANAGED_LIST_H_

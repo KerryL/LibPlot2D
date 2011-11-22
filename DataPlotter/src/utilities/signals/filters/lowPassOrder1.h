@@ -25,6 +25,7 @@ public:
 	// Constructor
 	LowPassFirstOrderFilter(const double& cutoffFrequency,
 		const double& sampleRate, const double& initialValue = 0.0);
+	LowPassFirstOrderFilter(const LowPassFirstOrderFilter &f);
 
 	// Mandatory overloads from FilterBase
 	// Resets all internal variables to initialize the filter to the specified value
@@ -32,6 +33,9 @@ public:
 
 	// Main method for filtering incoming data
 	virtual double Apply(const double &_u);
+
+	// Operators
+	LowPassFirstOrderFilter& operator = (const LowPassFirstOrderFilter &f);
 };
 
 #endif// _LOW_PASS_ORDER1_H_

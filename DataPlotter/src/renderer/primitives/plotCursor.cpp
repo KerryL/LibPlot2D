@@ -167,8 +167,6 @@ void PlotCursor::RescalePoint(unsigned int &point)
 	// Do the scaling
 	point = axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
 			+ (value - axis.GetMinimum()) / (axis.GetMaximum() - axis.GetMinimum()) * plotDimension;
-
-	return;
 }
 
 //==========================================================================
@@ -221,8 +219,6 @@ void PlotCursor::SetValue(const double& _value)
 	value = _value;
 	RescalePoint(locationAlongAxis);
 	modified = true;
-
-	return;
 }
 
 //==========================================================================

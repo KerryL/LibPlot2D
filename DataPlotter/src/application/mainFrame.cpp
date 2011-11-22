@@ -203,8 +203,6 @@ void MainFrame::DoLayout(void)
 	SetSizerAndFit(topSizer);
 	SetAutoLayout(true);
 	topSizer->SetSizeHints(this);
-
-	return;
 }
 
 //==========================================================================
@@ -241,8 +239,6 @@ void MainFrame::SetProperties(void)
 
 	// Allow draging-and-dropping of files onto this window to open them
 	SetDropTarget(dynamic_cast<wxDropTarget*>(new DropTarget(*this)));
-
-	return;
 }
 
 //==========================================================================
@@ -347,8 +343,6 @@ void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 	unsigned int i;
 	for (i = 0; i < fileList.GetCount(); i++)
 		LoadFile(fileList[i]);
-
-	return;
 }
 
 //==========================================================================
@@ -380,8 +374,6 @@ void MainFrame::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 
 	// Call the object's write image file method
 	plotArea->WriteImageToFile(pathAndFileName[0]);
-
-	return;
 }
 
 //==========================================================================
@@ -403,8 +395,6 @@ void MainFrame::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ButtonAutoScaleClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->AutoScale();
-
-	return;
 }
 
 //==========================================================================
@@ -449,8 +439,6 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 	}
 
 	plotArea->UpdateDisplay();
-
-	return;
 }
 
 //==========================================================================
@@ -505,8 +493,6 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 	// Delete the context menu object
 	delete contextMenu;
 	contextMenu = NULL;
-
-	return;
 }
 
 //==========================================================================
@@ -570,8 +556,6 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 	// Delete the context menu object
 	delete contextMenu;
 	contextMenu = NULL;
-
-	return;
 }
 
 //==========================================================================
@@ -1303,8 +1287,6 @@ void MainFrame::SetTitleFromFileName(wxString pathAndFileName)
 #endif
 	unsigned int end(pathAndFileName.find_last_of(_T(".")));
 	SetTitle(pathAndFileName.Mid(start, end - start) + _T(" - ") + DataPlotterApp::dataPlotterTitle);
-
-	return;
 }
 
 //==========================================================================
@@ -1328,8 +1310,6 @@ void MainFrame::ClearAllCurves(void)
 	// Remove the curves locally
 	while (plotList.GetCount() > 0)
 		RemoveCurve(0);
-
-	return;
 }
 
 //==========================================================================
@@ -1352,8 +1332,6 @@ void MainFrame::SetXDataLabel(wxString label)
 {
 	optionsGrid->SetCellValue(0, colName, label);
 	plotArea->SetXLabel(label);
-
-	return;
 }
 
 //==========================================================================
@@ -1392,8 +1370,6 @@ void MainFrame::SetXDataLabel(const FileFormat &format)
 	case FormatGeneric:
 		SetXDataLabel(genericXAxisLabel);
 	}
-
-	return;
 }
 
 //==========================================================================
@@ -1444,8 +1420,6 @@ void MainFrame::AddCurve(wxString mathString)
 
 	// Then, add the new dataset to the plot
 	AddCurve(mathChannel, mathString.Upper());// FIXME:  Get better name from user
-
-	return;
 }
 
 //==========================================================================
@@ -1546,7 +1520,7 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	// Set default boolean values
 	optionsGrid->SetCellValue(index, colVisible, _T("1"));
 
-	optionsGrid->AutoSizeColumns();
+	optionsGrid->AutoSizeColumns();// FIXME:  This doesn't seem to fit to the X data label, if it is longer than the regular curve names
 
 	optionsGrid->EndBatch();
 
@@ -1560,8 +1534,6 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 
 	// Resize to prevent scrollbars and hidden values in the grid control
 	topSizer->Layout();
-
-	return;
 }
 
 //==========================================================================
@@ -1596,8 +1568,6 @@ void MainFrame::RemoveCurve(const unsigned int &i)
 
 	// And remove from our local list (calls destructor for the dataset)
 	plotList.Remove(i);
-
-	return;
 }
 
 //==========================================================================
@@ -1621,8 +1591,6 @@ void MainFrame::GridRightClickEvent(wxGridEvent &event)
 {
 	optionsGrid->SelectRow(event.GetRow());
 	CreateGridContextMenu(event.GetPosition() + optionsGrid->GetPosition(), event.GetRow());
-
-	return;
 }
 
 //==========================================================================
@@ -1673,8 +1641,6 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
 			!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
 			!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
     }
-
-	return;
 }
 
 //==========================================================================
@@ -1742,8 +1708,6 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 	plotArea->SetCurveProperties(row - 1, color,
 		!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
 		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
-
-	return;
 }
 
 //==========================================================================
@@ -1906,8 +1870,6 @@ bool MainFrame::GetXAxisScalingFactor(double &factor)
 void MainFrame::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 {
 	DisplayMathChannelDialog();
-
-	return;
 }
 
 //==========================================================================
@@ -1935,8 +1897,6 @@ void MainFrame::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = _T("d/dt(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
-
-	return;
 }
 
 //==========================================================================
@@ -1964,8 +1924,6 @@ void MainFrame::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = _T("integral(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
-
-	return;
 }
 
 //==========================================================================
@@ -1993,8 +1951,6 @@ void MainFrame::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = _T("RMS(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
-
-	return;
 }
 
 //==========================================================================
@@ -2030,8 +1986,6 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
-
-	return;
 }
 
 //==========================================================================
@@ -2084,8 +2038,6 @@ void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = cutoffString.Trim() + _T(" Hz low-pass(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
-
-	return;
 }
 
 //==========================================================================
@@ -2138,8 +2090,6 @@ void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = cutoffString.Trim() + _T(" Hz high-pass(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
-
-	return;
 }
 
 //==========================================================================
@@ -2208,8 +2158,6 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 
 	// Free the coefficient data
 	delete [] fitData.coefficients;
-
-	return;
 }
 
 //==========================================================================
@@ -2236,8 +2184,6 @@ void MainFrame::ContextToggleGridlines(wxCommandEvent& WXUNUSED(event))
 		plotArea->SetGridOn();
 
 	plotArea->UpdateDisplay();
-
-	return;
 }
 
 //==========================================================================
@@ -2260,8 +2206,6 @@ void MainFrame::ContextAutoScale(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->AutoScale();
 	plotArea->UpdateDisplay();
-
-	return;
 }
 
 //==========================================================================
@@ -2366,8 +2310,6 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 			optionsGrid->SetCellValue(i, colDifference, wxEmptyString);
 		}
 	}
-
-	return;
 }
 
 //==========================================================================
@@ -2397,8 +2339,6 @@ void MainFrame::DisplayMathChannelDialog(wxString defaultInput)
 	message.Append(_T("    Use () to specify order of operations"));
 
 	AddCurve(::wxGetTextFromUser(message, _T("Specify Math Channel"), defaultInput, this));
-
-	return;
 }
 
 //==========================================================================
@@ -2485,8 +2425,6 @@ void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 	}
 
 	plotArea->UpdateDisplay();
-
-	return;
 }
 
 //==========================================================================
@@ -2508,8 +2446,6 @@ void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 void MainFrame::ContextToggleGridlinesBottom(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetBottomGrid(!plotArea->GetBottomGrid());
-
-	return;
 }
 
 //==========================================================================
@@ -2531,8 +2467,6 @@ void MainFrame::ContextToggleGridlinesBottom(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->AutoScaleBottom();
-
-	return;
 }
 
 //==========================================================================
@@ -2554,8 +2488,6 @@ void MainFrame::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 {
 	DisplayAxisRangeDialog(plotContextXAxis);
-
-	return;
 }
 
 //==========================================================================
@@ -2577,8 +2509,6 @@ void MainFrame::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextToggleGridlinesLeft(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetLeftGrid(!plotArea->GetLeftGrid());
-
-	return;
 }
 
 //==========================================================================
@@ -2600,8 +2530,6 @@ void MainFrame::ContextToggleGridlinesLeft(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->AutoScaleLeft();
-
-	return;
 }
 
 //==========================================================================
@@ -2623,8 +2551,6 @@ void MainFrame::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 {
 	DisplayAxisRangeDialog(plotContextLeftYAxis);
-
-	return;
 }
 
 //==========================================================================
@@ -2646,8 +2572,6 @@ void MainFrame::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextToggleGridlinesRight(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetRightGrid(!plotArea->GetRightGrid());
-
-	return;
 }
 
 //==========================================================================
@@ -2669,8 +2593,6 @@ void MainFrame::ContextToggleGridlinesRight(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->AutoScaleRight();
-
-	return;
 }
 
 //==========================================================================
@@ -2692,8 +2614,6 @@ void MainFrame::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 {
 	DisplayAxisRangeDialog(plotContextRightYAxis);
-
-	return;
 }
 
 //==========================================================================

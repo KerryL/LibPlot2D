@@ -68,6 +68,35 @@ LowPassSecondOrderFilter::LowPassSecondOrderFilter(const double& cutoffFrequency
 
 //==========================================================================
 // Class:			LowPassSecondOrderFilter
+// Function:		LowPassSecondOrderFilter
+//
+// Description:		Copy constructor for the LowPassSecondOrderFilter class.
+//
+// Input Arguments:
+//		f	= const LowPassSecondOrderFilter& to be copied
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+LowPassSecondOrderFilter::LowPassSecondOrderFilter(const LowPassSecondOrderFilter &f) : FilterBase(sampleRate)
+{
+	// Allocate memory
+	u = new double[3];
+	a = new double[1];
+
+	y = new double[3];
+	b = new double[2];
+
+	// Copy from the argument to this
+	*this = f;
+}
+
+//==========================================================================
+// Class:			LowPassSecondOrderFilter
 // Function:		Initialize
 //
 // Description:		Initialized (or re-initializes) the filter to the specified value.
@@ -91,8 +120,6 @@ void LowPassSecondOrderFilter::Initialize(const double &initialValue)
 	u[0] = initialValue;
 	u[1] = initialValue;
 	u[2] = initialValue;
-
-	return;
 }
 
 //==========================================================================
@@ -123,4 +150,43 @@ double LowPassSecondOrderFilter::Apply(const double &_u)
 	y[0] = (u[0] + 2.0 * u[1] + u[2]) * a[0] - y[1] * b[0] - y[2] * b[1];
 
 	return y[0];
+}
+
+//==========================================================================
+// Class:			LowPassSecondOrderFilter
+// Function:		operator=
+//
+// Description:		Assignment operator.
+//
+// Input Arguments:
+//		f	=	const LowPassSecondOrderFilter&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		LowPassSecondOrderFilter&, reference to this
+//
+//==========================================================================
+LowPassSecondOrderFilter& LowPassSecondOrderFilter::operator = (const LowPassSecondOrderFilter &f)
+{
+	// Check for self assignment
+	if (this == &f)
+		return *this;
+
+	// Assign member elements
+	u[0] = f.u[0];
+	u[1] = f.u[1];
+	u[2] = f.u[2];
+
+	a[0] = f.a[0];
+
+	y[0] = f.y[0];
+	y[1] = f.y[1];
+	y[2] = f.y[2];
+
+	b[0] = f.b[0];
+	b[1] = f.b[1];
+
+	return *this;
 }

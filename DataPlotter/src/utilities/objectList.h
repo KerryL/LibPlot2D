@@ -211,8 +211,6 @@ void ObjectList<T>::Remove(const int &index)
 
 	// Decrement the number of objects in the list
 	count--;
-
-	return;
 }
 
 //==========================================================================
@@ -288,8 +286,6 @@ void ObjectList<T>::Clear(void)
 	delete [] objectList;
 	objectList = NULL;
 	count = 0;
-
-	return;
 }
 
 //==========================================================================
@@ -329,8 +325,6 @@ void ObjectList<T>::ReorderObjects(const int *newOrder)
 	// Clean up memory
 	delete [] swapList;
 	swapList = NULL;
-
-	return;
 }
 
 #endif// _OBJECT_LIST_H_

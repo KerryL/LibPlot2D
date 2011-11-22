@@ -110,8 +110,6 @@ void TextRendering::GenerateGeometry(void)
 			font->Render(text.c_str());
 		glPopMatrix();
 	}
-
-	return;
 }
 
 //==========================================================================

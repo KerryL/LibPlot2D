@@ -22,9 +22,10 @@
 class LowPassSecondOrderFilter : public FilterBase
 {
 public:
-	// Constructor
+	// Constructors
 	LowPassSecondOrderFilter(const double& cutoffFrequency, const double& dampingRatio,
 		const double& sampleRate, const double& initialValue = 0.0);
+	LowPassSecondOrderFilter(const LowPassSecondOrderFilter &f);
 
 	// Mandatory overloads from FilterBase
 	// Resets all internal variables to initialize the filter to the specified value
@@ -32,6 +33,9 @@ public:
 
 	// Main method for filtering incoming data
 	virtual double Apply(const double &_u);
+
+	// Operators
+	LowPassSecondOrderFilter& operator = (const LowPassSecondOrderFilter &f);
 };
 
 #endif// _LOW_PASS_ORDER2_H_

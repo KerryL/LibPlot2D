@@ -79,8 +79,6 @@ void ZoomBox::GenerateGeometry(void)
 	glVertex2i(xAnchor, yAnchor);
 
 	glEnd();
-
-	return;
 }
 
 //==========================================================================
@@ -132,8 +130,6 @@ void ZoomBox::SetAnchorCorner(const unsigned int &_xAnchor, const unsigned int &
 	yAnchor = _yAnchor;
 
 	modified = true;
-
-	return;
 }
 
 //==========================================================================
@@ -159,6 +155,4 @@ void ZoomBox::SetFloatingCorner(const unsigned int &_xFloat, const unsigned int 
 	yFloat = _yFloat;
 
 	modified = true;
-
-	return;
 }

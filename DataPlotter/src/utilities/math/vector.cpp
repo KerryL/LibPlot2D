@@ -77,6 +77,28 @@ Vector::Vector(const double &_x, const double &_y, const double &_z)
 
 //==========================================================================
 // Class:			Vector
+// Function:		Vector
+//
+// Description:		Copy constructor for the Vector class.
+//
+// Input Arguments:
+//		v	= const Vector& to be copied
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Vector::Vector(const Vector &v)
+{
+	// Copy from the argument to this
+	*this = v;
+}
+
+//==========================================================================
+// Class:			Vector
 // Function:		~Vector
 //
 // Description:		Destructor for the Vector class.
@@ -193,8 +215,6 @@ void Vector::Rotate (const Vector &cor, const Vector &rotations,
 
 	// Now we can apply the rotations and translate the vector back
 	*this = rotationMatrix * temp + cor;
-
-	return;
 }
 
 //==========================================================================
@@ -226,8 +246,6 @@ void Vector::Rotate(const Vector &cor, const double &angle, const Axis &about)
 
 	// Translate the vector back to its original position
 	*this = translatedVector + cor;
-
-	return;
 }
 
 //==========================================================================
@@ -272,8 +290,6 @@ void Vector::Rotate(const double &angle, const Axis &about)
 
 	// Now we can apply the rotations
 	*this = rotationMatrix * *this;
-
-	return;
 }
 
 //==========================================================================
@@ -325,8 +341,6 @@ void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 
 	// Apply the rotation
 	*this = rotationMatrix * *this;
-
-	return;
 }
 
 //==========================================================================
@@ -494,8 +508,6 @@ void Vector::Set(const double &_x, const double &_y, const double &_z)
 	x = _x;
 	y = _y;
 	z = _z;
-
-	return;
 }
 
 //==========================================================================

@@ -175,6 +175,4 @@ void RangeLimitsDialog::OnOKButton(wxCommandEvent &event)
 
 	// Skip this event if the data is valid
 	event.Skip();
-
-	return;
 }

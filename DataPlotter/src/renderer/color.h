@@ -27,16 +27,16 @@ class Color
 public:
 	// Constructors
 	Color();
-	Color(const double &_Red, const double &_Green, const double &_Blue, double _Alpha = 1.0);
+	Color(const double &_red, const double &_green, const double &_blue, double _alpha = 1.0);
 
 	// Destructor
 	~Color();
 
 	// The color accessors
-	inline double GetRed(void) const { return Red; };
-	inline double GetGreen(void) const { return Green; };
-	inline double GetBlue(void) const { return Blue; };
-	inline double GetAlpha(void)  const { return Alpha; };
+	inline double GetRed(void) const { return red; };
+	inline double GetGreen(void) const { return green; };
+	inline double GetBlue(void) const { return blue; };
+	inline double GetAlpha(void)  const { return alpha; };
 
 	// Constant colors
 	static const Color ColorRed;
@@ -50,19 +50,19 @@ public:
 	static const Color ColorGray;
 
 	// For setting the value
-	void Set(const double &_Red, const double &_Green, const double &_Blue, double _Alpha = 1.0);
-	void Set(const wxColor &Color);
-	void SetAlpha(const double &_Alpha);
+	void Set(const double &_red, const double &_green, const double &_blue, double _alpha = 1.0);
+	void Set(const wxColor &color);
+	void SetAlpha(const double &_alpha);
 
 	// Conversion to a wxColor
 	wxColor ToWxColor(void) const;
 
 private:
 	// The class data
-	double Red;
-	double Green;
-	double Blue;
-	double Alpha;
+	double red;
+	double green;
+	double blue;
+	double alpha;
 
 	// Checks to make sure all values are between 0 and 1 (forces this to be true)
 	void ValidateColor(void);

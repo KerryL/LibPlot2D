@@ -41,10 +41,10 @@
 Color::Color()
 {
 	// Assign default values to the class members (solid black)
-	Red = 1.0;
-	Green = 1.0;
-	Blue = 1.0;
-	Alpha = 1.0;
+	red = 1.0;
+	green = 1.0;
+	blue = 1.0;
+	alpha = 1.0;
 }
 
 //==========================================================================
@@ -55,10 +55,10 @@ Color::Color()
 //					as specified by the arguments.
 //
 // Input Arguments:
-//		_Red	= const double& specifying the amount of red in this color (0.0 - 1.0)
-//		_Green	= const double& specifying the amount of green in this color (0.0 - 1.0)
-//		_Blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
-//		_Alpha	= double specifying the opacity of this color (0.0 - 1.0)
+//		_red	= const double& specifying the amount of red in this color (0.0 - 1.0)
+//		_green	= const double& specifying the amount of green in this color (0.0 - 1.0)
+//		_blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
+//		_alpha	= double specifying the opacity of this color (0.0 - 1.0)
 //
 // Output Arguments:
 //		None
@@ -67,13 +67,13 @@ Color::Color()
 //		None
 //
 //==========================================================================
-Color::Color(const double &_Red, const double &_Green, const double &_Blue, double _Alpha)
+Color::Color(const double &_red, const double &_green, const double &_blue, double _alpha)
 {
 	// Assign the arguments to the class members
-	Red = _Red;
-	Green = _Green;
-	Blue =_Blue;
-	Alpha = _Alpha;
+	red = _red;
+	green = _green;
+	blue = _blue;
+	alpha = _alpha;
 
 	ValidateColor();
 }
@@ -131,10 +131,10 @@ const Color Color::ColorGray(0.5, 0.5, 0.5);
 // Description:		Sets the RGBA values for this color.
 //
 // Input Arguments:
-//		_Red	= const double& specifying the amount of red in this color (0.0 - 1.0)
-//		_Green	= const double& specifying the amount of green in this color (0.0 - 1.0)
-//		_Blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
-//		_Alpha	= double specifying the opacity of this color (0.0 - 1.0)
+//		_red	= const double& specifying the amount of red in this color (0.0 - 1.0)
+//		_green	= const double& specifying the amount of green in this color (0.0 - 1.0)
+//		_blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
+//		_alpha	= double specifying the opacity of this color (0.0 - 1.0)
 //
 // Output Arguments:
 //		None
@@ -143,17 +143,15 @@ const Color Color::ColorGray(0.5, 0.5, 0.5);
 //		None
 //
 //==========================================================================
-void Color::Set(const double &_Red, const double &_Green, const double &_Blue, double _Alpha)
+void Color::Set(const double &_red, const double &_green, const double &_blue, double _alpha)
 {
 	// Assign the arguments to the class members
-	Red = _Red;
-	Green = _Green;
-	Blue =_Blue;
-	Alpha = _Alpha;
+	red = _red;
+	green = _green;
+	blue = _blue;
+	alpha = _alpha;
 
 	ValidateColor();
-
-	return;
 }
 
 //==========================================================================
@@ -164,7 +162,7 @@ void Color::Set(const double &_Red, const double &_Green, const double &_Blue, d
 //					wxColor argument.
 //
 // Input Arguments:
-//		Color	= wxColor& to match
+//		color	= wxColor& to match
 //
 // Output Arguments:
 //		None
@@ -173,17 +171,15 @@ void Color::Set(const double &_Red, const double &_Green, const double &_Blue, d
 //		None
 //
 //==========================================================================
-void Color::Set(const wxColor &Color)
+void Color::Set(const wxColor &color)
 {
 	// Convert from the wxColor to Color
-	Red = (double)Color.Red() / 255.0;
-	Green = (double)Color.Green() / 255.0;
-	Blue = (double)Color.Blue() / 255.0;
-	Alpha = (double)Color.Alpha() / 255.0;
+	red = (double)color.Red() / 255.0;
+	green = (double)color.Green() / 255.0;
+	blue = (double)color.Blue() / 255.0;
+	alpha = (double)color.Alpha() / 255.0;
 
 	ValidateColor();
-
-	return;
 }
 
 //==========================================================================
@@ -193,7 +189,7 @@ void Color::Set(const wxColor &Color)
 // Description:		Sets the alpha value for this object.
 //
 // Input Arguments:
-//		_Alpha = const double&
+//		_alpha = const double&
 //
 // Output Arguments:
 //		None
@@ -202,13 +198,11 @@ void Color::Set(const wxColor &Color)
 //		None
 //
 //==========================================================================
-void Color::SetAlpha(const double &_Alpha)
+void Color::SetAlpha(const double &_alpha)
 {
-	Alpha = _Alpha;
+	alpha = _alpha;
 
 	ValidateColor();
-
-	return;
 }
 
 //==========================================================================
@@ -230,19 +224,19 @@ void Color::SetAlpha(const double &_Alpha)
 wxColor Color::ToWxColor(void) const
 {
 	// Return object
-	wxColor Color;
+	wxColor color;
 
 	// Do the conversion to a wxColor object
-	Color.Set(char(Red * 255), char(Green * 255), char(Blue * 255), char(Alpha * 255));
+	color.Set(char(red * 255), char(green * 255), char(blue * 255), char(alpha * 255));
 
-	return Color;
+	return color;
 }
 
 //==========================================================================
 // Class:			Color
 // Function:		ValidateColor
 //
-// Description:		Forces all componenets of the color to be between 0 and 1
+// Description:		Forces all components of the color to be between 0 and 1
 //					if they are not already.
 //
 // Input Arguments:
@@ -258,28 +252,26 @@ wxColor Color::ToWxColor(void) const
 void Color::ValidateColor(void)
 {
 	// Check red
-	if (Red < 0.0)
-		Red = 0.0;
-	else if (Red > 1.0)
-		Red = 1.0;
+	if (red < 0.0)
+		red = 0.0;
+	else if (red > 1.0)
+		red = 1.0;
 
 	// Check green
-	if (Green < 0.0)
-		Green = 0.0;
-	else if (Green > 1.0)
-		Green = 1.0;
+	if (green < 0.0)
+		green = 0.0;
+	else if (green > 1.0)
+		green = 1.0;
 
 	// Check blue
-	if (Blue < 0.0)
-		Blue = 0.0;
-	else if (Blue > 1.0)
-		Blue = 1.0;
+	if (blue < 0.0)
+		blue = 0.0;
+	else if (blue > 1.0)
+		blue = 1.0;
 
 	// Check alpha
-	if (Alpha < 0.0)
-		Alpha= 0.0;
-	else if (Alpha > 1.0)
-		Alpha = 1.0;
-
-	return;
+	if (alpha < 0.0)
+		alpha= 0.0;
+	else if (alpha > 1.0)
+		alpha = 1.0;
 }

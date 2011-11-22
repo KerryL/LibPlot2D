@@ -208,8 +208,6 @@ void Matrix::SetElement(const unsigned int &row, const unsigned int &column, con
 
 	// Set the element as requested
 	elements[row][column] = value;
-
-	return;
 }
 
 //==========================================================================
@@ -255,9 +253,7 @@ void Matrix::Set(double element1, ...)
 	}
 
 	// Terminate the variable argument list
-	va_end(argumentList);
-
-	return;
+	va_end(argumentList);;
 }
 
 //==========================================================================
@@ -337,8 +333,6 @@ void Matrix::Zero(void)
 		for (j = 0; j < columns; j++)
 			elements[i][j] = 0.0;
 	}
-
-	return;
 }
 
 //==========================================================================
@@ -1213,8 +1207,6 @@ void Matrix::AllocateElements(void)
 	unsigned int i;
 	for (i = 0; i < rows; i++)
 		elements[i] = new double[columns];
-
-	return;
 }
 
 //==========================================================================
@@ -1243,8 +1235,6 @@ void Matrix::Resize(const unsigned int &_rows, const unsigned int &_columns)
 	columns = _columns;
 
 	AllocateElements();
-
-	return;
 }
 
 //==========================================================================

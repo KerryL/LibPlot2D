@@ -171,8 +171,6 @@ void Primitive::Draw(void)
 	// Call the list we created for this object (if it has a valid index)
 	if (listIndex != 0)
 		glCallList(listIndex);
-
-	return;
 }
 
 //==========================================================================
@@ -198,8 +196,6 @@ void Primitive::SetVisibility(const bool &_isVisible)
 	
 	// Reset the modified flag
 	modified = true;
-
-	return;
 }
 
 //==========================================================================
@@ -225,8 +221,6 @@ void Primitive::SetColor(const Color &_color)
 	
 	// Reset the modified flag
 	modified = true;
-
-	return;
 }
 
 //==========================================================================
