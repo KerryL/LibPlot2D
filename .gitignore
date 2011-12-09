@@ -9,11 +9,6 @@ DataPlotter/Release
 *.sdf
 *.opensdf
 
-# Ignore the property sheets - different computers have different wx verisons,
-# this file is where they are stored, so this file is required to be on each
-# computer, but after that we want to stop tracking it:
-DataPlotter/DataPlotter.props
-
 # Ignore GKT directories
 bin/
 .obj/
