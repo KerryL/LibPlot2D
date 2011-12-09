@@ -45,7 +45,7 @@ AR = ar rcs
 RANLIB = ranlib
 
 # Compiler flags
-CFLAGS = -g -Wall $(INCDIRS) `wx-config --cppflags` `freetype-config --cflags` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -D_WXDEBUB_
+CFLAGS = -g -Wall $(INCDIRS) `wx-config --cppflags` `freetype-config --cflags` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
 
 # Linker flags
 LDFLAGS = $(LIBDIRS) $(LIBS) `wx-config --libs` `freetype-config --libs`
