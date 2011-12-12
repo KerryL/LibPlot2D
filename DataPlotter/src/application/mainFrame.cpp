@@ -271,6 +271,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 
 	// Context menu
 	EVT_MENU(idContextAddMathChannel,				MainFrame::ContextAddMathChannelEvent)
+	EVT_MENU(idContextSetTimeUnits,					MainFrame::ContextSetTimeUnitsEvent)
 	EVT_MENU(idContextPlotDerivative,				MainFrame::ContextPlotDerivativeEvent)
 	EVT_MENU(idContextPlotIntegral,					MainFrame::ContextPlotIntegralEvent)
 	EVT_MENU(idContextPlotRMS,						MainFrame::ContextPlotRMSEvent)
@@ -466,7 +467,9 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 	// Start building the context menu
 	contextMenu->Append(idContextAddMathChannel, _T("Add Math Channel"));
 
-	if (row > 0)
+	if (row == 0 && currentFileFormat == FormatGeneric)
+		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
+	else if (row > 0)
 	{
 		contextMenu->Append(idContextPlotDerivative, _T("Plot Derivative"));
 		contextMenu->Append(idContextPlotIntegral, _T("Plot Integral"));
@@ -648,13 +651,13 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 		loadedOK = LoadTxtFile(pathAndFileName);
 	else
 		// Attempt to load the file, even if we don't recognize its extension
-		//::wxMessageBox(_T("ERROR:  Unrecognized file extension '") + fileExtension + _T("'!"), _T("Error Loading File"));
+		//::wxMessageBox(_T("ERROR:  Unrecognized file extension '") + fileExtension + _T("'!"), _T("Error Loading File"), 5L, this);
 		loadedOK = LoadGenericDelimitedFile(pathAndFileName);
 
 	// If we couldn't load the file, tell the user
 	// Changed 8/4/2011 - Specific messages are displayed in LoadXXXFile() methods
 	//if (!loadedOK && displayDialogOnError)
-	//	::wxMessageBox(_T("ERROR:  Unable to read data from file!"), _T("Error Loading File"));
+	//	::wxMessageBox(_T("ERROR:  Unable to read data from file!"), _T("Error Loading File"), 5L, this);
 
 	if (loadedOK)
 	{
@@ -712,7 +715,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -774,7 +777,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -823,7 +826,8 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 			{
 				delete [] data;
 
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Generating Plot"));
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"),
+					_T("Error Generating Plot"), wxICON_ERROR, this);
 				return false;
 			}
 
@@ -882,7 +886,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -926,7 +930,8 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 			{
 				delete [] data;
 
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"), _T("Error Generating Plot"));
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"),
+					_T("Error Generating Plot"), wxICON_ERROR, this);
 				return false;
 			}
 
@@ -996,7 +1001,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"));
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -1102,14 +1107,19 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 			plotNameList.Add(dummyPlotName);
 		}
 	}
-	genericXAxisLabel = plotNameList[0];
-	plotNameList.RemoveAt(0);
+
+	// If we have only one name, it's for the X-axis column, so we remove it
+	if (plotNameList.size() > 0)
+	{
+		genericXAxisLabel = plotNameList[0];
+		plotNameList.RemoveAt(0);
+	}
 
 	// If there are no names in the list at this point, it's because we didn't find any plottable data
 	if (plotNameList.size() == 0)
 	{
 		file.close();
-		::wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"));
+		::wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -1127,7 +1137,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	if (choices.size() == 0)
 	{
 		file.close();
-		::wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"));
+		::wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -1160,7 +1170,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 		{
 			delete [] data;
 
-			::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"));
+			::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"), wxICON_ERROR, this);
 			return false;
 		}
 		data[0].push_back(value);
@@ -1172,7 +1182,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 			{
 				delete [] data;
 
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"));
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"), wxICON_ERROR, this);
 				return false;
 			}
 			data[i + 1].push_back(value);
@@ -1330,6 +1340,7 @@ void MainFrame::ClearAllCurves(void)
 //==========================================================================
 void MainFrame::SetXDataLabel(wxString label)
 {
+	genericXAxisLabel = label;
 	optionsGrid->SetCellValue(0, colName, label);
 	plotArea->SetXLabel(label);
 }
@@ -1412,7 +1423,7 @@ void MainFrame::AddCurve(wxString mathString)
 	if (!errors.IsEmpty())
 	{
 		// Tell the user about the errors
-		::wxMessageBox(_T("Could not solve expression:\n\n") + errors, _T("Error Solving Expression"));
+		::wxMessageBox(_T("Could not solve expression:\n\n") + errors, _T("Error Solving Expression"), wxICON_ERROR, this);
 
 		DisplayMathChannelDialog(mathString);
 		return;
@@ -1755,20 +1766,29 @@ void MainFrame::GridCellChangeEvent(wxGridEvent &event)
 //
 // Output Arguments:
 //		factor	= double&, scaling factor
+//		label	= wxString*, pointer to string, to be populated with the unit string
 //
 // Return Value:
 //		bool; true for success, false otherwise
 //
 //==========================================================================
-bool MainFrame::GetXAxisScalingFactor(double &factor)
+bool MainFrame::GetXAxisScalingFactor(double &factor, wxString *label)
 {
 	// Put known file formats here (at the top), to save time and eliminate possibility for error
 
 	// For Baumulelr datasets, multiply x data by 1000 in order to have seconds
 	if (currentFileFormat == FormatBaumuller)
+	{
 		factor = 1000.0;
+		if (label)
+			label->assign(_T("msec"));
+	}
 	else if (currentFileFormat == FormatKollmorgen)
+	{
 		factor = 1.0;
+		if (label)
+			label->assign(_T("sec"));
+	}
 	else
 	{
 		// Use time series label to determine units and decide if scaling is necessary
@@ -1826,6 +1846,11 @@ bool MainFrame::GetXAxisScalingFactor(double &factor)
 			}
 		}
 
+		// Remove whitespace
+		unit = unit.Trim().Trim(false);
+		if (label)
+			label->assign(unit);
+
 		// We'll recognize the following units:
 		// h, hr, hours -> factor = 1.0 / 3600.0
 		// m, min, minutes -> factor = 1.0 / 60.0
@@ -1845,7 +1870,11 @@ bool MainFrame::GetXAxisScalingFactor(double &factor)
 		else if (unit.CmpNoCase(_T("us")) == 0 || unit.CmpNoCase(_T("usec")) == 0 || unit.CmpNoCase(_T("microseconds")) == 0)
 			factor = 1000000.0;
 		else
+		{
+			// Assume a factor of 1
+			factor = 1.0;
 			return false;
+		}
 	}
 
 	return true;
@@ -1870,6 +1899,57 @@ bool MainFrame::GetXAxisScalingFactor(double &factor)
 void MainFrame::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 {
 	DisplayMathChannelDialog();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextSetTimeUnitsEvent
+//
+// Description:		Available for the user to clarify the time units when we
+//					are unable to determine them easily from the input file.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextSetTimeUnitsEvent(wxCommandEvent& WXUNUSED(event))
+{
+	double f;
+	wxString units;
+
+	// Check to see if we already have some confidence in our x-axis units
+	if (GetXAxisScalingFactor(f, &units))
+	{
+		// Ask the user to confirm, since we don't think we need their help
+		if (wxMessageBox(_T("Time units are being interpreted as ") + units +
+			_T(", are you sure you want to change them?"), _T("Are You Sure?"), wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) == wxNO)
+			return;
+	}
+
+	// Ask the user to specify the correct units
+	wxString userUnits;
+	userUnits = ::wxGetTextFromUser(_T("Specify time units (e.g. \"msec\" or \"minutes\")"),
+		_T("Specify Units"), _T("seconds"), this);
+
+	// If the user cancelled, we will have a blank string
+	if (userUnits.IsEmpty())
+		return;
+
+	// Check to make sure we understand what the user specified
+	wxString currentLabel(optionsGrid->GetCellValue(0, colName));
+	SetXDataLabel(_T("Time, [") + userUnits + _T("]"));
+	if (!GetXAxisScalingFactor(f, &units))
+	{
+		// Set the label back to what it used to be and warn the user
+		SetXDataLabel(currentLabel);
+		wxMessageBox(_T("Could not understand units \"") + userUnits + _T("\"."), _T("Error Setting Units"), wxICON_ERROR, this);
+	}
 }
 
 //==========================================================================
@@ -1975,7 +2055,8 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 	double factor;
 	if (!GetXAxisScalingFactor(factor))
 		// Warn the user if we cannot determine the time units, but create the plot anyway
-		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"), _T("Accuracy Warning"));
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
 
 	// Create new dataset containing the FFT of dataset and add it to the plot
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
@@ -2017,7 +2098,7 @@ void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
 	double cutoff;
 	if (!cutoffString.ToDouble(&cutoff))
 	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"));
+		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"), wxICON_ERROR, this);
 		return;
 	}
 
@@ -2026,7 +2107,8 @@ void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	double factor;
 	if (!GetXAxisScalingFactor(factor))
-		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"), _T("Accuracy Warning"));
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
 
 	sampleRate *= factor;
 	LowPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
@@ -2069,7 +2151,7 @@ void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
 	double cutoff;
 	if (!cutoffString.ToDouble(&cutoff))
 	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"));
+		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"), wxICON_ERROR, this);
 		return;
 	}
 
@@ -2078,7 +2160,8 @@ void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
 
 	double factor;
 	if (!GetXAxisScalingFactor(factor))
-		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"), _T("Accuracy Warning"));
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
 
 	sampleRate *= factor;
 	HighPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
@@ -2118,7 +2201,7 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 
 	if (!orderString.ToULong(&order))
 	{
-		::wxMessageBox(_T("ERROR:  Order must be a positive integer!"), _T("Error Fitting Curve"));
+		::wxMessageBox(_T("ERROR:  Order must be a positive integer!"), _T("Error Fitting Curve"), wxICON_ERROR, this);
 		return;
 	}
 
@@ -2405,7 +2488,7 @@ void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 	// Make sure the limits aren't equal
 	if (min == max)
 	{
-		::wxMessageBox(_T("ERROR:  Limits must unique!"), _T("Error Setting Limits"));
+		::wxMessageBox(_T("ERROR:  Limits must unique!"), _T("Error Setting Limits"), wxICON_ERROR, this);
 		return;
 	}
 

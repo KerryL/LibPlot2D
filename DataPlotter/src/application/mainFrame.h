@@ -55,7 +55,7 @@ public:
 		plotContextPlotArea
 	};
 
-	bool GetXAxisScalingFactor(double &factor);
+	bool GetXAxisScalingFactor(double &factor, wxString *label = NULL);
 
 	void CreatePlotContextMenu(const wxPoint &position, const PlotContext &context);
 	void DisplayAxisRangeDialog(const PlotContext &axis);
@@ -111,6 +111,7 @@ private:
 		idButtonRemoveCurve,
 
 		idContextAddMathChannel,
+		idContextSetTimeUnits,
 		idContextPlotDerivative,
 		idContextPlotIntegral,
 		idContextPlotRMS,
@@ -159,6 +160,7 @@ private:
 
 	// Context menu events
 	void ContextAddMathChannelEvent(wxCommandEvent &event);
+	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
 	void ContextPlotDerivativeEvent(wxCommandEvent &event);
 	void ContextPlotIntegralEvent(wxCommandEvent &event);
 	void ContextPlotRMSEvent(wxCommandEvent &event);
