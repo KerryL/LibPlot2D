@@ -1340,7 +1340,6 @@ void MainFrame::ClearAllCurves(void)
 //==========================================================================
 void MainFrame::SetXDataLabel(wxString label)
 {
-	genericXAxisLabel = label;
 	optionsGrid->SetCellValue(0, colName, label);
 	plotArea->SetXLabel(label);
 }
@@ -1943,7 +1942,8 @@ void MainFrame::ContextSetTimeUnitsEvent(wxCommandEvent& WXUNUSED(event))
 
 	// Check to make sure we understand what the user specified
 	wxString currentLabel(optionsGrid->GetCellValue(0, colName));
-	SetXDataLabel(_T("Time, [") + userUnits + _T("]"));
+	genericXAxisLabel = _T("Time, [") + userUnits + _T("]");
+	SetXDataLabel(genericXAxisLabel);
 	if (!GetXAxisScalingFactor(f, &units))
 	{
 		// Set the label back to what it used to be and warn the user
