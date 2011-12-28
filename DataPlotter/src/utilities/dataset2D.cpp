@@ -26,6 +26,7 @@
 
 // Local headers
 #include "utilities/dataset2D.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			Dataset2D
@@ -674,6 +675,31 @@ const Dataset2D Dataset2D::operator/(const double &target) const
     result /= target;
 
     return result;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		operator%
+//
+// Description:		Overloaded operator (%).
+//
+// Input Arguments:
+//		target	= const double& to divide into this
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D& containing desired ratio
+//
+//==========================================================================
+const Dataset2D Dataset2D::operator%(const double &target) const
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = PlotMath::Modulo(yData[i], target);
+
+	return *this;
 }
 
 //==========================================================================

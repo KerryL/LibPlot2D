@@ -204,3 +204,31 @@ double PlotMath::Sign(const double &value)
 	else
 		return 0.0;
 }
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		Modulo
+//
+// Description:		Modulo for doubles.  Returns a value between zero and divisor.
+//
+// Input Arguments:
+//		value		= const double&
+//		div			= cosnt double&, divisor
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotMath::Modulo(const double &value, const double &div)
+{
+	double modulo(value);
+	while (modulo >= fabs(div))
+		modulo -= div;
+	while (modulo < 0)
+		modulo += div;
+
+	return modulo;
+}

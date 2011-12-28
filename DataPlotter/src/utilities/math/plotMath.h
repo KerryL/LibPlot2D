@@ -49,6 +49,9 @@ namespace PlotMath
 
 	// Returns the sign of the argument
 	double Sign(const double &value);
+
+	// Modulo operator defined for doubles (so not really a modulo, I guess)
+	double Modulo(const double &value, const double &div);
 }
 
 #endif// _PLOT_MATH_H_

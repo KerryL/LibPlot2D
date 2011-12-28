@@ -21,6 +21,7 @@
 #include "utilities/signals/derivative.h"
 #include "utilities/signals/integral.h"
 #include "utilities/signals/fft.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			ExpressionTree
@@ -119,7 +120,7 @@ wxString ExpressionTree::Parenthesize(wxString expression, wxString &errorString
 		return expression;
 	}
 
-	// Parse the expression and look for * and / operators, then parse in both directions
+	// Parse the expression and look for *, / and % operators, then parse in both directions
 	wxString targetOperator = _T("*");
 	int nextMorD = expression.Find(targetOperator);
 	int nextCloseParenthese, nextOpenParenthese, nextPlus, nextMinus, insertAt;
@@ -209,6 +210,12 @@ wxString ExpressionTree::Parenthesize(wxString expression, wxString &errorString
 			targetOperator = _T("/");
 			nextMorD = expression.find(targetOperator);
 		}
+		// Can't find any more divisions, look for modulo
+		else if (nextMorD == wxNOT_FOUND && targetOperator.Cmp(_T("/")) == 0)
+		{
+			targetOperator = _T("%");
+			nextMorD = expression.find(targetOperator);
+		}
 	}
 
 	return expression;
@@ -281,8 +288,10 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						node.set -= newNode.set;
 					else if (nextOperator.compare(_T("*")) == 0)
 						node.set *= newNode.set;
-					else// "/"
+					else if (nextOperator.compare(_T("/")) == 0)
 						node.set /= newNode.set;
+					else
+						assert(false);// FIXME:  Asserts are probably not the best choice here...
 				}
 				else if (node.set.GetNumberOfPoints())
 				{
@@ -293,8 +302,12 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						node.set -= newNode.dValue;
 					else if (nextOperator.compare(_T("*")) == 0)
 						node.set *= newNode.dValue;
-					else// "/"
+					else if (nextOperator.compare(_T("/")) == 0)
 						node.set /= newNode.dValue;
+					else if (nextOperator.compare(_T("%")) == 0)
+						node.set = node.set % newNode.dValue;
+					else
+						assert(false);// FIXME:  Asserts are probably not the best choice here...
 				}
 				else if (newNode.set.GetNumberOfPoints() > 0)
 				{
@@ -311,12 +324,14 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 					}
 					else if (nextOperator.compare(_T("*")) == 0)
 						node.set *= newNode.dValue;
-					else// "/"
+					else if (nextOperator.compare(_T("/")) == 0)
 					{
 						// Can't hande this case
 						errorString = _T("Cannot divide a number by a dataset!");
 						return node;
 					}
+					else
+						assert(false);// FIXME:  Asserts are probably not the best choice here...
 				}
 				else
 				{
@@ -327,8 +342,12 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						node.dValue -= newNode.dValue;
 					else if (nextOperator.compare(_T("*")) == 0)
 						node.dValue *= newNode.dValue;
-					else// "/"
+					else if (nextOperator.compare(_T("/")) == 0)
 						node.dValue /= newNode.dValue;
+					else if (nextOperator.compare(_T("%")) == 0)
+						node.dValue = PlotMath::Modulo(node.dValue, newNode.dValue);
+					else
+						assert(false);// FIXME:  Asserts are probably not the best choice here...
 				}
 
 				// Clear the operator
@@ -417,8 +436,10 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 							node.set -= newSet;
 						else if (nextOperator.compare(_T("*")) == 0)
 							node.set *= newSet;
-						else// "/"
+						else if (nextOperator.compare(_T("/")) == 0)
 							node.set /= newSet;
+						else
+							assert(false);// FIXME:  Asserts are probably not the best choice here...
 					}
 
 					nextOperator.Empty();
@@ -446,8 +467,12 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 							node.dValue -= value;
 						else if (nextOperator.compare(_T("*")) == 0)
 							node.dValue *= value;
-						else// "/"
+						else if (nextOperator.compare(_T("/")) == 0)
 							node.dValue /= value;
+						else if (nextOperator.compare(_T("%")) == 0)
+							node.dValue = PlotMath::Modulo(node.dValue, value);
+						else
+							assert(false);// FIXME:  Asserts are probably not the best choice here...
 					}
 					else
 					{
@@ -458,8 +483,12 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 							node.set -= value;
 						else if (nextOperator.compare(_T("*")) == 0)
 							node.set *= value;
-						else// "/"
+						else if (nextOperator.compare(_T("/")) == 0)
 							node.set /= value;
+						else if (nextOperator.compare(_T("%")) == 0)
+							node.set = node.set % value;
+						else
+							assert(false);// FIXME:  Asserts are probably not the best choice here...
 					}
 
 					nextOperator.Empty();
@@ -517,10 +546,16 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						}
 						else if (nextOperator.compare(_T("*")) == 0)
 							node.set *= node.dValue;
-						else// "/"
+						else if (nextOperator.compare(_T("/")) == 0)
 						{
 							// Can't hande this case
 							errorString = _T("Cannot divide a number by a dataset!");
+							return node;
+						}
+						else if (nextOperator.compare(_T("%")) == 0)
+						{
+							// Can't hande this case
+							errorString = _T("Cannot perform modulo with RHS dataset!");
 							return node;
 						}
 					}
@@ -533,8 +568,10 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 							node.set -= newSet;
 						else if (nextOperator.compare(_T("*")) == 0)
 							node.set *= newSet;
-						else// "/"
+						else if (nextOperator.compare(_T("/")) == 0)
 							node.set /= newSet;
+						else
+							assert(false);// FIXME:  Asserts are probably not the best choice here...
 					}
 
 					nextOperator.Empty();
@@ -561,7 +598,8 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 				else if (expression.Mid(0,1).compare(_T("+")) == 0 ||
 					expression.Mid(0,1).compare(_T("-")) == 0 ||
 					expression.Mid(0,1).compare(_T("*")) == 0 ||
-					expression.Mid(0,1).compare(_T("/")) == 0)
+					expression.Mid(0,1).compare(_T("/")) == 0 ||
+					expression.Mid(0,1).compare(_T("%")) == 0)
 				{
 					nextOperator = expression.at(0);
 					expression = expression.Mid(1);

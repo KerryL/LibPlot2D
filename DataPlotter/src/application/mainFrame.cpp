@@ -2418,7 +2418,7 @@ void MainFrame::DisplayMathChannelDialog(wxString defaultInput)
 	// Display input dialog in which user can specify the math desired
 	wxString message(_T("Enter the math you would like to perform:\n\n"));
 	message.Append(_T("    Use [x] notation to specify channels, where x = 0 is Time, x = 1 is the first data channel, etc.\n"));
-	message.Append(_T("    Valid operations are: +, -, *, /, ddt, and int\n"));
+	message.Append(_T("    Valid operations are: +, -, *, /, %, ddt, int and fft\n"));
 	message.Append(_T("    Use () to specify order of operations"));
 
 	AddCurve(::wxGetTextFromUser(message, _T("Specify Math Channel"), defaultInput, this));
