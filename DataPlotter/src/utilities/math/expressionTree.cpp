@@ -100,6 +100,8 @@ wxString ExpressionTree::Parenthesize(wxString expression, wxString &errorString
 	// Without parentheses, everthing is evaluated left-to-right, so we need (as a minimum)
 	// to add parentheses around multiplication and division
 
+	// FIXME:  I think parenthesizing can fix the double operator bug (see next function down)
+
 	// Check for a parentheses imbalance
 	unsigned int leftCount(0), rightCount(0);
 	int location = expression.find(_T("("));

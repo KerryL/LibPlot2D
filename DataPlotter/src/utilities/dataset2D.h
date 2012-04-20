@@ -37,6 +37,7 @@ public:
 	void ExportDataToFile(wxString pathAndFileName) const;
 
 	void Resize(const unsigned int &_numberOfPoints);
+	void Reverse(void);
 
 	unsigned int GetNumberOfPoints(void) const { return numberOfPoints; };
 	double *GetXPointer(void) { return xData; };

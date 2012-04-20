@@ -156,6 +156,9 @@
     <ClInclude Include="src\utilities\machineDefinitions.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="src\application\filterDialog.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\renderer\primitives\axis.cpp">
@@ -247,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="src\utilities\fontFinder.cpp">
       <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\filterDialog.cpp">
+      <Filter>Source Files\application</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

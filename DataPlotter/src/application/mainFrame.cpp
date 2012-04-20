@@ -28,6 +28,7 @@
 #include "application/plotterApp.h"
 #include "application/dropTarget.h"
 #include "application/rangeLimitsDialog.h"
+#include "application/filterDialog.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "utilities/dataset2D.h"
@@ -38,6 +39,7 @@
 #include "utilities/signals/fft.h"
 #include "utilities/math/expressionTree.h"
 #include "utilities/signals/filters/lowPassOrder1.h"
+#include "utilities/signals/filters/lowPassOrder2.h"
 #include "utilities/signals/filters/highPassOrder1.h"
 #include "utilities/signals/curveFit.h"
 
@@ -278,8 +280,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idContextPlotFFT,						MainFrame::ContextPlotFFTEvent)
 	EVT_MENU(idButtonRemoveCurve,					MainFrame::ButtonRemoveCurveClickedEvent)
 
-	EVT_MENU(idContextFilterLowPass,				MainFrame::ContextFilterLowPassEvent)
-	EVT_MENU(idContextFilterHighPass,				MainFrame::ContextFilterHighPassEvent)
+	EVT_MENU(idContextFilter,						MainFrame::ContextFilterEvent)
 
 	EVT_MENU(idContextFitCurve,						MainFrame::ContextFitCurve)
 
@@ -478,10 +479,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 
 		contextMenu->AppendSeparator();
 
-		wxMenu *filterMenu = new wxMenu();
-		filterMenu->Append(idContextFilterLowPass, _T("Low-Pass"));
-		filterMenu->Append(idContextFilterHighPass, _T("High-Pass"));
-		contextMenu->AppendSubMenu(filterMenu, _T("Filter"));
+		contextMenu->Append(idContextFilter, _T("Filter Curve"));
 
 		contextMenu->Append(idContextFitCurve, _T("Fit Curve"));
 
@@ -2071,9 +2069,10 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextFilterLowPassEvent
+// Function:		ContextFilterEvent
 //
-// Description:		Adds a curve showing the filtered signal to the plot.
+// Description:		Displays a dialog allowing the user to specify the filter,
+//					and adds the filtered curve to the plot.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -2085,93 +2084,21 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void MainFrame::ContextFilterLowPassEvent(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 {
+	// Display dialog
+	FilterParameters filterParameters = DisplayFilterDialog();
+	if (filterParameters.order == 0)
+		return;
+
 	// Create new dataset containing the FFT of dataset and add it to the plot
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
 	const Dataset2D *currentData = plotList[row - 1];
 	Dataset2D *newData = new Dataset2D(*currentData);
 
-	// Display a dialog asking for the cutoff frequency
-	wxString cutoffString = ::wxGetTextFromUser(_T("Specify the cutoff frequency in Hertz:"),
-		_T("Filter Cutoff Frequency"), _T("1.0"), this);
-	double cutoff;
-	if (!cutoffString.ToDouble(&cutoff))
-	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"), wxICON_ERROR, this);
-		return;
-	}
+	ApplyFilter(filterParameters, *newData);
 
-	// Create the filter
-	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
-
-	double factor;
-	if (!GetXAxisScalingFactor(factor))
-		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
-			_T("Accuracy Warning"), wxICON_WARNING, this);
-
-	sampleRate *= factor;
-	LowPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
-
-	// Apply the filter
-	unsigned int i;
-	for (i = 0; i < newData->GetNumberOfPoints(); i++)
-		newData->GetYPointer()[i] = filter.Apply(currentData->GetYData(i));
-
-	wxString name = cutoffString.Trim() + _T(" Hz low-pass(") + optionsGrid->GetCellValue(row, colName) + _T(")");
-	AddCurve(newData, name);
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		ContextFilterHighPassEvent
-//
-// Description:		Adds a curve showing the filtered signal to the plot.
-//
-// Input Arguments:
-//		event	= wxCommandEvent&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::ContextFilterHighPassEvent(wxCommandEvent& WXUNUSED(event))
-{
-	// Create new dataset containing the filtered dataset and add it to the plot
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	const Dataset2D *currentData = plotList[row - 1];
-	Dataset2D *newData = new Dataset2D(*currentData);
-
-	// Display a dialog asking for the cutoff frequency
-	wxString cutoffString = ::wxGetTextFromUser(_T("Specify the cutoff frequency in Hertz:"),
-		_T("Filter Cutoff Frequency"), _T("1.0"), this);
-	double cutoff;
-	if (!cutoffString.ToDouble(&cutoff))
-	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Filter Error"), wxICON_ERROR, this);
-		return;
-	}
-
-	// Create the filter
-	double sampleRate = 1.0 / (currentData->GetXData(1) - currentData->GetXData(0));// [Hz]
-
-	double factor;
-	if (!GetXAxisScalingFactor(factor))
-		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
-			_T("Accuracy Warning"), wxICON_WARNING, this);
-
-	sampleRate *= factor;
-	HighPassFirstOrderFilter filter(cutoff, sampleRate, currentData->GetYData(0));
-
-	// Apply the filter
-	unsigned int i;
-	for (i = 0; i < newData->GetNumberOfPoints(); i++)
-		newData->GetYPointer()[i] = filter.Apply(currentData->GetYData(i));
-
-	wxString name = cutoffString.Trim() + _T(" Hz high-pass(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+	wxString name = FilterDialog::GetFilterNamePrefix(filterParameters) + _T("(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
 }
 
@@ -2765,6 +2692,101 @@ void MainFrame::ContextGridColor(wxCommandEvent& WXUNUSED(event))
 		plotArea->SetGridColor(color);
 		plotArea->UpdateDisplay();
     }
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		DisplayFilterDialog
+//
+// Description:		Dispalys a dialog box allowing the user to specify a filter,
+//					returns the specified parameters.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		FilterParameters describing the user-specified filter (order = 0 for cancelled dialog)
+//
+//==========================================================================
+FilterParameters MainFrame::DisplayFilterDialog(void)
+{
+	FilterDialog dialog(this);
+	if (dialog.ShowModal() != wxID_OK)
+	{
+		FilterParameters parameters;
+		parameters.order = 0;
+		return parameters;
+	}
+
+	return dialog.GetFilterParameters();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ApplyFilter
+//
+// Description:		Applies the specified filter to the specified dataset.
+//
+// Input Arguments:
+//		parameters	= const FilterParameters&
+//		data		= Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
+{
+	double sampleRate = 1.0 / (data.GetXData(1) - data.GetXData(0));// [Hz]
+
+	double factor;
+	if (!GetXAxisScalingFactor(factor))
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
+	sampleRate *= factor;
+
+	FilterBase *filter = NULL;
+	switch (parameters.type)
+	{
+	case FilterParameters::TypeLowPass:
+		if ((parameters.order == 1 && !parameters.phaseless) || (parameters.order == 2 && parameters.phaseless))
+			filter = new LowPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, data.GetYData(0));
+		else if ((parameters.order == 2 && !parameters.phaseless) || (parameters.order == 4 && parameters.phaseless))
+			filter = new LowPassSecondOrderFilter(parameters.cutoffFrequency, parameters.dampingRatio, sampleRate, data.GetYData(0));
+		else
+			assert(false);
+		break;
+
+	case FilterParameters::TypeHighPass:
+		assert(parameters.order == 1);
+		filter = new HighPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, data.GetYData(0));
+		break;
+
+	default:
+		assert(false);
+	}
+
+	unsigned int i;
+	for (i = 0; i < data.GetNumberOfPoints(); i++)
+		data.GetYPointer()[i] = filter->Apply(data.GetYData(i));
+
+	// For phaseless filter, re-apply the same filter backwards
+	if (parameters.phaseless)
+	{
+		data.Reverse();
+		filter->Initialize(data.GetYData(0));
+		for (i = 0; i < data.GetNumberOfPoints(); i++)
+			data.GetYPointer()[i] = filter->Apply(data.GetYData(i));
+		data.Reverse();
+	}
+
+	delete filter;
 }
 
 //==========================================================================

@@ -125,6 +125,32 @@ Dataset2D::~Dataset2D()
 
 //==========================================================================
 // Class:			Dataset2D
+// Function:		Reverse
+//
+// Description:		Reverses the order of the Y-data.  X-data remains unchanged.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Dataset2D::Reverse(void)
+{
+	double *temp = new double[numberOfPoints];
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		temp[i] = yData[i];
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = temp[numberOfPoints - 1 - i];
+}
+
+//==========================================================================
+// Class:			Dataset2D
 // Function:		Resize
 //
 // Description:		Resizes the arrays.  Deletes all existing data before

@@ -29,6 +29,7 @@ class wxGridEvent;
 
 // Local forward declarations
 class PlotRenderer;
+struct FilterParameters;
 
 // The main frame class
 class MainFrame : public wxFrame
@@ -117,8 +118,7 @@ private:
 		idContextPlotRMS,
 		idContextPlotFFT,
 
-		idContextFilterLowPass,
-		idContextFilterHighPass,
+		idContextFilter,
 
 		idContextFitCurve,
 
@@ -166,8 +166,7 @@ private:
 	void ContextPlotRMSEvent(wxCommandEvent &event);
 	void ContextPlotFFTEvent(wxCommandEvent &event);
 
-	void ContextFilterLowPassEvent(wxCommandEvent &event);
-	void ContextFilterHighPassEvent(wxCommandEvent &event);
+	void ContextFilterEvent(wxCommandEvent &event);
 
 	void ContextFitCurve(wxCommandEvent &event);
 
@@ -192,6 +191,8 @@ private:
 	// End event handlers-------------------------------------------------
 
 	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);
+	FilterParameters DisplayFilterDialog(void);
+	void ApplyFilter(const FilterParameters &parameters, Dataset2D &data);
 
 	// The main control
 	PlotRenderer *plotArea;
