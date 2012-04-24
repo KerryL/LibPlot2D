@@ -19,7 +19,8 @@
 // wxWidgets headers
 #include <wx/wx.h>
 
-// wxWidgets forward declarations
+// wxWidgets forward
+class wxSpinCtrl;
 class wxSpinEvent;
 
 struct FilterParameters

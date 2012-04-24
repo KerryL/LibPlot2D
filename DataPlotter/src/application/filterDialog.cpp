@@ -81,8 +81,7 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 
 	phaselessCheckBox = new wxCheckBox(this, CheckboxID, _T("Phaseless"));
 	orderSpin = new wxSpinCtrl(this, SpinID, _T("Order"));
-	orderSpin->SetMin(1);
-	orderSpin->SetMax(2);
+	orderSpin->SetRange(1, 2);
 	orderSpin->SetValue(parameters.order);
 	inputSizer->Add(phaselessCheckBox, wxALIGN_CENTER_VERTICAL);
 	inputSizer->Add(orderSpin);
@@ -355,15 +354,9 @@ void FilterDialog::SetCorrectLimits(void)
 		orderSpin->Enable();
 
 		if (phaselessCheckBox->GetValue())
-		{
-			orderSpin->SetMin(2);
-			orderSpin->SetMax(4);
-		}
+			orderSpin->SetRange(2, 4);
 		else
-		{
-			orderSpin->SetMin(1);
-			orderSpin->SetMax(2);
-		}
+			orderSpin->SetRange(1, 2);
 	}
 
 	if ((orderSpin->GetValue() == 1 && !phaselessCheckBox->GetValue()) || 
