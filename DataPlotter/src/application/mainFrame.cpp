@@ -279,6 +279,8 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idContextPlotRMS,						MainFrame::ContextPlotRMSEvent)
 	EVT_MENU(idContextPlotFFT,						MainFrame::ContextPlotFFTEvent)
 	EVT_MENU(idButtonRemoveCurve,					MainFrame::ButtonRemoveCurveClickedEvent)
+	
+	EVT_MENU(idContextTimeShift,					MainFrame::ContextTimeShiftEvent)
 
 	EVT_MENU(idContextFilter,						MainFrame::ContextFilterEvent)
 
@@ -476,6 +478,8 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idContextPlotIntegral, _T("Plot Integral"));
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
+		
+		contextMenu->Append(idContextTimeShift, _T("Plot Time-Shifted"));
 
 		contextMenu->AppendSeparator();
 
@@ -756,7 +760,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 // Class:			MainFrame
 // Function:		LoadBaumullerFile
 //
-// Description:		Loads Baumuller data trace (from BM4x00 series drive).
+// Description:		Loads Baumuller data trace (from BM4xxx series drive).
 //
 // Input Arguments:
 //		pathAndFileName	= wxString
@@ -800,7 +804,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 	wxArrayString descriptions = ParseLineIntoColumns(nextLine, delimiter);
 
 	std::getline(file, nextLine);
-	wxArrayString units = ParseLineIntoColumns(nextLine, delimiter);
+	wxArrayString units = ParseLineIntoColumns(nextLine, delimiter, false);
 
 	// Throw out the max and min rows
 	std::getline(file, nextLine);
@@ -824,7 +828,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 			{
 				delete [] data;
 
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"),
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
 					_T("Error Generating Plot"), wxICON_ERROR, this);
 				return false;
 			}
@@ -928,7 +932,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 			{
 				delete [] data;
 
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encounted while parsing file!"),
+				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
 					_T("Error Generating Plot"), wxICON_ERROR, this);
 				return false;
 			}
@@ -1232,7 +1236,9 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 //		original line
 //
 //==========================================================================
-wxArrayString MainFrame::ParseLineIntoColumns(wxString line, const wxString &delimiter)
+wxArrayString MainFrame::ParseLineIntoColumns(wxString line,
+											  const wxString &delimiter,
+											  const bool &ignoreConsecutiveDelimiters)
 {
 	// Remove \r character from end of line (required for GTK, etc.)
 	line.Trim();
@@ -1250,7 +1256,9 @@ wxArrayString MainFrame::ParseLineIntoColumns(wxString line, const wxString &del
 		// If the next delimiting character is right next to the previous character
 		// (empty string between), ignore it (that is to say, we treat consecutive
 		// delimiters as one)
-		if (end == start)
+		// Changed 4/29/2012 - For some Baumuller data, there are no units, which
+		// results in consecutive delimiters that should NOT be treated as one
+		if (end == start && ignoreConsecutiveDelimiters)
 		{
 			start++;
 			continue;
@@ -2069,6 +2077,45 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		ContextTimeShiftEvent
+//
+// Description:		Adds a new curve equivalent to the selected curve shifted
+//					by the specified amount.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
+{	
+	double shift(0.0);
+	wxString shiftText = ::wxGetTextFromUser(
+		_T("Specify the time to add to time data in original data:\n"
+		"Use same units as time series.  Positive values shift curve to the right."),
+		_T("Time Shift"), _T("0"), this);
+	
+	if (!shiftText.ToDouble(&shift) || shift == 0.0)
+		return;
+	
+	// Create new dataset containing the RMS of dataset and add it to the plot
+	unsigned int row = optionsGrid->GetSelectedRows()[0];
+	Dataset2D *newData = new Dataset2D(*plotList[row - 1]);
+	
+	newData->XShift(shift);
+
+	wxString name = optionsGrid->GetCellValue(row, colName) + _T(", t = t0 + ");
+	name += shiftText;
+	AddCurve(newData, name);
+}
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		ContextFilterEvent
 //
 // Description:		Displays a dialog allowing the user to specify the filter,
@@ -2125,6 +2172,8 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 	unsigned long order;
 	wxString orderString = ::wxGetTextFromUser(_T("Specify the order of the polynomial fit:"),
 		_T("Polynomial Curve Fit"), _T("2"), this);
+	
+	// FIXME:  What if cancelled?
 
 	if (!orderString.ToULong(&order))
 	{
@@ -2142,7 +2191,7 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 	for (i = 0; i < newData->GetNumberOfPoints(); i++)
 		newData->GetYPointer()[i] = CurveFit::EvaluateFit(newData->GetXData(i), fitData);
 
-	// Create discriptive string to use as the name
+	// Create descriptive string to use as the name
 	wxString name, termString;
 	//name.Printf("Order %lu Fit([%i]), R^2 = %0.2f", order, row, fitData.rSquared);
 	name.Printf("Fit [%i] (R^2 = %0.2f): ", row, fitData.rSquared);

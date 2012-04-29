@@ -47,6 +47,8 @@ public:
 
 	Dataset2D& MultiplyXData(const double &target);
 	bool GetYAt(double &x) const;
+	
+	Dataset2D& XShift(const double &shift);
 
 	// Overloaded operators
 	Dataset2D& operator=(const Dataset2D &target);

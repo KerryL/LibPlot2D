@@ -270,6 +270,29 @@ bool Dataset2D::GetYAt(double &x) const
 
 //==========================================================================
 // Class:			Dataset2D
+// Function:		XShift
+//
+// Description:		Shifts the data's time series by the specified amount.
+//
+// Input Arguments:
+//		shift	= const double& to add to this object's X-data
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D& reference to this object
+//
+//==========================================================================
+Dataset2D& Dataset2D::XShift(const double &shift)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		xData[i] += shift;
+}
+
+//==========================================================================
+// Class:			Dataset2D
 // Function:		operator=
 //
 // Description:		Overloaded assignment operator.

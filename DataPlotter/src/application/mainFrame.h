@@ -117,6 +117,8 @@ private:
 		idContextPlotIntegral,
 		idContextPlotRMS,
 		idContextPlotFFT,
+		
+		idContextTimeShift,
 
 		idContextFilter,
 
@@ -165,6 +167,8 @@ private:
 	void ContextPlotIntegralEvent(wxCommandEvent &event);
 	void ContextPlotRMSEvent(wxCommandEvent &event);
 	void ContextPlotFFTEvent(wxCommandEvent &event);
+	
+	void ContextTimeShiftEvent(wxCommandEvent &event);
 
 	void ContextFilterEvent(wxCommandEvent &event);
 
@@ -206,7 +210,8 @@ private:
 	bool LoadGenericDelimitedFile(wxString pathAndFileName);
 	bool LoadBaumullerFile(wxString pathAndFileName);
 	bool LoadKollmorgenFile(wxString pathAndFileName);
-	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter);
+	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter,
+		const bool &ignoreConsecutiveDelimiters = true);
 
 	enum FileFormat
 	{
