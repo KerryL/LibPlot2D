@@ -289,6 +289,8 @@ Dataset2D& Dataset2D::XShift(const double &shift)
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
 		xData[i] += shift;
+
+	return *this;
 }
 
 //==========================================================================

@@ -39,6 +39,21 @@ struct FilterParameters
 	double dampingRatio;
 };
 
+struct FilterOrderLimits
+{
+	struct MinOrder
+	{
+		static const unsigned int lowPass = 1;
+		static const unsigned int highPass = 1;
+	};
+
+	struct MaxOrder
+	{
+		static const unsigned int lowPass = 2;
+		static const unsigned int highPass = 1;
+	};
+};
+
 class FilterDialog : public wxDialog
 {
 public:
@@ -65,10 +80,20 @@ private:
 
 	// Event handlers
 	void OnSpinChange(wxSpinEvent &event);
+	void OnSpinUp(wxSpinEvent &event);
+	void OnSpinDown(wxSpinEvent &event);
 	void OnRadioChange(wxCommandEvent &event);
 	void OnCheckboxChange(wxCommandEvent &event);
 
+	virtual bool TransferDataFromWindow(void);
+
+	void HandleSpin(wxSpinEvent &event);
 	void SetCorrectLimits(void);
+	bool OrderIsValid(const unsigned int &order) const;
+
+	FilterParameters::Type GetType(void) const;
+	unsigned int GetMinOrder(const FilterParameters::Type &type) const;
+	unsigned int GetMaxOrder(const FilterParameters::Type &type) const;
 
 	enum EventIDs
 	{

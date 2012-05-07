@@ -28,7 +28,7 @@
 //
 // Input Arguments:
 //		parent		= wxWindow* that owns this object
-//		_parameters	=
+//		_parameters	= const FilterParameters*
 //
 // Output Arguments:
 //		None
@@ -139,6 +139,8 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 BEGIN_EVENT_TABLE(FilterDialog, wxDialog)
 	EVT_BUTTON(wxID_OK,	FilterDialog::OnOKButton)
 	EVT_SPINCTRL(SpinID, FilterDialog::OnSpinChange)
+	EVT_SPIN_UP(SpinID, FilterDialog::OnSpinUp)
+	EVT_SPIN_DOWN(SpinID, FilterDialog::OnSpinDown)
 	EVT_RADIOBUTTON(RadioID, FilterDialog::OnRadioChange)
 	EVT_CHECKBOX(CheckboxID, FilterDialog::OnCheckboxChange)
 END_EVENT_TABLE()
@@ -265,9 +267,110 @@ wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 //		None
 //
 //==========================================================================
-void FilterDialog::OnSpinChange(wxSpinEvent& WXUNUSED(event))
+void FilterDialog::OnSpinChange(wxSpinEvent &event)
 {
+	if (!OrderIsValid(event.GetInt()))
+	{
+		int factor(1), order(orderSpin->GetValue());
+		if (phaselessCheckBox->GetValue())
+			factor *= 2;
+
+		if (abs(event.GetInt() - (int)GetMinOrder(GetType()) * factor) < abs(event.GetInt() - (int)GetMaxOrder(GetType()) * factor))
+			order = GetMinOrder(GetType()) * factor;
+		else
+			order = GetMaxOrder(GetType()) * factor;
+
+		orderSpin->SetValue(order);
+	}
+
 	SetCorrectLimits();
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		OnSpinUp
+//
+// Description:		Processes spin control change events (order selection).
+//
+// Input Arguments:
+//		event	= wxSpinEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::OnSpinUp(wxSpinEvent &event)
+{
+	HandleSpin(event);
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		OnSpinDown
+//
+// Description:		Processes spin control change events (order selection).
+//
+// Input Arguments:
+//		event	= wxSpinEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::OnSpinDown(wxSpinEvent &event)
+{
+	HandleSpin(event);
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		OnSpinDown
+//
+// Description:		Processes spin control change events (order selection).
+//
+// Input Arguments:
+//		event	= wxSpinEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::HandleSpin(wxSpinEvent &event)
+{
+	if (!OrderIsValid(event.GetInt()))
+	{
+		unsigned int factor(1), order(orderSpin->GetValue());
+		if (phaselessCheckBox->GetValue())
+			factor *= 2;
+
+		if ((unsigned)event.GetInt() < GetMinOrder(GetType()) * factor)
+			order = GetMinOrder(GetType()) * factor;
+		else if ((unsigned)event.GetInt() > GetMaxOrder(GetType()) * factor)
+			order = GetMaxOrder(GetType()) * factor;
+		else if ((unsigned)event.GetInt() > order)// increasing value
+		{
+			order = event.GetInt();
+			while (!OrderIsValid(order) && order < GetMaxOrder(GetType()) * factor)
+				order++;
+		}
+		else// if (event.GetInt() < order)// decreasing value
+		{
+			order = event.GetInt();
+			while (!OrderIsValid(order) && order > GetMinOrder(GetType()) * factor)
+				order--;
+		}
+
+		orderSpin->SetValue(order);
+	}
 }
 
 //==========================================================================
@@ -335,33 +438,181 @@ void FilterDialog::OnCheckboxChange(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void FilterDialog::SetCorrectLimits(void)
 {
+	// Prevent crashes during initialization
 	if (!highPassRadio || !lowPassRadio)
 		return;
 
 	if (highPassRadio->GetValue())
 	{
-		highPassRadio->SetValue(true);
+		orderSpin->SetValue(1);
 		orderSpin->Enable(false);
-
-		if (phaselessCheckBox->GetValue())
-			orderSpin->SetValue(2);
-		else
-			orderSpin->SetValue(1);
 	}
 	else
-	{
-		lowPassRadio->SetValue(true);
 		orderSpin->Enable();
 
-		if (phaselessCheckBox->GetValue())
-			orderSpin->SetRange(2, 4);
-		else
-			orderSpin->SetRange(1, 2);
-	}
+	unsigned int factor(1);
+	if (phaselessCheckBox->GetValue())
+		factor *= 2;
+
+	orderSpin->SetRange(GetMinOrder(GetType()) * factor, GetMaxOrder(GetType()) * factor);
 
 	if ((orderSpin->GetValue() == 1 && !phaselessCheckBox->GetValue()) || 
 		(orderSpin->GetValue() == 2 && phaselessCheckBox->GetValue()))
 		dampingRatioBox->Enable(false);
 	else
 		dampingRatioBox->Enable();
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		OrderIsValid
+//
+// Description:		Verifies that the specified order is acceptable given the
+//					other filter parameters
+//
+// Input Arguments:
+//		order	= const unsigned int& specifying the desired order
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if order is OK
+//
+//==========================================================================
+bool FilterDialog::OrderIsValid(const unsigned int &order) const
+{
+	// Prevent crashes during initialization
+	if (!highPassRadio || !lowPassRadio)
+		return false;
+
+	unsigned int factor(1);
+	if (phaselessCheckBox->GetValue())
+	{
+		if (order % 2 != 0)
+			return false;
+
+		factor *= 2;
+	}
+
+	return order >= GetMinOrder(GetType()) * factor && order <= GetMaxOrder(GetType()) * factor;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GetType
+//
+// Description:		Returns the currently selected filter type.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		FilterParameters::Type
+//
+//==========================================================================
+FilterParameters::Type FilterDialog::GetType(void) const
+{
+	if (!highPassRadio || !lowPassRadio)
+		return FilterParameters::TypeLowPass;
+
+	if (highPassRadio->GetValue())
+		return FilterParameters::TypeHighPass;
+	else if (lowPassRadio->GetValue())
+		return FilterParameters::TypeLowPass;
+
+	assert(false);
+	return FilterParameters::TypeLowPass;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GetMinOrder
+//
+// Description:		Returns the minimum allowable order for the specified type
+//					(for a non-phaseless filter).
+//
+// Input Arguments:
+//		type	= const FilterParameters::Type & specifying the filter type
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int, minimum filter order for non-phaseless filter
+//
+//==========================================================================
+unsigned int FilterDialog::GetMinOrder(const FilterParameters::Type &type) const
+{
+	switch (type)
+	{
+	case FilterParameters::TypeHighPass:
+		return FilterOrderLimits::MinOrder::highPass;
+
+	case FilterParameters::TypeLowPass:
+		return FilterOrderLimits::MinOrder::lowPass;
+
+	default:
+		assert(false);
+	}
+
+	return 0;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GetMaxOrder
+//
+// Description:		Returns the maximum allowable order for the specified type
+//					(for a non-phaseless filter).
+//
+// Input Arguments:
+//		type	= const FilterParameters::Type & specifying the filter type
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int, maximum filter order for non-phaseless filter
+//
+//==========================================================================
+unsigned int FilterDialog::GetMaxOrder(const FilterParameters::Type &type) const
+{
+	switch (type)
+	{
+	case FilterParameters::TypeHighPass:
+		return FilterOrderLimits::MaxOrder::highPass;
+
+	case FilterParameters::TypeLowPass:
+		return FilterOrderLimits::MaxOrder::lowPass;
+
+	default:
+		assert(false);
+	}
+
+	return 0;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		TransferDataFromWindow
+//
+// Description:		Validates dialog contents prior to allowing OK to be executed.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if dialog contents are valid
+//
+//==========================================================================
+bool FilterDialog::TransferDataFromWindow(void)
+{
+	return OrderIsValid(orderSpin->GetValue());
 }
