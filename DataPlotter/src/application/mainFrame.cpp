@@ -1491,7 +1491,7 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	optionsGrid->SetCellValue(index, colName, name);
 
 	// Choose next color and set background color of appropriate cell
-	unsigned int colorIndex = (index - 1) % 8;
+	unsigned int colorIndex = (index - 1) % 10;
 	Color color;
 	switch (colorIndex)
 	{
@@ -1516,17 +1516,31 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 		break;
 
 	case 5:
-		color = Color::ColorYellow;
+		color = Color::ColorOrange;// Opt not to use yellow by default -> too hard to see on default white background
 		break;
 
 	case 6:
 		color = Color::ColorGray;
 		break;
 
-	default:
 	case 7:
+		color = Color::ColorPurple;
+		break;
+
+	case 8:
+		color = Color::ColorLightBlue;
+		break;
+
+	default:
+	case 9:
 		color = Color::ColorBlack;
 		break;
+
+	// The following colors we opt'ed not to use - either too hard to see or too similar to other colors
+	// Color::ColorYellow
+	// Color::ColorDrabGreen
+	// Color::ColorPaleGreen
+	// Color::ColorPink
 	}
 
 	optionsGrid->SetCellBackgroundColour(index, colColor, color.ToWxColor());

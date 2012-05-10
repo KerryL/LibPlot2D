@@ -47,6 +47,12 @@ public:
 	static const Color ColorYellow;
 	static const Color ColorCyan;
 	static const Color ColorMagenta;
+	static const Color ColorOrange;
+	static const Color ColorPink;
+	static const Color ColorDrabGreen;
+	static const Color ColorPaleGreen;
+	static const Color ColorPurple;
+	static const Color ColorLightBlue;
 	static const Color ColorGray;
 
 	// For setting the value

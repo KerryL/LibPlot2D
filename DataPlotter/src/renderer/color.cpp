@@ -117,11 +117,23 @@ Color::~Color()
 const Color Color::ColorRed(1.0, 0.0, 0.0);
 const Color Color::ColorGreen(0.0, 1.0, 0.0);
 const Color Color::ColorBlue(0.0, 0.0, 1.0);
+
 const Color Color::ColorWhite(1.0, 1.0, 1.0);
 const Color Color::ColorBlack(0.0, 0.0, 0.0);
+
 const Color Color::ColorYellow(1.0, 1.0, 0.0);
 const Color Color::ColorCyan(0.0, 1.0, 1.0);
 const Color Color::ColorMagenta(1.0, 0.0, 1.0);
+
+const Color Color::ColorOrange(1.0, 0.5, 0.0);
+const Color Color::ColorPink(1.0, 0.0, 0.5);
+
+const Color Color::ColorDrabGreen(0.5, 1.0, 0.0);
+const Color Color::ColorPaleGreen(0.0, 1.0, 0.5);
+
+const Color Color::ColorPurple(0.5, 0.0, 1.0);
+const Color Color::ColorLightBlue(0.0, 0.5, 1.0);
+
 const Color Color::ColorGray(0.5, 0.5, 0.5);
 
 //==========================================================================
