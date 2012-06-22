@@ -34,7 +34,7 @@ class PlotRenderer : public RenderWindow
 {
 public:
 	// Constructor
-	PlotRenderer(MainFrame &_mainFrame, wxWindowID id, int args[]);
+	PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFrame &_mainFrame);
 
 	// Destructor
 	~PlotRenderer();
@@ -93,6 +93,8 @@ public:
 	double GetRightCursorValue(void) const;
 
 	void UpdateCursors(void);
+
+	MainFrame *GetMainFrame(void) { return &mainFrame; };
 
 private:
 	// Called from the PLOT_RENDERER constructor only in order to initialize the display

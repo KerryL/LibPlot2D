@@ -32,9 +32,10 @@
 // Description:		Constructor for PlotRenderer class.
 //
 // Input Arguments:
-//		_mainFrame	= MainFrame& reference to this object's parent window
+//		parent		= wxWindow* pointing to this object's parent window
 //		id			= wxWindowID
 //		args		= int[] NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
+//		_mainFrame	= MainFrame& reference to this applications's main window
 //
 // Output Arguments:
 //		None
@@ -43,8 +44,8 @@
 //		None
 //
 //==========================================================================
-PlotRenderer::PlotRenderer(MainFrame &_mainFrame, wxWindowID id, int args[])
-							 : RenderWindow(_mainFrame, id, args, wxDefaultPosition,
+PlotRenderer::PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFrame &_mainFrame)
+							 : RenderWindow(*parent, id, args, wxDefaultPosition,
 							 wxDefaultSize), mainFrame(_mainFrame)
 {
 	// Create the actors

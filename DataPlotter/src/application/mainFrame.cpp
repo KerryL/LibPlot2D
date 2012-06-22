@@ -144,8 +144,11 @@ void MainFrame::DoLayout(void)
 {
 	// Create the top sizer, and on inside of it just to pad the borders a bit
 	topSizer = new wxBoxSizer(wxVERTICAL);
+	wxPanel *mainPanel = new wxPanel(this);
+	topSizer->Add(mainPanel, 1, wxGROW);
+
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-	topSizer->Add(mainSizer, 1, wxGROW | wxALL, 5);
+	mainPanel->SetSizer(mainSizer);
 
 	// Create the main control
 	optionsGrid = NULL;// To avoid crashing in UpdateCursors
@@ -154,9 +157,9 @@ void MainFrame::DoLayout(void)
 	// Adding the double-buffer arugment fixes this.  Under windows, the double-buffer argument
 	// causes the colors to go funky.  So we have this #if.
 	int args[] = {WX_GL_DOUBLEBUFFER, 0};
-	plotArea = new PlotRenderer(*this, wxID_ANY, args);
+	plotArea = new PlotRenderer(mainPanel, wxID_ANY, args, *this);
 #else
-	plotArea = new PlotRenderer(*this, wxID_ANY, NULL);
+	plotArea = new PlotRenderer(mainPanel, wxID_ANY, NULL, *this);
 #endif
 	plotArea->SetSize(480, 320);
 	plotArea->SetGridOn();
@@ -169,14 +172,17 @@ void MainFrame::DoLayout(void)
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxVERTICAL);
 	lowerSizer->Add(buttonSizer, 0, wxGROW | wxALL, 5);
 
-	openButton = new wxButton(this, idButtonOpen, _T("Open"));
-	autoScaleButton = new wxButton(this, idButtonAutoScale, _T("Auto Scale"));
-	removeCurveButton = new wxButton(this, idButtonRemoveCurve, _T("Remove"));
+	openButton = new wxButton(mainPanel, idButtonOpen, _T("Open"));
+	autoScaleButton = new wxButton(mainPanel, idButtonAutoScale, _T("Auto Scale"));
+	removeCurveButton = new wxButton(mainPanel, idButtonRemoveCurve, _T("Remove"));
 	buttonSizer->Add(openButton, 0, wxEXPAND);
 	buttonSizer->Add(autoScaleButton, 0, wxEXPAND);
 	buttonSizer->Add(removeCurveButton, 0, wxEXPAND);
 
-	optionsGrid = new wxGrid(this, wxID_ANY);
+	wxStaticText *versionText = new wxStaticText(mainPanel, wxID_ANY, DataPlotterApp::versionString);
+	buttonSizer->Add(versionText, 0, wxEXPAND | wxALIGN_BOTTOM);
+
+	optionsGrid = new wxGrid(mainPanel, wxID_ANY);
 	lowerSizer->Add(optionsGrid, 1, wxGROW | wxALL, 5);
 
 	// Configure the grid
@@ -204,9 +210,6 @@ void MainFrame::DoLayout(void)
 	optionsGrid->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 
 	optionsGrid->EndBatch();
-
-	wxStaticText *versionText = new wxStaticText(this, wxID_ANY, DataPlotterApp::versionString);
-	mainSizer->Add(versionText);
 
 	// Assign sizers and resize the frame
 	SetSizerAndFit(topSizer);

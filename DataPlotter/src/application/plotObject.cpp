@@ -179,7 +179,7 @@ void PlotObject::Update(void)
 	renderer.UpdateCursors();
 
 	// Update the display of cursor values
-	dynamic_cast<MainFrame*>(renderer.GetParent())->UpdateCursorValues(
+	dynamic_cast<MainFrame*>(renderer.GetMainFrame())->UpdateCursorValues(
 		renderer.GetLeftCursorVisible(), renderer.GetRightCursorVisible(),
 		renderer.GetLeftCursorValue(), renderer.GetRightCursorValue());
 }
