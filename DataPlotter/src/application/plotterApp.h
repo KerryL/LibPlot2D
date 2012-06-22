@@ -33,6 +33,7 @@ public:
 	static const wxString dataPlotterTitle;// As displayed
 	static const wxString dataPlotterName;// Internal
 	static const wxString creator;
+	static const wxString versionString;
 
 private:
 	// The main class for the application - this object is the parent for all other objects

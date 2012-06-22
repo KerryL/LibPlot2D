@@ -46,7 +46,11 @@
 // *nix Icons
 #ifdef __WXGTK__
 #include "../../res/icons/plots16.xpm"
+#include "../../res/icons/plots24.xpm"
 #include "../../res/icons/plots32.xpm"
+#include "../../res/icons/plots48xpm"
+#include "../../res/icons/plots64.xpm"
+#include "../../res/icons/plots128.xpm"
 #endif
 
 //==========================================================================
@@ -201,6 +205,9 @@ void MainFrame::DoLayout(void)
 
 	optionsGrid->EndBatch();
 
+	wxStaticText *versionText = new wxStaticText(this, wxID_ANY, DataPlotterApp::versionString);
+	mainSizer->Add(versionText);
+
 	// Assign sizers and resize the frame
 	SetSizerAndFit(topSizer);
 	SetAutoLayout(true);
@@ -232,11 +239,14 @@ void MainFrame::SetProperties(void)
 
 	// Add the icon
 #ifdef __WXMSW__
-    SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE, 16, 16));
-	SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE, 32, 32));
+	SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE));
 #elif __WXGTK__
 	SetIcon(wxIcon(plots16_xpm, wxBITMAP_TYPE_XPM));
+	SetIcon(wxIcon(plots24_xpm, wxBITMAP_TYPE_XPM));
 	SetIcon(wxIcon(plots32_xpm, wxBITMAP_TYPE_XPM));
+	SetIcon(wxIcon(plots48_xpm, wxBITMAP_TYPE_XPM));
+	SetIcon(wxIcon(plots64_xpm, wxBITMAP_TYPE_XPM));
+	SetIcon(wxIcon(plots128_xpm, wxBITMAP_TYPE_XPM));
 #endif
 
 	// Allow draging-and-dropping of files onto this window to open them
