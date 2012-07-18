@@ -30,6 +30,7 @@ class wxGridEvent;
 // Local forward declarations
 class PlotRenderer;
 struct FilterParameters;
+class CustomFileFormat;
 
 // The main frame class
 class MainFrame : public wxFrame
@@ -205,9 +206,10 @@ private:
 	wxMenuBar *menuBar;
 
 	// Load file methods
+	bool LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat);
 	bool LoadTxtFile(wxString pathAndFileName);
 	bool LoadCsvFile(wxString pathAndFileName);
-	bool LoadGenericDelimitedFile(wxString pathAndFileName);
+	bool LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFormat *customFormat = NULL);
 	bool LoadBaumullerFile(wxString pathAndFileName);
 	bool LoadKollmorgenFile(wxString pathAndFileName);
 	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter,

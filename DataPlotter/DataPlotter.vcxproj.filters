@@ -159,6 +159,9 @@
     <ClInclude Include="src\application\filterDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
+    <ClInclude Include="src\application\customFileFormat.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\renderer\primitives\axis.cpp">
@@ -252,6 +255,9 @@
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
     <ClCompile Include="src\application\filterDialog.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\customFileFormat.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
   </ItemGroup>

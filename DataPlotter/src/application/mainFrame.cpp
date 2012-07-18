@@ -29,6 +29,7 @@
 #include "application/dropTarget.h"
 #include "application/rangeLimitsDialog.h"
 #include "application/filterDialog.h"
+#include "application/customFileFormat.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "utilities/dataset2D.h"
@@ -660,7 +661,10 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 
 	// Create the appropriate object
 	bool loadedOK(false);
-	if (fileExtension.CmpNoCase("csv") == 0)
+	CustomFileFormat customFormat(pathAndFileName);
+	if (customFormat.IsCustomFormat())
+		loadedOK = LoadCustomFile(pathAndFileName, customFormat);
+	else if (fileExtension.CmpNoCase("csv") == 0)
 		loadedOK = LoadCsvFile(pathAndFileName);
 	else if (fileExtension.CmpNoCase("txt") == 0)
 		loadedOK = LoadTxtFile(pathAndFileName);
@@ -685,9 +689,31 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		LoadCustomFile
+//
+// Description:		Method for loading a custom (defined in XML file) format.
+//
+// Input Arguments:
+//		pathAndFileName	= wxString
+//		customFormat	= CustomFileFormat
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true for file successfully loaded, false otherwise
+//
+//==========================================================================
+bool MainFrame::LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat)
+{
+	return LoadGenericDelimitedFile(pathAndFileName, &customFormat);
+}
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		LoadTxtFile
 //
-// Description:		Public method for loading a single object from file.
+// Description:		Method for loading a single object from a text file.
 //
 // Input Arguments:
 //		pathAndFileName	= wxString
@@ -746,7 +772,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 		file.close();
 		return LoadBaumullerFile(pathAndFileName);
 	}
-	else// Formats the require reading further into the file than the first line
+	else// Formats that require reading further into the file than the first line
 	{
 		std::getline(file, nextLine);
 		compatableNextLine = nextLine;
@@ -1009,7 +1035,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 //		true for file successfully loaded, false otherwise
 //
 //==========================================================================
-bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
+bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFormat *customFormat)
 {
 	// Open the file
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
@@ -1027,6 +1053,14 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	delimiterList.Add(_T(","));
 	delimiterList.Add(_T("\t"));
 	delimiterList.Add(_T(";"));
+	if (customFormat)
+	{
+		if (!customFormat->GetDelimiter().IsEmpty())
+		{
+			delimiterList.Clear();
+			delimiterList.Add(customFormat->GetDelimiter());
+		}
+	}
 
 	// Use std::string to read the file line-by-line
 	std::string nextLine;
@@ -1123,7 +1157,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 		}
 	}
 
-	// If we have only one name, it's for the X-axis column, so we remove it
+	// Remove the time series label
 	if (plotNameList.size() > 0)
 	{
 		genericXAxisLabel = plotNameList[0];
@@ -1137,6 +1171,11 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 		::wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
 		return false;
 	}
+
+	// Have the custom format definition handle re-naming of the plots
+	std::vector<double> scales(plotNameList.size(), 1.0);
+	if (customFormat)
+		customFormat->ProcessChannels(plotNameList, scales);
 
 	// Display a choice dialog allowing the user to specify which plots to import (only if there are more than 6 channels?)
 	wxMultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"), plotNameList);
@@ -1209,22 +1248,30 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName)
 	for (i = 0; i < choices.size(); i++)
 	{
 		dataSet = new Dataset2D(data[0].size());
+
 		for (j = 0; j < data[0].size(); j++)
 		{
 			dataSet->GetXPointer()[j] = data[0].at(j);
-			dataSet->GetYPointer()[j] = data[i + 1].at(j);
+			dataSet->GetYPointer()[j] = data[i + 1].at(j) * scales[choices[i]];
 		}
 
 		AddCurve(dataSet, plotNameList[choices[i]]);
 	}
 
 	// Clean up memory
-	// Don't delete dataSet -> this is handled by the MANAGED_LIST object
+	// Don't delete dataSet -> this is handled by the ManagedList object
 	delete [] data;
 	file.close();
 
 	// Set the file format flag
 	currentFileFormat = FormatGeneric;
+
+	// Set the X-axis units (if custom/specified)
+	if (customFormat)
+	{
+		if (!customFormat->GetTimeUnits().IsEmpty())
+			genericXAxisLabel = _T("Time [") + customFormat->GetTimeUnits() + _T("]");
+	}
 
 	return true;
 }

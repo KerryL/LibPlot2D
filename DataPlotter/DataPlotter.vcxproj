@@ -83,13 +83,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_lib;$(FREETYPE)\objs\win32\vc2010;$(FTGL)\msvc\Build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wxbase28.lib;wxmsw28_adv.lib;wxbase28_xml.lib;wxmsw28_core.lib;wxmsw28_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;ftgl_static.lib;freetype248MT.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase28.lib;wxmsw28_adv.lib;wxbase28_xml.lib;wxexpat.lib;wxmsw28_core.lib;wxmsw28_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;ftgl_static.lib;freetype248MT.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\application\customFileFormat.h" />
     <ClInclude Include="src\application\dropTarget.h" />
     <ClInclude Include="src\application\filterDialog.h" />
     <ClInclude Include="src\application\mainFrame.h" />
@@ -126,6 +127,7 @@
     <ClInclude Include="src\utilities\signals\rms.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\application\customFileFormat.cpp" />
     <ClCompile Include="src\application\dropTarget.cpp" />
     <ClCompile Include="src\application\filterDialog.cpp" />
     <ClCompile Include="src\application\mainFrame.cpp" />
