@@ -459,11 +459,13 @@ void PlotObject::FormatPlot(void)
 	// If one axis is unused, make it match the other
 	if (leftFound && !rightFound)
 	{
+		axisRight->SetLogarithmicScale(axisLeft->IsLogarithmic());
 		yRightMinOriginal = yLeftMinOriginal;
 		yRightMaxOriginal = yLeftMaxOriginal;
 	}
 	else if (!leftFound && rightFound)
 	{
+		axisLeft->SetLogarithmicScale(axisRight->IsLogarithmic());
 		yLeftMinOriginal = yRightMinOriginal;
 		yLeftMaxOriginal = yRightMaxOriginal;
 	}
@@ -540,11 +542,11 @@ void PlotObject::FormatPlot(void)
 	// Set up the axes resolution (and at the same time tweak the max and min)
 	// FIXME:  Make maximum number of ticks dependant on plot size and width of
 	// number (i.e. 1 2 3 fits better than 0.001 0.002 0.003)
-	double xMajorResolution = AutoScaleAxis(xMin, xMax, 7, !autoScaleX);
+	double xMajorResolution = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
 	double xMinorResolution = xMajorResolution;
-	double yLeftMajorResolution = AutoScaleAxis(yLeftMin, yLeftMax, 10, !autoScaleLeftY);
+	double yLeftMajorResolution = AutoScaleAxis(yLeftMin, yLeftMax, 10, axisLeft->IsLogarithmic(), !autoScaleLeftY);
 	double yLeftMinorResolution = yLeftMajorResolution;
-	double yRightMajorResolution = AutoScaleAxis(yRightMin, yRightMax, 10, !autoScaleRightY);
+	double yRightMajorResolution = AutoScaleAxis(yRightMin, yRightMax, 10, axisRight->IsLogarithmic(), !autoScaleRightY);
 	double yRightMinorResolution = yRightMajorResolution;
 
 	// Make sure the auto-scaled values are numbers
@@ -554,7 +556,7 @@ void PlotObject::FormatPlot(void)
 	{
 		xMin = -1.0;
 		xMax = 1.0;
-		xMajorResolution = AutoScaleAxis(xMin, xMax, 7, !autoScaleX);
+		xMajorResolution = AutoScaleAxis(xMin, xMax, 7, false, !autoScaleX);
 		xMinorResolution = xMajorResolution;
 	}
 
@@ -562,7 +564,7 @@ void PlotObject::FormatPlot(void)
 	{
 		yLeftMin = -1.0;
 		yLeftMax = 1.0;
-		yLeftMajorResolution = AutoScaleAxis(yLeftMin, yLeftMax, 7, !autoScaleLeftY);
+		yLeftMajorResolution = AutoScaleAxis(yLeftMin, yLeftMax, 7, false, !autoScaleLeftY);
 		yLeftMinorResolution = yLeftMajorResolution;
 	}
 
@@ -570,8 +572,30 @@ void PlotObject::FormatPlot(void)
 	{
 		yRightMin = -1.0;
 		yRightMax = 1.0;
-		yRightMajorResolution = AutoScaleAxis(yRightMin, yRightMax, 7, !autoScaleRightY);
+		yRightMajorResolution = AutoScaleAxis(yRightMin, yRightMax, 7, false, !autoScaleRightY);
 		yRightMinorResolution = yRightMajorResolution;
+	}
+
+	// Adjust the limits as necessary for logarithmic scaling
+	if (axisBottom->IsLogarithmic() && xMin <= 0.0)
+	{
+		::wxMessageBox(_T("Logarithmic scaling may only be used with strictly positive data."), _T("Logarithmic Scaling Error"));
+		axisBottom->SetLogarithmicScale(false);
+	}
+
+	if (axisLeft->IsLogarithmic() && yLeftMin <= 0.0)
+	{
+		::wxMessageBox(_T("Logarithmic scaling may only be used with strictly positive data."), _T("Logarithmic Scaling Error"));
+		axisLeft->SetLogarithmicScale(false);
+	}
+
+	if (axisRight->IsLogarithmic() && yRightMin <= 0.0)
+	{
+		// Only display this warning if the axes are independent - otherwise,
+		// this warning would have already been displayed for the left axis
+		if (leftFound && rightFound)
+			::wxMessageBox(_T("Logarithmic scaling may only be used with strictly positive data."), _T("Logarithmic Scaling Error"));
+		axisRight->SetLogarithmicScale(false);
 	}
 
 	// If we're auto-scaling, update the "original values" because chances are they
@@ -600,6 +624,7 @@ void PlotObject::FormatPlot(void)
 	axisBottom->SetMinorResolution(xMinorResolution);
 	axisBottom->SetMajorResolution(xMajorResolution);
 
+	axisTop->SetLogarithmicScale(axisBottom->IsLogarithmic());// Make it match the bottom
 	axisTop->SetMinimum(xMin);
 	axisTop->SetMaximum(xMax);
 	axisTop->SetMinorResolution(xMinorResolution);
@@ -641,6 +666,7 @@ void PlotObject::FormatPlot(void)
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
 //		maxTicks	= int specifying the maximum number of ticks to use
+//		logarithmic	= const bool& specifying whether or not to use a logarithmic scale
 //		forceLimits	= const bool& specifying whether or not to preserve the specified limits
 //
 // Output Arguments:
@@ -648,77 +674,98 @@ void PlotObject::FormatPlot(void)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
 //
 // Return Value:
-//		double, spacing between each tick mark for the axis (MajorResolution)
+//		double, spacing between each tick mark for the axis (majorResolution)
 //
 //==========================================================================
-double PlotObject::AutoScaleAxis(double &min, double &max, int maxTicks, const bool &forceLimits)
+double PlotObject::AutoScaleAxis(double &min, double &max, int maxTicks, const bool &logarithmic, const bool &forceLimits)
 {
 	// Get the order of magnitude of the axes to decide how to scale them
 	double range = max - min;
 	int orderOfMagnitude = (int)log10(range);
 	double tickSpacing = range / maxTicks;
 
-	// Acceptable resolution steps are:
-	//	Ones,
-	//	Twos (even numbers), and
-	//	Fives (multiples of five),
-	// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5], and [20, 40, 60] are all acceptable)
-
-	// Determine which method will result in the least whitespace before and after the actual range,
-	// and will get us closest to the maximum number of ticks.
-
-	// Scale the tick spacing so it is between 0.1 and 10.0
-	double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
-
-	// Choose the maximum spacing value that fits our criteria
-	if (scaledSpacing > 5.0)
-		scaledSpacing = 10.0;
-	else if (scaledSpacing > 2.0)
-		scaledSpacing = 5.0;
-	else if (scaledSpacing > 1.0)
-		scaledSpacing = 2.0;
-	else if (scaledSpacing > 0.5)
-		scaledSpacing = 1.0;
-	else if (scaledSpacing > 0.2)
-		scaledSpacing = 0.5;
-	else if (scaledSpacing > 0.1)
-		scaledSpacing = 0.2;
-	else
-		scaledSpacing = 0.1;
-
-	// Re-scale back to the correct order of magnitude
-	tickSpacing = scaledSpacing * pow(10.0, orderOfMagnitude - 1);
-
-	// Round the min and max down and up, respectively, so the plot fits within the range [Min Max]
-	if (!forceLimits)
+	if (logarithmic)
 	{
-		if (fmod(min, tickSpacing) != 0)
+		if (!forceLimits)
 		{
-			if (min < 0)
-			{
-				min -= fmod(min, tickSpacing);
-				min -= tickSpacing;
-			}
-			else
-				min -= fmod(min, tickSpacing);
+			// Determine the nearest power of 10 for each limit
+			min = pow(10.0, floor(log10(min)));
+			max = pow(10.0, ceil(log10(max)));
 		}
-		if (fmod(max, tickSpacing) != 0)
+		else
 		{
-			if (max > 0)
-			{
-				max -= fmod(max, tickSpacing);
-				max += tickSpacing;
-			}
-			else
-				max -= fmod(max, tickSpacing);
+			if (min <= 0.0)
+				min = pow(10.0, floor(log10(min)));
+			if (max <= 0.0)
+				max = pow(10.0, ceil(log10(max)));
 		}
-	}
 
-	// If numerical processing leads to ugly numbers, clean them up a bit
-	if (PlotMath::IsZero(min))
-		min = 0.0;
-	if (PlotMath::IsZero(max))
-		max = 0.0;
+		tickSpacing = 10.0;
+	}
+	else// Linear scaling
+	{
+		// Acceptable resolution steps are:
+		//	Ones,
+		//	Twos (even numbers), and
+		//	Fives (multiples of five),
+		// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5], and [20, 40, 60] are all acceptable)
+
+		// Determine which method will result in the least whitespace before and after the actual range,
+		// and will get us closest to the maximum number of ticks.
+
+		// Scale the tick spacing so it is between 0.1 and 10.0
+		double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
+
+		// Choose the maximum spacing value that fits our criteria
+		if (scaledSpacing > 5.0)
+			scaledSpacing = 10.0;
+		else if (scaledSpacing > 2.0)
+			scaledSpacing = 5.0;
+		else if (scaledSpacing > 1.0)
+			scaledSpacing = 2.0;
+		else if (scaledSpacing > 0.5)
+			scaledSpacing = 1.0;
+		else if (scaledSpacing > 0.2)
+			scaledSpacing = 0.5;
+		else if (scaledSpacing > 0.1)
+			scaledSpacing = 0.2;
+		else
+			scaledSpacing = 0.1;
+
+		// Re-scale back to the correct order of magnitude
+		tickSpacing = scaledSpacing * pow(10.0, orderOfMagnitude - 1);
+
+		// Round the min and max down and up, respectively, so the plot fits within the range [Min Max]
+		if (!forceLimits)
+		{
+			if (fmod(min, tickSpacing) != 0)
+			{
+				if (min < 0)
+				{
+					min -= fmod(min, tickSpacing);
+					min -= tickSpacing;
+				}
+				else
+					min -= fmod(min, tickSpacing);
+			}
+			if (fmod(max, tickSpacing) != 0)
+			{
+				if (max > 0)
+				{
+					max -= fmod(max, tickSpacing);
+					max += tickSpacing;
+				}
+				else
+					max -= fmod(max, tickSpacing);
+			}
+		}
+
+		// If numerical processing leads to ugly numbers, clean them up a bit
+		if (PlotMath::IsZero(min))
+			min = 0.0;
+		if (PlotMath::IsZero(max))
+			max = 0.0;
+	}
 
 	return tickSpacing;
 }
@@ -1227,4 +1274,76 @@ void PlotObject::SetGridColor(const Color &color)
 Color PlotObject::GetGridColor(void) const
 {
 	return axisBottom->GetGridColor();
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetXLogarithmic
+//
+// Description:		Sets the X axis to be scaled logarithmicly (or not).
+//
+// Input Arguments:
+//		log	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetXLogarithmic(const bool &log)
+{
+	if (!axisBottom)
+		return;
+
+	axisBottom->SetLogarithmicScale(log);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetLeftLogarithmic
+//
+// Description:		Sets the left Y axis to be scaled logarithmicly (or not).
+//
+// Input Arguments:
+//		log	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetLeftLogarithmic(const bool &log)
+{
+	if (!axisLeft)
+		return;
+
+	axisLeft->SetLogarithmicScale(log);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetRightLogarithmic
+//
+// Description:		Sets the right Y axis to be scaled logarithmicly (or not).
+//
+// Input Arguments:
+//		log	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetRightLogarithmic(const bool &log)
+{
+	if (!axisRight)
+		return;
+
+	axisRight->SetLogarithmicScale(log);
 }

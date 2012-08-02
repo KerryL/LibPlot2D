@@ -98,9 +98,7 @@ void PlotCursor::GenerateGeometry(void)
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
 	// This is the value where the cursor meets its associated axis
-	value = axis.GetMinimum() + double(locationAlongAxis
-			- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) /
-			(double)dimension * (axis.GetMaximum() - axis.GetMinimum());
+	value = axis.PixelToValue(locationAlongAxis);
 }
 
 //==========================================================================
@@ -130,43 +128,6 @@ bool PlotCursor::HasValidParameters(void)
 	isVisible = false;
 
 	return false;
-}
-
-//==========================================================================
-// Class:			PlotCursor
-// Function:		RescalePoint
-//
-// Description:		Rescales the onscreen position of the point according to
-//					the size of the axis with which this object is associated.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		point	= unsigned int& specifying the location of the object in screen coordinates
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCursor::RescalePoint(unsigned int &point)
-{
-	if (!axis.GetAxisAtMaxEnd() || !axis.GetAxisAtMinEnd())
-		return;
-			
-	int plotDimension;
-	if (axis.IsHorizontal())
-		plotDimension = renderWindow.GetSize().GetWidth()
-				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
-	else
-		plotDimension = renderWindow.GetSize().GetHeight()
-				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
-
-	// Do the scaling
-	point = axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-			+ (value - axis.GetMinimum()) / (axis.GetMaximum() - axis.GetMinimum()) * plotDimension;
 }
 
 //==========================================================================
@@ -202,10 +163,10 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 // Class:			PlotCursor
 // Function:		SetValue
 //
-// Description:		Sets the x-value where the cursor should appear on the plot.
+// Description:		Sets the x position where the cursor should appear on the plot.
 //
 // Input Arguments:
-//		_value	= const double& value to set
+//		location	= const int& location to set
 //
 // Output Arguments:
 //		None
@@ -214,10 +175,10 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 //		None
 //
 //==========================================================================
-void PlotCursor::SetValue(const double& _value)
+void PlotCursor::SetLocation(const int& location)
 {
-	value = _value;
-	RescalePoint(locationAlongAxis);
+	locationAlongAxis = location;
+	value = axis.PixelToValue(location);
 	modified = true;
 }
 

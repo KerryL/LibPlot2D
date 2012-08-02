@@ -66,8 +66,7 @@ private:
 
 	unsigned int size;
 
-	// For use when the axis scale changes
-	void RescalePoint(const double *xyPoint, int *point);
+	void RescalePoint(const double *value, int *coordinate) const;
 
 	// The data to be plotted
 	const Dataset2D *data;

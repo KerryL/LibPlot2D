@@ -94,6 +94,7 @@
     <ClInclude Include="src\application\dropTarget.h" />
     <ClInclude Include="src\application\filterDialog.h" />
     <ClInclude Include="src\application\mainFrame.h" />
+    <ClInclude Include="src\application\multiChoiceDialog.h" />
     <ClInclude Include="src\application\plotObject.h" />
     <ClInclude Include="src\application\plotterApp.h" />
     <ClInclude Include="src\application\rangeLimitsDialog.h" />
@@ -131,6 +132,7 @@
     <ClCompile Include="src\application\dropTarget.cpp" />
     <ClCompile Include="src\application\filterDialog.cpp" />
     <ClCompile Include="src\application\mainFrame.cpp" />
+    <ClCompile Include="src\application\multiChoiceDialog.cpp" />
     <ClCompile Include="src\application\plotObject.cpp" />
     <ClCompile Include="src\application\plotterApp.cpp" />
     <ClCompile Include="src\application\rangeLimitsDialog.cpp" />

@@ -134,18 +134,22 @@ private:
 
 		idPlotContextToggleBottomGridlines,
 		idPlotContextSetBottomRange,
+		idPlotContextSetBottomLogarithmic,
 		idPlotContextAutoScaleBottom,
 
 		/*idPlotContextToggleTopGridlines,
 		idPlotContextSetTopRange,
+		idPlotContextSetTopLogarithmic,
 		idPlotContextAutoScaleTop,*/
 
 		idPlotContextToggleLeftGridlines,
 		idPlotContextSetLeftRange,
+		idPlotContextSetLeftLogarithmic,
 		idPlotContextAutoScaleLeft,
 
 		idPlotContextToggleRightGridlines,
 		idPlotContextSetRightRange,
+		idPlotContextSetRightLogarithmic,
 		idPlotContextAutoScaleRight
 	};
 
@@ -185,14 +189,17 @@ private:
 	void ContextToggleGridlinesBottom(wxCommandEvent &event);
 	void ContextAutoScaleBottom(wxCommandEvent &event);
 	void ContextSetRangeBottom(wxCommandEvent &event);
+	void ContextSetLogarithmicBottom(wxCommandEvent &event);
 
 	void ContextToggleGridlinesLeft(wxCommandEvent &event);
 	void ContextAutoScaleLeft(wxCommandEvent &event);
 	void ContextSetRangeLeft(wxCommandEvent &event);
+	void ContextSetLogarithmicLeft(wxCommandEvent &event);
 
 	void ContextToggleGridlinesRight(wxCommandEvent &event);
 	void ContextAutoScaleRight(wxCommandEvent &event);
 	void ContextSetRangeRight(wxCommandEvent &event);
+	void ContextSetLogarithmicRight(wxCommandEvent &event);
 	// End event handlers-------------------------------------------------
 
 	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);

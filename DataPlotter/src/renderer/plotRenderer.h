@@ -53,6 +53,10 @@ public:
 	double GetRightYMin(void) const;
 	double GetRightYMax(void) const;
 
+	bool GetXLogarithmic(void) const;
+	bool GetLeftLogarithmic(void) const;
+	bool GetRightLogarithmic(void) const;
+
 	// Sets properties for actors
 	void SetGridOn(void);
 	void SetGridOff(void);
@@ -82,6 +86,10 @@ public:
 	void AutoScaleLeft(void);
 	void AutoScaleRight(void);
 
+	void SetXLogarithmic(const bool &log);
+	void SetLeftLogarithmic(const bool &log);
+	void SetRightLogarithmic(const bool &log);
+
 	bool GetGridOn(void);
 
 	// Called to update the screen
@@ -97,7 +105,7 @@ public:
 	MainFrame *GetMainFrame(void) { return &mainFrame; };
 
 private:
-	// Called from the PLOT_RENDERER constructor only in order to initialize the display
+	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors(void);
 
 	// The actors necessary to create the plot
@@ -125,8 +133,6 @@ private:
 
 	bool draggingLeftCursor;
 	bool draggingRightCursor;
-
-	double GetCursorValue(const unsigned int &location);
 
 protected:
 	// For the event table

@@ -286,9 +286,9 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 
 	// Are we moving cursors?
 	if (draggingLeftCursor)
-		leftCursor->SetValue(GetCursorValue(event.GetX()));
+		leftCursor->SetLocation(event.GetX());
 	else if (draggingRightCursor)
-		rightCursor->SetValue(GetCursorValue(event.GetX()));
+		rightCursor->SetLocation(event.GetX());
 	// ZOOM:  Left or Right mouse button + CTRL or SHIFT
 	else if ((event.ControlDown() || event.ShiftDown()) && (event.RightIsDown() || event.LeftIsDown()))
 	{
@@ -373,12 +373,25 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 			yRightDelta = plot->GetRightYMaxOriginal() - plot->GetRightYMax();*/
 		// FIXME:  Is this supposed to be commented out, or do we want to uncomment it?
 
-		plot->SetXMin(plot->GetXMin() - xDelta);
-		plot->SetXMax(plot->GetXMax() - xDelta);
-		plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
-		plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
-		plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
-		plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
+		// FIXME:  Panning for logarithmic-scaled plots is funky
+		// FIXME:  Somehow it still gives warning about negative values when zoom then pan
+		if (!plot->GetBottomAxis()->IsLogarithmic() || plot->GetXMin() - xDelta > 0.0)
+		{
+			plot->SetXMin(plot->GetXMin() - xDelta);
+			plot->SetXMax(plot->GetXMax() - xDelta);
+		}
+
+		if (!plot->GetLeftYAxis()->IsLogarithmic() || plot->GetLeftYMin() + yLeftDelta > 0.0)
+		{
+			plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
+			plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
+		}
+
+		if (!plot->GetRightYAxis()->IsLogarithmic() || plot->GetRightYMin() + yRightDelta > 0.0)
+		{
+			plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
+			plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
+		}
 	}
 	else// Not recognized
 	{
@@ -447,58 +460,20 @@ void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 	if (abs(int(zoomBox->GetXAnchor() - zoomBox->GetXFloat())) > limit &&
 		abs(int(zoomBox->GetYAnchor() - zoomBox->GetYFloat())) > limit)
 	{
-		// Determine the new zoom range by interpolation
+		// Determine the new zoom range
 		// Remember: OpenGL uses Bottom Left as origin, normal windows use Top Left as origin
-		int xCoordLeft = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
-		int xCoordRight = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
-		int yCoordBottom = plot->GetBottomAxis()->GetOffsetFromWindowEdge();
-		int yCoordTop = GetSize().GetHeight() - plot->GetTopAxis()->GetOffsetFromWindowEdge();
-
-		int leftX;
-		int rightX;
-		int bottomY;
-		int topY;
-		if (zoomBox->GetXAnchor() > zoomBox->GetXFloat())
-		{
-			leftX = zoomBox->GetXFloat();
-			rightX = zoomBox->GetXAnchor();
-		}
-		else
-		{
-			leftX = zoomBox->GetXAnchor();
-			rightX = zoomBox->GetXFloat();
-		}
-
-		if (zoomBox->GetYAnchor() > zoomBox->GetYFloat())
-		{
-			bottomY = zoomBox->GetYFloat();
-			topY = zoomBox->GetYAnchor();
-		}
-		else
-		{
-			bottomY = zoomBox->GetYAnchor();
-			topY = zoomBox->GetYFloat();
-		}
-
-		// Do the interpolation
-		double xMin = plot->GetXMin()
-			+ double(leftX - xCoordLeft) / double(xCoordRight - xCoordLeft)
-			* (plot->GetXMax() - plot->GetXMin());
-		double xMax = plot->GetXMin()
-			+ double(rightX - xCoordLeft) / double(xCoordRight - xCoordLeft)
-			* (plot->GetXMax() - plot->GetXMin());
-		double yLeftMin = plot->GetLeftYMin()
-			+ double(bottomY - yCoordBottom) / double(yCoordTop - yCoordBottom)
-			* (plot->GetLeftYMax() - plot->GetLeftYMin());
-		double yLeftMax = plot->GetLeftYMin()
-			+ double(topY - yCoordBottom) / double(yCoordTop - yCoordBottom)
-			* (plot->GetLeftYMax() - plot->GetLeftYMin());
-		double yRightMin = plot->GetRightYMin()
-			+ double(bottomY - yCoordBottom) / double(yCoordTop - yCoordBottom)
-			* (plot->GetRightYMax() - plot->GetRightYMin());
-		double yRightMax = plot->GetRightYMin()
-			+ double(topY - yCoordBottom) / double(yCoordTop - yCoordBottom)
-			* (plot->GetRightYMax() - plot->GetRightYMin());
+		double xMin = plot->GetBottomAxis()->PixelToValue(
+			std::min<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
+		double xMax = plot->GetBottomAxis()->PixelToValue(
+			std::max<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
+		double yLeftMin = plot->GetLeftYAxis()->PixelToValue(
+			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+		double yLeftMax = plot->GetLeftYAxis()->PixelToValue(
+			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+		double yRightMin = plot->GetRightYAxis()->PixelToValue(
+			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+		double yRightMax = plot->GetRightYAxis()->PixelToValue(
+			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
 
 		// Assign the results
 		SetXLimits(xMin, xMax);
@@ -1138,26 +1113,26 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
 	{
-		double value = GetCursorValue(x);
+		double value(plot->GetBottomAxis()->PixelToValue(x));
 
 		if (!leftCursor->GetIsVisible())
 		{
 			leftCursor->SetVisibility(true);
-			leftCursor->SetValue(value);
+			leftCursor->SetLocation(x);
 		}
 		else if (!rightCursor->GetIsVisible())
 		{
 			rightCursor->SetVisibility(true);
-			rightCursor->SetValue(value);
+			rightCursor->SetLocation(x);
 		}
 		else
 		{
 			// Both cursors are visible - move the closer one to the click spot
 			// FIXME:  Another option is to always alternate which one was moved?
 			if (fabs(leftCursor->GetValue() - value) < fabs(rightCursor->GetValue() - value))
-				leftCursor->SetValue(value);
+				leftCursor->SetLocation(x);
 			else
-				rightCursor->SetValue(value);
+				rightCursor->SetLocation(x);
 		}
 	}
 	else
@@ -1184,30 +1159,6 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 	}
 
 	UpdateDisplay();
-}
-
-//==========================================================================
-// Class:			PlotRenderer
-// Function:		GetCursorValue
-//
-// Description:		Gets the cursor value (plot units) given the position of
-//					the cursor (screen units).
-//
-// Input Arguments:
-//		location	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		double
-//
-//==========================================================================
-double PlotRenderer::GetCursorValue(const unsigned int &location)
-{
-	unsigned int width = GetSize().GetWidth() - plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
-	return double(location - plot->GetLeftYAxis()->GetOffsetFromWindowEdge()) / (double)width *
-		(plot->GetBottomAxis()->GetMaximum() - plot->GetBottomAxis()->GetMinimum()) + plot->GetBottomAxis()->GetMinimum();
 }
 
 //==========================================================================
@@ -1536,4 +1487,148 @@ Color PlotRenderer::GetGridColor(void) const
 void PlotRenderer::SetGridColor(const Color &color)
 {
 	plot->SetGridColor(color);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetXLogarithmic
+//
+// Description:		Returns a boolean indicating whether or not the X axis
+//					is scaled logarithmicly.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, indicating whether or not the X axis has a logarithmic scale
+//
+//==========================================================================
+bool PlotRenderer::GetXLogarithmic(void) const
+{
+	if (plot->GetBottomAxis())
+		return plot->GetBottomAxis()->IsLogarithmic();
+
+	return false;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetLeftLogarithmic
+//
+// Description:		Returns a boolean indicating whether or not the left Y axis
+//					is scaled logarithmicly.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, indicating whether or not the left Y axis has a logarithmic scale
+//
+//==========================================================================
+bool PlotRenderer::GetLeftLogarithmic(void) const
+{
+	if (plot->GetLeftYAxis())
+		return plot->GetLeftYAxis()->IsLogarithmic();
+
+	return false;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetRightLogarithmic
+//
+// Description:		Returns a boolean indicating whether or not the right Y axis
+//					is scaled logarithmicly.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, indicating whether or not the right Y axis has a logarithmic scale
+//
+//==========================================================================
+bool PlotRenderer::GetRightLogarithmic(void) const
+{
+	if (plot->GetRightYAxis())
+		return plot->GetRightYAxis()->IsLogarithmic();
+
+	return false;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetXLogarithmic
+//
+// Description:		Sets the X axis to be logarithmic or standard scaling.
+//
+// Input Arguments:
+//		log	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetXLogarithmic(const bool &log)
+{
+	plot->SetXLogarithmic(log);
+
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetLeftLogarithmic
+//
+// Description:		Sets the left Y axis to be logarithmic or standard scaling.
+//
+// Input Arguments:
+//		log	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetLeftLogarithmic(const bool &log)
+{
+	plot->SetLeftLogarithmic(log);
+
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetRightLogarithmic
+//
+// Description:		Sets the right Y axis to be logarithmic or standard scaling.
+//
+// Input Arguments:
+//		log	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetRightLogarithmic(const bool &log)
+{
+	plot->SetRightLogarithmic(log);
+
+	UpdateDisplay();
 }

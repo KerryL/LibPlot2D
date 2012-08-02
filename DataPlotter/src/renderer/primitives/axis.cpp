@@ -13,6 +13,7 @@
 // Description:  Derived from Primitive for creating axis objects on a plot.
 // History:
 //	11/17/2010	- Fixed some bugs related to rendering of ticks and grid lines, K. Loux.
+//	07/30/2012	- Added logarithmically-scalled plotting, K. Loux.
 
 // Local headers
 #include "renderer/primitives/axis.h"
@@ -55,6 +56,8 @@ Axis::Axis(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 	offsetFromWindowEdge = 75;// [pixels]
 
 	grid = false;
+
+	logarithmic = false;
 
 	font = NULL;
 	
@@ -161,6 +164,13 @@ void Axis::GenerateGeometry(void)
 				maxAxis->GetOffsetFromWindowEdge());
 	}
 
+	// Handle logarithmically-scaled plots
+	if (logarithmic)
+	{
+		numberOfTicks = ceil(log10(maximum)) - floor(log10(minimum)) - 1;
+		numberOfGridLines = (numberOfTicks + 1) * 8 + numberOfTicks;
+	}
+
 	// Compute the spacing for grids and ticks
 	gridSpacing = (double)axisLength / double(numberOfGridLines + 1);
 	tickSpacing = (double)axisLength / double(numberOfTicks + 1);
@@ -175,10 +185,44 @@ void Axis::GenerateGeometry(void)
 
 			for (tick = 0; tick < numberOfGridLines; tick++)
 			{
-				glVertex2i(minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing,
-						offsetFromWindowEdge);
-				glVertex2i(minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing,
-					renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
+				if (logarithmic)
+				{
+					// Here, use gridSpacing as the axis value for the next gridline
+					if (tick == 0)
+					{
+						// Find order of magnitude of minimum, then find smallest integer factor of that order greater than minimum
+						gridSpacing = pow(10.0, floor(log10(minimum)));
+						int scale(1);
+						while (gridSpacing * scale <= minimum)
+							scale++;
+						gridSpacing *= scale;
+					}
+					else
+					{
+						// Add the next increment equal to the order we're within
+						gridSpacing +=pow(10.0, floor(log10(gridSpacing)));
+
+						// Fix rounding errors (this can actually lead to grid lines in erroneous locations during OOM calcs)
+						double orderOfMagnitude(floor(log10(gridSpacing)));
+						gridSpacing /= pow(10.0, orderOfMagnitude);
+						gridSpacing = floor(gridSpacing + 0.5);
+						gridSpacing *= pow(10.0, orderOfMagnitude);
+					}
+
+					if (gridSpacing >= maximum)
+						break;
+
+					glVertex2i(ValueToPixel(gridSpacing), offsetFromWindowEdge);
+					glVertex2i(ValueToPixel(gridSpacing),
+						renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
+				}
+				else
+				{
+					glVertex2i(minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing,
+							offsetFromWindowEdge);
+					glVertex2i(minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing,
+						renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
+				}
 			}
 
 			glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
@@ -187,13 +231,22 @@ void Axis::GenerateGeometry(void)
 		// Draw the tick marks (if they're turned on)
 		if (tickStyle != TickStyleNone)
 		{
-			// The first and last inside ticks do not need to be drawn, thus we start this loop with Tick = 1.
+			// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 			for (tick = 1; tick <= numberOfTicks; tick++)
 			{
-				glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing,
+				if (logarithmic)
+				{
+					unsigned int location = ValueToPixel(pow(10.0, floor(log10(minimum)) + tick));
+					glVertex2i(location, mainAxisLocation - tickSize * outsideTick * sign);
+					glVertex2i(location, mainAxisLocation + tickSize * insideTick * sign);
+				}
+				else
+				{
+					glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing,
 						mainAxisLocation - tickSize * outsideTick * sign);
-				glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing,
+					glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing,
 						mainAxisLocation + tickSize * insideTick * sign);
+				}
 			}
 		}
 	}
@@ -206,9 +259,35 @@ void Axis::GenerateGeometry(void)
 
 			for (tick = 0; tick < numberOfGridLines; tick++)
 			{
-				glVertex2i(offsetFromWindowEdge, minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing);
-				glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(),
-					minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing);
+				if (logarithmic)
+				{
+					// Here, use gridSpacing as the axis value for the next gridline
+					if (tick == 0)
+					{
+						// Find order of magnitude of minimum, then find smallest integer factor of that order greater than minimum
+						gridSpacing = pow(10.0, floor(log10(minimum)));
+						int scale(1);
+						while (gridSpacing * scale <= minimum)
+							scale++;
+						gridSpacing *= scale;
+					}
+					else
+						// Add the next increment equal to the order we're within
+						gridSpacing += pow(10.0, floor(log10(gridSpacing)));
+
+					if (gridSpacing >= maximum)
+						break;
+
+					glVertex2i(offsetFromWindowEdge, ValueToPixel(gridSpacing));
+					glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(),
+						ValueToPixel(gridSpacing));
+				}
+				else
+				{
+					glVertex2i(offsetFromWindowEdge, minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing);
+					glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(),
+						minAxis->GetOffsetFromWindowEdge() + (tick + 1) * gridSpacing);
+				}
 			}
 
 			glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
@@ -219,10 +298,19 @@ void Axis::GenerateGeometry(void)
 		{
 			for (tick = 1; tick <= numberOfTicks; tick++)
 			{
-				glVertex2i(mainAxisLocation - tickSize * outsideTick * sign,
+				if (logarithmic)
+				{
+					unsigned int location = ValueToPixel(pow(10.0, floor(log10(minimum)) + tick));
+					glVertex2i(mainAxisLocation - tickSize * outsideTick * sign, location);
+					glVertex2i(mainAxisLocation + tickSize * insideTick * sign, location);
+				}
+				else
+				{
+					glVertex2i(mainAxisLocation - tickSize * outsideTick * sign,
 						minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing);
-				glVertex2i(mainAxisLocation + tickSize * insideTick * sign,
+					glVertex2i(mainAxisLocation + tickSize * insideTick * sign,
 						minAxis->GetOffsetFromWindowEdge() + tick * tickSpacing);
+				}
 			}
 		}
 	}
@@ -306,7 +394,10 @@ void Axis::GenerateGeometry(void)
 			precision = -log10(majorResolution) + 1;
 		precision += 2;// This is the change from 5/7/2011
 
-		// Set the maximum and minimum to be exactly the values show after rounding
+		// Sometimes for log plots we need to re-reference the minimum after it goes to zero during rounding
+		double originalMinimum(minimum);
+
+		// Set the maximum and minimum to be exactly the values shown after rounding
 		wxString limit;
 		limit.Printf("%0.*f", precision, minimum);
 		if (!limit.ToDouble(&minimum))
@@ -315,14 +406,39 @@ void Axis::GenerateGeometry(void)
 			// FIXME:  Warn the user
 		}
 
+		// Don't do this blindly for log plots - we can't have zero
+		if (logarithmic)
+		{
+			while (minimum == 0.0)
+			{
+				precision++;
+				limit.Printf("%0.*f", precision, originalMinimum);
+				if (!limit.ToDouble(&minimum))
+				{
+					// Warn the user?
+					// FIXME:  Warn the user
+				}
+			}
+		}
+
 		// Add the number values text
 		double textValue;
 		wxString valueLabel;
 		double valueOffsetFromEdge = offsetFromWindowEdge * 0.8;
-		for (tick = 0; tick < numberOfGridLines + 2; tick++)
+		for (tick = 0; tick < numberOfTicks + 2; tick++)
 		{
 			// Determine the label value
-			textValue = minimum + (double)tick * majorResolution;
+			if (logarithmic)
+			{
+				if (tick == 0)
+					textValue = minimum;
+				else if (tick == numberOfTicks + 1)
+					textValue = maximum;
+				else
+					textValue = pow(10.0, floor(log10(minimum)) + tick);
+			}
+			else
+				textValue = minimum + (double)tick * majorResolution;
 
 			// Assign the value to the string
 			valueLabel.Printf("%0.*f", precision, textValue);
@@ -340,7 +456,7 @@ void Axis::GenerateGeometry(void)
 					else
 						yTranslation = renderWindow.GetSize().GetHeight() - valueOffsetFromEdge;
 
-					xTranslation = minAxis->GetOffsetFromWindowEdge() + tick * gridSpacing -
+					xTranslation = ValueToPixel(textValue) -
 						(boundingBox.Upper().X() - boundingBox.Lower().X()) / 2.0;
 				}
 				else
@@ -350,7 +466,7 @@ void Axis::GenerateGeometry(void)
 					else
 						xTranslation = renderWindow.GetSize().GetWidth() - valueOffsetFromEdge;
 
-					yTranslation = minAxis->GetOffsetFromWindowEdge() + tick * gridSpacing -
+					yTranslation = ValueToPixel(textValue) -
 						(boundingBox.Upper().Y() - boundingBox.Lower().Y()) / 2.0;
 				}
 
@@ -420,4 +536,88 @@ bool Axis::HasValidParameters(void)
 		return false;
 
 	return true;
+}
+
+//==========================================================================
+// Class:			Axis
+// Function:		ValueToPixel
+//
+// Description:		Computes the pixel location along the axis that corresponds
+//					to the specified plot-units value.
+//
+// Input Arguments:
+//		value	= const double& containing the location of the point in plot
+//				  coordinates
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		int specifying the location of the object in screen coordinates
+//
+//==========================================================================
+int Axis::ValueToPixel(const double &value) const
+{
+	// Get the plot size
+	int plotDimension;
+	if (IsHorizontal())
+		plotDimension = renderWindow.GetSize().GetWidth()
+				- minAxis->GetOffsetFromWindowEdge()
+				- maxAxis->GetOffsetFromWindowEdge();
+	else
+		plotDimension = renderWindow.GetSize().GetHeight()
+				- minAxis->GetOffsetFromWindowEdge()
+				- maxAxis->GetOffsetFromWindowEdge();
+
+	// Do the scaling
+	if (IsLogarithmic())
+	{
+		if (value <= 0.0 || minimum <= 0.0)
+			return GetOffsetFromWindowEdge();
+		else
+			return minAxis->GetOffsetFromWindowEdge()
+				+ (log10(value) - log10(minimum)) /
+				(log10(maximum) - log10(minimum)) * plotDimension;
+	}
+
+	return minAxis->GetOffsetFromWindowEdge()
+		+ (value - minimum) /
+		(maximum - minimum) * plotDimension;
+}
+
+//==========================================================================
+// Class:			Axis
+// Function:		PixelToValue
+//
+// Description:		Computes the value (in plot-units) corresponding to the
+//					specified on-screen pixel location.
+//
+// Input Arguments:
+//		pixel	= const int& specifying desired screen-coordinate
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double specifing the corresponding value
+//
+//==========================================================================
+double Axis::PixelToValue(const int &pixel) const
+{
+	// Get the plot size
+	double fraction;
+	if (IsHorizontal())
+		fraction = double(pixel - minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetWidth()
+				- minAxis->GetOffsetFromWindowEdge()
+				- maxAxis->GetOffsetFromWindowEdge());
+	else
+		fraction = double(pixel - minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetHeight()
+				- minAxis->GetOffsetFromWindowEdge()
+				- maxAxis->GetOffsetFromWindowEdge());
+
+	// Do the scaling
+	if (IsLogarithmic())
+		return pow(10.0, fraction * (log10(maximum) - log10(minimum)) + log10(minimum));
+
+	return fraction * (maximum - minimum) + minimum;
 }

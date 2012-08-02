@@ -12,6 +12,7 @@
 // Author:  K. Loux
 // Description:  Derived from Primitive, this class is used to draw plot axis.
 // History:
+//	07/30/2012	- Added logarithmically-scalled plotting, K. Loux.
 
 #ifndef _AXIS_H_
 #define _AXIS_H_
@@ -34,7 +35,7 @@ public:
 	// Destructor
 	~Axis();
 
-	// Mandatory overloads from PRIMITIVE - for creating geometry and testing the
+	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
 	void GenerateGeometry(void);
 	bool HasValidParameters(void);
@@ -75,6 +76,8 @@ public:
 	void SetAxisAtMaxEnd(const Axis *max) { maxAxis = max; modified = true; };
 	void SetOppositeAxis(const Axis *opposite) { oppositeAxis = opposite; modified = true; };
 
+	void SetLogarithmicScale(const bool &log) { logarithmic = log; modified = true; };
+
 	// Get option methods
 	inline double GetMinimum(void) const { return minimum; };
 	inline double GetMaximum(void) const { return maximum; };
@@ -89,6 +92,11 @@ public:
 	
 	inline wxString GetLabel(void) const { return label; };
 
+	inline bool IsLogarithmic(void) const { return logarithmic; };
+
+	int ValueToPixel(const double &value) const;
+	double PixelToValue(const int &pixel) const;
+
 private:
 	// This object's orientation
 	AxisOrientation orientation;
@@ -100,6 +108,8 @@ private:
 	// For the tick and grid spacing
 	double majorResolution;
 	double minorResolution;
+
+	bool logarithmic;
 
 	// The tick options
 	TickStyle tickStyle;

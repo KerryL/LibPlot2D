@@ -30,6 +30,7 @@
 #include "application/rangeLimitsDialog.h"
 #include "application/filterDialog.h"
 #include "application/customFileFormat.h"
+#include "application/multiChoiceDialog.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "utilities/dataset2D.h"
@@ -309,18 +310,22 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 
 	EVT_MENU(idPlotContextToggleBottomGridlines,	MainFrame::ContextToggleGridlinesBottom)
 	EVT_MENU(idPlotContextSetBottomRange,			MainFrame::ContextSetRangeBottom)
+	EVT_MENU(idPlotContextSetBottomLogarithmic,		MainFrame::ContextSetLogarithmicBottom)
 	EVT_MENU(idPlotContextAutoScaleBottom,			MainFrame::ContextAutoScaleBottom)
 
 	//EVT_MENU(idPlotContextToggleTopGridlines,		MainFrame::)
-	//EVT_MENU(idPlotContextSetTopRange,				MainFrame::)
-	//EVT_MENU(idPlotContextAutoScaleTop,				MainFrame::)
+	//EVT_MENU(idPlotContextSetTopRange,			MainFrame::)
+	//EVT_MENU(idPlotContextSetTopLogarithmic,		MainFrame::)
+	//EVT_MENU(idPlotContextAutoScaleTop,			MainFrame::)
 
 	EVT_MENU(idPlotContextToggleLeftGridlines,		MainFrame::ContextToggleGridlinesLeft)
 	EVT_MENU(idPlotContextSetLeftRange,				MainFrame::ContextSetRangeLeft)
+	EVT_MENU(idPlotContextSetLeftLogarithmic,		MainFrame::ContextSetLogarithmicLeft)
 	EVT_MENU(idPlotContextAutoScaleLeft,			MainFrame::ContextAutoScaleLeft)
 
 	EVT_MENU(idPlotContextToggleRightGridlines,		MainFrame::ContextToggleGridlinesRight)
 	EVT_MENU(idPlotContextSetRightRange,			MainFrame::ContextSetRangeRight)
+	EVT_MENU(idPlotContextSetRightLogarithmic,		MainFrame::ContextSetLogarithmicRight)
 	EVT_MENU(idPlotContextAutoScaleRight,			MainFrame::ContextAutoScaleRight)
 END_EVENT_TABLE();
 
@@ -544,18 +549,27 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 		contextMenu->Append(idPlotContextToggleBottomGridlines, _T("Toggle Axis Gridlines"));
 		contextMenu->Append(idPlotContextAutoScaleBottom, _T("Auto Scale Axis"));
 		contextMenu->Append(idPlotContextSetBottomRange, _T("Set Range"));
+		contextMenu->AppendCheckItem(idPlotContextSetBottomLogarithmic, _T("Logarithmic Scale"));
+
+		contextMenu->Check(idPlotContextSetBottomLogarithmic, plotArea->GetXLogarithmic());
 		break;
 
 	case plotContextLeftYAxis:
 		contextMenu->Append(idPlotContextToggleLeftGridlines, _T("Toggle Axis Gridlines"));
 		contextMenu->Append(idPlotContextAutoScaleLeft, _T("Auto Scale Axis"));
 		contextMenu->Append(idPlotContextSetLeftRange, _T("Set Range"));
+		contextMenu->AppendCheckItem(idPlotContextSetLeftLogarithmic, _T("Logarithmic Scale"));
+		
+		contextMenu->Check(idPlotContextSetLeftLogarithmic, plotArea->GetLeftLogarithmic());
 		break;
 
 	case plotContextRightYAxis:
 		contextMenu->Append(idPlotContextToggleRightGridlines, _T("Toggle Axis Gridlines"));
 		contextMenu->Append(idPlotContextAutoScaleRight, _T("Auto Scale Axis"));
 		contextMenu->Append(idPlotContextSetRightRange, _T("Set Range"));
+		contextMenu->AppendCheckItem(idPlotContextSetRightLogarithmic, _T("Logarithmic Scale"));
+		
+		contextMenu->Check(idPlotContextSetRightLogarithmic, plotArea->GetRightLogarithmic());
 		break;
 
 	default:
@@ -1177,8 +1191,8 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFor
 	if (customFormat)
 		customFormat->ProcessChannels(plotNameList, scales);
 
-	// Display a choice dialog allowing the user to specify which plots to import (only if there are more than 6 channels?)
-	wxMultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"), plotNameList);
+	// Display a choice dialog allowing the user to specify which plots to import
+	MultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"), plotNameList);
 	if (dialog.ShowModal() == wxID_CANCEL)
 	{
 		file.close();
@@ -2910,6 +2924,69 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 	}
 
 	delete filter;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextSetLogarithmicBottom
+//
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextSetLogarithmicBottom(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetXLogarithmic(!plotArea->GetXLogarithmic());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextSetLogarithmicLeft
+//
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextSetLogarithmicLeft(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetLeftLogarithmic(!plotArea->GetLeftLogarithmic());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextSetLogarithmicRight
+//
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextSetLogarithmicRight(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetRightLogarithmic(!plotArea->GetRightLogarithmic());
 }
 
 //==========================================================================

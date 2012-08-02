@@ -13,55 +13,55 @@
 // Description:  Contains class declaration for complex number class.
 // History:
 
-#ifndef _COMPLEX_H_
-#define _COMPLEX_H_
+#ifndef _Complex_H_
+#define _Complex_H_
 
 using namespace std;
 
-class COMPLEX
+class Complex
 {
 public:
 	// Constructor
-	COMPLEX();
-	COMPLEX(const double &_Real, const double &_Imaginary);
+	Complex();
+	Complex(const double &_real, const double &_imaginary);
 
 	// Destructor
-	~COMPLEX();
+	~Complex();
 
 	// Prints the value to a string
 	wxString Print(void) const;
 
 	// Gets the complex conjugate of this object
-	const COMPLEX GetConjugate(void) const;
+	const Complex GetConjugate(void) const;
 
 	// Operators
-	const COMPLEX operator + (const COMPLEX &Complex) const;
-	const COMPLEX operator - (const COMPLEX &Complex) const;
-	const COMPLEX operator * (const COMPLEX &Complex) const;
-	const COMPLEX operator / (const COMPLEX &Complex) const;
-	COMPLEX& operator += (const COMPLEX &Complex);
-	COMPLEX& operator -= (const COMPLEX &Complex);
-	COMPLEX& operator *= (const COMPLEX &Complex);
-	COMPLEX& operator /= (const COMPLEX &Complex);
-	bool operator == (const COMPLEX &Complex) const;
-	bool operator != (const COMPLEX &Complex) const;
-	const COMPLEX operator + (const double &Double) const;
-	const COMPLEX operator - (const double &Double) const;
-	const COMPLEX operator * (const double &Double) const;
-	const COMPLEX operator / (const double &Double) const;
+	const Complex operator + (const Complex &complex) const;
+	const Complex operator - (const Complex &complex) const;
+	const Complex operator * (const Complex &complex) const;
+	const Complex operator / (const Complex &complex) const;
+	Complex& operator += (const Complex &complex);
+	Complex& operator -= (const Complex &complex);
+	Complex& operator *= (const Complex &complex);
+	Complex& operator /= (const Complex &complex);
+	bool operator == (const Complex &complex) const;
+	bool operator != (const Complex &complex) const;
+	const Complex operator + (const double &value) const;
+	const Complex operator - (const double &value) const;
+	const Complex operator * (const double &value) const;
+	const Complex operator / (const double &value) const;
 
 	// Raises this object to the specified power
-	COMPLEX& ToPower(const double &Power);
+	Complex& ToPower(const double &power);
 
 	// For streaming the value
-	friend ostream &operator << (ostream &WriteOut, const COMPLEX &Complex);
+	friend ostream &operator << (ostream &writeOut, const Complex &complex);
 
 	// The actual data contents of this class
-	double Real;
-	double Imaginary;
+	double real;
+	double imaginary;
 
 	// Defining the square root of negative 1
-	static const COMPLEX I;
+	static const Complex i;
 };
 
-#endif// _COMPLEX_H_
+#endif// _Complex_H_

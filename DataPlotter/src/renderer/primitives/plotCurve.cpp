@@ -140,6 +140,8 @@ void PlotCurve::GenerateGeometry(void)
 					interpolatedPoint[0] = data->GetXData(i - 1);
 					interpolatedPoint[1] = data->GetYData(i - 1);
 
+					// FIXME:  When we need to interpolate (if a point is off the screen) on a logarithmic-scaled axis, the current code is wrong (plot gets distorted)
+
 					// Interpolate to find the correct point
 					if (interpolatedPoint[0] < xAxis->GetMinimum())
 					{
@@ -191,6 +193,8 @@ void PlotCurve::GenerateGeometry(void)
 				{
 					interpolatedPoint[0] = doubPoint[0];
 					interpolatedPoint[1] = doubPoint[1];
+
+					// FIXME:  When we need to interpolate (if a point is off the screen) on a logarithmic-scaled axis, the current code is wrong (plot gets distorted)
 
 					// Interpolate to find the correct point
 					if (interpolatedPoint[0] < xAxis->GetMinimum())
@@ -355,7 +359,7 @@ void PlotCurve::GenerateGeometry(void)
 				if (crossings == 2)
 				{
 					// Depending on where the previously drawn point was, it is possible for the order of these
-					// points to be opposite from the proper order of "connectin the dots."
+					// points to be opposite from the proper order of "connecting the dots."
 					glEnd();
 					glBegin(GL_LINE_STRIP);
 
@@ -374,46 +378,6 @@ void PlotCurve::GenerateGeometry(void)
 	}
 
 	glEnd();
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		RescalePoint
-//
-// Description:		Rescales the onscreen position of the point according to
-//					the size of the axis with which this object is associated.
-//
-// Input Arguments:
-//		xyPoint	= const double* containing the location of the point in plot
-//					  coordinates
-//
-// Output Arguments:
-//		point	= int* specifying the location of the object in screen coordinates
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::RescalePoint(const double *xyPoint, int *point)
-{
-	if (!xyPoint || !point)
-		return;
-
-	// Get the plot size
-	int plotHeight = renderWindow.GetSize().GetHeight() -
-		xAxis->GetOffsetFromWindowEdge() -
-		xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
-	int plotWidth = renderWindow.GetSize().GetWidth() -
-		yAxis->GetOffsetFromWindowEdge() -
-		yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
-
-	// Do the scaling
-	point[0] = xAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-		+ (xyPoint[0] - xAxis->GetMinimum()) /
-		(xAxis->GetMaximum() - xAxis->GetMinimum()) * plotWidth;
-	point[1] = xAxis->GetOffsetFromWindowEdge()
-		+ (xyPoint[1]- yAxis->GetMinimum()) /
-		(yAxis->GetMaximum() - yAxis->GetMinimum()) * plotHeight;
 }
 
 //==========================================================================
@@ -446,7 +410,7 @@ bool PlotCurve::HasValidParameters(void)
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		operator =
+// Function:		operator=
 //
 // Description:		Assignment operator for PLOT_CURVE class.
 //
@@ -460,7 +424,7 @@ bool PlotCurve::HasValidParameters(void)
 //		PLOT_CURVE&, reference to this object
 //
 //==========================================================================
-PlotCurve& PlotCurve::operator = (const PlotCurve &plotCurve)
+PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 {
 	// Check for self-assignment
 	if (this == &plotCurve)
@@ -492,4 +456,31 @@ void PlotCurve::SetData(const Dataset2D *_data)
 {
 	data = _data;
 	modified = true;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		RescalePoint
+//
+// Description:		Rescales the onscreen position of the point according to
+//					the size of the axis with which this object is associated.
+//
+// Input Arguments:
+//		value	= const double* containing the location of the point in plot
+//				  coordinates
+//
+// Output Arguments:
+//		coordinate	= int* specifying the location of the object in screen coordinates
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::RescalePoint(const double *value, int *coordinate) const
+{
+	if (!value || !coordinate)
+		return;
+
+	coordinate[0] = xAxis->ValueToPixel(value[0]);
+	coordinate[1] = yAxis->ValueToPixel(value[1]);
 }

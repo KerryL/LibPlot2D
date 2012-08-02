@@ -34,7 +34,7 @@ public:
 	void GenerateGeometry(void);
 	bool HasValidParameters(void);
 
-	void SetValue(const double& _value);
+	void SetLocation(const int& location);
 	double GetValue(void) const { return value; };
 
 	bool IsUnder(const unsigned int &pixel);
@@ -48,9 +48,7 @@ private:
 
 	// Current value where this object meets the axis
 	double value;
-	unsigned int locationAlongAxis;
-
-	void RescalePoint(unsigned int &point);
+	int locationAlongAxis;
 };
 
 #endif// _CURSOR_H_

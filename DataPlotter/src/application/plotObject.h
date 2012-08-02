@@ -97,6 +97,10 @@ public:
 	const Axis* GetRightYAxis(void) const { return axisRight; };
 	bool GetGrid(void);
 
+	void SetXLogarithmic(const bool &log);
+	void SetLeftLogarithmic(const bool &log);
+	void SetRightLogarithmic(const bool &log);
+
 private:
 	// The renderer object
 	PlotRenderer &renderer;
@@ -131,7 +135,7 @@ private:
 	void FormatPlot(void);
 
 	// Handles the spacing of the axis ticks
-	double AutoScaleAxis(double &min, double &max, int maxTicks,
+	double AutoScaleAxis(double &min, double &max, int maxTicks, const bool &logarithmic,
 		const bool &forceLimits = false);
 };
 

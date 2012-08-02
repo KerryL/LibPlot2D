@@ -23,10 +23,10 @@
 #include "utilities/math/complex.h"
 
 //==========================================================================
-// Class:			COMPLEX
-// Function:		COMPLEX
+// Class:			Complex
+// Function:		Complex
 //
-// Description:		Constructor for the COMPLEX class.
+// Description:		Constructor for the Complex class.
 //
 // Input Arguments:
 //		None
@@ -38,19 +38,19 @@
 //		None
 //
 //==========================================================================
-COMPLEX::COMPLEX()
+Complex::Complex()
 {
 }
 
 //==========================================================================
-// Class:			COMPLEX
-// Function:		COMPLEX
+// Class:			Complex
+// Function:		Complex
 //
-// Description:		Constructor for the COMPLEX class.
+// Description:		Constructor for the Complex class.
 //
 // Input Arguments:
-//		_Real		= const double& Real component of the complex number
-//		_Imaginary	= const double& imaginary component of the complex number
+//		_real		= const double& real component of the complex number
+//		_imaginary	= const double& imaginary component of the complex number
 //
 // Output Arguments:
 //		None
@@ -59,18 +59,18 @@ COMPLEX::COMPLEX()
 //		None
 //
 //==========================================================================
-COMPLEX::COMPLEX(const double &_Real, const double &_Imaginary)
+Complex::Complex(const double &_real, const double &_imaginary)
 {
 	// Assign the arguments to the class members
-	Real = _Real;
-	Imaginary = _Imaginary;
+	real = _real;
+	imaginary = _imaginary;
 }
 
 //==========================================================================
-// Class:			COMPLEX
-// Function:		~COMPLEX
+// Class:			Complex
+// Function:		~Complex
 //
-// Description:		Destructor for the COMPLEX class.
+// Description:		Destructor for the Complex class.
 //
 // Input Arguments:
 //		None
@@ -82,15 +82,15 @@ COMPLEX::COMPLEX(const double &_Real, const double &_Imaginary)
 //		None
 //
 //==========================================================================
-COMPLEX::~COMPLEX()
+Complex::~Complex()
 {
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		Constant Definitions
 //
-// Description:		Defines class level constants for the COMPLES class.
+// Description:		Defines class level constants for the Complex class.
 //
 // Input Arguments:
 //		None
@@ -102,17 +102,17 @@ COMPLEX::~COMPLEX()
 //		None
 //
 //==========================================================================
-const COMPLEX COMPLEX::I(0.0, 1.0);
+const Complex Complex::i(0.0, 1.0);
 
 //==========================================================================
-// Class:			friend of COMPLEX
+// Class:			friend of Complex
 // Function:		operator <<
 //
 // Description:		Writes the value of Target to a stream.
 //
 // Input Arguments:
-//		WriteOut	= ostream& to write out to
-//		Complex		= const COMPLEX& value to be written to the stream
+//		writeOut	= ostream& to write out to
+//		complex		= const Complex& value to be written to the stream
 //
 // Output Arguments:
 //		None
@@ -121,15 +121,15 @@ const COMPLEX COMPLEX::I(0.0, 1.0);
 //		&ostream containing the formatted value
 //
 //==========================================================================
-ostream &operator << (ostream &WriteOut, const COMPLEX &Complex)
+ostream &operator << (ostream &writeOut, const Complex &complex)
 {
-	WriteOut << Complex.Print();
+	writeOut << complex.Print();
 
-	return WriteOut;
+	return writeOut;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		Print
 //
 // Description:		Prints this object to a string.
@@ -144,128 +144,128 @@ ostream &operator << (ostream &WriteOut, const COMPLEX &Complex)
 //		wxString containing the formatted value of this object
 //
 //==========================================================================
-wxString COMPLEX::Print(void) const
+wxString Complex::Print(void) const
 {
-	wxString Temp;
+	wxString temp;
 
-	if (Imaginary >= 0)
-		Temp.Printf("%0.3f + %0.3f i", Real, Imaginary);
+	if (imaginary >= 0)
+		temp.Printf("%0.3f + %0.3f i", real, imaginary);
 	else
-		Temp.Printf("%0.3f - %0.3f i", Real, -Imaginary);
+		temp.Printf("%0.3f - %0.3f i", real, -imaginary);
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator +
 //
-// Description:		Addition operator for the COMPLEX class.
+// Description:		Addition operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to add to this
+//		complex	= const Complex& to add to this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the addition
+//		const Complex result of the addition
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator + (const COMPLEX &Complex) const
+const Complex Complex::operator + (const Complex &complex) const
 {
 	// Make a copy of this object
-	COMPLEX Temp = *this;
+	Complex temp = *this;
 
 	// Do the addition
-	Temp += Complex;
+	temp += complex;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator -
 //
-// Description:		Subraction operator for the COMPLEX class.
+// Description:		Subraction operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to subtract from this
+//		complex	= const Complex& to subtract from this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the subtraction
+//		const Complex result of the subtraction
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator - (const COMPLEX &Complex) const
+const Complex Complex::operator - (const Complex &complex) const
 {
 	// Make a copy of this object
-	COMPLEX Temp = *this;
+	Complex temp = *this;
 
 	// Do the subtraction
-	Temp -= Complex;
+	temp -= complex;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator *
 //
-// Description:		Multiplication operator for the COMPLEX class.
+// Description:		Multiplication operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to multiply with this
+//		complex	= const Complex& to multiply with this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the multiplication
+//		const Complex result of the multiplication
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator * (const COMPLEX &Complex) const
+const Complex Complex::operator * (const Complex &complex) const
 {
 	// Make a copy of this object
-	COMPLEX Temp = *this;
+	Complex temp = *this;
 
 	// Do the multiplication
-	Temp *= Complex;
+	temp *= complex;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator /
 //
-// Description:		Division operator for the COMPLEX class.
+// Description:		Division operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to divide by this
+//		complex	= const Complex& to divide by this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the division
+//		const Complex result of the division
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator / (const COMPLEX &Complex) const
+const Complex Complex::operator / (const Complex &complex) const
 {
 	// Make a copy of this object
-	COMPLEX Temp = *this;
+	Complex temp = *this;
 
 	// Do the division
-	Temp /= Complex;
+	temp /= complex;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		ToPower
 //
 // Description:		Raises this object to the specified power.
@@ -277,150 +277,150 @@ const COMPLEX COMPLEX::operator / (const COMPLEX &Complex) const
 //		None
 //
 // Return Value:
-//		COMPLEX& result of the power
+//		Complex& result of the power
 //
 //==========================================================================
-COMPLEX& COMPLEX::ToPower(const double &Power)
+Complex& Complex::ToPower(const double &power)
 {
 	// Convert this from Cartesian to polar form
-	double r = sqrt(Real * Real + Imaginary * Imaginary);
-	double theta = atan2(Imaginary, Real);
+	double r = sqrt(real * real + imaginary * imaginary);
+	double theta = atan2(imaginary, real);
 
 	// Use De Moivre's theorem to raise this to a power
-	r = pow(r, Power);
-	theta *= Power;
+	r = pow(r, power);
+	theta *= power;
 
 	// Convert back to Cartesian form
-	Real = r * cos(theta);
-	Imaginary = r * sin(theta);
+	real = r * cos(theta);
+	imaginary = r * sin(theta);
 
 	return *this;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator +=
 //
-// Description:		Addition assignment operator for the COMPLEX class.
+// Description:		Addition assignment operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to add to this
+//		complex	= const Complex& to add to this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		COMPLEX& result of the addition
+//		Complex& result of the addition
 //
 //==========================================================================
-COMPLEX& COMPLEX::operator += (const COMPLEX &Complex)
+Complex& Complex::operator += (const Complex &complex)
 {
 	// Add the real components
-	Real += Complex.Real;
+	real += complex.real;
 
 	// Add the imaginary components
-	Imaginary += Complex.Imaginary;
+	imaginary += complex.imaginary;
 
 	return *this;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator -=
 //
-// Description:		Subraction assignment operator for the COMPLEX class.
+// Description:		Subraction assignment operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to subtract from this
+//		complex	= const Complex& to subtract from this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		COMPLEX& result of the subtraction
+//		Complex& result of the subtraction
 //
 //==========================================================================
-COMPLEX& COMPLEX::operator -= (const COMPLEX &Complex)
+Complex& Complex::operator -= (const Complex &complex)
 {
 	// Subtract the real components
-	Real -= Complex.Real;
+	real -= complex.real;
 
 	// Subtract the imaginary components
-	Imaginary -= Complex.Imaginary;
+	imaginary -= complex.imaginary;
 
 	return *this;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator *=
 //
-// Description:		Multiplication assignment operator for the COMPLEX class.
+// Description:		Multiplication assignment operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to multiply by this
+//		complex	= const Complex& to multiply by this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		COMPLEX& result of the multiplication
+//		Complex& result of the multiplication
 //
 //==========================================================================
-COMPLEX& COMPLEX::operator *= (const COMPLEX &Complex)
+Complex& Complex::operator *= (const Complex &complex)
 {
-	double Temp = Real;
+	double temp = real;
 
 	// Similar to a dot product, the real component of the result
 	// is the sum of the products of the like components
-	Real = Real * Complex.Real - Imaginary * Complex.Imaginary;
+	real = real * complex.real - imaginary * complex.imaginary;
 
 	// Similar to a cross product, the imaginary component of the
 	// result is the sum of the products of the opposite components
-	Imaginary = Temp * Complex.Imaginary + Imaginary * Complex.Real;
+	imaginary = temp * complex.imaginary + imaginary * complex.real;
 
 	return *this;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator /=
 //
-// Description:		Division assignment operator for the COMPLEX class.
+// Description:		Division assignment operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to divide by this
+//		complex	= const Complex& to divide by this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		COMPLEX& result of the division
+//		Complex& result of the division
 //
 //==========================================================================
-COMPLEX& COMPLEX::operator /= (const COMPLEX &Complex)
+Complex& Complex::operator /= (const Complex &complex)
 {
-	double Temp = Real;
+	double temp = real;
 
 	// Compute the real portion of the result
-	Real = (Real * Complex.Real + Imaginary * Complex.Imaginary) /
-		(Complex.Real * Complex.Real + Complex.Imaginary * Complex.Imaginary);
+	real = (real * complex.real + imaginary * complex.imaginary) /
+		(complex.real * complex.real + complex.imaginary * complex.imaginary);
 
 	// Compute the imaginary portion of the result
-	Imaginary = (Imaginary * Complex.Real - Temp * Complex.Imaginary) /
-		(Complex.Real * Complex.Real + Complex.Imaginary * Complex.Imaginary);
+	imaginary = (imaginary * complex.real - temp * complex.imaginary) /
+		(complex.real * complex.real + complex.imaginary * complex.imaginary);
 
 	return *this;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator ==
 //
-// Description:		Equal to comparison operator for the COMPLEX class.
+// Description:		Equal to comparison operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to compare to this
+//		complex	= const Complex& to compare to this
 //
 // Output Arguments:
 //		None
@@ -429,23 +429,23 @@ COMPLEX& COMPLEX::operator /= (const COMPLEX &Complex)
 //		bool, true for equal to, false for not equal to
 //
 //==========================================================================
-bool COMPLEX::operator == (const COMPLEX &Complex) const
+bool Complex::operator == (const Complex &complex) const
 {
 	// Check to see if both the real and imaginary components are equal
-	if (Real == Complex.Real && Imaginary == Complex.Imaginary)
+	if (real == complex.real && imaginary == complex.imaginary)
 		return true;
 	else
 		return false;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator !=
 //
-// Description:		Not equal to comparison operator for the COMPLEX class.
+// Description:		Not equal to comparison operator for the Complex class.
 //
 // Input Arguments:
-//		Complex	= const COMPLEX& to compare to this
+//		complex	= const Complex& to compare to this
 //
 // Output Arguments:
 //		None
@@ -454,13 +454,13 @@ bool COMPLEX::operator == (const COMPLEX &Complex) const
 //		bool, false for equal to, true for not equal to
 //
 //==========================================================================
-bool COMPLEX::operator != (const COMPLEX &Complex) const
+bool Complex::operator != (const Complex &complex) const
 {
-	return !(*this == Complex);
+	return !(*this == complex);
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		GetConjugate
 //
 // Description:		Returns the complex conjugate of this object.
@@ -472,131 +472,131 @@ bool COMPLEX::operator != (const COMPLEX &Complex) const
 //		None
 //
 // Return Value:
-//		const COMPLEX with the same real part as this and an imaginary component
+//		const Complex with the same real part as this and an imaginary component
 //		with opposite magnitude as this
 //
 //==========================================================================
-const COMPLEX COMPLEX::GetConjugate(void) const
+const Complex Complex::GetConjugate(void) const
 {
-	COMPLEX Temp;
+	Complex temp;
 
 	// Direct assignment of the real component
-	Temp.Real = Real;
+	temp.real = real;
 
 	// The imaginary part is the opposite of this
-	Temp.Imaginary = -Imaginary;
+	temp.imaginary = -imaginary;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator +
 //
-// Description:		Addition operator for the COMPLEX class.
+// Description:		Addition operator for the Complex class.
 //
 // Input Arguments:
-//		Double	= const double& to add to this
+//		value	= const double& to add to this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the addition
+//		const Complex result of the addition
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator + (const double &Double) const
+const Complex Complex::operator + (const double &value) const
 {
-	COMPLEX Temp;
+	Complex temp;
 
 	// Add the real component
-	Temp.Real = Real + Double;
+	temp.real = real + value;
 
 	// Direct assignment of the imaginary componet
-	Temp.Imaginary = Imaginary;
+	temp.imaginary = imaginary;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator -
 //
-// Description:		Subtraction operator for the COMPLEX class.
+// Description:		Subtraction operator for the Complex class.
 //
 // Input Arguments:
-//		Double	= const double& to subtract from this
+//		value	= const double& to subtract from this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the subtraction
+//		const Complex result of the subtraction
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator - (const double &Double) const
+const Complex Complex::operator - (const double &value) const
 {
-	COMPLEX Temp;
+	Complex temp;
 
 	// Subtract the real component
-	Temp.Real = Real - Double;
+	temp.real = real - value;
 
 	// Direct assignment of the imaginary component
-	Temp.Imaginary = Imaginary;
+	temp.imaginary = imaginary;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator *
 //
-// Description:		Multiplication operator for the COMPLEX class.
+// Description:		Multiplication operator for the Complex class.
 //
 // Input Arguments:
-//		Double	= const double& to multiply by this
+//		value	= const double& to multiply by this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the multiplication
+//		const Complex result of the multiplication
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator * (const double &Double) const
+const Complex Complex::operator * (const double &value) const
 {
-	COMPLEX Temp;
+	Complex temp;
 
 	// Perform the multiplication on both components
-	Temp.Real = Real * Double;
-	Temp.Imaginary = Imaginary * Double;
+	temp.real = real * value;
+	temp.imaginary = imaginary * value;
 
-	return Temp;
+	return temp;
 }
 
 //==========================================================================
-// Class:			COMPLEX
+// Class:			Complex
 // Function:		operator /
 //
-// Description:		Division operator for the COMPLEX class.
+// Description:		Division operator for the Complex class.
 //
 // Input Arguments:
-//		Double	= const double& to divide by this
+//		value	= const double& to divide by this
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		const COMPLEX result of the division
+//		const Complex result of the division
 //
 //==========================================================================
-const COMPLEX COMPLEX::operator / (const double &Double) const
+const Complex Complex::operator / (const double &value) const
 {
-	COMPLEX Temp;
+	Complex temp;
 
 	// Perform the division on both components
-	Temp.Real = Real / Double;
-	Temp.Imaginary = Imaginary / Double;
+	temp.real = real / value;
+	temp.imaginary = imaginary / value;
 
-	return Temp;
+	return temp;
 }
