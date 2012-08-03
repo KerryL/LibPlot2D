@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -25,12 +25,11 @@ class wxSpinEvent;
 
 struct FilterParameters
 {
-	// FIXME:  Could be made more general (gain, specify TF numerator and denominator etc.)
 	enum Type
 	{
 		TypeLowPass,
 		TypeHighPass
-		// FIXME:  Band pass, band stop, notch, etc.
+		// TODO:  Band pass, band stop, notch, etc.
 	} type;
 
 	bool phaseless;

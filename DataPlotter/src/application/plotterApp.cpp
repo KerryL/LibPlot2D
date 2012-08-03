@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -42,7 +42,7 @@ IMPLEMENT_APP(DataPlotterApp);
 const wxString DataPlotterApp::dataPlotterTitle = _T("Data Plotter");
 const wxString DataPlotterApp::dataPlotterName = _T("DataPlotterApplication");
 const wxString DataPlotterApp::creator = _T("Kerry Loux");
-const wxString DataPlotterApp::versionString = _T("v2.4");
+const wxString DataPlotterApp::versionString = _T("v2.5");
 
 //==========================================================================
 // Class:			DataPlotterApp

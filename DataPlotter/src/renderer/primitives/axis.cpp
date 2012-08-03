@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                         Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -406,7 +406,6 @@ void Axis::GenerateGeometry(void)
 		if (!limit.ToDouble(&minimum))
 		{
 			// Warn the user?
-			// FIXME:  Warn the user
 		}
 
 		// Add the number values text
@@ -466,7 +465,6 @@ void Axis::GenerateGeometry(void)
 		if (!valueLabel.ToDouble(&maximum))
 		{
 			// Warn the user?
-			// FIXME:  Warn the user
 		}
 	}
 }

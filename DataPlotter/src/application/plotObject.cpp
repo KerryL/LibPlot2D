@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -72,7 +72,6 @@ PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 	axisRight->SetOppositeAxis(axisLeft);
 
 	// Find the name of the font that we want to use
-	// FIXME:  Write this to config file so we don't have to do this every time?
 	wxString fontFile;
 	wxArrayString preferredFonts;
 
@@ -101,7 +100,7 @@ PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 		delete axisFont;
 		axisFont = NULL;
 
-		wxMessageBox(_T("Error loading axis font"));// FIXME:  If this is settable by some configuration option, tell the user here
+		wxMessageBox(_T("Error loading axis font"));
 	}
 	else
 	{
@@ -114,7 +113,7 @@ PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 		delete titleFont;
 		titleFont = NULL;
 
-		wxMessageBox(_T("Error loading title font"));// FIXME:  If this is settable by some configuration option, tell the user here
+		wxMessageBox(_T("Error loading title font"));
 	}
 	else
 	{

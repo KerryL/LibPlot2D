@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -350,7 +350,7 @@ void RenderWindow::Initialize()
 		glEnable(GL_DEPTH_TEST);
 		glDepthMask(GL_TRUE);
 
-		// Z-buffer settings?  FIXME  figure out what these do
+		// Z-buffer settings
 		glClearDepth(1.0);
 		glDepthFunc(GL_LEQUAL);
 
@@ -361,25 +361,21 @@ void RenderWindow::Initialize()
 		// Smooth shading for nice-looking object
 		glShadeModel(GL_SMOOTH);
 
+		// Don't disable this:  required for anti-aliasing
 		// Disable alpha blending (this is enabled as-needed when rendering objects)
-		//glDisable(GL_BLEND);// FIXME:  Must leave this on?
+		//glDisable(GL_BLEND);
 
 		// Enable anti-aliasing for polygons
 		glEnable(GL_POLYGON_SMOOTH);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-		
-		// FIXME:  I think this used to work without these next two lines, but
-		// somehow they're needed now?
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// FIXME:  Note in opengl.org samples, 9.2 Polygon Antialising
-		// destination alpha is required for this algorithm to work?
 	}
 	else// 2D
 	{
 		// Disable Z-buffering, but allow testing
-		//glEnable(GL_DEPTH_TEST);// FIXME:  Can't uncomment this line or the app fails to paint on any target machine (don't know why)
+		//glEnable(GL_DEPTH_TEST);// NOTE:  Can't uncomment this line or the app fails to paint on any target machine (don't know why)
 		glDepthMask(GL_FALSE);
 
 		// Turn lighting off
@@ -774,7 +770,7 @@ void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 	}
 	else
 	{
-		// FIXME:  Nothing here!
+		// Nothing here!
 	}
 }
 
@@ -829,7 +825,7 @@ void RenderWindow::DoDragDolly(wxMouseEvent &event)
 	}
 	else
 	{
-		// FIXME:  Nothing here!
+		// Nothing here!
 	}
 }
 
@@ -882,7 +878,7 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 	}
 	else
 	{
-		// FIXME:  Nothing here!
+		// Nothing here!
 	}
 }
 

@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                         Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -54,14 +54,14 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 	// until we find the one we're looking for
 
 #ifdef __WXMSW__
-	// Get the normal MSW font directory (FIXME:  Test this under Win 7, too!)
+	// Get the normal MSW font directory
 	fontDirectory = wxGetOSDirectory() + _T("\\Fonts\\");
 
 #elif defined __WXGTK__
 	//return _T("/usr/share/fonts/dejavu/DejaVuSans.ttf");// Fedora 13
 	//return _T("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf");// Ubuntu 11.10
 
-	// Get the normal *nix font directory (FIXME:  Test this!)
+	// Get the normal *nix font directory
 	fontDirectory = _T("/usr/share/fonts/");
 
 #else

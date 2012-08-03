@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -100,6 +100,8 @@ public:
 	void SetXLogarithmic(const bool &log);
 	void SetLeftLogarithmic(const bool &log);
 	void SetRightLogarithmic(const bool &log);
+
+	bool GetXAxisAutoScaled(void) const { return autoScaleX; };
 
 private:
 	// The renderer object

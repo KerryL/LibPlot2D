@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -1637,4 +1637,29 @@ void PlotRenderer::SetRightLogarithmic(const bool &log)
 	plot->SetRightLogarithmic(log);
 
 	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetXAxisZoomed
+//
+// Description:		Determines if the x-axis is zoomed (not autoscaled) and
+//					returns the result.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if the user zoomed in (or panned) along the x-axis
+//
+//==========================================================================
+bool PlotRenderer::GetXAxisZoomed(void) const
+{
+	if (!plot->GetBottomAxis())
+		return false;
+
+	return !plot->GetXAxisAutoScaled();
 }

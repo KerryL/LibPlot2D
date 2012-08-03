@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2012
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -100,7 +100,7 @@ CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFi
 			return;
 		}
 
-		// FIXME:  Any version checks necessary?
+		// Implement any version checks here
 	}
 
 	wxXmlNode *format = customFormatDefinitions.GetRoot()->GetChildren();
@@ -148,8 +148,9 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 	wxString extension;
 	if (!formatNode.GetPropVal(_T("EXTENSION"), &extension))
 		extension = _T("*");
-	// FIXME:  Make sure that our extension matches one of the ones in the list
-	if (false)
+
+	unsigned int lastDot = pathAndFileName.find_last_of(_T("."));
+	if (!extension.Cmp(_T("*")) && !pathAndFileName.Mid(lastDot).CmpNoCase(extension))
 		return false;
 
 	Identifier id;

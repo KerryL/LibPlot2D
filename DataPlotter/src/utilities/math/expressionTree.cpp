@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -101,6 +101,7 @@ wxString ExpressionTree::Parenthesize(wxString expression, wxString &errorString
 	// to add parentheses around multiplication and division
 
 	// FIXME:  I think parenthesizing can fix the double operator bug (see next function down)
+	// FIXME:  Also, need to add parentheses for things like int[1] -> should be int([1])
 
 	// Check for a parentheses imbalance
 	unsigned int leftCount(0), rightCount(0);
@@ -293,7 +294,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 					else if (nextOperator.compare(_T("/")) == 0)
 						node.set /= newNode.set;
 					else
-						assert(false);// FIXME:  Asserts are probably not the best choice here...
+						assert(false);
 				}
 				else if (node.set.GetNumberOfPoints())
 				{
@@ -309,7 +310,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 					else if (nextOperator.compare(_T("%")) == 0)
 						node.set = node.set % newNode.dValue;
 					else
-						assert(false);// FIXME:  Asserts are probably not the best choice here...
+						assert(false);
 				}
 				else if (newNode.set.GetNumberOfPoints() > 0)
 				{
@@ -333,7 +334,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						return node;
 					}
 					else
-						assert(false);// FIXME:  Asserts are probably not the best choice here...
+						assert(false);
 				}
 				else
 				{
@@ -349,7 +350,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 					else if (nextOperator.compare(_T("%")) == 0)
 						node.dValue = PlotMath::Modulo(node.dValue, newNode.dValue);
 					else
-						assert(false);// FIXME:  Asserts are probably not the best choice here...
+						assert(false);
 				}
 
 				// Clear the operator
@@ -441,7 +442,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						else if (nextOperator.compare(_T("/")) == 0)
 							node.set /= newSet;
 						else
-							assert(false);// FIXME:  Asserts are probably not the best choice here...
+							assert(false);
 					}
 
 					nextOperator.Empty();
@@ -474,7 +475,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						else if (nextOperator.compare(_T("%")) == 0)
 							node.dValue = PlotMath::Modulo(node.dValue, value);
 						else
-							assert(false);// FIXME:  Asserts are probably not the best choice here...
+							assert(false);
 					}
 					else
 					{
@@ -490,7 +491,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						else if (nextOperator.compare(_T("%")) == 0)
 							node.set = node.set % value;
 						else
-							assert(false);// FIXME:  Asserts are probably not the best choice here...
+							assert(false);
 					}
 
 					nextOperator.Empty();
@@ -573,7 +574,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 						else if (nextOperator.compare(_T("/")) == 0)
 							node.set /= newSet;
 						else
-							assert(false);// FIXME:  Asserts are probably not the best choice here...
+							assert(false);
 					}
 
 					nextOperator.Empty();

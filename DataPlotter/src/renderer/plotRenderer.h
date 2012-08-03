@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -56,6 +56,8 @@ public:
 	bool GetXLogarithmic(void) const;
 	bool GetLeftLogarithmic(void) const;
 	bool GetRightLogarithmic(void) const;
+
+	bool GetXAxisZoomed(void) const;
 
 	// Sets properties for actors
 	void SetGridOn(void);

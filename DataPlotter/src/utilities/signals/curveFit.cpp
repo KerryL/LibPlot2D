@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -81,7 +81,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 
 	ComputeRSquared(data, fit);
 
-	// FIXME:  Highjacked for matrix testing
+	// Uncomment for Matrix testing
 	// Example from wikipedia SVD article
 	/*Matrix M(4,5);
 	M(0,0) = 1.0;

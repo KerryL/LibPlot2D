@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                           Copyright Kerry R. Loux 2011
+                          Copyright Kerry R. Loux 2011-2012
 
      No requirement for distribution of wxWidgets libraries, source, or binaries.
                              (http://www.wxwidgets.org/)
@@ -120,7 +120,6 @@ MainFrame::~MainFrame()
 //
 //==========================================================================
 /*#ifdef __WXGTK__
-// FIXME:  Include preferences
 const wxString MainFrame::pathToConfigFile = _T("dataplotter.rc");
 #else
 const wxString MainFrame::pathToConfigFile = _T("dataplotter.ini");
@@ -741,7 +740,7 @@ bool MainFrame::LoadCustomFile(wxString pathAndFileName, CustomFileFormat &custo
 //==========================================================================
 bool MainFrame::LoadTxtFile(wxString pathAndFileName)
 {
-	// TODO:  Add any specific file formats here
+	// Add any specific file formats with .txt extensions here
 
 	// Try to load the file as a generic delimited file
 	return LoadGenericDelimitedFile(pathAndFileName);
@@ -800,8 +799,8 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 			return LoadKollmorgenFile(pathAndFileName);
 		}
 	}
-	// FIXME:  Add Siemens format here?  Useful for assigning readable names instead of .rXX
-	// TODO:  Add any other specific file formats here
+
+	// Add any other specific file formats with .csv extensions here
 
 	file.close();
 
@@ -842,7 +841,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 	std::getline(file, nextLine);
 
 	// For compatability with GTK - getline returns string ending with \r under GTK, which we can't have
-	wxString compatableNextLine(nextLine);// FIXME:  I don't think this is used
+	wxString compatableNextLine(nextLine);
 
 	// Throw out everything up to "Par.number:"
 	// This will give us the number of datasets we need
@@ -908,7 +907,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 	}
 
 	// Clean up memory
-	// Don't delete dataSet -> this is handled by the MANAGED_LIST object
+	// Don't delete dataSet -> this is handled by the ManagedList object
 	delete [] data;
 	file.close();
 
@@ -950,13 +949,9 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 	std::string nextLine;
 	std::getline(file, nextLine);
 
-	// For compatability with GTK - getline returns string ending with \r under GTK, which we can't have
-	wxString compatableNextLine(nextLine);// FIXME:  I don't think this is used...
-
 	// Throw out the first two lines
 	std::getline(file, nextLine);
 	std::getline(file, nextLine);
-	compatableNextLine = nextLine;
 
 	// The third line contains the number of data points and the sampling period in msec
 	// We use this information to generate the time series (file does not contain a time series)
@@ -1013,8 +1008,6 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 
 		AddCurve(dataSet, descriptions[i]);
 	}
-	// FIXME:  Add Siemens format here?  Useful for assigning readable names instead of .rXX
-	// TODO:  Add any other specific file formats here
 
 	// Clean up memory
 	// Don't delete dataSet -> this is handled by the ManagedList object
@@ -1490,11 +1483,7 @@ void MainFrame::AddCurve(wxString mathString)
 	Dataset2D *mathChannel = new Dataset2D;
 
 	double xAxisFactor;
-	if (!GetXAxisScalingFactor(xAxisFactor))
-	{
-		// FIXME:  Do we warn the user or not?  This is really only a problem if the user
-		// specified FFT or a filter
-	}
+	GetXAxisScalingFactor(xAxisFactor);// No warning here:  it's only an issue for FFTs and filters; warning are generated then
 
 	wxString errors = expression.Solve(mathString, *mathChannel, xAxisFactor);
 
@@ -2152,9 +2141,35 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"),
 			_T("Accuracy Warning"), wxICON_WARNING, this);
 
-	// Create new dataset containing the FFT of dataset and add it to the plot
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = new Dataset2D(FastFourierTransform::Compute(*plotList[row - 1]));
+	Dataset2D *newData;
+
+	// If the user has zoomed in along the X-axis, use the current "time window"
+	if (plotArea->GetXAxisZoomed())
+	{
+		wxMessageBox(_T("FFT will include currently visible time period only."), _T("FFT"), wxICON_WARNING, this);
+
+		unsigned int i, startIndex(0), endIndex(0);
+		while (plotList[row - 1]->GetXData(startIndex) < plotArea->GetXMin() &&
+			startIndex < plotList[row - 1]->GetNumberOfPoints())
+			startIndex++;
+		endIndex = startIndex;
+		while (plotList[row - 1]->GetXData(endIndex) < plotArea->GetXMax() &&
+			endIndex < plotList[row - 1]->GetNumberOfPoints())
+			endIndex++;
+
+		Dataset2D tempData(endIndex - startIndex);
+
+		for (i = startIndex; i < endIndex; i++)
+		{
+			tempData.GetXPointer()[i - startIndex] = plotList[row - 1]->GetXData(i);
+			tempData.GetYPointer()[i - startIndex] = plotList[row - 1]->GetYData(i);
+		}
+
+		newData = new Dataset2D(FastFourierTransform::Compute(tempData));
+	}
+	else
+		newData = new Dataset2D(FastFourierTransform::Compute(*plotList[row - 1]));
 
 	// Scale as required
 	newData->MultiplyXData(factor);
@@ -2245,7 +2260,7 @@ void MainFrame::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 //					User is asked to specify the order of the fit.
 //
 // Input Arguments:
-//		event	= wxCommandEvent&
+//		event	= wxCommandEvent& (unused)
 //
 // Output Arguments:
 //		None
@@ -2261,7 +2276,10 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 	wxString orderString = ::wxGetTextFromUser(_T("Specify the order of the polynomial fit:"),
 		_T("Polynomial Curve Fit"), _T("2"), this);
 	
-	// FIXME:  What if cancelled?
+	// If cancelled, the orderString will be empty.  It is possible that the user cleared the textbox
+	// and clicked OK, but we'll ignore this case since we can't tell the difference
+	if (orderString.IsEmpty())
+		return;
 
 	if (!orderString.ToULong(&order))
 	{
