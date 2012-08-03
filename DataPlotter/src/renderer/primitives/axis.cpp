@@ -167,6 +167,12 @@ void Axis::GenerateGeometry(void)
 	// Handle logarithmically-scaled plots
 	if (logarithmic)
 	{
+		// Only allow strictly positive limits
+		if (minimum <= 0.0)
+			minimum = 0.1;
+		if (maximum <= minimum)
+			maximum = 10.0 * minimum;
+
 		numberOfTicks = ceil(log10(maximum)) - floor(log10(minimum)) - 1;
 		numberOfGridLines = (numberOfTicks + 1) * 8 + numberOfTicks;
 	}
@@ -394,9 +400,6 @@ void Axis::GenerateGeometry(void)
 			precision = -log10(majorResolution) + 1;
 		precision += 2;// This is the change from 5/7/2011
 
-		// Sometimes for log plots we need to re-reference the minimum after it goes to zero during rounding
-		double originalMinimum(minimum);
-
 		// Set the maximum and minimum to be exactly the values shown after rounding
 		wxString limit;
 		limit.Printf("%0.*f", precision, minimum);
@@ -404,21 +407,6 @@ void Axis::GenerateGeometry(void)
 		{
 			// Warn the user?
 			// FIXME:  Warn the user
-		}
-
-		// Don't do this blindly for log plots - we can't have zero
-		if (logarithmic)
-		{
-			while (minimum == 0.0)
-			{
-				precision++;
-				limit.Printf("%0.*f", precision, originalMinimum);
-				if (!limit.ToDouble(&minimum))
-				{
-					// Warn the user?
-					// FIXME:  Warn the user
-				}
-			}
 		}
 
 		// Add the number values text
@@ -439,8 +427,7 @@ void Axis::GenerateGeometry(void)
 			}
 			else
 				textValue = minimum + (double)tick * majorResolution;
-
-			// Assign the value to the string
+			
 			valueLabel.Printf("%0.*f", precision, textValue);
 
 			glPushMatrix();
@@ -607,13 +594,13 @@ double Axis::PixelToValue(const int &pixel) const
 	// Get the plot size
 	double fraction;
 	if (IsHorizontal())
-		fraction = double(pixel - minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetWidth()
-				- minAxis->GetOffsetFromWindowEdge()
-				- maxAxis->GetOffsetFromWindowEdge());
+		fraction = double(pixel - (double)minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetWidth()
+				- (double)minAxis->GetOffsetFromWindowEdge()
+				- (double)maxAxis->GetOffsetFromWindowEdge());
 	else
-		fraction = double(pixel - minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetHeight()
-				- minAxis->GetOffsetFromWindowEdge()
-				- maxAxis->GetOffsetFromWindowEdge());
+		fraction = double(pixel - (double)minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetHeight()
+				- (double)minAxis->GetOffsetFromWindowEdge()
+				- (double)maxAxis->GetOffsetFromWindowEdge());
 
 	// Do the scaling
 	if (IsLogarithmic())

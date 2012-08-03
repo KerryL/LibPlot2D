@@ -353,42 +353,48 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		int height = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() - plot->GetTopAxis()->GetOffsetFromWindowEdge();
 		int width = GetSize().GetWidth() - plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
 
-		// Adjust the axis limits
-		double xDelta = (plot->GetXMax() - plot->GetXMin()) * (event.GetX() - lastMousePosition[0]) / width;
-		double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * (event.GetY() - lastMousePosition[1]) / height;
-		double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * (event.GetY() - lastMousePosition[1]) / height;
-
-		// Adjust the deltas so we can't zoom by scrolling (could occur if only one side was against a limit)
-		/*if (plot->GetXMin() - xDelta < plot->GetXMinOriginal())
-			xDelta = plot->GetXMin() - plot->GetXMinOriginal();
-		if (plot->GetXMax() - xDelta > plot->GetXMaxOriginal())
-			xDelta = plot->GetXMax() - plot->GetXMaxOriginal();
-		if (plot->GetLeftYMin() + yLeftDelta < plot->GetLeftYMinOriginal())
-			yLeftDelta = plot->GetLeftYMinOriginal() - plot->GetLeftYMin();
-		if (plot->GetLeftYMax() + yLeftDelta > plot->GetLeftYMaxOriginal())
-			yLeftDelta = plot->GetLeftYMaxOriginal() - plot->GetLeftYMax();
-		if (plot->GetRightYMin() + yRightDelta < plot->GetRightYMinOriginal())
-			yRightDelta = plot->GetRightYMinOriginal() - plot->GetRightYMin();
-		if (plot->GetRightYMax() + yRightDelta > plot->GetRightYMaxOriginal())
-			yRightDelta = plot->GetRightYMaxOriginal() - plot->GetRightYMax();*/
-		// FIXME:  Is this supposed to be commented out, or do we want to uncomment it?
-
-		// FIXME:  Panning for logarithmic-scaled plots is funky
-		// FIXME:  Somehow it still gives warning about negative values when zoom then pan
-		if (!plot->GetBottomAxis()->IsLogarithmic() || plot->GetXMin() - xDelta > 0.0)
+		// Adjust the axis limits to pan the plot
+		if (plot->GetBottomAxis()->IsLogarithmic())
 		{
+			int pixelDelta = event.GetX() - lastMousePosition[0];
+			plot->SetXMin(plot->GetBottomAxis()->PixelToValue(
+				(int)plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+			plot->SetXMax(plot->GetBottomAxis()->PixelToValue(
+				(int)plot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+		}
+		else
+		{
+			double xDelta = (plot->GetXMax() - plot->GetXMin()) * (event.GetX() - lastMousePosition[0]) / width;
 			plot->SetXMin(plot->GetXMin() - xDelta);
 			plot->SetXMax(plot->GetXMax() - xDelta);
 		}
 
-		if (!plot->GetLeftYAxis()->IsLogarithmic() || plot->GetLeftYMin() + yLeftDelta > 0.0)
+		if (plot->GetLeftYAxis()->IsLogarithmic())
 		{
+			int pixelDelta = event.GetY() - lastMousePosition[1];
+			plot->SetLeftYMin(plot->GetLeftYAxis()->PixelToValue(
+				(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+			plot->SetLeftYMax(plot->GetLeftYAxis()->PixelToValue(
+				(int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		}
+		else
+		{
+			double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * (event.GetY() - lastMousePosition[1]) / height;
 			plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
 			plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
 		}
 
-		if (!plot->GetRightYAxis()->IsLogarithmic() || plot->GetRightYMin() + yRightDelta > 0.0)
+		if (plot->GetRightYAxis()->IsLogarithmic())
 		{
+			int pixelDelta = event.GetY() - lastMousePosition[1];
+			plot->SetRightYMin(plot->GetRightYAxis()->PixelToValue(
+				(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+			plot->SetRightYMax(plot->GetRightYAxis()->PixelToValue(
+				(int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		}
+		else
+		{
+			double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * (event.GetY() - lastMousePosition[1]) / height;
 			plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
 			plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
 		}
