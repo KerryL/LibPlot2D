@@ -360,7 +360,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 			plot->SetXMin(plot->GetBottomAxis()->PixelToValue(
 				(int)plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
 			plot->SetXMax(plot->GetBottomAxis()->PixelToValue(
-				(int)plot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+				GetSize().GetWidth() - (int)plot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
 		}
 		else
 		{
@@ -375,7 +375,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 			plot->SetLeftYMin(plot->GetLeftYAxis()->PixelToValue(
 				(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
 			plot->SetLeftYMax(plot->GetLeftYAxis()->PixelToValue(
-				(int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+				GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
 		}
 		else
 		{
@@ -390,7 +390,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 			plot->SetRightYMin(plot->GetRightYAxis()->PixelToValue(
 				(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
 			plot->SetRightYMax(plot->GetRightYAxis()->PixelToValue(
-				(int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+				GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
 		}
 		else
 		{
