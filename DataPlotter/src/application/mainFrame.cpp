@@ -15,8 +15,6 @@
 // History:
 
 // Standard C++ headers
-#include <fstream>
-#include <vector>
 #include <algorithm>
 
 // wxWidgets headers
@@ -43,7 +41,6 @@
 #include "utilities/signals/filters/lowPassOrder1.h"
 #include "utilities/signals/filters/lowPassOrder2.h"
 #include "utilities/signals/filters/highPassOrder1.h"
-#include "utilities/signals/curveFit.h"
 
 // *nix Icons
 #ifdef __WXGTK__
@@ -151,6 +148,42 @@ void MainFrame::DoLayout(void)
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 	mainPanel->SetSizer(mainSizer);
 
+	CreatePlotArea(mainPanel);
+	mainSizer->Add(plotArea, 1, wxGROW);
+
+	// Create the options controls and buttons to add/remove math channels
+	wxBoxSizer *lowerSizer = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(lowerSizer);
+
+	lowerSizer->Add(CreateButtons(mainPanel), 0, wxGROW | wxALL, 5);
+
+	CreateOptionsGrid(mainPanel);
+	lowerSizer->Add(optionsGrid, 1, wxGROW | wxALL, 5);
+
+	// Assign sizers and resize the frame
+	SetSizerAndFit(topSizer);
+	SetAutoLayout(true);
+	topSizer->SetSizeHints(this);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		CreatePlotArea
+//
+// Description:		Creates the main plot control.
+//
+// Input Arguments:
+//		parent	= wxWindow*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::CreatePlotArea(wxWindow *parent)
+{
 	// Create the main control
 	optionsGrid = NULL;// To avoid crashing in UpdateCursors
 #ifdef __WXGTK__
@@ -158,35 +191,34 @@ void MainFrame::DoLayout(void)
 	// Adding the double-buffer arugment fixes this.  Under windows, the double-buffer argument
 	// causes the colors to go funky.  So we have this #if.
 	int args[] = {WX_GL_DOUBLEBUFFER, 0};
-	plotArea = new PlotRenderer(mainPanel, wxID_ANY, args, *this);
+	plotArea = new PlotRenderer(parent, wxID_ANY, args, *this);
 #else
-	plotArea = new PlotRenderer(mainPanel, wxID_ANY, NULL, *this);
+	plotArea = new PlotRenderer(parent, wxID_ANY, NULL, *this);
 #endif
 	plotArea->SetSize(480, 320);
 	plotArea->SetGridOn();
-	mainSizer->Add(plotArea, 1, wxGROW);
+}
 
-	// Create the options controls and buttons to add/remove math channels
-	wxBoxSizer *lowerSizer = new wxBoxSizer(wxHORIZONTAL);
-	mainSizer->Add(lowerSizer);
+//==========================================================================
+// Class:			MainFrame
+// Function:		CreateOptionsGrid
+//
+// Description:		Creates and formats the options grid.
+//
+// Input Arguments:
+//		parent	= wxWindow*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::CreateOptionsGrid(wxWindow *parent)
+{
+	optionsGrid = new wxGrid(parent, wxID_ANY);
 
-	wxBoxSizer *buttonSizer = new wxBoxSizer(wxVERTICAL);
-	lowerSizer->Add(buttonSizer, 0, wxGROW | wxALL, 5);
-
-	openButton = new wxButton(mainPanel, idButtonOpen, _T("Open"));
-	autoScaleButton = new wxButton(mainPanel, idButtonAutoScale, _T("Auto Scale"));
-	removeCurveButton = new wxButton(mainPanel, idButtonRemoveCurve, _T("Remove"));
-	buttonSizer->Add(openButton, 0, wxEXPAND);
-	buttonSizer->Add(autoScaleButton, 0, wxEXPAND);
-	buttonSizer->Add(removeCurveButton, 0, wxEXPAND);
-
-	wxStaticText *versionText = new wxStaticText(mainPanel, wxID_ANY, DataPlotterApp::versionString);
-	buttonSizer->Add(versionText, 0, wxEXPAND | wxALIGN_BOTTOM);
-
-	optionsGrid = new wxGrid(mainPanel, wxID_ANY);
-	lowerSizer->Add(optionsGrid, 1, wxGROW | wxALL, 5);
-
-	// Configure the grid
 	optionsGrid->BeginBatch();
 
 	optionsGrid->CreateGrid(0, colCount, wxGrid::wxGridSelectRows);
@@ -211,11 +243,39 @@ void MainFrame::DoLayout(void)
 	optionsGrid->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 
 	optionsGrid->EndBatch();
+}
 
-	// Assign sizers and resize the frame
-	SetSizerAndFit(topSizer);
-	SetAutoLayout(true);
-	topSizer->SetSizeHints(this);
+//==========================================================================
+// Class:			MainFrame
+// Function:		CreateButtons
+//
+// Description:		Creates the buttons and returns the sizer pointer.
+//
+// Input Arguments:
+//		parent	= wxWindow*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxBoxSizer*
+//
+//==========================================================================
+wxBoxSizer* MainFrame::CreateButtons(wxWindow *parent)
+{
+	wxBoxSizer *buttonSizer = new wxBoxSizer(wxVERTICAL);
+
+	openButton = new wxButton(parent, idButtonOpen, _T("Open"));
+	autoScaleButton = new wxButton(parent, idButtonAutoScale, _T("Auto Scale"));
+	removeCurveButton = new wxButton(parent, idButtonRemoveCurve, _T("Remove"));
+	buttonSizer->Add(openButton, 0, wxEXPAND);
+	buttonSizer->Add(autoScaleButton, 0, wxEXPAND);
+	buttonSizer->Add(removeCurveButton, 0, wxEXPAND);
+
+	wxStaticText *versionText = new wxStaticText(parent, wxID_ANY, DataPlotterApp::versionString);
+	buttonSizer->Add(versionText, 0, wxEXPAND | wxALIGN_BOTTOM);
+
+	return buttonSizer;
 }
 
 //==========================================================================
@@ -496,13 +556,11 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idContextPlotIntegral, _T("Plot Integral"));
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
-		
 		contextMenu->Append(idContextTimeShift, _T("Plot Time-Shifted"));
 
 		contextMenu->AppendSeparator();
 
 		contextMenu->Append(idContextFilter, _T("Filter Curve"));
-
 		contextMenu->Append(idContextFitCurve, _T("Fit Curve"));
 
 		contextMenu->AppendSeparator();
@@ -538,56 +596,92 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 //==========================================================================
 void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext &context)
 {
-	// Declare the menu variable and get the position of the cursor
-	wxMenu *contextMenu = new wxMenu();
+	wxMenu *contextMenu;
 
-	// Build the menu
 	switch (context)
 	{
 	case plotContextXAxis:
-		contextMenu->Append(idPlotContextToggleBottomGridlines, _T("Toggle Axis Gridlines"));
-		contextMenu->Append(idPlotContextAutoScaleBottom, _T("Auto Scale Axis"));
-		contextMenu->Append(idPlotContextSetBottomRange, _T("Set Range"));
-		contextMenu->AppendCheckItem(idPlotContextSetBottomLogarithmic, _T("Logarithmic Scale"));
-
+		contextMenu = CreateAxisContextMenu(idPlotContextToggleBottomGridlines);
 		contextMenu->Check(idPlotContextSetBottomLogarithmic, plotArea->GetXLogarithmic());
 		break;
 
 	case plotContextLeftYAxis:
-		contextMenu->Append(idPlotContextToggleLeftGridlines, _T("Toggle Axis Gridlines"));
-		contextMenu->Append(idPlotContextAutoScaleLeft, _T("Auto Scale Axis"));
-		contextMenu->Append(idPlotContextSetLeftRange, _T("Set Range"));
-		contextMenu->AppendCheckItem(idPlotContextSetLeftLogarithmic, _T("Logarithmic Scale"));
-		
+		contextMenu = CreateAxisContextMenu(idPlotContextToggleLeftGridlines);
 		contextMenu->Check(idPlotContextSetLeftLogarithmic, plotArea->GetLeftLogarithmic());
 		break;
 
 	case plotContextRightYAxis:
-		contextMenu->Append(idPlotContextToggleRightGridlines, _T("Toggle Axis Gridlines"));
-		contextMenu->Append(idPlotContextAutoScaleRight, _T("Auto Scale Axis"));
-		contextMenu->Append(idPlotContextSetRightRange, _T("Set Range"));
-		contextMenu->AppendCheckItem(idPlotContextSetRightLogarithmic, _T("Logarithmic Scale"));
-		
+		contextMenu = CreateAxisContextMenu(idPlotContextToggleRightGridlines);
 		contextMenu->Check(idPlotContextSetRightLogarithmic, plotArea->GetRightLogarithmic());
 		break;
 
 	default:
 	case plotContextPlotArea:
-		contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
-		contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
-		contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
-		contextMenu->AppendSeparator();
-		contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
-		contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));
+		contextMenu = CreatePlotAreaContextMenu();
 		break;
 	}
 
-	// Show the menu
 	PopupMenu(contextMenu, position);
 
-	// Delete the context menu object
 	delete contextMenu;
 	contextMenu = NULL;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		CreatePlotAreaContextMenu
+//
+// Description:		Displays a context menu for the specified plot axis.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxMenu*
+//
+//==========================================================================
+wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
+{
+	wxMenu *contextMenu = new wxMenu();
+	contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
+	contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
+	contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
+	contextMenu->AppendSeparator();
+	contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
+	contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));
+
+	return contextMenu;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		CreateAxisContextMenu
+//
+// Description:		Displays a context menu for the specified plot axis.
+//
+// Input Arguments:
+//		baseEventId	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxMenu*
+//
+//==========================================================================
+wxMenu* MainFrame::CreateAxisContextMenu(const unsigned int &baseEventId) const
+{
+	wxMenu* contextMenu = new wxMenu();
+
+	contextMenu->Append(baseEventId, _T("Toggle Axis Gridlines"));
+	contextMenu->Append(baseEventId + 1, _T("Auto Scale Axis"));
+	contextMenu->Append(baseEventId + 2, _T("Set Range"));
+	contextMenu->AppendCheckItem(baseEventId + 3, _T("Logarithmic Scale"));
+
+	return contextMenu;
 }
 
 //==========================================================================
@@ -664,15 +758,12 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 	int startOfExtension;
 	wxString fileExtension;
 
-	// Clear out any curves we already have
 	// NOTE:  If we ever choose to allow multiple files to be opened, this will need to go
 	ClearAllCurves();
 
-	// Decipher the file name to figure out what kind of object this is
 	startOfExtension = pathAndFileName.Last('.') + 1;
 	fileExtension = pathAndFileName.Mid(startOfExtension);
 
-	// Create the appropriate object
 	bool loadedOK(false);
 	CustomFileFormat customFormat(pathAndFileName);
 	if (customFormat.IsCustomFormat())
@@ -682,14 +773,7 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 	else if (fileExtension.CmpNoCase("txt") == 0)
 		loadedOK = LoadTxtFile(pathAndFileName);
 	else
-		// Attempt to load the file, even if we don't recognize its extension
-		//::wxMessageBox(_T("ERROR:  Unrecognized file extension '") + fileExtension + _T("'!"), _T("Error Loading File"), 5L, this);
 		loadedOK = LoadGenericDelimitedFile(pathAndFileName);
-
-	// If we couldn't load the file, tell the user
-	// Changed 8/4/2011 - Specific messages are displayed in LoadXXXFile() methods
-	//if (!loadedOK && displayDialogOnError)
-	//	::wxMessageBox(_T("ERROR:  Unable to read data from file!"), _T("Error Loading File"), 5L, this);
 
 	if (loadedOK)
 	{
@@ -764,47 +848,12 @@ bool MainFrame::LoadTxtFile(wxString pathAndFileName)
 //==========================================================================
 bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 {
-	// Open the file
-	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-
-	if (!file.is_open())
-	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
-		return false;
-	}
-
-	// Determine the type of the file we're trying to open
-	std::string nextLine;
-	std::getline(file, nextLine);
-
-	// For compatability with GTK - getline returns string ending with \r under GTK, which we can't have
-	wxString compatableNextLine(nextLine);
-
-	if (compatableNextLine.Trim().compare(_T("WinBASS_II_Oscilloscope_Data")) == 0)// Baumuller oscilloscope trace
-	{
-		file.close();
+	if (IsBaumullerFile(pathAndFileName))
 		return LoadBaumullerFile(pathAndFileName);
-	}
-	else// Formats that require reading further into the file than the first line
-	{
-		std::getline(file, nextLine);
-		compatableNextLine = nextLine;
-		// Formats requiring reading to the second line
-
-		// Kollmorgen format from S600 series drives
-		// There may be a better way to check this, but I haven't found it
-		if (compatableNextLine.compare(0, 7, _T("MMI vom")) == 0)
-		{
-			file.close();
-			return LoadKollmorgenFile(pathAndFileName);
-		}
-	}
-
+	else if (IsKollmorgenFile(pathAndFileName))
+		return LoadKollmorgenFile(pathAndFileName);
 	// Add any other specific file formats with .csv extensions here
 
-	file.close();
-
-	// Try to open the file as a generic delimited file
 	return LoadGenericDelimitedFile(pathAndFileName);
 }
 
@@ -826,9 +875,7 @@ bool MainFrame::LoadCsvFile(wxString pathAndFileName)
 //==========================================================================
 bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 {
-	// Open the file
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-
 	if (!file.is_open())
 	{
 		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
@@ -836,20 +883,54 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 	}
 
 	wxString delimiter(';');
+	wxArrayString descriptions = GetBaumullerDescriptions(file, delimiter);
 
+	std::vector<double> *data = new std::vector<double>[GetPopulatedCount(descriptions)];
+	if (!ExtractData(file, delimiter, data, descriptions))
+	{
+		::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
+			_T("Error Generating Plot"), wxICON_ERROR, this);
+		delete [] data;
+		return false;
+	}
+	file.close();
+
+	AddData(data, descriptions);
+	currentFileFormat = FormatBaumuller;
+
+	delete [] data;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetBaumullerDescriptions
+//
+// Description:		Parses the file and extracts curve descriptions.  This
+//					assumes that the file has been opened, but not read from.
+//					Also, prior to returning, all data prior to numeric data
+//					is discarded.
+//
+// Input Arguments:
+//		file		= std::ifstream&
+//		delimiter	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxArrayString containing curve descriptions
+//
+//==========================================================================
+wxArrayString MainFrame::GetBaumullerDescriptions(std::ifstream &file, const wxString &delimiter) const
+{
 	std::string nextLine;
 	std::getline(file, nextLine);
 
-	// For compatability with GTK - getline returns string ending with \r under GTK, which we can't have
-	wxString compatableNextLine(nextLine);
-
-	// Throw out everything up to "Par.number:"
-	// This will give us the number of datasets we need
-	while (compatableNextLine.Trim().substr(0, 11).compare(_T("Par.number:")) != 0)
-	{
+	// wxString makes this robust against varying line endings
+	while (wxString(nextLine).Trim().Mid(0, 11).Cmp(_T("Par.number:")) != 0)
 		std::getline(file, nextLine);
-		compatableNextLine = nextLine;
-	}
 	wxArrayString parameterNumbers = ParseLineIntoColumns(nextLine, delimiter);
 
 	std::getline(file, nextLine);
@@ -858,63 +939,13 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 	std::getline(file, nextLine);
 	wxArrayString units = ParseLineIntoColumns(nextLine, delimiter, false);
 
-	// Throw out the max and min rows
-	std::getline(file, nextLine);
-	std::getline(file, nextLine);
+	SkipLines(file, 2);// Throw out max and min rows
 
-	// Allocate datasets
-	std::vector<double> *data = new std::vector<double>[parameterNumbers.size()];
-
-	// Start reading data
-	wxArrayString parsed;
 	unsigned int i;
-	double tempDouble;
-	while (!file.eof())
-	{
-		std::getline(file, nextLine);
-		parsed = ParseLineIntoColumns(nextLine, delimiter);
+	for (i = 1; i < descriptions.GetCount(); i++)
+		descriptions[i].Append(_T(" (") + parameterNumbers[i] + _T(") [") + units[i] + _T("]"));
 
-		for (i = 0; i < parsed.size(); i++)
-		{
-			if (!parsed[i].ToDouble(&tempDouble))
-			{
-				delete [] data;
-
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
-					_T("Error Generating Plot"), wxICON_ERROR, this);
-				return false;
-			}
-
-			data[i].push_back(tempDouble);
-		}
-	}
-
-	// Put the data in datasets and add them to the plot
-	Dataset2D *dataSet;
-	unsigned int j;
-	for (i = 0; i < parameterNumbers.size() - 1; i++)
-	{
-		dataSet = new Dataset2D(data[0].size());
-		for (j = 0; j < data[0].size(); j++)
-		{
-			dataSet->GetXPointer()[j] = data[0].at(j);
-			dataSet->GetYPointer()[j] = data[i + 1].at(j);
-		}
-
-		AddCurve(dataSet, descriptions[i + 1]
-			+ _T(" (") + parameterNumbers[i + 1] + _T(") [")
-			+ units[i + 1] + _T("]"));
-	}
-
-	// Clean up memory
-	// Don't delete dataSet -> this is handled by the ManagedList object
-	delete [] data;
-	file.close();
-
-	// Set the file format flag
-	currentFileFormat = FormatBaumuller;
-
-	return true;
+	return descriptions;
 }
 
 //==========================================================================
@@ -935,9 +966,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 //==========================================================================
 bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 {
-	// Open the file
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-
 	if (!file.is_open())
 	{
 		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
@@ -945,79 +974,63 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 	}
 
 	wxString delimiter(',');
+	double samplingPeriod;
+	wxArrayString descriptions = GetKollmorgenDescriptions(file, delimiter, samplingPeriod);
+
+	std::vector<double> *data = new std::vector<double>[GetPopulatedCount(descriptions)];
+	if (!ExtractData(file, delimiter, data, descriptions))
+	{
+		::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
+			_T("Error Generating Plot"), wxICON_ERROR, this);
+		delete [] data;
+		return false;
+	}
+	file.close();
+
+	AddData(data, descriptions, &samplingPeriod);
+	currentFileFormat = FormatKollmorgen;
+
+	delete [] data;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetKollmorgenDescriptions
+//
+// Description:		Parses the file and extracts curve descriptions.  This
+//					assumes that the file has been opened, but not read from.
+//					Also, prior to returning, all data prior to numeric data
+//					is discarded.
+//
+// Input Arguments:
+//		file			= std::ifstream&
+//		delimiter		= const wxString&
+//
+// Output Arguments:
+//		samplingPeriod	= double&
+//
+// Return Value:
+//		wxArrayString containing curve descriptions
+//
+//==========================================================================
+wxArrayString MainFrame::GetKollmorgenDescriptions(std::ifstream &file, const wxString &delimiter, double &samplingPeriod) const
+{
+	SkipLines(file, 2);
 
 	std::string nextLine;
 	std::getline(file, nextLine);
 
-	// Throw out the first two lines
-	std::getline(file, nextLine);
-	std::getline(file, nextLine);
-
 	// The third line contains the number of data points and the sampling period in msec
 	// We use this information to generate the time series (file does not contain a time series)
-	//unsigned int rows = atoi(nextLine.substr(0, nextLine.find_first_of(delimiter)).c_str());
-	double samplingPeriod = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
+	samplingPeriod = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
 
 	// The fourth line contains the data set labels (which also gives us the number of datasets we need)
 	std::getline(file, nextLine);
 	wxArrayString descriptions = ParseLineIntoColumns(nextLine, delimiter);
 
-	// Allocate datasets
-	std::vector<double> *data = new std::vector<double>[descriptions.size()];
-
-	// Start reading data
-	wxArrayString parsed;
-	unsigned int i;
-	double tempDouble;
-	while (!file.eof())
-	{
-		std::getline(file, nextLine);
-		parsed = ParseLineIntoColumns(nextLine, delimiter);
-
-		for (i = 0; i < parsed.size(); i++)
-		{
-			if (!parsed[i].ToDouble(&tempDouble))
-			{
-				delete [] data;
-
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
-					_T("Error Generating Plot"), wxICON_ERROR, this);
-				return false;
-			}
-
-			data[i].push_back(tempDouble);
-		}
-	}
-
-	// Put the data in datasets and add them to the plot
-	Dataset2D *dataSet;
-	unsigned int j;
-	double time;
-	for (i = 0; i < descriptions.size(); i++)
-	{
-		dataSet = new Dataset2D(data[0].size());
-		time = 0.0;
-
-		for (j = 0; j < data[0].size(); j++)
-		{
-			dataSet->GetXPointer()[j] = time;
-			dataSet->GetYPointer()[j] = data[i].at(j);
-
-			time += samplingPeriod;
-		}
-
-		AddCurve(dataSet, descriptions[i]);
-	}
-
-	// Clean up memory
-	// Don't delete dataSet -> this is handled by the ManagedList object
-	delete [] data;
-	file.close();
-
-	// Set the file format flag
-	currentFileFormat = FormatKollmorgen;
-
-	return true;
+	return descriptions;
 }
 
 //==========================================================================
@@ -1044,22 +1057,168 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 //==========================================================================
 bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFormat *customFormat)
 {
-	// Open the file
-	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-
-	if (!file.is_open())
+	wxString delimiter;
+	unsigned int headerLines;
+	wxArrayString descriptions = GetGenericDescriptions(pathAndFileName,
+		GetDelimiterList(customFormat), delimiter, headerLines);
+	if (descriptions.size() < 2)
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		::wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
+		return false;
+	}
+	genericXAxisLabel = descriptions[0];
+
+	std::vector<double> scales(descriptions.size(), 1.0);
+	if (customFormat)
+		customFormat->ProcessChannels(descriptions, scales);
+
+	if (!ProcessGenericFile(pathAndFileName, descriptions, headerLines, delimiter, scales))
+		return false;
+	currentFileFormat = FormatGeneric;
+
+	if (customFormat)
+	{
+		if (!customFormat->GetTimeUnits().IsEmpty())
+			genericXAxisLabel = _T("Time [") + customFormat->GetTimeUnits() + _T("]");
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		CompensateGenericChoices
+//
+// Description:		Compensates for the method used (removing the x-data column
+//					as a choice) for the user to identify data to plot.
+//
+// Input Arguments:
+//		choices	= wxArrayInt&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::CompensateGenericChoices(wxArrayInt &choices) const
+{
+	unsigned int i;
+	for (i = 0; i < choices.Count(); i++)
+		choices[i]++;
+	choices.Add(0);// Keep the x-axis data
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ProcessGenericFile
+//
+// Description:		Performs necessary actions to extract desired data from
+//					the specified file.
+//
+// Input Arguments:
+//		fileName	= const wxString&
+//		descriptions	= wxArrayString&
+//		headerLines		= const unsigned int&
+//		delimiter		= const wxString&
+//		scales			= const std::vector<double>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool MainFrame::ProcessGenericFile(const wxString &fileName, wxArrayString &descriptions,
+	const unsigned int &headerLines, const wxString &delimiter, const std::vector<double> &scales)
+{
+	MultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"),
+		wxArrayString(descriptions.begin() + 1, descriptions.end()));
+	if (dialog.ShowModal() == wxID_CANCEL)
+		return false;
+
+	wxArrayInt choices = dialog.GetSelections();
+	if (choices.size() == 0)
+	{
+		::wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR, this);
 		return false;
 	}
 
-	// Create a list of acceptable delimiting characters
-	// Don't use periods ('.') because we're going to have those in regular numbers
+	std::ifstream file(fileName.c_str(), std::ios::in);
+	if (!file.is_open())
+	{
+		::wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		return false;
+	}
+	SkipLines(file, headerLines);
+
+	std::vector<double> *data = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
+
+	CompensateGenericChoices(choices);
+	RemoveUnwantedDescriptions(descriptions, choices);
+	ExtractData(file, delimiter, data, descriptions);
+	file.close();
+
+	AddData(data, descriptions, NULL, &scales);
+	delete [] data;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		SkipLines
+//
+// Description:		Reads and discards the specified number of lines from
+//					the file.
+//
+// Input Arguments:
+//		file	= std::ifstream&
+//		count	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::SkipLines(std::ifstream &file, const unsigned int &count) const
+{
+	std::string nextLine;
+	unsigned int i;
+	for (i = 0; i < count; i++)
+		std::getline(file, nextLine);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetDelimiterList
+//
+// Description:		Returns a list of delimiters to attempt to use when parsing
+//					a file.
+//
+// Input Arguments:
+//		customFormat	= const CustomFileFormat*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxArrayString containing all acceptable delimiters
+//
+//==========================================================================
+wxArrayString MainFrame::GetDelimiterList(const CustomFileFormat *customFormat) const
+{
+	// Don't use periods ('.') because we're going to have those in regular numbers (switch this for other languages?)
 	wxArrayString delimiterList;
 	delimiterList.Add(_T(" "));
 	delimiterList.Add(_T(","));
 	delimiterList.Add(_T("\t"));
 	delimiterList.Add(_T(";"));
+
 	if (customFormat)
 	{
 		if (!customFormat->GetDelimiter().IsEmpty())
@@ -1069,218 +1228,381 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFor
 		}
 	}
 
-	// Use std::string to read the file line-by-line
-	std::string nextLine;
+	return delimiterList;
+}
 
-	// Determine which character is the most likely delimiting character
-	// Determine how many file descriptor rows there are (and skip them)
-	wxString delimiter;
-	wxArrayString delimitedLine, plotNameList, previousLines;
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetGenericDescriptions
+//
+// Description:		Parses the file and extracts curve descriptions.  This
+//					assumes that the file has been opened, but not read from.
+//					Also, prior to returning, all data prior to numeric data
+//					is discarded.
+//
+// Input Arguments:
+//		fileName		= const wxString&
+//		delimiterList	= const wxArrayString&
+//
+// Output Arguments:
+//		delimiter		= wxString& indicating the delimiter to use for this file
+//		headerLines		= unsigned int& indicating the number of lines read
+//
+// Return Value:
+//		wxArrayString containing data descriptions
+//
+//==========================================================================
+wxArrayString MainFrame::GetGenericDescriptions(const wxString &fileName, const wxArrayString &delimiterList,
+	wxString &delimiter, unsigned int &headerLines)
+{
+	wxArrayString descriptions;
+
+	std::ifstream file(fileName.c_str(), std::ios::in);
+	if (!file.is_open())
+	{
+		::wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		return descriptions;
+	}
+
+	std::string nextLine;
+	wxArrayString delimitedLine, previousLines;
 	unsigned int i, j;
 	double value;
-	while (!file.eof())
+	while (std::getline(file, nextLine))
 	{
-		// Read the next line
-		std::getline(file, nextLine);
-
 		// Look for the first row starting with a number that contains at least one
 		// delimiting character (check all delimiters in our list)
 		for (i = 0; i < delimiterList.size(); i++)
 		{
 			delimitedLine = ParseLineIntoColumns(nextLine, delimiterList[i]);
-			if (delimitedLine.size() > 1)// Delimiters were found
+			if (delimitedLine.size() > 1)
 			{
 				// If all columns are numeric, this is probably the first row of data
 				delimiter = delimiterList[i];
 				for (j = 0; j < delimitedLine.size(); j++)
 				{
-					// Try to convert the string to a double
 					if (!delimitedLine[j].ToDouble(&value))
 					{
-						// Not the row we're looking for if the data isn't numeric
 						delimiter.Empty();
 						break;
 					}
 				}
 
-				// If we've found our delimiter, generate names for each plot
 				if (!delimiter.IsEmpty())
 				{
-					// Work backwards line-by-line
-					int line;
-					wxArrayString delimitedPreviousLine;
-					for (line = previousLines.size() - 1; line >= 0; line--)
+					GenerateGenericNames(previousLines, delimitedLine, delimiter, descriptions);
+					headerLines = previousLines.size();
+
+					if (descriptions.size() == 0)
 					{
-						delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
-
-						// Stop when the number of columns is different
-						if (delimitedPreviousLine.size() != delimitedLine.size())
-							break;
-
-						// If none of the entries on the line are numeric, prepend the plot name with this text
-						bool prependText(true);
-						for (j = 0; j < delimitedPreviousLine.size(); j++)
+						wxString dummyPlotName;
+						for (i = 0; i < delimitedLine.size(); i++)
 						{
-							prependText = !delimitedPreviousLine[j].ToDouble(&value);
-							if (!prependText)
-								break;
-						}
-
-						if (prependText)
-						{
-							for (j = 0; j < delimitedPreviousLine.size(); j++)
-							{
-								if (plotNameList.size() < j + 1)
-									plotNameList.Add(delimitedPreviousLine[j]);
-								else
-									plotNameList[j].Prepend(delimitedPreviousLine[j] + _T(", "));
-							}
+							dummyPlotName.Printf("[%i]", i);
+							descriptions.Add(dummyPlotName);
 						}
 					}
+
+					return descriptions;
 				}
 			}
-
-			// Have we determined what the delimiter is?
-			if (!delimiter.IsEmpty())
-				break;
 		}
 
-		// Have we determined what the delimiter is?
-		if (!delimiter.IsEmpty())
-			break;
-
-		// Store this line for later (for creating plot names)
 		previousLines.Add(nextLine);
 	}
 
-	// Find the header rows (if any) and use them to construct plot names
-	if (plotNameList.size() == 0)
+	return descriptions;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GenerateGenericNames
+//
+// Description:		Creates the first part of the plot name for generic files.
+//
+// Input Arguments:
+//		previousLines	= const wxArrayString&
+//		currentLin		= const wxArrayString&
+//		delimiter		= const wxString&
+//
+// Output Arguments:
+//		descriptions	= wxArrayString&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::GenerateGenericNames(const wxArrayString &previousLines, const wxArrayString &currentLine,
+	const wxString &delimiter, wxArrayString &descriptions) const
+{
+	unsigned int i;
+	int line;
+	wxArrayString delimitedPreviousLine;
+	double value;
+	for (line = previousLines.size() - 1; line >= 0; line--)
 	{
-		wxString dummyPlotName;
-		for (i = 0; i < delimitedLine.size(); i++)
-		{
-			dummyPlotName.Printf("[%i]", i);
-			plotNameList.Add(dummyPlotName);
-		}
-	}
-
-	// Remove the time series label
-	if (plotNameList.size() > 0)
-	{
-		genericXAxisLabel = plotNameList[0];
-		plotNameList.RemoveAt(0);
-	}
-
-	// If there are no names in the list at this point, it's because we didn't find any plottable data
-	if (plotNameList.size() == 0)
-	{
-		file.close();
-		::wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
-		return false;
-	}
-
-	// Have the custom format definition handle re-naming of the plots
-	std::vector<double> scales(plotNameList.size(), 1.0);
-	if (customFormat)
-		customFormat->ProcessChannels(plotNameList, scales);
-
-	// Display a choice dialog allowing the user to specify which plots to import
-	MultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"), plotNameList);
-	if (dialog.ShowModal() == wxID_CANCEL)
-	{
-		file.close();
-		// No message box - user canceled
-		return false;
-	}
-
-	// Get the selections and make sure the user selected something
-	wxArrayInt choices = dialog.GetSelections();
-	if (choices.size() == 0)
-	{
-		file.close();
-		::wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR, this);
-		return false;
-	}
-
-	// Add the selected datasets to the plot
-	// Allocate datasets
-	std::vector<double> *data = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
-
-	// Our first time through this loop, we've already populated the nextLine variable, and we
-	// don't want to read from the file again, or we'll lose our first point.  Catch this with
-	// a boolean (I know it's not clean, but it works)
-	bool firstTime(true);
-
-	// Start reading data
-	while (!file.eof())
-	{
-		// Read the next line
-		if (!firstTime)
-			std::getline(file, nextLine);
-		else
-			firstTime = false;
-		
-		// Make sure we're not trying to process a blank line at the end of a file
-		if (nextLine.empty())
+		delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
+		if (delimitedPreviousLine.size() != currentLine.size())
 			break;
-		
-		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 
-		// Get the X-data
-		if (!delimitedLine[0].ToDouble(&value))
+		bool prependText(true);
+		for (i = 0; i < delimitedPreviousLine.size(); i++)
 		{
-			delete [] data;
-
-			::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"), wxICON_ERROR, this);
-			return false;
+			prependText = !delimitedPreviousLine[i].ToDouble(&value);
+			if (!prependText)
+				break;
 		}
-		data[0].push_back(value);
 
-		// Get the Y-data
-		for (i = 0; i < choices.size(); i++)
+		if (prependText)
 		{
-			if (!delimitedLine[choices[i] + 1].ToDouble(&value))
+			for (i = 0; i < delimitedPreviousLine.size(); i++)
 			{
-				delete [] data;
-
-				::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"), _T("Error Reading File"), wxICON_ERROR, this);
-				return false;
+				if (descriptions.size() < i + 1)
+					descriptions.Add(delimitedPreviousLine[i]);
+				else
+					descriptions[i].Prepend(delimitedPreviousLine[i] + _T(", "));
 			}
-			data[i + 1].push_back(value);
 		}
 	}
+}
 
-	// Put the data in datasets and add them to the plot
-	Dataset2D *dataSet;
-	for (i = 0; i < choices.size(); i++)
+//==========================================================================
+// Class:			MainFrame
+// Function:		RemoveUnwantedDescriptions
+//
+// Description:		Makes descriptions for unselected items empty.
+//
+// Input Arguments:
+//		choices			= const wxArrayInt&
+//
+// Output Arguments:
+//		descriptions	= wxArrayString&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::RemoveUnwantedDescriptions(wxArrayString &descriptions, const wxArrayInt &choices) const
+{
+	unsigned int i, j;
+	bool remove;
+	for (i = 0; i < descriptions.size(); i++)
 	{
-		dataSet = new Dataset2D(data[0].size());
-
-		for (j = 0; j < data[0].size(); j++)
+		remove = true;
+		for (j = 0; j < choices.size(); j++)
 		{
-			dataSet->GetXPointer()[j] = data[0].at(j);
-			dataSet->GetYPointer()[j] = data[i + 1].at(j) * scales[choices[i]];
+			if (i == (unsigned int)choices[j])
+			{
+				remove = false;
+				break;
+			}
 		}
 
-		AddCurve(dataSet, plotNameList[choices[i]]);
+		if (remove)
+			descriptions[i].Empty();
+	}
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		IsBaumullerFile
+//
+// Description:		Determines if the specified file is a Baumuller osilloscope trace.
+//
+// Input Arguments:
+//		pathAndFileName	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for Baumuller files, false otherwise
+//
+//==========================================================================
+bool MainFrame::IsBaumullerFile(const wxString &pathAndFileName)
+{
+	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
+	if (!file.is_open())
+	{
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		return false;
 	}
 
-	// Clean up memory
-	// Don't delete dataSet -> this is handled by the ManagedList object
-	delete [] data;
+	std::string nextLine;
+	std::getline(file, nextLine);// Read first line
 	file.close();
 
-	// Set the file format flag
-	currentFileFormat = FormatGeneric;
+	// Wrap in wxString for robustness against varying line endings
+	if (wxString(nextLine).Trim().Cmp(_T("WinBASS_II_Oscilloscope_Data")) == 0)
+		return true;
+	
+	return false;
+}
 
-	// Set the X-axis units (if custom/specified)
-	if (customFormat)
+//==========================================================================
+// Class:			MainFrame
+// Function:		IsKollmorgenFile
+//
+// Description:		Determines if the specified file is a Baumuller osilloscope trace.
+//
+// Input Arguments:
+//		pathAndFileName	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for Baumuller files, false otherwise
+//
+//==========================================================================
+bool MainFrame::IsKollmorgenFile(const wxString &pathAndFileName)
+{
+	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
+	if (!file.is_open())
 	{
-		if (!customFormat->GetTimeUnits().IsEmpty())
-			genericXAxisLabel = _T("Time [") + customFormat->GetTimeUnits() + _T("]");
+		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		return false;
+	}
+
+	SkipLines(file, 1);
+
+	std::string nextLine;
+	std::getline(file, nextLine);// Read second line
+	file.close();
+
+	// Kollmorgen format from S600 series drives
+	// There may be a better way to check this, but I haven't found it
+	// Wrap in wxString for robustness against varying line endings
+	if (wxString(nextLine).Trim().Mid(0, 7).Cmp(_T("MMI vom")) == 0)
+		return true;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ExtractData
+//
+// Description:		Extracts numeric data from the file.  Columns with empty
+//					descriptions are ignored.
+//
+// Input Arguments:
+//		file			= std::ifstream&
+//		delimiter		= const wxString&
+//		data			= std::vector<double>*
+//		descriptions	= const wxArrayString&
+//
+// Output Arguments:
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool MainFrame::ExtractData(std::ifstream &file, const wxString &delimiter,
+	std::vector<double> *data, const wxArrayString &descriptions) const
+{
+	std::string nextLine;
+	wxArrayString parsed;
+	unsigned int i, set;
+	double tempDouble;
+
+	while (!file.eof())
+	{
+		std::getline(file, nextLine);
+		parsed = ParseLineIntoColumns(nextLine, delimiter);
+
+		set = 0;
+		for (i = 0; i < parsed.size(); i++)
+		{
+			if (!parsed[i].ToDouble(&tempDouble))
+				return false;
+
+			if (!descriptions[i].IsEmpty())
+			{
+				data[set].push_back(tempDouble);
+				set++;
+			}
+		}
 	}
 
 	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetPopulatedCount
+//
+// Description:		Determines the number of non-empty members of the array.
+//
+// Input Arguments:
+//		list	= const wxArrayString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int MainFrame::GetPopulatedCount(const wxArrayString &list) const
+{
+	unsigned int count(0), i;
+	for (i = 0; i < list.GetCount(); i++)
+	{
+		if (!list[i].IsEmpty())
+			count ++;
+	}
+
+	return count;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		AddData
+//
+// Description:		Creates datasets and adds the associated curves to the plot.
+//
+// Input Arguments:
+//		data			= const std::vector<double>*
+//		descriptions	= const wxArrayString&
+//		timeStep		= const double* (optional)
+//		scales			= const std::vector<double>* (optional)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::AddData(const std::vector<double> *data, const wxArrayString &descriptions,
+	const double *timeStep, const std::vector<double> *scales)
+{
+	assert(data);
+
+	Dataset2D *dataSet;
+	unsigned int i, j;
+
+	for (i = 1; i < descriptions.size(); i++)
+	{
+		if (descriptions[i].IsEmpty())
+			continue;
+
+		dataSet = new Dataset2D(data[0].size());
+		for (j = 0; j < data[0].size(); j++)
+		{
+			if (timeStep)
+				dataSet->GetXPointer()[j] = *timeStep * (double)j;
+			else
+				dataSet->GetXPointer()[j] = data[0].at(j);
+			dataSet->GetYPointer()[j] = data[plotList.GetCount() + 1].at(j);
+		}
+
+		if (scales)
+			*dataSet *= (*scales)[i];
+
+		AddCurve(dataSet, descriptions[i]);
+	}
 }
 
 //==========================================================================
@@ -1304,8 +1626,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFor
 //
 //==========================================================================
 wxArrayString MainFrame::ParseLineIntoColumns(wxString line,
-											  const wxString &delimiter,
-											  const bool &ignoreConsecutiveDelimiters)
+	const wxString &delimiter, const bool &ignoreConsecutiveDelimiters) const
 {
 	// Remove \r character from end of line (required for GTK, etc.)
 	line.Trim();
@@ -1361,7 +1682,6 @@ wxArrayString MainFrame::ParseLineIntoColumns(wxString line,
 //==========================================================================
 void MainFrame::SetTitleFromFileName(wxString pathAndFileName)
 {
-	// Set the name of the form to contain the file name
 	unsigned int start;
 #ifdef __WXMSW__
 	start = pathAndFileName.find_last_of(_T("\\")) + 1;
@@ -1390,7 +1710,6 @@ void MainFrame::SetTitleFromFileName(wxString pathAndFileName)
 //==========================================================================
 void MainFrame::ClearAllCurves(void)
 {
-	// Remove the curves locally
 	while (plotList.GetCount() > 0)
 		RemoveCurve(0);
 }
@@ -1522,20 +1841,67 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 {
 	plotList.Add(data);
 
-	// Handle adding to the grid control
 	optionsGrid->BeginBatch();
-
-	// If this is the first curve to be added, add a row for the time, too
-	unsigned int i;
 	if (optionsGrid->GetNumberRows() == 0)
-	{
-		optionsGrid->AppendRows();
-		
-		SetXDataLabel(currentFileFormat);
+		AddTimeRowToGrid();
+	unsigned int index = AddDataRowToGrid(name);
+	optionsGrid->EndBatch();
 
-		for (i = 0; i < colCount; i++)
-			optionsGrid->SetReadOnly(0, i, true);
-	}
+	plotArea->AddCurve(*data);
+	unsigned long size;
+	optionsGrid->GetCellValue(index, colSize).ToULong(&size);
+	plotArea->SetCurveProperties(index - 1, GetNextColor(index), true, false, size);
+	plotArea->UpdateDisplay();
+
+	// Resize to prevent scrollbars and hidden values in the grid control
+	topSizer->Layout();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		AddTimeRowToGrid
+//
+// Description:		Adds the entry for the time data to the options grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::AddTimeRowToGrid(void)
+{
+	optionsGrid->AppendRows();
+		
+	SetXDataLabel(currentFileFormat);
+
+	unsigned int i;
+	for (i = 0; i < colCount; i++)
+		optionsGrid->SetReadOnly(0, i, true);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		AddDataRowToGrid
+//
+// Description:		Adds the entry for the data to the options grid.
+//
+// Input Arguments:
+//		name	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int specifying the index of the new data
+//
+//==========================================================================
+unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
+{
 	unsigned int index = optionsGrid->GetNumberRows();
 	optionsGrid->AppendRows();
 
@@ -1545,88 +1911,72 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	optionsGrid->SetCellEditor(index, colRightAxis, new wxGridCellBoolEditor);
 	optionsGrid->SetCellEditor(index, colSize, new wxGridCellNumberEditor(1, maxLineSize));
 
-	// Don't allow the user to change the contents of anything except the boolean cells
+	unsigned int i;
 	for (i = 0; i < colDifference; i++)
 			optionsGrid->SetReadOnly(index, i, true);
 	optionsGrid->SetReadOnly(index, colSize, false);
-
-	// Populate cell values
 	optionsGrid->SetCellValue(index, colName, name);
 
-	// Choose next color and set background color of appropriate cell
+	Color color = GetNextColor(index);
+
+	optionsGrid->SetCellBackgroundColour(index, colColor, color.ToWxColor());
+	optionsGrid->SetCellValue(index, colSize, _T("1"));
+	optionsGrid->SetCellValue(index, colVisible, _T("1"));
+	optionsGrid->AutoSizeColumns();// FIXME:  This doesn't seem to fit to the X data label, if it is longer than the regular curve names
+
+	return index;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetNextColor
+//
+// Description:		Determines the next color to use (cycles through all the
+//					pre-defined colors).
+//
+// Input Arguments:
+//		index	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Color to sue
+//
+//==========================================================================
+Color MainFrame::GetNextColor(const unsigned int &index) const
+{
 	unsigned int colorIndex = (index - 1) % 10;
-	Color color;
-	switch (colorIndex)
-	{
-	case 0:
-		color = Color::ColorBlue;
-		break;
-
-	case 1:
-		color = Color::ColorRed;
-		break;
-
-	case 2:
-		color = Color::ColorGreen;
-		break;
-
-	case 3:
-		color = Color::ColorMagenta;
-		break;
-
-	case 4:
-		color = Color::ColorCyan;
-		break;
-
-	case 5:
-		color = Color::ColorOrange;// Opt not to use yellow by default -> too hard to see on default white background
-		break;
-
-	case 6:
-		color = Color::ColorGray;
-		break;
-
-	case 7:
-		color = Color::ColorPurple;
-		break;
-
-	case 8:
-		color = Color::ColorLightBlue;
-		break;
-
-	default:
-	case 9:
-		color = Color::ColorBlack;
-		break;
+	if (colorIndex == 0)
+		return Color::ColorBlue;
+	else if (colorIndex == 1)
+		return Color::ColorRed;
+	else if (colorIndex == 2)
+		return Color::ColorGreen;
+	else if (colorIndex == 3)
+		return Color::ColorMagenta;
+	else if (colorIndex == 4)
+		return Color::ColorCyan;
+	else if (colorIndex == 5)
+		return Color::ColorOrange;
+	else if (colorIndex == 6)
+		return Color::ColorGray;
+	else if (colorIndex == 7)
+		return Color::ColorPurple;
+	else if (colorIndex == 8)
+		return Color::ColorLightBlue;
+	else if (colorIndex == 9)
+		return Color::ColorBlack;
+	else
+		assert(false);
 
 	// The following colors we opt'ed not to use - either too hard to see or too similar to other colors
 	// Color::ColorYellow
 	// Color::ColorDrabGreen
 	// Color::ColorPaleGreen
 	// Color::ColorPink
-	}
 
-	optionsGrid->SetCellBackgroundColour(index, colColor, color.ToWxColor());
-
-	optionsGrid->SetCellValue(index, colSize, _T("1"));
-
-	// Set default boolean values
-	optionsGrid->SetCellValue(index, colVisible, _T("1"));
-
-	optionsGrid->AutoSizeColumns();// FIXME:  This doesn't seem to fit to the X data label, if it is longer than the regular curve names
-
-	optionsGrid->EndBatch();
-
-	// Add the curve to the plot
-	plotArea->AddCurve(*data);
-	unsigned long size;
-	optionsGrid->GetCellValue(index, colSize).ToULong(&size);
-	plotArea->SetCurveProperties(index - 1, color, true, false, size);
-
-	plotArea->UpdateDisplay();
-
-	// Resize to prevent scrollbars and hidden values in the grid control
-	topSizer->Layout();
+	return Color::ColorBlack;
 }
 
 //==========================================================================
@@ -1721,8 +2071,8 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
 
 	wxColourDialog dialog(this, &colorData);
 	dialog.CenterOnParent();
-    dialog.SetTitle(_T("Choose Line Color"));
-    if (dialog.ShowModal() == wxID_OK)
+	dialog.SetTitle(_T("Choose Line Color"));
+	if (dialog.ShowModal() == wxID_OK)
     {
         colorData = dialog.GetColourData();
 		optionsGrid->SetCellBackgroundColour(row, colColor, colorData.GetColour());
@@ -1733,7 +2083,7 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
 		plotArea->SetCurveProperties(row - 1, color,
 			!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
 			!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
-    }
+	}
 }
 
 //==========================================================================
@@ -1773,6 +2123,35 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 	else
 		optionsGrid->SetCellValue(row, event.GetCol(), _T("1"));
 
+	ShowAppropriateXLabel();
+
+	Color color;
+	color.Set(optionsGrid->GetCellBackgroundColour(row, colColor));
+	unsigned long size;
+	optionsGrid->GetCellValue(row, colSize).ToULong(&size);
+	plotArea->SetCurveProperties(row - 1, color,
+		!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
+		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ShowAppropriateXLabel
+//
+// Description:		Updates the x-axis label as necessary.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ShowAppropriateXLabel(void)
+{
 	// If the only visible curves are FFTs, change the x-label
 	int i;
 	bool showFFTLabel(false);
@@ -1789,18 +2168,11 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 			}
 		}
 	}
+
 	if (showFFTLabel)
 		SetXDataLabel(FormatFFT);
 	else
 		SetXDataLabel(currentFileFormat);
-
-	Color color;
-	color.Set(optionsGrid->GetCellBackgroundColour(row, colColor));
-	unsigned long size;
-	optionsGrid->GetCellValue(row, colSize).ToULong(&size);
-	plotArea->SetCurveProperties(row - 1, color,
-		!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
-		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
 }
 
 //==========================================================================
@@ -1856,107 +2228,183 @@ void MainFrame::GridCellChangeEvent(wxGridEvent &event)
 //==========================================================================
 bool MainFrame::GetXAxisScalingFactor(double &factor, wxString *label)
 {
-	// Put known file formats here (at the top), to save time and eliminate possibility for error
+	if (XScalingFactorIsKnown(factor, label))
+		return true;
 
-	// For Baumulelr datasets, multiply x data by 1000 in order to have seconds
+	wxString unit = ExtractUnitFromDescription(genericXAxisLabel);
+
+	unit = unit.Trim().Trim(false);
+	if (label)
+		label->assign(unit);
+
+	return UnitStringToFactor(unit, factor);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		XScalingFactorIsKnown
+//
+// Description:		If the x-axis scaling factor is known, determines its value.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		factor	= double&
+//		label	= wxString*
+//
+// Return Value:
+//		bool, true if known, false otherwise
+//
+//==========================================================================
+bool MainFrame::XScalingFactorIsKnown(double &factor, wxString *label) const
+{
 	if (currentFileFormat == FormatBaumuller)
 	{
 		factor = 1000.0;
 		if (label)
 			label->assign(_T("msec"));
+		return true;
 	}
 	else if (currentFileFormat == FormatKollmorgen)
 	{
 		factor = 1.0;
 		if (label)
 			label->assign(_T("sec"));
+		return true;
 	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ExtractUnitFromDescription
+//
+// Description:		Parses the description looking for a unit string.  This
+//					will recognize the following as unit strings:
+//					X Series Name [unit]
+//					X Series Name (unit)
+//					X Series Name *delimiter* unit
+//
+// Input Arguments:
+//		description	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing the unit porition of the description
+//
+//==========================================================================
+wxString MainFrame::ExtractUnitFromDescription(const wxString &description) const
+{
+	wxString unit;
+	if (FindWrappedString(description, unit, '[', ']'))
+		return unit;
+	else if (FindWrappedString(description, unit, '(', ')'))
+		return unit;
+
+	// Check for last string following a delimiter
+	wxArrayString delimiters;
+	delimiters.Add(_T(","));
+	delimiters.Add(_T(";"));
+	delimiters.Add(_T("-"));
+	delimiters.Add(_T(":"));
+
+	int location;
+	unsigned int i;
+	for (i = 0; i < delimiters.size(); i++)
+	{
+		location = description.Find(delimiters[i].c_str());
+		if (location != wxNOT_FOUND && location < (int)description.Len() - 1)
+		{
+			unit = description.Mid(location + 1);
+			break;
+		}
+	}
+
+	return unit;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		FindWrappedString
+//
+// Description:		Determines if the specified string contains a string wrapped
+//					with the specified characters.
+//
+// Input Arguments:
+//		s		= const wxString&
+//		open	= const wxChar& specifying the opening wrapping character
+//		close	= const wxChar& specifying the closing warpping character
+//
+// Output Arguments:
+//		contents	= wxString&
+//
+// Return Value:
+//		bool, true if a wrapped string is found, false otherwise
+//
+//==========================================================================
+bool MainFrame::FindWrappedString(const wxString &s, wxString &contents,
+	const wxChar &open, const wxChar &close) const
+{
+	if (s.Last() == close)
+	{
+		int i;
+		for (i = s.Len() - 2; i >= 0; i--)
+		{
+			if (s.at(i) == open)
+			{
+				contents = s.Mid(i + 1, s.Len() - i - 2);
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		UnitStringToFactor
+//
+// Description:		Converts from a unit string to a factor value.
+//
+// Input Arguments:
+//		unit	= const wxString&
+//
+// Output Arguments:
+//		factor	= double&
+//
+// Return Value:
+//		bool, true if unit can be converted, false otherwise
+//
+//==========================================================================
+bool MainFrame::UnitStringToFactor(const wxString &unit, double &factor) const
+{
+	// We'll recognize the following units:
+	// h, hr, hours -> factor = 1.0 / 3600.0
+	// m, min, minutes -> factor = 1.0 / 60.0
+	// s, sec, seconds -> factor = 1.0
+	// ms, msec, milliseconds -> factor = 1000.0
+	// us, usec, microseconds -> factor = 1000000.0
+
+	if (unit.CmpNoCase(_T("h")) == 0 || unit.CmpNoCase(_T("hr")) == 0 || unit.CmpNoCase(_T("hours")) == 0)
+		factor = 1.0 / 3600.0;
+	else if (unit.CmpNoCase(_T("m")) == 0 || unit.CmpNoCase(_T("min")) == 0 || unit.CmpNoCase(_T("minutes")) == 0)
+		factor = 1.0 / 60.0;
+	else if (unit.CmpNoCase(_T("s")) == 0 || unit.CmpNoCase(_T("sec")) == 0 || unit.CmpNoCase(_T("seconds")) == 0)
+		factor = 1.0;
+	else if (unit.CmpNoCase(_T("ms")) == 0 || unit.CmpNoCase(_T("msec")) == 0 || unit.CmpNoCase(_T("milliseconds")) == 0)
+		factor = 1000.0;
+	else if (unit.CmpNoCase(_T("us")) == 0 || unit.CmpNoCase(_T("usec")) == 0 || unit.CmpNoCase(_T("microseconds")) == 0)
+		factor = 1000000.0;
 	else
 	{
-		// Use time series label to determine units and decide if scaling is necessary
-		wxString xSeriesLabel(genericXAxisLabel);
-
-		// We'll recognize the following label formats:
-		// X Series Name [unit]
-		// X Series Name (unit)
-		// X Series Name *delimiter* unit
-
-		// Can we find an appropriate label format?
-		unsigned int i;
-		wxString unit;
-		if (xSeriesLabel.Last() == ']')
-		{
-			// Step backwards until we find the matching bracket
-			for (i = xSeriesLabel.Len() - 2; i >= 0; i--)
-			{
-				if (xSeriesLabel.at(i) == '[')
-				{
-					unit = xSeriesLabel.Mid(i + 1, xSeriesLabel.Len() - i - 2);
-					break;
-				}
-			}
-		}
-		else if (xSeriesLabel.Last() == ')')
-		{
-			// Step backwards until we find the matching parenthese
-			for (i = xSeriesLabel.Len() - 2; i >= 0; i--)
-			{
-				if (xSeriesLabel.at(i) == '(')
-				{
-					unit = xSeriesLabel.Mid(i + 1, xSeriesLabel.Len() - i - 2);
-					break;
-				}
-			}
-		}
-		else// Check for delimiters
-		{
-			wxArrayString delimiters;
-			delimiters.Add(_T(","));
-			delimiters.Add(_T(";"));
-			delimiters.Add(_T("-"));
-			delimiters.Add(_T(":"));
-
-			int location;
-			for (i = 0; i < delimiters.size(); i++)
-			{
-				location = xSeriesLabel.Find(delimiters[i].c_str());
-				if (location != wxNOT_FOUND && location < (int)xSeriesLabel.Len() - 1)
-				{
-					unit = xSeriesLabel.Mid(location + 1);
-					break;
-				}
-			}
-		}
-
-		// Remove whitespace
-		unit = unit.Trim().Trim(false);
-		if (label)
-			label->assign(unit);
-
-		// We'll recognize the following units:
-		// h, hr, hours -> factor = 1.0 / 3600.0
-		// m, min, minutes -> factor = 1.0 / 60.0
-		// s, sec, seconds -> factor = 1.0
-		// ms, msec, milliseconds -> factor = 1000.0
-		// us, usec, microseconds -> factor = 1000000.0
-
-		// Do we recognize the units?
-		if (unit.CmpNoCase(_T("h")) == 0 || unit.CmpNoCase(_T("hr")) == 0 || unit.CmpNoCase(_T("hours")) == 0)
-			factor = 1.0 / 3600.0;
-		else if (unit.CmpNoCase(_T("m")) == 0 || unit.CmpNoCase(_T("min")) == 0 || unit.CmpNoCase(_T("minutes")) == 0)
-			factor = 1.0 / 60.0;
-		else if (unit.CmpNoCase(_T("s")) == 0 || unit.CmpNoCase(_T("sec")) == 0 || unit.CmpNoCase(_T("seconds")) == 0)
-			factor = 1.0;
-		else if (unit.CmpNoCase(_T("ms")) == 0 || unit.CmpNoCase(_T("msec")) == 0 || unit.CmpNoCase(_T("milliseconds")) == 0)
-			factor = 1000.0;
-		else if (unit.CmpNoCase(_T("us")) == 0 || unit.CmpNoCase(_T("usec")) == 0 || unit.CmpNoCase(_T("microseconds")) == 0)
-			factor = 1000000.0;
-		else
-		{
-			// Assume a factor of 1
-			factor = 1.0;
-			return false;
-		}
+		// Assume a factor of 1
+		factor = 1.0;
+		return false;
 	}
 
 	return true;
@@ -2142,40 +2590,59 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 			_T("Accuracy Warning"), wxICON_WARNING, this);
 
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData;
-
-	// If the user has zoomed in along the X-axis, use the current "time window"
-	if (plotArea->GetXAxisZoomed())
-	{
-		wxMessageBox(_T("FFT will include currently visible time period only."), _T("FFT"), wxICON_WARNING, this);
-
-		unsigned int i, startIndex(0), endIndex(0);
-		while (plotList[row - 1]->GetXData(startIndex) < plotArea->GetXMin() &&
-			startIndex < plotList[row - 1]->GetNumberOfPoints())
-			startIndex++;
-		endIndex = startIndex;
-		while (plotList[row - 1]->GetXData(endIndex) < plotArea->GetXMax() &&
-			endIndex < plotList[row - 1]->GetNumberOfPoints())
-			endIndex++;
-
-		Dataset2D tempData(endIndex - startIndex);
-
-		for (i = startIndex; i < endIndex; i++)
-		{
-			tempData.GetXPointer()[i - startIndex] = plotList[row - 1]->GetXData(i);
-			tempData.GetYPointer()[i - startIndex] = plotList[row - 1]->GetYData(i);
-		}
-
-		newData = new Dataset2D(FastFourierTransform::Compute(tempData));
-	}
-	else
-		newData = new Dataset2D(FastFourierTransform::Compute(*plotList[row - 1]));
+	Dataset2D *newData = GetFFTData(plotList[row - 1]);
 
 	// Scale as required
 	newData->MultiplyXData(factor);
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetFFTData
+//
+// Description:		Returns a dataset containing an FFT of the specified data.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D* pointing to a dataset contining the new FFT data
+//
+//==========================================================================
+Dataset2D* MainFrame::GetFFTData(const Dataset2D* data)
+{
+	// If the user has zoomed in along the X-axis, use the current "time window"
+	if (plotArea->GetXAxisZoomed())
+	{
+		wxMessageBox(_T("FFT will include currently visible time period only."), _T("FFT"), wxICON_WARNING, this);
+
+		unsigned int i, startIndex(0), endIndex(0);
+		while (data->GetXData(startIndex) < plotArea->GetXMin() &&
+			startIndex < data->GetNumberOfPoints())
+			startIndex++;
+		endIndex = startIndex;
+		while (data->GetXData(endIndex) < plotArea->GetXMax() &&
+			endIndex < data->GetNumberOfPoints())
+			endIndex++;
+
+		Dataset2D tempData(endIndex - startIndex);
+
+		for (i = startIndex; i < endIndex; i++)
+		{
+			tempData.GetXPointer()[i - startIndex] = data->GetXData(i);
+			tempData.GetYPointer()[i - startIndex] = data->GetYData(i);
+		}
+
+		return new Dataset2D(FastFourierTransform::Compute(tempData));
+	}
+
+	return new Dataset2D(FastFourierTransform::Compute(*data));
 }
 
 //==========================================================================
@@ -2287,21 +2754,73 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 		return;
 	}
 
-	// Fit the data
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	CurveFit::PolynomialFit fitData = CurveFit::DoPolynomialFit(*plotList[row - 1], order);
+	wxString name;
+	Dataset2D* newData = GetCurveFitData(order, plotList[optionsGrid->GetSelectedRows()[0] - 1], name);
+	
+	AddCurve(newData, name);
+}
 
-	// Create a data set to draw the fit and add it to the plot
-	Dataset2D *newData = new Dataset2D(*plotList[row - 1]);
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetCurveFitData
+//
+// Description:		Fits a curve of the specified order to the specified data
+//					and returns a dataset containing the curve.
+//
+// Input Arguments:
+//		order	= const unsigned int&
+//		data	= const Dataset2D*
+//
+// Output Arguments:
+//		name	= wxString&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Dataset2D* MainFrame::GetCurveFitData(const unsigned int &order,
+	const Dataset2D* data, wxString &name) const
+{
+	CurveFit::PolynomialFit fitData = CurveFit::DoPolynomialFit(*data, order);
+
+	Dataset2D *newData = new Dataset2D(*data);
 	unsigned int i;
 	for (i = 0; i < newData->GetNumberOfPoints(); i++)
 		newData->GetYPointer()[i] = CurveFit::EvaluateFit(newData->GetXData(i), fitData);
 
-	// Create descriptive string to use as the name
+	name = GetCurveFitName(fitData, optionsGrid->GetSelectedRows()[0]);
+
+	delete [] fitData.coefficients;
+
+	return newData;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetCurveFitName
+//
+// Description:		Determines an appropriate name for a curve fit dataset.
+//
+// Input Arguments:
+//		fitData	= const CurveFit::PolynomialFit&
+//		row		= const unsigned int& specifying the dataset ID that was fit
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString indicating the name for the fit
+//
+//==========================================================================
+wxString MainFrame::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
+	const unsigned int &row) const
+{
 	wxString name, termString;
 	//name.Printf("Order %lu Fit([%i]), R^2 = %0.2f", order, row, fitData.rSquared);
 	name.Printf("Fit [%i] (R^2 = %0.2f): ", row, fitData.rSquared);
-	for (i = 0; i <= order; i++)
+
+	unsigned int i;
+	for (i = 0; i <= fitData.order; i++)
 	{
 		if (i == 0)
 			termString.Printf("%1.2e", fitData.coefficients[i]);
@@ -2310,7 +2829,7 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 		else
 			termString.Printf("%0.2ex^%i", fabs(fitData.coefficients[i]), i);
 
-		if (i < order)
+		if (i < fitData.order)
 		{
 			if (fitData.coefficients[i] > 0.0)
 				termString.Append(_T(" + "));
@@ -2319,10 +2838,8 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 		}
 		name.Append(termString);
 	}
-	AddCurve(newData, name);
 
-	// Free the coefficient data
-	delete [] fitData.coefficients;
+	return name;
 }
 
 //==========================================================================
@@ -2405,75 +2922,60 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 
 	// For each curve, update the cursor values
 	int i;
-	double value;
-	wxString valueString;
 	for (i = 1; i < optionsGrid->GetRows(); i++)
 	{
-		if (leftVisible)
-		{
-			valueString.Printf("%f", leftValue);
-			optionsGrid->SetCellValue(0, colLeftCursor, valueString);
+		UpdateSingleCursorValue(i, leftValue, colLeftCursor, leftVisible);
+		UpdateSingleCursorValue(i, rightValue, colRightCursor, rightVisible);
 
-			value = leftValue;
-			if (plotList[i - 1]->GetYAt(value))
-			{
-				valueString.Printf("%f", value);
-				optionsGrid->SetCellValue(i, colLeftCursor, _T("*") + valueString);
-			}
-			else
-			{
-				valueString.Printf("%f", value);
-				optionsGrid->SetCellValue(i, colLeftCursor, valueString);
-			}
+		if (leftVisible && rightVisible)
+		{
+			double left(leftValue), right(rightValue);
+			plotList[i - 1]->GetYAt(left);
+			plotList[i - 1]->GetYAt(right);
+			optionsGrid->SetCellValue(i, colDifference, wxString::Format("%f", right - left));
+			optionsGrid->SetCellValue(0, colDifference, wxString::Format("%f", rightValue - leftValue));
 		}
+	}
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		UpdateSingleCursorValue
+//
+// Description:		Updates a single cursor value.
+//
+// Input Arguments:
+//		row		= const unsigned int& specifying the grid row
+//		value	= const double& specifying the value to populate
+//		column	= const unsigned int& specifying which grid column to populate
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::UpdateSingleCursorValue(const unsigned int &row,
+	double value, const unsigned int &column, const bool &isVisible)
+{
+	if (isVisible)
+	{
+		optionsGrid->SetCellValue(0, column, wxString::Format("%f", value));
+
+		if (plotList[row - 1]->GetYAt(value))
+			optionsGrid->SetCellValue(row, column, _T("*") + wxString::Format("%f", value));
 		else
-		{
-			optionsGrid->SetCellValue(0, colLeftCursor, wxEmptyString);
-			optionsGrid->SetCellValue(i, colLeftCursor, wxEmptyString);
+			optionsGrid->SetCellValue(row, column, wxString::Format("%f", value));
+	}
+	else
+	{
+		optionsGrid->SetCellValue(0, column, wxEmptyString);
+		optionsGrid->SetCellValue(row, column, wxEmptyString);
 
-			// The difference column only exists if both cursors are visible
-			optionsGrid->SetCellValue(0, colDifference, wxEmptyString);
-			optionsGrid->SetCellValue(i, colDifference, wxEmptyString);
-		}
-
-		if (rightVisible)
-		{
-			valueString.Printf("%f", rightValue);
-			optionsGrid->SetCellValue(0, colRightCursor, valueString);
-
-			value = rightValue;
-			if (plotList[i - 1]->GetYAt(value))
-			{
-				valueString.Printf("%f", value);
-				optionsGrid->SetCellValue(i, colRightCursor, _T("*") + valueString);
-			}
-			else
-			{
-				valueString.Printf("%f", value);
-				optionsGrid->SetCellValue(i, colRightCursor, valueString);
-			}
-
-			// Update the difference cells if the left cursor is visible, too
-			if (leftVisible)
-			{
-				double left = leftValue;
-				plotList[i - 1]->GetYAt(left);
-				valueString.Printf("%f", value - left);
-				optionsGrid->SetCellValue(i, colDifference, valueString);
-
-				valueString.Printf("%f", rightValue - leftValue);
-				optionsGrid->SetCellValue(0, colDifference, valueString);
-			}
-		}
-		else
-		{
-			optionsGrid->SetCellValue(0, colRightCursor, wxEmptyString);
-			optionsGrid->SetCellValue(i, colRightCursor, wxEmptyString);
-
-			// The difference column only exists if both cursors are visible
-			optionsGrid->SetCellValue(0, colDifference, wxEmptyString);
-			optionsGrid->SetCellValue(i, colDifference, wxEmptyString);
-		}
+		// The difference column only exists if both cursors are visible
+		optionsGrid->SetCellValue(0, colDifference, wxEmptyString);
+		optionsGrid->SetCellValue(row, colDifference, wxEmptyString);
 	}
 }
 
@@ -2525,32 +3027,10 @@ void MainFrame::DisplayMathChannelDialog(wxString defaultInput)
 //==========================================================================
 void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 {
-	// Assign min and max to current axis limits
 	double min, max;
-	switch (axis)
-	{
-	case plotContextXAxis:
-		min = plotArea->GetXMin();
-		max = plotArea->GetXMax();
-		break;
-
-	case plotContextLeftYAxis:
-		min = plotArea->GetLeftYMin();
-		max = plotArea->GetLeftYMax();
-		break;
-
-	case plotContextRightYAxis:
-		min = plotArea->GetRightYMin();
-		max = plotArea->GetRightYMax();
-		break;
-
-	default:
-	case plotContextPlotArea:
-		// Plot area is not a valid context in which we can set axis limits
+	if (!GetCurrentAxisRange(axis, min, max))
 		return;
-	}
 
-	// Display the dialog and make sure the user doesn't cancel
 	RangeLimitsDialog dialog(this, min, max);
 	if (dialog.ShowModal() != wxID_OK)
 		return;
@@ -2574,6 +3054,74 @@ void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 		return;
 	}
 
+	SetNewAxisRange(axis, min, max);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetCurrentAxisRange
+//
+// Description:		Returns the range for the specified axis.
+//
+// Input Arguments:
+//		axis	= const PlotContext&
+//
+// Output Arguments:
+//		min		= double&
+//		max		= double&
+//
+// Return Value:
+//		bool, true on success, false otherwise
+//
+//==========================================================================
+bool MainFrame::GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const
+{
+	switch (axis)
+	{
+	case plotContextXAxis:
+		min = plotArea->GetXMin();
+		max = plotArea->GetXMax();
+		break;
+
+	case plotContextLeftYAxis:
+		min = plotArea->GetLeftYMin();
+		max = plotArea->GetLeftYMax();
+		break;
+
+	case plotContextRightYAxis:
+		min = plotArea->GetRightYMin();
+		max = plotArea->GetRightYMax();
+		break;
+
+	default:
+	case plotContextPlotArea:
+		// Plot area is not a valid context in which we can set axis limits
+		return false;
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		SetNewAxisRange
+//
+// Description:		Returns the range for the specified axis.
+//
+// Input Arguments:
+//		axis	= const PlotContext&
+//		min		= const double&
+//		max		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::SetNewAxisRange(const PlotContext &axis, const double &min, const double &max)
+{
 	switch (axis)
 	{
 	case plotContextLeftYAxis:
@@ -2805,14 +3353,14 @@ void MainFrame::ContextPlotBGColor(wxCommandEvent& WXUNUSED(event))
 
 	wxColourDialog dialog(this, &colorData);
 	dialog.CenterOnParent();
-    dialog.SetTitle(_T("Choose Background Color"));
-    if (dialog.ShowModal() == wxID_OK)
+	dialog.SetTitle(_T("Choose Background Color"));
+	if (dialog.ShowModal() == wxID_OK)
     {
 		Color color;
 		color.Set(dialog.GetColourData().GetColour());
 		plotArea->SetBackgroundColor(color);
 		plotArea->UpdateDisplay();
-    }
+	}
 }
 
 //==========================================================================
@@ -2839,14 +3387,14 @@ void MainFrame::ContextGridColor(wxCommandEvent& WXUNUSED(event))
 
 	wxColourDialog dialog(this, &colorData);
 	dialog.CenterOnParent();
-    dialog.SetTitle(_T("Choose Background Color"));
-    if (dialog.ShowModal() == wxID_OK)
+	dialog.SetTitle(_T("Choose Background Color"));
+	if (dialog.ShowModal() == wxID_OK)
     {
 		Color color;
 		color.Set(dialog.GetColourData().GetColour());
 		plotArea->SetGridColor(color);
 		plotArea->UpdateDisplay();
-    }
+	}
 }
 
 //==========================================================================
@@ -2898,34 +3446,12 @@ FilterParameters MainFrame::DisplayFilterDialog(void)
 //==========================================================================
 void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 {
-	double sampleRate = 1.0 / (data.GetXData(1) - data.GetXData(0));// [Hz]
-
 	double factor;
 	if (!GetXAxisScalingFactor(factor))
 		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
 			_T("Accuracy Warning"), wxICON_WARNING, this);
-	sampleRate *= factor;
 
-	FilterBase *filter = NULL;
-	switch (parameters.type)
-	{
-	case FilterParameters::TypeLowPass:
-		if ((parameters.order == 1 && !parameters.phaseless) || (parameters.order == 2 && parameters.phaseless))
-			filter = new LowPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, data.GetYData(0));
-		else if ((parameters.order == 2 && !parameters.phaseless) || (parameters.order == 4 && parameters.phaseless))
-			filter = new LowPassSecondOrderFilter(parameters.cutoffFrequency, parameters.dampingRatio, sampleRate, data.GetYData(0));
-		else
-			assert(false);
-		break;
-
-	case FilterParameters::TypeHighPass:
-		assert(parameters.order == 1);
-		filter = new HighPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, data.GetYData(0));
-		break;
-
-	default:
-		assert(false);
-	}
+	FilterBase *filter = GetFilter(parameters, factor / (data.GetXData(1) - data.GetXData(0)), data.GetYData(0));
 
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
@@ -2942,6 +3468,51 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 	}
 
 	delete filter;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetFilter
+//
+// Description:		Returns a filter matching the specified parameters.
+//
+// Input Arguments:
+//		parameters		= const FilterParameters&
+//		sampleRate		= const double& [sec]
+//		initialValue	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		FilterBase*
+//
+//==========================================================================
+FilterBase* MainFrame::GetFilter(const FilterParameters &parameters,
+	const double &sampleRate, const double &initialValue) const
+{
+	FilterBase *filter = NULL;
+	switch (parameters.type)
+	{
+	case FilterParameters::TypeLowPass:
+		if ((parameters.order == 1 && !parameters.phaseless) || (parameters.order == 2 && parameters.phaseless))
+			filter = new LowPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, initialValue);
+		else if ((parameters.order == 2 && !parameters.phaseless) || (parameters.order == 4 && parameters.phaseless))
+			filter = new LowPassSecondOrderFilter(parameters.cutoffFrequency, parameters.dampingRatio, sampleRate, initialValue);
+		else
+			assert(false);
+		break;
+
+	case FilterParameters::TypeHighPass:
+		assert(parameters.order == 1);
+		filter = new HighPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, initialValue);
+		break;
+
+	default:
+		assert(false);
+	}
+
+	return filter;
 }
 
 //==========================================================================

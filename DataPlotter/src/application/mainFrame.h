@@ -16,12 +16,17 @@
 #ifndef _MAIN_FRAME_H_
 #define _MAIN_FRAME_H_
 
+// Standard C++ headers
+#include <fstream>
+#include <vector>
+
 // wxWidgets headers
 #include <wx/wx.h>
 
 // Local headers
 #include "utilities/dataset2D.h"
 #include "utilities/managedList.h"
+#include "utilities/signals/curveFit.h"
 
 // wxWidgets forward declarations
 class wxGrid;
@@ -31,6 +36,8 @@ class wxGridEvent;
 class PlotRenderer;
 struct FilterParameters;
 class CustomFileFormat;
+class Color;
+class FilterBase;
 
 // The main frame class
 class MainFrame : public wxFrame
@@ -70,12 +77,18 @@ private:
 	void DoLayout(void);
 	void SetProperties(void);
 
+	void CreatePlotArea(wxWindow *parent);
+	void CreateOptionsGrid(wxWindow *parent);
+	wxBoxSizer* CreateButtons(wxWindow *parent);
+
 	// Controls
 	wxButton *openButton;
 	wxButton *autoScaleButton;
 	wxButton *removeCurveButton;
 	wxGrid *optionsGrid;
 	wxBoxSizer *topSizer;
+
+	PlotRenderer *plotArea;
 
 	enum Columns
 	{
@@ -102,12 +115,15 @@ private:
 	void AddCurve(Dataset2D *data, wxString name);
 	void RemoveCurve(const unsigned int &i);
 
+	Color GetNextColor(const unsigned int &index) const;
+	void AddTimeRowToGrid(void);
+	unsigned int AddDataRowToGrid(const wxString &name);
+
 	ManagedList<const Dataset2D> plotList;
 
 	// The event IDs
 	enum MainFrameEventID
 	{
-		// Menu bar
 		idButtonOpen = wxID_HIGHEST + 100,
 		idButtonAutoScale,
 		idButtonRemoveCurve,
@@ -132,7 +148,7 @@ private:
 		idPlotContextBGColor,
 		idPlotContextGridColor,
 
-		idPlotContextToggleBottomGridlines,
+		idPlotContextToggleBottomGridlines,// Maintain this order for each axis' context IDs
 		idPlotContextSetBottomRange,
 		idPlotContextSetBottomLogarithmic,
 		idPlotContextAutoScaleBottom,
@@ -152,6 +168,9 @@ private:
 		idPlotContextSetRightLogarithmic,
 		idPlotContextAutoScaleRight
 	};
+
+	wxMenu *CreateAxisContextMenu(const unsigned int &baseEventId) const;
+	wxMenu *CreatePlotAreaContextMenu(void) const;
 
 	// Event handlers-----------------------------------------------------
 	// Buttons
@@ -202,15 +221,30 @@ private:
 	void ContextSetLogarithmicRight(wxCommandEvent &event);
 	// End event handlers-------------------------------------------------
 
+	void ShowAppropriateXLabel(void);
+
 	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);
 	FilterParameters DisplayFilterDialog(void);
 	void ApplyFilter(const FilterParameters &parameters, Dataset2D &data);
 
-	// The main control
-	PlotRenderer *plotArea;
+	bool XScalingFactorIsKnown(double &factor, wxString *label) const;
+	bool UnitStringToFactor(const wxString &unit, double &factor) const;
+	wxString ExtractUnitFromDescription(const wxString &description) const;
+	bool FindWrappedString(const wxString &s, wxString &contents,
+		const wxChar &open, const wxChar &close) const;
 
-	// The menu and status bars
-	wxMenuBar *menuBar;
+	Dataset2D *GetFFTData(const Dataset2D* data);
+	Dataset2D *GetCurveFitData(const unsigned int &order, const Dataset2D* data, wxString &name) const;
+	wxString GetCurveFitName(const CurveFit::PolynomialFit &fitData, const unsigned int &row) const;
+
+	void UpdateSingleCursorValue(const unsigned int &row, double value,
+		const unsigned int &column, const bool &isVisible);
+
+	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
+	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);
+
+	FilterBase* GetFilter(const FilterParameters &parameters,
+		const double &sampleRate, const double &initialValue) const;
 
 	// Load file methods
 	bool LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat);
@@ -219,8 +253,35 @@ private:
 	bool LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFormat *customFormat = NULL);
 	bool LoadBaumullerFile(wxString pathAndFileName);
 	bool LoadKollmorgenFile(wxString pathAndFileName);
+
+	bool IsBaumullerFile(const wxString &pathAndFileName);
+	bool IsKollmorgenFile(const wxString &pathAndFileName);
+
+	bool ExtractData(std::ifstream &file, const wxString &delimiter, std::vector<double> *data,
+		const wxArrayString &descriptions) const;
+	void AddData(const std::vector<double> *data, const wxArrayString &descriptions,
+		const double *timeStep = NULL, const std::vector<double> *scales = NULL);
 	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter,
-		const bool &ignoreConsecutiveDelimiters = true);
+		const bool &ignoreConsecutiveDelimiters = true) const;
+	unsigned int GetPopulatedCount(const wxArrayString &list) const;
+
+	wxArrayString GetBaumullerDescriptions(std::ifstream &file, const wxString &delimiter) const;
+	wxArrayString GetKollmorgenDescriptions(std::ifstream &file, const wxString &delimiter, double &samplingPeriod) const;
+	wxArrayString GetGenericDescriptions(const wxString &fileName, const wxArrayString &delimiterList,
+		wxString &delimiter, unsigned int &headerLines);
+
+	void GenerateGenericNames(const wxArrayString &previousLines, const wxArrayString &currentLine,
+		const wxString &delimiter, wxArrayString &descriptions) const;
+
+	wxArrayString GetDelimiterList(const CustomFileFormat *customFormat) const;
+
+	void CompensateGenericChoices(wxArrayInt &choices) const;
+	void RemoveUnwantedDescriptions(wxArrayString &descriptions, const wxArrayInt &choices) const;
+
+	bool ProcessGenericFile(const wxString &fileName, wxArrayString &descriptions,
+		const unsigned int &headerLines, const wxString &delimiter, const std::vector<double> &scales);
+
+	void SkipLines(std::ifstream &file, const unsigned int &count) const;
 
 	enum FileFormat
 	{
@@ -237,7 +298,6 @@ private:
 	void SetXDataLabel(const FileFormat &format);
 	wxString genericXAxisLabel;
 
-	// For the event table
 	DECLARE_EVENT_TABLE();
 
 	// Testing methods

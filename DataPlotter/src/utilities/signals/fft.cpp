@@ -34,7 +34,7 @@
 //		None
 //
 // Return Value:
-//		Dataset2D containing the requested time history
+//		Dataset2D containing the FFT results
 //
 //==========================================================================
 Dataset2D FastFourierTransform::Compute(const Dataset2D &data)
@@ -64,25 +64,49 @@ Dataset2D FastFourierTransform::Compute(const Dataset2D &data)
 	if (data.GetNumberOfPoints() < 2)
 		return temp;
 
-	unsigned int i, i1, j, k, i2, l, l1, l2;
-	double c1, c2, tempX, tempY, t1, t2, u1, u2, z;
+	DoBitReversal(fftPoints, temp);
+	DoFFT(powerOfTwo, fftPoints, temp);
+	ConvertToMagnitudeFrequency(fftPoints, sampleRate, temp, fft);
 
-	// Do the bit reversal
-	i2 = fftPoints >> 1;
+	return fft;
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		DoBitReversal (static)
+//
+// Description:		Performs bit reversal on processing dataset (step one).
+//
+// Input Arguments:
+//		fftPoints	= const unsigned int&
+//		set			= Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FastFourierTransform::DoBitReversal(const unsigned int &fftPoints, Dataset2D &set)
+{
+	unsigned int i, j, k;
+	double tempX, tempY;
+
 	j = 0;
 	for (i = 0; i < fftPoints - 1; i++)
 	{
 		if (i < j)
 		{
-			tempX = temp.GetXData(i);
-			tempY = temp.GetYData(i);
-			temp.GetXPointer()[i] = temp.GetXData(j);
-			temp.GetYPointer()[i] = temp.GetYData(j);
-			temp.GetXPointer()[j] = tempX;
-			temp.GetYPointer()[j] = tempY;
+			tempX = set.GetXData(i);
+			tempY = set.GetYData(i);
+			set.GetXPointer()[i] = set.GetXData(j);
+			set.GetYPointer()[i] = set.GetYData(j);
+			set.GetXPointer()[j] = tempX;
+			set.GetYPointer()[j] = tempY;
 		}
 
-		k = i2;
+		k = fftPoints >> 1;
 		while (k <= j)
 		{
 			j -= k;
@@ -91,6 +115,30 @@ Dataset2D FastFourierTransform::Compute(const Dataset2D &data)
 
 		j += k;
 	}
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		DoFFT (static)
+//
+// Description:		Performs the calculation to get raw FFT data.
+//
+// Input Arguments:
+//		powerOfTwo	= const unsigned int&
+//		fftPoitns	= const unsigned int&
+//		temp		= Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FastFourierTransform::DoFFT(const unsigned int &powerOfTwo, const unsigned int &fftPoints, Dataset2D &temp)
+{
+	unsigned int i, j, i1, l, l1, l2;
+	double c1, c2, t1, t2, u1, u2, z;
 
 	// Compute the FFT
 	c1 = -1.0; 
@@ -122,17 +170,39 @@ Dataset2D FastFourierTransform::Compute(const Dataset2D &data)
 		c2 = -c2;
 		c1 = sqrt((1.0 + c1) / 2.0);
 	}
+}
 
-	double magnitude, frequency;
-	for (i = 0; i < fft.GetNumberOfPoints(); i++)
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		ConvertToMagnitudeFrequency (static)
+//
+// Description:		Converts raw FFT results into our desired magnitude vs.
+//					frequency format.
+//
+// Input Arguments:
+//		fftPoints	= const unsigned int&
+//		sampleRate	= const double&
+//		temp		= cosnt Dataset2D& containing raw FFT data
+//		results		= Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FastFourierTransform::ConvertToMagnitudeFrequency(const unsigned int &fftPoints,
+	const double &sampleRate, const Dataset2D &temp, Dataset2D &results)
+{
+	double magnitude;
+	unsigned int i;
+	for (i = 0; i < results.GetNumberOfPoints(); i++)
 	{
 		// Break out into magnitude (Y) and frequency (X)
 		magnitude = 2.0 / fftPoints * temp.GetYData(i);
-		frequency = 1.0 / (data.GetXData(1) - data.GetXData(0)) / fftPoints;
-		fft.GetYPointer()[i] = 2.0 / fftPoints * sqrt(
+		results.GetYPointer()[i] = 2.0 / fftPoints * sqrt(
 			temp.GetXData(i) * temp.GetXData(i) + temp.GetYData(i) * temp.GetYData(i));
-		fft.GetXPointer()[i] = i * sampleRate / fftPoints;
+		results.GetXPointer()[i] = i * sampleRate / fftPoints;
 	}
-
-	return fft;
 }

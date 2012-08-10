@@ -22,6 +22,7 @@
 
 // wxWidgets forward declarations
 class wxXmlNode;
+class wxXmlDocument;
 
 class CustomFileFormat
 {
@@ -29,10 +30,10 @@ public:
 	// Constructor
 	CustomFileFormat(const wxString &_pathAndFileName);
 
-	bool IsCustomFormat(void) { return !formatName.IsEmpty(); };
+	bool IsCustomFormat(void) const { return !formatName.IsEmpty(); };
 
-	wxString GetDelimiter(void) { return delimiter; };
-	wxString GetTimeUnits(void) { return timeUnits; };
+	wxString GetDelimiter(void) const { return delimiter; };
+	wxString GetTimeUnits(void) const { return timeUnits; };
 
 	void ProcessChannels(wxArrayString &names, std::vector<double> &scales);
 
@@ -75,12 +76,20 @@ private:
 
 	std::vector<Channel> channels;
 
+	bool CheckRootAndVersion(const wxXmlDocument &document) const;
+
 	bool IsFormat(const wxString &pathAndFileName, const Identifier &id);
-	bool MatchNextLine(std::ifstream &inFile, const Identifier &id);
+	bool MatchNextLine(std::ifstream &inFile, const Identifier &id) const;
 
 	bool ReadFormatTag(wxXmlNode &formatNode);
 	bool ReadIdentifierTag(wxXmlNode &idNode, Identifier &id);
 	bool ReadChannelTag(wxXmlNode &channelNode);
 
 	void ClearData(void);
+
+	bool ProcessLocationID(const wxString &value, Identifier &id) const;
+	bool ProcessFormatChildren(wxXmlNode *formatChild, Identifier &id);
+	bool MatchSpecifiedLine(std::ifstream &inFile, const Identifier &id) const;
+
+	bool ReadCodeOrColumn(wxXmlNode &channelNode, Channel &channel) const;
 };

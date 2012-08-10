@@ -18,7 +18,7 @@
 //	3/14/2008	- Added AnglesTo function, K. Loux.
 //	3/23/2008	- Changed arguments for class functions from degrees to radians, K. Loux.
 //	4/11/2009	- Changed all functions to take addresses of and use const, K. Loux.
-//	4/17/2009	- Renamed ROTATION_Axis enumeration to Axis, K. Loux
+//	4/17/2009	- Renamed ROTATION_AXIS enumeration to Axis, K. Loux
 //	6/15/2009	- Corrected function signatures for overloaded operators, K. Loux.
 //	11/7/2011	- Corrected camelCase, K. Loux.
 
@@ -151,63 +151,15 @@ void Vector::Rotate (const Vector &cor, const Vector &rotations,
 {
 	// Rotate self around point CoR with rotations in Rotations vector
 	Vector temp;
-	double s1 = sin(rotations.x);
-	double c1 = cos(rotations.x);
-	double s2 = sin(rotations.y);
-	double c2 = cos(rotations.y);
-	double s3 = sin(rotations.z);
-	double c3 = cos(rotations.z);
 
 	// First do the translation
 	temp = *this - cor;
 
-	// Define the rotation matrices using the sine and cosines computed above.  There will be three
-	// (one for each rotation).
-	Matrix firstRotation(3, 3);
-	Matrix secondRotation(3, 3);
-	Matrix thirdRotation(3, 3);
-
-	// Create the first rotation matrix
-	if (first == AxisX)
-		firstRotation.Set(	1.0,	0.0,	0.0,
-							0.0,	c1,		-s1,
-							0.0,	s1,		c1);
-	else if (first == AxisY)
-		firstRotation.Set(	c1,		0.0,	s1,
-							0.0,	1.0,	0.0,
-							-s1,	0.0,	c1);
-	else// if (first == AxisZ)
-		firstRotation.Set(	c1,		-s1,	0.0,
-							s1,		c1,		0.0,
-							0.0,	0.0,	1.0);
-
-	// Create the second rotation matrix
-	if (second == AxisX)
-		secondRotation.Set(	1.0,	0.0,	0.0,
-							0.0,	c2,		-s2,
-							0.0,	s2,		c2);
-	else if (second == AxisY)
-		secondRotation.Set(	c2,		0.0,	s2,
-							0.0,	1.0,	0.0,
-							-s2,	0.0,	c2);
-	else// if (second == AxisZ)
-		secondRotation.Set(	c2,		-s2,	0.0,
-							s2,		c2,		0.0,
-							0.0,	0.0,	1.0);
-
-	// Create the third rotation matrix
-	if (third == AxisX)
-		thirdRotation.Set(	1.0,	0.0,	0.0,
-							0.0,	c3,		-s3,
-							0.0,	s3,		c3);
-	else if (third == AxisY)
-		thirdRotation.Set(	c3,		0.0,	s3,
-							0.0,	1.0,	0.0,
-							-s3,	0.0,	c3);
-	else// if (third == AxisZ)
-		thirdRotation.Set(	c3,		-s3,	0.0,
-							s3,		c3,		0.0,
-							0.0,	0.0,	1.0);
+	// Define the rotation matrices using the sine and cosines computed above.
+	// There will be three (one for each rotation).
+	Matrix firstRotation = GenerateRotationMatrix(first, rotations.x);
+	Matrix secondRotation = GenerateRotationMatrix(second, rotations.y);
+	Matrix thirdRotation = GenerateRotationMatrix(third, rotations.z);
 
 	// Combine all three to create the complete rotation matrix
 	Matrix rotationMatrix(3, 3);
@@ -268,25 +220,8 @@ void Vector::Rotate(const Vector &cor, const double &angle, const Axis &about)
 //==========================================================================
 void Vector::Rotate(const double &angle, const Axis &about)
 {
-	double s = sin(angle);
-	double c = cos(angle);
-
 	// Define the rotation matrix using the sine and cosines computed above.
-	Matrix rotationMatrix(3, 3);
-
-	// Create the first rotation matrix
-	if (about == AxisX)
-		rotationMatrix.Set(	1.0,	0.0,	0.0,
-							0.0,	c,		-s,
-							0.0,	s,		c);
-	else if (about == AxisY)
-		rotationMatrix.Set(	c,		0.0,	s,
-							0.0,	1.0,	0.0,
-							-s,		0.0,	c);
-	else// if (about == AxisZ)
-		rotationMatrix.Set(	c,		-s,		0.0,
-							s,		c,		0.0,
-							0.0,	0.0,	1.0);
+	Matrix rotationMatrix = GenerateRotationMatrix(about, angle);
 
 	// Now we can apply the rotations
 	*this = rotationMatrix * *this;
@@ -341,6 +276,49 @@ void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 
 	// Apply the rotation
 	*this = rotationMatrix * *this;
+}
+
+//==========================================================================
+// Class:			Vector
+// Function:		GenerateRotationMatrix
+//
+// Description:		Creates a 3x3 rotation matrix for rotation about the
+//					specified axis.
+//
+// Input Arguments:
+//		axis	= const Axis& specifying the axis of rotation
+//		angle	= const double& specifying the distance to rotate this object [rad]
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Matrix, 3x3 rotation matrix
+//
+//==========================================================================
+Matrix Vector::GenerateRotationMatrix(const Axis &axis, const double &angle)
+{
+	double s = sin(angle);
+	double c = cos(angle);
+
+	// Define the rotation matrix using the sine and cosines computed above.
+	Matrix rotationMatrix(3, 3);
+
+	// Create the first rotation matrix
+	if (axis == AxisX)
+		rotationMatrix.Set(	1.0,	0.0,	0.0,
+							0.0,	c,		-s,
+							0.0,	s,		c);
+	else if (axis == AxisY)
+		rotationMatrix.Set(	c,		0.0,	s,
+							0.0,	1.0,	0.0,
+							-s,		0.0,	c);
+	else// if (axis == AxisZ)
+		rotationMatrix.Set(	c,		-s,		0.0,
+							s,		c,		0.0,
+							0.0,	0.0,	1.0);
+
+	return rotationMatrix;
 }
 
 //==========================================================================

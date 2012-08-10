@@ -74,6 +74,9 @@ public:
 	const Dataset2D operator/(const double &target) const;
 	const Dataset2D operator%(const double &target) const;
 
+	Dataset2D& ToPower(const double &target);
+	const Dataset2D ToPower(const double &target) const;
+
 private:
 	// The number of points contained within this object
 	unsigned int numberOfPoints;

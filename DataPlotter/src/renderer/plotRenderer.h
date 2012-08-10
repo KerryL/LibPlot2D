@@ -137,6 +137,20 @@ private:
 	bool draggingRightCursor;
 
 protected:
+	void ProcessZoom(wxMouseEvent &event);
+	void ProcessZoomWithBox(wxMouseEvent &event);
+	void ProcessPan(wxMouseEvent &event);
+
+	void PanBottomXAxis(wxMouseEvent &event);
+	void PanLeftYAxis(wxMouseEvent &event);
+	void PanRightYAxis(wxMouseEvent &event);
+
+	void ProcessPlotAreaDoubleClick(const unsigned int &x);
+	void ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y);
+
+	void ProcessRightClick(wxMouseEvent &event);
+	void ProcessZoomBoxEnd(void);
+
 	// For the event table
 	DECLARE_EVENT_TABLE()
 };

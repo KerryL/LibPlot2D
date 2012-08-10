@@ -28,8 +28,10 @@ struct FilterParameters
 	enum Type
 	{
 		TypeLowPass,
-		TypeHighPass
-		// TODO:  Band pass, band stop, notch, etc.
+		TypeHighPass,
+		TypeBandPass,
+		TypeBandStop,
+		TypeNotch
 	} type;
 
 	bool phaseless;
@@ -100,6 +102,14 @@ private:
 		CheckboxID,
 		SpinID
 	};
+
+	void CreateControls(void);
+	void CreateTextBoxes(wxFlexGridSizer *sizer);
+	wxBoxSizer* CreateRadioButtons(void);
+	wxBoxSizer* CreateDialogButtons(void);
+
+	bool CutoffFrequencyIsValid(void);
+	bool DampingRatioIsValid(void);
 
 	// For the event table
 	DECLARE_EVENT_TABLE();

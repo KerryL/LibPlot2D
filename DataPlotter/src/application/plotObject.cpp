@@ -22,7 +22,6 @@
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "renderer/primitives/plotCurve.h"
-#include "renderer/primitives/axis.h"
 #include "renderer/primitives/text.h"
 #include "utilities/math/plotMath.h"
 #include "utilities/dataset2D.h"
@@ -47,84 +46,10 @@
 //==========================================================================
 PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 {
-	// Create the actors
-	axisTop = new Axis(renderer);
-	axisBottom = new Axis(renderer);
-	axisLeft = new Axis(renderer);
-	axisRight = new Axis(renderer);
-	titleObject = new TextRendering(renderer);
+	CreateAxisObjects();
+	InitializeFonts();
 
-	// Tell each axis how they relate to other axes
-	axisTop->SetAxisAtMaxEnd(axisRight);
-	axisTop->SetAxisAtMinEnd(axisLeft);
-	axisTop->SetOppositeAxis(axisBottom);
-	
-	axisBottom->SetAxisAtMaxEnd(axisRight);
-	axisBottom->SetAxisAtMinEnd(axisLeft);
-	axisBottom->SetOppositeAxis(axisTop);
-	
-	axisLeft->SetAxisAtMaxEnd(axisTop);
-	axisLeft->SetAxisAtMinEnd(axisBottom);
-	axisLeft->SetOppositeAxis(axisRight);
-	
-	axisRight->SetAxisAtMaxEnd(axisTop);
-	axisRight->SetAxisAtMinEnd(axisBottom);
-	axisRight->SetOppositeAxis(axisLeft);
-
-	// Find the name of the font that we want to use
-	wxString fontFile;
-	wxArrayString preferredFonts;
-
-	preferredFonts.Add(_T("DejaVu Sans"));// GTK preference
-	preferredFonts.Add(_T("Arial"));// MSW preference
-
-	bool foundFont = FontFinder::GetPreferredFontFileName(wxFONTENCODING_SYSTEM,
-		preferredFonts, false, fontFile);
-
-	// Tell the user if we're unsure of the font
-	if (!foundFont)
-	{
-		if (!fontFile.IsEmpty())
-			wxMessageBox(_T("Could not find preferred plot font; using ") + fontFile);
-		else
-			wxMessageBox(_T("Could not find any *.ttf files - cannot generate plot fonts"));
-	}
-
-	// Create the fonts
-	axisFont = new FTGLTextureFont(fontFile.c_str());
-	titleFont = new FTGLTextureFont(fontFile.c_str());
-
-	// Make sure the fonts loaded OK
-	if (axisFont->Error())
-	{
-		delete axisFont;
-		axisFont = NULL;
-
-		wxMessageBox(_T("Error loading axis font"));
-	}
-	else
-	{
-		axisFont->FaceSize(12);
-		axisFont->CharMap(FT_ENCODING_UNICODE);
-	}
-
-	if (titleFont->Error())
-	{
-		delete titleFont;
-		titleFont = NULL;
-
-		wxMessageBox(_T("Error loading title font"));
-	}
-	else
-	{
-		titleFont->FaceSize(18);
-		titleFont->CharMap(FT_ENCODING_UNICODE);
-	}
-
-	// Initialize auto-scaling to true
 	ResetAutoScaling();
-
-	// Set the background color (establish the default)
 	renderer.SetBackgroundColor(Color::ColorWhite);
 }
 
@@ -151,6 +76,136 @@ PlotObject::~PlotObject()
 	axisFont = NULL;
 	delete titleFont;
 	titleFont = NULL;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		CreateAxisObjects
+//
+// Description:		Initializes the axis objects.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::CreateAxisObjects(void)
+{
+	axisTop = new Axis(renderer);
+	axisBottom = new Axis(renderer);
+	axisLeft = new Axis(renderer);
+	axisRight = new Axis(renderer);
+	titleObject = new TextRendering(renderer);
+
+	// Tell each axis how they relate to other axes
+	axisTop->SetAxisAtMaxEnd(axisRight);
+	axisTop->SetAxisAtMinEnd(axisLeft);
+	axisTop->SetOppositeAxis(axisBottom);
+	
+	axisBottom->SetAxisAtMaxEnd(axisRight);
+	axisBottom->SetAxisAtMinEnd(axisLeft);
+	axisBottom->SetOppositeAxis(axisTop);
+	
+	axisLeft->SetAxisAtMaxEnd(axisTop);
+	axisLeft->SetAxisAtMinEnd(axisBottom);
+	axisLeft->SetOppositeAxis(axisRight);
+	
+	axisRight->SetAxisAtMaxEnd(axisTop);
+	axisRight->SetAxisAtMinEnd(axisBottom);
+	axisRight->SetOppositeAxis(axisLeft);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		InitializeFonts
+//
+// Description:		Sets up plot fonts.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::InitializeFonts(void)
+{
+	// Find the name of the font that we want to use
+	wxString fontFile;
+	wxArrayString preferredFonts;
+
+	preferredFonts.Add(_T("DejaVu Sans"));// GTK preference
+	preferredFonts.Add(_T("Arial"));// MSW preference
+
+	bool foundFont = FontFinder::GetPreferredFontFileName(wxFONTENCODING_SYSTEM,
+		preferredFonts, false, fontFile);
+
+	// Tell the user if we're unsure of the font
+	if (!foundFont)
+	{
+		if (!fontFile.IsEmpty())
+			wxMessageBox(_T("Could not find preferred plot font; using ") + fontFile);
+		else
+			wxMessageBox(_T("Could not find any *.ttf files - cannot generate plot fonts"));
+	}
+
+	CreateFontObjects(fontFile);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		CreateFontObjects
+//
+// Description:		Creates the font objects.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::CreateFontObjects(const wxString &fontFile)
+{
+	axisFont = new FTGLTextureFont(fontFile.c_str());
+	titleFont = new FTGLTextureFont(fontFile.c_str());
+
+	if (axisFont->Error())
+	{
+		delete axisFont;
+		axisFont = NULL;
+
+		wxMessageBox(_T("Error loading axis font"));
+	}
+	else
+	{
+		axisFont->FaceSize(12);
+		axisFont->CharMap(FT_ENCODING_UNICODE);
+	}
+
+	if (titleFont->Error())
+	{
+		delete titleFont;
+		titleFont = NULL;
+
+		wxMessageBox(_T("Error loading title font"));
+	}
+	else
+	{
+		titleFont->FaceSize(18);
+		titleFont->CharMap(FT_ENCODING_UNICODE);
+	}
 }
 
 //==========================================================================
@@ -265,7 +320,7 @@ void PlotObject::SetRightYGrid(const bool &gridOn)
 void PlotObject::RemoveExistingPlots(void)
 {
 	// Remove all existing plots from the list
-	while (plotList.GetCount() > 0)
+	while (plotList.size() > 0)
 		RemovePlot(0);
 }
 
@@ -291,8 +346,8 @@ void PlotObject::RemovePlot(const unsigned int &index)
 	renderer.RemoveActor(plotList[index]);
 
 	// Remove it from the local list
-	plotList.Remove(index);
-	dataList.Remove(index);
+	plotList.erase(plotList.begin() + index);
+	dataList.erase(dataList.begin() + index);
 }
 
 //==========================================================================
@@ -314,8 +369,8 @@ void PlotObject::RemovePlot(const unsigned int &index)
 void PlotObject::AddCurve(const Dataset2D &data)
 {
 	PlotCurve *newPlot = new PlotCurve(renderer);
-	plotList.Add(newPlot);
-	dataList.Add(&data);
+	plotList.push_back(newPlot);
+	dataList.push_back(&data);
 
 	newPlot->BindToXAxis(axisBottom);
 	newPlot->BindToYAxis(axisLeft);
@@ -340,62 +395,10 @@ void PlotObject::AddCurve(const Dataset2D &data)
 //==========================================================================
 void PlotObject::FormatPlot(void)
 {
-	// Perform the basic stuff first - we do this whether or not we have data to display
-	Axis::TickStyle tickStyle = Axis::TickStyleInside;
+	FormatAxesBasics();
+	FormatTitle();
 
-	axisBottom->SetOrientation(Axis::OrientationBottom);
-	axisBottom->SetFont(axisFont);
-	axisBottom->SetTickStyle(tickStyle);
-	
-	if (axisBottom->GetLabel().IsEmpty())
-		axisBottom->SetOffsetFromWindowEdge(50);
-	else
-		axisBottom->SetOffsetFromWindowEdge(75);
-
-	axisTop->SetOrientation(Axis::OrientationTop);
-	axisTop->SetTickStyle(tickStyle);
-	
-	if (axisTop->GetLabel().IsEmpty())
-		axisTop->SetOffsetFromWindowEdge(50);
-	else
-		axisTop->SetOffsetFromWindowEdge(75);
-
-	if (!titleObject->GetText().IsEmpty())
-		axisTop->SetOffsetFromWindowEdge(axisTop->GetOffsetFromWindowEdge() + titleObject->GetTextHeight());
-
-	axisLeft->SetOrientation(Axis::OrientationLeft);
-	axisLeft->SetFont(axisFont);
-	axisLeft->SetTickStyle(tickStyle);
-	
-	if (axisLeft->GetLabel().IsEmpty())
-		axisLeft->SetOffsetFromWindowEdge(75);
-	else
-		axisLeft->SetOffsetFromWindowEdge(100);
-
-	axisRight->SetOrientation(Axis::OrientationRight);
-	axisRight->SetFont(axisFont);
-	axisRight->SetTickStyle(tickStyle);
-	
-	if (axisRight->GetLabel().IsEmpty())
-		axisRight->SetOffsetFromWindowEdge(75);
-	else
-		axisRight->SetOffsetFromWindowEdge(100);
-
-	// Set the title properties
-	titleObject->SetFont(titleFont);
-	titleObject->SetCentered(true);
-	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
-		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);
-
-	// Set the axis colors
-	Color color = Color::ColorBlack;
-	axisBottom->SetColor(color);
-	axisTop->SetColor(color);
-	axisLeft->SetColor(color);
-	axisRight->SetColor(color);
-
-	// If we don't have any data, we don't want stop before getting into the details
-	if (dataList.GetCount() == 0)
+	if (dataList.size() == 0)
 		return;
 
 	// Determine "Original" values by parsing data associated with each axis
@@ -403,7 +406,7 @@ void PlotObject::FormatPlot(void)
 	bool rightFound = false;
 	unsigned int i, j;
 	Axis *yAxis;
-	for (i = 0; i < (unsigned int)dataList.GetCount(); i++)
+	for (i = 0; i < (unsigned int)dataList.size(); i++)
 	{
 		// If this plot is not visible, ignore it
 		if (!plotList[i]->GetIsVisible())
@@ -469,78 +472,14 @@ void PlotObject::FormatPlot(void)
 		yLeftMaxOriginal = yRightMaxOriginal;
 	}
 
-	// Apply range limits
-
 	// Tell the curves they will need to be re-drawn
-	for (i = 0; i < (unsigned int)plotList.GetCount(); i++)
+	for (i = 0; i < (unsigned int)plotList.size(); i++)
 		plotList[i]->SetModified();
 
-	// If the axes mins and maxes are equal, stretch the range to make the plot display
-	// We use IsZero to check for equality to avoid problems with very small numbers
-	if (PlotMath::IsZero(xMaxOriginal - xMinOriginal))
-	{
-		if (PlotMath::IsZero(xMinOriginal))
-		{
-			xMinOriginal = -1.0;
-			xMaxOriginal = 1.0;
-		}
-		else
-		{
-			xMinOriginal -= xMinOriginal * 0.1;
-			xMaxOriginal += xMaxOriginal * 0.1;
-		}
-	}
-
-	if (PlotMath::IsZero(yLeftMaxOriginal - yLeftMinOriginal))
-	{
-		if (PlotMath::IsZero(yLeftMinOriginal))
-		{
-			yLeftMinOriginal = -1.0;
-			yLeftMaxOriginal = 1.0;
-		}
-		else
-		{
-			yLeftMinOriginal -= yLeftMinOriginal * 0.1;
-			yLeftMaxOriginal += yLeftMaxOriginal * 0.1;
-		}
-	}
-
-	if (PlotMath::IsZero(yRightMaxOriginal - yRightMinOriginal))
-	{
-		if (PlotMath::IsZero(yRightMinOriginal))
-		{
-			yRightMinOriginal = -1.0;
-			yRightMaxOriginal = 1.0;
-		}
-		else
-		{
-			yRightMinOriginal -= yRightMinOriginal * 0.1;
-			yRightMaxOriginal += yRightMaxOriginal * 0.1;
-		}
-	}
-
-	// If we want to auto-scale the plot, set the range limits to the original values
-	if (autoScaleX)
-	{
-		xMin = xMinOriginal;
-		xMax = xMaxOriginal;
-	}
-
-	if (autoScaleLeftY)
-	{
-		yLeftMin = yLeftMinOriginal;
-		yLeftMax = yLeftMaxOriginal;
-	}
-
-	if (autoScaleRightY)
-	{
-		yRightMin = yRightMinOriginal;
-		yRightMax = yRightMaxOriginal;
-	}
+	CheckForZeroRange();
+	CheckAutoScaling();
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
-	// FIXME:  Make maximum number of ticks dependant on plot size and width of
-	// number (i.e. 1 2 3 fits better than 0.001 0.002 0.003)
 	double xMajorResolution = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
 	double xMinorResolution = xMajorResolution;
 	double yLeftMajorResolution = AutoScaleAxis(yLeftMin, yLeftMax, 10, axisLeft->IsLogarithmic(), !autoScaleLeftY);
@@ -639,7 +578,317 @@ void PlotObject::FormatPlot(void)
 	axisRight->SetMinorResolution(yRightMinorResolution);
 	axisRight->SetMajorResolution(yRightMajorResolution);
 
-	// Update the axis limits so they are exactly the same as what is displayed on screen
+	UpdateLimitValues();
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		FormatAxesBasics
+//
+// Description:		Formats each axis with orientation, color, etc.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::FormatAxesBasics(void)
+{
+	Axis::TickStyle tickStyle = Axis::TickStyleInside;
+
+	FormatBottomBasics(tickStyle);
+	FormatTopBasics(tickStyle);
+	FormatLeftBasics(tickStyle);
+	FormatRightBasics(tickStyle);
+
+	SetAxesColor(Color::ColorBlack);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		FormatBottomBasics
+//
+// Description:		Formats the orientation, tick style and font for the bottom axis.
+//
+// Input Arguments:
+//		tickStyle	= const Axis::TickStyle&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
+{
+	axisBottom->SetOrientation(Axis::OrientationBottom);
+	axisBottom->SetFont(axisFont);
+	axisBottom->SetTickStyle(tickStyle);
+	
+	if (axisBottom->GetLabel().IsEmpty())
+		axisBottom->SetOffsetFromWindowEdge(50);
+	else
+		axisBottom->SetOffsetFromWindowEdge(75);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		FormatTopBasics
+//
+// Description:		Formats the orientation, tick style and font for the top axis.
+//
+// Input Arguments:
+//		tickStyle	= const Axis::TickStyle&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
+{
+	axisTop->SetOrientation(Axis::OrientationTop);
+	axisTop->SetTickStyle(tickStyle);
+	
+	if (axisTop->GetLabel().IsEmpty())
+		axisTop->SetOffsetFromWindowEdge(50);
+	else
+		axisTop->SetOffsetFromWindowEdge(75);
+
+	if (!titleObject->GetText().IsEmpty())
+		axisTop->SetOffsetFromWindowEdge(axisTop->GetOffsetFromWindowEdge() + titleObject->GetTextHeight());
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		FormatLeftBasics
+//
+// Description:		Formats the orientation, tick style and font for the left axis.
+//
+// Input Arguments:
+//		tickStyle	= const Axis::TickStyle&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
+{
+	axisLeft->SetOrientation(Axis::OrientationLeft);
+	axisLeft->SetFont(axisFont);
+	axisLeft->SetTickStyle(tickStyle);
+	
+	if (axisLeft->GetLabel().IsEmpty())
+		axisLeft->SetOffsetFromWindowEdge(75);
+	else
+		axisLeft->SetOffsetFromWindowEdge(100);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		FormatRightBasics
+//
+// Description:		Formats the orientation, tick style and font for the right axis.
+//
+// Input Arguments:
+//		tickStyle	= const Axis::TickStyle&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
+{
+	axisRight->SetOrientation(Axis::OrientationRight);
+	axisRight->SetFont(axisFont);
+	axisRight->SetTickStyle(tickStyle);
+	
+	if (axisRight->GetLabel().IsEmpty())
+		axisRight->SetOffsetFromWindowEdge(75);
+	else
+		axisRight->SetOffsetFromWindowEdge(100);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetAxesColor
+//
+// Description:		Sets all of the axes to the specified color.
+//
+// Input Arguments:
+//		color	= const Color&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetAxesColor(const Color &color)
+{
+	axisBottom->SetColor(color);
+	axisTop->SetColor(color);
+	axisLeft->SetColor(color);
+	axisRight->SetColor(color);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		FormatTitle
+//
+// Description:		Formats the title object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::FormatTitle(void)
+{
+	titleObject->SetFont(titleFont);
+	titleObject->SetCentered(true);
+	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
+		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		HandleZeroRangeAxis
+//
+// Description:		Adjusts the specified min and max so they are not equal.
+//
+// Input Arguments:
+//		min	= double& (also output)
+//		max = double& (also output)
+//
+// Output Arguments:
+//		min	= double& (also input)
+//		max = double& (also input)
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
+{
+	if (PlotMath::IsZero(min))
+	{
+		min = -1.0;
+		max = 1.0;
+	}
+	else
+	{
+		min -= min * 0.1;
+		max += max * 0.1;
+	}
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		CheckForZeroRange
+//
+// Description:		If the min and max for any axis is equal, it adjusts the
+//					scaling so they are not equal.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::CheckForZeroRange(void)
+{
+	if (PlotMath::IsZero(xMaxOriginal - xMinOriginal))
+		HandleZeroRangeAxis(xMinOriginal, xMaxOriginal);
+
+	if (PlotMath::IsZero(yLeftMaxOriginal - yLeftMinOriginal))
+		HandleZeroRangeAxis(yLeftMinOriginal, yLeftMaxOriginal);
+
+	if (PlotMath::IsZero(yRightMaxOriginal - yRightMinOriginal))
+		HandleZeroRangeAxis(yRightMinOriginal, yRightMaxOriginal);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		CheckAutoScaling
+//
+// Description:		Checks if each axis is auto-scaled, and if so, adjusts
+//					the axis limits to the original values.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::CheckAutoScaling(void)
+{
+	if (autoScaleX)
+	{
+		xMin = xMinOriginal;
+		xMax = xMaxOriginal;
+	}
+
+	if (autoScaleLeftY)
+	{
+		yLeftMin = yLeftMinOriginal;
+		yLeftMax = yLeftMaxOriginal;
+	}
+
+	if (autoScaleRightY)
+	{
+		yRightMin = yRightMinOriginal;
+		yRightMax = yRightMaxOriginal;
+	}
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		UpdateLimitValues
+//
+// Description:		Updates the axes' limits so they are exactly the same as
+//					what is displayed on screen (after rounding, etc.).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::UpdateLimitValues(void)
+{
 	axisBottom->Draw();
 	xMin = axisBottom->GetMinimum();
 	xMax = axisBottom->GetMaximum();
@@ -664,7 +913,7 @@ void PlotObject::FormatPlot(void)
 // Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
-//		maxTicks	= int specifying the maximum number of ticks to use
+//		maxTicks	= const int& specifying the maximum number of ticks to use
 //		logarithmic	= const bool& specifying whether or not to use a logarithmic scale
 //		forceLimits	= const bool& specifying whether or not to preserve the specified limits
 //
@@ -676,97 +925,160 @@ void PlotObject::FormatPlot(void)
 //		double, spacing between each tick mark for the axis (majorResolution)
 //
 //==========================================================================
-double PlotObject::AutoScaleAxis(double &min, double &max, int maxTicks, const bool &logarithmic, const bool &forceLimits)
+double PlotObject::AutoScaleAxis(double &min, double &max, const int &maxTicks,
+	const bool &logarithmic, const bool &forceLimits) const
 {
-	// Get the order of magnitude of the axes to decide how to scale them
+	if (logarithmic)
+		return AutoScaleLogAxis(min, max, forceLimits);
+
+	return AutoScaleLinearAxis(min, max, maxTicks, forceLimits);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		AutoScaleLogAxis
+//
+// Description:		Determines best axis limits for log axes.
+//
+// Input Arguments:
+//		min			= double& specifying the minimum value for the axis (required for input and output)
+//		max			= double& specifying the maximum value for the axis (required for input and output)
+//		forceLimits	= const bool& specifying whether or not to preserve the specified limits
+//
+// Output Arguments:
+//		min			= double& specifying the minimum value for the axis (required for input and output)
+//		max			= double& specifying the maximum value for the axis (required for input and output)
+//
+// Return Value:
+//		double, spacing between each tick mark for the axis (majorResolution)
+//
+//==========================================================================
+double PlotObject::AutoScaleLogAxis(double &min, double &max, const bool &forceLimits) const
+{
+	if (!forceLimits)
+	{
+		// Determine the nearest power of 10 for each limit
+		min = pow(10.0, floor(log10(min)));
+		max = pow(10.0, ceil(log10(max)));
+	}
+	else
+	{
+		if (min <= 0.0)
+			min = pow(10.0, floor(log10(min)));
+		if (max <= 0.0)
+			max = pow(10.0, ceil(log10(max)));
+	}
+
+	return 10.0;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		AutoScaleLinearAxis
+//
+// Description:		Determines best axis limits for linear axes.
+//
+// Input Arguments:
+//		min			= double& specifying the minimum value for the axis (required for input and output)
+//		max			= double& specifying the maximum value for the axis (required for input and output)
+//		maxTicks	= const int& specifying the maximum number of ticks to use
+//		forceLimits	= const bool& specifying whether or not to preserve the specified limits
+//
+// Output Arguments:
+//		min			= double& specifying the minimum value for the axis (required for input and output)
+//		max			= double& specifying the maximum value for the axis (required for input and output)
+//
+// Return Value:
+//		double, spacing between each tick mark for the axis (majorResolution)
+//
+//==========================================================================
+double PlotObject::AutoScaleLinearAxis(double &min, double &max, const int &maxTicks, const bool &forceLimits) const
+{
 	double range = max - min;
 	int orderOfMagnitude = (int)log10(range);
 	double tickSpacing = range / maxTicks;
 
-	if (logarithmic)
-	{
-		if (!forceLimits)
-		{
-			// Determine the nearest power of 10 for each limit
-			min = pow(10.0, floor(log10(min)));
-			max = pow(10.0, ceil(log10(max)));
-		}
-		else
-		{
-			if (min <= 0.0)
-				min = pow(10.0, floor(log10(min)));
-			if (max <= 0.0)
-				max = pow(10.0, ceil(log10(max)));
-		}
+	// Acceptable resolution steps are:
+	//	Ones,
+	//	Twos (even numbers), and
+	//	Fives (multiples of five),
+	// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5], and [20, 40, 60] are all acceptable)
 
-		tickSpacing = 10.0;
-	}
-	else// Linear scaling
-	{
-		// Acceptable resolution steps are:
-		//	Ones,
-		//	Twos (even numbers), and
-		//	Fives (multiples of five),
-		// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5], and [20, 40, 60] are all acceptable)
+	// Scale the tick spacing so it is between 0.1 and 10.0
+	double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
 
-		// Determine which method will result in the least whitespace before and after the actual range,
-		// and will get us closest to the maximum number of ticks.
+	if (scaledSpacing > 5.0)
+		scaledSpacing = 10.0;
+	else if (scaledSpacing > 2.0)
+		scaledSpacing = 5.0;
+	else if (scaledSpacing > 1.0)
+		scaledSpacing = 2.0;
+	else if (scaledSpacing > 0.5)
+		scaledSpacing = 1.0;
+	else if (scaledSpacing > 0.2)
+		scaledSpacing = 0.5;
+	else if (scaledSpacing > 0.1)
+		scaledSpacing = 0.2;
+	else
+		scaledSpacing = 0.1;
 
-		// Scale the tick spacing so it is between 0.1 and 10.0
-		double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
+	tickSpacing = scaledSpacing * pow(10.0, orderOfMagnitude - 1);
 
-		// Choose the maximum spacing value that fits our criteria
-		if (scaledSpacing > 5.0)
-			scaledSpacing = 10.0;
-		else if (scaledSpacing > 2.0)
-			scaledSpacing = 5.0;
-		else if (scaledSpacing > 1.0)
-			scaledSpacing = 2.0;
-		else if (scaledSpacing > 0.5)
-			scaledSpacing = 1.0;
-		else if (scaledSpacing > 0.2)
-			scaledSpacing = 0.5;
-		else if (scaledSpacing > 0.1)
-			scaledSpacing = 0.2;
-		else
-			scaledSpacing = 0.1;
-
-		// Re-scale back to the correct order of magnitude
-		tickSpacing = scaledSpacing * pow(10.0, orderOfMagnitude - 1);
-
-		// Round the min and max down and up, respectively, so the plot fits within the range [Min Max]
-		if (!forceLimits)
-		{
-			if (fmod(min, tickSpacing) != 0)
-			{
-				if (min < 0)
-				{
-					min -= fmod(min, tickSpacing);
-					min -= tickSpacing;
-				}
-				else
-					min -= fmod(min, tickSpacing);
-			}
-			if (fmod(max, tickSpacing) != 0)
-			{
-				if (max > 0)
-				{
-					max -= fmod(max, tickSpacing);
-					max += tickSpacing;
-				}
-				else
-					max -= fmod(max, tickSpacing);
-			}
-		}
-
-		// If numerical processing leads to ugly numbers, clean them up a bit
-		if (PlotMath::IsZero(min))
-			min = 0.0;
-		if (PlotMath::IsZero(max))
-			max = 0.0;
-	}
+	RoundMinMax(min, max, tickSpacing, forceLimits);
 
 	return tickSpacing;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		RoundMinMax
+//
+// Description:		Rounds the min and max to the appropriate precision.
+//
+// Input Arguments:
+//		min			= double& specifying the minimum value for the axis (required for input and output)
+//		max			= double& specifying the maximum value for the axis (required for input and output)
+//		tickSpacing	= const double& specifying spacing between tick marks
+//		forceLimits	= const bool& specifying whether or not to preserve the specified limits
+//
+// Output Arguments:
+//		min			= double& specifying the minimum value for the axis (required for input and output)
+//		max			= double& specifying the maximum value for the axis (required for input and output)
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing, const bool &forceLimits) const
+{
+	if (!forceLimits)
+	{
+		if (fmod(min, tickSpacing) != 0)
+		{
+			if (min < 0)
+			{
+				min -= fmod(min, tickSpacing);
+				min -= tickSpacing;
+			}
+			else
+				min -= fmod(min, tickSpacing);
+		}
+		if (fmod(max, tickSpacing) != 0)
+		{
+			if (max > 0)
+			{
+				max -= fmod(max, tickSpacing);
+				max += tickSpacing;
+			}
+			else
+				max -= fmod(max, tickSpacing);
+		}
+	}
+
+	if (PlotMath::IsZero(min))
+		min = 0.0;
+	if (PlotMath::IsZero(max))
+		max = 0.0;
 }
 
 //==========================================================================

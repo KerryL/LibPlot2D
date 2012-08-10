@@ -63,18 +63,13 @@ PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis)
 //==========================================================================
 void PlotCursor::GenerateGeometry(void)
 {
-	// The on-screen representation of the cursor is just a line, either horizontal
-	// or vertical, whichever the axis we're associated with is not
-
 	// Set the line width
 	glLineWidth(1.0f);
 
 	// Create the axis
 	glBegin(GL_LINES);
 
-	// Draw the cursor
 	unsigned int dimension;// [pixels]
-
 	if (axis.IsHorizontal())
 	{
 		dimension = renderWindow.GetSize().GetWidth()
@@ -97,7 +92,6 @@ void PlotCursor::GenerateGeometry(void)
 	glEnd();
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
-	// This is the value where the cursor meets its associated axis
 	value = axis.PixelToValue(locationAlongAxis);
 }
 

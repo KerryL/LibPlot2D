@@ -18,9 +18,6 @@
 #include <utility>
 #include <assert.h>
 
-// Standard C++ headers
-#include <assert.h>
-
 // wxWidgets headers
 #include <wx/wx.h>
 
@@ -455,9 +452,9 @@ Dataset2D& Dataset2D::operator/=(const Dataset2D &target)
 const Dataset2D Dataset2D::operator+(const Dataset2D &target) const
 {
 	Dataset2D result = *this;
-    result += target;
+	result += target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -479,9 +476,9 @@ const Dataset2D Dataset2D::operator+(const Dataset2D &target) const
 const Dataset2D Dataset2D::operator-(const Dataset2D &target) const
 {
 	Dataset2D result = *this;
-    result -= target;
+	result -= target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -503,9 +500,9 @@ const Dataset2D Dataset2D::operator-(const Dataset2D &target) const
 const Dataset2D Dataset2D::operator*(const Dataset2D &target) const
 {
 	Dataset2D result = *this;
-    result *= target;
+	result *= target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -527,9 +524,9 @@ const Dataset2D Dataset2D::operator*(const Dataset2D &target) const
 const Dataset2D Dataset2D::operator/(const Dataset2D &target) const
 {
 	Dataset2D result = *this;
-    result /= target;
+	result /= target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -651,9 +648,9 @@ Dataset2D& Dataset2D::operator/=(const double &target)
 const Dataset2D Dataset2D::operator+(const double &target) const
 {
 	Dataset2D result = *this;
-    result += target;
+	result += target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -675,9 +672,9 @@ const Dataset2D Dataset2D::operator+(const double &target) const
 const Dataset2D Dataset2D::operator-(const double &target) const
 {
 	Dataset2D result = *this;
-    result -= target;
+	result -= target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -699,9 +696,9 @@ const Dataset2D Dataset2D::operator-(const double &target) const
 const Dataset2D Dataset2D::operator*(const double &target) const
 {
 	Dataset2D result = *this;
-    result *= target;
+	result *= target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -723,9 +720,9 @@ const Dataset2D Dataset2D::operator*(const double &target) const
 const Dataset2D Dataset2D::operator/(const double &target) const
 {
 	Dataset2D result = *this;
-    result /= target;
+	result /= target;
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -776,4 +773,53 @@ Dataset2D& Dataset2D::MultiplyXData(const double &target)
 		xData[i] *= target;
 
 	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		ToPower
+//
+// Description:		Raises each element to the specified power.
+//
+// Input Arguments:
+//		target	= const double& indicating the power
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D& reference to this
+//
+//==========================================================================
+Dataset2D& Dataset2D::ToPower(const double &target)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = pow(yData[i], target);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		MultiplyXData
+//
+// Description:		Multiplies specified value with X vector.
+//
+// Input Arguments:
+//		target	= const double& to multiply with this
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D& reference to this
+//
+//==========================================================================
+const Dataset2D Dataset2D::ToPower(const double &target) const
+{
+	Dataset2D result = *this;
+	result.ToPower(target);
+
+	return result;
 }

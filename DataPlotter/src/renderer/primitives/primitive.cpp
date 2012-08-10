@@ -116,59 +116,35 @@ Primitive::~Primitive()
 //==========================================================================
 void Primitive::Draw(void)
 {
-	// Check to see if we need to re-create the geometry for this object
 	if (modified || listIndex == 0)
 	{
-		// Reset the modified flag
 		modified = false;
 
-		// If the list index is zero, try and get a valid index
 		if (listIndex == 0)
 			listIndex = glGenLists(1);
 
-		// Start a new glList
 		glNewList(listIndex, GL_COMPILE);
 
-		// Check to see if this object's parameters allow for it to be drawn correctly
-		// or if the visibility flag is false
 		if (!HasValidParameters() || !isVisible)
 		{
-			// End the list without drawing the object
 			glEndList();
-
 			return;
 		}
 
-		// Set the color
 		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 
 		// If the object is transparent, enable alpha blending
 		/*if (color.GetAlpha() != 1.0)
-		{
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			EnableAlphaBlending();*/
 
-			// Also disable the Z-buffer
-			glDepthMask(GL_FALSE);
-		}*/// FIXME:  Let this be handled by anti-aliasing controls?
-
-		// Generate the object's geometry
 		GenerateGeometry();
 
-		// Turn off alpha blending, if we turned it on to render this object
 		/*if (color.GetAlpha() != 1.0)
-		{
-			glDisable(GL_BLEND);
+			DisableAlphaBlending();*/
 
-			// And re-enable the z-buffer
-			glDepthMask(GL_TRUE);
-		}*/// FIXME:  Let this be handled by anti-aliasing controls?
-		
-		// End the glList
 		glEndList();
 	}
 
-	// Call the list we created for this object (if it has a valid index)
 	if (listIndex != 0)
 		glCallList(listIndex);
 }
@@ -230,13 +206,13 @@ void Primitive::SetColor(const Color &_color)
 // Description:		Assignment operator for Primitive class.
 //
 // Input Arguments:
-//		Primitive	= const PRIMITIVE& to assign to this object
+//		Primitive	= const Primitive& to assign to this object
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		PRIMITIVE&, reference to this object
+//		Primitive&, reference to this object
 //
 //==========================================================================
 Primitive& Primitive::operator = (const Primitive &primitive)
@@ -254,4 +230,51 @@ Primitive& Primitive::operator = (const Primitive &primitive)
 	listIndex = 0;
 
 	return *this;
+}
+
+//==========================================================================
+// Class:			Primitive
+// Function:		EnableAlphaBlending
+//
+// Description:		Assignment operator for Primitive class.
+//
+// Input Arguments:
+//		Primitive	= const Primitive& to assign to this object
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive&, reference to this object
+//
+//==========================================================================
+void Primitive::EnableAlphaBlending(void)
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Also disable the Z-buffer
+	glDepthMask(GL_FALSE);
+}
+
+//==========================================================================
+// Class:			Primitive
+// Function:		DisableAlphaBlending
+//
+// Description:		Assignment operator for Primitive class.
+//
+// Input Arguments:
+//		Primitive	= const Primitive& to assign to this object
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive&, reference to this object
+//
+//==========================================================================
+void Primitive::DisableAlphaBlending(void)
+{
+	glDisable(GL_BLEND);
+	glDepthMask(GL_TRUE);
 }

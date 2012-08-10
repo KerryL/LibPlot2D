@@ -23,6 +23,12 @@ class FastFourierTransform
 {
 public:
 	static Dataset2D Compute(const Dataset2D &data);
+
+private:
+	static void DoBitReversal(const unsigned int &fftPoints, Dataset2D &set);
+	static void ConvertToMagnitudeFrequency(const unsigned int &fftPoints, const double &sampleRate,
+		const Dataset2D &temp, Dataset2D &results);
+	static void DoFFT(const unsigned int &powerOfTwo, const unsigned int &fftPoints, Dataset2D &temp);
 };
 
 #endif// _FFT_H_

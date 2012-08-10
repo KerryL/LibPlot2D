@@ -43,7 +43,7 @@ public:
 	virtual ~RenderWindow();
 
 	// Sets up all of the open GL parameters
-    void Initialize();
+	void Initialize();
 
 	// Sets up the camera
 	void SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection);
@@ -128,20 +128,20 @@ private:
 
 	// Window events
 	void OnPaint(wxPaintEvent& event);
-    void OnSize(wxSizeEvent& event);
+	void OnSize(wxSizeEvent& event);
 	void OnEnterWindow(wxMouseEvent &event);
 	// End event handlers-------------------------------------------------
 	
 	// The main render method - re-draws the scene
-    void Render();
+	void Render();
 
 	// The type of interaction to perform
 	enum InteractionType
 	{
-		interactionDollyDrag,// zoom
-		interactionDollyWheel,// zoom
-		interactionPan,// translate
-		interactionRotate
+		InteractionDollyDrag,// zoom
+		InteractionDollyWheel,// zoom
+		InteractionPan,// translate
+		InteractionRotate
 	};
 
 	// Performs the computations and transformations associated with the specified interaction
@@ -186,11 +186,20 @@ protected:
 	// Stores the last mouse position variables
 	void StoreMousePosition(wxMouseEvent &event);
 
+	bool Determine2DInteraction(const wxMouseEvent &event, InteractionType &interaction) const;
+	bool Determine3DInteraction(const wxMouseEvent &event, InteractionType &interaction) const;
+
 	// Flag indicating whether or not we should select a new focal point for the interactions
 	bool isInteracting;
 
 	static void ConvertMatrixToGL(const Matrix& matrix, double gl[]);
 	static void ConvertGLToMatrix(Matrix& matrix, const double gl[]);
+
+	void Initialize2D(void) const;
+	void Initialize3D(void) const;
+
+	Matrix Generate2DProjectionMatrix(void) const;
+	Matrix Generate3DProjectionMatrix(void) const;
 
 	// For the event table
 	DECLARE_EVENT_TABLE()

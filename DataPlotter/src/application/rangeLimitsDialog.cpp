@@ -37,7 +37,6 @@
 RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const double &max)
 									 : wxDialog(parent, wxID_ANY, _T("Set Axis Limits"), wxDefaultPosition)
 {
-	// Create controls
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 5);
@@ -46,7 +45,6 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 	mainSizer->Add(inputSizer, 0, wxEXPAND);
 	inputSizer->AddGrowableCol(1);
 
-	// Create the text boxes and their labels
 	wxString valueString;
 	wxStaticText *minLabel = new wxStaticText(this, wxID_ANY, _T("Minimum"));
 	valueString.Printf("%f", min);
@@ -62,7 +60,6 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 
 	mainSizer->AddSpacer(10);
 
-	// Create the dialog buttons
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(buttonSizer, 0, wxALIGN_CENTER_HORIZONTAL);
 	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
@@ -71,7 +68,6 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 	buttonSizer->Add(okButton, 1, wxALL, 5);
 	buttonSizer->Add(cancelButton, 1, wxALL, 5);
 
-	// Set the sizer to this dialog
 	SetSizerAndFit(topSizer);
 
 	Center();

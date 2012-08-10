@@ -65,560 +65,19 @@ ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> &_list) : list
 wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const double &_xAxisFactor)
 {
 	xAxisFactor = _xAxisFactor;
+
+	if (!ParenthesesBalanced(expression))
+		return _T("Imbalanced parentheses!");
+
 	wxString errorString;
-	expression = Parenthesize(expression, errorString);
+	errorString = ParseExpression(expression);
 
 	if (!errorString.IsEmpty())
 		return errorString;
 
-	Node topNode = EvaluateNextNode(expression, errorString);
-	solvedData = topNode.set;
+	errorString = EvaluateExpression(solvedData);
 
 	return errorString;
-}
-
-//==========================================================================
-// Class:			ExpressionTree
-// Function:		Parenthesize
-//
-// Description:		Adds parentheses to the string so it is fully parenthesized,
-//					and still the original order of operations holds.  Also
-//					removes spaces from the string.
-//
-// Input Arguments:
-//		expression	= wxString containing the expression as entered by the user
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxString containing string with parentheses added
-//
-//==========================================================================
-wxString ExpressionTree::Parenthesize(wxString expression, wxString &errorString) const
-{
-	// Without parentheses, everthing is evaluated left-to-right, so we need (as a minimum)
-	// to add parentheses around multiplication and division
-
-	// FIXME:  I think parenthesizing can fix the double operator bug (see next function down)
-	// FIXME:  Also, need to add parentheses for things like int[1] -> should be int([1])
-
-	// Check for a parentheses imbalance
-	unsigned int leftCount(0), rightCount(0);
-	int location = expression.find(_T("("));
-	while (location != wxNOT_FOUND)
-	{
-		leftCount++;
-		location = expression.find(_T("("), location + 1);
-	}
-	location = expression.find(_T(")"));
-	while (location != wxNOT_FOUND)
-	{
-		rightCount++;
-		location = expression.find(_T(")"), location + 1);
-	}
-	if (leftCount != rightCount)
-	{
-		errorString = _T("Imbalanced parentheses!");
-		return expression;
-	}
-
-	// Parse the expression and look for *, / and % operators, then parse in both directions
-	wxString targetOperator = _T("*");
-	int nextMorD = expression.Find(targetOperator);
-	int nextCloseParenthese, nextOpenParenthese, nextPlus, nextMinus, insertAt;
-
-	while (nextMorD != wxNOT_FOUND)
-	{
-		// Find next previous important characters
-		nextCloseParenthese = expression.find_last_of(_T(")"), nextMorD);
-		nextOpenParenthese = expression.find_last_of(_T("("), nextMorD);
-		nextPlus = expression.find_last_of(_T("+"), nextMorD);
-		nextMinus = expression.find_last_of(_T("-"), nextMorD);
-
-		// Handle cases differently, depending on what the first important character is
-		if (nextCloseParenthese > nextPlus &&
-			nextCloseParenthese > nextMinus &&
-			nextCloseParenthese > nextOpenParenthese)
-		{
-			insertAt = expression.find_last_of(_T("("), nextCloseParenthese);
-			if (insertAt == wxNOT_FOUND)
-			{
-				errorString = _T("Imbalanced parentheses!");
-				return expression;
-			}
-		}
-		else if (nextPlus > nextMinus &&
-			nextPlus > nextOpenParenthese)
-			insertAt = nextPlus;
-		else if (nextMinus > nextOpenParenthese)
-			insertAt = nextMinus;
-		else
-		{
-			// Nothing was found (all are == wxNOT_FOUND) OR
-			// The first character found was a "("
-			// Take no further action this loop
-			insertAt = -2;// -2 because -1 == wxNOT_FOUND
-		}
-
-		if (insertAt >= 0)
-		{
-			// Insert an open parenthese
-			expression = expression.Mid(0, insertAt + 1) + _("(") + expression.Mid(insertAt + 1);
-
-			// Find next previous important characters
-			nextOpenParenthese = expression.find_first_of(_T("("), nextMorD);
-			nextPlus = expression.find_first_of(_T("+"), nextMorD);
-			nextMinus = expression.find_first_of(_T("-"), nextMorD);
-
-			// Handle cases differently, depending on what the first important character is
-			if ((nextOpenParenthese < nextPlus || nextPlus == wxNOT_FOUND) &&
-				(nextOpenParenthese < nextMinus || nextMinus == wxNOT_FOUND) &&
-				nextOpenParenthese != wxNOT_FOUND)
-			{
-				insertAt = expression.find_first_of(_T(")"), nextOpenParenthese);
-				if (insertAt == wxNOT_FOUND)
-				{
-					errorString = _T("Imbalanced parentheses!");
-					return expression;
-				}
-			}
-			else if ((nextPlus < nextMinus || nextMinus == wxNOT_FOUND) &&
-				nextPlus != wxNOT_FOUND)
-				insertAt = nextPlus;
-			else if (nextMinus != wxNOT_FOUND)
-				insertAt = nextMinus;
-			else
-			{
-				// Nothing was found (all are == wxNOT_FOUND)
-				insertAt = expression.Len();
-			}
-
-			// Insert a close parenthese
-			expression = expression.Mid(0, insertAt) + _(")") + expression.Mid(insertAt);
-		}
-
-		if (insertAt == -2)
-			insertAt = nextMorD - 1;
-
-		// Find the next multiplcation or division
-		if (insertAt + 2 < (int)expression.Len())
-			nextMorD = expression.find(targetOperator, insertAt + 2);
-		else
-			nextMorD = wxNOT_FOUND;
-
-		// If we can't find any more multiplications, look for divisions
-		if (nextMorD == wxNOT_FOUND && targetOperator.Cmp(_T("*")) == 0)
-		{
-			targetOperator = _T("/");
-			nextMorD = expression.find(targetOperator);
-		}
-		// Can't find any more divisions, look for modulo
-		else if (nextMorD == wxNOT_FOUND && targetOperator.Cmp(_T("/")) == 0)
-		{
-			targetOperator = _T("%");
-			nextMorD = expression.find(targetOperator);
-		}
-	}
-
-	return expression;
-}
-
-//==========================================================================
-// Class:			ExpressionTree
-// Function:		EvaluateNextNode
-//
-// Description:		Evaluates single node.  Removes children from the node
-//					in the process.
-//
-// Input Arguments:
-//		expression	= wxString& containing the remaining portion of the expression
-//
-// Output Arguments:
-//		errorString	= wxString& containing a description of any errors encountered
-//
-// Return Value:
-//		Node evaluated
-//
-//==========================================================================
-ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxString &errorString)
-{
-	// FIXME:  Double operators are not handled properly and do not generate errors (example: 5*int([1]) evaluates as int([1]) )
-	Node node;
-	wxString nextOperator;
-	bool firstChar = true;
-	while (expression.Len() > 0)
-	{
-		if (expression.at(0) == ')')
-		{
-			// Exit the loop
-			expression = expression.Mid(1);
-			break;
-		}
-		else if (expression.at(0) == '(')
-		{
-			// Make recursive call
-			expression = expression.Mid(1);
-			Node newNode = EvaluateNextNode(expression, errorString);
-
-			// Don't continue if we have an error
-			if (!errorString.IsEmpty())
-				return node;
-
-			if (nextOperator.IsEmpty())
-				// FIXME:  If there is no operator, we should generate an error (example: 3(3+[2]) should generate an error, but doesn't)
-				node = newNode;
-			else
-			{
-				// Apply the operator
-				if (nextOperator.CmpNoCase(_T("ddt")) == 0)
-					node.set = DiscreteDerivative::ComputeTimeHistory(newNode.set);
-				else if (nextOperator.CmpNoCase(_T("int")) == 0)
-					node.set = DiscreteIntegral::ComputeTimeHistory(newNode.set);
-				else if (nextOperator.CmpNoCase(_T("fft")) == 0)
-				{
-					node.set = FastFourierTransform::Compute(newNode.set);
-
-					// Scale the X-axis as required
-					node.set.MultiplyXData(xAxisFactor);
-				}
-				else if (node.set.GetNumberOfPoints() > 0 && newNode.set.GetNumberOfPoints() > 0)
-				{
-					// set and set
-					if (nextOperator.compare(_T("+")) == 0)
-						node.set += newNode.set;
-					else if (nextOperator.compare(_T("-")) == 0)
-						node.set -= newNode.set;
-					else if (nextOperator.compare(_T("*")) == 0)
-						node.set *= newNode.set;
-					else if (nextOperator.compare(_T("/")) == 0)
-						node.set /= newNode.set;
-					else
-						assert(false);
-				}
-				else if (node.set.GetNumberOfPoints())
-				{
-					// set and double
-					if (nextOperator.compare(_T("+")) == 0)
-						node.set += newNode.dValue;
-					else if (nextOperator.compare(_T("-")) == 0)
-						node.set -= newNode.dValue;
-					else if (nextOperator.compare(_T("*")) == 0)
-						node.set *= newNode.dValue;
-					else if (nextOperator.compare(_T("/")) == 0)
-						node.set /= newNode.dValue;
-					else if (nextOperator.compare(_T("%")) == 0)
-						node.set = node.set % newNode.dValue;
-					else
-						assert(false);
-				}
-				else if (newNode.set.GetNumberOfPoints() > 0)
-				{
-					node.set = newNode.set;
-
-					// double and set
-					if (nextOperator.compare(_T("+")) == 0)
-						node.set += newNode.dValue;
-					else if (nextOperator.compare(_T("-")) == 0)
-					{
-						// Special handling because this is double - set, not set - double
-						node.set *= -1.0;
-						node.set += newNode.set;
-					}
-					else if (nextOperator.compare(_T("*")) == 0)
-						node.set *= newNode.dValue;
-					else if (nextOperator.compare(_T("/")) == 0)
-					{
-						// Can't hande this case
-						errorString = _T("Cannot divide a number by a dataset!");
-						return node;
-					}
-					else
-						assert(false);
-				}
-				else
-				{
-					// double and double
-					if (nextOperator.compare(_T("+")) == 0)
-						node.dValue += newNode.dValue;
-					else if (nextOperator.compare(_T("-")) == 0)
-						node.dValue -= newNode.dValue;
-					else if (nextOperator.compare(_T("*")) == 0)
-						node.dValue *= newNode.dValue;
-					else if (nextOperator.compare(_T("/")) == 0)
-						node.dValue /= newNode.dValue;
-					else if (nextOperator.compare(_T("%")) == 0)
-						node.dValue = PlotMath::Modulo(node.dValue, newNode.dValue);
-					else
-						assert(false);
-				}
-
-				// Clear the operator
-				nextOperator.Empty();
-			}
-		}
-		else
-		{
-			// Evaluate
-			// Are we at a number?
-			if (expression.Mid(0, 1).IsNumber() &&
-				expression.Mid(0, 1).compare(_T("+")) != 0 &&// Not a + sign
-				(expression.Mid(0, 1).compare(_T("-")) != 0 ||// Not a - sign
-				(expression.Mid(0, 1).compare(_T("-")) == 0 &&
-				(!nextOperator.IsEmpty() || firstChar))))// Is a - sign, but to identify a negative number
-			{
-				unsigned int i;
-				for (i = 1; i < expression.Len(); i++)
-				{
-					if ((!expression.Mid(i, 1).IsNumber() &&
-						expression.Mid(i, 1).compare(_T(".")) != 0) ||
-						expression.Mid(i, 1).compare(_T("-")) == 0 ||
-						expression.Mid(i, 1).compare(_T("+")) == 0)
-					{
-						break;
-					}
-				}
-
-				// This could be reached if user inputed -[x] (invert dataset) - handle this here
-				if (expression.at(i) == '[')
-				{
-					int end = expression.find(_T("]"), i);
-					if (end == wxNOT_FOUND)
-					{
-						errorString = _T("Missing ']'!");
-						return node;
-					}
-
-					Dataset2D newSet;
-					long set;
-					if (expression.Mid(i + 1, end - i - 1).ToLong(&set))
-					{
-						if (set >= 0 && set <= list.GetCount())
-							newSet = GetSetFromList(set) * -1.0;
-						else
-						{
-							errorString.Printf("Dataset ID %li is invalid!", set);
-							return node;
-						}
-					}
-					else
-					{
-						errorString = _T("Unrecognized dataset ID:  ") + expression.Mid(i + 1, end - i - 1);
-						return node;
-					}
-
-					// Handle the math
-					if (node.set.GetNumberOfPoints() == 0)
-					{
-						node.set = newSet;
-
-						// handle operating on a double and a set
-						if (nextOperator.compare(_T("+")) == 0)
-							node.set += node.dValue;
-						else if (nextOperator.compare(_T("-")) == 0)
-						{
-							// Special handling because this is double - set, not set - double
-							node.set *= -1.0;
-							node.set += node.dValue;
-						}
-						else if (nextOperator.compare(_T("*")) == 0)
-							node.set *= node.dValue;
-						else// "/"
-						{
-							// Can't hande this case
-							errorString = _T("Cannot divide a number by a dataset!");
-							return node;
-						}
-					}
-					else
-					{
-						// handle operating on two sets
-						if (nextOperator.compare(_T("+")) == 0)
-							node.set += newSet;
-						else if (nextOperator.compare(_T("-")) == 0)
-							node.set -= newSet;
-						else if (nextOperator.compare(_T("*")) == 0)
-							node.set *= newSet;
-						else if (nextOperator.compare(_T("/")) == 0)
-							node.set /= newSet;
-						else
-							assert(false);
-					}
-
-					nextOperator.Empty();
-
-					// Shorten the expression
-					expression = expression.Mid(end + 1);
-
-					continue;
-				}
-
-				if (nextOperator.IsEmpty())
-					expression.Mid(0, i).ToDouble(&node.dValue);
-				else
-				{
-					double value;
-					expression.Mid(0, i).ToDouble(&value);
-
-					// Are operating on two doubles, or one double and one set?
-					if (node.set.GetNumberOfPoints() == 0)
-					{
-						// handle operating on two doubles
-						if (nextOperator.compare(_T("+")) == 0)
-							node.dValue += value;
-						else if (nextOperator.compare(_T("-")) == 0)
-							node.dValue -= value;
-						else if (nextOperator.compare(_T("*")) == 0)
-							node.dValue *= value;
-						else if (nextOperator.compare(_T("/")) == 0)
-							node.dValue /= value;
-						else if (nextOperator.compare(_T("%")) == 0)
-							node.dValue = PlotMath::Modulo(node.dValue, value);
-						else
-							assert(false);
-					}
-					else
-					{
-						// handle operating on a set and a double
-						if (nextOperator.compare(_T("+")) == 0)
-							node.set += value;
-						else if (nextOperator.compare(_T("-")) == 0)
-							node.set -= value;
-						else if (nextOperator.compare(_T("*")) == 0)
-							node.set *= value;
-						else if (nextOperator.compare(_T("/")) == 0)
-							node.set /= value;
-						else if (nextOperator.compare(_T("%")) == 0)
-							node.set = node.set % value;
-						else
-							assert(false);
-					}
-
-					nextOperator.Empty();
-				}
-
-				// Shorten the string
-				expression = expression.Mid(i);
-			}
-			// At a dataset identifier
-			else if (expression.Mid(0, 1).CmpNoCase(_T("[")) == 0)
-			{
-				long i;
-				Dataset2D newSet;
-				int end = expression.Find(_T("]"));
-				if (end == wxNOT_FOUND)
-				{
-					errorString = _T("Missing ']'!");
-					return node;
-				}
-
-				if (expression.Mid(1, end - 1).ToLong(&i))
-				{
-					if (i >= 0 && i <= list.GetCount())
-						newSet = GetSetFromList(i);
-					else
-					{
-						errorString.Printf("Dataset ID %li is invalid!", i);
-						return node;
-					}
-				}
-				else
-				{
-					wxString t=expression.Mid(1, end-1);
-					errorString = _T("Unrecognized dataset ID:  ") + expression.Mid(1, end - 1);
-					return node;
-				}
-				expression = expression.Mid(end + 1);
-
-				if (nextOperator.IsEmpty())
-					node.set = newSet;
-				else
-				{
-					if (node.set.GetNumberOfPoints() == 0)
-					{
-						node.set = newSet;
-
-						// handle operating on a double and a set
-						if (nextOperator.compare(_T("+")) == 0)
-							node.set += node.dValue;
-						else if (nextOperator.compare(_T("-")) == 0)
-						{
-							// Special handling because this is double - set, not set - double
-							node.set *= -1.0;
-							node.set += node.dValue;
-						}
-						else if (nextOperator.compare(_T("*")) == 0)
-							node.set *= node.dValue;
-						else if (nextOperator.compare(_T("/")) == 0)
-						{
-							// Can't hande this case
-							errorString = _T("Cannot divide a number by a dataset!");
-							return node;
-						}
-						else if (nextOperator.compare(_T("%")) == 0)
-						{
-							// Can't hande this case
-							errorString = _T("Cannot perform modulo with RHS dataset!");
-							return node;
-						}
-					}
-					else
-					{
-						// handle operating on two sets
-						if (nextOperator.compare(_T("+")) == 0)
-							node.set += newSet;
-						else if (nextOperator.compare(_T("-")) == 0)
-							node.set -= newSet;
-						else if (nextOperator.compare(_T("*")) == 0)
-							node.set *= newSet;
-						else if (nextOperator.compare(_T("/")) == 0)
-							node.set /= newSet;
-						else
-							assert(false);
-					}
-
-					nextOperator.Empty();
-				}
-			}
-			else// Must be at an operator
-			{
-				// Store the operator so we know what to do next
-				if (expression.Mid(0,3).CmpNoCase(_T("int")) == 0)
-				{
-					nextOperator = _T("int");
-					expression = expression.Mid(3);
-				}
-				else if (expression.Mid(0,3).CmpNoCase(_T("ddt")) == 0)
-				{
-					nextOperator = _T("ddt");
-					expression = expression.Mid(3);
-				}
-				else if (expression.Mid(0,3).CmpNoCase(_T("fft")) == 0)
-				{
-					nextOperator = _T("fft");
-					expression = expression.Mid(3);
-				}
-				else if (expression.Mid(0,1).compare(_T("+")) == 0 ||
-					expression.Mid(0,1).compare(_T("-")) == 0 ||
-					expression.Mid(0,1).compare(_T("*")) == 0 ||
-					expression.Mid(0,1).compare(_T("/")) == 0 ||
-					expression.Mid(0,1).compare(_T("%")) == 0)
-				{
-					nextOperator = expression.at(0);
-					expression = expression.Mid(1);
-				}
-				else
-				{
-					errorString = _T("Unrecognized character:  ") + expression.Mid(0, 1);
-					return node;
-				}
-			}
-		}
-
-		firstChar = false;
-	}
-
-	return node;
 }
 
 //==========================================================================
@@ -638,7 +97,7 @@ ExpressionTree::Node ExpressionTree::EvaluateNextNode(wxString &expression, wxSt
 //		Datased2D requested
 //
 //==========================================================================
-Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i)
+Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 {
 	// If user is requesting time, we need to assign the x values to the y values
 	if (i == 0)
@@ -652,4 +111,1031 @@ Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i)
 	}
 	
 	return *list[i - 1];
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ParenthesesBalanced
+//
+// Description:		Checks to see if the expression has balanced parentheses.
+//
+// Input Arguments:
+//		expression	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if parentheses are balanced, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::ParenthesesBalanced(const wxString &expression) const
+{
+	unsigned int leftCount(0), rightCount(0);
+	int location = expression.find(_T("("));
+
+	while (location != wxNOT_FOUND)
+	{
+		leftCount++;
+		location = expression.find(_T("("), location + 1);
+	}
+
+	location = expression.find(_T(")"));
+
+	while (location != wxNOT_FOUND)
+	{
+		rightCount++;
+		location = expression.find(_T(")"), location + 1);
+	}
+
+	if (leftCount != rightCount)
+		return false;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ParseExpression
+//
+// Description:		Parses the expression and produces a queue of Reverse
+//					Polish Notation values and operations.  Implements the
+//					shunting-yard algorithm as described by Wikipedia.
+//
+// Input Arguments:
+//		expression	= const wxString& to be parsed
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing error descriptions or an empty string on success
+//
+//==========================================================================
+wxString ExpressionTree::ParseExpression(const wxString &expression)
+{
+	std::stack<wxString> operatorStack;
+	unsigned int i, advance;
+	for (i = 0; i < expression.Len(); i++)
+	{
+		if (expression.Mid(i, 1).Trim().IsEmpty())
+			continue;
+
+		if (NextIsNumber(expression.Mid(i), &advance))
+			outputQueue.push(expression.Mid(i, advance));
+		else if (NextIsDataset(expression.Mid(i), &advance))
+			outputQueue.push(expression.Mid(i, advance));
+		else if (NextIsFunction(expression.Mid(i), &advance))
+			operatorStack.push(expression.Mid(i, advance));
+		else if (NextIsOperator(expression.Mid(i), &advance))
+			ProcessOperator(operatorStack, expression.Mid(i, advance));
+		else if (expression[i] == '(')
+		{
+			operatorStack.push(expression.Mid(i, 1));
+			advance = 1;
+		}
+		else if (expression[i] == ')')
+		{
+			ProcessCloseParenthese(operatorStack);
+			advance = 1;
+		}
+		else
+			return _T("Unrecognized character:  '") + expression.Mid(i, 1) + _T("'.");
+
+		i += advance - 1;
+	}
+
+	if (!EmptyStackToQueue(operatorStack))
+		return _T("Imbalanced parentheses!");
+	return wxEmptyString;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ProcessOperator
+//
+// Description:		Processes the next operator in the expression, adding it
+//					to the appropriate stack.  This method enforces the order
+//					of operations.
+//
+// Input Arguments:
+//		operatorStack	= std::stack<wxString>&
+//		s				= const wxString& representing the next operator
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ExpressionTree::ProcessOperator(std::stack<wxString> &operatorStack, const wxString &s)
+{
+	// Handle operator precedence
+	while (!operatorStack.empty())
+	{
+		if ((!NextIsOperator(operatorStack.top()) ||
+			!OperatorShift(operatorStack.top(), s)) &&
+			!NextIsFunction(operatorStack.top()))// Force functions to pop to maintain highest precedence
+			break;
+		PopStackToQueue(operatorStack);
+	}
+	operatorStack.push(s);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ProcessCloseParenthese
+//
+// Description:		Adjusts the stacks in response to encountering a close
+//					parenthese.
+//
+// Input Arguments:
+//		operatorStack	= std::stack<wxString>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ExpressionTree::ProcessCloseParenthese(std::stack<wxString> &operatorStack)
+{
+	while (!operatorStack.empty())
+	{
+		if (operatorStack.top().Cmp(_T("(")) == 0)
+			break;
+		PopStackToQueue(operatorStack);
+	}
+
+	if (operatorStack.empty())
+	{
+		assert(false);
+		// Should never happen due to prior parenthese balance checks
+		//return _T("Imbalanced parentheses!");
+	}
+
+	operatorStack.pop();
+	if (!operatorStack.empty())
+	{
+		if (NextIsFunction(operatorStack.top()))
+			PopStackToQueue(operatorStack);
+	}
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateExpression
+//
+// Description:		Evaluates the expression in the queue using Reverse Polish
+//					Notation.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		results	= Dataset2D&
+//
+// Return Value:
+//		wxString containing a description of any errors, or wxEmptyString on success
+//
+//==========================================================================
+wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
+{
+	wxString next, errorString;
+
+	std::stack<double> doubleStack;
+	std::stack<Dataset2D> setStack;
+	std::stack<bool> useDoubleStack;
+
+	if (NextIsOperator(outputQueue.front()))// Special handling in case of "-3*..."
+		PushToStack(0.0, doubleStack, useDoubleStack);
+
+	while (!outputQueue.empty())
+	{
+		next = outputQueue.front();
+		outputQueue.pop();
+
+		if (!EvaluateNext(next, doubleStack, setStack, useDoubleStack, errorString))
+			return errorString;
+	}
+
+	if (useDoubleStack.top())
+		return _T("Expression evaluates to a number!");
+	else
+		results = setStack.top();
+
+	return wxEmptyString;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		PopStackToQueue
+//
+// Description:		Removes the top entry of the stack and puts it in the queue.
+//
+// Input Arguments:
+//		stack	= std::stack<wxString>& to be popped
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ExpressionTree::PopStackToQueue(std::stack<wxString> &stack)
+{
+	outputQueue.push(stack.top());
+	stack.pop();
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EmptyStackToQueue
+//
+// Description:		Empties the contents of the stack into the queue.
+//
+// Input Arguments:
+//		stack	= std::stack<wxString>& to be emptied
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for success, false otherwise (imbalance parentheses)
+//
+//==========================================================================
+bool ExpressionTree::EmptyStackToQueue(std::stack<wxString> &stack)
+{
+	while (!stack.empty())
+	{
+		if (stack.top().Cmp(_T("(")) == 0)
+			return false;
+		PopStackToQueue(stack);
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		NextIsNumber
+//
+// Description:		Determines if the next portion of the expression is a number.
+//
+// Input Arguments:
+//		s		= const wxString& containing the expression
+//
+// Output Arguments:
+//		stop	= unsigned int* (optional) indicating length of number
+//
+// Return Value:
+//		bool, true if a number is next in the expression
+//
+//==========================================================================
+bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop) const
+{
+	if (s.Len() == 0)
+		return false;
+
+	bool foundDecimal = s[0] == '.';
+	if (foundDecimal ||
+		(int(s[0]) >= int('0') && int(s[0]) <= int('9')))
+	{
+		unsigned int i;
+		for (i = 1; i < s.Len(); i++)
+		{
+			if (s[i] == '.')
+			{
+				if (foundDecimal)
+					return false;
+				foundDecimal = true;
+			}
+			else if (int(s[i]) < int('0') || int(s[i]) > int('9'))
+				break;
+		}
+
+		if (stop)
+			*stop = i;
+		return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		NextIsDataset
+//
+// Description:		Determines if the next portion of the expression is a dataset.
+//
+// Input Arguments:
+//		s		= const wxString& containing the expression
+//
+// Output Arguments:
+//		stop	= unsigned int* (optional) indicating length of dataset ID
+//
+// Return Value:
+//		bool, true if a dataset is next in the expression
+//
+//==========================================================================
+bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop) const
+{
+	if (s.Len() < 3)
+		return false;
+
+	if (s[0] == '[')
+	{
+		unsigned int close = s.Find(']');
+		if (close == wxNOT_FOUND)
+			return false;
+
+		unsigned int i;
+		for (i = 1; i < close; i++)
+		{
+			if (int(s[i]) < '0' || int(s[i]) > '9')
+				return false;
+		}
+
+		if (stop)
+			*stop = close + 1;
+		return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		NextIsFunction
+//
+// Description:		Determines if the next portion of the expression is a function.
+//
+// Input Arguments:
+//		s		= const wxString& containing the expression
+//
+// Output Arguments:
+//		stop	= unsigned int* (optional) indicating length of function
+//
+// Return Value:
+//		bool, true if a function is next in the expression
+//
+//==========================================================================
+bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop) const
+{
+	if (s.Len() < 3)
+		return false;
+
+	if (s.Mid(0, 3).CmpNoCase(_T("int")) == 0 ||
+		s.Mid(0, 3).CmpNoCase(_T("ddt")) == 0 ||
+		s.Mid(0, 3).CmpNoCase(_T("fft")) == 0)
+	{
+		if (stop)
+			*stop = 3;
+		return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		NextIsOperator
+//
+// Description:		Determines if the next portion of the expression is an operator.
+//
+// Input Arguments:
+//		s		= const wxString& containing the expression
+//
+// Output Arguments:
+//		stop	= unsigned int* (optional) indicating length of operator
+//
+// Return Value:
+//		bool, true if an operator is next in the expression
+//
+//==========================================================================
+bool ExpressionTree::NextIsOperator(const wxString &s, unsigned int *stop) const
+{
+	if (s.Len() == 0)
+		return false;
+
+	if (s[0] == '+' ||// From least precedence
+		s[0] == '-' ||
+		s[0] == '*' ||
+		s[0] == '/' ||
+		s[0] == '%' ||
+		s[0] == '^')// To most precedence
+	{
+		if (stop)
+			*stop = 1;
+		return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		OperatorShift
+//
+// Description:		Determines if the new operator requires a shift in
+//					operator placement.
+//
+// Input Arguments:
+//		stackString	= const wxString& containing the expression
+//		newString	= const wxString& containing the expression
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if shifting needs to occur
+//
+//==========================================================================
+bool ExpressionTree::OperatorShift(const wxString &stackString, const wxString &newString) const
+{
+	unsigned int stackPrecedence = GetPrecedence(stackString);
+	unsigned int newPrecedence = GetPrecedence(newString);
+
+	if (stackPrecedence == 0 || newPrecedence == 0)
+		return false;
+
+	if (IsLeftAssociative(newString[0]))
+	{
+		if (newPrecedence <= stackPrecedence)
+			return true;
+	}
+	else if (newPrecedence < stackPrecedence)
+		return true;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		GetPrecedence
+//
+// Description:		Determines the precedence of the specified operator
+//					(higher values are performed first)
+//
+// Input Arguments:
+//		s	= const wxString& containing the operator
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int representing the precedence
+//
+//==========================================================================
+unsigned int ExpressionTree::GetPrecedence(const wxString &s) const
+{
+	if (s.Len() != 1)
+		return 0;
+
+	if (s[0] == '+' ||
+		s[0] == '-')
+		return 2;
+	else if (s[0] == '*' ||
+		s[0] == '/' ||
+		s[0] == '%')
+		return 3;
+	else if (s[0] == '^')
+		return 4;
+
+	return 0;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		IsLeftAssociative
+//
+// Description:		Determines if the specified operator is left or right
+//					associative.
+//
+// Input Arguments:
+//		c	= const wxChar&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if left associative
+//
+//==========================================================================
+bool ExpressionTree::IsLeftAssociative(const wxChar &c) const
+{
+	switch (c)
+	{
+	case '^':
+		return false;
+
+	default:
+		return true;
+	}
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		PushToStack
+//
+// Description:		Pushes the specified value onto the stack.
+//
+// Input Arguments:
+//		value			= const double&
+//		doubleStack		= std::stack<double>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ExpressionTree::PushToStack(const double &value, std::stack<double> &doubleStack,
+	std::stack<bool> &useDoubleStack) const
+{
+	doubleStack.push(value);
+	useDoubleStack.push(true);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		PushToStack
+//
+// Description:		Pushes the specified dataset onto the stack.
+//
+// Input Arguments:
+//		dataset			= const Dataset2D&
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ExpressionTree::PushToStack(const Dataset2D &dataset, std::stack<Dataset2D> &setStack,
+	std::stack<bool> &useDoubleStack) const
+{
+	setStack.push(dataset);
+	useDoubleStack.push(false);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		PopFromStack
+//
+// Description:		Pops the next value from the top of the appropriate stack.
+//
+// Input Arguments:
+//		doubleStack		= std::stack<double>&
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		value			= double&
+//		dataset			= Dataset2D&
+//
+// Return Value:
+//		bool, true if a double was popped, false if a dataset was popped
+//
+//==========================================================================
+bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<Dataset2D> &setStack,
+	std::stack<bool> &useDoubleStack, double &value, Dataset2D &dataset) const
+{
+	assert(!useDoubleStack.empty());
+
+	bool useDouble = useDoubleStack.top();
+	useDoubleStack.pop();
+
+	if (useDouble)
+	{
+		assert(!doubleStack.empty());
+		value = doubleStack.top();
+		doubleStack.pop();
+	}
+	else
+	{
+		assert(!setStack.empty());
+		dataset = setStack.top();
+		setStack.pop();
+	}
+
+	return useDouble;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyFunction
+//
+// Description:		Applies the specified function to the specified dataset.
+//
+// Input Arguments:
+//		function	= const wxString& describing the function to apply
+//		set			= Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D containing the result of the function
+//
+//==========================================================================
+Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
+	const Dataset2D &set) const
+{
+	if (function.CmpNoCase(_T("int")) == 0)
+		return DiscreteIntegral::ComputeTimeHistory(set);
+	else if (function.CmpNoCase(_T("ddt")) == 0)
+		return DiscreteDerivative::ComputeTimeHistory(set);
+	else if (function.CmpNoCase(_T("fft")) == 0)
+		return FastFourierTransform::Compute(set).MultiplyXData(xAxisFactor);
+
+	assert(false);
+	return set;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyOperation
+//
+// Description:		Applies the specified operation to the specified operands.
+//
+// Input Arguments:
+//		operation	= const wxString& describing the function to apply
+//		first		= const Dataset2D&
+//		second		= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D containing the result of the operation
+//
+//==========================================================================
+Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
+	const Dataset2D &first, const Dataset2D &second) const
+{
+	if (operation.Cmp(_T("+")) == 0)
+		return second + first;
+	else if (operation.Cmp(_T("-")) == 0)
+		return second - first;
+	else if (operation.Cmp(_T("*")) == 0)
+		return second * first;
+	else if (operation.Cmp(_T("/")) == 0)
+		return second / first;
+
+	assert(false);
+	return first;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyOperation
+//
+// Description:		Applies the specified operation to the specified operands.
+//
+// Input Arguments:
+//		operation	= const wxString& describing the function to apply
+//		first		= const Dataset2D&
+//		second		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D containing the result of the operation
+//
+//==========================================================================
+Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
+	const Dataset2D &first, const double &second) const
+{
+	// These operations have some orders reversed in order to avoid undefined operations for doubles
+	if (operation.Cmp(_T("+")) == 0)
+		return first + second;
+	else if (operation.Cmp(_T("-")) == 0)
+		return first * -1.0 + second;
+	else if (operation.Cmp(_T("*")) == 0)
+		return first * second;
+
+	assert(false);
+	return 0.0;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyOperation
+//
+// Description:		Applies the specified operation to the specified operands.
+//
+// Input Arguments:
+//		operation	= const wxString& describing the function to apply
+//		first		= const double&
+//		second		= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D containing the result of the operation
+//
+//==========================================================================
+Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
+	const double &first, const Dataset2D &second) const
+{
+	if (operation.Cmp(_T("+")) == 0)
+		return second + first;
+	else if (operation.Cmp(_T("-")) == 0)
+		return second - first;
+	else if (operation.Cmp(_T("*")) == 0)
+		return second * first;
+	else if (operation.Cmp(_T("/")) == 0)
+		return second / first;
+	else if (operation.Cmp(_T("%")) == 0)
+		return second % first;
+	else if (operation.Cmp(_T("^")) == 0)
+		return second.ToPower(first);
+
+	assert(false);
+	return 0.0;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyOperation
+//
+// Description:		Applies the specified operation to the specified operands.
+//
+// Input Arguments:
+//		operation	= const wxString& describing the function to apply
+//		first		= const double&
+//		second		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double containing the result of the operation
+//
+//==========================================================================
+double ExpressionTree::ApplyOperation(const wxString &operation,
+	const double &first, const double &second) const
+{
+	if (operation.Cmp(_T("+")) == 0)
+		return second + first;
+	else if (operation.Cmp(_T("-")) == 0)
+		return second - first;
+	else if (operation.Cmp(_T("*")) == 0)
+		return second * first;
+	else if (operation.Cmp(_T("/")) == 0)
+		return second / first;
+	else if (operation.Cmp(_T("%")) == 0)
+		return PlotMath::Modulo(second, first);
+	else if (operation.Cmp(_T("^")) == 0)
+		return pow(second, first);
+
+	assert(false);
+	return 0.0;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateFunction
+//
+// Description:		Evaluates the function specified.
+//
+// Input Arguments:
+//		function		= const wxString& describing the function to apply
+//		doubleStack		= std::stack<double>&
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateFunction(const wxString &function, std::stack<double> &doubleStack,
+	std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	double value;
+	Dataset2D dataset;
+
+	if (useDoubleStack.empty())
+	{
+		errorString = _T("Attempting to apply function without argument!");
+		return false;
+	}
+	else if (PopFromStack(doubleStack, setStack, useDoubleStack, value, dataset))
+	{
+		errorString = _T("Attempting to apply function to value (requires dataset).");
+		return false;
+	}
+
+	PushToStack(ApplyFunction(function, dataset), setStack, useDoubleStack);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateOperator
+//
+// Description:		Evaluates the operator specified.
+//
+// Input Arguments:
+//		operator		= const wxString& describing the function to apply
+//		doubleStack		= std::stack<double>&
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<double> &doubleStack,
+	std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	double value1, value2;
+	Dataset2D dataset1, dataset2;
+
+	if (useDoubleStack.size() < 2)
+	{
+		errorString = _T("Attempting to apply operator without two operands!");
+		return false;
+	}
+	else if (PopFromStack(doubleStack, setStack, useDoubleStack, value1, dataset1))
+	{
+		if (PopFromStack(doubleStack, setStack, useDoubleStack, value2, dataset2))
+			PushToStack(ApplyOperation(operation, value1, value2), doubleStack, useDoubleStack);
+		else
+			PushToStack(ApplyOperation(operation, value1, dataset2), setStack, useDoubleStack);
+	}
+	else if (PopFromStack(doubleStack, setStack, useDoubleStack, value2, dataset2))
+	{
+		if (!SetOperatorValid(operation, true))
+		{
+			errorString = wxString::Format("The number %s dataset operation is invalid.", operation.c_str());
+			return false;
+		}
+		PushToStack(ApplyOperation(operation, dataset1, value2), setStack, useDoubleStack);
+	}
+	else
+	{
+		if (!SetOperatorValid(operation, false))
+		{
+			errorString = wxString::Format("The dataset %s dataset operation is invalid.", operation.c_str());
+			return false;
+		}
+		PushToStack(ApplyOperation(operation, dataset1, dataset2), setStack, useDoubleStack);
+	}
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateNumber
+//
+// Description:		Evaluates the number specified.
+//
+// Input Arguments:
+//		number			= const wxString& describing the function to apply
+//		doubleStack		= std::stack<double>&
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateNumber(const wxString &number, std::stack<double> &doubleStack,
+	std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	double value;
+
+	if (!number.ToDouble(&value))
+	{
+		errorString = _T("Could not convert ") + number + _T(" to a number.");
+		return false;
+	}
+
+	PushToStack(value, doubleStack, useDoubleStack);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateDataset
+//
+// Description:		Evaluates the dataset specified.
+//
+// Input Arguments:
+//		dataset			= const wxString& describing the function to apply
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateDataset(const wxString &dataset, std::stack<Dataset2D> &setStack,
+	std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	unsigned long set;
+	if (!dataset.Mid(1, dataset.Len() - 2).ToULong(&set))
+	{
+		errorString = _T("Could not convert '") + dataset + _T("' to set ID.");
+		return false;
+	}
+	else if (set > (unsigned int)list.GetCount())
+	{
+		errorString = wxString::Format("Set ID %ui is not a valid set ID", set);
+		return false;
+	}
+
+	PushToStack(GetSetFromList(set), setStack, useDoubleStack);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		SetOperatorValid
+//
+// Description:		Verifies if the specified operator is valid for dataset operations.
+//
+// Input Arguments:
+//		operation			= const wxString&
+//		leftOperandIsDouble	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for valid operation, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::SetOperatorValid(const wxString &operation, const bool &leftOperandIsDouble) const
+{
+	if (operation.Cmp(_T("+")) == 0)
+		return true;
+	else if (operation.Cmp(_T("-")) == 0)
+		return true;
+	else if (operation.Cmp(_T("*")) == 0)
+		return true;
+
+	if (!leftOperandIsDouble &&
+		operation.Cmp(_T("/")) == 0)
+			return true;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateNext
+//
+// Description:		Determines how to evaluate the specified term and takes
+//					appropriate action.
+//
+// Input Arguments:
+//		operation			= const wxString&
+//		leftOperandIsDouble	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for valid operation, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doubleStack,
+		std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	if (NextIsFunction(next))
+		return EvaluateFunction(next, doubleStack, setStack, useDoubleStack, errorString);
+	else if(NextIsOperator(next))
+		return EvaluateOperator(next, doubleStack, setStack, useDoubleStack, errorString);
+	else if (NextIsDataset(next))
+		return EvaluateDataset(next, setStack, useDoubleStack, errorString);
+
+	return EvaluateNumber(next, doubleStack, useDoubleStack, errorString);
 }

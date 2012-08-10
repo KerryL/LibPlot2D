@@ -90,6 +90,8 @@ public:
 	// Force magnitude == 1 while preserving the direction
 	Vector Normalize(void) const;
 
+	static Matrix GenerateRotationMatrix(const Axis &axis, const double &angle);
+
 	// Multiplication that results in a 3x3 matrix
 	Matrix OuterProduct(const Vector &v) const;
 

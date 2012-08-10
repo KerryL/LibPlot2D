@@ -213,7 +213,6 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 //==========================================================================
 void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 {
-	// If we are a 3D plot, let the default event handlers do their job
 	if (view3D)
 	{
 		event.Skip();
@@ -232,9 +231,8 @@ void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 	else if (event.ShiftDown() && !event.ControlDown())
 		zoomScaleX = 0.0;
 
-	// Otherwise, scale both axes
 	// FIXME:  Focus the zooming around the cursor
-	// Adjust the axis limits
+	// Adjust the axis limits to achieve zooming
 	double xDelta = (plot->GetXMax() - plot->GetXMin()) * zoomScaleX * event.GetWheelRotation() / 120.0;
 	double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomScaleY * event.GetWheelRotation() / 120.0;
 	double yRightDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomScaleY * event.GetWheelRotation() / 120.0;
@@ -246,7 +244,6 @@ void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 	plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
 	plot->SetRightYMax(plot->GetRightYMax() - yRightDelta);
 
-	// Update the plot display
 	UpdateDisplay();
 }
 
@@ -270,145 +267,38 @@ void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 {
-	// If we are a 3D plot, let the default event handlers do their job
 	if (view3D)
 	{
 		event.Skip();
 		return;
 	}
 
-	// Don't perform and actions if this isn't a dragging event
 	if (!event.Dragging())
 	{
 		StoreMousePosition(event);
 		return;
 	}
 
-	// Are we moving cursors?
 	if (draggingLeftCursor)
 		leftCursor->SetLocation(event.GetX());
 	else if (draggingRightCursor)
 		rightCursor->SetLocation(event.GetX());
 	// ZOOM:  Left or Right mouse button + CTRL or SHIFT
 	else if ((event.ControlDown() || event.ShiftDown()) && (event.RightIsDown() || event.LeftIsDown()))
-	{
-		// CTRL for Left Y-zoom
-		// SHIFT for Right Y-zoom
-
-		// ZOOM in or out
-		double zoomXScale = 0.005 * (event.GetX() - lastMousePosition[0]);// [% of current scale]
-		double zoomYScale = 0.005 * (event.GetY() - lastMousePosition[1]);// [% of current scale]
-
-		// FIXME:  Focus the zooming around the cursor
-		// Adjust the axis limits
-		double xDelta = (plot->GetXMax() - plot->GetXMin()) * zoomXScale;
-		double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomYScale * (int)event.ControlDown();
-		double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * zoomYScale * (int)event.ShiftDown();
-
-		// Left mouse button fixes left and bottom corner, right button fixes right and top corner
-		if (event.LeftIsDown())
-		{
-			plot->SetXMax(plot->GetXMax() - xDelta);
-			plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
-			plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
-		}
-		else
-		{
-			plot->SetXMin(plot->GetXMin() - xDelta);
-			plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
-			plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
-		}
-	}
+		ProcessZoom(event);
 	// ZOOM WITH BOX: Right mouse button
 	else if (event.RightIsDown())
-	{
-		// If we're not already visible, set the anchor and make us visible
-		if (!zoomBox->GetIsVisible())
-		{
-			zoomBox->SetVisibility(true);
-			zoomBox->SetAnchorCorner(lastMousePosition[0], GetSize().GetHeight() - lastMousePosition[1]);
-		}
-
-		unsigned int x = event.GetX();
-		unsigned int y = event.GetY();
-
-		// Make sure we're still over the plot area - if we're not, draw the box as if we were
-		if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge())
-			x = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
-		else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-			x = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
-
-		if (y < plot->GetTopAxis()->GetOffsetFromWindowEdge())
-			y = plot->GetTopAxis()->GetOffsetFromWindowEdge();
-		else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-			y = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge();
-
-		// Tell the zoom box where to draw the floaing corner
-		zoomBox->SetFloatingCorner(x, GetSize().GetHeight() - y);
-	}
+		ProcessZoomWithBox(event);
 	// PAN:  Left mouse button (includes with any buttons not caught above)
 	else if (event.LeftIsDown())
-	{
-		// Determine size of plot within window and scale actions according to the scale of the plot window
-		int height = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() - plot->GetTopAxis()->GetOffsetFromWindowEdge();
-		int width = GetSize().GetWidth() - plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
-
-		// Adjust the axis limits to pan the plot
-		if (plot->GetBottomAxis()->IsLogarithmic())
-		{
-			int pixelDelta = event.GetX() - lastMousePosition[0];
-			plot->SetXMin(plot->GetBottomAxis()->PixelToValue(
-				(int)plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
-			plot->SetXMax(plot->GetBottomAxis()->PixelToValue(
-				GetSize().GetWidth() - (int)plot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
-		}
-		else
-		{
-			double xDelta = (plot->GetXMax() - plot->GetXMin()) * (event.GetX() - lastMousePosition[0]) / width;
-			plot->SetXMin(plot->GetXMin() - xDelta);
-			plot->SetXMax(plot->GetXMax() - xDelta);
-		}
-
-		if (plot->GetLeftYAxis()->IsLogarithmic())
-		{
-			int pixelDelta = event.GetY() - lastMousePosition[1];
-			plot->SetLeftYMin(plot->GetLeftYAxis()->PixelToValue(
-				(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
-			plot->SetLeftYMax(plot->GetLeftYAxis()->PixelToValue(
-				GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
-		}
-		else
-		{
-			double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * (event.GetY() - lastMousePosition[1]) / height;
-			plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
-			plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
-		}
-
-		if (plot->GetRightYAxis()->IsLogarithmic())
-		{
-			int pixelDelta = event.GetY() - lastMousePosition[1];
-			plot->SetRightYMin(plot->GetRightYAxis()->PixelToValue(
-				(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
-			plot->SetRightYMax(plot->GetRightYAxis()->PixelToValue(
-				GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
-		}
-		else
-		{
-			double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * (event.GetY() - lastMousePosition[1]) / height;
-			plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
-			plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
-		}
-	}
+		ProcessPan(event);
 	else// Not recognized
 	{
 		StoreMousePosition(event);
 		return;
 	}
 
-	// Store the last mouse position
 	StoreMousePosition(event);
-
-	// Update the display
 	UpdateDisplay();
 }
 
@@ -430,63 +320,13 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 {
-	// If the zoom box is not visible, process this like a right click event
 	if (!zoomBox->GetIsVisible())
 	{
-		// Determine the context
-		MainFrame::PlotContext context;
-		unsigned int x = event.GetX();
-		unsigned int y = event.GetY();
-		if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-			y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-			y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-			context = MainFrame::plotContextLeftYAxis;
-		else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
-			y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-			y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-			context = MainFrame::plotContextRightYAxis;
-		else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
-			x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-			x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-			context = MainFrame::plotContextXAxis;
-		else
-			context = MainFrame::plotContextPlotArea;
-
-		// Display the context menu (further events handled by MainFrame)
-		mainFrame.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
-
+		ProcessRightClick(event);
 		return;
 	}
 
-	// Hide the zoom box
-	zoomBox->SetVisibility(false);
-
-	// Make sure the box isn't too small
-	int limit = 5;// [pixels]
-	if (abs(int(zoomBox->GetXAnchor() - zoomBox->GetXFloat())) > limit &&
-		abs(int(zoomBox->GetYAnchor() - zoomBox->GetYFloat())) > limit)
-	{
-		// Determine the new zoom range
-		// Remember: OpenGL uses Bottom Left as origin, normal windows use Top Left as origin
-		double xMin = plot->GetBottomAxis()->PixelToValue(
-			std::min<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
-		double xMax = plot->GetBottomAxis()->PixelToValue(
-			std::max<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
-		double yLeftMin = plot->GetLeftYAxis()->PixelToValue(
-			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
-		double yLeftMax = plot->GetLeftYAxis()->PixelToValue(
-			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
-		double yRightMin = plot->GetRightYAxis()->PixelToValue(
-			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
-		double yRightMax = plot->GetRightYAxis()->PixelToValue(
-			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
-
-		// Assign the results
-		SetXLimits(xMin, xMax);
-		SetLeftYLimits(yLeftMin, yLeftMax);
-		SetRightYLimits(yRightMin, yRightMax);
-	}
-
+	ProcessZoomBoxEnd();
 	UpdateDisplay();
 }
 
@@ -1118,51 +958,9 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-	{
-		double value(plot->GetBottomAxis()->PixelToValue(x));
-
-		if (!leftCursor->GetIsVisible())
-		{
-			leftCursor->SetVisibility(true);
-			leftCursor->SetLocation(x);
-		}
-		else if (!rightCursor->GetIsVisible())
-		{
-			rightCursor->SetVisibility(true);
-			rightCursor->SetLocation(x);
-		}
-		else
-		{
-			// Both cursors are visible - move the closer one to the click spot
-			// FIXME:  Another option is to always alternate which one was moved?
-			if (fabs(leftCursor->GetValue() - value) < fabs(rightCursor->GetValue() - value))
-				leftCursor->SetLocation(x);
-			else
-				rightCursor->SetLocation(x);
-		}
-	}
+		ProcessPlotAreaDoubleClick(x);
 	else
-	{
-		// Determine the context
-		MainFrame::PlotContext context;
-		if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-			y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-			y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-			context = MainFrame::plotContextLeftYAxis;
-		else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
-			y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-			y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-			context = MainFrame::plotContextRightYAxis;
-		else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
-			x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-			x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-			context = MainFrame::plotContextXAxis;
-		else
-			context = MainFrame::plotContextPlotArea;
-
-		// Display the dialog
-		mainFrame.DisplayAxisRangeDialog(context);
-	}
+		ProcessOffPlotDoubleClick(x, y);
 
 	UpdateDisplay();
 }
@@ -1662,4 +1460,392 @@ bool PlotRenderer::GetXAxisZoomed(void) const
 		return false;
 
 	return !plot->GetXAxisAutoScaled();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ProcessZoom
+//
+// Description:		Handles mouse-drag zoom events.
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ProcessZoom(wxMouseEvent &event)
+{
+	// CTRL for Left Y-zoom
+	// SHIFT for Right Y-zoom
+
+	// ZOOM in or out
+	double zoomXScale = 0.005 * (event.GetX() - lastMousePosition[0]);// [% of current scale]
+	double zoomYScale = 0.005 * (event.GetY() - lastMousePosition[1]);// [% of current scale]
+
+	// FIXME:  Focus the zooming around the cursor
+	// Adjust the axis limits
+	double xDelta = (plot->GetXMax() - plot->GetXMin()) * zoomXScale;
+	double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomYScale * (int)event.ControlDown();
+	double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * zoomYScale * (int)event.ShiftDown();
+
+	// Left mouse button fixes left and bottom corner, right button fixes right and top corner
+	if (event.LeftIsDown())
+	{
+		plot->SetXMax(plot->GetXMax() - xDelta);
+		plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
+		plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
+	}
+	else
+	{
+		plot->SetXMin(plot->GetXMin() - xDelta);
+		plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
+		plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ProcessZoomWithBox
+//
+// Description:		Handles mouse-drag zoom box events.
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ProcessZoomWithBox(wxMouseEvent &event)
+{
+	// If we're not already visible, set the anchor and make us visible
+	if (!zoomBox->GetIsVisible())
+	{
+		zoomBox->SetVisibility(true);
+		zoomBox->SetAnchorCorner(lastMousePosition[0], GetSize().GetHeight() - lastMousePosition[1]);
+	}
+
+	unsigned int x = event.GetX();
+	unsigned int y = event.GetY();
+
+	// Make sure we're still over the plot area - if we're not, draw the box as if we were
+	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge())
+		x = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
+	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
+		x = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
+
+	if (y < plot->GetTopAxis()->GetOffsetFromWindowEdge())
+		y = plot->GetTopAxis()->GetOffsetFromWindowEdge();
+	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		y = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge();
+
+	// Tell the zoom box where to draw the floaing corner
+	zoomBox->SetFloatingCorner(x, GetSize().GetHeight() - y);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ProcessPan
+//
+// Description:		Handles mouse-drag pan events.
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ProcessPan(wxMouseEvent &event)
+{	
+	PanBottomXAxis(event);
+	PanLeftYAxis(event);
+	PanRightYAxis(event);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		PanBottomXAxis
+//
+// Description:		Pans the bottom x-axis in resposne to mouse moves.
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::PanBottomXAxis(wxMouseEvent &event)
+{
+	int width = GetSize().GetWidth() - plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
+
+	if (plot->GetBottomAxis()->IsLogarithmic())
+	{
+		int pixelDelta = event.GetX() - lastMousePosition[0];
+		plot->SetXMin(plot->GetBottomAxis()->PixelToValue(
+			(int)plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+		plot->SetXMax(plot->GetBottomAxis()->PixelToValue(
+			GetSize().GetWidth() - (int)plot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+	}
+	else
+	{
+		double xDelta = (plot->GetXMax() - plot->GetXMin()) * (event.GetX() - lastMousePosition[0]) / width;
+		plot->SetXMin(plot->GetXMin() - xDelta);
+		plot->SetXMax(plot->GetXMax() - xDelta);
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		PanLeftYAxis
+//
+// Description:		Pans the left y-axis in resposne to mouse moves.
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::PanLeftYAxis(wxMouseEvent &event)
+{
+	int height = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() - plot->GetTopAxis()->GetOffsetFromWindowEdge();
+
+	if (plot->GetLeftYAxis()->IsLogarithmic())
+	{
+		int pixelDelta = event.GetY() - lastMousePosition[1];
+		plot->SetLeftYMin(plot->GetLeftYAxis()->PixelToValue(
+			(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		plot->SetLeftYMax(plot->GetLeftYAxis()->PixelToValue(
+			GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+	}
+	else
+	{
+		double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * (event.GetY() - lastMousePosition[1]) / height;
+		plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
+		plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		PanRightYAxis
+//
+// Description:		Pans the right y-axis in resposne to mouse moves.
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::PanRightYAxis(wxMouseEvent &event)
+{
+	int height = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() - plot->GetTopAxis()->GetOffsetFromWindowEdge();
+
+	if (plot->GetRightYAxis()->IsLogarithmic())
+	{
+		int pixelDelta = event.GetY() - lastMousePosition[1];
+		plot->SetRightYMin(plot->GetRightYAxis()->PixelToValue(
+			(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		plot->SetRightYMax(plot->GetRightYAxis()->PixelToValue(
+			GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+	}
+	else
+	{
+		double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * (event.GetY() - lastMousePosition[1]) / height;
+		plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
+		plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ProcessPlotAreaDoubleClick
+//
+// Description:		Processes double click events occurring within the plot area.
+//
+// Input Arguments:
+//		x	= const unsigned int&, location of click along x-axis
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ProcessPlotAreaDoubleClick(const unsigned int &x)
+{
+	double value(plot->GetBottomAxis()->PixelToValue(x));
+
+	if (!leftCursor->GetIsVisible())
+	{
+		leftCursor->SetVisibility(true);
+		leftCursor->SetLocation(x);
+	}
+	else if (!rightCursor->GetIsVisible())
+	{
+		rightCursor->SetVisibility(true);
+		rightCursor->SetLocation(x);
+	}
+	else
+	{
+		// Both cursors are visible - move the closer one to the click spot
+		// FIXME:  Another option is to always alternate which one was moved?
+		if (fabs(leftCursor->GetValue() - value) < fabs(rightCursor->GetValue() - value))
+			leftCursor->SetLocation(x);
+		else
+			rightCursor->SetLocation(x);
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ProcessOffPlotDoubleClick
+//
+// Description:		Process double click events that occured outside the plot area.
+//
+// Input Arguments:
+//		x	= const unsigned int&, location of click along x-axis
+//		y	= const unsigned int&, location of click along y-axis
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y)
+{
+	// Determine the context
+	MainFrame::PlotContext context;
+	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		context = MainFrame::plotContextLeftYAxis;
+	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
+		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		context = MainFrame::plotContextRightYAxis;
+	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
+		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
+		context = MainFrame::plotContextXAxis;
+	else
+		context = MainFrame::plotContextPlotArea;
+
+	// Display the dialog
+	mainFrame.DisplayAxisRangeDialog(context);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ProcessRightClick
+//
+// Description:		Processes right click events.
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
+{
+	// Determine the context
+	MainFrame::PlotContext context;
+	unsigned int x = event.GetX();
+	unsigned int y = event.GetY();
+	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		context = MainFrame::plotContextLeftYAxis;
+	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
+		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		context = MainFrame::plotContextRightYAxis;
+	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
+		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
+		context = MainFrame::plotContextXAxis;
+	else
+		context = MainFrame::plotContextPlotArea;
+
+	// Display the context menu (further events handled by MainFrame)
+	mainFrame.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ProcessZoomBoxEnd
+//
+// Description:		Completes zoom and cleans up box after user releases zoom box.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ProcessZoomBoxEnd(void)
+{
+	zoomBox->SetVisibility(false);
+
+	// Make sure the box isn't too small
+	int limit = 5;// [pixels]
+	if (abs(int(zoomBox->GetXAnchor() - zoomBox->GetXFloat())) > limit &&
+		abs(int(zoomBox->GetYAnchor() - zoomBox->GetYFloat())) > limit)
+	{
+		// Determine the new zoom range
+		// Remember: OpenGL uses Bottom Left as origin, normal windows use Top Left as origin
+		double xMin = plot->GetBottomAxis()->PixelToValue(
+			std::min<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
+		double xMax = plot->GetBottomAxis()->PixelToValue(
+			std::max<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
+		double yLeftMin = plot->GetLeftYAxis()->PixelToValue(
+			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+		double yLeftMax = plot->GetLeftYAxis()->PixelToValue(
+			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+		double yRightMin = plot->GetRightYAxis()->PixelToValue(
+			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+		double yRightMax = plot->GetRightYAxis()->PixelToValue(
+			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+
+		SetXLimits(xMin, xMax);
+		SetLeftYLimits(yLeftMin, yLeftMax);
+		SetRightYLimits(yRightMin, yRightMax);
+	}
 }

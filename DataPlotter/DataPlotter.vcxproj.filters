@@ -114,9 +114,6 @@
     <ClInclude Include="src\renderer\primitives\text.h">
       <Filter>Header Files\renderer\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\objectList.h">
-      <Filter>Header Files\utilities</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\managedList.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>

@@ -56,68 +56,7 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 		parameters.phaseless = false;
 	}
 
-	// Create controls
-	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
-	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 5);
-
-	wxFlexGridSizer *inputSizer = new wxFlexGridSizer(2, 5, 5);
-	mainSizer->Add(inputSizer, 0, wxEXPAND);
-	inputSizer->AddGrowableCol(1);
-
-	// Create the text boxes and their labels
-	wxString valueString;
-	wxStaticText *cutoffLabel = new wxStaticText(this, wxID_ANY, _T("Cutoff Frequency"));
-	valueString.Printf("%f", parameters.cutoffFrequency);
-	cutoffFrequencyBox = new wxTextCtrl(this, wxID_ANY, valueString);
-	inputSizer->Add(cutoffLabel, wxALIGN_CENTER_VERTICAL);
-	inputSizer->Add(cutoffFrequencyBox, 0, wxEXPAND);
-
-	wxStaticText *dampingLabel = new wxStaticText(this, wxID_ANY, _T("Damping Ratio"));
-	valueString.Printf("%f", parameters.dampingRatio);
-	dampingRatioBox = new wxTextCtrl(this, wxID_ANY, valueString);
-	inputSizer->Add(dampingLabel, wxALIGN_CENTER_VERTICAL);
-	inputSizer->Add(dampingRatioBox, 0, wxEXPAND);
-
-	phaselessCheckBox = new wxCheckBox(this, CheckboxID, _T("Phaseless"));
-	orderSpin = new wxSpinCtrl(this, SpinID, _T("Order"));
-	orderSpin->SetRange(1, 2);
-	orderSpin->SetValue(parameters.order);
-	inputSizer->Add(phaselessCheckBox, wxALIGN_CENTER_VERTICAL);
-	inputSizer->Add(orderSpin);
-
-	mainSizer->AddSpacer(10);
-
-	wxBoxSizer *typeSizer = new wxBoxSizer(wxVERTICAL);
-	mainSizer->Add(typeSizer);
-
-	lowPassRadio = new wxRadioButton(this, RadioID, _T("Low-Pass"));
-	highPassRadio = new wxRadioButton(this, RadioID, _T("High-Pass"));
-	typeSizer->Add(lowPassRadio, 0, wxALL, 2);
-	typeSizer->Add(highPassRadio, 0, wxALL, 2);
-
-	if (parameters.type == FilterParameters::TypeHighPass)
-		highPassRadio->SetValue(true);
-	else
-		lowPassRadio->SetValue(true);
-
-	SetCorrectLimits();
-
-	mainSizer->AddSpacer(10);
-
-	// Create the dialog buttons
-	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-	mainSizer->Add(buttonSizer, 0, wxALIGN_CENTER_HORIZONTAL);
-	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
-	okButton->SetDefault();
-	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
-	buttonSizer->Add(okButton, 1, wxALL, 5);
-	buttonSizer->Add(cancelButton, 1, wxALL, 5);
-
-	// Set the sizer to this dialog
-	SetSizerAndFit(topSizer);
-
-	Center();
+	CreateControls();
 }
 
 //==========================================================================
@@ -147,6 +86,151 @@ END_EVENT_TABLE()
 
 //==========================================================================
 // Class:			FilterDialog
+// Function:		CreateControls
+//
+// Description:		Populates the dialog with controls.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::CreateControls(void)
+{
+	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 5);
+
+	wxFlexGridSizer *inputSizer = new wxFlexGridSizer(2, 5, 5);
+	mainSizer->Add(inputSizer, 0, wxEXPAND);
+	inputSizer->AddGrowableCol(1);
+
+	CreateTextBoxes(inputSizer);
+	mainSizer->AddSpacer(10);
+	mainSizer->Add(CreateRadioButtons());
+
+	SetCorrectLimits();
+	mainSizer->AddSpacer(10);
+	mainSizer->Add(CreateDialogButtons(), 0, wxALIGN_CENTER_HORIZONTAL);
+
+	// Set the sizer to this dialog
+	SetSizerAndFit(topSizer);
+
+	Center();
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		CreateTextBoxes
+//
+// Description:		Creates the text boxes and adds them to the sizer.
+//
+// Input Arguments:
+//		sizer	= wxFlexGridSizer* to which the boxes are added
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::CreateTextBoxes(wxFlexGridSizer *sizer)
+{
+	// Create the text boxes and their labels
+	wxString valueString;
+	wxStaticText *cutoffLabel = new wxStaticText(this, wxID_ANY, _T("Cutoff Frequency"));
+	valueString.Printf("%f", parameters.cutoffFrequency);
+	cutoffFrequencyBox = new wxTextCtrl(this, wxID_ANY, valueString);
+	sizer->Add(cutoffLabel, wxALIGN_CENTER_VERTICAL);
+	sizer->Add(cutoffFrequencyBox, 0, wxEXPAND);
+
+	wxStaticText *dampingLabel = new wxStaticText(this, wxID_ANY, _T("Damping Ratio"));
+	valueString.Printf("%f", parameters.dampingRatio);
+	dampingRatioBox = new wxTextCtrl(this, wxID_ANY, valueString);
+	sizer->Add(dampingLabel, wxALIGN_CENTER_VERTICAL);
+	sizer->Add(dampingRatioBox, 0, wxEXPAND);
+
+	phaselessCheckBox = new wxCheckBox(this, CheckboxID, _T("Phaseless"));
+	orderSpin = new wxSpinCtrl(this, SpinID, _T("Order"));
+	orderSpin->SetRange(1, 2);
+	orderSpin->SetValue(parameters.order);
+	sizer->Add(phaselessCheckBox, wxALIGN_CENTER_VERTICAL);
+	sizer->Add(orderSpin);
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		CreateRadioButtons
+//
+// Description:		Creates the type-selection radio buttons.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxBoxSizer* containing the radio buttons
+//
+//==========================================================================
+wxBoxSizer* FilterDialog::CreateRadioButtons(void)
+{
+	wxBoxSizer *typeSizer = new wxBoxSizer(wxVERTICAL);
+
+	lowPassRadio = new wxRadioButton(this, RadioID, _T("Low-Pass"));
+	highPassRadio = new wxRadioButton(this, RadioID, _T("High-Pass"));
+
+	typeSizer->Add(lowPassRadio, 0, wxALL, 2);
+	typeSizer->Add(highPassRadio, 0, wxALL, 2);
+
+	if (parameters.type == FilterParameters::TypeHighPass)
+		highPassRadio->SetValue(true);
+	else
+		lowPassRadio->SetValue(true);
+
+	return typeSizer;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		CreateDialogButtons
+//
+// Description:		Creates the OK and Cancel buttons at the bottom of the dialog.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxBoxSizer* containing the buttons
+//
+//==========================================================================
+wxBoxSizer* FilterDialog::CreateDialogButtons(void)
+{
+	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
+	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
+
+	okButton->SetDefault();
+
+	buttonSizer->Add(okButton, 1, wxALL, 5);
+	buttonSizer->Add(cancelButton, 1, wxALL, 5);
+
+	return buttonSizer;
+}
+
+//==========================================================================
+// Class:			FilterDialog
 // Function:		OnOKButton
 //
 // Description:		Validates data and passes command to default handler.
@@ -167,31 +251,10 @@ void FilterDialog::OnOKButton(wxCommandEvent &event)
 	parameters.phaseless = phaselessCheckBox->GetValue();
 
 	// Validate the values
-	if (!cutoffFrequencyBox->GetValue().ToDouble(&parameters.cutoffFrequency))
-	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Error Defining Filter"));
+	if (!CutoffFrequencyIsValid())
 		return;
-	}
-	else if (parameters.cutoffFrequency <= 0.0)
-	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be positive!"), _T("Error Defining Filter"));
+	if (!DampingRatioIsValid())
 		return;
-	}
-
-	if ((parameters.order > 1 && !phaselessCheckBox->GetValue()) ||
-		(parameters.order > 2 && phaselessCheckBox->GetValue()))
-	{
-		if (!dampingRatioBox->GetValue().ToDouble(&parameters.dampingRatio))
-		{
-			::wxMessageBox(_T("ERROR:  Damping ratio must be numeric!"), _T("Error Defining Filter"));
-			return;
-		}
-		else if (parameters.dampingRatio <= 0.0)
-		{
-			::wxMessageBox(_T("ERROR:  Damping ratio must be positive!"), _T("Error Defining Filter"));
-			return;
-		}
-	}
 
 	if (lowPassRadio->GetValue())
 		parameters.type = FilterParameters::TypeLowPass;
@@ -615,4 +678,72 @@ unsigned int FilterDialog::GetMaxOrder(const FilterParameters::Type &type) const
 bool FilterDialog::TransferDataFromWindow(void)
 {
 	return OrderIsValid(orderSpin->GetValue());
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		CutoffFrequencyIsValid
+//
+// Description:		Validates the cutoff frequency value.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if dialog contents are valid
+//
+//==========================================================================
+bool FilterDialog::CutoffFrequencyIsValid(void)
+{
+	if (!cutoffFrequencyBox->GetValue().ToDouble(&parameters.cutoffFrequency))
+	{
+		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Error Defining Filter"));
+		return false;
+	}
+	else if (parameters.cutoffFrequency <= 0.0)
+	{
+		::wxMessageBox(_T("ERROR:  Cutoff frequency must be positive!"), _T("Error Defining Filter"));
+		return false;
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		DampingRatioIsValid
+//
+// Description:		Validates the damping ratio value.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if dialog contents are valid
+//
+//==========================================================================
+bool FilterDialog::DampingRatioIsValid(void)
+{
+	if ((parameters.order > 1 && !phaselessCheckBox->GetValue()) ||
+		(parameters.order > 2 && phaselessCheckBox->GetValue()))
+	{
+		if (!dampingRatioBox->GetValue().ToDouble(&parameters.dampingRatio))
+		{
+			::wxMessageBox(_T("ERROR:  Damping ratio must be numeric!"), _T("Error Defining Filter"));
+			return false;
+		}
+		else if (parameters.dampingRatio <= 0.0)
+		{
+			::wxMessageBox(_T("ERROR:  Damping ratio must be positive!"), _T("Error Defining Filter"));
+			return false;
+		}
+	}
+
+	return true;
 }

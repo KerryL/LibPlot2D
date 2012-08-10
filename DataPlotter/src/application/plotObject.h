@@ -16,15 +16,17 @@
 #ifndef _PLOT_OBJECT_H_
 #define _PLOT_OBJECT_H_
 
+// Standard C++ headers
+#include <vector>
+
 // wxWidgets headers
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/objectList.h"
+#include "renderer/primitives/axis.h"
 
 // Local forward declarations
 class PlotRenderer;
-class Axis;
 class TextRendering;
 class PlotCurve;
 class Dataset2D;
@@ -130,15 +132,36 @@ private:
 	bool autoScaleRightY;
 
 	// The actual plot objects
-	ObjectList<PlotCurve> plotList;
-	ObjectList<const Dataset2D> dataList;
+	std::vector<PlotCurve*> plotList;
+	std::vector<const Dataset2D*> dataList;
+
+	void CreateAxisObjects(void);
+	void InitializeFonts(void);
+	void CreateFontObjects(const wxString &fontFile);
 
 	// Handles all of the formatting for the plot
 	void FormatPlot(void);
 
 	// Handles the spacing of the axis ticks
-	double AutoScaleAxis(double &min, double &max, int maxTicks, const bool &logarithmic,
-		const bool &forceLimits = false);
+	double AutoScaleAxis(double &min, double &max, const int &maxTicks, const bool &logarithmic,
+		const bool &forceLimits = false) const;
+	double AutoScaleLogAxis(double &min, double &max, const bool &forceLimits) const;
+	double AutoScaleLinearAxis(double &min, double &max, const int &maxTicks, const bool &forceLimits) const;
+	void RoundMinMax(double &min, double &max, const double &tickSpacing, const bool &forceLimits) const;
+
+	void FormatAxesBasics(void);
+	void FormatBottomBasics(const Axis::TickStyle &tickStyle);
+	void FormatTopBasics(const Axis::TickStyle &tickStyle);
+	void FormatLeftBasics(const Axis::TickStyle &tickStyle);
+	void FormatRightBasics(const Axis::TickStyle &tickStyle);
+	void SetAxesColor(const Color &color);
+	void FormatTitle(void);
+
+	void CheckForZeroRange(void);
+	void HandleZeroRangeAxis(double &min, double &max) const;
+
+	void CheckAutoScaling(void);
+	void UpdateLimitValues(void);
 };
 
 #endif// _PLOT_OBJECT_H_

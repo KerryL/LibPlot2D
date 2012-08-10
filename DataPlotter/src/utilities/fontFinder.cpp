@@ -46,35 +46,21 @@
 //==========================================================================
 wxString FontFinder::GetFontFileName(const wxString &fontName)
 {
-	// We will need to search through all the font files on the system, open
-	// each one and get the name from file to know if we have the correct file
 	wxString fontDirectory;
 
-	// Search through the fonts directory, checking font names
-	// until we find the one we're looking for
-
 #ifdef __WXMSW__
-	// Get the normal MSW font directory
 	fontDirectory = wxGetOSDirectory() + _T("\\Fonts\\");
-
 #elif defined __WXGTK__
-	//return _T("/usr/share/fonts/dejavu/DejaVuSans.ttf");// Fedora 13
-	//return _T("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf");// Ubuntu 11.10
-
-	// Get the normal *nix font directory
 	fontDirectory = _T("/usr/share/fonts/");
-
 #else
 	// Unknown platform - warn the user
 #	warning "Unrecognized platform - unable to locate font files!"
 	return wxEmptyString
 #endif
 
-	// Grab file names for all .ttf files in that directory
 	wxArrayString fontFiles;
 	wxDir::GetAllFiles(fontDirectory, &fontFiles, _T("*.ttf"), wxDIR_FILES | wxDIR_DIRS);
 
-	// Check the name of each file against our desired font face name
 	unsigned int i;
 	wxString nameFromFile;
 	for (i = 0; i < fontFiles.GetCount(); i++)
@@ -210,105 +196,183 @@ bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &p
 //==========================================================================
 bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 {
-	
-	// Open the font file
 	std::ifstream fontStream(fontFile.c_str(), std::ios::in | std::ios::binary);
-
-	// Make sure it opened OK
 	if (!fontStream.good())
 		return false;
 
-	// Read the offset table
-	TT_OFFSET_TABLE ttOffsetTable;
-	fontStream.read((char*)&ttOffsetTable, sizeof(TT_OFFSET_TABLE));
-
-	// Rearrange the bytes for the important fields
-	SwapEndian(ttOffsetTable.numOfTables);
-	SwapEndian(ttOffsetTable.majorVersion);
-	SwapEndian(ttOffsetTable.minorVersion);
+	TT_OFFSET_TABLE ttOffsetTable = ReadOffsetTable(fontStream);
 
 	// Make sure this is a version 1.0 TrueType Font
 	if(ttOffsetTable.majorVersion != 1 || ttOffsetTable.minorVersion != 0)
 		return false;
 
 	TT_TABLE_DIRECTORY tblDir;
-	tblDir.offset = 0;// To avoid MSVC++ Warning C4701
-	bool found = false;
+	if (!GetNameTable(fontStream, ttOffsetTable, tblDir))
+		return false;
+
+	TT_NAME_TABLE_HEADER ttNTHeader = GetNameTableHeader(fontStream, tblDir.offset);
+
+	unsigned int i;
+	for (i = 0; i < ttNTHeader.nrCount; i++)
+	{
+		fontName = CheckHeaderForName(fontStream, tblDir.offset + ttNTHeader.storageOffset);
+		if (!fontName.IsEmpty())
+			return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			FontFinder
+// Function:		ReadOffsetTable
+//
+// Description:		Reads the offset table from file.
+//
+// Input Arguments:
+//		file	= std::ifstream& to read from
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		TT_OFFSET_TABLE containing endian-correct table information
+//
+//==========================================================================
+FontFinder::TT_OFFSET_TABLE FontFinder::ReadOffsetTable(std::ifstream &file)
+{
+	TT_OFFSET_TABLE table;
+	file.read((char*)&table, sizeof(TT_OFFSET_TABLE));
+
+	// Rearrange the bytes for the important fields
+	SwapEndian(table.numOfTables);
+	SwapEndian(table.majorVersion);
+	SwapEndian(table.minorVersion);
+
+	return table;
+}
+
+//==========================================================================
+// Class:			FontFinder
+// Function:		GetNameTable
+//
+// Description:		Finds and outputs the name table from the file.
+//
+// Input Arguments:
+//		file		= std::ifstream& to read from
+//		offsetTable	= const TT_OFFSET_TABLE&
+//
+// Output Arguments:
+//		table	= TT_TABLE_DIRECTORY&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offsetTable, TT_TABLE_DIRECTORY &table)
+{
+	table.offset = 0;// To avoid MSVC++ Warning C4701
 	wxString tempTagString;
 	wxString tableName("name");
 
 	int i;
-	for (i = 0; i < ttOffsetTable.numOfTables; i++)
+	for (i = 0; i < offsetTable.numOfTables; i++)
 	{
-		fontStream.read((char*)&tblDir, sizeof(TT_TABLE_DIRECTORY));
+		file.read((char*)&table, sizeof(TT_TABLE_DIRECTORY));
 		tempTagString.clear();
 
 		// Table's tag is <= 4 characters
-		tempTagString.assign(tblDir.tag);
+		tempTagString.assign(table.tag);
 		tempTagString.resize(4);
 		if(tempTagString.CmpNoCase(tableName) == 0)
 		{
-			// Found the table, make sure to swap the bytes for the offset and length
-			found = true;
-			SwapEndian(tblDir.length);
-			SwapEndian(tblDir.offset);
-			break;
+			SwapEndian(table.length);
+			SwapEndian(table.offset);
+			return true;
 		}
 	}
-
-	// If we didnt' find the name, stop now
-	if (!found)
-		return false;
-
-	// Go to the offset we found above
-	fontStream.seekg(tblDir.offset, std::ios_base::beg);
-	TT_NAME_TABLE_HEADER ttNTHeader;
-	fontStream.read((char*)&ttNTHeader, sizeof(TT_NAME_TABLE_HEADER));
-
-	// Swap the bytes again
-	SwapEndian(ttNTHeader.nrCount);
-	SwapEndian(ttNTHeader.storageOffset);
-
-	TT_NAME_RECORD ttRecord;
-	found = false;
-
-	for (i = 0; i < ttNTHeader.nrCount; i++)
-	{
-		fontStream.read((char*)&ttRecord, sizeof(TT_NAME_RECORD));
-		SwapEndian(ttRecord.nameID);
-
-		// Name ID == 1 indicates font name
-		if (ttRecord.nameID == 1)
-		{
-			SwapEndian(ttRecord.stringLength);
-			SwapEndian(ttRecord.stringOffset);
-
-			// Save file position, so we can return to continue with search
-			int nPos = fontStream.tellg();
-			fontStream.seekg(tblDir.offset + ttRecord.stringOffset +
-				ttNTHeader.storageOffset, std::ios_base::beg);
-
-			char *nameBuffer = new char[ttRecord.stringLength];
-			fontStream.read(nameBuffer, ttRecord.stringLength);
-			fontName.assign(nameBuffer);
-			// Apparent bug with setting the string length every time:
-			// When the string is empty, and we assign a length anyway, it is no
-			// longer emtpy, even though it contains no valid data.  As a workaround,
-			// we only assign the proper length if the string is not already empty
-			if (!fontName.IsEmpty())
-				fontName.resize(ttRecord.stringLength);
-			delete [] nameBuffer;
-
-			// Check to make sure the name isn't empty - if it is, continue searching
-			if (!fontName.IsEmpty())
-				break;
-
-			fontStream.seekg(nPos, std::ios_base::beg);
-		}
-	}
-
-	if (fontName.Length() > 0)
-		return true;
 
 	return false;
+}
+
+//==========================================================================
+// Class:			FontFinder
+// Function:		GetNameTableHeader
+//
+// Description:		Gets the header for the name table from file.
+//
+// Input Arguments:
+//		file	= std::ifstream& to read from
+//		offset	= const size_t& specifying the offset from the beginning of the file
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		TT_NAME_TABLE_HEADER filled with endian-correct header info
+//
+//==========================================================================
+FontFinder::TT_NAME_TABLE_HEADER FontFinder::GetNameTableHeader(std::ifstream &file, const size_t &offset)
+{
+	TT_NAME_TABLE_HEADER header;
+
+	file.seekg(offset, std::ios_base::beg);
+	file.read((char*)&header, sizeof(TT_NAME_TABLE_HEADER));
+
+	SwapEndian(header.nrCount);
+	SwapEndian(header.storageOffset);
+
+	return header;
+}
+
+//==========================================================================
+// Class:			FontFinder
+// Function:		CheckHeaderForName
+//
+// Description:		Checks the table record (in the ifstream) for a font name.
+//
+// Input Arguments:
+//		file	= std::ifstream& to read from
+//		offset	= const size_t& specifying the offset from the beginning of the file
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing the name, or an empty string if not found
+//
+//==========================================================================
+wxString FontFinder::CheckHeaderForName(std::ifstream &file, const size_t &offset)
+{
+	TT_NAME_RECORD ttRecord;
+	wxString name;
+
+	file.read((char*)&ttRecord, sizeof(TT_NAME_RECORD));
+	SwapEndian(ttRecord.nameID);
+
+	// Name ID == 1 indicates font name
+	if (ttRecord.nameID == 1)
+	{
+		SwapEndian(ttRecord.stringLength);
+		SwapEndian(ttRecord.stringOffset);
+
+		// Save file position, so we can return to continue with search
+		int nPos = file.tellg();
+		file.seekg(ttRecord.stringOffset + offset, std::ios_base::beg);
+
+		char *nameBuffer = new char[ttRecord.stringLength];
+		file.read(nameBuffer, ttRecord.stringLength);
+		name.assign(nameBuffer);
+		// Apparent bug with setting the string length every time:
+		// When the string is empty, and we assign a length anyway, it is no
+		// longer emtpy, even though it contains no valid data.  As a workaround,
+		// we only assign the proper length if the string is not already empty
+		if (!name.IsEmpty())
+			name.resize(ttRecord.stringLength);
+		delete [] nameBuffer;
+
+		file.seekg(nPos, std::ios_base::beg);
+	}
+
+	return name;
 }

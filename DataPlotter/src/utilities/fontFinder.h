@@ -91,6 +91,12 @@ private:
 			((x >> 8) & 0x0000FF00) |
 			(x << 24);
 	}
+
+	static TT_OFFSET_TABLE ReadOffsetTable(std::ifstream &file);
+	static bool GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offsetTable,
+		TT_TABLE_DIRECTORY &table);
+	static TT_NAME_TABLE_HEADER GetNameTableHeader(std::ifstream &file, const size_t &offset);
+	static wxString CheckHeaderForName(std::ifstream &file, const size_t &offset);
 };
 
 #endif// _FONT_FINDER_H_

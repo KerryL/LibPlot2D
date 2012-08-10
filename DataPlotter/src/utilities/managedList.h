@@ -10,19 +10,19 @@
 // File:  managedList.h
 // Created:  1/29/2009
 // Author:  K. Loux
-// Description:  This is a template class for linked lists that handle automatic deletion
+// Description:  This is a template class for lists that handle automatic deletion
 //				 of the items in the list.
 // History:
 //	11/7/2011	- Corrected camelCase, K. Loux.
+//	8/10/2012	- Removed dependence on ObjectList in favor of std::vector, K. Loux.
 
 #ifndef _MANAGED_LIST_H_
 #define _MANAGED_LIST_H_
 
-// Local headers
-#include "objectList.h"
-
 // Standard C++ headers
 #include <cstdlib>
+#include <vector>
+#include <assert.h>
 
 // Disable warning C4505 for this file
 // This warning occurs because some types (every T= is a different type) do not
@@ -32,22 +32,38 @@
 #endif
 
 template <class T>
-class ManagedList : public ObjectList<T>
+class ManagedList
 {
 public:
-	// Overloaded methods
-	void Remove(const int &Index);
-	void Clear(void);
+	// Destructor
+	~ManagedList();
+
+	// Private data accessors
+	unsigned int Add(T *toAdd);
+	virtual void Remove(const unsigned int &index);
+	inline unsigned int GetCount(void) const { return list.size(); };
+
+	// Removes all objects from the list
+	virtual void Clear(void);
+
+	// Re-organizes the data in the list
+	void ReorderObjects(const std::vector<unsigned int> &order);
+
+	// Operators
+	T *operator [](const unsigned int &index) const;
+
+private:
+	std::vector<T*> list;
 };
 
 //==========================================================================
 // Class:			ManagedList
-// Function:		Remove
+// Function:		~ManagedList
 //
-// Description:		Removes the object at the specified index from the list.
+// Description:		Destructor for the ManagedList class.
 //
 // Input Arguments:
-//		index	= const int& specifying the object to remove
+//		None
 //
 // Output Arguments:
 //		None
@@ -57,50 +73,115 @@ public:
 //
 //==========================================================================
 template <class T>
-void ManagedList<T>::Remove(const int &index)
+ManagedList<T>::~ManagedList()
 {
-	// Check to see if we have more than one object in the list
-	if (ObjectList<T>::count == 1)
-	{
-		delete ObjectList<T>::objectList[0];
-		ObjectList<T>::objectList[0] = NULL;
+	Clear();
+}
 
-		// Delete the list entry for the object
-		delete [] ObjectList<T>::objectList;
-		ObjectList<T>::objectList = NULL;
-	}
-	else
-	{
-		// Store the array in a temporary list
-		T **tempList = new T *[ObjectList<T>::count];
-		int i;
-		for (i = 0; i < ObjectList<T>::count; i++)
-			tempList[i] = ObjectList<T>::objectList[i];
+//==========================================================================
+// Class:			ManagedList
+// Function:		Add
+//
+// Description:		Adds objects to the list.  Performs the necessary memory
+//					allocating and transferring routines.
+//
+// Input Arguments:
+//		toAdd	= const T*, pointing to the object to add
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		int specifying the index of the newly added item
+//
+//==========================================================================
+template <class T>
+unsigned int ManagedList<T>::Add(T *toAdd)
+{
+	list.push_back(toAdd);
+	return list.size() - 1;
+}
 
-		// Re-dimension the list to be one pointer smaller
-		delete [] ObjectList<T>::objectList;
-		ObjectList<T>::objectList = new T *[ObjectList<T>::count - 1];
+//==========================================================================
+// Class:			ManagedList
+// Function:		Remove
+//
+// Description:		Removes the object at the specified index from the list
+//
+// Input Arguments:
+//		index	= const unsigned int& specifying the object to remove
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+template <class T>
+void ManagedList<T>::Remove(const unsigned int &index)
+{
+	assert(index < list.size());
 
-		// For all of the pointers below the one we want to remove, it's a direct copy
-		// from the temporary list.
-		for (i = 0; i < index; i++)
-			ObjectList<T>::objectList[i] = tempList[i];
+	delete list[index];
+	list.erase(list.begin() + index);
+}
 
-		// Delete the object with the specified index
-		delete tempList[index];
-		tempList[index] = NULL;
+//==========================================================================
+// Class:			ManagedList
+// Function:		operator[]
+//
+// Description:		Returns a pointer to the object with the specified index.
+//
+// Input Arguments:
+//		index	= const int& specifying which object we want to retrieve
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		T* pointing to the object at the specified index
+//
+//==========================================================================
+template <class T>
+T *ManagedList<T>::operator[](const unsigned int &index) const
+{
+	// Make sure the index is valid
+	assert(index >= 0 && index < list.size());
 
-		// For the rest of the objects, we have to re-number them as we add them
-		for (i = index; i < ObjectList<T>::count - 1; i++)
-			// Add the object from the temporary list to our "permanent" list
-			ObjectList<T>::objectList[i] = tempList[i + 1];
+	return list[index];
+}
 
-		delete [] tempList;
-		tempList = NULL;
-	}
+//==========================================================================
+// Class:			ManagedList
+// Function:		ReorderObjects
+//
+// Description:		Re-organizes all of the objects in the list according to
+//					the specified order.
+//
+// Input Arguments:
+//		order	= conststd::vector<unsigned int>& specifying the new
+//				  order.  If the list were {3, 2, 1}, then the three element
+//				  list would be reversed.  If it were {2, 1, 3} then only the
+//				  first two elements would be swapped.
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+template <class T>
+void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
+{
+	assert(order.size() == list.size());
 
-	// Decrement the number of objects in the list
-	ObjectList<T>::count--;
+	std::vector<T*> swap = list;
+
+	unsigned int i;
+	for (i = 0; i < list.size(); i++)
+		list[i] = swap[order[i]];
 }
 
 //==========================================================================
@@ -122,18 +203,11 @@ void ManagedList<T>::Remove(const int &index)
 template <class T>
 void ManagedList<T>::Clear(void)
 {
-	// Delete all of the items in the list
-	int i;
-	for (i = 0; i < ObjectList<T>::count; i++)
-	{
-		delete ObjectList<T>::objectList[i];
-		ObjectList<T>::objectList[i] = NULL;
-	}
+	unsigned int i;
+	for (i = 0; i < list.size(); i++)
+		delete list[i];
 
-	// Delete the list and set the count to zero
-	delete [] ObjectList<T>::objectList;
-	ObjectList<T>::objectList = NULL;
-	ObjectList<T>::count = 0;
+	list.clear();
 }
 
 #endif// _MANAGED_LIST_H_

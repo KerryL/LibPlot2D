@@ -66,6 +66,9 @@ protected:
 	// The render window that contains this object
 	RenderWindow &renderWindow;
 
+	void EnableAlphaBlending(void);
+	void DisableAlphaBlending(void);
+
 private:
 	// The openGL list index
 	unsigned int listIndex;

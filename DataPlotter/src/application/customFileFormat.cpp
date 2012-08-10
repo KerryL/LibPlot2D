@@ -70,37 +70,10 @@ CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFi
 		return;
 	}
 
-	// Check that the root name matches
-	if (customFormatDefinitions.GetRoot()->GetName().Cmp(customFormatsRootName) != 0)
+	if (!CheckRootAndVersion(customFormatDefinitions))
 	{
-		::wxMessageBox(_T("Ignoring custom file formats:  XML root must be ")
-			+ customFormatsRootName + _T("."), _T("Error Reading Custom Format Definitions"));
 		ClearData();
 		return;
-	}
-
-	wxString temp;
-
-	// Check file version
-	unsigned long version;
-	if (!customFormatDefinitions.GetRoot()->GetPropVal(_T("VERSION"), &temp))
-	{
-		::wxMessageBox(_T("Ignoring custom file formats:  XML root must contain VERSION attribute."),
-			_T("Error Reading Custom Format Definitions"));
-		ClearData();
-		return;
-	}
-	else
-	{
-		if (!temp.ToULong(&version))
-		{
-			::wxMessageBox(_T("Ignoring custom file formats:  VERSION value must be an integer."),
-				_T("Error Reading Custom Format Definitions"));
-			ClearData();
-			return;
-		}
-
-		// Implement any version checks here
 	}
 
 	wxXmlNode *format = customFormatDefinitions.GetRoot()->GetChildren();
@@ -154,25 +127,8 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 		return false;
 
 	Identifier id;
-	wxXmlNode *formatChild = formatNode.GetChildren();
-	while (formatChild)
-	{
-		if (formatChild->GetName().Cmp(_T("IDENTIFIER")) == 0)
-		{
-			if (!ReadIdentifierTag(*formatChild, id))
-				return false;
-		}
-		else if (formatChild->GetName().Cmp(_T("CHANNEL")) == 0)
-		{
-			/*if (!ReadChannelTag(*formatChild))
-				return false;*/
-			// We ignore the return value for now - if a channel has an error, we don't
-			// want to prevent reading and using other channel descriptors
-			ReadChannelTag(*formatChild);
-		}
-
-		formatChild = formatChild->GetNext();
-	}
+	if (!ProcessFormatChildren(formatNode.GetChildren(), id))
+		return false;
 
 	if (IsFormat(pathAndFileName, id))
 	{
@@ -216,24 +172,7 @@ bool CustomFileFormat::ReadIdentifierTag(wxXmlNode &idNode, Identifier &id)
 	}
 	else
 	{
-		if (temp.CmpNoCase(_T("BOF")) == 0)
-		{
-			id.location = Identifier::BOF;
-			id.bolNumber = 0;
-		}
-		else if (temp.Mid(0, 3).CmpNoCase(_T("BOL")) == 0)
-		{
-			id.location = Identifier::BOL;
-
-			if (temp.Len() > 3)
-			{
-				if (!temp.Mid(3).ToLong(&id.bolNumber))
-					id.bolNumber = -1;
-			}
-			else
-				id.bolNumber = -1;
-		}
-		else
+		if (!ProcessLocationID(temp, id))
 		{
 			::wxMessageBox(_T("Ignoring custom file formats:  LOCATION attributes must have value 'BOF' or 'BOL'."),
 				_T("Error Reading Custom Format Definitions"));
@@ -273,36 +212,8 @@ bool CustomFileFormat::ReadChannelTag(wxXmlNode &channelNode)
 	// Must have either column (<0) or code
 	wxString temp;
 	Channel channel;
-	if (!channelNode.GetPropVal(_T("CODE"), &channel.code))
-	{
-		if (!channelNode.GetPropVal(_T("COLUMN"), &temp))
-		{
-			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE or COLUMN must be specified."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
-		else if (!temp.ToLong(&channel.column))
-		{
-			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must have integer value."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
-		else if (channel.column <= 0)
-		{
-			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must be greater than zero."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
-	}
-	else
-	{
-		if (channel.code.IsEmpty())
-		{
-			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE must not be empty."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
-	}
+	if (!ReadCodeOrColumn(channelNode, channel))
+		return false;
 
 	if (!channelNode.GetPropVal(_T("NAME"), &channel.name))
 	{
@@ -351,33 +262,14 @@ bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifie
 		return false;
 	}
 
-	int line(0);
-	std::string nextLine;
-
 	switch (id.location)
 	{
 	case Identifier::BOF:
-		// Must match this line
 		return MatchNextLine(dataFile, id);
 		break;
 
 	case Identifier::BOL:
-		if (id.bolNumber < 0)
-		{
-			// Check every line for a match
-			while (!dataFile.eof())
-			{
-				if (MatchNextLine(dataFile, id))
-					return true;
-			}
-		}
-		else
-		{
-			// Go to the nth line and check
-			while (!dataFile.eof() && line < id.bolNumber)
-				std::getline(dataFile, nextLine);
-			return MatchNextLine(dataFile, id);
-		}
+		return MatchSpecifiedLine(dataFile, id);
 		break;
 	}
 
@@ -401,7 +293,7 @@ bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifie
 //		bool, true for match, false otherwise
 //
 //==========================================================================
-bool CustomFileFormat::MatchNextLine(std::ifstream &inFile, const Identifier &id)
+bool CustomFileFormat::MatchNextLine(std::ifstream &inFile, const Identifier &id) const
 {
 	std::string nextLine;
 	std::getline(inFile, nextLine);
@@ -490,4 +382,228 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 			}
 		}
 	}
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		CheckRootAndVersion
+//
+// Description:		Checks root node and XML version.
+//
+// Input Arguments:
+//		document	= const wxXmlDocument&, previously opened XML document
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true if checks are OK, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::CheckRootAndVersion(const wxXmlDocument &document) const
+{
+	// Check that the root name matches
+	if (document.GetRoot()->GetName().Cmp(customFormatsRootName) != 0)
+	{
+		::wxMessageBox(_T("Ignoring custom file formats:  XML root must be ")
+			+ customFormatsRootName + _T("."), _T("Error Reading Custom Format Definitions"));
+		return false;
+	}
+
+	wxString temp;
+
+	// Check file version
+	unsigned long version;
+	if (!document.GetRoot()->GetPropVal(_T("VERSION"), &temp))
+	{
+		::wxMessageBox(_T("Ignoring custom file formats:  XML root must contain VERSION attribute."),
+			_T("Error Reading Custom Format Definitions"));
+		return false;
+	}
+	else
+	{
+		if (!temp.ToULong(&version))
+		{
+			::wxMessageBox(_T("Ignoring custom file formats:  VERSION value must be an integer."),
+				_T("Error Reading Custom Format Definitions"));
+			return false;
+		}
+
+		// Implement any version checks here
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		ProcessLocationID
+//
+// Description:		Processes specified ID location tag.
+//
+// Input Arguments:
+//		value	= const wxString& specified in the XML file
+//
+// Output Arguments:
+//		id		= Identifier&
+//
+// Return Value:
+//		bool, true if ID was processed sucessfully, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::ProcessLocationID(const wxString &value, Identifier &id) const
+{
+	if (value.CmpNoCase(_T("BOF")) == 0)
+	{
+		id.location = Identifier::BOF;
+		id.bolNumber = 0;
+		return true;
+	}
+
+	if (value.Mid(0, 3).CmpNoCase(_T("BOL")) == 0)
+	{
+		id.location = Identifier::BOL;
+
+		if (value.Len() > 3)
+		{
+			if (!value.Mid(3).ToLong(&id.bolNumber))
+				id.bolNumber = -1;
+		}
+		else
+			id.bolNumber = -1;
+
+		return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		MatchSpecifiedLine
+//
+// Description:		Attempts to match the file to the specified line text.
+//
+// Input Arguments:
+//		inFile	= std::ifstream&
+//		id		= const Identifier&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool true if the line matches, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::MatchSpecifiedLine(std::ifstream &inFile, const Identifier &id) const
+{
+	if (id.bolNumber < 0)
+	{
+		// Check every line for a match
+		while (!inFile.eof())
+		{
+			if (MatchNextLine(inFile, id))
+				return true;
+		}
+	}
+
+	int line(0);
+	std::string nextLine;
+
+	while (!inFile.eof() && line < id.bolNumber)
+		std::getline(inFile, nextLine);
+	return MatchNextLine(inFile, id);
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		ProcessFormatChildren
+//
+// Description:		Processes the child nodes of the format node.
+//
+// Input Arguments:
+//		formatChild	= wxXmlNode* pointing to the format node (parent)
+//
+// Output Arguments:
+//		id			= Identifier&
+//
+// Return Value:
+//		bool, true if nodes are read without errors, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::ProcessFormatChildren(wxXmlNode *formatChild, Identifier &id)
+{
+	while (formatChild)
+	{
+		if (formatChild->GetName().Cmp(_T("IDENTIFIER")) == 0)
+		{
+			if (!ReadIdentifierTag(*formatChild, id))
+				return false;
+		}
+		else if (formatChild->GetName().Cmp(_T("CHANNEL")) == 0)
+		{
+			/*if (!ReadChannelTag(*formatChild))
+				return false;*/
+			// We ignore the return value for now - if a channel has an error, we don't
+			// want to prevent reading and using other channel descriptors
+			ReadChannelTag(*formatChild);
+		}
+
+		formatChild = formatChild->GetNext();
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		ReadCodeOrColumn
+//
+// Description:		Reads the information pertaining to CODE or COLUMN tags.
+//
+// Input Arguments:
+//		channelNode	= wxXmlNode& containing CODE or COLUMN tags
+//
+// Output Arguments:
+//		channel	= Channel&
+//
+// Return Value:
+//		bool, true if code/column is successfully read, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::ReadCodeOrColumn(wxXmlNode &channelNode, Channel &channel) const
+{
+	wxString temp;
+	if (!channelNode.GetPropVal(_T("CODE"), &channel.code))
+	{
+		if (!channelNode.GetPropVal(_T("COLUMN"), &temp))
+		{
+			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE or COLUMN must be specified."),
+				_T("Error Reading Custom Format Definitions"));
+			return false;
+		}
+		else if (!temp.ToLong(&channel.column))
+		{
+			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must have integer value."),
+				_T("Error Reading Custom Format Definitions"));
+			return false;
+		}
+		else if (channel.column <= 0)
+		{
+			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must be greater than zero."),
+				_T("Error Reading Custom Format Definitions"));
+			return false;
+		}
+	}
+	else
+	{
+		if (channel.code.IsEmpty())
+		{
+			::wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE must not be empty."),
+				_T("Error Reading Custom Format Definitions"));
+			return false;
+		}
+	}
+
+	return true;
 }
