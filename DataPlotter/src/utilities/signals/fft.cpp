@@ -195,12 +195,9 @@ void FastFourierTransform::DoFFT(const unsigned int &powerOfTwo, const unsigned 
 void FastFourierTransform::ConvertToMagnitudeFrequency(const unsigned int &fftPoints,
 	const double &sampleRate, const Dataset2D &temp, Dataset2D &results)
 {
-	double magnitude;
 	unsigned int i;
 	for (i = 0; i < results.GetNumberOfPoints(); i++)
 	{
-		// Break out into magnitude (Y) and frequency (X)
-		magnitude = 2.0 / fftPoints * temp.GetYData(i);
 		results.GetYPointer()[i] = 2.0 / fftPoints * sqrt(
 			temp.GetXData(i) * temp.GetXData(i) + temp.GetYData(i) * temp.GetYData(i));
 		results.GetXPointer()[i] = i * sampleRate / fftPoints;

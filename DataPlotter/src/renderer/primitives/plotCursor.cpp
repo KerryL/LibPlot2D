@@ -69,21 +69,21 @@ void PlotCursor::GenerateGeometry(void)
 	// Create the axis
 	glBegin(GL_LINES);
 
-	unsigned int dimension;// [pixels]
+	//unsigned int dimension;// [pixels]
 	if (axis.IsHorizontal())
 	{
-		dimension = renderWindow.GetSize().GetWidth()
+		/*dimension = renderWindow.GetSize().GetWidth()
 				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
+				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();*/
 		glVertex2i(locationAlongAxis, axis.GetOffsetFromWindowEdge());
 		glVertex2i(locationAlongAxis, renderWindow.GetSize().GetHeight()
 				- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
 	}
 	else
 	{
-		dimension = renderWindow.GetSize().GetHeight()
+		/*dimension = renderWindow.GetSize().GetHeight()
 				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();
+				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();*/
 		glVertex2i(axis.GetOffsetFromWindowEdge(), locationAlongAxis);
 		glVertex2i(renderWindow.GetSize().GetWidth()
 				- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);

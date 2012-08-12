@@ -449,7 +449,7 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop) const
 	if (s[0] == '[')
 	{
 		unsigned int close = s.Find(']');
-		if (close == wxNOT_FOUND)
+		if (close == (unsigned int)wxNOT_FOUND)
 			return false;
 
 		unsigned int i;
@@ -1067,7 +1067,7 @@ bool ExpressionTree::EvaluateDataset(const wxString &dataset, std::stack<Dataset
 	}
 	else if (set > (unsigned int)list.GetCount())
 	{
-		errorString = wxString::Format("Set ID %ui is not a valid set ID", set);
+		errorString = wxString::Format("Set ID %lu is not a valid set ID", set);
 		return false;
 	}
 

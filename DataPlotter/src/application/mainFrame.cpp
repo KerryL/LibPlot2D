@@ -47,7 +47,7 @@
 #include "../../res/icons/plots16.xpm"
 #include "../../res/icons/plots24.xpm"
 #include "../../res/icons/plots32.xpm"
-#include "../../res/icons/plots48xpm"
+#include "../../res/icons/plots48.xpm"
 #include "../../res/icons/plots64.xpm"
 #include "../../res/icons/plots128.xpm"
 #endif
