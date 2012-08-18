@@ -2,38 +2,25 @@
 <configurationDescriptor version="79">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df name="DataPlotter" root=".">
-      <df name=".obj">
-        <df name="src">
-          <df name="application">
-          </df>
-          <df name="renderer">
-            <df name="primitives">
-            </df>
-          </df>
-          <df name="utilities">
-            <df name="math">
-            </df>
-            <df name="signals">
-              <df name="filters">
-              </df>
-            </df>
-          </df>
-        </df>
-      </df>
       <df name="bin">
       </df>
       <df name="res">
         <df name="icons">
+          <in>iconGenerator.m</in>
         </df>
       </df>
       <df name="src">
         <df name="application">
+          <in>customFileFormat.cpp</in>
+          <in>customFileFormat.h</in>
           <in>dropTarget.cpp</in>
           <in>dropTarget.h</in>
           <in>filterDialog.cpp</in>
           <in>filterDialog.h</in>
           <in>mainFrame.cpp</in>
           <in>mainFrame.h</in>
+          <in>multiChoiceDialog.cpp</in>
+          <in>multiChoiceDialog.h</in>
           <in>plotObject.cpp</in>
           <in>plotObject.h</in>
           <in>plotterApp.cpp</in>
@@ -104,7 +91,6 @@
           <in>fontFinder.h</in>
           <in>machineDefinitions.h</in>
           <in>managedList.h</in>
-          <in>objectList.h</in>
         </df>
       </df>
     </df>

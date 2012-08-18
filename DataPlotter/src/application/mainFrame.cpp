@@ -2716,7 +2716,7 @@ void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
 	Dataset2D *newData = new Dataset2D(PlotMath::ApplyBitMask(*plotList[row - 1], bit));
 
-	wxString name = optionsGrid->GetCellValue(row, colName) + _T(", Bit ") + wxString::Format("%u", bit);
+	wxString name = optionsGrid->GetCellValue(row, colName) + _T(", Bit ") + wxString::Format("%lu", bit);
 	AddCurve(newData, name);
 }
 
