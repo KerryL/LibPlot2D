@@ -25,7 +25,7 @@ public:
 	// Constructor
 	ZoomBox(RenderWindow &_renderWindow);
 
-	// Mandatory overloads from PRIMITIVE - for creating geometry and testing the
+	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
 	void GenerateGeometry(void);
 	bool HasValidParameters(void);

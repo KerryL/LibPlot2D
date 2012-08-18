@@ -56,6 +56,8 @@ PlotRenderer::PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFram
 
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
+
+	ignoreNextMouseMove = false;
 }
 
 //==========================================================================
@@ -182,6 +184,8 @@ void PlotRenderer::CreateActors(void)
 //==========================================================================
 void PlotRenderer::OnSize(wxSizeEvent &event)
 {
+	ignoreNextMouseMove = true;
+
 	// If the cursors are visible, set them visible again so they get updated
 	if (leftCursor->GetIsVisible())
 		leftCursor->SetVisibility(true);
@@ -273,8 +277,9 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	if (!event.Dragging())
+	if (!event.Dragging() || ignoreNextMouseMove)// ignoreNextMouseMove prevents panning on maximize by double clicking title bar
 	{
+		ignoreNextMouseMove = false;
 		StoreMousePosition(event);
 		return;
 	}

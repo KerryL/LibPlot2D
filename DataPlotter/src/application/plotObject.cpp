@@ -227,12 +227,9 @@ void PlotObject::CreateFontObjects(const wxString &fontFile)
 //==========================================================================
 void PlotObject::Update(void)
 {
-	// Format the plot
 	FormatPlot();
 
 	renderer.UpdateCursors();
-
-	// Update the display of cursor values
 	dynamic_cast<MainFrame*>(renderer.GetMainFrame())->UpdateCursorValues(
 		renderer.GetLeftCursorVisible(), renderer.GetRightCursorVisible(),
 		renderer.GetLeftCursorValue(), renderer.GetRightCursorValue());
@@ -319,7 +316,6 @@ void PlotObject::SetRightYGrid(const bool &gridOn)
 //==========================================================================
 void PlotObject::RemoveExistingPlots(void)
 {
-	// Remove all existing plots from the list
 	while (plotList.size() > 0)
 		RemovePlot(0);
 }
@@ -342,10 +338,8 @@ void PlotObject::RemoveExistingPlots(void)
 //==========================================================================
 void PlotObject::RemovePlot(const unsigned int &index)
 {
-	// Remove the object from the renderer object
 	renderer.RemoveActor(plotList[index]);
 
-	// Remove it from the local list
 	plotList.erase(plotList.begin() + index);
 	dataList.erase(dataList.begin() + index);
 }
@@ -397,187 +391,35 @@ void PlotObject::FormatPlot(void)
 {
 	FormatAxesBasics();
 	FormatTitle();
-
 	if (dataList.size() == 0)
 		return;
 
-	// Determine "Original" values by parsing data associated with each axis
-	bool leftFound = false;
-	bool rightFound = false;
-	unsigned int i, j;
-	Axis *yAxis;
-	for (i = 0; i < (unsigned int)dataList.size(); i++)
-	{
-		// If this plot is not visible, ignore it
-		if (!plotList[i]->GetIsVisible())
-			continue;
-
-		// Initialize the X limits the first time through only
-		if (!leftFound && !rightFound)
-		{
-			xMinOriginal = dataList[i]->GetXData(0);
-			xMaxOriginal = xMinOriginal;
-		}
-
-		// Determine which y-axis this dataset is associated with
-		yAxis = plotList[i]->GetYAxis();
-		if (yAxis == axisLeft && !leftFound)
-		{
-			leftFound = true;
-			yLeftMinOriginal = dataList[i]->GetYData(0);
-			yLeftMaxOriginal = yLeftMinOriginal;
-		}
-		else if (yAxis == axisRight && !rightFound)
-		{
-			rightFound = true;
-			yRightMinOriginal = dataList[i]->GetYData(0);
-			yRightMaxOriginal = yRightMinOriginal;
-		}
-
-		for (j = 0; j < dataList[i]->GetNumberOfPoints(); j++)
-		{
-			if (dataList[i]->GetXData(j) > xMaxOriginal)
-				xMaxOriginal = dataList[i]->GetXData(j);
-			else if (dataList[i]->GetXData(j) < xMinOriginal)
-				xMinOriginal = dataList[i]->GetXData(j);
-
-			if (yAxis == axisLeft)
-			{
-				if (dataList[i]->GetYData(j) > yLeftMaxOriginal)
-					yLeftMaxOriginal = dataList[i]->GetYData(j);
-				else if (dataList[i]->GetYData(j) < yLeftMinOriginal)
-					yLeftMinOriginal = dataList[i]->GetYData(j);
-			}
-			else
-			{
-				if (dataList[i]->GetYData(j) > yRightMaxOriginal)
-					yRightMaxOriginal = dataList[i]->GetYData(j);
-				else if (dataList[i]->GetYData(j) < yRightMinOriginal)
-					yRightMinOriginal = dataList[i]->GetYData(j);
-			}
-		}
-	}
-
-	// If one axis is unused, make it match the other
-	if (leftFound && !rightFound)
-	{
-		axisRight->SetLogarithmicScale(axisLeft->IsLogarithmic());
-		yRightMinOriginal = yLeftMinOriginal;
-		yRightMaxOriginal = yLeftMaxOriginal;
-	}
-	else if (!leftFound && rightFound)
-	{
-		axisLeft->SetLogarithmicScale(axisRight->IsLogarithmic());
-		yLeftMinOriginal = yRightMinOriginal;
-		yLeftMaxOriginal = yRightMaxOriginal;
-	}
-
-	// Tell the curves they will need to be re-drawn
-	for (i = 0; i < (unsigned int)plotList.size(); i++)
-		plotList[i]->SetModified();
-
+	SetOriginalAxisLimits();
 	CheckForZeroRange();
 	CheckAutoScaling();
 
+	unsigned int i;
+	for (i = 0; i < (unsigned int)plotList.size(); i++)
+		plotList[i]->SetModified();
+
 	// Set up the axes resolution (and at the same time tweak the max and min)
-	double xMajorResolution = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
-	double xMinorResolution = xMajorResolution;
-	double yLeftMajorResolution = AutoScaleAxis(yLeftMin, yLeftMax, 10, axisLeft->IsLogarithmic(), !autoScaleLeftY);
-	double yLeftMinorResolution = yLeftMajorResolution;
-	double yRightMajorResolution = AutoScaleAxis(yRightMin, yRightMax, 10, axisRight->IsLogarithmic(), !autoScaleRightY);
-	double yRightMinorResolution = yRightMajorResolution;
+	double xMajor = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
+	double xMinor = xMajor;
+	double yLeftMajor = AutoScaleAxis(yLeftMin, yLeftMax, 10, axisLeft->IsLogarithmic(), !autoScaleLeftY);
+	double yLeftMinor = yLeftMajor;
+	double yRightMajor = AutoScaleAxis(yRightMin, yRightMax, 10, axisRight->IsLogarithmic(), !autoScaleRightY);
+	double yRightMinor = yRightMajor;
 
-	// Make sure the auto-scaled values are numbers
-	// If they're not numbers, set them to +/- 1 and recalculate the tick spacing
-	// (with inputs of +/- 1, they will always give valid results)
-	if (PlotMath::IsNaN(xMin) || PlotMath::IsNaN(xMax))
-	{
-		xMin = -1.0;
-		xMax = 1.0;
-		xMajorResolution = AutoScaleAxis(xMin, xMax, 7, false, !autoScaleX);
-		xMinorResolution = xMajorResolution;
-	}
+	ValidateRangeLimits(xMin, xMax, autoScaleX, xMajor, xMinor);
+	ValidateRangeLimits(yLeftMin, yLeftMax, autoScaleLeftY, yLeftMajor, yLeftMinor);
+	ValidateRangeLimits(yRightMin, yRightMax, autoScaleRightY, yRightMajor, yRightMinor);
 
-	if (PlotMath::IsNaN(yLeftMin) || PlotMath::IsNaN(yLeftMax))
-	{
-		yLeftMin = -1.0;
-		yLeftMax = 1.0;
-		yLeftMajorResolution = AutoScaleAxis(yLeftMin, yLeftMax, 7, false, !autoScaleLeftY);
-		yLeftMinorResolution = yLeftMajorResolution;
-	}
+	ValidateLogarithmicLimits(*axisBottom, xMin);
+	ValidateLogarithmicLimits(*axisLeft, yLeftMin);
+	ValidateLogarithmicLimits(*axisRight, yRightMin);
 
-	if (PlotMath::IsNaN(yRightMin) || PlotMath::IsNaN(yRightMax))
-	{
-		yRightMin = -1.0;
-		yRightMax = 1.0;
-		yRightMajorResolution = AutoScaleAxis(yRightMin, yRightMax, 7, false, !autoScaleRightY);
-		yRightMinorResolution = yRightMajorResolution;
-	}
-
-	// Adjust the limits as necessary for logarithmic scaling
-	if (axisBottom->IsLogarithmic() && xMin <= 0.0)
-	{
-		::wxMessageBox(_T("Logarithmic scaling may only be used with strictly positive data."), _T("Logarithmic Scaling Error"));
-		axisBottom->SetLogarithmicScale(false);
-	}
-
-	if (axisLeft->IsLogarithmic() && yLeftMin <= 0.0)
-	{
-		::wxMessageBox(_T("Logarithmic scaling may only be used with strictly positive data."), _T("Logarithmic Scaling Error"));
-		axisLeft->SetLogarithmicScale(false);
-	}
-
-	if (axisRight->IsLogarithmic() && yRightMin <= 0.0)
-	{
-		// Only display this warning if the axes are independent - otherwise,
-		// this warning would have already been displayed for the left axis
-		if (leftFound && rightFound)
-			::wxMessageBox(_T("Logarithmic scaling may only be used with strictly positive data."), _T("Logarithmic Scaling Error"));
-		axisRight->SetLogarithmicScale(false);
-	}
-
-	// If we're auto-scaling, update the "original values" because chances are they
-	// have been tweaked to make the numbers prettier
-	if (autoScaleX)
-	{
-		xMinOriginal = xMin;
-		xMaxOriginal = xMax;
-	}
-
-	if (autoScaleLeftY)
-	{
-		yLeftMinOriginal = yLeftMin;
-		yLeftMaxOriginal = yLeftMax;
-	}
-
-	if (autoScaleRightY)
-	{
-		yRightMinOriginal = yRightMin;
-		yRightMaxOriginal = yRightMax;
-	}
-
-	// Apply the desired range and resolution to each axis
-	axisBottom->SetMinimum(xMin);
-	axisBottom->SetMaximum(xMax);
-	axisBottom->SetMinorResolution(xMinorResolution);
-	axisBottom->SetMajorResolution(xMajorResolution);
-
-	axisTop->SetLogarithmicScale(axisBottom->IsLogarithmic());// Make it match the bottom
-	axisTop->SetMinimum(xMin);
-	axisTop->SetMaximum(xMax);
-	axisTop->SetMinorResolution(xMinorResolution);
-	axisTop->SetMajorResolution(xMajorResolution);
-	
-	axisLeft->SetMinimum(yLeftMin);
-	axisLeft->SetMaximum(yLeftMax);
-	axisLeft->SetMinorResolution(yLeftMinorResolution);
-	axisLeft->SetMajorResolution(yLeftMajorResolution);
-	
-	axisRight->SetMinimum(yRightMin);
-	axisRight->SetMaximum(yRightMax);
-	axisRight->SetMinorResolution(yRightMinorResolution);
-	axisRight->SetMajorResolution(yRightMajorResolution);
-
+	ResetOriginalLimits();
+	ApplyRangeLimits(xMinor, xMajor, yLeftMinor, yLeftMajor, yRightMinor, yRightMajor);
 	UpdateLimitValues();
 }
 
@@ -769,6 +611,285 @@ void PlotObject::FormatTitle(void)
 	titleObject->SetCentered(true);
 	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
 		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetOriginalAxisLimits
+//
+// Description:		Finds the range of each axis and sets the "original" values
+//					(limits for if the axese were autoscaled).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetOriginalAxisLimits(void)
+{
+	// Determine "original" values by parsing data associated with each axis
+	bool leftFound = false;
+	bool rightFound = false;
+	unsigned int i;
+	Axis *yAxis;
+	for (i = 0; i < (unsigned int)dataList.size(); i++)
+	{
+		if (!plotList[i]->GetIsVisible())
+			continue;
+		if (!leftFound && !rightFound)
+		{
+			xMinOriginal = dataList[i]->GetXData(0);
+			xMaxOriginal = xMinOriginal;
+		}
+
+		yAxis = plotList[i]->GetYAxis();
+		if (yAxis == axisLeft && !leftFound)
+		{
+			leftFound = true;
+			yLeftMinOriginal = dataList[i]->GetYData(0);
+			yLeftMaxOriginal = yLeftMinOriginal;
+		}
+		else if (yAxis == axisRight && !rightFound)
+		{
+			rightFound = true;
+			yRightMinOriginal = dataList[i]->GetYData(0);
+			yRightMaxOriginal = yRightMinOriginal;
+		}
+
+		GetAxisExtremes(*dataList[i], yAxis);
+	}
+
+	MatchYAxes(leftFound, rightFound);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		MatchYAxes
+//
+// Description:		If one of the y-axes does not have any associated curves,
+//					forces the limits to match the opposite y-axis.
+//
+// Input Arguments:
+//		leftFound	= const bool&
+//		rightFound	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::MatchYAxes(const bool &leftFound, const bool &rightFound)
+{
+	// If one axis is unused, make it match the other
+	if (leftFound && !rightFound)
+	{
+		axisRight->SetLogarithmicScale(axisLeft->IsLogarithmic());
+		yRightMinOriginal = yLeftMinOriginal;
+		yRightMaxOriginal = yLeftMaxOriginal;
+	}
+	else if (!leftFound && rightFound)
+	{
+		axisLeft->SetLogarithmicScale(axisRight->IsLogarithmic());
+		yLeftMinOriginal = yRightMinOriginal;
+		yLeftMaxOriginal = yRightMaxOriginal;
+	}
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetAxisExtremes
+//
+// Description:		Parese the specified dataset and sets the associated mins
+//					and maxes (original) equal to the extremum for the dataset.
+//
+// Input Arguments:
+//		data	= const Dataset2D&
+//		yAxis	= Axis* indicating the associated y-axis for the data
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
+{
+	unsigned int i;
+	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	{
+		if (data.GetXData(i) > xMaxOriginal)
+			xMaxOriginal = data.GetXData(i);
+		else if (data.GetXData(i) < xMinOriginal)
+			xMinOriginal = data.GetXData(i);
+
+		if (yAxis == axisLeft)
+		{
+			if (data.GetYData(i) > yLeftMaxOriginal)
+				yLeftMaxOriginal = data.GetYData(i);
+			else if (data.GetYData(i) < yLeftMinOriginal)
+				yLeftMinOriginal = data.GetYData(i);
+		}
+		else
+		{
+			if (data.GetYData(i) > yRightMaxOriginal)
+				yRightMaxOriginal = data.GetYData(i);
+			else if (data.GetYData(i) < yRightMinOriginal)
+				yRightMinOriginal = data.GetYData(i);
+		}
+	}
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		ApplyRangeLimits
+//
+// Description:		Applies the limits and resolutions for each axis.
+//
+// Input Arguments:
+//		xMinor		= const double&
+//		xMajor		= const double&
+//		yLeftMinor	= const double&
+//		yLeftMajor	= const double&
+//		yRightMinor	= const double&
+//		yRightMajor	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::ApplyRangeLimits(const double &xMinor, const double &xMajor,
+	const double &yLeftMinor, const double &yLeftMajor,
+	const double &yRightMinor, const double &yRightMajor)
+{
+	axisBottom->SetMinimum(xMin);
+	axisBottom->SetMaximum(xMax);
+	axisBottom->SetMinorResolution(xMinor);
+	axisBottom->SetMajorResolution(xMajor);
+
+	axisTop->SetLogarithmicScale(axisBottom->IsLogarithmic());// Make it match the bottom
+	axisTop->SetMinimum(xMin);
+	axisTop->SetMaximum(xMax);
+	axisTop->SetMinorResolution(xMinor);
+	axisTop->SetMajorResolution(xMajor);
+	
+	axisLeft->SetMinimum(yLeftMin);
+	axisLeft->SetMaximum(yLeftMax);
+	axisLeft->SetMinorResolution(yLeftMinor);
+	axisLeft->SetMajorResolution(yLeftMajor);
+	
+	axisRight->SetMinimum(yRightMin);
+	axisRight->SetMaximum(yRightMax);
+	axisRight->SetMinorResolution(yRightMinor);
+	axisRight->SetMajorResolution(yRightMajor);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		ValidateRangeLimits
+//
+// Description:		Ensures the limit values are valid numbers.  If they are
+//					not valid, axis limits are set to default values of +/- 1.
+//
+// Input Arguments:
+//		min			= double&
+//		max			= double&
+//		autoScale	= const bool&
+//		major		= double&
+//		minor		= double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::ValidateRangeLimits(double &min, double &max,
+	const bool &autoScale, double &major, double &minor) const
+{
+	if (PlotMath::IsNaN(min) || PlotMath::IsNaN(max))
+	{
+		min = -1.0;
+		max = 1.0;
+		major = AutoScaleAxis(min, max, 7, false, !autoScale);
+		minor = major;
+	}
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		ApplyRangeLimits
+//
+// Description:		Resets the axes' limits to their original values, if the
+//					axis is set to be auto-scaled.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::ResetOriginalLimits(void)
+{
+	if (autoScaleX)
+	{
+		xMinOriginal = xMin;
+		xMaxOriginal = xMax;
+	}
+
+	if (autoScaleLeftY)
+	{
+		yLeftMinOriginal = yLeftMin;
+		yLeftMaxOriginal = yLeftMax;
+	}
+
+	if (autoScaleRightY)
+	{
+		yRightMinOriginal = yRightMin;
+		yRightMaxOriginal = yRightMax;
+	}
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		ValidateLogarithmicLimits
+//
+// Description:		Checks that the minimum value for the axis is strictly
+//					positive, if the scaling is logarithmic.
+//
+// Input Arguments:
+//		axis	= Axis&
+//		min		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::ValidateLogarithmicLimits(Axis &axis, const double &min)
+{
+	if (axis.IsLogarithmic() && min <= 0.0)
+	{
+		::wxMessageBox(_T("Logarithmic scaling may only be used with strictly positive data."), _T("Logarithmic Scaling Error"));
+		axis.SetLogarithmicScale(false);
+	}
 }
 
 //==========================================================================

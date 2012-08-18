@@ -162,6 +162,12 @@
     <ClInclude Include="src\application\multiChoiceDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
+    <ClInclude Include="src\application\fftDialog.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\transferFunctionDialog.h">
+      <Filter>Header Files\application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\renderer\primitives\axis.cpp">
@@ -261,6 +267,12 @@
       <Filter>Source Files\application</Filter>
     </ClCompile>
     <ClCompile Include="src\application\multiChoiceDialog.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\fftDialog.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\transferFunctionDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
   </ItemGroup>

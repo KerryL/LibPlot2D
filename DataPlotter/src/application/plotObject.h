@@ -160,8 +160,16 @@ private:
 	void CheckForZeroRange(void);
 	void HandleZeroRangeAxis(double &min, double &max) const;
 
+	void ApplyRangeLimits(const double &xMinor, const double &xMajor, const double &yLeftMinor,
+		const double &yLeftMajor, const double &yRightMinor, const double &yRightMajor);
 	void CheckAutoScaling(void);
 	void UpdateLimitValues(void);
+	void ValidateRangeLimits(double &min, double &max, const bool &autoScale, double &major, double &minor) const;
+	void ValidateLogarithmicLimits(Axis &axis, const double &min);
+	void SetOriginalAxisLimits(void);
+	void GetAxisExtremes(const Dataset2D &data, Axis *yAxis);
+	void ResetOriginalLimits(void);
+	void MatchYAxes(const bool &leftFound, const bool &rightFound);
 };
 
 #endif// _PLOT_OBJECT_H_

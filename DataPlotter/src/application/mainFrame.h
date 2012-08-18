@@ -129,13 +129,14 @@ private:
 		idButtonRemoveCurve,
 
 		idContextAddMathChannel,
+		idContextTransferFunction,
 		idContextSetTimeUnits,
 		idContextPlotDerivative,
 		idContextPlotIntegral,
 		idContextPlotRMS,
 		idContextPlotFFT,
-		
 		idContextTimeShift,
+		idContextBitMask,
 
 		idContextFilter,
 
@@ -149,24 +150,24 @@ private:
 		idPlotContextGridColor,
 
 		idPlotContextToggleBottomGridlines,// Maintain this order for each axis' context IDs
+		idPlotContextAutoScaleBottom,
 		idPlotContextSetBottomRange,
 		idPlotContextSetBottomLogarithmic,
-		idPlotContextAutoScaleBottom,
 
 		/*idPlotContextToggleTopGridlines,
+		idPlotContextAutoScaleTop,
 		idPlotContextSetTopRange,
-		idPlotContextSetTopLogarithmic,
-		idPlotContextAutoScaleTop,*/
+		idPlotContextSetTopLogarithmic,*/
 
 		idPlotContextToggleLeftGridlines,
+		idPlotContextAutoScaleLeft,
 		idPlotContextSetLeftRange,
 		idPlotContextSetLeftLogarithmic,
-		idPlotContextAutoScaleLeft,
 
 		idPlotContextToggleRightGridlines,
+		idPlotContextAutoScaleRight,
 		idPlotContextSetRightRange,
-		idPlotContextSetRightLogarithmic,
-		idPlotContextAutoScaleRight
+		idPlotContextSetRightLogarithmic
 	};
 
 	wxMenu *CreateAxisContextMenu(const unsigned int &baseEventId) const;
@@ -186,13 +187,14 @@ private:
 
 	// Context menu events
 	void ContextAddMathChannelEvent(wxCommandEvent &event);
+	void ContextTransferFunctionEvent(wxCommandEvent &event);
 	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
 	void ContextPlotDerivativeEvent(wxCommandEvent &event);
 	void ContextPlotIntegralEvent(wxCommandEvent &event);
 	void ContextPlotRMSEvent(wxCommandEvent &event);
 	void ContextPlotFFTEvent(wxCommandEvent &event);
-	
 	void ContextTimeShiftEvent(wxCommandEvent &event);
+	void ContextBitMaskEvent(wxCommandEvent &event);
 
 	void ContextFilterEvent(wxCommandEvent &event);
 
@@ -272,6 +274,8 @@ private:
 
 	void GenerateGenericNames(const wxArrayString &previousLines, const wxArrayString &currentLine,
 		const wxString &delimiter, wxArrayString &descriptions) const;
+	wxArrayString GenerateDummyNames(const unsigned int &count) const;
+	bool ListIsNumeric(const wxArrayString &list) const;
 
 	wxArrayString GetDelimiterList(const CustomFileFormat *customFormat) const;
 

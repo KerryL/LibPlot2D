@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros">
     <WXWIN>C:\lib\wxWidgets-2.8.12</WXWIN>
     <FTGL>C:\lib\ftgl-2.1.3~rc5</FTGL>
-    <FREETYPE>C:\lib\freetype-2.4.8</FREETYPE>
+    <FREETYPE>C:\lib\freetype-2.4.10</FREETYPE>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />

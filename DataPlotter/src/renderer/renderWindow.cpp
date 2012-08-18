@@ -995,7 +995,7 @@ bool RenderWindow::WriteImageToFile(wxString pathAndFileName) const
 //					extension.
 //
 // Input Arguments:
-//		pickedObject	= const PRIMITIVE* pointing to the selected primitive
+//		pickedObject	= const Primitive* pointing to the selected primitive
 //
 // Output Arguments:
 //		None

@@ -151,6 +151,8 @@ protected:
 	void ProcessRightClick(wxMouseEvent &event);
 	void ProcessZoomBoxEnd(void);
 
+	bool ignoreNextMouseMove;
+
 	// For the event table
 	DECLARE_EVENT_TABLE()
 };

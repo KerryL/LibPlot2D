@@ -34,7 +34,7 @@ public:
 	// Destructor
 	~PlotCurve();
 
-	// Mandatory overloads from PRIMITIVE - for creating geometry and testing the
+	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
 	void GenerateGeometry(void);
 	bool HasValidParameters(void);
@@ -64,12 +64,12 @@ private:
 	Axis *xAxis;
 	Axis *yAxis;
 
+	const Dataset2D *data;
 	unsigned int size;
 
 	void RescalePoint(const double *value, int *coordinate) const;
 
-	// The data to be plotted
-	const Dataset2D *data;
+	bool PointIsWithinPlotArea(const unsigned int &i) const;
 };
 
 #endif// _PLOT_CURVE_H_

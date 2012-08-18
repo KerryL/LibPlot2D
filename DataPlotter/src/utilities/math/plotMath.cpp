@@ -23,6 +23,7 @@
 #include "utilities/math/plotMath.h"
 #include "utilities/math/vector.h"
 #include "utilities/math/matrix.h"
+#include "utilities/dataset2D.h"
 
 //==========================================================================
 // Namespace:		PlotMath
@@ -231,4 +232,52 @@ double PlotMath::Modulo(const double &value, const double &div)
 		modulo += div;
 
 	return modulo;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		ApplyBitMask
+//
+// Description:		Extracts a single bit from values of the specified dataset.
+//
+// Input Arguments:
+//		data	= const Dataset2D&
+//		bit		= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data, const unsigned int &bit)
+{
+	Dataset2D set(data);
+	unsigned int i;
+	for (i = 0; i < set.GetNumberOfPoints(); i++)
+		set.GetYPointer()[i] = ApplyBitMask((unsigned int)set.GetYPointer()[i], bit);
+	return set;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		ApplyBitMask
+//
+// Description:		Extracts a single bit from the value.
+//
+// Input Arguments:
+//		value	= const unsigned int&
+//		bit		= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+unsigned int PlotMath::ApplyBitMask(const unsigned &value, const unsigned int &bit)
+{
+	return (value >> bit) & 1;
 }

@@ -25,6 +25,7 @@
 
 // FTGL forward declarations
 class FTFont;
+class FTBBox;
 
 class Axis : public Primitive
 {
@@ -130,6 +131,26 @@ private:
 	// The axis label and font
 	wxString label;
 	FTFont *font;
+
+	void DrawFullAxis(void);
+	int ComputeMainAxisLocation(void) const;
+	void ComputeGridAndTickCounts(int &tickCount, int *gridCount = NULL);
+	int DrawMainAxis(const int &mainAxisLocation) const;
+	void DrawHorizontalGrid(const unsigned int &count, double spacing) const;
+	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation, const double &spacing) const;
+	void DrawVerticalGrid(const unsigned int &count, double spacing) const;
+	void DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation, const double &spacing) const;
+	void InitializeTickParameters(int &inside, int &outside, int &sign) const;
+	void GetNextLogValue(const bool &first, double &value) const;
+	double GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const;
+
+	void DrawAxisLabel(void) const;
+	void DrawTickLabels(void);
+
+	double GetAxisLabelTranslation(const double &offset, const double &fontHeight) const;
+	unsigned int GetPrecision(void) const;
+	void ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
+		const FTBBox &boundingBox, const double &offset) const;
 };
 
 #endif// _AXIS_H_

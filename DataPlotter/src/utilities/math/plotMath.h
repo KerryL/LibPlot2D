@@ -23,6 +23,7 @@
 
 // Local forward declarations
 class Vector;
+class Dataset2D;
 
 namespace PlotMath
 {
@@ -52,6 +53,9 @@ namespace PlotMath
 
 	// Modulo operator defined for doubles (so not really a modulo, I guess)
 	double Modulo(const double &value, const double &div);
+
+	Dataset2D ApplyBitMask(const Dataset2D &data, const unsigned int &bit);
+	unsigned int ApplyBitMask(const unsigned &value, const unsigned int &bit);
 }
 
 #endif// _PLOT_MATH_H_

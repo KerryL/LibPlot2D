@@ -59,7 +59,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_dll;$(FTGL)\msvc\Build;$(FREETYPE)\objs\win32\vc2010;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wxbase28d.lib;wxmsw28d_adv.lib;wxbase28d_xml.lib;wxmsw28d_core.lib;wxmsw28d_gl.lib;wxzlibd.lib;opengl32.lib;ftgl_static_D.lib;freetype248MT_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase28d.lib;wxmsw28d_adv.lib;wxbase28d_xml.lib;wxmsw28d_core.lib;wxmsw28d_gl.lib;wxzlibd.lib;opengl32.lib;ftgl_static_D.lib;freetype2410MT_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
@@ -83,7 +83,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_lib;$(FREETYPE)\objs\win32\vc2010;$(FTGL)\msvc\Build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wxbase28.lib;wxmsw28_adv.lib;wxbase28_xml.lib;wxexpat.lib;wxmsw28_core.lib;wxmsw28_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;ftgl_static.lib;freetype248MT.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase28.lib;wxmsw28_adv.lib;wxbase28_xml.lib;wxexpat.lib;wxmsw28_core.lib;wxmsw28_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;ftgl_static.lib;freetype2410MT.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
@@ -92,12 +92,14 @@
   <ItemGroup>
     <ClInclude Include="src\application\customFileFormat.h" />
     <ClInclude Include="src\application\dropTarget.h" />
+    <ClInclude Include="src\application\fftDialog.h" />
     <ClInclude Include="src\application\filterDialog.h" />
     <ClInclude Include="src\application\mainFrame.h" />
     <ClInclude Include="src\application\multiChoiceDialog.h" />
     <ClInclude Include="src\application\plotObject.h" />
     <ClInclude Include="src\application\plotterApp.h" />
     <ClInclude Include="src\application\rangeLimitsDialog.h" />
+    <ClInclude Include="src\application\transferFunctionDialog.h" />
     <ClInclude Include="src\renderer\color.h" />
     <ClInclude Include="src\renderer\plotRenderer.h" />
     <ClInclude Include="src\renderer\primitives\axis.h" />
@@ -129,12 +131,14 @@
   <ItemGroup>
     <ClCompile Include="src\application\customFileFormat.cpp" />
     <ClCompile Include="src\application\dropTarget.cpp" />
+    <ClCompile Include="src\application\fftDialog.cpp" />
     <ClCompile Include="src\application\filterDialog.cpp" />
     <ClCompile Include="src\application\mainFrame.cpp" />
     <ClCompile Include="src\application\multiChoiceDialog.cpp" />
     <ClCompile Include="src\application\plotObject.cpp" />
     <ClCompile Include="src\application\plotterApp.cpp" />
     <ClCompile Include="src\application\rangeLimitsDialog.cpp" />
+    <ClCompile Include="src\application\transferFunctionDialog.cpp" />
     <ClCompile Include="src\renderer\color.cpp" />
     <ClCompile Include="src\renderer\plotRenderer.cpp" />
     <ClCompile Include="src\renderer\primitives\axis.cpp" />

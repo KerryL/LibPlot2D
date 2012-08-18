@@ -29,6 +29,7 @@
 #include "application/filterDialog.h"
 #include "application/customFileFormat.h"
 #include "application/multiChoiceDialog.h"
+#include "application/transferFunctionDialog.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "utilities/dataset2D.h"
@@ -347,13 +348,14 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 
 	// Context menu
 	EVT_MENU(idContextAddMathChannel,				MainFrame::ContextAddMathChannelEvent)
+	EVT_MENU(idContextTransferFunction,				MainFrame::ContextTransferFunctionEvent)
 	EVT_MENU(idContextSetTimeUnits,					MainFrame::ContextSetTimeUnitsEvent)
 	EVT_MENU(idContextPlotDerivative,				MainFrame::ContextPlotDerivativeEvent)
 	EVT_MENU(idContextPlotIntegral,					MainFrame::ContextPlotIntegralEvent)
 	EVT_MENU(idContextPlotRMS,						MainFrame::ContextPlotRMSEvent)
 	EVT_MENU(idContextPlotFFT,						MainFrame::ContextPlotFFTEvent)
 	EVT_MENU(idButtonRemoveCurve,					MainFrame::ButtonRemoveCurveClickedEvent)
-	
+	EVT_MENU(idContextBitMask,						MainFrame::ContextBitMaskEvent)
 	EVT_MENU(idContextTimeShift,					MainFrame::ContextTimeShiftEvent)
 
 	EVT_MENU(idContextFilter,						MainFrame::ContextFilterEvent)
@@ -547,6 +549,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 
 	// Start building the context menu
 	contextMenu->Append(idContextAddMathChannel, _T("Add Math Channel"));
+	contextMenu->Append(idContextTransferFunction, _T("Transfer Function"));
 
 	if (row == 0 && currentFileFormat == FormatGeneric)
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
@@ -557,6 +560,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
 		contextMenu->Append(idContextTimeShift, _T("Plot Time-Shifted"));
+		contextMenu->Append(idContextBitMask, _T("Plot Bit"));
 
 		contextMenu->AppendSeparator();
 
@@ -878,7 +882,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -888,7 +892,7 @@ bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
 	std::vector<double> *data = new std::vector<double>[GetPopulatedCount(descriptions)];
 	if (!ExtractData(file, delimiter, data, descriptions))
 	{
-		::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
+		wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
 			_T("Error Generating Plot"), wxICON_ERROR, this);
 		delete [] data;
 		return false;
@@ -969,7 +973,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -980,7 +984,7 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 	std::vector<double> *data = new std::vector<double>[GetPopulatedCount(descriptions)];
 	if (!ExtractData(file, delimiter, data, descriptions))
 	{
-		::wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
+		wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
 			_T("Error Generating Plot"), wxICON_ERROR, this);
 		delete [] data;
 		return false;
@@ -1063,7 +1067,7 @@ bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFor
 		GetDelimiterList(customFormat), delimiter, headerLines);
 	if (descriptions.size() < 2)
 	{
-		::wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
+		wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
 		return false;
 	}
 	genericXAxisLabel = descriptions[0];
@@ -1142,23 +1146,26 @@ bool MainFrame::ProcessGenericFile(const wxString &fileName, wxArrayString &desc
 	wxArrayInt choices = dialog.GetSelections();
 	if (choices.size() == 0)
 	{
-		::wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR, this);
+		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR, this);
 		return false;
 	}
 
 	std::ifstream file(fileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 	SkipLines(file, headerLines);
 
 	std::vector<double> *data = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
-
 	CompensateGenericChoices(choices);
 	RemoveUnwantedDescriptions(descriptions, choices);
-	ExtractData(file, delimiter, data, descriptions);
+	if (!ExtractData(file, delimiter, data, descriptions))
+	{
+		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR, this);
+		return false;
+	}
 	file.close();
 
 	AddData(data, descriptions, NULL, &scales);
@@ -1256,62 +1263,99 @@ wxArrayString MainFrame::GetGenericDescriptions(const wxString &fileName, const 
 	wxString &delimiter, unsigned int &headerLines)
 {
 	wxArrayString descriptions;
-
 	std::ifstream file(fileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return descriptions;
 	}
 
 	std::string nextLine;
 	wxArrayString delimitedLine, previousLines;
-	unsigned int i, j;
-	double value;
+	unsigned int i;
 	while (std::getline(file, nextLine))
 	{
-		// Look for the first row starting with a number that contains at least one
-		// delimiting character (check all delimiters in our list)
-		for (i = 0; i < delimiterList.size(); i++)
+		for (i = 0; i < delimiterList.size(); i++)// Try all delimiters until we find one that works
 		{
-			delimitedLine = ParseLineIntoColumns(nextLine, delimiterList[i]);
+			delimiter = delimiterList[i];
+			delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 			if (delimitedLine.size() > 1)
 			{
-				// If all columns are numeric, this is probably the first row of data
-				delimiter = delimiterList[i];
-				for (j = 0; j < delimitedLine.size(); j++)
-				{
-					if (!delimitedLine[j].ToDouble(&value))
-					{
-						delimiter.Empty();
-						break;
-					}
-				}
+				if (!ListIsNumeric(delimitedLine))// If not all columns are numeric, this isn't a data row
+					break;
 
-				if (!delimiter.IsEmpty())
-				{
-					GenerateGenericNames(previousLines, delimitedLine, delimiter, descriptions);
-					headerLines = previousLines.size();
-
-					if (descriptions.size() == 0)
-					{
-						wxString dummyPlotName;
-						for (i = 0; i < delimitedLine.size(); i++)
-						{
-							dummyPlotName.Printf("[%i]", i);
-							descriptions.Add(dummyPlotName);
-						}
-					}
-
-					return descriptions;
-				}
+				GenerateGenericNames(previousLines, delimitedLine, delimiter, descriptions);
+				headerLines = previousLines.size();
+				if (descriptions.size() == 0)
+					descriptions = GenerateDummyNames(delimitedLine.size());
+				return descriptions;
 			}
 		}
-
+		delimiter.Empty();
 		previousLines.Add(nextLine);
 	}
 
 	return descriptions;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ListIsNumeric
+//
+// Description:		Checks to see if the input array contains only numeric values.
+//
+// Input Arguments:
+//		list	= const wxArrayString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if all values are numeric, false otherwise
+//
+//==========================================================================
+bool MainFrame::ListIsNumeric(const wxArrayString &list) const
+{
+	unsigned int j;
+	double value;
+	for (j = 0; j < list.size(); j++)
+	{
+		if (!list[j].ToDouble(&value))
+			return false;
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GenerateDummyNames
+//
+// Description:		Generates plot names for cases where no information was
+//					provided by the data file.
+//
+// Input Arguments:
+//		count	= const unsigned int& specifying the number of names to generate
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxArrayString containing dummy names
+//
+//==========================================================================
+wxArrayString MainFrame::GenerateDummyNames(const unsigned int &count) const
+{
+	unsigned int i;
+	wxString dummyPlotName;
+	wxArrayString names;
+	for (i = 0; i < count; i++)
+	{
+		dummyPlotName.Printf("[%i]", i);
+		names.Add(dummyPlotName);
+	}
+
+	return names;
 }
 
 //==========================================================================
@@ -1424,7 +1468,7 @@ bool MainFrame::IsBaumullerFile(const wxString &pathAndFileName)
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -1460,7 +1504,7 @@ bool MainFrame::IsKollmorgenFile(const wxString &pathAndFileName)
 	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		::wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -1503,13 +1547,20 @@ bool MainFrame::ExtractData(std::ifstream &file, const wxString &delimiter,
 {
 	std::string nextLine;
 	wxArrayString parsed;
-	unsigned int i, set;
+	unsigned int i, set, curveCount(GetPopulatedCount(descriptions));
 	double tempDouble;
 
 	while (!file.eof())
 	{
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
+
+		if (parsed.size() < curveCount && parsed.size() > 0)
+		{
+			/*wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
+				_T("Column Count Mismatch"), wxICON_WARNING, this);*/// No warning here due to const method
+			return true;
+		}
 
 		set = 0;
 		for (i = 0; i < parsed.size(); i++)
@@ -1806,17 +1857,14 @@ void MainFrame::AddCurve(wxString mathString)
 
 	wxString errors = expression.Solve(mathString, *mathChannel, xAxisFactor);
 
-	// Check to see if there were any problems solving the tree
 	if (!errors.IsEmpty())
 	{
-		// Tell the user about the errors
-		::wxMessageBox(_T("Could not solve expression:\n\n") + errors, _T("Error Solving Expression"), wxICON_ERROR, this);
+		wxMessageBox(_T("Could not solve expression:\n\n") + errors, _T("Error Solving Expression"), wxICON_ERROR, this);
 
 		DisplayMathChannelDialog(mathString);
 		return;
 	}
 
-	// Then, add the new dataset to the plot
 	AddCurve(mathChannel, mathString.Upper());// FIXME:  Get better name from user
 }
 
@@ -2433,6 +2481,44 @@ void MainFrame::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		ContextTransferFunctionEvent
+//
+// Description:		Event handler for context menu transfer function events.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextTransferFunctionEvent(wxCommandEvent& WXUNUSED(event))
+{
+	wxArrayString descriptions;
+	int i;
+	for (i = 1; i < optionsGrid->GetNumberRows(); i++)
+		descriptions.Add(optionsGrid->GetCellValue(i, 0));
+
+	TransferFunctionDialog dialog(this, descriptions);
+	if (dialog.ShowModal() != wxID_OK)
+		return;
+
+	Dataset2D *amplitude = new Dataset2D;
+	Dataset2D *phase = new Dataset2D;
+	FastFourierTransform::ComputeTransferFunction(*plotList[dialog.GetInputIndex()],
+		*plotList[dialog.GetOutputIndex()], *amplitude, *phase);
+
+	AddCurve(amplitude, wxString::Format("TF Amplitude, [%u] to [%u], [dB]",
+		dialog.GetInputIndex(), dialog.GetOutputIndex()));
+	AddCurve(phase, wxString::Format("TF Phase, [%u] to [%u], [dB]",
+		dialog.GetInputIndex(), dialog.GetOutputIndex()));
+}
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		ContextSetTimeUnitsEvent
 //
 // Description:		Available for the user to clarify the time units when we
@@ -2512,7 +2598,7 @@ void MainFrame::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextPlotDerivativeEvent
+// Function:		ContextPlotIntegralEvent
 //
 // Description:		Adds a curve showing the integral of the selected grid
 //					row to the plot.
@@ -2539,7 +2625,7 @@ void MainFrame::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextPlotDerivativeEvent
+// Function:		ContextPlotRMSEvent
 //
 // Description:		Adds a curve showing the RMS of the selected grid
 //					row to the plot.
@@ -2566,7 +2652,7 @@ void MainFrame::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextPlotDerivativeEvent
+// Function:		ContextPlotFFTEvent
 //
 // Description:		Adds a curve showing the FFT of the selected grid
 //					row to the plot.
@@ -2596,6 +2682,41 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 	newData->MultiplyXData(factor);
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+	AddCurve(newData, name);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextBitMaskEvent
+//
+// Description:		Creates bit mask for the specified curve.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
+{
+	unsigned long bit;
+	wxString bitString = wxGetTextFromUser(_T("Specify the bit to plot:"), _T("Bit Seleciton"), _T("0"), this);
+	if (bitString.IsEmpty())
+		return;
+	else if (!bitString.ToULong(&bit))
+	{
+		wxMessageBox(_T("Bit value must be a positive integer."), _T("Bit Selection Error"), wxICON_ERROR, this);
+		return;
+	}
+
+	unsigned int row = optionsGrid->GetSelectedRows()[0];
+	Dataset2D *newData = new Dataset2D(PlotMath::ApplyBitMask(*plotList[row - 1], bit));
+
+	wxString name = optionsGrid->GetCellValue(row, colName) + _T(", Bit ") + wxString::Format("%u", bit);
 	AddCurve(newData, name);
 }
 
@@ -2639,10 +2760,10 @@ Dataset2D* MainFrame::GetFFTData(const Dataset2D* data)
 			tempData.GetYPointer()[i - startIndex] = data->GetYData(i);
 		}
 
-		return new Dataset2D(FastFourierTransform::Compute(tempData));
+		return new Dataset2D(FastFourierTransform::ComputeFFT(tempData));
 	}
 
-	return new Dataset2D(FastFourierTransform::Compute(*data));
+	return new Dataset2D(FastFourierTransform::ComputeFFT(*data));
 }
 
 //==========================================================================
@@ -2750,7 +2871,7 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 
 	if (!orderString.ToULong(&order))
 	{
-		::wxMessageBox(_T("ERROR:  Order must be a positive integer!"), _T("Error Fitting Curve"), wxICON_ERROR, this);
+		wxMessageBox(_T("ERROR:  Order must be a positive integer!"), _T("Error Fitting Curve"), wxICON_ERROR, this);
 		return;
 	}
 
@@ -3002,7 +3123,7 @@ void MainFrame::DisplayMathChannelDialog(wxString defaultInput)
 	// Display input dialog in which user can specify the math desired
 	wxString message(_T("Enter the math you would like to perform:\n\n"));
 	message.Append(_T("    Use [x] notation to specify channels, where x = 0 is Time, x = 1 is the first data channel, etc.\n"));
-	message.Append(_T("    Valid operations are: +, -, *, /, %, ddt, int and fft\n"));
+	message.Append(_T("    Valid operations are: +, -, *, /, %, ddt, int and fft.\n"));
 	message.Append(_T("    Use () to specify order of operations"));
 
 	AddCurve(::wxGetTextFromUser(message, _T("Specify Math Channel"), defaultInput, this));
@@ -3050,7 +3171,7 @@ void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 	// Make sure the limits aren't equal
 	if (min == max)
 	{
-		::wxMessageBox(_T("ERROR:  Limits must unique!"), _T("Error Setting Limits"), wxICON_ERROR, this);
+		wxMessageBox(_T("ERROR:  Limits must unique!"), _T("Error Setting Limits"), wxICON_ERROR, this);
 		return;
 	}
 

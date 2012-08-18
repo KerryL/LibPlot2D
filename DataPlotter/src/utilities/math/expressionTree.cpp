@@ -490,10 +490,17 @@ bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop) const
 
 	if (s.Mid(0, 3).CmpNoCase(_T("int")) == 0 ||
 		s.Mid(0, 3).CmpNoCase(_T("ddt")) == 0 ||
-		s.Mid(0, 3).CmpNoCase(_T("fft")) == 0)
+		s.Mid(0, 3).CmpNoCase(_T("fft")) == 0 ||
+		s.Mid(0, 3).CmpNoCase(_T("bit")) == 0)
 	{
 		if (stop)
 			*stop = 3;
+		return true;
+	}
+	else if (s.Mid(0, 8).CmpNoCase(_T("transfer")) == 0)
+	{
+		if (stop)
+			*stop = 8;
 		return true;
 	}
 
@@ -755,7 +762,11 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 	else if (function.CmpNoCase(_T("ddt")) == 0)
 		return DiscreteDerivative::ComputeTimeHistory(set);
 	else if (function.CmpNoCase(_T("fft")) == 0)
-		return FastFourierTransform::Compute(set).MultiplyXData(xAxisFactor);
+		return FastFourierTransform::ComputeFFT(set).MultiplyXData(xAxisFactor);
+	/*else if (function.CmpNoCase(_T("bit")) == 0)
+		return PlotMath::ApplyBitMask(set, bit);
+	else if (function.CmpNoCase(_T("transfer")) == 0)
+		return FastFourierTransform::ComputeTransferFunction(set1, set2);*/
 
 	assert(false);
 	return set;
@@ -939,6 +950,8 @@ bool ExpressionTree::EvaluateFunction(const wxString &function, std::stack<doubl
 		errorString = _T("Attempting to apply function to value (requires dataset).");
 		return false;
 	}
+
+	// FIXME:  Handle multiple args here
 
 	PushToStack(ApplyFunction(function, dataset), setStack, useDoubleStack);
 
