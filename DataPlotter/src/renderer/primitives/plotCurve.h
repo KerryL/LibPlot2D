@@ -70,6 +70,23 @@ private:
 	void RescalePoint(const double *value, int *coordinate) const;
 
 	bool PointIsWithinPlotArea(const unsigned int &i) const;
+	void PlotPoint(const unsigned int &i) const;
+	void PlotPoint(const double &x, const double &y) const;
+	void PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint) const;
+	void PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second) const;
+
+	bool PointsCrossBottomAxis(const unsigned int &first, const unsigned int &second) const;
+	bool PointsCrossTopAxis(const unsigned int &first, const unsigned int &second) const;
+	bool PointsCrossLeftAxis(const unsigned int &first, const unsigned int &second) const;
+	bool PointsCrossRightAxis(const unsigned int &first, const unsigned int &second) const;
+
+	bool PointsCrossXOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const;
+	bool PointsCrossYOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const;
+
+	bool PointsJumpPlotArea(const unsigned int &first, const unsigned int &second) const;
+
+	double GetInterpolatedXOrdinate(const unsigned int &first, const unsigned int &second, const double &yValue) const;
+	double GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const;
 };
 
 #endif// _PLOT_CURVE_H_

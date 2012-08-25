@@ -29,7 +29,8 @@
 #include "application/filterDialog.h"
 #include "application/customFileFormat.h"
 #include "application/multiChoiceDialog.h"
-#include "application/transferFunctionDialog.h"
+#include "application/frfDialog.h"
+#include "application/fftDialog.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "utilities/dataset2D.h"
@@ -348,7 +349,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 
 	// Context menu
 	EVT_MENU(idContextAddMathChannel,				MainFrame::ContextAddMathChannelEvent)
-	EVT_MENU(idContextTransferFunction,				MainFrame::ContextTransferFunctionEvent)
+	EVT_MENU(idContextFRF,							MainFrame::ContextFRFEvent)
 	EVT_MENU(idContextSetTimeUnits,					MainFrame::ContextSetTimeUnitsEvent)
 	EVT_MENU(idContextPlotDerivative,				MainFrame::ContextPlotDerivativeEvent)
 	EVT_MENU(idContextPlotIntegral,					MainFrame::ContextPlotIntegralEvent)
@@ -549,7 +550,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 
 	// Start building the context menu
 	contextMenu->Append(idContextAddMathChannel, _T("Add Math Channel"));
-	contextMenu->Append(idContextTransferFunction, _T("Transfer Function"));
+	contextMenu->Append(idContextFRF, _T("Frequency Response"));
 
 	if (row == 0 && currentFileFormat == FormatGeneric)
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
@@ -1815,7 +1816,7 @@ void MainFrame::SetXDataLabel(const FileFormat &format)
 		SetXDataLabel(_T("Time [sec]"));
 		break;
 
-	case FormatFFT:
+	case FormatFrequency:
 		SetXDataLabel(_T("Frequency [Hz]"));
 		break;
 
@@ -1865,7 +1866,7 @@ void MainFrame::AddCurve(wxString mathString)
 		return;
 	}
 
-	AddCurve(mathChannel, mathString.Upper());// FIXME:  Get better name from user
+	AddCurve(mathChannel, mathString.Upper());// TODO:  Get better name from user
 }
 
 //==========================================================================
@@ -2200,25 +2201,26 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 //==========================================================================
 void MainFrame::ShowAppropriateXLabel(void)
 {
-	// If the only visible curves are FFTs, change the x-label
+	// If the only visible curves are frequency plots, change the x-label
 	int i;
-	bool showFFTLabel(false);
+	bool showFrequencyLabel(false);
 	for (i = 1; i < optionsGrid->GetRows(); i++)
 	{
 		if (optionsGrid->GetCellValue(i, colVisible).Cmp(_T("1")) == 0)
 		{
-			if (optionsGrid->GetCellValue(i, colName).Mid(0, 3).CmpNoCase(_T("FFT")) == 0)
-				showFFTLabel = true;
+			if (optionsGrid->GetCellValue(i, colName).Mid(0, 3).CmpNoCase(_T("FFT")) == 0 ||
+				optionsGrid->GetCellValue(i, colName).Mid(0, 3).CmpNoCase(_T("FRF")) == 0)
+				showFrequencyLabel = true;
 			else
 			{
-				showFFTLabel = false;
+				showFrequencyLabel = false;
 				break;
 			}
 		}
 	}
 
-	if (showFFTLabel)
-		SetXDataLabel(FormatFFT);
+	if (showFrequencyLabel)
+		SetXDataLabel(FormatFrequency);
 	else
 		SetXDataLabel(currentFileFormat);
 }
@@ -2481,7 +2483,7 @@ void MainFrame::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextTransferFunctionEvent
+// Function:		ContextFRFEvent
 //
 // Description:		Event handler for context menu transfer function events.
 //
@@ -2495,26 +2497,42 @@ void MainFrame::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void MainFrame::ContextTransferFunctionEvent(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 {
+	double factor;
+	if (!GetXAxisScalingFactor(factor))
+		// Warn the user if we cannot determine the time units, but create the plot anyway
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
+
 	wxArrayString descriptions;
 	int i;
 	for (i = 1; i < optionsGrid->GetNumberRows(); i++)
 		descriptions.Add(optionsGrid->GetCellValue(i, 0));
 
-	TransferFunctionDialog dialog(this, descriptions);
+	FRFDialog dialog(this, descriptions);
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
 	Dataset2D *amplitude = new Dataset2D;
-	Dataset2D *phase = new Dataset2D;
-	FastFourierTransform::ComputeTransferFunction(*plotList[dialog.GetInputIndex()],
-		*plotList[dialog.GetOutputIndex()], *amplitude, *phase);
+	Dataset2D *phase = NULL, *coherence = NULL;
 
-	AddCurve(amplitude, wxString::Format("TF Amplitude, [%u] to [%u], [dB]",
+	if (dialog.GetComputePhase())
+		phase = new Dataset2D;
+	if (dialog.GetComputeCoherence())
+		coherence = new Dataset2D;
+
+	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
+		*plotList[dialog.GetOutputIndex()], *amplitude, phase, coherence);
+
+	AddCurve(&(amplitude->MultiplyXData(factor)), wxString::Format("FRF Amplitude, [%u] to [%u], [dB]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
-	AddCurve(phase, wxString::Format("TF Phase, [%u] to [%u], [dB]",
-		dialog.GetInputIndex(), dialog.GetOutputIndex()));
+	if (dialog.GetComputePhase())
+		AddCurve(&(phase->MultiplyXData(factor)), wxString::Format("FRF Phase, [%u] to [%u], [deg]",
+			dialog.GetInputIndex(), dialog.GetOutputIndex()));
+	if (dialog.GetComputeCoherence())
+		AddCurve(&(coherence->MultiplyXData(factor)), wxString::Format("FRF Coherence, [%u] to [%u]",
+			dialog.GetInputIndex(), dialog.GetOutputIndex()));
 }
 
 //==========================================================================
@@ -2676,9 +2694,10 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 			_T("Accuracy Warning"), wxICON_WARNING, this);
 
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = GetFFTData(plotList[row - 1]);
+	Dataset2D *newData = GetFFTData(plotList[row - 1], factor);
+	if (!newData)
+		return;
 
-	// Scale as required
 	newData->MultiplyXData(factor);
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
@@ -2727,7 +2746,8 @@ void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 // Description:		Returns a dataset containing an FFT of the specified data.
 //
 // Input Arguments:
-//		None
+//		data				= const Dataset2D&
+//		timeScalingFactor	= const double& factor required to get seconds
 //
 // Output Arguments:
 //		None
@@ -2736,34 +2756,58 @@ void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 //		Dataset2D* pointing to a dataset contining the new FFT data
 //
 //==========================================================================
-Dataset2D* MainFrame::GetFFTData(const Dataset2D* data)
+Dataset2D* MainFrame::GetFFTData(const Dataset2D* data, const double &timeScalingFactor)
 {
-	// If the user has zoomed in along the X-axis, use the current "time window"
-	if (plotArea->GetXAxisZoomed())
+	FFTDialog dialog(this, data->GetNumberOfPoints(),
+		data->GetNumberOfZoomedPoints(plotArea->GetXMin(), plotArea->GetXMax()),
+		(data->GetXData(1) - data->GetXData(0)) / timeScalingFactor);
+	if (dialog.ShowModal() != wxID_OK)
+		return NULL;
+
+	if (dialog.GetUseZoomedData())
+		return new Dataset2D(FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
+			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap()));
+
+	return new Dataset2D(FastFourierTransform::ComputeFFT(*data,
+		dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap()));
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetXZoomedDataset
+//
+// Description:		Returns a dataset containing only the data within the
+//					current zoomed x-limits.
+//
+// Input Arguments:
+//		fullData	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D MainFrame::GetXZoomedDataset(const Dataset2D &fullData) const
+{
+	unsigned int i, startIndex(0), endIndex(0);
+	while (fullData.GetXData(startIndex) < plotArea->GetXMin() &&
+		startIndex < fullData.GetNumberOfPoints())
+		startIndex++;
+	endIndex = startIndex;
+	while (fullData.GetXData(endIndex) < plotArea->GetXMax() &&
+		endIndex < fullData.GetNumberOfPoints())
+		endIndex++;
+
+	Dataset2D data(endIndex - startIndex);
+	for (i = startIndex; i < endIndex; i++)
 	{
-		wxMessageBox(_T("FFT will include currently visible time period only."), _T("FFT"), wxICON_WARNING, this);
-
-		unsigned int i, startIndex(0), endIndex(0);
-		while (data->GetXData(startIndex) < plotArea->GetXMin() &&
-			startIndex < data->GetNumberOfPoints())
-			startIndex++;
-		endIndex = startIndex;
-		while (data->GetXData(endIndex) < plotArea->GetXMax() &&
-			endIndex < data->GetNumberOfPoints())
-			endIndex++;
-
-		Dataset2D tempData(endIndex - startIndex);
-
-		for (i = startIndex; i < endIndex; i++)
-		{
-			tempData.GetXPointer()[i - startIndex] = data->GetXData(i);
-			tempData.GetYPointer()[i - startIndex] = data->GetYData(i);
-		}
-
-		return new Dataset2D(FastFourierTransform::ComputeFFT(tempData));
+		data.GetXPointer()[i - startIndex] = fullData.GetXData(i);
+		data.GetYPointer()[i - startIndex] = fullData.GetYData(i);
 	}
 
-	return new Dataset2D(FastFourierTransform::ComputeFFT(*data));
+	return data;
 }
 
 //==========================================================================
@@ -3039,7 +3083,7 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 	if (optionsGrid == NULL)
 		return;
 
-	// FIXME:  This would be nicer with smart precision so we show enough digits but not too many
+	// TODO:  This would be nicer with smart precision so we show enough digits but not too many
 
 	// For each curve, update the cursor values
 	int i;

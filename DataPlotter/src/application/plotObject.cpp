@@ -148,7 +148,6 @@ void PlotObject::InitializeFonts(void)
 	bool foundFont = FontFinder::GetPreferredFontFileName(wxFONTENCODING_SYSTEM,
 		preferredFonts, false, fontFile);
 
-	// Tell the user if we're unsure of the font
 	if (!foundFont)
 	{
 		if (!fontFile.IsEmpty())
@@ -632,7 +631,6 @@ void PlotObject::FormatTitle(void)
 //==========================================================================
 void PlotObject::SetOriginalAxisLimits(void)
 {
-	// Determine "original" values by parsing data associated with each axis
 	bool leftFound = false;
 	bool rightFound = false;
 	unsigned int i;
@@ -643,7 +641,8 @@ void PlotObject::SetOriginalAxisLimits(void)
 			continue;
 		if (!leftFound && !rightFound)
 		{
-			xMinOriginal = dataList[i]->GetXData(0);
+			xMinOriginal = GetFirstValidValue(dataList[i]->GetXPointer(),
+				dataList[i]->GetNumberOfPoints());
 			xMaxOriginal = xMinOriginal;
 		}
 
@@ -651,20 +650,52 @@ void PlotObject::SetOriginalAxisLimits(void)
 		if (yAxis == axisLeft && !leftFound)
 		{
 			leftFound = true;
-			yLeftMinOriginal = dataList[i]->GetYData(0);
+			yLeftMinOriginal = GetFirstValidValue(dataList[i]->GetYPointer(),
+				dataList[i]->GetNumberOfPoints());
 			yLeftMaxOriginal = yLeftMinOriginal;
 		}
 		else if (yAxis == axisRight && !rightFound)
 		{
 			rightFound = true;
-			yRightMinOriginal = dataList[i]->GetYData(0);
+			yRightMinOriginal = GetFirstValidValue(dataList[i]->GetYPointer(),
+				dataList[i]->GetNumberOfPoints());
 			yRightMaxOriginal = yRightMinOriginal;
 		}
-
 		GetAxisExtremes(*dataList[i], yAxis);
 	}
 
 	MatchYAxes(leftFound, rightFound);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetFirstValidValue
+//
+// Description:		Retrieves the first valid value from the specified array.
+//
+// Input Arguments:
+//		data	= const double*
+//		size	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotObject::GetFirstValidValue(const double* data, const unsigned int &size) const
+{
+	assert(data);
+
+	unsigned int i;
+	for (i = 0; i < size; i++)
+	{
+		if (PlotMath::IsValid(data[i]))
+			return data[i];
+	}
+
+	return data[0];
 }
 
 //==========================================================================
@@ -725,19 +756,22 @@ void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
 	{
-		if (data.GetXData(i) > xMaxOriginal)
-			xMaxOriginal = data.GetXData(i);
-		else if (data.GetXData(i) < xMinOriginal)
-			xMinOriginal = data.GetXData(i);
+		if (PlotMath::IsValid<double>(data.GetXData(i)))
+		{
+			if (data.GetXData(i) > xMaxOriginal)
+				xMaxOriginal = data.GetXData(i);
+			else if (data.GetXData(i) < xMinOriginal)
+				xMinOriginal = data.GetXData(i);
+		}
 
-		if (yAxis == axisLeft)
+		if (yAxis == axisLeft && PlotMath::IsValid<double>(data.GetYData(i)))
 		{
 			if (data.GetYData(i) > yLeftMaxOriginal)
 				yLeftMaxOriginal = data.GetYData(i);
 			else if (data.GetYData(i) < yLeftMinOriginal)
 				yLeftMinOriginal = data.GetYData(i);
 		}
-		else
+		else if (yAxis == axisRight && PlotMath::IsValid<double>(data.GetYData(i)))
 		{
 			if (data.GetYData(i) > yRightMaxOriginal)
 				yRightMaxOriginal = data.GetYData(i);
@@ -1220,22 +1254,6 @@ void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing
 //==========================================================================
 void PlotObject::SetXMin(const double &_xMin)
 {
-	// Make sure the limit is within the bounds of the original
-	/*if (_xMin <= xMinOriginal)
-	{
-		xMin = xMinOriginal;
-
-		// If the opposite limit is also at the original value, enable auto-scaling again
-		if (xMax == xMaxOriginal)
-			autoScaleX = true;
-
-		return;
-	}
-	
-	// Make the assignment and disable auto-scaling
-	xMin = _xMin;
-	autoScaleX = false;*/
-
 	// If the both limits are at the original value, enable auto-scaling again
 	if (xMax == xMaxOriginal && _xMin == xMinOriginal)
 		autoScaleX = true;
@@ -1265,22 +1283,6 @@ void PlotObject::SetXMin(const double &_xMin)
 //==========================================================================
 void PlotObject::SetXMax(const double &_xMax)
 {
-	// Make sure the limit is within the bounds of the original
-	/*if (_xMax >= xMaxOriginal)
-	{
-		xMax = xMaxOriginal;
-
-		// If the opposite limit is also at the original value, enable auto-scaling again
-		if (xMin == xMinOriginal)
-			autoScaleX = true;
-
-		return;
-	}
-
-	// Make the assignment and disable auto-scaling
-	xMax = _xMax;
-	autoScaleX = false;*/
-
 	// If the both limits are at the original value, enable auto-scaling again
 	if (xMin == xMinOriginal && _xMax == xMaxOriginal)
 		autoScaleX = true;
@@ -1310,22 +1312,6 @@ void PlotObject::SetXMax(const double &_xMax)
 //==========================================================================
 void PlotObject::SetLeftYMin(const double &_yMin)
 {
-	// Make sure the limit is within the bounds of the original
-	/*if (_yMin <= yLeftMinOriginal)
-	{
-		yLeftMin = yLeftMinOriginal;
-
-		// If the opposite limit is also at the original value, enable auto-scaling again
-		if (yLeftMax == yLeftMaxOriginal)
-			autoScaleLeftY = true;
-
-		return;
-	}
-
-	// Make the assignment and disable auto-scaling
-	yLeftMin = _yMin;
-	autoScaleLeftY = false;*/
-
 	// If the both limits are at the original value, enable auto-scaling again
 	if (yLeftMax == yLeftMaxOriginal && _yMin == yLeftMinOriginal)
 		autoScaleLeftY = true;
@@ -1355,22 +1341,6 @@ void PlotObject::SetLeftYMin(const double &_yMin)
 //==========================================================================
 void PlotObject::SetLeftYMax(const double &_yMax)
 {
-	// Make sure the limit is within the bounds of the original
-	/*if (_yMax >= yLeftMaxOriginal)
-	{
-		yLeftMax = yLeftMaxOriginal;
-
-		// If the opposite limit is also at the original value, enable auto-scaling again
-		if (yLeftMin == yLeftMinOriginal)
-			autoScaleLeftY = true;
-
-		return;
-	}
-
-	// Make the assignment and disable auto-scaling
-	yLeftMax = _yMax;
-	autoScaleLeftY = false;*/
-
 	// If the both limits are at the original value, enable auto-scaling again
 	if (yLeftMin == yLeftMinOriginal && _yMax == yLeftMaxOriginal)
 		autoScaleLeftY = true;
@@ -1400,22 +1370,6 @@ void PlotObject::SetLeftYMax(const double &_yMax)
 //==========================================================================
 void PlotObject::SetRightYMin(const double &_yMin)
 {
-	// Make sure the limit is within the bounds of the original
-	/*if (_yMin <= yRightMinOriginal)
-	{
-		yRightMin = yRightMinOriginal;
-
-		// If the opposite limit is also at the original value, enable auto-scaling again
-		if (yRightMax == yRightMaxOriginal)
-			autoScaleRightY = true;
-
-		return;
-	}
-
-	// Make the assignment and disable auto-scaling
-	yRightMin = _yMin;
-	autoScaleRightY = false;*/
-
 	// If the both limits are at the original value, enable auto-scaling again
 	if (yRightMax == yRightMaxOriginal && _yMin == yRightMinOriginal)
 		autoScaleRightY = true;
@@ -1445,22 +1399,6 @@ void PlotObject::SetRightYMin(const double &_yMin)
 //==========================================================================
 void PlotObject::SetRightYMax(const double &_yMax)
 {
-	// Make sure the limit is within the bounds of the original
-	/*if (_yMax >= yRightMaxOriginal)
-	{
-		yRightMax = yRightMaxOriginal;
-
-		// If the opposite limit is also at the original value, enable auto-scaling again
-		if (yRightMin == yRightMinOriginal)
-			autoScaleRightY = true;
-
-		return;
-	}
-
-	// Make the assignment and disable auto-scaling
-	yRightMax = _yMax;
-	autoScaleRightY = false;*/
-
 	// If the both limits are at the original value, enable auto-scaling again
 	if (yRightMin == yRightMinOriginal && _yMax == yRightMaxOriginal)
 		autoScaleRightY = true;
@@ -1490,7 +1428,6 @@ void PlotObject::SetRightYMax(const double &_yMax)
 //==========================================================================
 void PlotObject::ResetAutoScaling(void)
 {
-	// Enable auto-scaling for all axes
 	autoScaleX = true;
 	autoScaleLeftY = true;
 	autoScaleRightY = true;

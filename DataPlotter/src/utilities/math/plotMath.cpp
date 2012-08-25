@@ -18,6 +18,7 @@
 // Standard C++ headers
 #include <cstdlib>
 #include <assert.h>
+#include <limits>
 
 // Local headers
 #include "utilities/math/plotMath.h"
@@ -77,49 +78,6 @@ bool PlotMath::IsZero(const Vector &toCheck)
 
 //==========================================================================
 // Namespace:		PlotMath
-// Function:		IsNaN
-//
-// Description:		Determines if the specified number is or is not a number.
-//
-// Input Arguments:
-//		toCheck	= const double& to check
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true if the argument is NOT a number
-//
-//==========================================================================
-bool PlotMath::IsNaN(const double &toCheck)
-{
-	return toCheck != toCheck;
-}
-
-//==========================================================================
-// Namespace:		PlotMath
-// Function:		IsNaN
-//
-// Description:		Determines if the specified number is or is not a number.
-//					Vector version - returns false if any component is NaN.
-//
-// Input Arguments:
-//		ToCheck	= Vector& to be checked for containing valid numbers
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true if the argument is NOT a number
-//
-//==========================================================================
-bool PlotMath::IsNaN(const Vector &toCheck)
-{
-	return IsNaN(toCheck.x) || IsNaN(toCheck.y) || IsNaN(toCheck.z);
-}
-
-//==========================================================================
-// Namespace:		PlotMath
 // Function:		Clamp
 //
 // Description:		Ensures the specified value is between the limits.  In the
@@ -169,22 +127,16 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit, const doub
 //		double, equal to the re-ranged angle
 //
 //==========================================================================
-double PlotMath::RangeToPlusMinusPi(const double &_angle)
+double PlotMath::RangeToPlusMinusPi(const double &angle)
 {
-	double angle = _angle;
-	while (angle <= Pi)
-		angle += 2 * Pi;
-	while (angle > Pi)
-		angle -= 2 * Pi;
-
-	return angle;
+	return Modulo(angle, 2.0 * Pi) - Pi;
 }
 
 //==========================================================================
 // Namespace:		PlotMath
 // Function:		Sign
 //
-// Description:		Returns 1 for positive, -1 for negative and 0 for zero.
+// Description:		Returns 1.0 for positive, -1.0 for negative and 0.0 for zero.
 //
 // Input Arguments:
 //		value		= const double&
@@ -228,7 +180,7 @@ double PlotMath::Modulo(const double &value, const double &div)
 	double modulo(value);
 	while (modulo >= fabs(div))
 		modulo -= div;
-	while (modulo < 0)
+	while (modulo < 0.0)
 		modulo += div;
 
 	return modulo;

@@ -19,6 +19,7 @@
 #include "renderer/renderWindow.h"
 #include "renderer/primitives/axis.h"
 #include "utilities/dataset2D.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			PlotCurve
@@ -103,481 +104,27 @@ PlotCurve::~PlotCurve()
 //
 //==========================================================================
 void PlotCurve::GenerateGeometry(void)
-/*{
-	glLineWidth((float)size);
-	glBegin(GL_LINE_STRIP);
-
-	unsigned int i;
-	for (i = 1; i < data->GetNumberOfPoints(); i++)
-	{
-		if (PointIsWithinPlotArea(i))
-			PlotPoint(i);
-		else if (PointIsWithinPlotArea(i + 1))
-		{
-			// If the next point in the series is within the valid drawing area, interpolate
-			if (i > 0)
-			{
-				// Check previous point
-				if (PointIsWithinPlotArea(i - 1))
-				{
-					interpolatedPoint[0] = doubPoint[0];
-					interpolatedPoint[1] = doubPoint[1];
-
-					// FIXME:  When we need to interpolate (if a point is off the screen) on a logarithmic-scaled axis, the current code is wrong (plot gets distorted)
-
-					// Interpolate to find the correct point
-					if (interpolatedPoint[0] < xAxis->GetMinimum())
-					{
-						interpolatedPoint[0] = xAxis->GetMinimum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i - 1) - doubPoint[0]) *
-							(data->GetYData(i - 1) - doubPoint[1]);
-					}
-					else if (interpolatedPoint[0] > xAxis->GetMaximum())
-					{
-						interpolatedPoint[0] = xAxis->GetMaximum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i - 1) - doubPoint[0]) *
-							(data->GetYData(i - 1) - doubPoint[1]);
-					}
-
-					if (interpolatedPoint[1] < yAxis->GetMinimum())
-					{
-						interpolatedPoint[1] = yAxis->GetMinimum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i - 1) - doubPoint[1]) *
-							(data->GetXData(i - 1) - doubPoint[0]);
-					}
-					else if (interpolatedPoint[1] > yAxis->GetMaximum())
-					{
-						interpolatedPoint[1] = yAxis->GetMaximum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i - 1) - doubPoint[1]) *
-							(data->GetXData(i - 1) - doubPoint[0]);
-					}
-
-					RescalePoint(interpolatedPoint, point);
-					glVertex2iv(point);
-					glEnd();
-					continue;
-				}
-			}
-
-			// If we get here, the current point and the previous point were outside the plot area
-			// were all outside the plot area
-
-			// Check to see if we've "jumped" the plot area - if so, interpolate between
-			// two points to draw a straight line on the screen
-			if (i > 0)
-			{
-				// Check for plot "jumping" - defined by a stright line between two points crossing
-				// any two plot axes within the range of the axes
-				unsigned int crossings(0);
-
-				// Left Y-Axis
-				if ((data->GetXData(i - 1) < xAxis->GetMinimum() && doubPoint[0] > xAxis->GetMinimum()) ||// Crossed from left-to-right
-					(data->GetXData(i - 1) > xAxis->GetMinimum() && doubPoint[0] < xAxis->GetMinimum()))// Crossed from right-to-left
-				{
-					// Find the interpolated point
-					interpolatedPoint[0] = xAxis->GetMinimum();
-					interpolatedPoint[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
-						(doubPoint[0] - data->GetXData(i - 1)) * (interpolatedPoint[0] - data->GetXData(i - 1));
-
-					// Check that the interpolated point is within the axis limits
-					if (interpolatedPoint[1] >= yAxis->GetMinimum() && interpolatedPoint[1] <= yAxis->GetMaximum())
-						crossings++;
-				}
-
-				// Right Y-Axis
-				if ((data->GetXData(i - 1) < xAxis->GetMaximum() && doubPoint[0] > xAxis->GetMaximum()) ||// Crossed from left-to-right
-					(data->GetXData(i - 1) > xAxis->GetMaximum() && doubPoint[0] < xAxis->GetMaximum()))// Crossed from right-to-left
-				{
-					// Find the interpolated point
-					if (crossings == 0)
-					{
-						interpolatedPoint[0] = xAxis->GetMaximum();
-						interpolatedPoint[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
-							(doubPoint[0] - data->GetXData(i - 1)) * (interpolatedPoint[0] - data->GetXData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (interpolatedPoint[1] >= yAxis->GetMinimum() && interpolatedPoint[1] <= yAxis->GetMaximum())
-							crossings++;
-					}
-					else
-					{
-						temp[0] = xAxis->GetMaximum();
-						temp[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
-							(doubPoint[0] - data->GetXData(i - 1)) * (temp[0] - data->GetXData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (temp[1] >= yAxis->GetMinimum() && temp[1] <= yAxis->GetMaximum())
-						{
-							crossings++;
-							interpolatedPoint2[0] = temp[0];
-							interpolatedPoint2[1] = temp[1];
-						}
-					}
-				}
-
-				// Bottom X-Axis
-				if ((data->GetYData(i - 1) < yAxis->GetMinimum() && doubPoint[1] > yAxis->GetMinimum()) ||// Crossed from bottom-to-top
-					(data->GetYData(i - 1) > yAxis->GetMinimum() && doubPoint[1] < yAxis->GetMinimum()))// Crossed from top-to-bottom
-				{
-					// Find the interpolated point
-					if (crossings == 0)
-					{
-						interpolatedPoint[1] = yAxis->GetMinimum();
-						interpolatedPoint[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (interpolatedPoint[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (interpolatedPoint[0] >= xAxis->GetMinimum() && interpolatedPoint[0] <= xAxis->GetMaximum())
-							crossings++;
-					}
-					else
-					{
-						temp[1] = yAxis->GetMinimum();
-						temp[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (temp[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (temp[0] >= xAxis->GetMinimum() && temp[0] <= xAxis->GetMaximum())
-						{
-							crossings++;
-							interpolatedPoint2[0] = temp[0];
-							interpolatedPoint2[1] = temp[1];
-						}
-					}
-				}
-
-				// Top X-Axis
-				if ((data->GetYData(i - 1) < yAxis->GetMaximum() && doubPoint[1] > yAxis->GetMaximum()) ||// Crossed from bottom-to-top
-					(data->GetYData(i - 1) > yAxis->GetMaximum() && doubPoint[1] < yAxis->GetMaximum()))// Crossed from top-to-bottom
-				{
-					// Find the interpolated point
-					if (crossings == 0)
-					{
-						interpolatedPoint[1] = yAxis->GetMaximum();
-						interpolatedPoint[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (interpolatedPoint[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (interpolatedPoint[0] >= xAxis->GetMinimum() && interpolatedPoint[0] <= xAxis->GetMaximum())
-							crossings++;
-					}
-					else
-					{
-						temp[1] = yAxis->GetMaximum();
-						temp[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (temp[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (temp[0] >= xAxis->GetMinimum() && temp[0] <= xAxis->GetMaximum())
-						{
-							crossings++;
-							interpolatedPoint2[0] = temp[0];
-							interpolatedPoint2[1] = temp[1];
-						}
-					}
-				}
-
-				// Impossible to have a number of crossings other than zero or two
-				assert(crossings == 0 || crossings == 2);
-
-				// If we have two crossings, we have a jump
-				if (crossings == 2)
-				{
-					// Depending on where the previously drawn point was, it is possible for the order of these
-					// points to be opposite from the proper order of "connecting the dots."
-					glEnd();
-					glBegin(GL_LINE_STRIP);
-
-					// Connect the points
-					RescalePoint(interpolatedPoint, point);
-					glVertex2iv(point);
-
-					RescalePoint(interpolatedPoint2, point);
-					glVertex2iv(point);
-
-					glEnd();
-					glBegin(GL_LINE_STRIP);
-				}
-			}
-		}
-	}
-
-	glEnd();
-}*/
 {
 	glLineWidth((float)size);
-
-	unsigned int i;
-	int point[2];
-	double doubPoint[2];
-	double interpolatedPoint[2];
-	double interpolatedPoint2[2];
-	double temp[2];
-
 	glBegin(GL_LINE_STRIP);
 
-	// FIXME:  If there are more points than pixels, we should avoid sending single pixel
-	// line-draw commands to OpenGL (doesn't seem to affect quality, but may affect performance - of course, if we
-	// don't do this intelligently it'll end up being better just to let OpenGL deal with this)
+	unsigned int i;
 	for (i = 0; i < data->GetNumberOfPoints(); i++)
 	{
-		doubPoint[0] = data->GetXData(i);
-		doubPoint[1] = data->GetYData(i);
-
-		// Clip data that lies outside of the plot range and interpolate to the edge of the plot
-		// No interpolation necessary
 		if (PointIsWithinPlotArea(i))
 		{
-			// If the previous point was interpolated, then we need to add an additional point to make the plot draw correctly
-			if (i > 0)
-			{
-				if (!PointIsWithinPlotArea(i - 1))
-				{
-					interpolatedPoint[0] = data->GetXData(i - 1);
-					interpolatedPoint[1] = data->GetYData(i - 1);
-
-					// FIXME:  When we need to interpolate (if a point is off the screen) on a logarithmic-scaled axis, the current code is wrong (plot gets distorted)
-
-					// Interpolate to find the correct point
-					if (interpolatedPoint[0] < xAxis->GetMinimum())
-					{
-						interpolatedPoint[0] = xAxis->GetMinimum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i - 1) - doubPoint[0]) *
-							(data->GetYData(i - 1) - doubPoint[1]);
-					}
-					else if (interpolatedPoint[0] > xAxis->GetMaximum())
-					{
-						interpolatedPoint[0] = xAxis->GetMaximum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i - 1) - doubPoint[0]) *
-							(data->GetYData(i - 1) - doubPoint[1]);
-					}
-
-					if (interpolatedPoint[1] < yAxis->GetMinimum())
-					{
-						interpolatedPoint[1] = yAxis->GetMinimum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i - 1) - doubPoint[1]) *
-							(data->GetXData(i - 1) - doubPoint[0]);
-					}
-					else if (interpolatedPoint[1] > yAxis->GetMaximum())
-					{
-						interpolatedPoint[1] = yAxis->GetMaximum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i - 1) - doubPoint[1]) *
-							(data->GetXData(i - 1) - doubPoint[0]);
-					}
-
-					glBegin(GL_LINE_STRIP);
-					RescalePoint(interpolatedPoint, point);
-					glVertex2iv(point);
-				}
-			}
-
-			RescalePoint(doubPoint, point);
-			glVertex2iv(point);
+			if (i > 0 && !PointIsWithinPlotArea(i - 1))
+				PlotInterpolatedPoint(i - 1, i, true);
+			PlotPoint(i);
 		}
-		else// Outside the plot area
-		{
-			// If the next point in the series is within the valid drawing area, interpolate
-			if (i > 0)
-			{
-				// Check previous point
-				if (PointIsWithinPlotArea(i - 1))
-				{
-					interpolatedPoint[0] = doubPoint[0];
-					interpolatedPoint[1] = doubPoint[1];
-
-					// FIXME:  When we need to interpolate (if a point is off the screen) on a logarithmic-scaled axis, the current code is wrong (plot gets distorted)
-
-					// Interpolate to find the correct point
-					if (interpolatedPoint[0] < xAxis->GetMinimum())
-					{
-						interpolatedPoint[0] = xAxis->GetMinimum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i - 1) - doubPoint[0]) *
-							(data->GetYData(i - 1) - doubPoint[1]);
-					}
-					else if (interpolatedPoint[0] > xAxis->GetMaximum())
-					{
-						interpolatedPoint[0] = xAxis->GetMaximum();
-						interpolatedPoint[1] = doubPoint[1] +
-							(interpolatedPoint[0] - doubPoint[0]) / (data->GetXData(i - 1) - doubPoint[0]) *
-							(data->GetYData(i - 1) - doubPoint[1]);
-					}
-
-					if (interpolatedPoint[1] < yAxis->GetMinimum())
-					{
-						interpolatedPoint[1] = yAxis->GetMinimum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i - 1) - doubPoint[1]) *
-							(data->GetXData(i - 1) - doubPoint[0]);
-					}
-					else if (interpolatedPoint[1] > yAxis->GetMaximum())
-					{
-						interpolatedPoint[1] = yAxis->GetMaximum();
-						interpolatedPoint[0] = doubPoint[0] +
-							(interpolatedPoint[1] - doubPoint[1]) / (data->GetYData(i - 1) - doubPoint[1]) *
-							(data->GetXData(i - 1) - doubPoint[0]);
-					}
-
-					RescalePoint(interpolatedPoint, point);
-					glVertex2iv(point);
-					glEnd();
-					continue;
-				}
-			}
-
-			// If we get here, the current point and the previous point were outside the plot area
-			// were all outside the plot area
-
-			// Check to see if we've "jumped" the plot area - if so, interpolate between
-			// two points to draw a straight line on the screen
-			if (i > 0)
-			{
-				// Check for plot "jumping" - defined by a stright line between two points crossing
-				// any two plot axes within the range of the axes
-				unsigned int crossings(0);
-
-				// Left Y-Axis
-				if ((data->GetXData(i - 1) < xAxis->GetMinimum() && doubPoint[0] > xAxis->GetMinimum()) ||// Crossed from left-to-right
-					(data->GetXData(i - 1) > xAxis->GetMinimum() && doubPoint[0] < xAxis->GetMinimum()))// Crossed from right-to-left
-				{
-					// Find the interpolated point
-					interpolatedPoint[0] = xAxis->GetMinimum();
-					interpolatedPoint[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
-						(doubPoint[0] - data->GetXData(i - 1)) * (interpolatedPoint[0] - data->GetXData(i - 1));
-
-					// Check that the interpolated point is within the axis limits
-					if (interpolatedPoint[1] >= yAxis->GetMinimum() && interpolatedPoint[1] <= yAxis->GetMaximum())
-						crossings++;
-				}
-
-				// Right Y-Axis
-				if ((data->GetXData(i - 1) < xAxis->GetMaximum() && doubPoint[0] > xAxis->GetMaximum()) ||// Crossed from left-to-right
-					(data->GetXData(i - 1) > xAxis->GetMaximum() && doubPoint[0] < xAxis->GetMaximum()))// Crossed from right-to-left
-				{
-					// Find the interpolated point
-					if (crossings == 0)
-					{
-						interpolatedPoint[0] = xAxis->GetMaximum();
-						interpolatedPoint[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
-							(doubPoint[0] - data->GetXData(i - 1)) * (interpolatedPoint[0] - data->GetXData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (interpolatedPoint[1] >= yAxis->GetMinimum() && interpolatedPoint[1] <= yAxis->GetMaximum())
-							crossings++;
-					}
-					else
-					{
-						temp[0] = xAxis->GetMaximum();
-						temp[1] = data->GetYData(i - 1) + (doubPoint[1] - data->GetYData(i - 1)) /
-							(doubPoint[0] - data->GetXData(i - 1)) * (temp[0] - data->GetXData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (temp[1] >= yAxis->GetMinimum() && temp[1] <= yAxis->GetMaximum())
-						{
-							crossings++;
-							interpolatedPoint2[0] = temp[0];
-							interpolatedPoint2[1] = temp[1];
-						}
-					}
-				}
-
-				// Bottom X-Axis
-				if ((data->GetYData(i - 1) < yAxis->GetMinimum() && doubPoint[1] > yAxis->GetMinimum()) ||// Crossed from bottom-to-top
-					(data->GetYData(i - 1) > yAxis->GetMinimum() && doubPoint[1] < yAxis->GetMinimum()))// Crossed from top-to-bottom
-				{
-					// Find the interpolated point
-					if (crossings == 0)
-					{
-						interpolatedPoint[1] = yAxis->GetMinimum();
-						interpolatedPoint[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (interpolatedPoint[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (interpolatedPoint[0] >= xAxis->GetMinimum() && interpolatedPoint[0] <= xAxis->GetMaximum())
-							crossings++;
-					}
-					else
-					{
-						temp[1] = yAxis->GetMinimum();
-						temp[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (temp[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (temp[0] >= xAxis->GetMinimum() && temp[0] <= xAxis->GetMaximum())
-						{
-							crossings++;
-							interpolatedPoint2[0] = temp[0];
-							interpolatedPoint2[1] = temp[1];
-						}
-					}
-				}
-
-				// Top X-Axis
-				if ((data->GetYData(i - 1) < yAxis->GetMaximum() && doubPoint[1] > yAxis->GetMaximum()) ||// Crossed from bottom-to-top
-					(data->GetYData(i - 1) > yAxis->GetMaximum() && doubPoint[1] < yAxis->GetMaximum()))// Crossed from top-to-bottom
-				{
-					// Find the interpolated point
-					if (crossings == 0)
-					{
-						interpolatedPoint[1] = yAxis->GetMaximum();
-						interpolatedPoint[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (interpolatedPoint[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (interpolatedPoint[0] >= xAxis->GetMinimum() && interpolatedPoint[0] <= xAxis->GetMaximum())
-							crossings++;
-					}
-					else
-					{
-						temp[1] = yAxis->GetMaximum();
-						temp[0] = data->GetXData(i - 1) + (doubPoint[0] - data->GetXData(i - 1)) /
-							(doubPoint[1] - data->GetYData(i - 1)) * (temp[1] - data->GetYData(i - 1));
-
-						// Check that the interpolated point is within the axis limits
-						if (temp[0] >= xAxis->GetMinimum() && temp[0] <= xAxis->GetMaximum())
-						{
-							crossings++;
-							interpolatedPoint2[0] = temp[0];
-							interpolatedPoint2[1] = temp[1];
-						}
-					}
-				}
-
-				// Impossible to have a number of crossings other than zero or two
-				assert(crossings == 0 || crossings == 2);
-
-				// If we have two crossings, we have a jump
-				if (crossings == 2)
-				{
-					// Depending on where the previously drawn point was, it is possible for the order of these
-					// points to be opposite from the proper order of "connecting the dots."
-					glEnd();
-					glBegin(GL_LINE_STRIP);
-
-					// Connect the points
-					RescalePoint(interpolatedPoint, point);
-					glVertex2iv(point);
-
-					RescalePoint(interpolatedPoint2, point);
-					glVertex2iv(point);
-
-					glEnd();
-					glBegin(GL_LINE_STRIP);
-				}
-			}
-		}
+		else if (i > 0 && PointIsWithinPlotArea(i - 1))
+			PlotInterpolatedPoint(i - 1, i, false);
+		else if (i > 0 && PointsJumpPlotArea(i - 1, i))
+			PlotInterpolatedJumpPoints(i - 1, i);
 	}
 
 	glEnd();
-}//*/
+}
 
 //==========================================================================
 // Class:			PlotCurve
@@ -587,7 +134,7 @@ void PlotCurve::GenerateGeometry(void)
 //					within the plot area.
 //
 // Input Arguments:
-//		i	= const unsigned&
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -605,6 +152,137 @@ bool PlotCurve::PointIsWithinPlotArea(const unsigned int &i) const
 		return true;
 
 	return false;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PlotPoint
+//
+// Description:		Plots the coordinate with the specified data index.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::PlotPoint(const unsigned int &i) const
+{
+	PlotPoint(data->GetXData(i), data->GetYData(i));
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PlotPoint
+//
+// Description:		Plots the coordinate with the specified coordinates.
+//
+// Input Arguments:
+//		x	= const double&
+//		y	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::PlotPoint(const double &x, const double &y) const
+{
+	double doublePoint[2] = {x, y};
+	int point[2];
+
+	RescalePoint(doublePoint, point);
+	glVertex2iv(point);
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PlotPoint
+//
+// Description:		Plots the coordinate where the line between the specified
+//					indecies crosses out of/in to the plot area.
+//
+// Input Arguments:
+//		first			= const unsigned int&
+//		second			= const unsigned int&
+//		startingPoint	= const bool& indicates whether this point is a
+//						  continuation of an existing line strip, or if we
+//						  are starting a new line strip
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint) const
+{
+	if (startingPoint)
+	{
+		glEnd();
+		glBegin(GL_LINE_STRIP);
+	}
+
+	if (PointsCrossBottomAxis(first, second))
+		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
+	else if (PointsCrossTopAxis(first, second))
+		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
+	else if (PointsCrossLeftAxis(first, second))
+		PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
+	else if (PointsCrossRightAxis(first, second))
+		PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
+	else
+		assert(false);
+
+	if (!startingPoint)
+	{
+		glEnd();
+		glBegin(GL_LINE_STRIP);
+	}
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PlotInterpolatedJumpPoints
+//
+// Description:		Plots the coordinate where the line between the specified
+//					indecies crosses out of/in to the plot area.  It is assumed
+//					that exactly two of the if clauses will evaluate true.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second) const
+{
+	glEnd();
+	glBegin(GL_LINE_STRIP);
+
+	if (PointsCrossBottomAxis(first, second))
+		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
+	if (PointsCrossTopAxis(first, second))
+		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
+	if (PointsCrossLeftAxis(first, second))
+		PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
+	if (PointsCrossRightAxis(first, second))
+		PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
+
+	glEnd();
+	glBegin(GL_LINE_STRIP);
 }
 
 //==========================================================================
@@ -639,7 +317,7 @@ bool PlotCurve::HasValidParameters(void)
 // Class:			PlotCurve
 // Function:		operator=
 //
-// Description:		Assignment operator for PLOT_CURVE class.
+// Description:		Assignment operator for PlotCurve class.
 //
 // Input Arguments:
 //		plotCurve	= const PlotCurve& to assign to this object
@@ -648,16 +326,14 @@ bool PlotCurve::HasValidParameters(void)
 //		None
 //
 // Return Value:
-//		PLOT_CURVE&, reference to this object
+//		PlotCurve&, reference to this object
 //
 //==========================================================================
 PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 {
-	// Check for self-assignment
 	if (this == &plotCurve)
 		return *this;
 
-	// Copy the important information using the base class's assignment operator
 	this->Primitive::operator=(plotCurve);
 
 	return *this;
@@ -710,4 +386,285 @@ void PlotCurve::RescalePoint(const double *value, int *coordinate) const
 
 	coordinate[0] = xAxis->ValueToPixel(value[0]);
 	coordinate[1] = yAxis->ValueToPixel(value[1]);
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointsCrossBottomAxis
+//
+// Description:		Determines whether or not the specified points span the
+//					bottom axis.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for crossing, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointsCrossBottomAxis(const unsigned int &first, const unsigned int &second) const
+{
+	if (!PointsCrossYOrdinate(first, second, yAxis->GetMinimum()))
+		return false;
+	
+	double crossing = GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum());
+	if (crossing < xAxis->GetMinimum() || crossing > xAxis->GetMaximum())
+		return false;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointsCrossTopAxis
+//
+// Description:		Determines whether or not the specified points span the
+//					top axis.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for crossing, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointsCrossTopAxis(const unsigned int &first, const unsigned int &second) const
+{
+	if (!PointsCrossYOrdinate(first, second, yAxis->GetMaximum()))
+		return false;
+	
+	double crossing = GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum());
+	if (crossing < xAxis->GetMinimum() || crossing > xAxis->GetMaximum())
+		return false;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointsCrossLeftAxis
+//
+// Description:		Determines whether or not the specified points span the
+//					left axis.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for crossing, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointsCrossLeftAxis(const unsigned int &first, const unsigned int &second) const
+{
+	if (!PointsCrossXOrdinate(first, second, xAxis->GetMinimum()))
+		return false;
+	
+	double crossing = GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum());
+	if (crossing < yAxis->GetMinimum() || crossing > yAxis->GetMaximum())
+		return false;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointsCrossRightAxis
+//
+// Description:		Determines whether or not the specified points span the
+//					right axis.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for crossing, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointsCrossRightAxis(const unsigned int &first, const unsigned int &second) const
+{
+	if (!PointsCrossXOrdinate(first, second, xAxis->GetMaximum()))
+		return false;
+	
+	double crossing = GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum());
+	if (crossing < yAxis->GetMinimum() || crossing > yAxis->GetMaximum())
+		return false;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointsCrossXOrdinate
+//
+// Description:		Determines whether or not the specified points span the
+//					specified x-value.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//		value	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for crossing, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointsCrossXOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const
+{
+	if ((data->GetXData(first) <= value && data->GetXData(second) >= value) ||
+		(data->GetXData(first) >= value && data->GetXData(second) <= value))
+		return true;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointsCrossYOrdinate
+//
+// Description:		Determines whether or not the specified points span the
+//					specified y-value.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//		value	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for crossing, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointsCrossYOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const
+{
+	if ((data->GetYData(first) <= value && data->GetYData(second) >= value) ||
+		(data->GetYData(first) >= value && data->GetYData(second) <= value))
+		return true;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointsJumpPlotArea
+//
+// Description:		Determines whether or not the specified points result in
+//					a line through the plot area without either point lying
+//					inside the plot area.  This assumes that neither point is
+//					within the plot area (must have been previously determined).
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for jumping, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointsJumpPlotArea(const unsigned int &first, const unsigned int &second) const
+{
+	unsigned int crossings(0);
+	crossings += (unsigned int)PointsCrossBottomAxis(first, second);
+	crossings += (unsigned int)PointsCrossTopAxis(first, second);
+	crossings += (unsigned int)PointsCrossLeftAxis(first, second);
+	crossings += (unsigned int)PointsCrossRightAxis(first, second);
+
+	assert(crossings == 0 || crossings == 2);
+
+	return crossings == 2;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		GetInterpolatedXOrdinate
+//
+// Description:		Interpolates to find the x-value most closesly matching
+//					the specified y-value.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//		yValue	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotCurve::GetInterpolatedXOrdinate(const unsigned int &first,
+	const unsigned int &second, const double &yValue) const
+{
+	double fraction;
+	if (yAxis->IsLogarithmic())
+		fraction = (log10(yValue) - log10(data->GetYData(first))) / (log10(data->GetYData(second)) - log10(data->GetYData(first)));
+	else
+		fraction = (yValue - data->GetYData(first)) / (data->GetYData(second) - data->GetYData(first));
+
+	if (PlotMath::IsNaN(fraction))
+		fraction = 1.0;
+
+	if (xAxis->IsLogarithmic())
+		return pow(data->GetXData(second), fraction) * pow(data->GetXData(first), 1.0 - fraction);
+	return data->GetXData(first) + (data->GetXData(second) - data->GetXData(first)) * fraction;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		GetInterpolatedYOrdinate
+//
+// Description:		Interpolates to find the y-value most closesly matching
+//					the specified x-value.
+//
+// Input Arguments:
+//		first	= const unsigned int&
+//		second	= const unsigned int&
+//		xValue	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotCurve::GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const
+{
+	double fraction;
+	if (xAxis->IsLogarithmic())
+		fraction = (log10(xValue) - log10(data->GetXData(first))) / (log10(data->GetXData(second)) - log10(data->GetXData(first)));
+	else
+		fraction = (xValue - data->GetXData(first)) / (data->GetXData(second) - data->GetXData(first));
+
+	if (PlotMath::IsNaN(fraction))
+		fraction = 1.0;
+
+	if (yAxis->IsLogarithmic())
+		return pow(data->GetYData(second), fraction) * pow(data->GetYData(first), 1.0 - fraction);
+
+	return data->GetYData(first) + (data->GetYData(second) - data->GetYData(first)) * fraction;
 }

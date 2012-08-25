@@ -170,6 +170,7 @@ private:
 	void GetAxisExtremes(const Dataset2D &data, Axis *yAxis);
 	void ResetOriginalLimits(void);
 	void MatchYAxes(const bool &leftFound, const bool &rightFound);
+	double GetFirstValidValue(const double* data, const unsigned int &size) const;
 };
 
 #endif// _PLOT_OBJECT_H_

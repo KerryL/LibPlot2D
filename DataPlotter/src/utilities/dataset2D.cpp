@@ -194,31 +194,23 @@ void Dataset2D::Resize(const unsigned int &_numberOfPoints)
 //==========================================================================
 void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 {
-	// Determine what type of delimiter to use
 	wxString extension(pathAndFileName.substr(pathAndFileName.find_last_of('.') + 1));
 	wxChar delimiter;
 	if (extension.Cmp(_T("txt")) == 0)
-		// Tab delimited
-		delimiter = '\t';
+		delimiter = '\t';// Tab delimited
 	else if (extension.Cmp(_T("csv")) == 0)
-		// Comma separated values
-		delimiter = ',';
+		delimiter = ',';// Comma separated values
 	else
 		return;
 
-	// Perform the save - open the file
 	std::ofstream exportFile(pathAndFileName.c_str(), std::ios::out);
-
-	// Warn the user if the file could not be opened failed
 	if (!exportFile.is_open() || !exportFile.good())
 		return;
 
-	// Write the information to file
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
 		exportFile << xData[i] << delimiter << yData[i] << std::endl;
 
-	// Close the file
 	exportFile.close();
 }
 
@@ -647,7 +639,7 @@ Dataset2D& Dataset2D::operator/=(const double &target)
 //==========================================================================
 const Dataset2D Dataset2D::operator+(const double &target) const
 {
-	Dataset2D result = *this;
+	Dataset2D result(*this);
 	result += target;
 
 	return result;
@@ -671,7 +663,7 @@ const Dataset2D Dataset2D::operator+(const double &target) const
 //==========================================================================
 const Dataset2D Dataset2D::operator-(const double &target) const
 {
-	Dataset2D result = *this;
+	Dataset2D result(*this);
 	result -= target;
 
 	return result;
@@ -695,7 +687,7 @@ const Dataset2D Dataset2D::operator-(const double &target) const
 //==========================================================================
 const Dataset2D Dataset2D::operator*(const double &target) const
 {
-	Dataset2D result = *this;
+	Dataset2D result(*this);
 	result *= target;
 
 	return result;
@@ -719,7 +711,7 @@ const Dataset2D Dataset2D::operator*(const double &target) const
 //==========================================================================
 const Dataset2D Dataset2D::operator/(const double &target) const
 {
-	Dataset2D result = *this;
+	Dataset2D result(*this);
 	result /= target;
 
 	return result;
@@ -802,6 +794,54 @@ Dataset2D& Dataset2D::ToPower(const double &target)
 
 //==========================================================================
 // Class:			Dataset2D
+// Function:		ToPower
+//
+// Description:		Element-wise application of ToPower method.
+//
+// Input Arguments:
+//		target	= const Dataset2D& indicating the power
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D& reference to this
+//
+//==========================================================================
+Dataset2D& Dataset2D::ToPower(const Dataset2D &target)
+{
+	assert(numberOfPoints == target.numberOfPoints);
+
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = pow(yData[i], target.GetYData(i));
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		ToPower
+//
+// Description:		Element-wise application of ToPower method.
+//
+// Input Arguments:
+//		target	= const Dataset2D& indicating the power
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D
+//
+//==========================================================================
+const Dataset2D Dataset2D::ToPower(const Dataset2D &target) const
+{
+	Dataset2D result(*this);
+	return result.ToPower(target);
+}
+
+//==========================================================================
+// Class:			Dataset2D
 // Function:		MultiplyXData
 //
 // Description:		Multiplies specified value with X vector.
@@ -818,8 +858,272 @@ Dataset2D& Dataset2D::ToPower(const double &target)
 //==========================================================================
 const Dataset2D Dataset2D::ToPower(const double &target) const
 {
-	Dataset2D result = *this;
-	result.ToPower(target);
+	Dataset2D result(*this);
+	return result.ToPower(target);;
+}
 
-	return result;
+//==========================================================================
+// Class:			Dataset2D
+// Function:		GetNumberOfZoomedPoints
+//
+// Description:		Returns the number of data points within the zoomed area.
+//					Assumes that the x-data is increasing only.
+//
+// Input Arguments:
+//		min	= const double&
+//		max	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int Dataset2D::GetNumberOfZoomedPoints(const double &min, const double &max) const
+{
+	unsigned int start(0), end(0);
+	while (start < numberOfPoints && xData[start] < min)
+		start++;
+	end = start;
+	while (end < numberOfPoints && xData[end] < max)
+		end++;
+
+	return end - start;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoLog
+//
+// Description:		Applies the log function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoLog(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = log(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoLog10
+//
+// Description:		Applies the log10 function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoLog10(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = log10(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoExp
+//
+// Description:		Applies the exp function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoExp(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = exp(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoAbs
+//
+// Description:		Applies the abs function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoAbs(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = abs(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoLog
+//
+// Description:		Applies the log function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D&
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoLog(void) const
+{
+	Dataset2D result(*this);
+	return result.DoLog();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoLog10
+//
+// Description:		Applies the log10 function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D&
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoLog10(void) const
+{
+	Dataset2D result(*this);
+	return result.DoLog10();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoExp
+//
+// Description:		Applies the exp function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D&
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoExp(void) const
+{
+	Dataset2D result(*this);
+	return result.DoExp();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoAbs
+//
+// Description:		Applies the abs function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D&
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoAbs(void) const
+{
+	Dataset2D result(*this);
+	return result.DoAbs();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		ApplyPower
+//
+// Description:		Raises the specified value to the power equal to the y-value
+//					of the dataset.
+//
+// Input Arguments:
+//		target	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::ApplyPower(const double &target)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = pow(target, yData[i]);
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		ApplyPower
+//
+// Description:		Raises the specified value to the power equal to the y-value
+//					of the dataset.
+//
+// Input Arguments:
+//		target	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D&
+//
+//==========================================================================
+const Dataset2D Dataset2D::ApplyPower(const double &target) const
+{
+	Dataset2D result(*this);
+	return result.ApplyPower(target);
 }

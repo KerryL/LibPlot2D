@@ -7,20 +7,20 @@
 
 ===================================================================================*/
 
-// File:  transferFunctionDialog.cpp
+// File:  frfDialog.cpp
 // Created:  8/15/2012
 // Author:  K. Loux
-// Description:  Dialog for selection of transfer function data
+// Description:  Dialog for selection of frequency response function data.
 // History:
 
 // Local headers
-#include "application/transferFunctionDialog.h"
+#include "application/frfDialog.h"
 
 //==========================================================================
-// Class:			TransferFunctionDialog
-// Function:		TransferFunctionDialog
+// Class:			FRFDialog
+// Function:		FRFDialog
 //
-// Description:		Constructor for TransferFunctionDialog class.
+// Description:		Constructor for FRFDialog class.
 //
 // Input Arguments:
 //		parent		= wxWindow* that owns this object
@@ -33,14 +33,14 @@
 //		None
 //
 //==========================================================================
-TransferFunctionDialog::TransferFunctionDialog(wxWindow *parent, const wxArrayString &descriptions)
-									 : wxDialog(parent, wxID_ANY, _T("Transfer Function"), wxDefaultPosition)
+FRFDialog::FRFDialog(wxWindow *parent, const wxArrayString &descriptions)
+									 : wxDialog(parent, wxID_ANY, _T("Frequency Response Function"), wxDefaultPosition)
 {
 	CreateControls(descriptions);
 }
 
 //==========================================================================
-// Class:			TransferFunctionDialog
+// Class:			FRFDialog
 // Function:		CreateControls
 //
 // Description:		Populates the dialog with controls.
@@ -55,23 +55,22 @@ TransferFunctionDialog::TransferFunctionDialog(wxWindow *parent, const wxArraySt
 //		None
 //
 //==========================================================================
-void TransferFunctionDialog::CreateControls(const wxArrayString &descriptions)
+void FRFDialog::CreateControls(const wxArrayString &descriptions)
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 5);
 
 	mainSizer->Add(CreateSelectionControls(descriptions));
+	mainSizer->Add(CreateCheckBoxes());
 	mainSizer->Add(CreateButtons(), 1, wxGROW);
 
-	// Set the sizer to this dialog
 	SetSizerAndFit(topSizer);
-
 	Center();
 }
 
 //==========================================================================
-// Class:			TransferFunctionDialog
+// Class:			FRFDialog
 // Function:		CreateSelectionControls
 //
 // Description:		Returns a sizer containing the selection controls.
@@ -86,7 +85,7 @@ void TransferFunctionDialog::CreateControls(const wxArrayString &descriptions)
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* TransferFunctionDialog::CreateSelectionControls(const wxArrayString &descriptions)
+wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *leftSizer = new wxBoxSizer(wxVERTICAL);
@@ -108,7 +107,38 @@ wxSizer* TransferFunctionDialog::CreateSelectionControls(const wxArrayString &de
 }
 
 //==========================================================================
-// Class:			TransferFunctionDialog
+// Class:			FRFDialog
+// Function:		CreateCheckBoxes
+//
+// Description:		Returns a sizer containing the check box controls.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxSizer*
+//
+//==========================================================================
+wxSizer *FRFDialog::CreateCheckBoxes(void)
+{
+	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+
+	phaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Phase Data"));
+	coherenceCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Coherence Data"));
+
+	phaseCheckBox->SetValue(true);
+
+	sizer->Add(phaseCheckBox, 0, wxALL, 5);
+	sizer->Add(coherenceCheckBox, 0, wxALL, 5);
+
+	return sizer;
+}
+
+//==========================================================================
+// Class:			FRFDialog
 // Function:		CreateButtons
 //
 // Description:		Returns a sizer containing the button controls.
@@ -123,7 +153,7 @@ wxSizer* TransferFunctionDialog::CreateSelectionControls(const wxArrayString &de
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* TransferFunctionDialog::CreateButtons(void)
+wxSizer* FRFDialog::CreateButtons(void)
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -137,7 +167,7 @@ wxSizer* TransferFunctionDialog::CreateButtons(void)
 }
 
 //==========================================================================
-// Class:			TransferFunctionDialog
+// Class:			FRFDialog
 // Function:		TransferDataFromWindow
 //
 // Description:		Validates selections (ensures there are selections).
@@ -152,7 +182,7 @@ wxSizer* TransferFunctionDialog::CreateButtons(void)
 //		bool, true if transfer is valid, false otherwise
 //
 //==========================================================================
-bool TransferFunctionDialog::TransferDataFromWindow(void)
+bool FRFDialog::TransferDataFromWindow(void)
 {
 	if (inputList->GetSelection() == wxNOT_FOUND || outputList->GetSelection() == wxNOT_FOUND)
 	{
@@ -165,7 +195,7 @@ bool TransferFunctionDialog::TransferDataFromWindow(void)
 }
 
 //==========================================================================
-// Class:			TransferFunctionDialog
+// Class:			FRFDialog
 // Function:		GetInputIndex
 //
 // Description:		Returns the input data index.
@@ -180,13 +210,13 @@ bool TransferFunctionDialog::TransferDataFromWindow(void)
 //		unsigned int
 //
 //==========================================================================
-unsigned int TransferFunctionDialog::GetInputIndex(void) const
+unsigned int FRFDialog::GetInputIndex(void) const
 {
 	return inputList->GetSelection();
 }
 
 //==========================================================================
-// Class:			TransferFunctionDialog
+// Class:			FRFDialog
 // Function:		GetOutputIndex
 //
 // Description:		Returns the output data index.
@@ -201,7 +231,49 @@ unsigned int TransferFunctionDialog::GetInputIndex(void) const
 //		unsigned int
 //
 //==========================================================================
-unsigned int TransferFunctionDialog::GetOutputIndex(void) const
+unsigned int FRFDialog::GetOutputIndex(void) const
 {
 	return outputList->GetSelection();
+}
+
+//==========================================================================
+// Class:			FRFDialog
+// Function:		GetComputePhase
+//
+// Description:		Indicates whether or not the user selected phase computation.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FRFDialog::GetComputePhase(void) const
+{
+	return phaseCheckBox->GetValue();
+}
+
+//==========================================================================
+// Class:			FRFDialog
+// Function:		GetComputeCoherence
+//
+// Description:		Indicates whether or not the user selected coherence computation.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FRFDialog::GetComputeCoherence(void) const
+{
+	return coherenceCheckBox->GetValue();
 }

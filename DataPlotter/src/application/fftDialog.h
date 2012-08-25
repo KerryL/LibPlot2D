@@ -19,16 +19,51 @@
 // wxWidgets headers
 #include <wx/wx.h>
 
+// Local headers
+#include "utilities/signals/fft.h"
+
 class FFTDialog : public wxDialog
 {
 public:
 	// Constructor
-	FFTDialog();
+	FFTDialog(wxWindow *parent, const unsigned int &_dataPoints,
+		const unsigned int &_zoomDataPoints, const double &_sampleTime);
+
+	FastFourierTransform::FFTWindow GetFFTWindow(void) const;
+	unsigned int GetWindowSize(void) const;
+	double GetOverlap(void) const;
+	bool GetUseZoomedData(void) const;
 
 private:
-	virtual void OnOKButton(wxCommandEvent &event);
+	void CreateControls(void);
+	wxSizer* CreateInputControls(void);
+	wxSizer* CreateOutputControls(void);
+	wxSizer* CreateButtons(void);
+	void ConfigureControls(void);
+
+	unsigned int dataPoints;
+	unsigned int zoomDataPoints;
+	double sampleTime;
+
+	unsigned int GetPointCount(void) const;
+
+	wxComboBox *windowSizeCombo;
+	wxComboBox *windowCombo;
+	wxTextCtrl *overlapTextBox;
+	wxCheckBox *useZoomCheckBox;
+
+	wxStaticText *frequencyRange;
+	wxStaticText *frequencyResolution;
+	wxStaticText *numberOfAverages;
 
 	virtual bool TransferDataFromWindow(void);
+
+	void OnCheckBoxEvent(wxCommandEvent &event);
+	void OnComboBoxEvent(wxCommandEvent &event);
+	void OnTextBoxEvent(wxCommandEvent &event);
+
+	wxArrayString GetWindowList(void) const;
+	void UpdateOutputControls(void);
 
 	DECLARE_EVENT_TABLE()
 };

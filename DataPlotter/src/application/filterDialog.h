@@ -89,8 +89,9 @@ private:
 	virtual bool TransferDataFromWindow(void);
 
 	void HandleSpin(wxSpinEvent &event);
-	void SetCorrectLimits(void);
 	bool OrderIsValid(const unsigned int &order) const;
+	void UpdateSpin(void);
+	void UpdateDamping(void);
 
 	FilterParameters::Type GetType(void) const;
 	unsigned int GetMinOrder(const FilterParameters::Type &type) const;

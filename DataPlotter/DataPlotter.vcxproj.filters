@@ -165,7 +165,7 @@
     <ClInclude Include="src\application\fftDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\transferFunctionDialog.h">
+    <ClInclude Include="src\application\frfDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
   </ItemGroup>
@@ -272,7 +272,7 @@
     <ClCompile Include="src\application\fftDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\transferFunctionDialog.cpp">
+    <ClCompile Include="src\application\frfDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
   </ItemGroup>

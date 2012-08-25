@@ -99,7 +99,7 @@
     <ClInclude Include="src\application\plotObject.h" />
     <ClInclude Include="src\application\plotterApp.h" />
     <ClInclude Include="src\application\rangeLimitsDialog.h" />
-    <ClInclude Include="src\application\transferFunctionDialog.h" />
+    <ClInclude Include="src\application\frfDialog.h" />
     <ClInclude Include="src\renderer\color.h" />
     <ClInclude Include="src\renderer\plotRenderer.h" />
     <ClInclude Include="src\renderer\primitives\axis.h" />
@@ -138,7 +138,7 @@
     <ClCompile Include="src\application\plotObject.cpp" />
     <ClCompile Include="src\application\plotterApp.cpp" />
     <ClCompile Include="src\application\rangeLimitsDialog.cpp" />
-    <ClCompile Include="src\application\transferFunctionDialog.cpp" />
+    <ClCompile Include="src\application\frfDialog.cpp" />
     <ClCompile Include="src\renderer\color.cpp" />
     <ClCompile Include="src\renderer\plotRenderer.cpp" />
     <ClCompile Include="src\renderer\primitives\axis.cpp" />

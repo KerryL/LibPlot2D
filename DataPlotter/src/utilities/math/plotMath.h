@@ -38,15 +38,20 @@ namespace PlotMath
 	bool IsZero(const double &toCheck);
 	bool IsZero(const Vector &toCheck);
 
-	// Checks to see if a value is not a number
-	bool IsNaN(const double &toCheck);
-	bool IsNaN(const Vector &toCheck);
+	template<typename T>
+	bool IsNaN(const T &value);
+
+	template<typename T>
+	bool IsInf(const T &value);
+
+	template<typename T>
+	bool IsValid(const T &value);
 
 	// Ensure the value is between two definined limits
 	double Clamp(const double &value, const double &lowerLimit, const double &upperLimit);
 
-	// Converts the angle to be between -PI and PI
-	double RangeToPlusMinusPi(const double &_angle);
+	// Converts the angle to be between -Pi and Pi
+	double RangeToPlusMinusPi(const double &angle);
 
 	// Returns the sign of the argument
 	double Sign(const double &value);
@@ -56,6 +61,74 @@ namespace PlotMath
 
 	Dataset2D ApplyBitMask(const Dataset2D &data, const unsigned int &bit);
 	unsigned int ApplyBitMask(const unsigned &value, const unsigned int &bit);
+}
+
+// Template methods must be defined here:
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		IsNaN
+//
+// Description:		Determines if the specified number is or is not a number.
+//
+// Input Arguments:
+//		value	= const T& to check
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if the argument is NOT a number
+//
+//==========================================================================
+template<typename T>
+bool PlotMath::IsNaN(const T &value)
+{
+	return value != value;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		IsInf
+//
+// Description:		Determines if the specified number is infinite.
+//
+// Input Arguments:
+//		value	= const T&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if the argument is ininite
+//
+//==========================================================================
+template<typename T>
+bool PlotMath::IsInf(const T &value)
+{
+	return std::numeric_limits<T>::has_infinity &&
+		value == std::numeric_limits<T>::infinity();
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		IsValid
+//
+// Description:		Determines if the specified value is a valid number.
+//
+// Input Arguments:
+//		value	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if the argument is valid
+//
+//==========================================================================
+template<typename T>
+bool PlotMath::IsValid(const T &value)
+{
+	return !IsNaN<T>(value) && !IsInf<T>(value);
 }
 
 #endif// _PLOT_MATH_H_

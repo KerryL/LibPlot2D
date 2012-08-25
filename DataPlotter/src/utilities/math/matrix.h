@@ -27,15 +27,15 @@ class Matrix
 public:
 	// Constructors
 	Matrix();
-	Matrix(const unsigned int &_Rows, const unsigned int &_Columns);
-	Matrix(const unsigned int &_Rows, const unsigned int &_Columns, double Element1, ...);
+	Matrix(const unsigned int &_rows, const unsigned int &_columns);
+	Matrix(const unsigned int &_rows, const unsigned int &_columns, double element1, ...);
 	Matrix(const Matrix &matrix);
 
 	// Destructor
 	~Matrix();
 
 	// Sets the values of all of the elements
-	void Set(double Element1, ...);
+	void Set(double element1, ...);
 
 	// Make all elements zero
 	void Zero(void);
@@ -67,20 +67,20 @@ public:
 	wxString Print(void) const;
 
 	// Operators
-	Matrix& operator += (const Matrix &target);
-	Matrix& operator -= (const Matrix &target);
-	Matrix& operator *= (const Matrix &target);
-	Matrix& operator *= (const double &target);
-	Matrix& operator /= (const double &target);
-	Matrix& operator = (const Matrix &target);
-	double &operator () (const unsigned int &row, const unsigned int &column);
-	const Matrix operator + (const Matrix &target) const;
-	const Matrix operator - (const Matrix &target) const;
-	const Matrix operator * (const Matrix &target) const;
-	const Matrix operator * (const double &target) const;
-	const Vector operator * (const Vector &target) const;
-	const Matrix operator / (const double &target) const;
-	const double &operator () (const unsigned int &row, const unsigned int &column) const;
+	Matrix& operator+=(const Matrix &target);
+	Matrix& operator-=(const Matrix &target);
+	Matrix& operator*=(const Matrix &target);
+	Matrix& operator*=(const double &target);
+	Matrix& operator/=(const double &target);
+	Matrix& operator=(const Matrix &target);
+	double &operator()(const unsigned int &row, const unsigned int &column);
+	const Matrix operator+(const Matrix &target) const;
+	const Matrix operator-(const Matrix &target) const;
+	const Matrix operator*(const Matrix &target) const;
+	const Matrix operator*(const double &target) const;
+	const Vector operator*(const Vector &target) const;
+	const Matrix operator/(const double &target) const;
+	const double &operator()(const unsigned int &row, const unsigned int &column) const;
 
 	// Common matrix operations ------------------------------------
 	bool GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) const;
@@ -107,6 +107,11 @@ private:
 
 	// Helper function for SVD algorithm
 	double pythag(const double& a, const double &b) const;
+
+	Matrix& SwapRows(const unsigned int &r1, const unsigned int &r2);
+
+	// Helper function for row reduction
+	void ZeroRowByScalingAndAdding(const unsigned int &pivotRow, const unsigned int &pivotColumn, const unsigned int &targetRow);
 };
 
 #endif// _MATRIX_H_

@@ -546,12 +546,12 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //==========================================================================
 void Axis::DrawAxisLabel(void) const
 {
-	// FIXME:  Should add something here to center text over the plot area, not the render window
+	// TODO:  Should add something here to center text over the plot area, not the render window
 	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
 
-	// FIXME:  Change plot dimension if there is a title? or if there is a title and a label for the top axis?
+	// TODO:  Change plot dimension if there is a title? or if there is a title and a label for the top axis?
 	FTBBox boundingBox = font->BBox("H");// Some capital letter to assure uniform spacing
 	double yTranslation = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.Upper().Y());
 
@@ -648,7 +648,7 @@ void Axis::DrawTickLabels(void)
 	ComputeGridAndTickCounts(numberOfTicks);
 	for (tick = 0; tick < numberOfTicks + 2; tick++)
 	{
-		value = GetNextTickValue(tick == 0, tick == numberOfTicks + 1, tick);
+		value = std::min(GetNextTickValue(tick == 0, tick == numberOfTicks + 1, tick), maximum);
 		valueLabel.Printf("%0.*f", precision, value);
 
 		glPushMatrix();
@@ -681,12 +681,18 @@ void Axis::DrawTickLabels(void)
 unsigned int Axis::GetPrecision(void) const
 {
 	unsigned int precision;
-	if (log10(majorResolution) >= 0.0)
+	double baseValue;
+	if (logarithmic)
+		baseValue = minimum;
+	else
+		baseValue = majorResolution;
+
+	if (log10(baseValue) >= 0.0)
 		precision = 0;
 	else
-		precision = -log10(majorResolution) + 1;
+		precision = -log10(baseValue) + 1;
 
-	precision += 2;// This is the change from 5/7/2011
+	precision += 2;
 
 	return precision;
 }

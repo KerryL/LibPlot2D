@@ -16,6 +16,9 @@
 #ifndef _FFT_H_
 #define _FFT_H_
 
+// Standard C++ headers
+#include <string>
+
 // Local forward declarations
 class Dataset2D;
 
@@ -29,14 +32,24 @@ public:
 		WindowHamming,
 		WindowFlatTop,
 		/*WindowForce,
-		WindowExponential*/
+		WindowExponential,*/
+		WindowCount
 	};
 
 	static Dataset2D ComputeFFT(const Dataset2D &data);
-	static void ComputeTransferFunction(const Dataset2D &input, const Dataset2D &output,
-		Dataset2D &amplitude, Dataset2D &phase);
-	static Dataset2D ComputeCrossPowerSpectrum(const Dataset2D &set1, const Dataset2D &set2);
+	static Dataset2D ComputeFFT(const Dataset2D &data, const FFTWindow &window,
+		unsigned int windowSize, const double &overlap);
+	static void ComputeFRF(const Dataset2D &input, const Dataset2D &output,
+		Dataset2D &amplitude, Dataset2D *phase = NULL, Dataset2D *coherence = NULL);
+	static Dataset2D ComputeCrossPowerSpectrum(const Dataset2D &input, const Dataset2D &output);
 	static Dataset2D ComputePowerSpectrum(const Dataset2D &set);
+	static Dataset2D ComputeCoherence(const Dataset2D& input, const Dataset2D& output);
+
+	static unsigned int GetNumberOfAverages(const unsigned int windowSize,
+		const double &overlap, const unsigned int &dataSize);
+
+	static std::string GetWindowName(const FFTWindow &window);
+	static unsigned int GetMaxPowerOfTwo(const unsigned int &sampleSize);
 
 private:
 	static void ApplyWindow(Dataset2D &data, const FFTWindow &window);
@@ -46,10 +59,14 @@ private:
 	/*static void ApplyForceWindow(Dataset2D &data);
 	static void ApplyExponentialWindow(Dataset2D &data);*/
 
-	static void DoBitReversal(const unsigned int &fftPoints, Dataset2D &set);
-	static void DoFFT(const unsigned int &powerOfTwo, const unsigned int &fftPoints, Dataset2D &temp);
+	static void DoBitReversal(Dataset2D &set);
+	static void DoFFT(Dataset2D &temp);
 
 	static Dataset2D ConvertDoubleSidedToSingleSided(const Dataset2D &fullSpectrum);
+
+	static Dataset2D ChopSample(const Dataset2D &data, const unsigned int &sample,
+		const unsigned int &windowSize, const double &overlap);
+	static void AddToAverage(Dataset2D &average, const Dataset2D &data, const unsigned int &count);
 
 	static void ConvertAmplitudeToDecibels(Dataset2D &fft);
 	static void PopulateFrequencyData(Dataset2D &data, const double &sampleRate);
@@ -58,11 +75,13 @@ private:
 	static Dataset2D GetPhaseData(const Dataset2D &rawFFT, const double &sampleRate);
 
 	static Dataset2D ComputeRawFFT(const Dataset2D &data, const FFTWindow &window);
-	static void InitializeRawFFTDataset(Dataset2D &rawFFT, const Dataset2D &data,
-		const unsigned int &numberOfPoints, const FFTWindow &window);
+	static void InitializeRawFFTDataset(Dataset2D &rawFFT, const Dataset2D &data, const FFTWindow &window);
 
 	static Dataset2D ComplexMultiply(const Dataset2D &a, const Dataset2D &b);
 	static Dataset2D ComplexDivide(const Dataset2D &a, const Dataset2D &b);
+
+	static Dataset2D ComplexMagnitude(const Dataset2D &a);
+	static Dataset2D ComplexPower(const Dataset2D &a, const double &power);
 };
 
 #endif// _FFT_H_

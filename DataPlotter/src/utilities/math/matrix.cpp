@@ -70,13 +70,10 @@ Matrix::Matrix()
 //==========================================================================
 Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns)
 {
-	// Initialize the number of rows and columns
 	rows = _rows;
 	columns = _columns;
 
 	AllocateElements();
-
-	// Initialize the matrix
 	Zero();
 }
 
@@ -103,21 +100,18 @@ Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns)
 //==========================================================================
 Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns, double element1, ...)
 {
-	// Initialize the number of rows and columns
 	rows = _rows;
 	columns = _columns;
 
 	AllocateElements();
 
-	// Declare a va_list macro and initialize it with va_start
 	va_list argumentList;
 	va_start(argumentList, element1);
 
-	// Assign the first element
 	elements[0][0] = element1;
 
 	// Fill all of the elements with the arguments
-	// FIXME:  There is no check to make sure the correct number of elements was
+	// NOTE:  There is no check to make sure the correct number of elements was
 	// passed!  This could result in runtime crash or wrong calculations!
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
@@ -129,7 +123,6 @@ Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns, double e
 		}
 	}
 
-	// Terminate the variable argument list
 	va_end(argumentList);
 }
 
@@ -151,12 +144,10 @@ Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns, double e
 //==========================================================================
 Matrix::Matrix(const Matrix &matrix)
 {
-	// Initialize the elements pointer
 	elements = NULL;
 	rows = 0;
 	columns = 0;
 
-	// Copy from the argument to this
 	*this = matrix;
 }
 
@@ -178,7 +169,6 @@ Matrix::Matrix(const Matrix &matrix)
 //==========================================================================
 Matrix::~Matrix()
 {
-	// Delete the elements
 	FreeElements();
 }
 
@@ -203,10 +193,8 @@ Matrix::~Matrix()
 //==========================================================================
 void Matrix::SetElement(const unsigned int &row, const unsigned int &column, const double &value)
 {
-	// Check to make sure it is a valid index
 	assert(row < rows && column < columns);
 
-	// Set the element as requested
 	elements[row][column] = value;
 }
 
@@ -232,15 +220,13 @@ void Matrix::SetElement(const unsigned int &row, const unsigned int &column, con
 //==========================================================================
 void Matrix::Set(double element1, ...)
 {
-	// Declare a va_list macro and initialize it with va_start
 	va_list argumentList;
 	va_start(argumentList, element1);
 
-	// Assign the first element
 	elements[0][0] = element1;
 
 	// Fill all of the elements with the arguments
-	// FIXME:  There is no check to make sure the correct number of elements was
+	// NOTE:  There is no check to make sure the correct number of elements was
 	// passed!  This could result in runtime crash or wrong calculations!
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
@@ -252,7 +238,6 @@ void Matrix::Set(double element1, ...)
 		}
 	}
 
-	// Terminate the variable argument list
 	va_end(argumentList);;
 }
 
@@ -275,7 +260,6 @@ void Matrix::Set(double element1, ...)
 //==========================================================================
 double Matrix::GetElement(const int &row, const int &column) const
 {
-	// Return the element at the specified location
 	return elements[row][column];
 }
 
@@ -297,10 +281,8 @@ double Matrix::GetElement(const int &row, const int &column) const
 //==========================================================================
 Matrix& Matrix::MakeIdentity(void)
 {
-	// Set everything to zero
 	Zero();
 
-	// Make the diagonal elements 1.0
 	unsigned int i;
 	for (i = 0; i < GetMinimumDimension(); i++)
 		elements[i][i] = 1.0;
@@ -326,7 +308,6 @@ Matrix& Matrix::MakeIdentity(void)
 //==========================================================================
 void Matrix::Zero(void)
 {
-	// Go through all of the elements setting everything to zero
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
@@ -360,10 +341,8 @@ Matrix Matrix::GetSubMatrix(const unsigned int &startRow, const unsigned int &st
 {
 	assert(startRow + subRows < rows && startColumn + subColumns < columns);
 
-	// Our return matrix
 	Matrix subMatrix(subRows, subColumns);
 
-	// Assign the values for the sub-matrix
 	unsigned int i, j;
 	for (i = 0; i < subRows; i++)
 	{
@@ -435,7 +414,7 @@ Matrix Matrix::LeftDivide(const Matrix &b) const
 
 	if (!GetSingularValueDecomposition(U, V, W))
 	{
-		// FIXME:  Generate an error?
+		// TODO:  Generate an error?
 		return *this;
 	}
 
@@ -490,13 +469,10 @@ const Vector Matrix::operator * (const Vector &target) const
 //==========================================================================
 Matrix& Matrix::operator *= (const Matrix &target)
 {
-	// Make sure the inner dimensions match
 	assert(columns == target.rows);
 
-	// Store the information contained in this matrix
 	Matrix result(rows, target.columns);
 
-	// Now do the multiplication, storing the results in this matrix
 	unsigned int counter, i, j;
 	for (i = 0; i < result.rows; i++)
 	{
@@ -508,7 +484,6 @@ Matrix& Matrix::operator *= (const Matrix &target)
 		}
 	}
 
-	// Assign the result to this
 	*this = result;
 	
 	return *this;
@@ -532,13 +507,11 @@ Matrix& Matrix::operator *= (const Matrix &target)
 //==========================================================================
 Matrix& Matrix::operator = (const Matrix &target)
 {
-	// Check for self assignment
 	if (this == &target)
 		return *this;
 
 	Resize(target.rows, target.columns);
 
-	// Now assign the elements one by one
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
@@ -567,10 +540,8 @@ Matrix& Matrix::operator = (const Matrix &target)
 //==========================================================================
 Matrix& Matrix::operator += (const Matrix &target)
 {
-	// Make sure dimensions match
 	assert(columns == target.columns && rows == target.rows);
 
-	// Add target to this element by element
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
@@ -599,10 +570,8 @@ Matrix& Matrix::operator += (const Matrix &target)
 //==========================================================================
 Matrix& Matrix::operator -= (const Matrix &target)
 {
-	// Make sure dimensions match
 	assert(columns == target.columns && rows == target.rows);
 
-	// Add target to this element by element
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
@@ -632,7 +601,6 @@ Matrix& Matrix::operator -= (const Matrix &target)
 //==========================================================================
 Matrix& Matrix::operator *=(const double &target)
 {
-	// Add target to this element by element
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
@@ -662,7 +630,6 @@ Matrix& Matrix::operator *=(const double &target)
 //==========================================================================
 Matrix& Matrix::operator /=(const double &target)
 {
-	// Add target to this element by element
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
@@ -693,14 +660,11 @@ wxString Matrix::Print(void) const
 {
 	wxString temp, intermediate;
 
-	// Go row-by-row
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
-		// Go col-by-col
 		for (j = 0; j < columns; j++)
 		{
-			// Add the current element to the temporary string
 			intermediate.Printf("%7.3f\t", elements[i][j]);
 			temp.Append(intermediate);
 		}
@@ -716,7 +680,7 @@ wxString Matrix::Print(void) const
 // Class:			Matrix
 // Function:		GetRowReduced
 //
-// Description:		Performs row-reduction on this object until the matrix
+// Description:		Performs row-reduction on copy of this until the matrix
 //					is upper-triangular.
 //
 // Input Arguments:
@@ -731,69 +695,35 @@ wxString Matrix::Print(void) const
 //==========================================================================
 Matrix Matrix::GetRowReduced(void) const
 {
-	unsigned int curCol, curRow, pivotCol(0), pivotRow;
-	double factor;
+	unsigned int curRow, pivotCol(0), pivotRow;
 	Matrix reduced(*this);
 
 	for (pivotRow = 0; pivotRow < GetMinimumDimension(); pivotRow++)
 	{
-		// Make sure the pivot is non-zero
-		// If it is zero, move the row to the bottom and start over
-		// (or if it is all zeros below, then advance to the next column)
 		if (!PlotMath::IsZero(reduced.elements[pivotRow][pivotCol]))
 		{
 			for (curRow = pivotRow + 1; curRow < rows; curRow++)
 			{
-				// Scale the pivot row and add it to this row such that the
-				// element of this row in the pivot column becomes zero
 				if (!PlotMath::IsZero(reduced.elements[curRow][pivotCol]))
-				{
-					factor = reduced.elements[pivotRow][pivotCol] /
-						reduced.elements[curRow][pivotCol];
-
-					for (curCol = pivotCol; curCol < columns; curCol++)
-						reduced.elements[curRow][curCol] =
-							reduced.elements[curRow][curCol] * factor -
-							reduced.elements[pivotRow][curCol];
-				}
+					reduced.ZeroRowByScalingAndAdding(pivotRow, pivotCol, curRow);
 			}
 		}
 		else
 		{
-			// Find a non-zero row to swap with
 			for (curRow = pivotRow + 1; curRow < rows; curRow++)
 			{
 				if (!PlotMath::IsZero(reduced.elements[curRow][pivotCol]))
 				{
-					double temp;
-					for (curCol = pivotCol; curCol < columns; curCol++)
-					{
-						temp = reduced.elements[pivotRow][curCol];
-						reduced.elements[pivotRow][curCol] =
-							reduced.elements[curRow][curCol];
-						reduced.elements[curRow][curCol] = temp;
-					}
-
-					// Decrement the pivot column because we need it to
-					// be the pivot column again
+					reduced.SwapRows(pivotRow, curRow);
 					pivotCol--;
-
-					// We did the swap, so we can stop searching
 					break;
 				}
 			}
 
-			// If we didn't find anything, we just move on, but we
-			// decrement the pivot row because we need it to be the
-			// pivot row again
 			pivotRow--;
 		}
 
-		// Increment the pivot column
 		pivotCol++;
-
-		// If we get all the way to the end of the matrix and don't find
-		// anything, then we're done!
 		if (pivotCol >= columns)
 			break;
 	}
@@ -803,7 +733,67 @@ Matrix Matrix::GetRowReduced(void) const
 
 //==========================================================================
 // Class:			Matrix
-// Function:		operator +
+// Function:		SwapRows
+//
+// Description:		Swaps the values in the specified rows.
+//
+// Input Arguments:
+//		r1	= const unsigned int&
+//		r2	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Matrix&, reference to this
+//
+//==========================================================================
+Matrix& Matrix::SwapRows(const unsigned int &r1, const unsigned int &r2)
+{
+	double swap;
+	unsigned int i;
+	for (i = 0; i < columns; i++)
+	{
+		swap = elements[r1][i];
+		elements[r1][i] = elements[r2][i];
+		elements[r2][i] = swap;
+	}
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		ZeroRowByScalingAndAdding
+//
+// Description:		Makes the element at (targtRow, pivotColumn) zero by scaling
+//					the target row and adding it to the pivot row.
+//
+// Input Arguments:
+//		pivotrow		= const unsigned int&
+//		pivotColumn		= const unsigned int&
+//		targetColumn	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Matrix::ZeroRowByScalingAndAdding(const unsigned int &pivotRow,
+	const unsigned int &pivotColumn, const unsigned int &targetRow)
+{
+	double factor = elements[pivotRow][pivotColumn] / elements[targetRow][pivotColumn];
+
+	unsigned int i;
+	for (i = pivotColumn; i < columns; i++)
+		elements[targetRow][i] = elements[targetRow][i] * factor - elements[pivotRow][i];
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		operator+
 //
 // Description:		Addition operator for the Matrix class.
 //
@@ -817,7 +807,7 @@ Matrix Matrix::GetRowReduced(void) const
 //		Matrix contining the result of the addition
 //
 //==========================================================================
-const Matrix Matrix::operator + (const Matrix &target) const
+const Matrix Matrix::operator+(const Matrix &target) const
 {
 	// Create the return matrix
 	Matrix temp(target.rows, target.columns);
@@ -831,7 +821,7 @@ const Matrix Matrix::operator + (const Matrix &target) const
 
 //==========================================================================
 // Class:			Matrix
-// Function:		operator -
+// Function:		operator-
 //
 // Description:		Subtraction operator for the Matrix class.
 //
@@ -845,7 +835,7 @@ const Matrix Matrix::operator + (const Matrix &target) const
 //		const Matrix contining the result of the subtraction
 //
 //==========================================================================
-const Matrix Matrix::operator - (const Matrix &target) const
+const Matrix Matrix::operator-(const Matrix &target) const
 {
 	// Create the return matrix
 	Matrix temp(target.rows, target.columns);
@@ -859,7 +849,7 @@ const Matrix Matrix::operator - (const Matrix &target) const
 
 //==========================================================================
 // Class:			Matrix
-// Function:		operator *
+// Function:		operator*
 //
 // Description:		Multiplication operator for the Matrix class.
 //
@@ -873,7 +863,7 @@ const Matrix Matrix::operator - (const Matrix &target) const
 //		const Matrix contining the result of the multiplication
 //
 //==========================================================================
-const Matrix Matrix::operator * (const Matrix &target) const
+const Matrix Matrix::operator*(const Matrix &target) const
 {
 	// Create the return matrix
 	Matrix temp(target.rows, target.columns);
@@ -887,7 +877,7 @@ const Matrix Matrix::operator * (const Matrix &target) const
 
 //==========================================================================
 // Class:			Matrix
-// Function:		operator *
+// Function:		operator*
 //
 // Description:		Element-wise multiplication operator for the Matrix class.
 //
@@ -1017,7 +1007,7 @@ Matrix Matrix::GetInverse(void) const
 	if (!IsSquare() || GetRank() != rows)
 		return GetPsuedoInverse();
 
-	// FIXME:  I'm not sure there is a point to having two inverse methods?
+	// NOTE:  I'm not sure there is a point to having two inverse methods?
 	return GetPsuedoInverse();
 }
 
@@ -1047,7 +1037,7 @@ Matrix Matrix::GetPsuedoInverse(void) const
 
 	if (!GetSingularValueDecomposition(U, V, W))
 	{
-		// FIXME:  Generate an error?
+		// TODO:  Generate an error?
 		return *this;
 	}
 
@@ -1138,7 +1128,7 @@ double Matrix::pythag(const double& a, const double &b) const
 //==========================================================================
 unsigned int Matrix::GetRank(void) const
 {
-	// FIXME:  Is it better to use SVD for this?  Rank = # of non-zero singular values
+	// TODO:  Is it better to use SVD for this?  Rank = # of non-zero singular values
 	Matrix reduced = GetRowReduced();
 
 	unsigned int rank(0), curRow, curCol;
@@ -1261,7 +1251,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 	U.Resize(rows, columns);
 	W.Resize(columns, columns);
 	//U.Resize(rows, rows);// Minimal solution has these dimensions, but
-	//W.Resize(rows, columns);// apparently this algorithm does not compute this solution
+	//W.Resize(rows, columns);// apparently this algorithm does not compute the minimal solution
 	W.Zero();
 	V.Resize(columns, columns);
 

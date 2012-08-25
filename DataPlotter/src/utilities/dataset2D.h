@@ -40,8 +40,11 @@ public:
 	void Reverse(void);
 
 	unsigned int GetNumberOfPoints(void) const { return numberOfPoints; };
+	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;
 	double *GetXPointer(void) { return xData; };
 	double *GetYPointer(void) { return yData; };
+	const double *GetXPointer(void) const { return xData; };
+	const double *GetYPointer(void) const { return yData; };
 	double GetXData(const unsigned int &i) const { assert(i < numberOfPoints); return xData[i]; };
 	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; };
 
@@ -75,7 +78,20 @@ public:
 	const Dataset2D operator%(const double &target) const;
 
 	Dataset2D& ToPower(const double &target);
+	Dataset2D& ToPower(const Dataset2D &target);
+	Dataset2D& ApplyPower(const double &target);
+	Dataset2D& DoLog(void);
+	Dataset2D& DoLog10(void);
+	Dataset2D& DoExp(void);
+	Dataset2D& DoAbs(void);
+
 	const Dataset2D ToPower(const double &target) const;
+	const Dataset2D ToPower(const Dataset2D &target) const;
+	const Dataset2D ApplyPower(const double &target) const;
+	const Dataset2D DoLog(void) const;
+	const Dataset2D DoLog10(void) const;
+	const Dataset2D DoExp(void) const;
+	const Dataset2D DoAbs(void) const;
 
 private:
 	// The number of points contained within this object

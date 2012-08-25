@@ -26,7 +26,8 @@
 // Function:		ComputeFFT (static)
 //
 // Description:		Computes the fast fourier transform for the given signal.
-//					Assumes y contains data and x is time.
+//					Assumes y contains data and x is time.  Quick version -
+//					all default options are used.
 //
 // Input Arguments:
 //		_data	= const Dataset2D& referring to the data of interest
@@ -40,10 +41,47 @@
 //==========================================================================
 Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data)
 {
+	return ComputeFFT(data, WindowHann, 0, 0.0);
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		ComputeFFT (static)
+//
+// Description:		Computes the fast fourier transform for the given signal.
+//					Assumes y contains data and x is time.  This overload
+//					contains all specifiable parameters.
+//
+// Input Arguments:
+//		_data		= const Dataset2D& referring to the data of interest
+//		window		= const FFTWindow&
+//		windowSize	= unsigned int, number of points in each sample;
+//					  zero uses max sample size
+//		overlap		= const double&, percentage overlap (0.0 - 1.0) between
+//					  adjacent samples
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D containing the FFT results
+//
+//==========================================================================
+Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data, const FFTWindow &window,
+		unsigned int windowSize, const double &overlap)
+{
 	double sampleRate = 1.0 / (data.GetXData(1) - data.GetXData(0));// [Hz]
 
-	Dataset2D rawFFT = ComputeRawFFT(data, WindowHann);
-	Dataset2D fft = GetAmplitudeData(rawFFT, sampleRate);
+	if (windowSize == 0)
+		windowSize = (unsigned int)pow(2, (double)GetMaxPowerOfTwo(data.GetNumberOfPoints()));
+
+	Dataset2D rawFFT, fft;
+	unsigned int i, count = GetNumberOfAverages(windowSize, overlap, data.GetNumberOfPoints());
+	for (i = 0; i < count; i++)
+	{
+		rawFFT = ComputeRawFFT(ChopSample(data, i, windowSize, overlap), window);
+		AddToAverage(fft, GetAmplitudeData(rawFFT, sampleRate), count);
+	}
 	fft = ConvertDoubleSidedToSingleSided(fft);
 	//ConvertAmplitudeToDecibels(fft);// Appearance can be achieved with log scaled y-axis, so don't force it on them
 
@@ -52,10 +90,110 @@ Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data)
 
 //==========================================================================
 // Class:			FastFourierTransform
+// Function:		GetMaxPowerOfTwo (static)
+//
+// Description:		Returns the max allowable window size given the number of
+//					data points.
+//
+// Input Arguments:
+//		sampleSize	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int FastFourierTransform::GetMaxPowerOfTwo(const unsigned int &sampleSize)
+{
+	return (unsigned int)(log((double)sampleSize) / log(2.0));
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		ChopSample (static)
+//
+// Description:		Chops the specified sample from the data.
+//
+// Input Arguments:
+//		data		= const Dataset2D&
+//		sample		= const unsigned int&
+//		windowSize	= const unsigned int&
+//		overlap		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D FastFourierTransform::ChopSample(const Dataset2D &data, const unsigned int &sample,
+	const unsigned int &windowSize, const double &overlap)
+{
+	assert(overlap >= 0.0 && overlap <= 1.0 && windowSize > 0);
+
+	unsigned int overlapSize = (unsigned int)(overlap * (double)windowSize);
+	if (overlapSize >= windowSize)
+		overlapSize = windowSize - 1;
+	unsigned int start = sample * (windowSize - overlapSize);
+
+	assert(start + windowSize <= data.GetNumberOfPoints());
+
+	Dataset2D chopped(windowSize);
+	unsigned int i;
+	for (i = 0; i < windowSize; i++)
+	{
+		chopped.GetXPointer()[i] = data.GetXData(start + i);
+		chopped.GetYPointer()[i] = data.GetYData(start + i);
+	}
+
+	return chopped;
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		AddToAverage (static)
+//
+// Description:		Adds the data to the average.  Initializes the average
+//					if it is empty.
+//
+// Input Arguments:
+//		average	= Dataset2D& (input and output)
+//		data	= const Dataset2D&
+//		count	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FastFourierTransform::AddToAverage(Dataset2D &average, const Dataset2D &data, const unsigned int &count)
+{
+	unsigned int i;
+	if (average.GetNumberOfPoints() == 0)
+	{
+		average.Resize(data.GetNumberOfPoints());
+		for (i = 0; i < average.GetNumberOfPoints(); i++)
+		{
+			average.GetXPointer()[i] = data.GetXData(i);
+			average.GetYPointer()[i] = 0.0;
+		}
+	}
+
+	for (i = 0; i < average.GetNumberOfPoints(); i++)
+		average.GetYPointer()[i] += data.GetYData(i) / double(count);
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
 // Function:		InitializeRawFFTDataset (static)
 //
 // Description:		Initializes the raw FFT dataset for future processing.
-//					Chops the data to a power of 2 size and applies a window.
+//					Applies the specified window.
 //
 // Input Arguments:
 //		data			= const Dataset2D&
@@ -70,9 +208,9 @@ Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data)
 //
 //==========================================================================
 void FastFourierTransform::InitializeRawFFTDataset(Dataset2D &rawFFT,
-	const Dataset2D &data, const unsigned int &numberOfPoints, const FFTWindow &window)
+	const Dataset2D &data, const FFTWindow &window)
 {
-	rawFFT.Resize(numberOfPoints);
+	rawFFT.Resize(data.GetNumberOfPoints());
 
 	unsigned int i;
 	for (i = 0; i < rawFFT.GetNumberOfPoints(); i++)
@@ -89,7 +227,9 @@ void FastFourierTransform::InitializeRawFFTDataset(Dataset2D &rawFFT,
 // Function:		ComputeRawFFT (static)
 //
 // Description:		Computes the raw (complex) FFT data for the specified
-//					time-domain data.
+//					time-domain data.  It is expected that the data has size
+//					equal to the number of points to use for the FFT (it is
+//					one FFT sample).
 //
 // Input Arguments:
 //		data	= const Dataset2D&
@@ -107,17 +247,12 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 	// FIXME:  Remove trends?
 	Dataset2D rawFFT;
 
-	// Determine nearest power of 2
-	// FIXME:  Allow selection based on desired freq. resoltuion, etc.
-	int powerOfTwo = int(log((float)data.GetNumberOfPoints()) / log(2.0f));
-	unsigned int fftPoints = (unsigned int)pow(2.0, powerOfTwo);
-
-	InitializeRawFFTDataset(rawFFT, data, fftPoints, window);
+	InitializeRawFFTDataset(rawFFT, data, window);
 	if (data.GetNumberOfPoints() < 2)
 		return rawFFT;
 
-	DoBitReversal(fftPoints, rawFFT);
-	DoFFT(powerOfTwo, fftPoints, rawFFT);
+	DoBitReversal(rawFFT);
+	DoFFT(rawFFT);
 
 	return rawFFT;
 }
@@ -126,7 +261,7 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 // Class:			FastFourierTransform
 // Function:		ComputeTransferFunction (static)
 //
-// Description:		Computes transfer function between input and output data.
+// Description:		Computes frequency response function between input and output data.
 //
 // Input Arguments:
 //		input		= const Dataset2D&
@@ -134,31 +269,41 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 //
 // Output Arguments:
 //		amplitude	= Dataset2D&
-//		phase		= Dataset2D&
+//		phase		= Dataset2D* [deg]
+//		coherence	= Dataset2D*
 //
 // Return Value:
 //		None
 //
 //==========================================================================
-void FastFourierTransform::ComputeTransferFunction(const Dataset2D &input, const Dataset2D &output,
-	Dataset2D &amplitude, Dataset2D &phase)
+void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &output,
+	Dataset2D &amplitude, Dataset2D *phase, Dataset2D *coherence)
 {
-	Dataset2D fftIn, fftOut;
-	fftIn = ComputeRawFFT(input, WindowUniform);
-	fftOut = ComputeRawFFT(output, WindowUniform);
+	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
 
-	Dataset2D crossPower = ComputeCrossPowerSpectrum(input, output);
-	Dataset2D power = ComputePowerSpectrum(input);
-	Dataset2D rawTF = ComplexDivide(crossPower, power);
+	unsigned int windowSize = (unsigned int)pow(2, (double)GetMaxPowerOfTwo(input.GetNumberOfPoints()));
+
+	Dataset2D fftIn, fftOut;
+	fftIn = ComputeRawFFT(ChopSample(input, 0, windowSize, 0.0), WindowUniform);
+	fftOut = ComputeRawFFT(ChopSample(output, 0, windowSize, 0.0), WindowUniform);
+
+	/*Dataset2D rawFRF = ComplexDivide(ComputeCrossPowerSpectrum(input, output),
+		ComputePowerSpectrum(input));// FIXME:  Still not right...*/
+	Dataset2D rawFRF = ComputeCrossPowerSpectrum(input, output);
+	rawFRF = ConvertDoubleSidedToSingleSided(rawFRF);
 
 	double sampleRate = 1.0 / (input.GetXData(1) - input.GetXData(0));// [Hz]
+	amplitude = GetAmplitudeData(rawFRF, sampleRate);
+	if (phase)
+		*phase = GetPhaseData(rawFRF, sampleRate);
+	if (coherence)
+		*coherence = ComputeCoherence(fftIn, fftOut);
 
-	amplitude = ConvertDoubleSidedToSingleSided(GetAmplitudeData(rawTF, sampleRate));
-	phase = ConvertDoubleSidedToSingleSided(GetPhaseData(rawTF, sampleRate));
+	ConvertAmplitudeToDecibels(amplitude);
 
-	//ConvertAmplitudeToDecibels(amplitude);// FIXME:  Not sure about this one...
-
-	// FIXME:  Allow averaging several computations as described in NI application note
+	// TODO:  Allow averaging several computations as described in NI application note:
+	// To sum these, sum the cross power spectrum in complex form, then divide by the number of samples.
+	// The power spectrum is alread in real form and can be averaged normally.
 }
 
 //==========================================================================
@@ -169,8 +314,8 @@ void FastFourierTransform::ComputeTransferFunction(const Dataset2D &input, const
 //					FFT data sets.
 //
 // Input Arguments:
-//		set1	= const Dataset2D&
-//		set2	= const Dataset2D&
+//		intput	= const Dataset2D&
+//		output	= const Dataset2D&
 //
 // Output Arguments:
 //		None
@@ -179,16 +324,19 @@ void FastFourierTransform::ComputeTransferFunction(const Dataset2D &input, const
 //		Dataset2D
 //
 //==========================================================================
-Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &set1, const Dataset2D &set2)
+Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &input, const Dataset2D &output)
 {
-	assert(set1.GetNumberOfPoints() == set2.GetNumberOfPoints());
+	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
 
-	// Complex conjugate is multiplication of imaginary part by -1
-	Dataset2D complexConjugate = set1 * -1.0;
-	Dataset2D crossPowerSpectrum = ComplexMultiply(set2, complexConjugate)
-		/ (set1.GetNumberOfPoints() * set2.GetNumberOfPoints());
+	Dataset2D size(input.GetNumberOfPoints());
+	unsigned int i;
+	for (i = 0; i < size.GetNumberOfPoints(); i++)
+	{
+		size.GetXPointer()[i] = size.GetNumberOfPoints() * size.GetNumberOfPoints();
+		size.GetYPointer()[i] = 0.0;
+	}
 
-	return crossPowerSpectrum;
+	return  ComplexDivide(ComplexMultiply(output, input * -1.0), size);
 }
 
 //==========================================================================
@@ -214,12 +362,52 @@ Dataset2D FastFourierTransform::ComputePowerSpectrum(const Dataset2D &set)
 
 //==========================================================================
 // Class:			FastFourierTransform
-// Function:		DoBitReversal (static)
+// Function:		ComputeCoherence (static)
 //
-// Description:		Performs bit reversal on processing dataset (step one).
+// Description:		Computes the coherence function for the specified input/output.
 //
 // Input Arguments:
-//		fftPoints	= const unsigned int&
+//		input	= const Dataset2D&
+//		output	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D FastFourierTransform::ComputeCoherence(const Dataset2D& input, const Dataset2D& output)
+{
+	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
+
+	unsigned int windowSize = (unsigned int)pow(2, (double)GetMaxPowerOfTwo(input.GetNumberOfPoints()));
+
+	Dataset2D fftIn, fftOut;
+	fftIn = ComputeRawFFT(ChopSample(input, 0, windowSize, 0.0), WindowUniform);
+	fftOut = ComputeRawFFT(ChopSample(output, 0, windowSize, 0.0), WindowUniform);
+
+	Dataset2D crossPower = ComputeCrossPowerSpectrum(fftIn, fftOut);
+	Dataset2D inputPower = ComputePowerSpectrum(fftIn);
+	Dataset2D outputPower = ComputePowerSpectrum(fftOut);
+
+	Dataset2D rawCoherence = ComplexDivide(ComplexPower(ComplexMagnitude(crossPower), 2.0),
+		ComplexMultiply(ComputePowerSpectrum(input), ComputePowerSpectrum(output)));// FIXME:  Not right!
+	rawCoherence = ConvertDoubleSidedToSingleSided(rawCoherence);
+
+	double sampleRate = 1.0 / (input.GetXData(1) - input.GetXData(0));// [Hz]
+
+	return GetAmplitudeData(rawCoherence, sampleRate);
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		DoBitReversal (static)
+//
+// Description:		Performs bit reversal on processing dataset.  It is assumed
+//					that the set has already been padded/chopped.
+//
+// Input Arguments:
 //		set			= Dataset2D&
 //
 // Output Arguments:
@@ -229,13 +417,15 @@ Dataset2D FastFourierTransform::ComputePowerSpectrum(const Dataset2D &set)
 //		None
 //
 //==========================================================================
-void FastFourierTransform::DoBitReversal(const unsigned int &fftPoints, Dataset2D &set)
+void FastFourierTransform::DoBitReversal(Dataset2D &set)
 {
+	assert(double(set.GetNumberOfPoints()) / 2.0 == double(set.GetNumberOfPoints() / 2));
+
 	unsigned int i, j, k;
 	double tempX, tempY;
 
 	j = 0;
-	for (i = 0; i < fftPoints - 1; i++)
+	for (i = 0; i < set.GetNumberOfPoints() - 1; i++)
 	{
 		if (i < j)
 		{
@@ -247,7 +437,7 @@ void FastFourierTransform::DoBitReversal(const unsigned int &fftPoints, Dataset2
 			set.GetYPointer()[j] = tempY;
 		}
 
-		k = fftPoints >> 1;
+		k = set.GetNumberOfPoints() >> 1;
 		while (k <= j)
 		{
 			j -= k;
@@ -266,7 +456,6 @@ void FastFourierTransform::DoBitReversal(const unsigned int &fftPoints, Dataset2
 //
 // Input Arguments:
 //		powerOfTwo	= const unsigned int&
-//		fftPoitns	= const unsigned int&
 //		temp		= Dataset2D&
 //
 // Output Arguments:
@@ -276,15 +465,16 @@ void FastFourierTransform::DoBitReversal(const unsigned int &fftPoints, Dataset2
 //		None
 //
 //==========================================================================
-void FastFourierTransform::DoFFT(const unsigned int &powerOfTwo, const unsigned int &fftPoints, Dataset2D &temp)
+void FastFourierTransform::DoFFT(Dataset2D &temp)
 {
 	unsigned int i, j, i1, l, l1, l2;
 	double c1, c2, t1, t2, u1, u2, z;
+	unsigned int powerOfTwo = GetMaxPowerOfTwo(temp.GetNumberOfPoints());
 
 	c1 = -1.0; 
 	c2 = 0.0;
 	l2 = 1;
-	for (l = 0; l < (unsigned int)powerOfTwo; l++)
+	for (l = 0; l < powerOfTwo; l++)
 	{
 		l1 = l2;
 		l2 <<= 1;
@@ -292,7 +482,7 @@ void FastFourierTransform::DoFFT(const unsigned int &powerOfTwo, const unsigned 
 		u2 = 0.0;
 		for (j = 0; j < l1; j++)
 		{
-			for (i = j; i < fftPoints; i += l2)
+			for (i = j; i < temp.GetNumberOfPoints(); i += l2)
 			{
 				i1 = i + l1;
 				t1 = u1 * temp.GetXData(i1) - u2 * temp.GetYData(i1);
@@ -459,7 +649,8 @@ Dataset2D FastFourierTransform::GetPhaseData(const Dataset2D &rawFFT, const doub
 
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
-		data.GetYPointer()[i] = atan2(rawFFT.GetYData(i), rawFFT.GetXData(i)) * 180.0 / PlotMath::Pi;
+		data.GetYPointer()[i] = PlotMath::RangeToPlusMinusPi(
+			atan2(rawFFT.GetYData(i), rawFFT.GetXData(i))) * 180.0 / PlotMath::Pi;
 
 	return data;
 }
@@ -529,6 +720,76 @@ Dataset2D FastFourierTransform::ComplexDivide(const Dataset2D &a, const Dataset2
 		denominator = b.GetXData(i) * b.GetXData(i) + b.GetYData(i) * b.GetYData(i);
 		result.GetXPointer()[i] = (a.GetXData(i) * b.GetXData(i) + a.GetYData(i) * b.GetYData(i)) / denominator;
 		result.GetYPointer()[i] = (a.GetYData(i) * b.GetXData(i) - a.GetXData(i) * b.GetYData(i)) / denominator;
+	}
+
+	return result;
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		ComplexMagnitude (static)
+//
+// Description:		Computes the magnitude of each complex element.
+//
+// Input Arguments:
+//		a	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D FastFourierTransform::ComplexMagnitude(const Dataset2D &a)
+{
+	Dataset2D result(a.GetNumberOfPoints());
+
+	unsigned int i;
+	for (i = 0; i < result.GetNumberOfPoints(); i++)
+	{
+		result.GetXPointer()[i] = sqrt(a.GetXData(i) * a.GetXData(i)
+			+ a.GetYData(i) * a.GetYData(i));
+		result.GetYPointer()[i] = 0.0;
+	}
+
+	return result;
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		ComplexPower (static)
+//
+// Description:		Raises each complex element to the specified power.
+//
+// Input Arguments:
+//		a		= const Dataset2D&
+//		power	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D FastFourierTransform::ComplexPower(const Dataset2D &a, const double &power)
+{
+	Dataset2D result(a.GetNumberOfPoints());
+
+	double magnitude, angle;
+
+	unsigned int i;
+	for (i = 0; i < a.GetNumberOfPoints(); i++)
+	{
+		magnitude = sqrt(a.GetXData(i) * a.GetXData(i) + a.GetYData(i) * a.GetYData(i));
+		angle = atan2(a.GetYData(i), a.GetXData(i));
+
+		magnitude = pow(magnitude, power);
+		angle *= power;
+
+		result.GetXPointer()[i] = magnitude * cos(angle);
+		result.GetYPointer()[i] = magnitude * sin(angle);
 	}
 
 	return result;
@@ -626,7 +887,8 @@ void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 // Function:		ApplyFlatTopWindow (static)
 //
 // Description:		Applies a flat top window to the data.  Scales by coherent
-//					gain of 0.22.
+//					gain of 0.22.  NOTE:  Scaling removed, as apparently it was
+//					incorrect.  Can not find any references explaining this.
 //
 // Input Arguments:
 //		data	= Dataset2D&
@@ -642,11 +904,11 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 {
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
-		data.GetXPointer()[i] *= (1.0
+		data.GetXPointer()[i] *= 1.0
 		- 1.93 * cos(2.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))
 		+ 1.29 * cos(4.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))
 		- 0.388 * cos(6.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))
-		+ 0.032 * cos(8.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))) / 0.22;
+		+ 0.032 * cos(8.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1));
 }
 
 //==========================================================================
@@ -688,3 +950,66 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 {
 }*/
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		GetWindowName (static)
+//
+// Description:		Returns a string describing the specified window.
+//
+// Input Arguments:
+//		window	= const FFTWindow&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		std::string
+//
+//==========================================================================
+std::string FastFourierTransform::GetWindowName(const FFTWindow &window)
+{
+	if (window == WindowUniform)
+		return "Uniform";
+	else if (window == WindowHann)
+		return "Hann";
+	else if (window == WindowHamming)
+		return "Hamming";
+	else if (window == WindowFlatTop)
+		return "Flat Top";
+	/*else if (window == WindowForce)
+		return "Force";
+	else if (window == WindowExponential)
+		return "Exponential";*/
+
+	assert(false);
+	return "";
+}
+
+//==========================================================================
+// Class:			FastFourierTransform
+// Function:		GetNumberOfAverages (static)
+//
+// Description:		Determines the number of samples to be averaged, given the
+//					specified parameters.
+//
+// Input Arguments:
+//		windowSize	= const unsigned int&
+//		overlap		= const double&
+//		dataSize	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int FastFourierTransform::GetNumberOfAverages(const unsigned int windowSize,
+		const double &overlap, const unsigned int &dataSize)
+{
+	unsigned int overlapSize = (unsigned int)(overlap * (double)windowSize);
+	if (overlapSize >= windowSize)
+		overlapSize = windowSize - 1;
+	return (dataSize - overlapSize) / (windowSize - overlapSize);
+}

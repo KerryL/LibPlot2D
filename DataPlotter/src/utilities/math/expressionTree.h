@@ -89,6 +89,7 @@ private:
 
 	bool SetOperatorValid(const wxString &operation, const bool &leftOperandIsDouble) const;
 	bool ParenthesesBalanced(const wxString &expression) const;
+	bool BeginningMatchesNoCase(const wxString &s, const wxString &target, unsigned int *length = NULL) const;
 };
 
 #endif// _EXPRESSION_TREE_H_

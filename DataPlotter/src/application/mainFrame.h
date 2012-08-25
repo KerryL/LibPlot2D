@@ -129,7 +129,7 @@ private:
 		idButtonRemoveCurve,
 
 		idContextAddMathChannel,
-		idContextTransferFunction,
+		idContextFRF,
 		idContextSetTimeUnits,
 		idContextPlotDerivative,
 		idContextPlotIntegral,
@@ -187,7 +187,7 @@ private:
 
 	// Context menu events
 	void ContextAddMathChannelEvent(wxCommandEvent &event);
-	void ContextTransferFunctionEvent(wxCommandEvent &event);
+	void ContextFRFEvent(wxCommandEvent &event);
 	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
 	void ContextPlotDerivativeEvent(wxCommandEvent &event);
 	void ContextPlotIntegralEvent(wxCommandEvent &event);
@@ -235,7 +235,7 @@ private:
 	bool FindWrappedString(const wxString &s, wxString &contents,
 		const wxChar &open, const wxChar &close) const;
 
-	Dataset2D *GetFFTData(const Dataset2D* data);
+	Dataset2D *GetFFTData(const Dataset2D* data, const double &timeScalingFactor);
 	Dataset2D *GetCurveFitData(const unsigned int &order, const Dataset2D* data, wxString &name) const;
 	wxString GetCurveFitName(const CurveFit::PolynomialFit &fitData, const unsigned int &row) const;
 
@@ -291,7 +291,7 @@ private:
 	{
 		FormatBaumuller,
 		FormatKollmorgen,
-		FormatFFT,
+		FormatFrequency,
 		FormatGeneric
 	};
 
@@ -301,6 +301,8 @@ private:
 	void SetXDataLabel(wxString label);
 	void SetXDataLabel(const FileFormat &format);
 	wxString genericXAxisLabel;
+
+	Dataset2D GetXZoomedDataset(const Dataset2D &fullData) const;
 
 	DECLARE_EVENT_TABLE();
 

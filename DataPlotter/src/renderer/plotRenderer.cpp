@@ -235,7 +235,7 @@ void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 	else if (event.ShiftDown() && !event.ControlDown())
 		zoomScaleX = 0.0;
 
-	// FIXME:  Focus the zooming around the cursor
+	// TODO:  Focus the zooming around the cursor
 	// Adjust the axis limits to achieve zooming
 	double xDelta = (plot->GetXMax() - plot->GetXMin()) * zoomScaleX * event.GetWheelRotation() / 120.0;
 	double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomScaleY * event.GetWheelRotation() / 120.0;
@@ -1492,7 +1492,7 @@ void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 	double zoomXScale = 0.005 * (event.GetX() - lastMousePosition[0]);// [% of current scale]
 	double zoomYScale = 0.005 * (event.GetY() - lastMousePosition[1]);// [% of current scale]
 
-	// FIXME:  Focus the zooming around the cursor
+	// TODO:  Focus the zooming around the cursor
 	// Adjust the axis limits
 	double xDelta = (plot->GetXMax() - plot->GetXMin()) * zoomXScale;
 	double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomYScale * (int)event.ControlDown();
@@ -1720,7 +1720,7 @@ void PlotRenderer::ProcessPlotAreaDoubleClick(const unsigned int &x)
 	else
 	{
 		// Both cursors are visible - move the closer one to the click spot
-		// FIXME:  Another option is to always alternate which one was moved?
+		// NOTE:  Another option is to always alternate which one was moved?
 		if (fabs(leftCursor->GetValue() - value) < fabs(rightCursor->GetValue() - value))
 			leftCursor->SetLocation(x);
 		else

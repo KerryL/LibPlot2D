@@ -114,7 +114,8 @@ void FilterDialog::CreateControls(void)
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(CreateRadioButtons());
 
-	SetCorrectLimits();
+	UpdateSpin();
+	UpdateDamping();
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(CreateDialogButtons(), 0, wxALIGN_CENTER_HORIZONTAL);
 
@@ -346,7 +347,8 @@ void FilterDialog::OnSpinChange(wxSpinEvent &event)
 		orderSpin->SetValue(order);
 	}
 
-	SetCorrectLimits();
+	UpdateSpin();
+	UpdateDamping();
 }
 
 //==========================================================================
@@ -434,6 +436,9 @@ void FilterDialog::HandleSpin(wxSpinEvent &event)
 
 		orderSpin->SetValue(order);
 	}
+
+	UpdateSpin();
+	UpdateDamping();
 }
 
 //==========================================================================
@@ -454,7 +459,8 @@ void FilterDialog::HandleSpin(wxSpinEvent &event)
 //==========================================================================
 void FilterDialog::OnRadioChange(wxCommandEvent& WXUNUSED(event))
 {
-	SetCorrectLimits();
+	UpdateSpin();
+	UpdateDamping();
 }
 
 //==========================================================================
@@ -475,19 +481,22 @@ void FilterDialog::OnRadioChange(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void FilterDialog::OnCheckboxChange(wxCommandEvent& WXUNUSED(event))
 {
-	SetCorrectLimits();
+	unsigned int originalOrder = orderSpin->GetValue();
+	UpdateSpin();
 
 	if (phaselessCheckBox->GetValue())
-		orderSpin->SetValue(orderSpin->GetValue() * 2);
+		orderSpin->SetValue(originalOrder * 2);
 	else
-		orderSpin->SetValue(orderSpin->GetValue() / 2);
+		orderSpin->SetValue(originalOrder / 2);
+
+	UpdateDamping();
 }
 
 //==========================================================================
 // Class:			FilterDialog
-// Function:		SetCorrectLimits
+// Function:		UpdateSpin
 //
-// Description:		Ensures proper control limits, enables/disables, etc. are set.
+// Description:		Ensures proper control limits are set.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -499,31 +508,52 @@ void FilterDialog::OnCheckboxChange(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void FilterDialog::SetCorrectLimits(void)
+void FilterDialog::UpdateSpin(void)
 {
-	// Prevent crashes during initialization
 	if (!highPassRadio || !lowPassRadio)
 		return;
 
 	if (highPassRadio->GetValue())
-	{
-		orderSpin->SetValue(1);
 		orderSpin->Enable(false);
-	}
 	else
 		orderSpin->Enable();
 
 	unsigned int factor(1);
 	if (phaselessCheckBox->GetValue())
-		factor *= 2;
+		factor = 2;
 
 	orderSpin->SetRange(GetMinOrder(GetType()) * factor, GetMaxOrder(GetType()) * factor);
+}
 
-	if ((orderSpin->GetValue() == 1 && !phaselessCheckBox->GetValue()) || 
-		(orderSpin->GetValue() == 2 && phaselessCheckBox->GetValue()))
+//==========================================================================
+// Class:			FilterDialog
+// Function:		UpdateDamping
+//
+// Description:		Ensures dampnig control is enabled/disabled properly.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::UpdateDamping(void)
+{
+	if (!highPassRadio || !lowPassRadio)
+		return;
+
+	unsigned int factor(1);
+	if (phaselessCheckBox->GetValue())
+		factor = 2;
+
+	if (orderSpin->GetValue() / factor == 1)
 		dampingRatioBox->Enable(false);
 	else
-		dampingRatioBox->Enable();
+		dampingRatioBox->Enable(true);
 }
 
 //==========================================================================
@@ -545,7 +575,6 @@ void FilterDialog::SetCorrectLimits(void)
 //==========================================================================
 bool FilterDialog::OrderIsValid(const unsigned int &order) const
 {
-	// Prevent crashes during initialization
 	if (!highPassRadio || !lowPassRadio)
 		return false;
 

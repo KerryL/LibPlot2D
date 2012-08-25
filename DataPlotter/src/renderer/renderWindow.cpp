@@ -59,32 +59,24 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 	&parent, id, position, size, style | wxFULL_REPAINT_ON_RESIZE, wxEmptyString,
 	args)
 {
-	// Initialize the private data
 	wireFrame = false;
 	view3D = true;
 	viewOrthogonal = false;
 
-	// Initialize the frustum parameters
 	AutoSetFrustum();
 
-	// Initialize the transformation matrices
 	modelToView = new Matrix(3, 3);
 	modelToView->MakeIdentity();
 
 	viewToModel = new Matrix(3, 3);
 	viewToModel->MakeIdentity();
 
-	// Initialize the camera position
 	cameraPosition.Set(0.0, 0.0, 0.0);
-
-	// Initialize the focal point parameters
 	focalPoint.Set(0.0, 0.0, 0.0);
 	isInteracting = false;
 	
-	// To avoid flashing on MSW
-	SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+	SetBackgroundStyle(wxBG_STYLE_CUSTOM);// To avoid flashing under MSW
 
-	// Initialize the openGL settings first time we try to render
 	modified = true;
 }
 
@@ -107,10 +99,8 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 //==========================================================================
 RenderWindow::~RenderWindow()
 {
-	// Clear out the list of primitives
 	primitiveList.Clear();
 
-	// Delete the transformation matrices
 	delete modelToView;
 	modelToView = NULL;
 
@@ -216,7 +206,6 @@ void RenderWindow::Render()
 //==========================================================================
 void RenderWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
-	// Render the scene
     Render();
 }
 
@@ -274,7 +263,6 @@ void RenderWindow::OnSize(wxSizeEvent& event)
 //==========================================================================
 void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 {
-	// Bring focus to the render window
 	//SetFocus();
 	event.Skip();
 }
@@ -298,23 +286,19 @@ void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 //==========================================================================
 bool RenderWindow::RemoveActor(Primitive *toRemove)
 {
-	// Make sure the argument is valid
 	if (!toRemove)
 		return false;
 
-	// Check every entry in the primitives list to see if it matches the argument
 	unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 	{
 		if (toRemove == primitiveList[i])
 		{
-			// Found a match!  Remove it and return true
 			primitiveList.Remove(i);
 			return true;
 		}
 	}
 
-	// If we haven't returned yet, return false
 	return false;
 }
 
@@ -462,7 +446,7 @@ void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent 
 
 	if (!isInteracting)
 	{
-		// FIXME:  Get focal point
+		// TODO:  Get focal point in order to perform interactions around the cursor
 		//FocalPoint.Set(0.0, 0.0, 0.0);
 
 		// Don't re-compute the focal point until the next interaction
@@ -570,7 +554,7 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 
 	// The angle is determined by how much the mouse moved.  800 pixels of movement will result in
 	// a full 360 degrees rotation.
-	// FIXME:  Add adjustable rotation sensitivity (actually, all of the interactions can be adjustable)
+	// TODO:  Add user-adjustable rotation sensitivity (actually, all of the interactions can be adjustable)
 	double angle = sqrt(fabs(double((xDistance - lastXDistance) * (xDistance - lastXDistance))
 		+ double((yDistance - lastYDistance) * (yDistance - lastYDistance)))) / 800.0 * 360.0;// [deg]
 
@@ -603,7 +587,7 @@ void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 		// Always dolly a constant distance
 		double dollyDistance = 0.05;
 
-		// FIXME:  Adjust the dolly distance so it is slower closer to the focal point and slower farther away
+		// TODO:  Adjust the dolly distance so it is slower closer to the focal point and slower farther away
 
 		// Get the normal direction (along which we will translate)
 		Vector normal(0.0, 0.0, 1.0);
@@ -890,7 +874,7 @@ void RenderWindow::AutoSetFrustum(void)
 	verticalFOV = 20.0 * PlotMath::Pi / 180.0;
 
 	// Set the clipping plane distances to something reasonable
-	// FIXME:  Should this be smarter (distance between camera and focal point?)
+	// TODO:  Make this be smarter, or user-adjustable (distance between camera and focal point)
 	nearClip = 5.0;
 	farClip = 500.0;
 

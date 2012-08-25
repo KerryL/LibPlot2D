@@ -485,24 +485,25 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop) const
 //==========================================================================
 bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop) const
 {
-	if (s.Len() < 3)
-		return false;
-
-	if (s.Mid(0, 3).CmpNoCase(_T("int")) == 0 ||
-		s.Mid(0, 3).CmpNoCase(_T("ddt")) == 0 ||
-		s.Mid(0, 3).CmpNoCase(_T("fft")) == 0 ||
-		s.Mid(0, 3).CmpNoCase(_T("bit")) == 0)
-	{
-		if (stop)
-			*stop = 3;
+	// List these in order of longest to shortest
+	if (BeginningMatchesNoCase(s, _T("log10"), stop))
 		return true;
-	}
-	else if (s.Mid(0, 8).CmpNoCase(_T("transfer")) == 0)
-	{
-		if (stop)
-			*stop = 8;
+	else if (BeginningMatchesNoCase(s, _T("int"), stop))
 		return true;
-	}
+	else if (BeginningMatchesNoCase(s, _T("ddt"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("fft"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("frf"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("log"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("exp"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("abs"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("bit"), stop))
+		return true;
 
 	return false;
 }
@@ -763,9 +764,17 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 		return DiscreteDerivative::ComputeTimeHistory(set);
 	else if (function.CmpNoCase(_T("fft")) == 0)
 		return FastFourierTransform::ComputeFFT(set).MultiplyXData(xAxisFactor);
+	else if (function.CmpNoCase(_T("log")) == 0)
+		return set.DoLog();
+	else if (function.CmpNoCase(_T("log10")) == 0)
+		return set.DoLog10();
+	else if (function.CmpNoCase(_T("exp")) == 0)
+		return set.DoExp();
+	else if (function.CmpNoCase(_T("abs")) == 0)
+		return set.DoAbs();
 	/*else if (function.CmpNoCase(_T("bit")) == 0)
 		return PlotMath::ApplyBitMask(set, bit);
-	else if (function.CmpNoCase(_T("transfer")) == 0)
+	else if (function.CmpNoCase(_T("frf")) == 0)
 		return FastFourierTransform::ComputeTransferFunction(set1, set2);*/
 
 	assert(false);
@@ -801,6 +810,8 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 		return second * first;
 	else if (operation.Cmp(_T("/")) == 0)
 		return second / first;
+	else if (operation.Cmp(_T("^")) == 0)
+		return second.ToPower(first);
 
 	assert(false);
 	return first;
@@ -834,6 +845,8 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 		return first * -1.0 + second;
 	else if (operation.Cmp(_T("*")) == 0)
 		return first * second;
+	else if (operation.Cmp(_T("^")) == 0)
+		return first.ApplyPower(second);
 
 	assert(false);
 	return 0.0;
@@ -951,7 +964,7 @@ bool ExpressionTree::EvaluateFunction(const wxString &function, std::stack<doubl
 		return false;
 	}
 
-	// FIXME:  Handle multiple args here
+	// TODO:  Handle multiple args here
 
 	PushToStack(ApplyFunction(function, dataset), setStack, useDoubleStack);
 
@@ -1114,6 +1127,8 @@ bool ExpressionTree::SetOperatorValid(const wxString &operation, const bool &lef
 		return true;
 	else if (operation.Cmp(_T("*")) == 0)
 		return true;
+	else if (operation.Cmp(_T("^")) == 0)
+		return true;
 
 	if (!leftOperandIsDouble &&
 		operation.Cmp(_T("/")) == 0)
@@ -1151,4 +1166,38 @@ bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doub
 		return EvaluateDataset(next, setStack, useDoubleStack, errorString);
 
 	return EvaluateNumber(next, doubleStack, useDoubleStack, errorString);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		BeginningMatchesNoCase
+//
+// Description:		Determines if the target string matches the beginning of
+//					string s.  Populates the length argument if provided and
+//					if a match is found.
+//
+// Input Arguments:
+//		s		= const wxString&
+//		target	= const wxString&
+//
+// Output Arguments:
+//		length	= unsigned int* (optional)
+//
+// Return Value:
+//		bool, true for match
+//
+//==========================================================================
+bool ExpressionTree::BeginningMatchesNoCase(const wxString &s, const wxString &target,
+	unsigned int *length) const
+{
+	if (s.Len() < target.Len())
+		return false;
+
+	if (s.Mid(0, target.Len()).CmpNoCase(target) != 0)
+		return false;
+
+	if (length)
+		*length = target.Len();
+
+	return true;
 }
