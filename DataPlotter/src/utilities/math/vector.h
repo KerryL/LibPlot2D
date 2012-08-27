@@ -24,8 +24,8 @@
 //	11/22/2009	- Moved to vMath.lib, K. Loux.
 //	11/1/2010	- Removed non-const Normalize(), K. Loux.
 
-#ifndef _Vector_CLASSS_H_
-#define _Vector_CLASSS_H_
+#ifndef _VECTOR_H_
+#define _VECTOR_H_
 
 // Standard C++ headers
 #include <cmath>
@@ -34,7 +34,7 @@
 // wxWidgets forward declarations
 class wxString;
 
-// VVASE forward declarations
+// Local forward declarations
 class Matrix;
 
 using namespace std;
@@ -51,7 +51,7 @@ public:
 	~Vector();
 
 	// Main class data
-	double	x, y, z;
+	double x, y, z;
 
 	// Enumerations
 	enum Axis
@@ -64,7 +64,7 @@ public:
 	// Vector norm
 	double Length(void) const { return sqrt(x * x + y * y + z * z); };
 
-	// Calculates the distance between this and Target
+	// Calculates the distance between this and v
 	double Distance(const Vector &v) const { return sqrt((x - v.x) * (x - v.x)
 		+ (y - v.y) * (y - v.y) + (z - v.z) * (z - v.z)); };
 
@@ -78,7 +78,7 @@ public:
 	// Returns a string with the name of the specified axis
 	static wxString GetAxisName(Axis axis);
 
-	// Return the angles between this and target
+	// Return the angles between this and v
 	Vector AnglesTo(const Vector &v) const;
 
 	// Prints the object to a string
@@ -111,4 +111,4 @@ public:
 	friend ostream& operator << (ostream &writeOut, const Vector &v);
 };
 
-#endif// _Vector_CLASSS_H_
+#endif// _VECTOR_H_

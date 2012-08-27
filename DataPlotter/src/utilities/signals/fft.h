@@ -41,8 +41,6 @@ public:
 		unsigned int windowSize, const double &overlap);
 	static void ComputeFRF(const Dataset2D &input, const Dataset2D &output,
 		Dataset2D &amplitude, Dataset2D *phase = NULL, Dataset2D *coherence = NULL);
-	static Dataset2D ComputeCrossPowerSpectrum(const Dataset2D &input, const Dataset2D &output);
-	static Dataset2D ComputePowerSpectrum(const Dataset2D &set);
 	static Dataset2D ComputeCoherence(const Dataset2D& input, const Dataset2D& output);
 
 	static unsigned int GetNumberOfAverages(const unsigned int windowSize,
@@ -62,7 +60,10 @@ private:
 	static void DoBitReversal(Dataset2D &set);
 	static void DoFFT(Dataset2D &temp);
 
-	static Dataset2D ConvertDoubleSidedToSingleSided(const Dataset2D &fullSpectrum);
+	static Dataset2D ComputeCrossPowerSpectrum(const Dataset2D &fftIn, const Dataset2D &fftOut);
+	static Dataset2D ComputePowerSpectrum(const Dataset2D &fft);
+
+	static Dataset2D ConvertDoubleSidedToSingleSided(const Dataset2D &fullSpectrum, const bool &preserveDCValue = true);
 
 	static Dataset2D ChopSample(const Dataset2D &data, const unsigned int &sample,
 		const unsigned int &windowSize, const double &overlap);

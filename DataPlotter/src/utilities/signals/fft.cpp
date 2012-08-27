@@ -287,17 +287,15 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &o
 	fftIn = ComputeRawFFT(ChopSample(input, 0, windowSize, 0.0), WindowUniform);
 	fftOut = ComputeRawFFT(ChopSample(output, 0, windowSize, 0.0), WindowUniform);
 
-	/*Dataset2D rawFRF = ComplexDivide(ComputeCrossPowerSpectrum(input, output),
-		ComputePowerSpectrum(input));// FIXME:  Still not right...*/
-	Dataset2D rawFRF = ComputeCrossPowerSpectrum(input, output);
-	rawFRF = ConvertDoubleSidedToSingleSided(rawFRF);
+	Dataset2D rawFRF = ComplexDivide(ComputeCrossPowerSpectrum(fftIn, fftOut),
+		ComputePowerSpectrum(fftIn));
 
 	double sampleRate = 1.0 / (input.GetXData(1) - input.GetXData(0));// [Hz]
-	amplitude = GetAmplitudeData(rawFRF, sampleRate);
+	amplitude = ConvertDoubleSidedToSingleSided(GetAmplitudeData(rawFRF, sampleRate), false);
 	if (phase)
-		*phase = GetPhaseData(rawFRF, sampleRate);
+		*phase = ConvertDoubleSidedToSingleSided(GetPhaseData(rawFRF, sampleRate), false);
 	if (coherence)
-		*coherence = ComputeCoherence(fftIn, fftOut);
+		*coherence = ConvertDoubleSidedToSingleSided(ComputeCoherence(input, output), false);
 
 	ConvertAmplitudeToDecibels(amplitude);
 
@@ -314,8 +312,8 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &o
 //					FFT data sets.
 //
 // Input Arguments:
-//		intput	= const Dataset2D&
-//		output	= const Dataset2D&
+//		fftIn	= const Dataset2D&
+//		fftOut	= const Dataset2D&
 //
 // Output Arguments:
 //		None
@@ -324,11 +322,11 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &o
 //		Dataset2D
 //
 //==========================================================================
-Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &input, const Dataset2D &output)
+Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &fftIn, const Dataset2D &fftOut)
 {
-	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
+	assert(fftIn.GetNumberOfPoints() == fftOut.GetNumberOfPoints());
 
-	Dataset2D size(input.GetNumberOfPoints());
+	Dataset2D size(fftIn.GetNumberOfPoints());
 	unsigned int i;
 	for (i = 0; i < size.GetNumberOfPoints(); i++)
 	{
@@ -336,7 +334,7 @@ Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &input
 		size.GetYPointer()[i] = 0.0;
 	}
 
-	return  ComplexDivide(ComplexMultiply(output, input * -1.0), size);
+	return  ComplexDivide(ComplexMultiply(fftOut, fftIn * -1.0), size);
 }
 
 //==========================================================================
@@ -346,7 +344,7 @@ Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &input
 // Description:		Computes the power spectrum of the specified raw FFT data.
 //
 // Input Arguments:
-//		set		= const Dataset2D&
+//		fft		= const Dataset2D&
 //
 // Output Arguments:
 //		None
@@ -355,9 +353,9 @@ Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &input
 //		Dataset2D
 //
 //==========================================================================
-Dataset2D FastFourierTransform::ComputePowerSpectrum(const Dataset2D &set)
+Dataset2D FastFourierTransform::ComputePowerSpectrum(const Dataset2D &fft)
 {
-	return ComputeCrossPowerSpectrum(set, set);
+	return ComputeCrossPowerSpectrum(fft, fft);
 }
 
 //==========================================================================
@@ -392,7 +390,7 @@ Dataset2D FastFourierTransform::ComputeCoherence(const Dataset2D& input, const D
 	Dataset2D outputPower = ComputePowerSpectrum(fftOut);
 
 	Dataset2D rawCoherence = ComplexDivide(ComplexPower(ComplexMagnitude(crossPower), 2.0),
-		ComplexMultiply(ComputePowerSpectrum(input), ComputePowerSpectrum(output)));// FIXME:  Not right!
+		ComplexMultiply(inputPower, outputPower));
 	rawCoherence = ConvertDoubleSidedToSingleSided(rawCoherence);
 
 	double sampleRate = 1.0 / (input.GetXData(1) - input.GetXData(0));// [Hz]
@@ -512,6 +510,7 @@ void FastFourierTransform::DoFFT(Dataset2D &temp)
 //
 // Input Arguments:
 //		fullSpectrum	= const Dataset2D& containing double-sided data
+//		preserveDCValue	= const bool& indicating whether or not to keep the 0 Hz point (optional)
 //
 // Output Arguments:
 //		None
@@ -520,18 +519,33 @@ void FastFourierTransform::DoFFT(Dataset2D &temp)
 //		Dataset2D containing single-sided data
 //
 //==========================================================================
-Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D &fullSpectrum)
+Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D &fullSpectrum, const bool &preserveDCValue)
 {
-	Dataset2D halfSpectrum(fullSpectrum.GetNumberOfPoints() / 2);
-
-	halfSpectrum.GetXPointer()[0] = fullSpectrum.GetXData(0);
-	halfSpectrum.GetYPointer()[0] = fullSpectrum.GetYData(0);// No factor of 2 for DC point
-
+	Dataset2D halfSpectrum;
 	unsigned int i;
-	for (i = 1; i < halfSpectrum.GetNumberOfPoints(); i++)
+	
+	if (preserveDCValue)
 	{
-		halfSpectrum.GetXPointer()[i] = fullSpectrum.GetXData(i);
-		halfSpectrum.GetYPointer()[i] = fullSpectrum.GetYData(i) * 2.0;
+		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2);
+
+		halfSpectrum.GetXPointer()[0] = fullSpectrum.GetXData(0);
+		halfSpectrum.GetYPointer()[0] = fullSpectrum.GetYData(0);// No factor of 2 for DC point
+
+		for (i = 1; i < halfSpectrum.GetNumberOfPoints(); i++)
+		{
+			halfSpectrum.GetXPointer()[i] = fullSpectrum.GetXData(i);
+			halfSpectrum.GetYPointer()[i] = fullSpectrum.GetYData(i) * 2.0;
+		}
+	}
+	else
+	{
+		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2 - 1);
+
+		for (i = 0; i < halfSpectrum.GetNumberOfPoints(); i++)
+		{
+			halfSpectrum.GetXPointer()[i] = fullSpectrum.GetXData(i + 1);
+			halfSpectrum.GetYPointer()[i] = fullSpectrum.GetYData(i + 1);
+		}
 	}
 
 	return halfSpectrum;
