@@ -78,7 +78,7 @@ private:
 	void SetProperties(void);
 
 	void CreatePlotArea(wxWindow *parent);
-	void CreateOptionsGrid(wxWindow *parent);
+	wxGrid* CreateOptionsGrid(wxWindow *parent);
 	wxBoxSizer* CreateButtons(wxWindow *parent);
 
 	// Controls
@@ -86,7 +86,6 @@ private:
 	wxButton *autoScaleButton;
 	wxButton *removeCurveButton;
 	wxGrid *optionsGrid;
-	wxBoxSizer *topSizer;
 
 	PlotRenderer *plotArea;
 

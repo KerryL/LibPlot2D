@@ -77,7 +77,6 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 	DoLayout();
 	SetProperties();
 
-	// Initialize the file format flag
 	currentFileFormat = FormatGeneric;
 }
 
@@ -143,7 +142,7 @@ const wxString MainFrame::pathToConfigFile = _T("dataplotter.ini");
 void MainFrame::DoLayout(void)
 {
 	// Create the top sizer, and on inside of it just to pad the borders a bit
-	topSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxPanel *mainPanel = new wxPanel(this);
 	topSizer->Add(mainPanel, 1, wxGROW);
 
@@ -153,14 +152,12 @@ void MainFrame::DoLayout(void)
 	CreatePlotArea(mainPanel);
 	mainSizer->Add(plotArea, 1, wxGROW);
 
-	// Create the options controls and buttons to add/remove math channels
+	// Create the options controls and buttons
 	wxBoxSizer *lowerSizer = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(lowerSizer);
 
 	lowerSizer->Add(CreateButtons(mainPanel), 0, wxGROW | wxALL, 5);
-
-	CreateOptionsGrid(mainPanel);
-	lowerSizer->Add(optionsGrid, 1, wxGROW | wxALL, 5);
+	lowerSizer->Add(CreateOptionsGrid(mainPanel), 1, wxGROW | wxALL, 5);
 
 	// Assign sizers and resize the frame
 	SetSizerAndFit(topSizer);
@@ -186,8 +183,8 @@ void MainFrame::DoLayout(void)
 //==========================================================================
 void MainFrame::CreatePlotArea(wxWindow *parent)
 {
-	// Create the main control
-	optionsGrid = NULL;// To avoid crashing in UpdateCursors
+	optionsGrid = NULL;
+
 #ifdef __WXGTK__
 	// Under GTK, we get a segmentation fault or X error on call to SwapBuffers in RenderWindow.
 	// Adding the double-buffer arugment fixes this.  Under windows, the double-buffer argument
@@ -197,6 +194,7 @@ void MainFrame::CreatePlotArea(wxWindow *parent)
 #else
 	plotArea = new PlotRenderer(parent, wxID_ANY, NULL, *this);
 #endif
+
 	plotArea->SetSize(480, 320);
 	plotArea->SetGridOn();
 }
@@ -214,10 +212,10 @@ void MainFrame::CreatePlotArea(wxWindow *parent)
 //		None
 //
 // Return Value:
-//		None
+//		wxGrid* pointing to optionsGrid
 //
 //==========================================================================
-void MainFrame::CreateOptionsGrid(wxWindow *parent)
+wxGrid* MainFrame::CreateOptionsGrid(wxWindow *parent)
 {
 	optionsGrid = new wxGrid(parent, wxID_ANY);
 
@@ -245,6 +243,8 @@ void MainFrame::CreateOptionsGrid(wxWindow *parent)
 	optionsGrid->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 
 	optionsGrid->EndBatch();
+
+	return optionsGrid;
 }
 
 //==========================================================================
@@ -303,7 +303,6 @@ void MainFrame::SetProperties(void)
 	SetName(DataPlotterApp::dataPlotterName);
 	Center();
 
-	// Add the icon
 #ifdef __WXMSW__
 	SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE));
 #elif __WXGTK__
@@ -315,7 +314,6 @@ void MainFrame::SetProperties(void)
 	SetIcon(wxIcon(plots128_xpm, wxBITMAP_TYPE_XPM));
 #endif
 
-	// Allow draging-and-dropping of files onto this window to open them
 	SetDropTarget(dynamic_cast<wxDropTarget*>(new DropTarget(*this)));
 }
 
@@ -360,7 +358,6 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idContextTimeShift,					MainFrame::ContextTimeShiftEvent)
 
 	EVT_MENU(idContextFilter,						MainFrame::ContextFilterEvent)
-
 	EVT_MENU(idContextFitCurve,						MainFrame::ContextFitCurve)
 
 	EVT_MENU(idPlotContextToggleGridlines,			MainFrame::ContextToggleGridlines)
@@ -784,6 +781,7 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 	{
 		SetTitleFromFileName(pathAndFileName);
 		SetXDataLabel(currentFileFormat);
+		plotArea->SaveCurrentZoom();
 	}
 
 	return loadedOK;
@@ -1902,8 +1900,10 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	plotArea->SetCurveProperties(index - 1, GetNextColor(index), true, false, size);
 	plotArea->UpdateDisplay();
 
-	// Resize to prevent scrollbars and hidden values in the grid control
-	topSizer->Layout();
+	// Generate an on-size event to force the options grid to re-size
+	// FIXME:  There needs to be a better way to do this
+	SetSize(GetSize() + wxSize(0, 1));
+	SetSize(GetSize() + wxSize(0, -1));
 }
 
 //==========================================================================
@@ -2046,19 +2046,14 @@ Color MainFrame::GetNextColor(const unsigned int &index) const
 //==========================================================================
 void MainFrame::RemoveCurve(const unsigned int &i)
 {
-	// Remove from grid control
 	optionsGrid->DeleteRows(i + 1);
 
-	// If this was the last data row, also remove the time row
 	if (optionsGrid->GetNumberRows() == 1)
 		optionsGrid->DeleteRows();
 
 	optionsGrid->AutoSizeColumns();
 
-	// Also remove the curve from the plot
 	plotArea->RemoveCurve(i);
-
-	// And remove from our local list (calls destructor for the dataset)
 	plotList.Remove(i);
 }
 
@@ -2514,8 +2509,7 @@ void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
-	Dataset2D *amplitude = new Dataset2D;
-	Dataset2D *phase = NULL, *coherence = NULL;
+	Dataset2D *amplitude = new Dataset2D, *phase = NULL, *coherence = NULL;
 
 	if (dialog.GetComputePhase())
 		phase = new Dataset2D;
@@ -2523,7 +2517,8 @@ void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 		coherence = new Dataset2D;
 
 	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
-		*plotList[dialog.GetOutputIndex()], *amplitude, phase, coherence);
+		*plotList[dialog.GetOutputIndex()], dialog.GetNumberOfAverages(),
+		FastFourierTransform::WindowUniform, *amplitude, phase, coherence);
 
 	AddCurve(&(amplitude->MultiplyXData(factor)), wxString::Format("FRF Amplitude, [%u] to [%u], [dB]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
@@ -2996,7 +2991,7 @@ wxString MainFrame::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
 
 		if (i < fitData.order)
 		{
-			if (fitData.coefficients[i] > 0.0)
+			if (fitData.coefficients[i + 1] > 0.0)
 				termString.Append(_T(" + "));
 			else
 				termString.Append(_T(" - "));
@@ -3220,6 +3215,7 @@ void MainFrame::DisplayAxisRangeDialog(const PlotContext &axis)
 	}
 
 	SetNewAxisRange(axis, min, max);
+	plotArea->SaveCurrentZoom();
 }
 
 //==========================================================================
@@ -3699,6 +3695,7 @@ FilterBase* MainFrame::GetFilter(const FilterParameters &parameters,
 void MainFrame::ContextSetLogarithmicBottom(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetXLogarithmic(!plotArea->GetXLogarithmic());
+	plotArea->ClearZoomStack();
 }
 
 //==========================================================================
@@ -3720,6 +3717,7 @@ void MainFrame::ContextSetLogarithmicBottom(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextSetLogarithmicLeft(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetLeftLogarithmic(!plotArea->GetLeftLogarithmic());
+	plotArea->ClearZoomStack();
 }
 
 //==========================================================================
@@ -3741,6 +3739,7 @@ void MainFrame::ContextSetLogarithmicLeft(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextSetLogarithmicRight(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetRightLogarithmic(!plotArea->GetRightLogarithmic());
+	plotArea->ClearZoomStack();
 }
 
 //==========================================================================

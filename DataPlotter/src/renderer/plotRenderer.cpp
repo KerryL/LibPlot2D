@@ -48,10 +48,8 @@ PlotRenderer::PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFram
 							 : RenderWindow(*parent, id, args, wxDefaultPosition,
 							 wxDefaultSize), mainFrame(_mainFrame)
 {
-	// Create the actors
 	CreateActors();
 
-	// Set this to a 2D view by default
 	SetView3D(false);
 
 	draggingLeftCursor = false;
@@ -78,7 +76,6 @@ PlotRenderer::PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFram
 //==========================================================================
 PlotRenderer::~PlotRenderer()
 {
-	// Delete the plot object
 	delete plot;
 	plot = NULL;
 }
@@ -113,6 +110,7 @@ BEGIN_EVENT_TABLE(PlotRenderer, RenderWindow)
 	EVT_RIGHT_UP(		PlotRenderer::OnRightButtonUpEvent)
 	EVT_LEFT_UP(		PlotRenderer::OnLeftButtonUpEvent)
 	EVT_LEFT_DOWN(		PlotRenderer::OnLeftButtonDownEvent)
+	EVT_MIDDLE_UP(		PlotRenderer::OnMiddleButtonUpEvent)
 END_EVENT_TABLE()
 
 //==========================================================================
@@ -133,7 +131,6 @@ END_EVENT_TABLE()
 //==========================================================================
 void PlotRenderer::UpdateDisplay(void)
 {
-	// Update the plot
 	plot->Update();
 	Refresh();
 }
@@ -186,13 +183,11 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 {
 	ignoreNextMouseMove = true;
 
-	// If the cursors are visible, set them visible again so they get updated
 	if (leftCursor->GetIsVisible())
 		leftCursor->SetVisibility(true);
 	if (rightCursor->GetIsVisible())
 		rightCursor->SetVisibility(true);
 
-	// If the object exists, update the display
 	UpdateDisplay();
 
 	// Skip this event so the base class OnSize event fires, too
@@ -332,7 +327,155 @@ void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 	}
 
 	ProcessZoomBoxEnd();
+	SaveCurrentZoom();
 	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		OnMiddleButtonUpEvent
+//
+// Description:		Undoes the zoom level (if available).
+//
+// Input Arguments:
+//		event	= wxMouseEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::OnMiddleButtonUpEvent(wxMouseEvent& WXUNUSED(event))
+{
+	UndoZoom();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ZoomChanged
+//
+// Description:		Determines if the zoom level is different from the previous
+//					zoom level.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool PlotRenderer::ZoomChanged(void) const
+{
+	if (zoom.size() == 0)
+		return true;
+
+	Zoom lastZoom = zoom.top();
+
+	if (lastZoom.xMin == plot->GetXMin() &&
+		lastZoom.xMax == plot->GetXMax() &&
+		lastZoom.leftYMin == plot->GetLeftYMin() &&
+		lastZoom.leftYMax == plot->GetLeftYMax() &&
+		lastZoom.rightYMin == plot->GetRightYMin() &&
+		lastZoom.rightYMax == plot->GetRightYMax())
+		return false;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SaveCurrentZoom
+//
+// Description:		Saves the current zoom level.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SaveCurrentZoom(void)
+{
+	if (!ZoomChanged())
+		return;
+
+	Zoom currentZoom;
+
+	currentZoom.xMin = plot->GetXMin();
+	currentZoom.xMax = plot->GetXMax();
+	currentZoom.leftYMin = plot->GetLeftYMin();
+	currentZoom.leftYMax = plot->GetLeftYMax();
+	currentZoom.rightYMin = plot->GetRightYMin();
+	currentZoom.rightYMax = plot->GetRightYMax();
+
+	zoom.push(currentZoom);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		UndoZoom
+//
+// Description:		Reverts to the previous zoom level.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::UndoZoom(void)
+{
+	if (zoom.size() < 2)
+		return;
+
+	zoom.pop();// Pop the current zoom in order to read the previous zoom
+	Zoom lastZoom = zoom.top();
+	zoom.pop();
+
+	plot->SetXMin(lastZoom.xMin);
+	plot->SetXMax(lastZoom.xMax);
+	plot->SetLeftYMin(lastZoom.leftYMin);
+	plot->SetLeftYMax(lastZoom.leftYMax);
+	plot->SetRightYMin(lastZoom.rightYMin);
+	plot->SetRightYMax(lastZoom.rightYMax);
+
+	UpdateDisplay();
+	SaveCurrentZoom();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ClearZoomStack
+//
+// Description:		Empties the zoom stack.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ClearZoomStack(void)
+{
+	while (zoom.size() > 0)
+		zoom.pop();
 }
 
 //==========================================================================
@@ -701,6 +844,9 @@ void PlotRenderer::AddCurve(const Dataset2D &data)
 void PlotRenderer::RemoveAllCurves()
 {
 	plot->RemoveExistingPlots();
+
+	if (plot->GetCurveCount() == 0)
+		ClearZoomStack();
 }
 
 //==========================================================================
@@ -722,6 +868,9 @@ void PlotRenderer::RemoveAllCurves()
 void PlotRenderer::RemoveCurve(const unsigned int& index)
 {
 	plot->RemovePlot(index);
+
+	if (plot->GetCurveCount() == 0)
+		ClearZoomStack();
 }
 
 //==========================================================================
@@ -743,8 +892,8 @@ void PlotRenderer::RemoveCurve(const unsigned int& index)
 void PlotRenderer::AutoScale()
 {
 	plot->ResetAutoScaling();
-
 	UpdateDisplay();
+	SaveCurrentZoom();
 }
 
 //==========================================================================
@@ -766,8 +915,8 @@ void PlotRenderer::AutoScale()
 void PlotRenderer::AutoScaleBottom()
 {
 	plot->SetAutoScaleBottom();
-
 	UpdateDisplay();
+	SaveCurrentZoom();
 }
 
 //==========================================================================
@@ -789,8 +938,8 @@ void PlotRenderer::AutoScaleBottom()
 void PlotRenderer::AutoScaleLeft()
 {
 	plot->SetAutoScaleLeft();
-
 	UpdateDisplay();
+	SaveCurrentZoom();
 }
 
 //==========================================================================
@@ -812,8 +961,8 @@ void PlotRenderer::AutoScaleLeft()
 void PlotRenderer::AutoScaleRight()
 {
 	plot->SetAutoScaleRight();
-
 	UpdateDisplay();
+	SaveCurrentZoom();
 }
 
 //==========================================================================
@@ -1015,6 +1164,8 @@ void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 {
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
+
+	SaveCurrentZoom();
 }
 
 //==========================================================================
@@ -1531,7 +1682,6 @@ void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::ProcessZoomWithBox(wxMouseEvent &event)
 {
-	// If we're not already visible, set the anchor and make us visible
 	if (!zoomBox->GetIsVisible())
 	{
 		zoomBox->SetVisibility(true);

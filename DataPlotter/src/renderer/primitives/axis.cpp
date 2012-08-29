@@ -137,7 +137,7 @@ void Axis::GenerateGeometry(void)
 void Axis::DrawFullAxis(void)
 {
 	double tickSpacing, gridSpacing;// To avoid rounding errors, we convert this back to an int after we do some math
-	int numberOfTicks, numberOfGridLines;
+	unsigned int numberOfTicks, numberOfGridLines;
 	int mainAxisLocation = ComputeMainAxisLocation();
 
 	ComputeGridAndTickCounts(numberOfTicks, &numberOfGridLines);
@@ -207,14 +207,14 @@ int Axis::ComputeMainAxisLocation(void) const
 //		None
 //
 // Output Arguments:
-//		tickCount	= int&
-//		gridCount	= int*
+//		tickCount	= unsigned int&
+//		gridCount	= unsigned int*
 //
 // Return Value:
 //		None
 //
 //==========================================================================
-void Axis::ComputeGridAndTickCounts(int &tickCount, int *gridCount)
+void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount)
 {
 	if (logarithmic)
 	{
@@ -230,9 +230,9 @@ void Axis::ComputeGridAndTickCounts(int &tickCount, int *gridCount)
 	}
 	else
 	{
-		tickCount = int((maximum - minimum) / minorResolution + 0.5) - 1;
+		tickCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
 		if (gridCount)
-			*gridCount = int((maximum - minimum) / majorResolution + 0.5) - 1;
+			*gridCount = (unsigned int)((maximum - minimum) / majorResolution + 0.5) - 1;
 	}
 }
 
@@ -644,7 +644,7 @@ void Axis::DrawTickLabels(void)
 	double value;
 	wxString valueLabel;
 	double valueOffsetFromEdge = offsetFromWindowEdge * 0.8;
-	int tick, numberOfTicks;
+	unsigned int tick, numberOfTicks;
 	ComputeGridAndTickCounts(numberOfTicks);
 	for (tick = 0; tick < numberOfTicks + 2; tick++)
 	{

@@ -61,11 +61,10 @@ const unsigned long CustomFileFormat::customFormatsVersion = 1;
 //==========================================================================
 CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFileName(_pathAndFileName)
 {
-	// Load the XML file
 	wxXmlDocument customFormatDefinitions;
-	if (!customFormatDefinitions.Load(customFormatsXMLFileName))
+	if (!wxFileExists(pathAndFileName) ||
+		!customFormatDefinitions.Load(customFormatsXMLFileName))
 	{
-		// Load method above will warn user - no need for explicit warning here
 		ClearData();
 		return;
 	}

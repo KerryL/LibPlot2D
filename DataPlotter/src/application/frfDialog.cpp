@@ -62,6 +62,7 @@ void FRFDialog::CreateControls(const wxArrayString &descriptions)
 	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 5);
 
 	mainSizer->Add(CreateSelectionControls(descriptions));
+	mainSizer->Add(CreateTextBox());
 	mainSizer->Add(CreateCheckBoxes());
 	mainSizer->Add(CreateButtons(), 1, wxGROW);
 
@@ -102,6 +103,34 @@ wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 	outputList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, descriptions, wxLB_SINGLE);
 	rightSizer->Add(outputText);
 	rightSizer->Add(outputList, 0, wxGROW | wxALL, 5);
+
+	return sizer;
+}
+
+//==========================================================================
+// Class:			FRFDialog
+// Function:		CreateTextBox
+//
+// Description:		Returns a sizer containing the text box control.
+//
+// Input Arguments:
+///		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxSizer*
+//
+//==========================================================================
+wxSizer* FRFDialog::CreateTextBox(void)
+{
+	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+
+	wxStaticText *averagesLabel = new wxStaticText(this, wxID_ANY, _T("Number of Averages"));
+	averagesTextBox = new wxTextCtrl(this, wxID_ANY, _T("1"));
+	sizer->Add(averagesLabel, 0, wxALL, 5);
+	sizer->Add(averagesTextBox, 1, wxGROW | wxALL, 5);
 
 	return sizer;
 }
@@ -191,6 +220,14 @@ bool FRFDialog::TransferDataFromWindow(void)
 		return false;
 	}
 
+	unsigned long value;
+	if (!averagesTextBox->GetValue().ToULong(&value))
+	{
+		wxMessageBox(_T("Number of averages must be an integer."),
+			_T("Transfer Function"), wxICON_ERROR);
+		return false;
+	}
+
 	return true;
 }
 
@@ -234,6 +271,29 @@ unsigned int FRFDialog::GetInputIndex(void) const
 unsigned int FRFDialog::GetOutputIndex(void) const
 {
 	return outputList->GetSelection();
+}
+
+//==========================================================================
+// Class:			FRFDialog
+// Function:		GetNumberOfAverages
+//
+// Description:		Returns the number of averages specified by the user.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int FRFDialog::GetNumberOfAverages(void) const
+{
+	unsigned long value;
+	averagesTextBox->GetValue().ToULong(&value);
+	return std::max<unsigned int>((unsigned int)value, 1);
 }
 
 //==========================================================================

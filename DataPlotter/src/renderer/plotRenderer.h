@@ -17,6 +17,9 @@
 #ifndef _PLOT_RENDERER_H_
 #define _PLOT_RENDERER_H_
 
+// Standard C++ headers
+#include <stack>
+
 // Local headers
 #include "renderer/renderWindow.h"
 
@@ -106,6 +109,9 @@ public:
 
 	MainFrame *GetMainFrame(void) { return &mainFrame; };
 
+	void SaveCurrentZoom(void);
+	void ClearZoomStack(void);
+
 private:
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors(void);
@@ -125,6 +131,7 @@ private:
 	void OnRightButtonUpEvent(wxMouseEvent &event);
 	void OnLeftButtonUpEvent(wxMouseEvent &event);
 	void OnLeftButtonDownEvent(wxMouseEvent &event);
+	void OnMiddleButtonUpEvent(wxMouseEvent &event);
 
 	void OnMouseLeaveWindowEvent(wxMouseEvent &event);
 	void OnDoubleClickEvent(wxMouseEvent &event);
@@ -150,6 +157,20 @@ protected:
 
 	void ProcessRightClick(wxMouseEvent &event);
 	void ProcessZoomBoxEnd(void);
+
+	struct Zoom
+	{
+		double xMin;
+		double xMax;
+		double leftYMin;
+		double leftYMax;
+		double rightYMin;
+		double rightYMax;
+	};
+
+	std::stack<Zoom> zoom;
+	void UndoZoom(void);
+	bool ZoomChanged(void) const;
 
 	bool ignoreNextMouseMove;
 

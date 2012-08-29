@@ -39,12 +39,14 @@ public:
 	static Dataset2D ComputeFFT(const Dataset2D &data);
 	static Dataset2D ComputeFFT(const Dataset2D &data, const FFTWindow &window,
 		unsigned int windowSize, const double &overlap);
-	static void ComputeFRF(const Dataset2D &input, const Dataset2D &output,
-		Dataset2D &amplitude, Dataset2D *phase = NULL, Dataset2D *coherence = NULL);
+	static void ComputeFRF(const Dataset2D &input, const Dataset2D &output, unsigned int numberOfAverages,
+		const FFTWindow &window, Dataset2D &amplitude, Dataset2D *phase = NULL, Dataset2D *coherence = NULL);
 	static Dataset2D ComputeCoherence(const Dataset2D& input, const Dataset2D& output);
 
 	static unsigned int GetNumberOfAverages(const unsigned int windowSize,
 		const double &overlap, const unsigned int &dataSize);
+	static double ComputeOverlap(unsigned int &windowSize,
+		unsigned int &numberOfAverages, const unsigned int &dataSize);
 
 	static std::string GetWindowName(const FFTWindow &window);
 	static unsigned int GetMaxPowerOfTwo(const unsigned int &sampleSize);
@@ -59,6 +61,9 @@ private:
 
 	static void DoBitReversal(Dataset2D &set);
 	static void DoFFT(Dataset2D &temp);
+
+	static void ZeroDataset(Dataset2D &data);
+	static Dataset2D GenerateConstantDataset(const double &xValue, const double &yValue, const unsigned int &size);
 
 	static Dataset2D ComputeCrossPowerSpectrum(const Dataset2D &fftIn, const Dataset2D &fftOut);
 	static Dataset2D ComputePowerSpectrum(const Dataset2D &fft);
@@ -78,11 +83,15 @@ private:
 	static Dataset2D ComputeRawFFT(const Dataset2D &data, const FFTWindow &window);
 	static void InitializeRawFFTDataset(Dataset2D &rawFFT, const Dataset2D &data, const FFTWindow &window);
 
+	static Dataset2D ComplexAdd(const Dataset2D &a, const Dataset2D &b);
 	static Dataset2D ComplexMultiply(const Dataset2D &a, const Dataset2D &b);
 	static Dataset2D ComplexDivide(const Dataset2D &a, const Dataset2D &b);
 
 	static Dataset2D ComplexMagnitude(const Dataset2D &a);
 	static Dataset2D ComplexPower(const Dataset2D &a, const double &power);
+
+	static unsigned int ComputeRequiredOverlapPoints(const unsigned int &dataSize,
+		const unsigned int &windowSize, const unsigned int &averages);
 };
 
 #endif// _FFT_H_

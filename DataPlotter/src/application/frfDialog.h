@@ -27,6 +27,7 @@ public:
 
 	unsigned int GetInputIndex(void) const;
 	unsigned int GetOutputIndex(void) const;
+	unsigned int GetNumberOfAverages(void) const;
 
 	bool GetComputePhase(void) const;
 	bool GetComputeCoherence(void) const;
@@ -34,6 +35,7 @@ public:
 private:
 	void CreateControls(const wxArrayString &descriptions);
 	wxSizer *CreateSelectionControls(const wxArrayString &descriptions);
+	wxSizer *CreateTextBox(void);
 	wxSizer *CreateCheckBoxes(void);
 	wxSizer *CreateButtons(void);
 
@@ -42,6 +44,8 @@ private:
 
 	wxCheckBox *phaseCheckBox;
 	wxCheckBox *coherenceCheckBox;
+
+	wxTextCtrl *averagesTextBox;
 
 	virtual bool TransferDataFromWindow(void);
 };

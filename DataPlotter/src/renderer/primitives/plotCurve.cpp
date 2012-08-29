@@ -42,6 +42,9 @@ PlotCurve::PlotCurve(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 	xAxis = NULL;
 	yAxis = NULL;
 
+	showMarkers = false;
+	autoShowMarkers = true;
+
 	size = 1;
 }
 
@@ -124,6 +127,13 @@ void PlotCurve::GenerateGeometry(void)
 	}
 
 	glEnd();
+
+	if (showMarkers || (autoShowMarkers && SmallXRange()))
+	{
+		glBegin(GL_QUADS);
+		PlotMarkers();
+		glEnd();
+	}
 }
 
 //==========================================================================
@@ -667,4 +677,92 @@ double PlotCurve::GetInterpolatedYOrdinate(const unsigned int &first, const unsi
 		return pow(data->GetYData(second), fraction) * pow(data->GetYData(first), 1.0 - fraction);
 
 	return data->GetYData(first) + (data->GetYData(second) - data->GetYData(first)) * fraction;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PlotMarkers
+//
+// Description:		Plots markers at all un-interpolated points.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::PlotMarkers(void) const
+{
+	unsigned int i;
+	for (i = 0; i < data->GetNumberOfPoints(); i++)
+	{
+		if (PointIsWithinPlotArea(i))
+			DrawMarker(data->GetXData(i), data->GetYData(i));
+	}
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		DrawMarker
+//
+// Description:		Draws a marker at the specified location.
+//
+// Input Arguments:
+//		x	= const double&
+//		y	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::DrawMarker(const double &x, const double &y) const
+{
+	double doublePoint[2] = {x, y};
+	int point[2];
+	RescalePoint(doublePoint, point);
+
+	int halfMarkerSize = 2;
+
+	glVertex2i(point[0] + halfMarkerSize, point[1] + halfMarkerSize);
+	glVertex2i(point[0] + halfMarkerSize, point[1] - halfMarkerSize);
+	glVertex2i(point[0] - halfMarkerSize, point[1] - halfMarkerSize);
+	glVertex2i(point[0] - halfMarkerSize, point[1] + halfMarkerSize);
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		SmallXRange
+//
+// Description:		Determines if the x-range is small enough to warrant
+//					drawing the point markers.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool PlotCurve::SmallXRange(void) const
+{
+	if (data->GetNumberOfPoints() < 2)
+		return false;
+
+	double period = data->GetXData(1) - data->GetXData(0);
+	unsigned int xPoints = (unsigned int)floor((xAxis->GetMaximum() - xAxis->GetMinimum()) / period);
+
+	if (xPoints < 50)
+		return true;
+
+	return false;
 }

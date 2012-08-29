@@ -71,7 +71,6 @@ PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 //==========================================================================
 PlotObject::~PlotObject()
 {
-	// Delete the font objects
 	delete axisFont;
 	axisFont = NULL;
 	delete titleFont;
@@ -396,10 +395,8 @@ void PlotObject::FormatPlot(void)
 	SetOriginalAxisLimits();
 	CheckForZeroRange();
 	CheckAutoScaling();
-
-	unsigned int i;
-	for (i = 0; i < (unsigned int)plotList.size(); i++)
-		plotList[i]->SetModified();
+	MatchYAxes();
+	FormatCurves();
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
 	double xMajor = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
@@ -631,15 +628,15 @@ void PlotObject::FormatTitle(void)
 //==========================================================================
 void PlotObject::SetOriginalAxisLimits(void)
 {
-	bool leftFound = false;
-	bool rightFound = false;
+	leftUsed = false;
+	rightUsed = false;
 	unsigned int i;
 	Axis *yAxis;
 	for (i = 0; i < (unsigned int)dataList.size(); i++)
 	{
 		if (!plotList[i]->GetIsVisible())
 			continue;
-		if (!leftFound && !rightFound)
+		if (!leftUsed && !rightUsed)
 		{
 			xMinOriginal = GetFirstValidValue(dataList[i]->GetXPointer(),
 				dataList[i]->GetNumberOfPoints());
@@ -647,24 +644,22 @@ void PlotObject::SetOriginalAxisLimits(void)
 		}
 
 		yAxis = plotList[i]->GetYAxis();
-		if (yAxis == axisLeft && !leftFound)
+		if (yAxis == axisLeft && !leftUsed)
 		{
-			leftFound = true;
+			leftUsed = true;
 			yLeftMinOriginal = GetFirstValidValue(dataList[i]->GetYPointer(),
 				dataList[i]->GetNumberOfPoints());
 			yLeftMaxOriginal = yLeftMinOriginal;
 		}
-		else if (yAxis == axisRight && !rightFound)
+		else if (yAxis == axisRight && !rightUsed)
 		{
-			rightFound = true;
+			rightUsed = true;
 			yRightMinOriginal = GetFirstValidValue(dataList[i]->GetYPointer(),
 				dataList[i]->GetNumberOfPoints());
 			yRightMaxOriginal = yRightMinOriginal;
 		}
 		GetAxisExtremes(*dataList[i], yAxis);
 	}
-
-	MatchYAxes(leftFound, rightFound);
 }
 
 //==========================================================================
@@ -706,8 +701,7 @@ double PlotObject::GetFirstValidValue(const double* data, const unsigned int &si
 //					forces the limits to match the opposite y-axis.
 //
 // Input Arguments:
-//		leftFound	= const bool&
-//		rightFound	= const bool&
+//		None
 //
 // Output Arguments:
 //		None
@@ -716,20 +710,24 @@ double PlotObject::GetFirstValidValue(const double* data, const unsigned int &si
 //		None
 //
 //==========================================================================
-void PlotObject::MatchYAxes(const bool &leftFound, const bool &rightFound)
+void PlotObject::MatchYAxes(void)
 {
 	// If one axis is unused, make it match the other
-	if (leftFound && !rightFound)
+	if (leftUsed && !rightUsed)
 	{
 		axisRight->SetLogarithmicScale(axisLeft->IsLogarithmic());
 		yRightMinOriginal = yLeftMinOriginal;
 		yRightMaxOriginal = yLeftMaxOriginal;
+		yRightMin = yLeftMin;
+		yRightMax = yLeftMax;
 	}
-	else if (!leftFound && rightFound)
+	else if (!leftUsed && rightUsed)
 	{
 		axisLeft->SetLogarithmicScale(axisRight->IsLogarithmic());
 		yLeftMinOriginal = yRightMinOriginal;
 		yLeftMaxOriginal = yRightMaxOriginal;
+		yLeftMin = yRightMin;
+		yLeftMax = yRightMax;
 	}
 }
 
@@ -1004,7 +1002,7 @@ void PlotObject::CheckForZeroRange(void)
 //		None
 //
 //==========================================================================
-void PlotObject::CheckAutoScaling(void)
+void PlotObject::CheckAutoScaling()
 {
 	if (autoScaleX)
 	{
@@ -1715,4 +1713,29 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 		return;
 
 	axisRight->SetLogarithmicScale(log);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		FormatCurves
+//
+// Description:		Formats the curve objects.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::FormatCurves(void)
+{
+	unsigned int i;
+	for (i = 0; i < (unsigned int)plotList.size(); i++)
+	{
+		plotList[i]->SetModified();
+	}
 }

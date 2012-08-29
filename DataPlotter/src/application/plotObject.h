@@ -105,6 +105,8 @@ public:
 
 	bool GetXAxisAutoScaled(void) const { return autoScaleX; };
 
+	unsigned int GetCurveCount(void) const { return plotList.size(); };
+
 private:
 	// The renderer object
 	PlotRenderer &renderer;
@@ -130,6 +132,9 @@ private:
 	bool autoScaleX;
 	bool autoScaleLeftY;
 	bool autoScaleRightY;
+
+	bool leftUsed;
+	bool rightUsed;
 
 	// The actual plot objects
 	std::vector<PlotCurve*> plotList;
@@ -157,6 +162,8 @@ private:
 	void SetAxesColor(const Color &color);
 	void FormatTitle(void);
 
+	void FormatCurves(void);
+
 	void CheckForZeroRange(void);
 	void HandleZeroRangeAxis(double &min, double &max) const;
 
@@ -169,7 +176,7 @@ private:
 	void SetOriginalAxisLimits(void);
 	void GetAxisExtremes(const Dataset2D &data, Axis *yAxis);
 	void ResetOriginalLimits(void);
-	void MatchYAxes(const bool &leftFound, const bool &rightFound);
+	void MatchYAxes(void);
 	double GetFirstValidValue(const double* data, const unsigned int &size) const;
 };
 

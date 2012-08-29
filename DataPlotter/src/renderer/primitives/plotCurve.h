@@ -42,6 +42,8 @@ public:
 	void SetModified(void) { modified = true; };
 
 	void SetSize(const unsigned int &_size) { size = _size; modified = true; };
+	void ShowMarkers(const bool &_showMarkers = true) { showMarkers = _showMarkers; modified = true; };
+	void AutoShowMarkers(const bool &_autoShowMarkers = true) { autoShowMarkers = _autoShowMarkers; modified = true; };
 
 	// Remove all data from the plot
 	void SetData(const Dataset2D *_data);
@@ -67,6 +69,9 @@ private:
 	const Dataset2D *data;
 	unsigned int size;
 
+	bool showMarkers;
+	bool autoShowMarkers;
+
 	void RescalePoint(const double *value, int *coordinate) const;
 
 	bool PointIsWithinPlotArea(const unsigned int &i) const;
@@ -87,6 +92,10 @@ private:
 
 	double GetInterpolatedXOrdinate(const unsigned int &first, const unsigned int &second, const double &yValue) const;
 	double GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const;
+
+	void PlotMarkers(void) const;
+	void DrawMarker(const double &x, const double &y) const;
+	bool SmallXRange(void) const;
 };
 
 #endif// _PLOT_CURVE_H_
