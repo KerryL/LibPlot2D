@@ -74,10 +74,10 @@ public:
 
 private:
 	// Functions that do some of the frame initialization and control positioning
-	void DoLayout(void);
+	void CreateControls(void);
 	void SetProperties(void);
 
-	void CreatePlotArea(wxWindow *parent);
+	PlotRenderer* CreatePlotArea(wxWindow *parent);
 	wxGrid* CreateOptionsGrid(wxWindow *parent);
 	wxBoxSizer* CreateButtons(wxWindow *parent);
 

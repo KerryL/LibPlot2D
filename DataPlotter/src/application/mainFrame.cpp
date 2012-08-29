@@ -20,6 +20,7 @@
 // wxWidgets headers
 #include <wx/grid.h>
 #include <wx/colordlg.h>
+#include <wx/splitter.h>
 
 // Local headers
 #include "application/mainFrame.h"
@@ -74,7 +75,7 @@
 MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPosition,
 								 wxDefaultSize, wxDEFAULT_FRAME_STYLE)
 {
-	DoLayout();
+	CreateControls();
 	SetProperties();
 
 	currentFileFormat = FormatGeneric;
@@ -125,7 +126,7 @@ const wxString MainFrame::pathToConfigFile = _T("dataplotter.ini");
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		DoLayout
+// Function:		CreateControls
 //
 // Description:		Creates sizers and controls and lays them out in the window.
 //
@@ -139,30 +140,24 @@ const wxString MainFrame::pathToConfigFile = _T("dataplotter.ini");
 //		None
 //
 //==========================================================================
-void MainFrame::DoLayout(void)
+void MainFrame::CreateControls(void)
 {
-	// Create the top sizer, and on inside of it just to pad the borders a bit
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
-	wxPanel *mainPanel = new wxPanel(this);
-	topSizer->Add(mainPanel, 1, wxGROW);
+	wxSplitterWindow *splitter = new wxSplitterWindow(this);
+	topSizer->Add(splitter, 1, wxGROW);
 
-	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-	mainPanel->SetSizer(mainSizer);
-
-	CreatePlotArea(mainPanel);
-	mainSizer->Add(plotArea, 1, wxGROW);
-
-	// Create the options controls and buttons
+	wxPanel *lowerPanel = new wxPanel(splitter);
 	wxBoxSizer *lowerSizer = new wxBoxSizer(wxHORIZONTAL);
-	mainSizer->Add(lowerSizer);
+	lowerSizer->Add(CreateButtons(lowerPanel), 0, wxGROW | wxALL, 5);
+	lowerSizer->Add(CreateOptionsGrid(lowerPanel), 1, wxGROW | wxALL, 5);
+	lowerPanel->SetSizer(lowerSizer);
 
-	lowerSizer->Add(CreateButtons(mainPanel), 0, wxGROW | wxALL, 5);
-	lowerSizer->Add(CreateOptionsGrid(mainPanel), 1, wxGROW | wxALL, 5);
+	CreatePlotArea(splitter);
+	splitter->SplitHorizontally(plotArea, lowerPanel, plotArea->GetSize().GetHeight());
+	splitter->SetSashGravity(1.0);
+	splitter->SetMinimumPaneSize(150);
 
-	// Assign sizers and resize the frame
 	SetSizerAndFit(topSizer);
-	SetAutoLayout(true);
-	topSizer->SetSizeHints(this);
 }
 
 //==========================================================================
@@ -178,13 +173,11 @@ void MainFrame::DoLayout(void)
 //		None
 //
 // Return Value:
-//		None
+//		PlotRenderer* pointing to plotArea
 //
 //==========================================================================
-void MainFrame::CreatePlotArea(wxWindow *parent)
+PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 {
-	optionsGrid = NULL;
-
 #ifdef __WXGTK__
 	// Under GTK, we get a segmentation fault or X error on call to SwapBuffers in RenderWindow.
 	// Adding the double-buffer arugment fixes this.  Under windows, the double-buffer argument
@@ -197,6 +190,8 @@ void MainFrame::CreatePlotArea(wxWindow *parent)
 
 	plotArea->SetSize(480, 320);
 	plotArea->SetGridOn();
+
+	return plotArea;
 }
 
 //==========================================================================
@@ -1899,11 +1894,6 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	optionsGrid->GetCellValue(index, colSize).ToULong(&size);
 	plotArea->SetCurveProperties(index - 1, GetNextColor(index), true, false, size);
 	plotArea->UpdateDisplay();
-
-	// Generate an on-size event to force the options grid to re-size
-	// FIXME:  There needs to be a better way to do this
-	SetSize(GetSize() + wxSize(0, 1));
-	SetSize(GetSize() + wxSize(0, -1));
 }
 
 //==========================================================================
