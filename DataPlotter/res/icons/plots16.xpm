@@ -1,5 +1,5 @@
 /* XPM */
-static char * plots16_xpm[] = {
+const char * plots16_xpm[] = {
 "16 16 14 1",
 " 	c None",
 ".	c #0000FF",

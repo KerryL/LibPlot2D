@@ -2,6 +2,12 @@
 <configurationDescriptor version="79">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df name="DataPlotter" root=".">
+      <df name=".obj">
+        <df name="src">
+          <df name="application">
+          </df>
+        </df>
+      </df>
       <df name="bin">
       </df>
       <df name="res">
@@ -15,6 +21,8 @@
           <in>customFileFormat.h</in>
           <in>dropTarget.cpp</in>
           <in>dropTarget.h</in>
+          <in>fftDialog.cpp</in>
+          <in>fftDialog.h</in>
           <in>filterDialog.cpp</in>
           <in>filterDialog.h</in>
           <in>mainFrame.cpp</in>
@@ -27,6 +35,8 @@
           <in>plotterApp.h</in>
           <in>rangeLimitsDialog.cpp</in>
           <in>rangeLimitsDialog.h</in>
+          <in>transferFunctionDialog.cpp</in>
+          <in>transferFunctionDialog.h</in>
         </df>
         <df name="renderer">
           <df name="primitives">
