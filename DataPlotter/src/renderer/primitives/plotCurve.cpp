@@ -420,7 +420,7 @@ bool PlotCurve::PointsCrossBottomAxis(const unsigned int &first, const unsigned 
 {
 	if (!PointsCrossYOrdinate(first, second, yAxis->GetMinimum()))
 		return false;
-	
+
 	double crossing = GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum());
 	if (crossing < xAxis->GetMinimum() || crossing > xAxis->GetMaximum())
 		return false;
@@ -450,7 +450,7 @@ bool PlotCurve::PointsCrossTopAxis(const unsigned int &first, const unsigned int
 {
 	if (!PointsCrossYOrdinate(first, second, yAxis->GetMaximum()))
 		return false;
-	
+
 	double crossing = GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum());
 	if (crossing < xAxis->GetMinimum() || crossing > xAxis->GetMaximum())
 		return false;
@@ -480,7 +480,7 @@ bool PlotCurve::PointsCrossLeftAxis(const unsigned int &first, const unsigned in
 {
 	if (!PointsCrossXOrdinate(first, second, xAxis->GetMinimum()))
 		return false;
-	
+
 	double crossing = GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum());
 	if (crossing < yAxis->GetMinimum() || crossing > yAxis->GetMaximum())
 		return false;
@@ -510,7 +510,7 @@ bool PlotCurve::PointsCrossRightAxis(const unsigned int &first, const unsigned i
 {
 	if (!PointsCrossXOrdinate(first, second, xAxis->GetMaximum()))
 		return false;
-	
+
 	double crossing = GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum());
 	if (crossing < yAxis->GetMinimum() || crossing > yAxis->GetMaximum())
 		return false;

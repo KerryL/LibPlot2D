@@ -529,14 +529,14 @@ void FastFourierTransform::DoFFT(Dataset2D &temp)
 	double c1, c2, t1, t2, u1, u2, z;
 	unsigned int powerOfTwo = GetMaxPowerOfTwo(temp.GetNumberOfPoints());
 
-	c1 = -1.0; 
+	c1 = -1.0;
 	c2 = 0.0;
 	l2 = 1;
 	for (l = 0; l < powerOfTwo; l++)
 	{
 		l1 = l2;
 		l2 <<= 1;
-		u1 = 1.0; 
+		u1 = 1.0;
 		u2 = 0.0;
 		for (j = 0; j < l1; j++)
 		{
@@ -545,7 +545,7 @@ void FastFourierTransform::DoFFT(Dataset2D &temp)
 				i1 = i + l1;
 				t1 = u1 * temp.GetXData(i1) - u2 * temp.GetYData(i1);
 				t2 = u1 * temp.GetYData(i1) + u2 * temp.GetXData(i1);
-				temp.GetXPointer()[i1] = temp.GetXData(i) - t1; 
+				temp.GetXPointer()[i1] = temp.GetXData(i) - t1;
 				temp.GetYPointer()[i1] = temp.GetYData(i) - t2;
 				temp.GetXPointer()[i] += t1;
 				temp.GetYPointer()[i] += t2;
@@ -583,7 +583,7 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 {
 	Dataset2D halfSpectrum;
 	unsigned int i;
-	
+
 	if (preserveDCValue)
 	{
 		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2);

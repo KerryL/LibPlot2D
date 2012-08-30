@@ -37,6 +37,8 @@ public:
 
 	void ProcessChannels(wxArrayString &names, std::vector<double> &scales);
 
+	inline static bool CustomDefinitionsExist(void) { return wxFileExists(customFormatsXMLFileName); };
+
 private:
 	static const wxString customFormatsXMLFileName;
 	static const wxString customFormatsRootName;

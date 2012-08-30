@@ -109,7 +109,7 @@ Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 
 		return set;
 	}
-	
+
 	return *list[i - 1];
 }
 

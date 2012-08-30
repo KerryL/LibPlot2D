@@ -167,10 +167,7 @@ void Primitive::Draw(void)
 //==========================================================================
 void Primitive::SetVisibility(const bool &_isVisible)
 {
-	// Set the visibility flag to the argument
 	isVisible = _isVisible;
-	
-	// Reset the modified flag
 	modified = true;
 }
 
@@ -192,10 +189,7 @@ void Primitive::SetVisibility(const bool &_isVisible)
 //==========================================================================
 void Primitive::SetColor(const Color &_color)
 {
-	// Set the color to the argument
 	color = _color;
-	
-	// Reset the modified flag
 	modified = true;
 }
 

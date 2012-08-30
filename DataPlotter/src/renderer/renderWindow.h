@@ -131,7 +131,7 @@ private:
 	void OnSize(wxSizeEvent& event);
 	void OnEnterWindow(wxMouseEvent &event);
 	// End event handlers-------------------------------------------------
-	
+
 	// The main render method - re-draws the scene
 	void Render();
 
@@ -176,7 +176,7 @@ protected:
 
 	// Flag indicating whether or not we need to re-initialize this object
 	bool modified;
-	
+
 	// The list of objects to create in this scene
 	ManagedList<Primitive> primitiveList;
 

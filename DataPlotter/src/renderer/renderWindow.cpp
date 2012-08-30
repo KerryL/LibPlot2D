@@ -74,7 +74,7 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 	cameraPosition.Set(0.0, 0.0, 0.0);
 	focalPoint.Set(0.0, 0.0, 0.0);
 	isInteracting = false;
-	
+
 	SetBackgroundStyle(wxBG_STYLE_CUSTOM);// To avoid flashing under MSW
 
 	modified = true;

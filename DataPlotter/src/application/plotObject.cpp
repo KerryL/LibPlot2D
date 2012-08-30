@@ -105,15 +105,15 @@ void PlotObject::CreateAxisObjects(void)
 	axisTop->SetAxisAtMaxEnd(axisRight);
 	axisTop->SetAxisAtMinEnd(axisLeft);
 	axisTop->SetOppositeAxis(axisBottom);
-	
+
 	axisBottom->SetAxisAtMaxEnd(axisRight);
 	axisBottom->SetAxisAtMinEnd(axisLeft);
 	axisBottom->SetOppositeAxis(axisTop);
-	
+
 	axisLeft->SetAxisAtMaxEnd(axisTop);
 	axisLeft->SetAxisAtMinEnd(axisBottom);
 	axisLeft->SetOppositeAxis(axisRight);
-	
+
 	axisRight->SetAxisAtMaxEnd(axisTop);
 	axisRight->SetAxisAtMinEnd(axisBottom);
 	axisRight->SetOppositeAxis(axisLeft);
@@ -468,7 +468,7 @@ void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 	axisBottom->SetOrientation(Axis::OrientationBottom);
 	axisBottom->SetFont(axisFont);
 	axisBottom->SetTickStyle(tickStyle);
-	
+
 	if (axisBottom->GetLabel().IsEmpty())
 		axisBottom->SetOffsetFromWindowEdge(50);
 	else
@@ -495,7 +495,7 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 {
 	axisTop->SetOrientation(Axis::OrientationTop);
 	axisTop->SetTickStyle(tickStyle);
-	
+
 	if (axisTop->GetLabel().IsEmpty())
 		axisTop->SetOffsetFromWindowEdge(50);
 	else
@@ -526,7 +526,7 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 	axisLeft->SetOrientation(Axis::OrientationLeft);
 	axisLeft->SetFont(axisFont);
 	axisLeft->SetTickStyle(tickStyle);
-	
+
 	if (axisLeft->GetLabel().IsEmpty())
 		axisLeft->SetOffsetFromWindowEdge(75);
 	else
@@ -554,7 +554,7 @@ void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 	axisRight->SetOrientation(Axis::OrientationRight);
 	axisRight->SetFont(axisFont);
 	axisRight->SetTickStyle(tickStyle);
-	
+
 	if (axisRight->GetLabel().IsEmpty())
 		axisRight->SetOffsetFromWindowEdge(75);
 	else
@@ -814,12 +814,12 @@ void PlotObject::ApplyRangeLimits(const double &xMinor, const double &xMajor,
 	axisTop->SetMaximum(xMax);
 	axisTop->SetMinorResolution(xMinor);
 	axisTop->SetMajorResolution(xMajor);
-	
+
 	axisLeft->SetMinimum(yLeftMin);
 	axisLeft->SetMaximum(yLeftMax);
 	axisLeft->SetMinorResolution(yLeftMinor);
 	axisLeft->SetMajorResolution(yLeftMajor);
-	
+
 	axisRight->SetMinimum(yRightMin);
 	axisRight->SetMaximum(yRightMax);
 	axisRight->SetMinorResolution(yRightMinor);

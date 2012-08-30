@@ -60,7 +60,7 @@ Axis::Axis(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 	logarithmic = false;
 
 	font = NULL;
-	
+
 	minAxis = NULL;
 	maxAxis = NULL;
 	oppositeAxis = NULL;
@@ -737,12 +737,13 @@ double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigne
 // Description:		Computes the translations required for the specified bounding box.
 //
 // Input Arguments:
-//		value	= 
-//		last	= const bool&
-//		tick	= const unsigned int&
+//		value			= const double&
+//		boundingBox		= const FTBBox&
+//		offset			= const double&
 //
 // Output Arguments:
-//		None
+//		xTranslation	= int&
+//		yTranslation	= int&
 //
 // Return Value:
 //		double
@@ -819,7 +820,7 @@ bool Axis::HasValidParameters(void)
 	// Don't draw if any of the limits are not numbers
 	if (PlotMath::IsNaN(minimum) || PlotMath::IsNaN(maximum))
 		return false;
-	
+
 	// Make sure the pointers to the perpendicular axes have been provided
 	if (!minAxis || !maxAxis)
 		return false;

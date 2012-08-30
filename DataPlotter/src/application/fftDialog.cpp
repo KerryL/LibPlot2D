@@ -290,7 +290,7 @@ wxArrayString FFTDialog::GetWindowList(void) const
 	unsigned int i;
 	for (i = 0; i < FastFourierTransform::WindowCount; i++)
 		list.Add(FastFourierTransform::GetWindowName((FastFourierTransform::FFTWindow)i));
-	
+
 	return list;
 }
 

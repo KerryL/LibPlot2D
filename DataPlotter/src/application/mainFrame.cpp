@@ -78,6 +78,9 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 	CreateControls();
 	SetProperties();
 
+	if (!CustomFileFormat::CustomDefinitionsExist())
+		wxMessageBox(_T("Warning:  Custom file definitions not found!"), _T("Custom File Formats"), wxICON_WARNING, this);
+
 	currentFileFormat = FormatGeneric;
 }
 
@@ -1473,7 +1476,7 @@ bool MainFrame::IsBaumullerFile(const wxString &pathAndFileName)
 	// Wrap in wxString for robustness against varying line endings
 	if (wxString(nextLine).Trim().Cmp(_T("WinBASS_II_Oscilloscope_Data")) == 0)
 		return true;
-	
+
 	return false;
 }
 
@@ -1915,7 +1918,7 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 void MainFrame::AddTimeRowToGrid(void)
 {
 	optionsGrid->AppendRows();
-		
+
 	SetXDataLabel(currentFileFormat);
 
 	unsigned int i;
@@ -2813,20 +2816,20 @@ Dataset2D MainFrame::GetXZoomedDataset(const Dataset2D &fullData) const
 //
 //==========================================================================
 void MainFrame::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
-{	
+{
 	double shift(0.0);
 	wxString shiftText = ::wxGetTextFromUser(
 		_T("Specify the time to add to time data in original data:\n"
 		"Use same units as time series.  Positive values shift curve to the right."),
 		_T("Time Shift"), _T("0"), this);
-	
+
 	if (!shiftText.ToDouble(&shift) || shift == 0.0)
 		return;
-	
+
 	// Create new dataset containing the RMS of dataset and add it to the plot
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
 	Dataset2D *newData = new Dataset2D(*plotList[row - 1]);
-	
+
 	newData->XShift(shift);
 
 	wxString name = optionsGrid->GetCellValue(row, colName) + _T(", t = t0 + ");
@@ -2892,7 +2895,7 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 	unsigned long order;
 	wxString orderString = ::wxGetTextFromUser(_T("Specify the order of the polynomial fit:"),
 		_T("Polynomial Curve Fit"), _T("2"), this);
-	
+
 	// If cancelled, the orderString will be empty.  It is possible that the user cleared the textbox
 	// and clicked OK, but we'll ignore this case since we can't tell the difference
 	if (orderString.IsEmpty())
@@ -2906,7 +2909,7 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 
 	wxString name;
 	Dataset2D* newData = GetCurveFitData(order, plotList[optionsGrid->GetSelectedRows()[0] - 1], name);
-	
+
 	AddCurve(newData, name);
 }
 

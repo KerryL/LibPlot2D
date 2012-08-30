@@ -124,8 +124,8 @@ Vector::~Vector()
 // Description:		Performs Euler rotation of this object around point CoR.
 //					Rotations vector contains first (.X), second (.Y), and
 //					third (.Z).  Rotations are performed in that order and
-//					around the global coordinate system each time. 
-//					Rotations vector must be in radians.  The final three 
+//					around the global coordinate system each time.
+//					Rotations vector must be in radians.  The final three
 //					arguments define the rotation angle.  Care must be taken
 //					in setting these arguments, as results will not be
 //					accurate unless they are correct.

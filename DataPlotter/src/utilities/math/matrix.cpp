@@ -485,7 +485,7 @@ Matrix& Matrix::operator *= (const Matrix &target)
 	}
 
 	*this = result;
-	
+
 	return *this;
 }
 
@@ -1145,7 +1145,7 @@ unsigned int Matrix::GetRank(void) const
 			}
 		}
 	}
-	
+
 	return rank;
 }
 
@@ -1339,7 +1339,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 
 				h = f * g - s;
 				U.elements[i][l - 1] = f - g;
-                    
+
 				for (k = l - 1; k < (int)V.rows; k++)
 					rv1[k] = U.elements[i][k] / h;
 
