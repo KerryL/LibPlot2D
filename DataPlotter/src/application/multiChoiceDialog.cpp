@@ -124,30 +124,52 @@ void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayStr
 	mainSizer->Add(instructions, 0, wxALL, 8);
 
 	choiceListBox = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxSize(300, 200), choices, wxLB_ALWAYS_SB);
+	SetAllChoices(true);
 	mainSizer->Add(choiceListBox, 0, wxALL, 10);
 
 	mainSizer->Add(new wxStaticLine(this), wxSizerFlags().Expand().DoubleBorder(wxLEFT | wxRIGHT));
-
-	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	wxButton *selectAllButton = new wxButton(this, ID_SELECT_ALL, _T("Select All"));
-	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
-	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
-
-	buttonSizer->Add(selectAllButton, 0, wxALIGN_LEFT | wxLEFT | wxRIGHT | wxTOP, 3);
-	buttonSizer->AddStretchSpacer();
-	buttonSizer->Add(okButton, 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxTOP, 3);
-	buttonSizer->Add(cancelButton, 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxTOP, 3);
-
-	mainSizer->Add(buttonSizer, 1, wxGROW | wxALL, 5);
+	mainSizer->Add(CreateButtons(), 1, wxGROW | wxALL, 5);
 
 	SetSizer(topSizer);
 	topSizer->SetSizeHints(this);
 	topSizer->Fit(this);
 
 	Center();
-	okButton->SetDefault();
 	choiceListBox->SetFocus();
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		CreateButtons
+//
+// Description:		Creates the buttons.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxSizer*
+//
+//==========================================================================
+wxSizer* MultiChoiceDialog::CreateButtons(void)
+{
+	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+
+	wxButton *selectAllButton = new wxButton(this, ID_SELECT_ALL, _T("Select All"));
+	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
+	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
+
+	sizer->Add(selectAllButton, 0, wxALIGN_LEFT | wxLEFT | wxRIGHT | wxTOP, 3);
+	sizer->AddStretchSpacer();
+	sizer->Add(okButton, 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxTOP, 3);
+	sizer->Add(cancelButton, 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxTOP, 3);
+
+	okButton->SetDefault();
+
+	return sizer;
 }
 
 //==========================================================================
@@ -179,6 +201,28 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 		}
 	}
 
+	SetAllChoices(!allSelected);
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		SetAllChoices
+//
+// Description:		Sets all choices to the specified value.
+//
+// Input Arguments:
+//		selected	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MultiChoiceDialog::SetAllChoices(const bool &selected)
+{
+	unsigned int i;
 	for (i = 0; i < choiceListBox->GetCount(); i++)
-		choiceListBox->Check(i, !allSelected);
+		choiceListBox->Check(i, selected);
 }

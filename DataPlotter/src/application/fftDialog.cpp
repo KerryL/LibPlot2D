@@ -256,7 +256,10 @@ void FFTDialog::ConfigureControls(void)
 		useZoomCheckBox->Enable(false);
 	}
 	else
+	{
 		useZoomCheckBox->Enable(true);
+		useZoomCheckBox->SetValue(true);
+	}
 
 	unsigned int maxPower(FastFourierTransform::GetMaxPowerOfTwo(GetPointCount()));
 	windowSizeCombo->Clear();

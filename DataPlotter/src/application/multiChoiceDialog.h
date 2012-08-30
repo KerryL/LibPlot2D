@@ -31,6 +31,7 @@ public:
 
 private:
 	void CreateControls(const wxString& message, const wxArrayString& choices);
+	wxSizer* CreateButtons(void);
 
 	wxCheckListBox *choiceListBox;
 
@@ -42,6 +43,8 @@ private:
 
 	// Event handlers
 	void OnSelectAllButton(wxCommandEvent &event);
+
+	void SetAllChoices(const bool &selected);
 
 	DECLARE_EVENT_TABLE();
 };
