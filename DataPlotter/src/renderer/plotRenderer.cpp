@@ -443,7 +443,6 @@ void PlotRenderer::UndoZoom(void)
 
 	zoom.pop();// Pop the current zoom in order to read the previous zoom
 	Zoom lastZoom = zoom.top();
-	zoom.pop();
 
 	plot->SetXMin(lastZoom.xMin);
 	plot->SetXMax(lastZoom.xMax);
@@ -453,7 +452,6 @@ void PlotRenderer::UndoZoom(void)
 	plot->SetRightYMax(lastZoom.rightYMax);
 
 	UpdateDisplay();
-	SaveCurrentZoom();
 }
 
 //==========================================================================
@@ -1723,7 +1721,7 @@ void PlotRenderer::ProcessZoomWithBox(wxMouseEvent &event)
 //
 //==========================================================================
 void PlotRenderer::ProcessPan(wxMouseEvent &event)
-{	
+{
 	PanBottomXAxis(event);
 	PanLeftYAxis(event);
 	PanRightYAxis(event);

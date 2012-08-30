@@ -62,7 +62,7 @@ const unsigned long CustomFileFormat::customFormatsVersion = 1;
 CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFileName(_pathAndFileName)
 {
 	wxXmlDocument customFormatDefinitions;
-	if (!wxFileExists(pathAndFileName) ||
+	if (!wxFileExists(pathAndFileName) ||// FIXME:  This doesn't silent the missing file warning!
 		!customFormatDefinitions.Load(customFormatsXMLFileName))
 	{
 		ClearData();
