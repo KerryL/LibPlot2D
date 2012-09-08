@@ -2722,6 +2722,8 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
+	optionsGrid->SetCellValue(optionsGrid->GetRows() - 1, colMarkerSize, _T("0"));
+	UpdateCurveProperties(optionsGrid->GetRows() - 2);
 }
 
 //==========================================================================
