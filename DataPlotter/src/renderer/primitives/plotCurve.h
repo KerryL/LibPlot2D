@@ -41,9 +41,8 @@ public:
 
 	void SetModified(void) { modified = true; };
 
-	void SetSize(const unsigned int &_size) { size = _size; modified = true; };
-	void ShowMarkers(const bool &_showMarkers = true) { showMarkers = _showMarkers; modified = true; };
-	void AutoShowMarkers(const bool &_autoShowMarkers = true) { autoShowMarkers = _autoShowMarkers; modified = true; };
+	void SetLineSize(const unsigned int &size) { lineSize = size; modified = true; };
+	void SetMarkerSize(const int &size) { markerSize = size; modified = true; };
 
 	// Remove all data from the plot
 	void SetData(const Dataset2D *_data);
@@ -55,9 +54,6 @@ public:
 
 	Axis *GetYAxis(void) { return yAxis; };
 
-	// Gets the Y-value that corresponds to the specified X value
-	bool GetYAt(double &value);
-
 	// Overloaded operators
 	PlotCurve& operator = (const PlotCurve &plotCurve);
 
@@ -67,10 +63,9 @@ private:
 	Axis *yAxis;
 
 	const Dataset2D *data;
-	unsigned int size;
 
-	bool showMarkers;
-	bool autoShowMarkers;
+	unsigned int lineSize;
+	int markerSize;
 
 	void RescalePoint(const double *value, int *coordinate) const;
 
@@ -95,7 +90,9 @@ private:
 
 	void PlotMarkers(void) const;
 	void DrawMarker(const double &x, const double &y) const;
+	bool SmallRange(void) const;
 	bool SmallXRange(void) const;
+	bool SmallYRange(void) const;
 };
 
 #endif// _PLOT_CURVE_H_

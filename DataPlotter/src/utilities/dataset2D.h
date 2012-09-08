@@ -49,7 +49,7 @@ public:
 	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; };
 
 	Dataset2D& MultiplyXData(const double &target);
-	bool GetYAt(double &x) const;
+	bool GetYAt(double &x) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
 
 	Dataset2D& XShift(const double &shift);
 

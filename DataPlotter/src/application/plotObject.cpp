@@ -1442,7 +1442,8 @@ void PlotObject::ResetAutoScaling(void)
 //		color		= const Color&
 //		visible		= const bool&
 //		rightAxis	= const bool&
-//		size		= const unsigned int&
+//		lineSize	= const unsigned int&
+//		markerSize	= const int&
 //
 // Output Arguments:
 //		None
@@ -1452,11 +1453,12 @@ void PlotObject::ResetAutoScaling(void)
 //
 //==========================================================================
 void PlotObject::SetCurveProperties(const unsigned int &index, const Color &color,
-	const bool &visible, const bool &rightAxis, const unsigned int &size)
+	const bool &visible, const bool &rightAxis, const unsigned int &lineSize, const int &markerSize)
 {
 	plotList[index]->SetColor(color);
 	plotList[index]->SetVisibility(visible);
-	plotList[index]->SetSize(size);
+	plotList[index]->SetLineSize(lineSize);
+	plotList[index]->SetMarkerSize(markerSize);
 
 	if (rightAxis)
 		plotList[index]->BindToYAxis(axisRight);

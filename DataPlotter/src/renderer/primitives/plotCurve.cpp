@@ -42,10 +42,8 @@ PlotCurve::PlotCurve(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 	xAxis = NULL;
 	yAxis = NULL;
 
-	showMarkers = false;
-	autoShowMarkers = true;
-
-	size = 1;
+	lineSize = 1;
+	markerSize = -1;
 }
 
 //==========================================================================
@@ -108,7 +106,7 @@ PlotCurve::~PlotCurve()
 //==========================================================================
 void PlotCurve::GenerateGeometry(void)
 {
-	glLineWidth((float)size);
+	glLineWidth((float)lineSize);
 	glBegin(GL_LINE_STRIP);
 
 	unsigned int i;
@@ -128,7 +126,7 @@ void PlotCurve::GenerateGeometry(void)
 
 	glEnd();
 
-	if (showMarkers || (autoShowMarkers && SmallXRange()))
+	if (markerSize > 0 || (markerSize < 0 && SmallRange()))
 	{
 		glBegin(GL_QUADS);
 		PlotMarkers();
@@ -728,7 +726,7 @@ void PlotCurve::DrawMarker(const double &x, const double &y) const
 	int point[2];
 	RescalePoint(doublePoint, point);
 
-	int halfMarkerSize = 2;
+	int halfMarkerSize = 2 * markerSize;
 
 	glVertex2i(point[0] + halfMarkerSize, point[1] + halfMarkerSize);
 	glVertex2i(point[0] + halfMarkerSize, point[1] - halfMarkerSize);
@@ -738,10 +736,40 @@ void PlotCurve::DrawMarker(const double &x, const double &y) const
 
 //==========================================================================
 // Class:			PlotCurve
+// Function:		SmallRange
+//
+// Description:		Determines if the range is small enough to warrant
+//					drawing the point markers.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool PlotCurve::SmallRange(void) const
+{
+	if (data->GetNumberOfPoints() < 2)
+		return false;
+
+	if (SmallXRange())
+		return true;
+
+	return SmallYRange();
+}
+
+//==========================================================================
+// Class:			PlotCurve
 // Function:		SmallXRange
 //
 // Description:		Determines if the x-range is small enough to warrant
-//					drawing the point markers.
+//					drawing the point markers.  A "small enough range" is
+//					one where there are less than some number of pixels in the
+//					x-direction between points (on average).
 //
 // Input Arguments:
 //		None
@@ -755,13 +783,58 @@ void PlotCurve::DrawMarker(const double &x, const double &y) const
 //==========================================================================
 bool PlotCurve::SmallXRange(void) const
 {
-	if (data->GetNumberOfPoints() < 2)
+	double period = data->GetXData(1) - data->GetXData(0);
+	if (period == 0.0)
 		return false;
 
-	double period = data->GetXData(1) - data->GetXData(0);
-	unsigned int xPoints = (unsigned int)floor((xAxis->GetMaximum() - xAxis->GetMinimum()) / period);
+	unsigned int points = (unsigned int)floor((xAxis->GetMaximum() - xAxis->GetMinimum()) / period);
+	if (points == 0)
+		return true;
 
-	if (xPoints < 50)
+	unsigned int spacing = (renderWindow.GetSize().GetWidth()
+		- xAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
+		- xAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
+
+	if (spacing > 7)
+		return true;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		SmallYRange
+//
+// Description:		Determines if the y-range is small enough to warrant
+//					drawing the point markers.  A "small enough range" is
+//					one where there are less than some number of pixels in the
+//					y-direction between points (on average).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool PlotCurve::SmallYRange(void) const
+{
+	double period = data->GetYData(1) - data->GetYData(0);
+	if (period == 0.0)
+		return false;
+
+	unsigned int points = (unsigned int)floor((yAxis->GetMaximum() - yAxis->GetMinimum()) / period);
+	if (points == 0)
+		return true;
+
+	unsigned int spacing = (renderWindow.GetSize().GetHeight()
+		- yAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
+		- yAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
+
+	if (spacing > 7)
 		return true;
 
 	return false;

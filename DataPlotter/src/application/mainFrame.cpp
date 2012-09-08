@@ -191,7 +191,7 @@ PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 	plotArea = new PlotRenderer(parent, wxID_ANY, NULL, *this);
 #endif
 
-	plotArea->SetSize(480, 320);
+	plotArea->SetMinSize(wxSize(650, 320));
 	plotArea->SetGridOn();
 
 	return plotArea;
@@ -221,7 +221,8 @@ wxGrid* MainFrame::CreateOptionsGrid(wxWindow *parent)
 
 	optionsGrid->CreateGrid(0, colCount, wxGrid::wxGridSelectRows);
 	optionsGrid->SetRowLabelSize(0);
-	optionsGrid->SetColFormatNumber(colSize);
+	optionsGrid->SetColFormatNumber(colLineSize);
+	optionsGrid->SetColFormatNumber(colMarkerSize);
 	optionsGrid->SetColFormatFloat(colLeftCursor);
 	optionsGrid->SetColFormatFloat(colRightCursor);
 	optionsGrid->SetColFormatFloat(colDifference);
@@ -230,7 +231,8 @@ wxGrid* MainFrame::CreateOptionsGrid(wxWindow *parent)
 
 	optionsGrid->SetColLabelValue(colName, _T("Curve"));
 	optionsGrid->SetColLabelValue(colColor, _T("Color"));
-	optionsGrid->SetColLabelValue(colSize, _T("Size"));
+	optionsGrid->SetColLabelValue(colLineSize, _T("Line"));
+	optionsGrid->SetColLabelValue(colMarkerSize, _T("Marker"));
 	optionsGrid->SetColLabelValue(colLeftCursor, _T("Left Cursor"));
 	optionsGrid->SetColLabelValue(colRightCursor, _T("Right Cursor"));
 	optionsGrid->SetColLabelValue(colDifference, _T("Difference"));
@@ -239,6 +241,10 @@ wxGrid* MainFrame::CreateOptionsGrid(wxWindow *parent)
 
 	optionsGrid->SetColLabelAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 	optionsGrid->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
+
+	unsigned int i;
+	for (i = 1; i < colCount; i++)// Skip the name column
+		optionsGrid->AutoSizeColLabelSize(i);
 
 	optionsGrid->EndBatch();
 
@@ -405,21 +411,17 @@ END_EVENT_TABLE();
 //==========================================================================
 void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
-	// Set up the wildcard specifications
-	// (Done here for readability)
+	// Set up the wildcard specifications (done here for readability)
 	wxString wildcard("All files (*.*)|*.*");
 	wildcard.append("|Comma Separated (*.csv)|*.csv");
 	wildcard.append("|Tab Delimited (*.txt)|*.txt");
 
-	// Get the file name to open from the user
 	wxArrayString fileList = GetFileNameFromUser(_T("Open Data File"), wxEmptyString, wxEmptyString,
 		wildcard, wxFD_OPEN /*| wxFD_MULTIPLE*/ | wxFD_FILE_MUST_EXIST);
 
-	// Make sure the user didn't cancel
 	if (fileList.GetCount() == 0)
 		return;
 
-	// Loop to make sure we open all selected files
 	unsigned int i;
 	for (i = 0; i < fileList.GetCount(); i++)
 		LoadFile(fileList[i]);
@@ -443,16 +445,13 @@ void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 {
-	// Get the file name to open from the user
 	wxArrayString pathAndFileName = GetFileNameFromUser(_T("Save Image File"), wxEmptyString, wxEmptyString,
 		_T("Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|PNG Image (*.png)|*.png|TIFF Image (*.tif)|*.tif"),
 		wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	// Make sure the user didn't cancel
 	if (pathAndFileName.IsEmpty())
 		return;
 
-	// Call the object's write image file method
 	plotArea->WriteImageToFile(pathAndFileName[0]);
 }
 
@@ -540,10 +539,8 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned int &row)
 {
-	// Declare the menu variable and get the position of the cursor
 	wxMenu *contextMenu = new wxMenu();
 
-	// Start building the context menu
 	contextMenu->Append(idContextAddMathChannel, _T("Add Math Channel"));
 	contextMenu->Append(idContextFRF, _T("Frequency Response"));
 
@@ -568,10 +565,8 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idButtonRemoveCurve, _T("Remove Curve"));
 	}
 
-	// Show the menu
 	PopupMenu(contextMenu, position);
 
-	// Delete the context menu object
 	delete contextMenu;
 	contextMenu = NULL;
 }
@@ -712,17 +707,12 @@ wxMenu* MainFrame::CreateAxisContextMenu(const unsigned int &baseEventId) const
 wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defaultDirectory,
 										 wxString defaultFileName, wxString wildcard, long style)
 {
-	// Initialize the return variable
 	wxArrayString pathsAndFileNames;
 
-	// Step 1 is to ask the user to specify the file name
 	wxFileDialog dialog(this, dialogTitle, defaultDirectory, defaultFileName,
 		wildcard, style);
 
-	// Set the dialog to display center screen at the user's home directory
 	dialog.CenterOnParent();
-
-	// Display the dialog and make sure the user clicked OK
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		// If this was an open dialog, we want to get all of the selected paths,
@@ -733,7 +723,6 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 			pathsAndFileNames.Add(dialog.GetPath());
 	}
 
-	// Return the path and file name
 	return pathsAndFileNames;
 }
 
@@ -827,7 +816,6 @@ bool MainFrame::LoadTxtFile(wxString pathAndFileName)
 {
 	// Add any specific file formats with .txt extensions here
 
-	// Try to load the file as a generic delimited file
 	return LoadGenericDelimitedFile(pathAndFileName);
 }
 
@@ -1893,9 +1881,7 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 	optionsGrid->EndBatch();
 
 	plotArea->AddCurve(*data);
-	unsigned long size;
-	optionsGrid->GetCellValue(index, colSize).ToULong(&size);
-	plotArea->SetCurveProperties(index - 1, GetNextColor(index), true, false, size);
+	UpdateCurveProperties(index - 1, GetNextColor(index), true, false);
 	plotArea->UpdateDisplay();
 }
 
@@ -1948,23 +1934,31 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 	optionsGrid->AppendRows();
 
 	unsigned int maxLineSize(5);
+	unsigned int maxMarkerSize(5);
 
 	optionsGrid->SetCellEditor(index, colVisible, new wxGridCellBoolEditor);
 	optionsGrid->SetCellEditor(index, colRightAxis, new wxGridCellBoolEditor);
-	optionsGrid->SetCellEditor(index, colSize, new wxGridCellNumberEditor(1, maxLineSize));
+	optionsGrid->SetCellEditor(index, colLineSize, new wxGridCellNumberEditor(1, maxLineSize));
+	optionsGrid->SetCellEditor(index, colMarkerSize, new wxGridCellNumberEditor(-1, maxMarkerSize));
 
 	unsigned int i;
 	for (i = 0; i < colDifference; i++)
 			optionsGrid->SetReadOnly(index, i, true);
-	optionsGrid->SetReadOnly(index, colSize, false);
+	optionsGrid->SetReadOnly(index, colLineSize, false);
+	optionsGrid->SetReadOnly(index, colMarkerSize, false);
 	optionsGrid->SetCellValue(index, colName, name);
 
 	Color color = GetNextColor(index);
 
 	optionsGrid->SetCellBackgroundColour(index, colColor, color.ToWxColor());
-	optionsGrid->SetCellValue(index, colSize, _T("1"));
+	optionsGrid->SetCellValue(index, colLineSize, _T("1"));
+	optionsGrid->SetCellValue(index, colMarkerSize, _T("-1"));
 	optionsGrid->SetCellValue(index, colVisible, _T("1"));
-	optionsGrid->AutoSizeColumns();// FIXME:  This doesn't seem to fit to the X data label, if it is longer than the regular curve names
+
+	int width = optionsGrid->GetColumnWidth(colName);
+	optionsGrid->AutoSizeColumn(colName);
+	if (optionsGrid->GetColumnWidth(colName) < width)
+		optionsGrid->SetColumnWidth(colName, width);
 
 	return index;
 }
@@ -2070,7 +2064,8 @@ void MainFrame::RemoveCurve(const unsigned int &i)
 void MainFrame::GridRightClickEvent(wxGridEvent &event)
 {
 	optionsGrid->SelectRow(event.GetRow());
-	CreateGridContextMenu(event.GetPosition() + optionsGrid->GetPosition(), event.GetRow());
+	CreateGridContextMenu(event.GetPosition() + optionsGrid->GetPosition()
+		+ optionsGrid->GetParent()->GetPosition(), event.GetRow());
 }
 
 //==========================================================================
@@ -2113,13 +2108,7 @@ void MainFrame::GridDoubleClickEvent(wxGridEvent &event)
     {
         colorData = dialog.GetColourData();
 		optionsGrid->SetCellBackgroundColour(row, colColor, colorData.GetColour());
-		Color color;
-		color.Set(colorData.GetColour());
-		unsigned long size;
-		optionsGrid->GetCellValue(row, colSize).ToULong(&size);
-		plotArea->SetCurveProperties(row - 1, color,
-			!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
-			!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
+		UpdateCurveProperties(row - 1);
 	}
 }
 
@@ -2162,13 +2151,61 @@ void MainFrame::GridLeftClickEvent(wxGridEvent &event)
 
 	ShowAppropriateXLabel();
 
+	UpdateCurveProperties(row - 1);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		UpdateCurveProperties
+//
+// Description:		Updates the specified curve properties.
+//
+// Input Arguments:
+//		index	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::UpdateCurveProperties(const unsigned int &index)
+{
 	Color color;
-	color.Set(optionsGrid->GetCellBackgroundColour(row, colColor));
-	unsigned long size;
-	optionsGrid->GetCellValue(row, colSize).ToULong(&size);
-	plotArea->SetCurveProperties(row - 1, color,
-		!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
-		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
+	color.Set(optionsGrid->GetCellBackgroundColour(index + 1, colColor));
+	UpdateCurveProperties(index, color,
+		!optionsGrid->GetCellValue(index + 1, colVisible).IsEmpty(),
+		!optionsGrid->GetCellValue(index + 1, colRightAxis).IsEmpty());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		UpdateCurveProperties
+//
+// Description:		Updates the specified curve properties to match the arguments.
+//
+// Input Arguments:
+//		index		= const unsigned int&
+//		color		= const Color&
+//		visible		= const bool&
+//		rightAxis	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::UpdateCurveProperties(const unsigned int &index, const Color &color,
+	const bool &visible, const bool &rightAxis)
+{
+	unsigned long lineSize;
+	long markerSize;
+	optionsGrid->GetCellValue(index + 1, colLineSize).ToULong(&lineSize);
+	optionsGrid->GetCellValue(index + 1, colMarkerSize).ToLong(&markerSize);
+	plotArea->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
 }
 
 //==========================================================================
@@ -2231,19 +2268,14 @@ void MainFrame::ShowAppropriateXLabel(void)
 //==========================================================================
 void MainFrame::GridCellChangeEvent(wxGridEvent &event)
 {
-	// This event is only valid for one column, and then not in the first row
 	unsigned int row(event.GetRow());
-	if (row == 0 || event.GetCol() != colSize)
+	if (row == 0 || (event.GetCol() != colLineSize && event.GetCol() != colMarkerSize))
+	{
 		event.Skip();
+		return;
+	}
 
-	// Update all of the line parameters
-	Color color;
-	color.Set(optionsGrid->GetCellBackgroundColour(row, colColor));
-	unsigned long size;
-	optionsGrid->GetCellValue(row, colSize).ToULong(&size);
-	plotArea->SetCurveProperties(row - 1, color,
-		!optionsGrid->GetCellValue(row, colVisible).IsEmpty(),
-		!optionsGrid->GetCellValue(row, colRightAxis).IsEmpty(), size);
+	UpdateCurveProperties(row - 1);
 }
 
 //==========================================================================

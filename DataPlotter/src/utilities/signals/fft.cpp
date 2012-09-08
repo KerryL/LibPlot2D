@@ -932,9 +932,9 @@ void FastFourierTransform::ApplyWindow(Dataset2D &data, const FFTWindow &window)
 	else if (window == WindowFlatTop)
 		ApplyFlatTopWindow(data);
 	/*else if (window == WindowForce)
-		ApplyForceWindow(data);
+		ApplyForceWindow(data);*/
 	else if (window == WindowExponential)
-		ApplyExponentialWindow(data);*/
+		ApplyExponentialWindow(data);
 	else
 		assert(false);
 }
@@ -1037,13 +1037,15 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 //==========================================================================
 /*void FastFourierTransform::ApplyForceWindow(Dataset2D &data)
 {
-}
+}*/
 
 //==========================================================================
 // Class:			FastFourierTransform
 // Function:		ApplyExponentialWindow (static)
 //
-// Description:		Applies an exponential window to the data.
+// Description:		Applies an exponential window to the data.  Denominator of
+//					exponent (5.0) is chosen somewhat arbitrarily to provide a
+//					nice decay.
 //
 // Input Arguments:
 //		data	= Dataset2D&
@@ -1057,7 +1059,10 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 //==========================================================================
 void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 {
-}*/
+	unsigned int i;
+	for (i = 0; i < data.GetNumberOfPoints(); i++)
+		data.GetXPointer()[i] *= exp(-(double)i / (double)data.GetNumberOfPoints() * 5.0);
+}
 
 //==========================================================================
 // Class:			FastFourierTransform
@@ -1086,9 +1091,9 @@ std::string FastFourierTransform::GetWindowName(const FFTWindow &window)
 	else if (window == WindowFlatTop)
 		return "Flat Top";
 	/*else if (window == WindowForce)
-		return "Force";
+		return "Force";*/
 	else if (window == WindowExponential)
-		return "Exponential";*/
+		return "Exponential";
 
 	assert(false);
 	return "";

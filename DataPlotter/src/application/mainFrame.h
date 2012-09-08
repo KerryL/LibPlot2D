@@ -93,7 +93,8 @@ private:
 	{
 		colName = 0,
 		colColor,
-		colSize,
+		colLineSize,
+		colMarkerSize,
 		colLeftCursor,
 		colRightCursor,
 		colDifference,
@@ -117,6 +118,10 @@ private:
 	Color GetNextColor(const unsigned int &index) const;
 	void AddTimeRowToGrid(void);
 	unsigned int AddDataRowToGrid(const wxString &name);
+
+	void UpdateCurveProperties(const unsigned int &index, const Color &color,
+		const bool &visible, const bool &rightAxis);
+	void UpdateCurveProperties(const unsigned int &index);
 
 	ManagedList<const Dataset2D> plotList;
 

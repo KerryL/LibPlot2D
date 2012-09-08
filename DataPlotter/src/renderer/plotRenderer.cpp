@@ -686,7 +686,8 @@ void PlotRenderer::SetRightGrid(const bool &grid)
 //					  be drawn
 //		rightAxis	= const bool& indicating whether the curve should be tied
 //					  to the left or right axis
-//		size		= const unsigned int&
+//		lineSize	= const unsigned int&
+//		markerSize	= const int&
 //
 // Output Arguments:
 //		None
@@ -697,9 +698,9 @@ void PlotRenderer::SetRightGrid(const bool &grid)
 //==========================================================================
 void PlotRenderer::SetCurveProperties(const unsigned int &index, const Color &color,
 									  const bool &visible, const bool &rightAxis,
-									  const unsigned int &size)
+									  const unsigned int &lineSize, const int &markerSize)
 {
-	plot->SetCurveProperties(index, color, visible, rightAxis, size);
+	plot->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
 	UpdateDisplay();
 }
 

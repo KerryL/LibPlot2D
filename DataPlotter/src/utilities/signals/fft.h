@@ -31,8 +31,8 @@ public:
 		WindowHann,
 		WindowHamming,
 		WindowFlatTop,
-		/*WindowForce,
-		WindowExponential,*/
+		//WindowForce,
+		WindowExponential,
 		WindowCount
 	};
 
@@ -56,8 +56,8 @@ private:
 	static void ApplyHannWindow(Dataset2D &data);
 	static void ApplyHammingWindow(Dataset2D &data);
 	static void ApplyFlatTopWindow(Dataset2D &data);
-	/*static void ApplyForceWindow(Dataset2D &data);
-	static void ApplyExponentialWindow(Dataset2D &data);*/
+	//static void ApplyForceWindow(Dataset2D &data);
+	static void ApplyExponentialWindow(Dataset2D &data);
 
 	static void DoBitReversal(Dataset2D &set);
 	static void DoFFT(Dataset2D &temp);

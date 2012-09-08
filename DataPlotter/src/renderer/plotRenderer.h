@@ -72,7 +72,8 @@ public:
 	void SetGridColor(const Color &color);
 
 	void SetCurveProperties(const unsigned int &index, const Color &color,
-		const bool &visible, const bool &rightAxis, const unsigned int &size);
+		const bool &visible, const bool &rightAxis, const unsigned int &lineSize,
+		const int &markerSize);
 	void SetXLimits(const double &min, const double &max);
 	void SetLeftYLimits(const double &min, const double &max);
 	void SetRightYLimits(const double &min, const double &max);
