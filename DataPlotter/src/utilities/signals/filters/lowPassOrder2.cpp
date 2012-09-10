@@ -40,7 +40,6 @@ LowPassSecondOrderFilter::LowPassSecondOrderFilter(const double& cutoffFrequency
 	const double& dampingRatio, const double& sampleRate, const double& initialValue)
 	: FilterBase(sampleRate)
 {
-	// Allocate and determine the coefficients for the filter
 	u = new double[3];
 	a = new double[1];
 
@@ -62,7 +61,6 @@ LowPassSecondOrderFilter::LowPassSecondOrderFilter(const double& cutoffFrequency
 	b[0] /= b0;
 	b[1] /= b0;
 
-	// Initialize the filter
 	Initialize(initialValue);
 }
 
@@ -84,14 +82,12 @@ LowPassSecondOrderFilter::LowPassSecondOrderFilter(const double& cutoffFrequency
 //==========================================================================
 LowPassSecondOrderFilter::LowPassSecondOrderFilter(const LowPassSecondOrderFilter &f) : FilterBase(sampleRate)
 {
-	// Allocate memory
 	u = new double[3];
 	a = new double[1];
 
 	y = new double[3];
 	b = new double[2];
 
-	// Copy from the argument to this
 	*this = f;
 }
 
@@ -170,11 +166,9 @@ double LowPassSecondOrderFilter::Apply(const double &_u)
 //==========================================================================
 LowPassSecondOrderFilter& LowPassSecondOrderFilter::operator = (const LowPassSecondOrderFilter &f)
 {
-	// Check for self assignment
 	if (this == &f)
 		return *this;
 
-	// Assign member elements
 	u[0] = f.u[0];
 	u[1] = f.u[1];
 	u[2] = f.u[2];

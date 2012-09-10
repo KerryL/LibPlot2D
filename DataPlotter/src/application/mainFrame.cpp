@@ -1332,13 +1332,9 @@ bool MainFrame::ListIsNumeric(const wxArrayString &list) const
 wxArrayString MainFrame::GenerateDummyNames(const unsigned int &count) const
 {
 	unsigned int i;
-	wxString dummyPlotName;
 	wxArrayString names;
 	for (i = 0; i < count; i++)
-	{
-		dummyPlotName.Printf("[%i]", i);
-		names.Add(dummyPlotName);
-	}
+		names.Add(wxString::Format("[%i]", i));
 
 	return names;
 }
