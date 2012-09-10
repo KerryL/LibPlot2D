@@ -227,6 +227,8 @@ private:
 	void ContextSetLogarithmicRight(wxCommandEvent &event);
 	// End event handlers-------------------------------------------------
 
+	void SetMarkerSize(const unsigned int &curve, const int &size);
+
 	void ShowAppropriateXLabel(void);
 
 	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);

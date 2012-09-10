@@ -2547,12 +2547,21 @@ void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 
 	AddCurve(&(amplitude->MultiplyXData(factor)), wxString::Format("FRF Amplitude, [%u] to [%u], [dB]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
+	SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+
 	if (dialog.GetComputePhase())
+	{
 		AddCurve(&(phase->MultiplyXData(factor)), wxString::Format("FRF Phase, [%u] to [%u], [deg]",
 			dialog.GetInputIndex(), dialog.GetOutputIndex()));
+		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+	}
+
 	if (dialog.GetComputeCoherence())
+	{
 		AddCurve(&(coherence->MultiplyXData(factor)), wxString::Format("FRF Coherence, [%u] to [%u]",
 			dialog.GetInputIndex(), dialog.GetOutputIndex()));
+		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+	}
 }
 
 //==========================================================================
@@ -2722,8 +2731,7 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
-	optionsGrid->SetCellValue(optionsGrid->GetRows() - 1, colMarkerSize, _T("0"));
-	UpdateCurveProperties(optionsGrid->GetRows() - 2);
+	SetMarkerSize(optionsGrid->GetRows() - 2, 0);
 }
 
 //==========================================================================
@@ -3767,6 +3775,29 @@ void MainFrame::ContextSetLogarithmicRight(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetRightLogarithmic(!plotArea->GetRightLogarithmic());
 	plotArea->ClearZoomStack();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		SetMarkerSize
+//
+// Description:		Sets the marker size for the specified curve.
+//
+// Input Arguments:
+//		curve	= const unsigned int&
+//		size	= const int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::SetMarkerSize(const unsigned int &curve, const int &size)
+{
+	optionsGrid->SetCellValue(curve + 1, colMarkerSize, wxString::Format("%i", size));
+	UpdateCurveProperties(curve);
 }
 
 //==========================================================================
