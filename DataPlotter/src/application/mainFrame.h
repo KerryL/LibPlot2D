@@ -245,6 +245,9 @@ private:
 	Dataset2D *GetCurveFitData(const unsigned int &order, const Dataset2D* data, wxString &name) const;
 	wxString GetCurveFitName(const CurveFit::PolynomialFit &fitData, const unsigned int &row) const;
 
+	void AddFFTCurves(const double& xFactor, Dataset2D *amplitude, Dataset2D *phase,
+		Dataset2D *coherence, const wxString &namePortion);
+
 	void UpdateSingleCursorValue(const unsigned int &row, double value,
 		const unsigned int &column, const bool &isVisible);
 

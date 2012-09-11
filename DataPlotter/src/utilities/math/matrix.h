@@ -105,13 +105,21 @@ private:
 	void FreeElements(void);
 	void AllocateElements(void);
 
-	// Helper function for SVD algorithm
-	double pythag(const double& a, const double &b) const;
+	// Helper functions for SVD algorithm
+	double Pythag(const double& a, const double &b) const;
+	void InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const;
+	double ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1) const;
+	void AccumulateRightHandTransforms(Matrix &U, Matrix &V, const double *rv1) const;
+	void AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const;
+	bool DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1, const double &anorm) const;
+	void RemoveZeroSingularValues(Matrix &U, Matrix &W) const;
+	void SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const;
 
 	Matrix& SwapRows(const unsigned int &r1, const unsigned int &r2);
 
 	// Helper function for row reduction
-	void ZeroRowByScalingAndAdding(const unsigned int &pivotRow, const unsigned int &pivotColumn, const unsigned int &targetRow);
+	void ZeroRowByScalingAndAdding(const unsigned int &pivotRow,
+		const unsigned int &pivotColumn, const unsigned int &targetRow);
 };
 
 #endif// _MATRIX_H_

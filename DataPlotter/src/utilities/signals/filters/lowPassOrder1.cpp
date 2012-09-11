@@ -46,7 +46,7 @@ LowPassFirstOrderFilter::LowPassFirstOrderFilter(const double& cutoffFrequency,
 	b = new double[1];
 
 	double sampleTime = 1.0 / sampleRate;// [sec]
-	double cutoffRadians = 2.0 * PlotMath::Pi * cutoffFrequency;// [rad/sec]
+	double cutoffRadians = 2.0 * PlotMath::pi * cutoffFrequency;// [rad/sec]
 
 	a[0] = sampleTime * cutoffRadians;
 	// a1 = a0, so we don't store it

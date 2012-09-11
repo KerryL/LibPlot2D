@@ -31,6 +31,7 @@ public:
 
 	bool GetComputePhase(void) const;
 	bool GetComputeCoherence(void) const;
+	bool GetModuloPhase(void) const;
 
 private:
 	void CreateControls(const wxArrayString &descriptions);
@@ -44,6 +45,7 @@ private:
 
 	wxCheckBox *phaseCheckBox;
 	wxCheckBox *coherenceCheckBox;
+	wxCheckBox *moduloPhaseCheckBox;
 
 	wxTextCtrl *averagesTextBox;
 

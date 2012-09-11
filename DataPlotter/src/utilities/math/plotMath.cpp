@@ -114,7 +114,7 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit, const doub
 // Namespace:		PlotMath
 // Function:		RangeToPlusMinusPi
 //
-// Description:		Adds or subtracts 2 * PI to the specified angle until the
+// Description:		Adds or subtracts 2 * pi to the specified angle until the
 //					angle is between -pi and pi.
 //
 // Input Arguments:
@@ -129,7 +129,59 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit, const doub
 //==========================================================================
 double PlotMath::RangeToPlusMinusPi(const double &angle)
 {
-	return Modulo(angle, 2.0 * Pi) - Pi;
+	return Modulo(angle + pi, 2.0 * pi) - pi;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		RangeToPlusMinus180
+//
+// Description:		Adds or subtracts 180 to the specified angle until the
+//					angle is between -180 and 180.
+//
+// Input Arguments:
+//		angle		= const double& reference to the angle we want to bound
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double, equal to the re-ranged angle
+//
+//==========================================================================
+double PlotMath::RangeToPlusMinus180(const double &angle)
+{
+	return Modulo(angle + 180.0, 360.0) - 180.0;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		Unwrap
+//
+// Description:		Minimizes the jump between adjacent points by adding/subtracting
+//					multiples of 2 * pi.
+//
+// Input Arguments:
+//		data	= Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotMath::Unwrap(Dataset2D &data)
+{
+	double threshold(pi);
+	unsigned int i;
+	for (i = 1; i < data.GetNumberOfPoints(); i++)
+	{
+		if (data.GetYData(i) - data.GetYData(i - 1) > threshold)
+			data.GetYPointer()[i] -= 2 * pi;
+		if (data.GetYData(i) - data.GetYData(i - 1) < -threshold)
+			data.GetYPointer()[i] += 2 * pi;
+	}
 }
 
 //==========================================================================

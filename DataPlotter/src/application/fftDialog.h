@@ -33,6 +33,7 @@ public:
 	unsigned int GetWindowSize(void) const;
 	double GetOverlap(void) const;
 	bool GetUseZoomedData(void) const;
+	bool GetSubtractMean(void) const;
 
 private:
 	void CreateControls(void);
@@ -40,6 +41,7 @@ private:
 	wxSizer* CreateOutputControls(void);
 	wxSizer* CreateButtons(void);
 	void ConfigureControls(void);
+	void SetCheckBoxDefaults(void);
 
 	unsigned int dataPoints;
 	unsigned int zoomDataPoints;
@@ -51,6 +53,7 @@ private:
 	wxComboBox *windowCombo;
 	wxTextCtrl *overlapTextBox;
 	wxCheckBox *useZoomCheckBox;
+	wxCheckBox *subtractMeanCheckBox;
 
 	wxStaticText *frequencyRange;
 	wxStaticText *frequencyResolution;

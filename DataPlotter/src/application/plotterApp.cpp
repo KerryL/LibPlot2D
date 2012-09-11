@@ -42,7 +42,7 @@ IMPLEMENT_APP(DataPlotterApp);
 const wxString DataPlotterApp::dataPlotterTitle = _T("Data Plotter");
 const wxString DataPlotterApp::dataPlotterName = _T("DataPlotterApplication");
 const wxString DataPlotterApp::creator = _T("Kerry Loux");
-const wxString DataPlotterApp::versionString = _T("v2.9");
+const wxString DataPlotterApp::versionString = _T("v2.10");
 
 //==========================================================================
 // Class:			DataPlotterApp

@@ -871,7 +871,7 @@ void RenderWindow::AutoSetFrustum(void)
 	aspectRatio = (double)WindowSize.GetWidth() / (double)WindowSize.GetHeight();
 
 	// Set the vertical FOV
-	verticalFOV = 20.0 * PlotMath::Pi / 180.0;
+	verticalFOV = 20.0 * PlotMath::pi / 180.0;
 
 	// Set the clipping plane distances to something reasonable
 	// TODO:  Make this be smarter, or user-adjustable (distance between camera and focal point)

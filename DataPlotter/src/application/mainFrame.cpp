@@ -2539,23 +2539,47 @@ void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 
 	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
 		*plotList[dialog.GetOutputIndex()], dialog.GetNumberOfAverages(),
-		FastFourierTransform::WindowUniform, *amplitude, phase, coherence);
+		FastFourierTransform::WindowUniform, dialog.GetModuloPhase(), *amplitude, phase, coherence);
 
-	AddCurve(&(amplitude->MultiplyXData(factor)), wxString::Format("FRF Amplitude, [%u] to [%u], [dB]",
+	AddFFTCurves(factor, amplitude, phase, coherence, wxString::Format("[%u] to [%u]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		AddFFTCurves
+//
+// Description:		Adds the FFT curves to the plot list.
+//
+// Input Arguments:
+//		xFactor	= const double& scaling factor to convert X units to Hz
+//		amplitude	= Dataset2D*
+//		phase		= Dataset2D*
+//		coherence	= Dataset2D*
+//		namePortion	= const wxString& identifying the input/output signals
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::AddFFTCurves(const double& xFactor, Dataset2D *amplitude, Dataset2D *phase,
+	Dataset2D *coherence, const wxString &namePortion)
+{
+	AddCurve(&(amplitude->MultiplyXData(xFactor)), _T("FRF Amplitude, ") + namePortion + _T(", [dB]"));
 	SetMarkerSize(optionsGrid->GetRows() - 2, 0);
 
-	if (dialog.GetComputePhase())
+	if (phase)
 	{
-		AddCurve(&(phase->MultiplyXData(factor)), wxString::Format("FRF Phase, [%u] to [%u], [deg]",
-			dialog.GetInputIndex(), dialog.GetOutputIndex()));
+		AddCurve(&(phase->MultiplyXData(xFactor)), _T("FRF Phase, ") + namePortion + _T(", [deg]"));
 		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
 	}
 
-	if (dialog.GetComputeCoherence())
+	if (coherence)
 	{
-		AddCurve(&(coherence->MultiplyXData(factor)), wxString::Format("FRF Coherence, [%u] to [%u]",
-			dialog.GetInputIndex(), dialog.GetOutputIndex()));
+		AddCurve(&(coherence->MultiplyXData(xFactor)), _T("FRF Coherence, ") + namePortion + _T(", [dB]"));
 		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
 	}
 }
@@ -2792,10 +2816,12 @@ Dataset2D* MainFrame::GetFFTData(const Dataset2D* data, const double &timeScalin
 
 	if (dialog.GetUseZoomedData())
 		return new Dataset2D(FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
-			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap()));
+			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
+			dialog.GetSubtractMean()));
 
 	return new Dataset2D(FastFourierTransform::ComputeFFT(*data,
-		dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap()));
+		dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
+		dialog.GetSubtractMean()));
 }
 
 //==========================================================================

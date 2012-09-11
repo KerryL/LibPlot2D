@@ -37,10 +37,10 @@ public:
 	};
 
 	static Dataset2D ComputeFFT(const Dataset2D &data);
-	static Dataset2D ComputeFFT(const Dataset2D &data, const FFTWindow &window,
-		unsigned int windowSize, const double &overlap);
+	static Dataset2D ComputeFFT(Dataset2D data, const FFTWindow &window,
+		unsigned int windowSize, const double &overlap, const bool &subtractMean);
 	static void ComputeFRF(const Dataset2D &input, const Dataset2D &output, unsigned int numberOfAverages,
-		const FFTWindow &window, Dataset2D &amplitude, Dataset2D *phase = NULL, Dataset2D *coherence = NULL);
+		const FFTWindow &window, const bool &moduloPhase, Dataset2D &amplitude, Dataset2D *phase = NULL, Dataset2D *coherence = NULL);
 	static Dataset2D ComputeCoherence(const Dataset2D& input, const Dataset2D& output);
 
 	static unsigned int GetNumberOfAverages(const unsigned int windowSize,
@@ -78,7 +78,7 @@ private:
 	static void PopulateFrequencyData(Dataset2D &data, const double &sampleRate);
 
 	static Dataset2D GetAmplitudeData(const Dataset2D &rawFFT, const double &sampleRate);
-	static Dataset2D GetPhaseData(const Dataset2D &rawFFT, const double &sampleRate);
+	static Dataset2D GetPhaseData(const Dataset2D &rawFFT, const double &sampleRate, const bool &moduloPhase);
 
 	static Dataset2D ComputeRawFFT(const Dataset2D &data, const FFTWindow &window);
 	static void InitializeRawFFTDataset(Dataset2D &rawFFT, const Dataset2D &data, const FFTWindow &window);

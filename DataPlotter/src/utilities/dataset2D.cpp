@@ -1127,3 +1127,29 @@ const Dataset2D Dataset2D::ApplyPower(const double &target) const
 	Dataset2D result(*this);
 	return result.ApplyPower(target);
 }
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		ComputeYMean
+//
+// Description:		Computes the average of the Y-data.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Dataset2D::ComputeYMean(void) const
+{
+	double sum(0.0);
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		sum += yData[i];
+
+	return sum / (double)numberOfPoints;
+}

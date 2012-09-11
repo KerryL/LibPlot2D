@@ -31,7 +31,7 @@ namespace PlotMath
 	// Constant declarations
 	const double NEARLY_ZERO = 1.0e-12;
 	const double QNAN = std::numeric_limits<double>::quiet_NaN();
-	const double Pi = 3.141592653589793238462643;
+	const double pi = 3.141592653589793238462643;
 
 	// Prototypes =====================================================
 	// For determining if a number is close enough to zero to regard as zero
@@ -50,8 +50,10 @@ namespace PlotMath
 	// Ensure the value is between two definined limits
 	double Clamp(const double &value, const double &lowerLimit, const double &upperLimit);
 
-	// Converts the angle to be between -Pi and Pi
 	double RangeToPlusMinusPi(const double &angle);
+	double RangeToPlusMinus180(const double &angle);
+
+	void Unwrap(Dataset2D &data);
 
 	// Returns the sign of the argument
 	double Sign(const double &value);

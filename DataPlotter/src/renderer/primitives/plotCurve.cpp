@@ -756,10 +756,20 @@ bool PlotCurve::SmallRange(void) const
 	if (data->GetNumberOfPoints() < 2)
 		return false;
 
-	if (SmallXRange())
+	switch (SmallXRange())
+	{
+	case RangeSizeSmall:
 		return true;
 
-	return SmallYRange();
+	case RangeSizeLarge:
+		return false;
+
+	default:
+	case RangeSizeUndetermined:
+		break;
+	}
+
+	return SmallYRange() == RangeSizeSmall;
 }
 
 //==========================================================================
@@ -778,27 +788,27 @@ bool PlotCurve::SmallRange(void) const
 //		None
 //
 // Return Value:
-//		bool
+//		PlotCurve::RangeSize
 //
 //==========================================================================
-bool PlotCurve::SmallXRange(void) const
+PlotCurve::RangeSize PlotCurve::SmallXRange(void) const
 {
 	double period = data->GetXData(1) - data->GetXData(0);
 	if (period == 0.0)
-		return false;
+		return RangeSizeUndetermined;
 
 	unsigned int points = (unsigned int)floor((xAxis->GetMaximum() - xAxis->GetMinimum()) / period);
 	if (points == 0)
-		return true;
+		return RangeSizeSmall;
 
 	unsigned int spacing = (renderWindow.GetSize().GetWidth()
 		- xAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
 		- xAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 
 	if (spacing > 7)
-		return true;
+		return RangeSizeSmall;
 
-	return false;
+	return RangeSizeLarge;
 }
 
 //==========================================================================
@@ -817,25 +827,25 @@ bool PlotCurve::SmallXRange(void) const
 //		None
 //
 // Return Value:
-//		bool
+//		PlotCurve::RangeSize
 //
 //==========================================================================
-bool PlotCurve::SmallYRange(void) const
+PlotCurve::RangeSize PlotCurve::SmallYRange(void) const
 {
 	double period = data->GetYData(1) - data->GetYData(0);
 	if (period == 0.0)
-		return false;
+		return RangeSizeUndetermined;
 
 	unsigned int points = (unsigned int)floor((yAxis->GetMaximum() - yAxis->GetMinimum()) / period);
 	if (points == 0)
-		return true;
+		return RangeSizeSmall;
 
 	unsigned int spacing = (renderWindow.GetSize().GetHeight()
 		- yAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
 		- yAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 
 	if (spacing > 7)
-		return true;
+		return RangeSizeSmall;
 
-	return false;
+	return RangeSizeLarge;
 }

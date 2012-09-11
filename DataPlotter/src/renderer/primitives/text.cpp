@@ -98,10 +98,10 @@ void TextRendering::GenerateGeometry(void)
 
 			// Position the text
 			if (centered)
-				glTranslated(x - GetTextWidth() / 2.0 * cos(angle * PlotMath::Pi / 180.0)
-					+ GetTextHeight() / 2.0 * sin(angle * PlotMath::Pi / 180.0),
-					y - GetTextWidth() / 2.0 * sin(angle * PlotMath::Pi / 180.0)
-					- GetTextHeight() / 2.0 * cos(angle * PlotMath::Pi / 180.0), 0.0);
+				glTranslated(x - GetTextWidth() / 2.0 * cos(angle * PlotMath::pi / 180.0)
+					+ GetTextHeight() / 2.0 * sin(angle * PlotMath::pi / 180.0),
+					y - GetTextWidth() / 2.0 * sin(angle * PlotMath::pi / 180.0)
+					- GetTextHeight() / 2.0 * cos(angle * PlotMath::pi / 180.0), 0.0);
 			else
 				glTranslated(x, y, 0.0);
 			glRotated(angle, 0.0, 0.0, 1.0);

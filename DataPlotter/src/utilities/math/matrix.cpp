@@ -1082,9 +1082,9 @@ Matrix Matrix::GetDiagonalInverse(void) const
 
 //==========================================================================
 // Class:			Matrix
-// Function:		pythag
+// Function:		Pythag
 //
-// Description:		Helper method for SVD calculation (used in psuedo-inverse).
+// Description:		Helper method for SVD calculation.
 //
 // Input Arguments:
 //		None
@@ -1096,7 +1096,7 @@ Matrix Matrix::GetDiagonalInverse(void) const
 //		double
 //
 //==========================================================================
-double Matrix::pythag(const double& a, const double &b) const
+double Matrix::Pythag(const double& a, const double &b) const
 {
 	double absa = fabs(a);
 	double absb = fabs(b);
@@ -1232,6 +1232,10 @@ void Matrix::Resize(const unsigned int &_rows, const unsigned int &_columns)
 // Function:		GetSingularValueDecomposition
 //
 // Description:		Computes singular value decomposition of this matrix.
+//					This is the SVD algorithm from Numerical Recipies in C,
+//					modified for readability.  Note that minimal solution
+//					has dimensions U(rows, rows) and W(rows, columns), but
+//					this algorithm does not compute the minimal solution.
 //
 // Input Arguments:
 //		None
@@ -1247,44 +1251,97 @@ void Matrix::Resize(const unsigned int &_rows, const unsigned int &_columns)
 //==========================================================================
 bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) const
 {
-	// SVD algorithm interpreted from Numerical Recipies in C
+	InitializeSVDMatrices(U, V, W);
+	double *rv1 = new double[V.rows];
+
+	double anorm = ReduceToBidiagonalForm(U, V, W, rv1);
+
+	AccumulateRightHandTransforms(U, V, rv1);
+	AccumulateLeftHandTransforms(U, V, W);
+	if (!DiagonalizeBidiagonalForm(U, V, W, rv1, anorm))
+		return false;
+
+	delete [] rv1;
+
+	RemoveZeroSingularValues(U, W);
+	SortSingularValues(U, V, W);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		InitializeSVDMatrices
+//
+// Description:		Part of SVD algorithm.  Initializes the matrices (sets sizes)
+//					and copies this matrix to U.
+//
+// Input Arguments:
+//		U	= Matrix&
+//		V	= Matrix&
+//		W	= Matrix&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Matrix::InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const
+{
 	U.Resize(rows, columns);
 	W.Resize(columns, columns);
-	//U.Resize(rows, rows);// Minimal solution has these dimensions, but
-	//W.Resize(rows, columns);// apparently this algorithm does not compute the minimal solution
 	W.Zero();
 	V.Resize(columns, columns);
 
-	// Copy target to U
-	int i, j;
-	for (i = 0; i < (int)U.rows; i++)
+	unsigned int i, j;
+	for (i = 0; i < U.rows; i++)
 	{
-		for (j = 0; j < (int)V.rows; j++)
+		for (j = 0; j < V.rows; j++)
 			U.elements[i][j] = elements[i][j];
 	}
+}
 
-	// Reduce to bidiagonal form
-	int its, jj, k, l(0), nm(0);
-	double *rv1 = new double[V.rows];
-	double anorm, c, f, g, h, s, scale, x, y, z;
-	anorm = 0.0;
-	g = 0.0;
-	scale = 0.0;
-	for (i = 0; i < (int)V.rows; i++)
+//==========================================================================
+// Class:			Matrix
+// Function:		ReduceToBidiagonalForm
+//
+// Description:		Part of SVD algorithm.  "Reduces matrix to bidiagonal form."
+//
+// Input Arguments:
+//		U	= Matrix&
+//		V	= Matrix&
+//		W	= Matrix&
+//		rv1	= double*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double, value of anorm
+//
+//==========================================================================
+double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1) const
+{
+	unsigned int i, j, k, l(0);
+	double anorm(0.0), f, g(0.0), h, s, scale(0.0);
+
+	for (i = 0; i < V.rows; i++)
 	{
 		l = i + 2;
 		rv1[i] = scale * g;
 		g = 0.0;
 		scale = 0.0;
 		s = 0.0;
-		if (i < (int)U.rows)
+		if (i < U.rows)
 		{
-			for (k = i; k < (int)U.rows; k++)
+			for (k = i; k < U.rows; k++)
 				scale += fabs(U.elements[k][i]);
 
 			if (scale != 0.0)
 			{
-				for (k = i; k < (int)U.rows; k++)
+				for (k = i; k < U.rows; k++)
 				{
 					U.elements[k][i] /= scale;
 					s += U.elements[k][i] * U.elements[k][i];
@@ -1299,16 +1356,16 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 				h = f * g - s;
 				U.elements[i][i] = f - g;
 
-				for (j = l - 1; j < (int)V.rows; j++)
+				for (j = l - 1; j < V.rows; j++)
 				{
 					s = 0.0;
-					for (k = i; k < (int)U.rows; k++)
+					for (k = i; k < U.rows; k++)
 						s += U.elements[k][i] * U.elements[k][j];
 					f = s / h;
-					for (k = i; k < (int)U.rows; k++)
+					for (k = i; k < U.rows; k++)
 						U.elements[k][j] += f * U.elements[k][i];
 				}
-				for (k = i; k < (int)U.rows; k++)
+				for (k = i; k < U.rows; k++)
 					U.elements[k][i] *= scale;
 			}
 		}
@@ -1318,14 +1375,14 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 		s = 0.0;
 		scale = 0.0;
 
-		if (i < (int)U.rows && i != (int)V.rows - 1)
+		if (i < U.rows && i != V.rows - 1)
 		{
 			for (k = l - 1; k < (int)V.rows; k++)
 				scale += fabs(U.elements[i][k]);
 
 			if (scale != 0.0)
 			{
-				for (k = l - 1; k < (int)V.rows; k++)
+				for (k = l - 1; k < V.rows; k++)
 				{
 					U.elements[i][k] /= scale;
 					s += U.elements[i][k] * U.elements[i][k];
@@ -1340,19 +1397,19 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 				h = f * g - s;
 				U.elements[i][l - 1] = f - g;
 
-				for (k = l - 1; k < (int)V.rows; k++)
+				for (k = l - 1; k < V.rows; k++)
 					rv1[k] = U.elements[i][k] / h;
 
-				for (j = l - 1; j < (int)U.rows; j++)
+				for (j = l - 1; j < U.rows; j++)
 				{
 					s = 0.0;
-					for (k = l - 1; k < (int)V.rows; k++)
+					for (k = l - 1; k < V.rows; k++)
 						s += U.elements[j][k] * U.elements[i][k];
-					for (k = l - 1; k < (int)V.rows; k++)
+					for (k = l - 1; k < V.rows; k++)
 						U.elements[j][k] += s * rv1[k];
 				}
 
-				for (k = l - 1; k < (int)V.rows; k++)
+				for (k = l - 1; k < V.rows; k++)
 					U.elements[i][k] *= scale;
 			}
 		}
@@ -1361,77 +1418,147 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 			anorm = fabs(W.elements[i][i]) + fabs(rv1[i]);
 	}
 
-	// Accumulation of right-hand transforms
-	for (i = V.rows - 1; i >= 0; i--)
+	return anorm;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		AccumulateRightHandTransforms
+//
+// Description:		Part of SVD algorithm.  "Accumulates right-hand transforms."
+//
+// Input Arguments:
+//		U	= Matrix&
+//		V	= Matrix&
+//		rv1	= const double*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Matrix::AccumulateRightHandTransforms(Matrix &U, Matrix &V, const double *rv1) const
+{
+	int i(V.rows - 1);
+	unsigned int j, l(i), k;
+	double g(rv1[i]), s;
+	V.elements[i][i] = 1.0;
+
+	for (i = V.rows - 2; i >= 0; i--)
 	{
-		if (i < (int)V.rows - 1)
+		if (g != 0.0)
 		{
-			if (g != 0.0)
+			for (j = l; j < V.rows; j++)
+				V.elements[j][i] = (U.elements[i][j] / U.elements[i][l]) / g;
+
+			for (j = l; j < V.rows; j++)
 			{
-				for (j = l; j < (int)V.rows; j++)
-					V.elements[j][i] =
-							(U.elements[i][j] / U.elements[i][l])
-							/ g;
+				s = 0.0;
+				for (k = l; k < V.rows; k++)
+					s += U.elements[i][k] * V.elements[k][j];
 
-				for (j = l; j < (int)V.rows; j++)
-				{
-					s = 0.0;
-					for (k = l; k < (int)V.rows; k++)
-						s += U.elements[i][k] * V.elements[k][j];
-
-					for (k = l; k < (int)V.rows; k++)
-						V.elements[k][j] += s * V.elements[k][i];
-				}
-			}
-
-			for (j = l; j < (int)V.rows; j++)
-			{
-				V.elements[i][j] = 0.0;
-				V.elements[j][i] = 0.0;
+				for (k = l; k < V.rows; k++)
+					V.elements[k][j] += s * V.elements[k][i];
 			}
 		}
+
+		for (j = l; j < V.rows; j++)
+		{
+			V.elements[i][j] = 0.0;
+			V.elements[j][i] = 0.0;
+		}
+
 		V.elements[i][i] = 1.0;
 		g = rv1[i];
 		l = i;
 	}
+}
 
-	// Accumulation of left-hand transforms
+//==========================================================================
+// Class:			Matrix
+// Function:		AccumulateLeftHandTransforms
+//
+// Description:		Part of SVD algorithm.  "Accumulates left-hand transforms."
+//
+// Input Arguments:
+//		U	= Matrix&
+//		V	= Matrix&
+//		W	= Matrix&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Matrix::AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const
+{
+	int i;
+	unsigned int j, l, k;
+	double f, g, s;
 	for (i = GetMinimumDimension() - 1; i >= 0; i--)
 	{
 		l = i + 1;
 		g = W.elements[i][i];
-		for (j = l; j < (int)V.rows; j++)
+		for (j = l; j < V.rows; j++)
 			U.elements[i][j] = 0.0;
 
 		if (g != 0.0)
 		{
 			g = 1.0 / g;
-			for (j = l; j < (int)V.rows; j++)
+			for (j = l; j < V.rows; j++)
 			{
 				s = 0.0;
-				for (k = l; k < (int)U.rows; k++)
+				for (k = l; k < U.rows; k++)
 					s += U.elements[k][i] * U.elements[k][j];
 
 				f = (s / U.elements[i][i]) * g;
-
-				for (k = i; k < (int)U.rows; k++)
+				for (k = i; k < U.rows; k++)
 					U.elements[k][j] += f * U.elements[k][i];
 			}
 
-			for (j = i; j < (int)U.rows; j++)
+			for (j = i; j < U.rows; j++)
 				U.elements[j][i] *= g;
 		}
 		else
 		{
-			for (j = i; j < (int)U.rows; j++)
+			for (j = i; j < U.rows; j++)
 				U.elements[j][i] = 0.0;
 		}
 		U.elements[i][i]++;
 	}
+}
 
-	// Diagonalization of the bidiagonal form
+//==========================================================================
+// Class:			Matrix
+// Function:		DiagonalizeBidiagonalForm
+//
+// Description:		Part of SVD algorithm.  "Diagonalizes the bidiagonal form."
+//
+// Input Arguments:
+//		U	= Matrix&
+//		V	= Matrix&
+//		W	= Matrix&
+//		rv1	= double*
+//		anorm	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, false if iteration limit was reached, true otherwise
+//
+//==========================================================================
+bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1, const double &anorm) const
+{
+	int i, j, its, jj, k, l(0), nm(0);
+	double c, f, g, h, s, x, y, z;
+
 	bool finished;
-	double eps = 1e-6;
+	double eps = 1.0e-6;
 	int its_limit = 30;
 	for (k = V.rows - 1; k >= 0; k--)
 	{
@@ -1464,7 +1591,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 						break;
 
 					g = W.elements[i][i];
-					h = pythag(f, g);
+					h = Pythag(f, g);
 					W.elements[i][i] = h;
 					h = 1.0 / h;
 					c = g * h;
@@ -1491,8 +1618,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 				break;
 			}
 
-			// Print an error if we've hit the iteration limit
-			if (its == its_limit - 1)
+			if (its == its_limit - 1)// Reached iteration limit
 				return false;
 
 			x = W.elements[l][l];
@@ -1501,7 +1627,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 			g = rv1[nm];
 			h = rv1[k];
 			f = ((y-z) * (y+z) + (g-h) * (g+h)) / (2.0 * h * y);
-			g = pythag(f, 1.0);
+			g = Pythag(f, 1.0);
 			if (f >= 0.0)
 				f = ((x-z) * (x+z) + h * ((y / (f + fabs(g))) - h)) / x;
 			else
@@ -1516,7 +1642,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 				y = W.elements[i][i];
 				h = s * g;
 				g = c * g;
-				z = pythag(f,h);
+				z = Pythag(f,h);
 				rv1[j] = z;
 				c = f / z;
 				s = h / z;
@@ -1533,7 +1659,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 					V.elements[jj][i] = z * c - x * s;
 				}
 
-				z = pythag(f, h);
+				z = Pythag(f, h);
 				W.elements[j][j] = z;
 
 				if (z != 0.0)
@@ -1561,24 +1687,64 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 		}
 	}
 
-	delete [] rv1;
+	return true;
+}
 
-	// Remove zero-value singular values and the corresponding columns and
-	// rows from the U and V matrices
-	// Without this, the results are close, but this makes them much better
-	for (i = 0; i < (int)GetMinimumDimension(); i++)
+//==========================================================================
+// Class:			Matrix
+// Function:		RemoveZeroSingularValues
+//
+// Description:		Part of SVD algorithm - removes very small singular values.
+//					Without this step, the results are OK, but this makes them
+//					much better.
+//
+// Input Arguments:
+//		U	= Matrix&
+//		W	= Matrix&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Matrix::RemoveZeroSingularValues(Matrix &U, Matrix &W) const
+{
+	unsigned int i;
+	for (i = 0; i < GetMinimumDimension(); i++)
 	{
-		// No need to use Math.abs - we've already ensured positive values
 		if (PlotMath::IsZero(W.elements[i][i]))
 		{
 			W.elements[i][i] = 0.0;
 			U.elements[i][i] = 0.0;
 		}
 	}
+}
 
-	// Sort singular values (and corresponding columns of U and V) by decreasing magnitude
-	its = 1;
-	double sw;
+//==========================================================================
+// Class:			Matrix
+// Function:		SortSingularValues
+//
+// Description:		Part of SVD algorithm.  Sorts singular values (and corresponding
+//					columns of U and V) by decreasing magnitude.
+//
+// Input Arguments:
+//		U	= Matrix&
+//		V	= Matrix&
+//		W	= Matrix&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
+{
+	unsigned int its(1), i, j, k;
+	double sw, s;
 	double *su = new double[U.rows];
 	double *sv = new double[V.rows];
 
@@ -1586,28 +1752,28 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 	{
 		its *= 3;
 		its++;
-	} while (its <= (int)V.rows);
+	} while (its <= V.rows);
 
 	do
 	{
 		its /= 3;
-		for (i = its; i < (int)V.rows; i++)
+		for (i = its; i < V.rows; i++)
 		{
 			sw = W.elements[i][i];
-			for (k = 0; k < (int)U.rows; k++)
+			for (k = 0; k < U.rows; k++)
 				su[k] = U.elements[k][i];
 
-			for (k = 0; k < (int)V.rows; k++)
+			for (k = 0; k < V.rows; k++)
 				sv[k] = V.elements[k][i];
 
 			j = i;
 			while (W.elements[j - its][j - its] < sw)
 			{
 				W.elements[j][j] = W.elements[j - its][j - its];
-				for (k = 0; k < (int)U.rows; k++)
+				for (k = 0; k < U.rows; k++)
 					U.elements[k][j] = U.elements[k][j - its];
 
-				for (k = 0; k < (int)V.rows; k++)
+				for (k = 0; k < V.rows; k++)
 					V.elements[k][j] = V.elements[k][j - its];
 
 				j -= its;
@@ -1617,24 +1783,24 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 
 			W.elements[j][j] = sw;
 
-			for (k = 0; k < (int)U.rows; k++)
+			for (k = 0; k < U.rows; k++)
 				U.elements[k][j] = su[k];
 
-			for (k = 0; k < (int)V.rows; k++)
+			for (k = 0; k < V.rows; k++)
 				V.elements[k][j] = sv[k];
 		}
 	} while (its > 1);
 
-	for (k = 0; k < (int)V.rows; k++)
+	for (k = 0; k < V.rows; k++)
 	{
 		s = 0.0;
-		for (i = 0; i < (int)U.rows; i++)
+		for (i = 0; i < U.rows; i++)
 		{
 			if (U.elements[i][k] < 0.0)
 				s++;
 		}
 
-		for (j = 0; j < (int)V.rows; j++)
+		for (j = 0; j < V.rows; j++)
 		{
 			if (V.elements[j][k] < 0.0)
 				s++;
@@ -1642,25 +1808,23 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 
 		if (s > (U.rows + V.rows) / 2)
 		{
-			for (i = 0; i < (int)U.rows; i++)
+			for (i = 0; i < U.rows; i++)
 				U.elements[i][k] = -U.elements[i][k];
 
-			for (j = 0; j < (int)V.rows; j++)
+			for (j = 0; j < V.rows; j++)
 				V.elements[j][k] = -V.elements[j][k];
 		}
 	}
 
 	delete [] su;
 	delete [] sv;
-
-	return true;
 }
 
 //==========================================================================
 // Class:			Matrix
 // Function:		RemoveRow
 //
-// Description:		Removes the specified row from the matrix
+// Description:		Removes the specified row from the matrix.
 //
 // Input Arguments:
 //		None

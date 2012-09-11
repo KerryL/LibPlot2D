@@ -156,11 +156,17 @@ wxSizer *FRFDialog::CreateCheckBoxes(void)
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
 	phaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Phase Data"));
+	moduloPhaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Keep Phase Data Within ±180 deg"));
 	coherenceCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Coherence Data"));
 
 	phaseCheckBox->SetValue(true);
 
+	wxBoxSizer *moduloSizer = new wxBoxSizer(wxHORIZONTAL);
+	moduloSizer->AddSpacer(phaseCheckBox->GetSize().GetHeight());
+	moduloSizer->Add(moduloPhaseCheckBox);
+
 	sizer->Add(phaseCheckBox, 0, wxALL, 5);
+	sizer->Add(moduloSizer, 0, wxALL, 5);
 	sizer->Add(coherenceCheckBox, 0, wxALL, 5);
 
 	return sizer;
@@ -336,4 +342,25 @@ bool FRFDialog::GetComputePhase(void) const
 bool FRFDialog::GetComputeCoherence(void) const
 {
 	return coherenceCheckBox->GetValue();
+}
+
+//==========================================================================
+// Class:			FRFDialog
+// Function:		GetModuloPhase
+//
+// Description:		Indicates whether or not the user selected to modulo phase data.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FRFDialog::GetModuloPhase(void) const
+{
+	return moduloPhaseCheckBox->GetValue();
 }

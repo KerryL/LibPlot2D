@@ -41,7 +41,7 @@
 //==========================================================================
 Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data)
 {
-	return ComputeFFT(data, WindowHann, 0, 0.0);
+	return ComputeFFT(data, WindowHann, 0, 0.0, true);
 }
 
 //==========================================================================
@@ -53,12 +53,14 @@ Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data)
 //					contains all specifiable parameters.
 //
 // Input Arguments:
-//		_data		= const Dataset2D& referring to the data of interest
-//		window		= const FFTWindow&
-//		windowSize	= unsigned int, number of points in each sample;
-//					  zero uses max sample size
-//		overlap		= const double&, percentage overlap (0.0 - 1.0) between
-//					  adjacent samples
+//		data			= Dataset2D referring to the data of interest
+//		window			= const FFTWindow&
+//		windowSize		= unsigned int, number of points in each sample;
+//						  zero uses max sample size
+//		overlap			= const double&, percentage overlap (0.0 - 1.0) between
+//						  adjacent samples
+//		subtractMean	= const bool& indicating that the data should be averaged,
+//						  then have the average subtracted from the data
 //
 // Output Arguments:
 //		None
@@ -67,10 +69,13 @@ Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data)
 //		Dataset2D containing the FFT results
 //
 //==========================================================================
-Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data, const FFTWindow &window,
-		unsigned int windowSize, const double &overlap)
+Dataset2D FastFourierTransform::ComputeFFT(Dataset2D data, const FFTWindow &window,
+		unsigned int windowSize, const double &overlap, const bool &subtractMean)
 {
 	double sampleRate = 1.0 / (data.GetXData(1) - data.GetXData(0));// [Hz]
+
+	if (subtractMean)
+		data -= data.ComputeYMean();
 
 	if (windowSize == 0)
 		windowSize = (unsigned int)pow(2, (double)GetMaxPowerOfTwo(data.GetNumberOfPoints()));
@@ -267,6 +272,7 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 //		output				= const Dataset2D&
 //		numberOfAverages	= unsigned int
 //		window				= const FFTWindow&
+//		moduloRange			= const bool&
 //
 // Output Arguments:
 //		amplitude			= Dataset2D& [dB]
@@ -278,7 +284,8 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 //
 //==========================================================================
 void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &output,
-	unsigned int numberOfAverages, const FFTWindow &window, Dataset2D &amplitude, Dataset2D *phase, Dataset2D *coherence)
+	unsigned int numberOfAverages, const FFTWindow &window, const bool &moduloPhase,
+	Dataset2D &amplitude, Dataset2D *phase, Dataset2D *coherence)
 {
 	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
 
@@ -304,7 +311,7 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &o
 	double sampleRate = 1.0 / (input.GetXData(1) - input.GetXData(0));// [Hz]
 	amplitude = ConvertDoubleSidedToSingleSided(GetAmplitudeData(rawFRF, sampleRate), false);
 	if (phase)
-		*phase = ConvertDoubleSidedToSingleSided(GetPhaseData(rawFRF, sampleRate), false);
+		*phase = ConvertDoubleSidedToSingleSided(GetPhaseData(rawFRF, sampleRate, moduloPhase), false);
 	if (coherence)
 		*coherence = ConvertDoubleSidedToSingleSided(ComputeCoherence(input, output), false);
 
@@ -708,6 +715,7 @@ Dataset2D FastFourierTransform::GetAmplitudeData(const Dataset2D &rawFFT, const 
 // Input Arguments:
 //		rawFFT		= const Dataset2D&
 //		sampleRate	= const double& [Hz]
+//		moduloPhase	= const bool&
 //
 // Output Arguments:
 //		None
@@ -716,15 +724,20 @@ Dataset2D FastFourierTransform::GetAmplitudeData(const Dataset2D &rawFFT, const 
 //		Dataset2D
 //
 //==========================================================================
-Dataset2D FastFourierTransform::GetPhaseData(const Dataset2D &rawFFT, const double &sampleRate)
+Dataset2D FastFourierTransform::GetPhaseData(const Dataset2D &rawFFT, const double &sampleRate,
+	const bool &moduloPhase)
 {
 	Dataset2D data(rawFFT);
 	PopulateFrequencyData(data, sampleRate);
 
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
-		data.GetYPointer()[i] = PlotMath::RangeToPlusMinusPi(
-			atan2(rawFFT.GetYData(i), rawFFT.GetXData(i))) * 180.0 / PlotMath::Pi;
+		data.GetYPointer()[i] = atan2(rawFFT.GetYData(i), rawFFT.GetXData(i));
+
+	if (!moduloPhase)
+		PlotMath::Unwrap(data);
+
+	data *= 180.0 / PlotMath::pi;
 
 	return data;
 }
@@ -962,7 +975,7 @@ void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
 		data.GetXPointer()[i] *= 1.0
-		- cos(2.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1));
+		- cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1));
 }
 
 //==========================================================================
@@ -987,7 +1000,7 @@ void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
 		data.GetXPointer()[i] *= (0.54 - 0.46
-		* cos(2.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))) / 0.54;
+		* cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))) / 0.54;
 }
 
 //==========================================================================
@@ -1013,10 +1026,10 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
 		data.GetXPointer()[i] *= 1.0
-		- 1.93 * cos(2.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))
-		+ 1.29 * cos(4.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))
-		- 0.388 * cos(6.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1))
-		+ 0.032 * cos(8.0 * PlotMath::Pi * (double)i / double(data.GetNumberOfPoints() - 1));
+		- 1.93 * cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
+		+ 1.29 * cos(4.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
+		- 0.388 * cos(6.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
+		+ 0.032 * cos(8.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1));
 }
 
 //==========================================================================

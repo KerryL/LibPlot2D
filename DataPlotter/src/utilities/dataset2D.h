@@ -39,6 +39,8 @@ public:
 	void Resize(const unsigned int &_numberOfPoints);
 	void Reverse(void);
 
+	double ComputeYMean(void) const;
+
 	unsigned int GetNumberOfPoints(void) const { return numberOfPoints; };
 	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;
 	double *GetXPointer(void) { return xData; };

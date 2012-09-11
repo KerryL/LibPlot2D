@@ -90,9 +90,17 @@ private:
 
 	void PlotMarkers(void) const;
 	void DrawMarker(const double &x, const double &y) const;
+
+	enum RangeSize
+	{
+		RangeSizeSmall,
+		RangeSizeLarge,
+		RangeSizeUndetermined
+	};
+
 	bool SmallRange(void) const;
-	bool SmallXRange(void) const;
-	bool SmallYRange(void) const;
+	RangeSize SmallXRange(void) const;
+	RangeSize SmallYRange(void) const;
 };
 
 #endif// _PLOT_CURVE_H_

@@ -151,7 +151,10 @@ wxSizer* FFTDialog::CreateInputControls(void)
 	topSizer->AddSpacer(5);
 	useZoomCheckBox = new wxCheckBox(this, wxID_ANY, _T("Use Zoomed Region Only"));
 	topSizer->Add(useZoomCheckBox, 0, wxALL, 2);
+	subtractMeanCheckBox = new wxCheckBox(this, wxID_ANY, _T("Subtract Mean Value"));
+	topSizer->Add(subtractMeanCheckBox, 0, wxALL, 2);
 
+	SetCheckBoxDefaults();
 	ConfigureControls();
 
 	return topSizer;
@@ -250,6 +253,34 @@ wxSizer* FFTDialog::CreateButtons(void)
 //==========================================================================
 void FFTDialog::ConfigureControls(void)
 {
+	unsigned int maxPower(FastFourierTransform::GetMaxPowerOfTwo(GetPointCount()));
+	windowSizeCombo->Clear();
+
+	unsigned int i;
+	for (i = 1; i <= maxPower; i++)
+		windowSizeCombo->Append(wxString::Format("%u", (unsigned int)pow(2, (double)i)));
+	windowSizeCombo->SetSelection(windowSizeCombo->GetCount() - 1);
+}
+
+//==========================================================================
+// Class:			FFTDialog
+// Function:		SetCheckBoxDefaults
+//
+// Description:		Configures the zoom check box (decides whether or not it
+//					is enabled).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FFTDialog::SetCheckBoxDefaults(void)
+{
 	if (zoomDataPoints == dataPoints || zoomDataPoints == 0)
 	{
 		useZoomCheckBox->SetValue(false);
@@ -261,13 +292,7 @@ void FFTDialog::ConfigureControls(void)
 		useZoomCheckBox->SetValue(true);
 	}
 
-	unsigned int maxPower(FastFourierTransform::GetMaxPowerOfTwo(GetPointCount()));
-	windowSizeCombo->Clear();
-
-	unsigned int i;
-	for (i = 1; i <= maxPower; i++)
-		windowSizeCombo->Append(wxString::Format("%u", (unsigned int)pow(2, (double)i)));
-	windowSizeCombo->SetSelection(windowSizeCombo->GetCount() - 1);
+	subtractMeanCheckBox->SetValue(true);
 }
 
 //==========================================================================
@@ -477,6 +502,28 @@ double FFTDialog::GetOverlap(void) const
 bool FFTDialog::GetUseZoomedData(void) const
 {
 	return useZoomCheckBox->GetValue();
+}
+
+//==========================================================================
+// Class:			FFTDialog
+// Function:		GetSubtractMean
+//
+// Description:		Indicates whether the user specified that the data's mean
+//					should be subtracted prior to evaluating the FFT.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FFTDialog::GetSubtractMean(void) const
+{
+	return subtractMeanCheckBox->GetValue();
 }
 
 //==========================================================================
