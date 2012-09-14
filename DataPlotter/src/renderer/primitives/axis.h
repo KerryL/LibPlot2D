@@ -135,11 +135,11 @@ private:
 	void DrawFullAxis(void);
 	int ComputeMainAxisLocation(void) const;
 	void ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount = NULL);
-	int DrawMainAxis(const int &mainAxisLocation) const;
-	void DrawHorizontalGrid(const unsigned int &count, double spacing) const;
-	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation, const double &spacing) const;
-	void DrawVerticalGrid(const unsigned int &count, double spacing) const;
-	void DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation, const double &spacing) const;
+	void DrawMainAxis(const int &mainAxisLocation) const;
+	void DrawHorizontalGrid(const unsigned int &count) const;
+	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation) const;
+	void DrawVerticalGrid(const unsigned int &count) const;
+	void DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation) const;
 	void InitializeTickParameters(int &inside, int &outside, int &sign) const;
 	void GetNextLogValue(const bool &first, double &value) const;
 	double GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const;

@@ -136,7 +136,6 @@ void Axis::GenerateGeometry(void)
 //==========================================================================
 void Axis::DrawFullAxis(void)
 {
-	double tickSpacing, gridSpacing;// To avoid rounding errors, we convert this back to an int after we do some math
 	unsigned int numberOfTicks, numberOfGridLines;
 	int mainAxisLocation = ComputeMainAxisLocation();
 
@@ -145,25 +144,23 @@ void Axis::DrawFullAxis(void)
 	glLineWidth(1.0f);
 	glBegin(GL_LINES);
 
-	int axisLength = DrawMainAxis(mainAxisLocation);
-	gridSpacing = (double)axisLength / double(numberOfGridLines + 1);
-	tickSpacing = (double)axisLength / double(numberOfTicks + 1);
+	DrawMainAxis(mainAxisLocation);
 
 	if (IsHorizontal())
 	{
 		if (grid && oppositeAxis)
-			DrawHorizontalGrid(numberOfGridLines, gridSpacing);
+			DrawHorizontalGrid(numberOfGridLines);
 
 		if (tickStyle != TickStyleNone)
-			DrawHorizontalTicks(numberOfTicks, mainAxisLocation, tickSpacing);
+			DrawHorizontalTicks(numberOfTicks, mainAxisLocation);
 	}
 	else
 	{
 		if (grid && oppositeAxis)
-			DrawVerticalGrid(numberOfGridLines, gridSpacing);
+			DrawVerticalGrid(numberOfGridLines);
 
 		if (tickStyle != TickStyleNone)
-			DrawVerticalTicks(numberOfTicks, mainAxisLocation, tickSpacing);
+			DrawVerticalTicks(numberOfTicks, mainAxisLocation);
 	}
 
 	glEnd();
@@ -249,30 +246,23 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 //		None
 //
 // Return Value:
-//		int, indicating the length of the axis on screen
+//		None
 //
 //==========================================================================
-int Axis::DrawMainAxis(const int &mainAxisLocation) const
+void Axis::DrawMainAxis(const int &mainAxisLocation) const
 {
-	int axisLength;
 	if (IsHorizontal())
 	{
-		axisLength = renderWindow.GetSize().GetWidth() -
-				minAxis->GetOffsetFromWindowEdge() - maxAxis->GetOffsetFromWindowEdge();
 		glVertex2i(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
 		glVertex2i(renderWindow.GetSize().GetWidth()
 				- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
 	}
 	else
 	{
-		axisLength = renderWindow.GetSize().GetHeight() -
-				minAxis->GetOffsetFromWindowEdge() - maxAxis->GetOffsetFromWindowEdge();
 		glVertex2i(mainAxisLocation, minAxis->GetOffsetFromWindowEdge());
 		glVertex2i(mainAxisLocation, renderWindow.GetSize().GetHeight() -
 				maxAxis->GetOffsetFromWindowEdge());
 	}
-
-	return axisLength;
 }
 
 //==========================================================================
@@ -321,7 +311,6 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 //
 // Input Arguments:
 //		count	= const unsigned int&
-//		spacing	= double
 //
 // Output Arguments:
 //		None
@@ -330,29 +319,18 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 //		None
 //
 //==========================================================================
-void Axis::DrawHorizontalGrid(const unsigned int &count, double spacing) const
+void Axis::DrawHorizontalGrid(const unsigned int &count) const
 {
 	glColor4d(gridColor.GetRed(), gridColor.GetGreen(), gridColor.GetBlue(), gridColor.GetAlpha());
 
+	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
-	for (grid = 0; grid < count; grid++)
+	int location;
+	for (grid = 1; grid <= count; grid++)
 	{
-		if (logarithmic)
-		{
-			GetNextLogValue(grid == 0, spacing);
-			if (spacing >= maximum)
-				break;
-
-			glVertex2i(ValueToPixel(spacing), offsetFromWindowEdge);
-			glVertex2i(ValueToPixel(spacing),
-				renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
-		}
-		else
-		{
-			glVertex2i(minAxis->GetOffsetFromWindowEdge() + (grid + 1) * spacing, offsetFromWindowEdge);
-			glVertex2i(minAxis->GetOffsetFromWindowEdge() + (grid + 1) * spacing,
-				renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
-		}
+		location = ValueToPixel(GetNextTickValue(false, false, grid));
+		glVertex2i(location, offsetFromWindowEdge);
+		glVertex2i(location, renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
 	}
 
 	glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
@@ -367,7 +345,6 @@ void Axis::DrawHorizontalGrid(const unsigned int &count, double spacing) const
 // Input Arguments:
 //		count				= const unsigned int&
 //		mainAxisLocation	= const int&
-//		spacing				= const double&
 //
 // Output Arguments:
 //		None
@@ -376,28 +353,19 @@ void Axis::DrawHorizontalGrid(const unsigned int &count, double spacing) const
 //		None
 //
 //==========================================================================
-void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation, const double &spacing) const
+void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation) const
 {
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
+	int location;
 	for (tick = 1; tick <= count; tick++)
 	{
-		if (logarithmic)
-		{
-			unsigned int location = ValueToPixel(pow(10.0, floor(log10(minimum)) + tick));
-			glVertex2i(location, mainAxisLocation - tickSize * outsideTick * sign);
-			glVertex2i(location, mainAxisLocation + tickSize * insideTick * sign);
-		}
-		else
-		{
-			glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * spacing,
-				mainAxisLocation - tickSize * outsideTick * sign);
-			glVertex2i(minAxis->GetOffsetFromWindowEdge() + tick * spacing,
-				mainAxisLocation + tickSize * insideTick * sign);
-		}
+		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		glVertex2i(location, mainAxisLocation - tickSize * outsideTick * sign);
+		glVertex2i(location, mainAxisLocation + tickSize * insideTick * sign);
 	}
 }
 
@@ -409,7 +377,6 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 //
 // Input Arguments:
 //		count	= const unsigned int&
-//		spacing	= double
 //
 // Output Arguments:
 //		None
@@ -418,29 +385,18 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 //		None
 //
 //==========================================================================
-void Axis::DrawVerticalGrid(const unsigned int &count, double spacing) const
+void Axis::DrawVerticalGrid(const unsigned int &count) const
 {
 	glColor4d(gridColor.GetRed(), gridColor.GetGreen(), gridColor.GetBlue(), gridColor.GetAlpha());
 
+	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
-	for (grid = 0; grid < count; grid++)
+	int location;
+	for (grid = 1; grid <= count; grid++)
 	{
-		if (logarithmic)
-		{
-			GetNextLogValue(grid == 0, spacing);
-			if (spacing >= maximum)
-				break;
-
-			glVertex2i(offsetFromWindowEdge, ValueToPixel(spacing));
-			glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(),
-				ValueToPixel(spacing));
-		}
-		else
-		{
-			glVertex2i(offsetFromWindowEdge, minAxis->GetOffsetFromWindowEdge() + (grid + 1) * spacing);
-			glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(),
-				minAxis->GetOffsetFromWindowEdge() + (grid + 1) * spacing);
-		}
+		location = ValueToPixel(GetNextTickValue(false, false, grid));
+		glVertex2i(offsetFromWindowEdge, location);
+		glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(), location);
 	}
 
 	glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
@@ -455,7 +411,6 @@ void Axis::DrawVerticalGrid(const unsigned int &count, double spacing) const
 // Input Arguments:
 //		count				= const unsigned int&
 //		mainAxisLocation	= const int&
-//		spacing				= const double&
 //
 // Output Arguments:
 //		None
@@ -464,28 +419,19 @@ void Axis::DrawVerticalGrid(const unsigned int &count, double spacing) const
 //		None
 //
 //==========================================================================
-void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation, const double &spacing) const
+void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation) const
 {
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
+	int location;
 	for (tick = 1; tick <= count; tick++)
 	{
-		if (logarithmic)
-		{
-			unsigned int location = ValueToPixel(pow(10.0, floor(log10(minimum)) + tick));
-			glVertex2i(mainAxisLocation - tickSize * outsideTick * sign, location);
-			glVertex2i(mainAxisLocation + tickSize * insideTick * sign, location);
-		}
-		else
-		{
-			glVertex2i(mainAxisLocation - tickSize * outsideTick * sign,
-				minAxis->GetOffsetFromWindowEdge() + tick * spacing);
-			glVertex2i(mainAxisLocation + tickSize * insideTick * sign,
-				minAxis->GetOffsetFromWindowEdge() + tick * spacing);
-		}
+		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		glVertex2i(mainAxisLocation - tickSize * outsideTick * sign, location);
+		glVertex2i(mainAxisLocation + tickSize * insideTick * sign, location);
 	}
 }
 
@@ -621,6 +567,9 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 //					determines the precision for each tick label.  The goal
 //					is to provide just enough precision so that adjacent tick
 //					marks are distinguishable, and then add just a hair more.
+//					Here we also reset the axis min and max values to be exactly
+//					the vales of the min and max labels after rounding (keeps
+//					tick labels accurate).
 //
 // Input Arguments:
 //		None
@@ -638,7 +587,6 @@ void Axis::DrawTickLabels(void)
 	int xTranslation, yTranslation;
 	unsigned int precision = GetPrecision();
 
-	// Set the maximum and minimum to be exactly the values shown after rounding
 	if (!wxString::Format("%0.*f", precision, minimum).ToDouble(&minimum)) { /*Warn the user?*/ }
 
 	double value;

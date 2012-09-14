@@ -2539,7 +2539,7 @@ void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 
 	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
 		*plotList[dialog.GetOutputIndex()], dialog.GetNumberOfAverages(),
-		FastFourierTransform::WindowUniform, dialog.GetModuloPhase(), *amplitude, phase, coherence);
+		FastFourierTransform::WindowHann, dialog.GetModuloPhase(), *amplitude, phase, coherence);
 
 	AddFFTCurves(factor, amplitude, phase, coherence, wxString::Format("[%u] to [%u]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
@@ -2579,7 +2579,7 @@ void MainFrame::AddFFTCurves(const double& xFactor, Dataset2D *amplitude, Datase
 
 	if (coherence)
 	{
-		AddCurve(&(coherence->MultiplyXData(xFactor)), _T("FRF Coherence, ") + namePortion + _T(", [dB]"));
+		AddCurve(&(coherence->MultiplyXData(xFactor)), _T("FRF Coherence, ") + namePortion + _T(", [-]"));
 		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
 	}
 }
