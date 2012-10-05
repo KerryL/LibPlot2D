@@ -1160,12 +1160,16 @@ bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doub
 {
 	if (NextIsFunction(next))
 		return EvaluateFunction(next, doubleStack, setStack, useDoubleStack, errorString);
+	else if (NextIsNumber(next))
+		return EvaluateNumber(next, doubleStack, useDoubleStack, errorString);
 	else if(NextIsOperator(next))
 		return EvaluateOperator(next, doubleStack, setStack, useDoubleStack, errorString);
 	else if (NextIsDataset(next))
 		return EvaluateDataset(next, setStack, useDoubleStack, errorString);
+	else
+		errorString = _T("Unable to evaluate '") + next + _T("'.");
 
-	return EvaluateNumber(next, doubleStack, useDoubleStack, errorString);
+	return false;
 }
 
 //==========================================================================

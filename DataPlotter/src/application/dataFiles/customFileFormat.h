@@ -14,6 +14,9 @@
 //				 file and reading them into Dataset2D objects.
 // History:
 
+#ifndef _CUSTOM_FILE_FORMAT_H_
+#define _CUSTOM_FILE_FORMAT_H_
+
 // Standard C++ headers
 #include <vector>
 
@@ -34,8 +37,11 @@ public:
 
 	wxString GetDelimiter(void) const { return delimiter; };
 	wxString GetTimeUnits(void) const { return timeUnits; };
+	wxString GetTimeFormat(void) const { return timeFormat; };
 
-	void ProcessChannels(wxArrayString &names, std::vector<double> &scales);
+	bool GetIsAsynchronous(void) const { return asynchronous; };
+
+	void ProcessChannels(wxArrayString &names, std::vector<double> &scales) const;
 
 	inline static bool CustomDefinitionsExist(void) { return wxFileExists(customFormatsXMLFileName); };
 
@@ -49,6 +55,9 @@ private:
 	wxString formatName;
 	wxString delimiter;
 	wxString timeUnits;
+	wxString timeFormat;
+
+	bool asynchronous;
 
 	struct Identifier
 	{
@@ -74,6 +83,8 @@ private:
 		long column;
 
 		double scale;
+
+		bool discardCode;
 	};
 
 	std::vector<Channel> channels;
@@ -95,3 +106,5 @@ private:
 
 	bool ReadCodeOrColumn(wxXmlNode &channelNode, Channel &channel) const;
 };
+
+#endif//_CUSTOM_FILE_FORMAT_H_

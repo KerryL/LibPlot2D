@@ -17,7 +17,6 @@
 #define _MAIN_FRAME_H_
 
 // Standard C++ headers
-#include <fstream>
 #include <vector>
 
 // wxWidgets headers
@@ -38,6 +37,7 @@ struct FilterParameters;
 class CustomFileFormat;
 class Color;
 class FilterBase;
+class DataFile;
 
 // The main frame class
 class MainFrame : public wxFrame
@@ -65,6 +65,7 @@ public:
 	};
 
 	bool GetXAxisScalingFactor(double &factor, wxString *label = NULL);
+	static bool UnitStringToFactor(const wxString &unit, double &factor);
 
 	void CreatePlotContextMenu(const wxPoint &position, const PlotContext &context);
 	void DisplayAxisRangeDialog(const PlotContext &axis);
@@ -236,10 +237,9 @@ private:
 	void ApplyFilter(const FilterParameters &parameters, Dataset2D &data);
 
 	bool XScalingFactorIsKnown(double &factor, wxString *label) const;
-	bool UnitStringToFactor(const wxString &unit, double &factor) const;
-	wxString ExtractUnitFromDescription(const wxString &description) const;
-	bool FindWrappedString(const wxString &s, wxString &contents,
-		const wxChar &open, const wxChar &close) const;
+	static wxString ExtractUnitFromDescription(const wxString &description);
+	static bool FindWrappedString(const wxString &s, wxString &contents,
+		const wxChar &open, const wxChar &close);
 
 	Dataset2D *GetFFTData(const Dataset2D* data, const double &timeScalingFactor);
 	Dataset2D *GetCurveFitData(const unsigned int &order, const Dataset2D* data, wxString &name) const;
@@ -257,44 +257,7 @@ private:
 	FilterBase* GetFilter(const FilterParameters &parameters,
 		const double &sampleRate, const double &initialValue) const;
 
-	// Load file methods
-	bool LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat);
-	bool LoadTxtFile(wxString pathAndFileName);
-	bool LoadCsvFile(wxString pathAndFileName);
-	bool LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFormat *customFormat = NULL);
-	bool LoadBaumullerFile(wxString pathAndFileName);
-	bool LoadKollmorgenFile(wxString pathAndFileName);
-
-	bool IsBaumullerFile(const wxString &pathAndFileName);
-	bool IsKollmorgenFile(const wxString &pathAndFileName);
-
-	bool ExtractData(std::ifstream &file, const wxString &delimiter, std::vector<double> *data,
-		const wxArrayString &descriptions) const;
-	void AddData(const std::vector<double> *data, const wxArrayString &descriptions,
-		const double *timeStep = NULL, const std::vector<double> *scales = NULL);
-	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter,
-		const bool &ignoreConsecutiveDelimiters = true) const;
-	unsigned int GetPopulatedCount(const wxArrayString &list) const;
-
-	wxArrayString GetBaumullerDescriptions(std::ifstream &file, const wxString &delimiter) const;
-	wxArrayString GetKollmorgenDescriptions(std::ifstream &file, const wxString &delimiter, double &samplingPeriod) const;
-	wxArrayString GetGenericDescriptions(const wxString &fileName, const wxArrayString &delimiterList,
-		wxString &delimiter, unsigned int &headerLines);
-
-	void GenerateGenericNames(const wxArrayString &previousLines, const wxArrayString &currentLine,
-		const wxString &delimiter, wxArrayString &descriptions) const;
-	wxArrayString GenerateDummyNames(const unsigned int &count) const;
-	bool ListIsNumeric(const wxArrayString &list) const;
-
-	wxArrayString GetDelimiterList(const CustomFileFormat *customFormat) const;
-
-	void CompensateGenericChoices(wxArrayInt &choices) const;
-	void RemoveUnwantedDescriptions(wxArrayString &descriptions, const wxArrayInt &choices) const;
-
-	bool ProcessGenericFile(const wxString &fileName, wxArrayString &descriptions,
-		const unsigned int &headerLines, const wxString &delimiter, const std::vector<double> &scales);
-
-	void SkipLines(std::ifstream &file, const unsigned int &count) const;
+	DataFile* GetDataFile(const wxString &fileName) const;
 
 	enum FileFormat
 	{

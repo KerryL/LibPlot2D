@@ -21,7 +21,7 @@
 #include <wx/xml/xml.h>
 
 // Local headers
-#include "application/customFileFormat.h"
+#include "application/dataFiles/customFileFormat.h"
 
 //==========================================================================
 // Class:			CustomFileFormat
@@ -133,6 +133,8 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 	{
 		delimiter = formatNode.GetPropVal(_T("DELIMITER"), wxEmptyString);
 		timeUnits = formatNode.GetPropVal(_T("TIME_UNITS"), wxEmptyString);
+		timeFormat = formatNode.GetPropVal(_T("TIME_FORMAT"), wxEmptyString);
+		asynchronous = formatNode.GetPropVal(_T("ASYNC"), "FALSE").CmpNoCase("TRUE") == 0;
 		return true;
 	}
 
@@ -229,6 +231,8 @@ bool CustomFileFormat::ReadChannelTag(wxXmlNode &channelNode)
 			_T("Error Reading Custom Format Definitions"));
 		channel.scale = 1.0;
 	}
+
+	channel.discardCode = channelNode.GetPropVal(_T("DISCARD_CODE"), "FALSE").CmpNoCase(_T("TRUE")) == 0;
 
 	channels.push_back(channel);
 
@@ -350,8 +354,10 @@ void CustomFileFormat::ClearData(void)
 //		None
 //
 //==========================================================================
-void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double> &scales)
+void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double> &scales) const
 {
+	assert(scales.size() == names.size());
+
 	// Check each name against each channel definition (or until we find a match)
 	unsigned int i, j;//, location;
 	for (i = 0; i < names.size(); i++)
@@ -374,7 +380,11 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 			{
 				/*location = names[i].Find(channels[j].code);
 				names[i] = names[i].Mid(0, location) + _T(", ") + channels[j].name;*/
-				names[i].Append(_T(", ") + channels[j].name);
+				if (channels[j].discardCode)
+					names[i].Empty();
+				else
+					names[i].Append(_T(", "));
+				names[i].Append(channels[j].name);
 				if (!channels[j].units.IsEmpty())
 					names[i].Append(_T(", [") + channels[j].units + _T("]"));
 				scales[i] = channels[j].scale;
