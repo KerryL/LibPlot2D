@@ -55,6 +55,12 @@
     <Filter Include="Source Files\utilities\signals\filters">
       <UniqueIdentifier>{470ade42-4f64-4f7b-a029-59870c1cc4ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\application\dataFiles">
+      <UniqueIdentifier>{230ae823-c77d-4b86-9334-0cc3b3f520dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\application\dataFiles">
+      <UniqueIdentifier>{5484ca7e-7212-4b63-9d52-0b77d07eb94d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\renderer\primitives\axis.h">
@@ -156,9 +162,6 @@
     <ClInclude Include="src\application\filterDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\customFileFormat.h">
-      <Filter>Header Files\application</Filter>
-    </ClInclude>
     <ClInclude Include="src\application\multiChoiceDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
@@ -167,6 +170,27 @@
     </ClInclude>
     <ClInclude Include="src\application\frfDialog.h">
       <Filter>Header Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\dataFiles\dataFile.h">
+      <Filter>Header Files\application\dataFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\dataFiles\customFileFormat.h">
+      <Filter>Header Files\application\dataFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\dataFiles\customFile.h">
+      <Filter>Header Files\application\dataFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\dataFiles\customXMLFile.h">
+      <Filter>Header Files\application\dataFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\dataFiles\genericFile.h">
+      <Filter>Header Files\application\dataFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\dataFiles\baumullerFile.h">
+      <Filter>Header Files\application\dataFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\application\dataFiles\kollmorgenFile.h">
+      <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -263,9 +287,6 @@
     <ClCompile Include="src\application\filterDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\customFileFormat.cpp">
-      <Filter>Source Files\application</Filter>
-    </ClCompile>
     <ClCompile Include="src\application\multiChoiceDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
@@ -274,6 +295,27 @@
     </ClCompile>
     <ClCompile Include="src\application\frfDialog.cpp">
       <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\dataFiles\dataFile.cpp">
+      <Filter>Source Files\application\dataFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\dataFiles\customFileFormat.cpp">
+      <Filter>Source Files\application\dataFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\dataFiles\customFile.cpp">
+      <Filter>Source Files\application\dataFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\dataFiles\customXMLFile.cpp">
+      <Filter>Source Files\application\dataFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\dataFiles\genericFile.cpp">
+      <Filter>Source Files\application\dataFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\dataFiles\baumullerFile.cpp">
+      <Filter>Source Files\application\dataFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\application\dataFiles\kollmorgenFile.cpp">
+      <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

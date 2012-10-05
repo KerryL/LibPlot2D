@@ -305,7 +305,7 @@ wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 	{
 		name += _T(" Low-Pass Filter");
 		if (parameters.order == 2)
-			name << " (zeta = " << parameters.order << ")";
+			name << " (zeta = " << parameters.dampingRatio << ")";
 	}
 	else if (parameters.type == FilterParameters::TypeHighPass)
 		name += _T(" High-Pass Filter");

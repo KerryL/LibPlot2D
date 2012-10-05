@@ -90,7 +90,13 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\application\customFileFormat.h" />
+    <ClInclude Include="src\application\dataFiles\baumullerFile.h" />
+    <ClInclude Include="src\application\dataFiles\customFile.h" />
+    <ClInclude Include="src\application\dataFiles\customFileFormat.h" />
+    <ClInclude Include="src\application\dataFiles\customXMLFile.h" />
+    <ClInclude Include="src\application\dataFiles\dataFile.h" />
+    <ClInclude Include="src\application\dataFiles\genericFile.h" />
+    <ClInclude Include="src\application\dataFiles\kollmorgenFile.h" />
     <ClInclude Include="src\application\dropTarget.h" />
     <ClInclude Include="src\application\fftDialog.h" />
     <ClInclude Include="src\application\filterDialog.h" />
@@ -129,7 +135,13 @@
     <ClInclude Include="src\utilities\signals\rms.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\application\customFileFormat.cpp" />
+    <ClCompile Include="src\application\dataFiles\baumullerFile.cpp" />
+    <ClCompile Include="src\application\dataFiles\customFile.cpp" />
+    <ClCompile Include="src\application\dataFiles\customFileFormat.cpp" />
+    <ClCompile Include="src\application\dataFiles\customXMLFile.cpp" />
+    <ClCompile Include="src\application\dataFiles\dataFile.cpp" />
+    <ClCompile Include="src\application\dataFiles\genericFile.cpp" />
+    <ClCompile Include="src\application\dataFiles\kollmorgenFile.cpp" />
     <ClCompile Include="src\application\dropTarget.cpp" />
     <ClCompile Include="src\application\fftDialog.cpp" />
     <ClCompile Include="src\application\filterDialog.cpp" />

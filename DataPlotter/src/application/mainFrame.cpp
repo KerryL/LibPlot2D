@@ -28,8 +28,13 @@
 #include "application/dropTarget.h"
 #include "application/rangeLimitsDialog.h"
 #include "application/filterDialog.h"
-#include "application/customFileFormat.h"
-#include "application/multiChoiceDialog.h"
+#include "application/dataFiles/dataFile.h"
+#include "application/dataFiles/genericFile.h"
+#include "application/dataFiles/baumullerFile.h"
+#include "application/dataFiles/kollmorgenFile.h"
+#include "application/dataFiles/customFile.h"
+#include "application/dataFiles/customXMLFile.h"
+#include "application/dataFiles/customFileFormat.h"
 #include "application/frfDialog.h"
 #include "application/fftDialog.h"
 #include "renderer/plotRenderer.h"
@@ -753,25 +758,22 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 	startOfExtension = pathAndFileName.Last('.') + 1;
 	fileExtension = pathAndFileName.Mid(startOfExtension);
 
-	bool loadedOK(false);
-	CustomFileFormat customFormat(pathAndFileName);
-	if (customFormat.IsCustomFormat())
-		loadedOK = LoadCustomFile(pathAndFileName, customFormat);
-	else if (fileExtension.CmpNoCase("csv") == 0)
-		loadedOK = LoadCsvFile(pathAndFileName);
-	else if (fileExtension.CmpNoCase("txt") == 0)
-		loadedOK = LoadTxtFile(pathAndFileName);
-	else
-		loadedOK = LoadGenericDelimitedFile(pathAndFileName);
-
-	if (loadedOK)
+	DataFile *file = GetDataFile(pathAndFileName);
+	if (file->Load())
 	{
+		unsigned int i;
+		for (i = 0; i < file->GetDataCount(); i++)
+			AddCurve(file->GetDataset(i), file->GetDescription(i + 1));
 		SetTitleFromFileName(pathAndFileName);
-		SetXDataLabel(currentFileFormat);
+		SetXDataLabel(file->GetDescription(0));
 		plotArea->SaveCurrentZoom();
+
+		delete file;
+		return true;
 	}
 
-	return loadedOK;
+	delete file;
+	return false;
 }
 
 //==========================================================================
@@ -791,150 +793,35 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 //		true for file successfully loaded, false otherwise
 //
 //==========================================================================
-bool MainFrame::LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat)
+/*bool MainFrame::LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat)
 {
-	return LoadGenericDelimitedFile(pathAndFileName, &customFormat);
-}
+	if (!customFormat.GetIsAsynchronous() && !customFormat.GetTimeFormat().IsEmpty())
+		return LoadGenericDelimitedFile(pathAndFileName, &customFormat);
 
-//==========================================================================
-// Class:			MainFrame
-// Function:		LoadTxtFile
-//
-// Description:		Method for loading a single object from a text file.
-//
-// Input Arguments:
-//		pathAndFileName	= wxString
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		true for file successfully loaded, false otherwise
-//
-//==========================================================================
-bool MainFrame::LoadTxtFile(wxString pathAndFileName)
-{
-	// Add any specific file formats with .txt extensions here
-
-	return LoadGenericDelimitedFile(pathAndFileName);
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		LoadCsvFile
-//
-// Description:		Loads specific .csv file formats.
-//
-// Input Arguments:
-//		pathAndFileName	= wxString
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		true for file successfully loaded, false otherwise
-//
-//==========================================================================
-bool MainFrame::LoadCsvFile(wxString pathAndFileName)
-{
-	if (IsBaumullerFile(pathAndFileName))
-		return LoadBaumullerFile(pathAndFileName);
-	else if (IsKollmorgenFile(pathAndFileName))
-		return LoadKollmorgenFile(pathAndFileName);
-	// Add any other specific file formats with .csv extensions here
-
-	return LoadGenericDelimitedFile(pathAndFileName);
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		LoadBaumullerFile
-//
-// Description:		Loads Baumuller data trace (from BM4xxx series drive).
-//
-// Input Arguments:
-//		pathAndFileName	= wxString
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		true for file successfully loaded, false otherwise
-//
-//==========================================================================
-bool MainFrame::LoadBaumullerFile(wxString pathAndFileName)
-{
-	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-	if (!file.is_open())
+	wxString delimiter;
+	unsigned int headerLines;
+	wxArrayString descriptions = GetGenericDescriptions(pathAndFileName,
+		GetDelimiterList(&customFormat), delimiter, headerLines,
+		!customFormat.GetTimeFormat().IsEmpty(), customFormat.GetIsAsynchronous());
+	if (descriptions.size() < 2)
 	{
-		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
+		wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
 		return false;
 	}
 
-	wxString delimiter(';');
-	wxArrayString descriptions = GetBaumullerDescriptions(file, delimiter);
+	std::vector<double> scales(descriptions.size(), 1.0);
+	customFormat.ProcessChannels(descriptions, scales);
 
-	std::vector<double> *data = new std::vector<double>[GetPopulatedCount(descriptions)];
-	if (!ExtractData(file, delimiter, data, descriptions))
-	{
-		wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
-			_T("Error Generating Plot"), wxICON_ERROR, this);
-		delete [] data;
+	genericXAxisLabel = descriptions[0];
+
+	if (!ProcessCustomFile(pathAndFileName, descriptions, headerLines, delimiter, scales, customFormat))
 		return false;
-	}
-	file.close();
+	currentFileFormat = FormatGeneric;
 
-	AddData(data, descriptions);
-	currentFileFormat = FormatBaumuller;
-
-	delete [] data;
+	if (!customFormat.GetTimeUnits().IsEmpty())
+		genericXAxisLabel = _T("Time, [") + customFormat.GetTimeUnits() + _T("]");
 
 	return true;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		GetBaumullerDescriptions
-//
-// Description:		Parses the file and extracts curve descriptions.  This
-//					assumes that the file has been opened, but not read from.
-//					Also, prior to returning, all data prior to numeric data
-//					is discarded.
-//
-// Input Arguments:
-//		file		= std::ifstream&
-//		delimiter	= const wxString&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxArrayString containing curve descriptions
-//
-//==========================================================================
-wxArrayString MainFrame::GetBaumullerDescriptions(std::ifstream &file, const wxString &delimiter) const
-{
-	std::string nextLine;
-	std::getline(file, nextLine);
-
-	// wxString makes this robust against varying line endings
-	while (wxString(nextLine).Trim().Mid(0, 11).Cmp(_T("Par.number:")) != 0)
-		std::getline(file, nextLine);
-	wxArrayString parameterNumbers = ParseLineIntoColumns(nextLine, delimiter);
-
-	std::getline(file, nextLine);
-	wxArrayString descriptions = ParseLineIntoColumns(nextLine, delimiter);
-
-	std::getline(file, nextLine);
-	wxArrayString units = ParseLineIntoColumns(nextLine, delimiter, false);
-
-	SkipLines(file, 2);// Throw out max and min rows
-
-	unsigned int i;
-	for (i = 1; i < descriptions.GetCount(); i++)
-		descriptions[i].Append(_T(" (") + parameterNumbers[i] + _T(") [") + units[i] + _T("]"));
-
-	return descriptions;
 }
 
 //==========================================================================
@@ -982,126 +869,11 @@ bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
 	delete [] data;
 
 	return true;
-}
+}*/
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		GetKollmorgenDescriptions
-//
-// Description:		Parses the file and extracts curve descriptions.  This
-//					assumes that the file has been opened, but not read from.
-//					Also, prior to returning, all data prior to numeric data
-//					is discarded.
-//
-// Input Arguments:
-//		file			= std::ifstream&
-//		delimiter		= const wxString&
-//
-// Output Arguments:
-//		samplingPeriod	= double&
-//
-// Return Value:
-//		wxArrayString containing curve descriptions
-//
-//==========================================================================
-wxArrayString MainFrame::GetKollmorgenDescriptions(std::ifstream &file, const wxString &delimiter, double &samplingPeriod) const
-{
-	SkipLines(file, 2);
-
-	std::string nextLine;
-	std::getline(file, nextLine);
-
-	// The third line contains the number of data points and the sampling period in msec
-	// We use this information to generate the time series (file does not contain a time series)
-	samplingPeriod = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
-
-	// The fourth line contains the data set labels (which also gives us the number of datasets we need)
-	std::getline(file, nextLine);
-	wxArrayString descriptions = ParseLineIntoColumns(nextLine, delimiter);
-
-	return descriptions;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		LoadGenericDelimitedFile
-//
-// Description:		Attempts to load a generic delimited file by following a
-//					standard set of rules:
-//					- Assume first column is X-data
-//					- Assume there are some non-delimited rows at the top of the
-//					  file (skip these)
-//					- Assume that once the delimited rows begin, there may be
-//					  column headers (sometimes multiple rows)
-//
-// Input Arguments:
-//		pathAndFileName	= wxString
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		true for file successfully loaded, false otherwise
-//
-//==========================================================================
-bool MainFrame::LoadGenericDelimitedFile(wxString pathAndFileName, CustomFileFormat *customFormat)
-{
-	wxString delimiter;
-	unsigned int headerLines;
-	wxArrayString descriptions = GetGenericDescriptions(pathAndFileName,
-		GetDelimiterList(customFormat), delimiter, headerLines);
-	if (descriptions.size() < 2)
-	{
-		wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
-		return false;
-	}
-	genericXAxisLabel = descriptions[0];
-
-	std::vector<double> scales(descriptions.size(), 1.0);
-	if (customFormat)
-		customFormat->ProcessChannels(descriptions, scales);
-
-	if (!ProcessGenericFile(pathAndFileName, descriptions, headerLines, delimiter, scales))
-		return false;
-	currentFileFormat = FormatGeneric;
-
-	if (customFormat)
-	{
-		if (!customFormat->GetTimeUnits().IsEmpty())
-			genericXAxisLabel = _T("Time [") + customFormat->GetTimeUnits() + _T("]");
-	}
-
-	return true;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		CompensateGenericChoices
-//
-// Description:		Compensates for the method used (removing the x-data column
-//					as a choice) for the user to identify data to plot.
-//
-// Input Arguments:
-//		choices	= wxArrayInt&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::CompensateGenericChoices(wxArrayInt &choices) const
-{
-	unsigned int i;
-	for (i = 0; i < choices.Count(); i++)
-		choices[i]++;
-	choices.Add(0);// Keep the x-axis data
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		ProcessGenericFile
+// Function:		ProcessCustomFile
 //
 // Description:		Performs necessary actions to extract desired data from
 //					the specified file.
@@ -1120,8 +892,9 @@ void MainFrame::CompensateGenericChoices(wxArrayInt &choices) const
 //		bool, true for success, false otherwise
 //
 //==========================================================================
-bool MainFrame::ProcessGenericFile(const wxString &fileName, wxArrayString &descriptions,
-	const unsigned int &headerLines, const wxString &delimiter, const std::vector<double> &scales)
+/*bool MainFrame::ProcessCustomFile(const wxString &fileName, wxArrayString &descriptions,
+	const unsigned int &headerLines, const wxString &delimiter, const std::vector<double> &scales,
+	const CustomFileFormat &customFormat)
 {
 	MultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"),
 		wxArrayString(descriptions.begin() + 1, descriptions.end()));
@@ -1143,558 +916,29 @@ bool MainFrame::ProcessGenericFile(const wxString &fileName, wxArrayString &desc
 	}
 	SkipLines(file, headerLines);
 
-	std::vector<double> *data = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
+	unsigned int dataSize(choices.size());
+	if (customFormat.GetIsAsynchronous())
+		dataSize *= 2;// each set of data gets it's own time column
+	else
+		dataSize += 1;// +1 for time column, which isn't displayed for user to select
+	std::vector<double> *data = new std::vector<double>[dataSize];
 	CompensateGenericChoices(choices);
 	RemoveUnwantedDescriptions(descriptions, choices);
-	if (!ExtractData(file, delimiter, data, descriptions))
+	if (!ExtractCustomData(file, delimiter, data, descriptions, customFormat))
 	{
 		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR, this);
 		return false;
 	}
 	file.close();
 
-	AddData(data, descriptions, NULL, &scales);
+	if (customFormat.GetIsAsynchronous())
+		AddAsynchronousData(data, descriptions, &scales);
+	else
+		AddData(data, descriptions, NULL, &scales);
 	delete [] data;
 
 	return true;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		SkipLines
-//
-// Description:		Reads and discards the specified number of lines from
-//					the file.
-//
-// Input Arguments:
-//		file	= std::ifstream&
-//		count	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::SkipLines(std::ifstream &file, const unsigned int &count) const
-{
-	std::string nextLine;
-	unsigned int i;
-	for (i = 0; i < count; i++)
-		std::getline(file, nextLine);
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		GetDelimiterList
-//
-// Description:		Returns a list of delimiters to attempt to use when parsing
-//					a file.
-//
-// Input Arguments:
-//		customFormat	= const CustomFileFormat*
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxArrayString containing all acceptable delimiters
-//
-//==========================================================================
-wxArrayString MainFrame::GetDelimiterList(const CustomFileFormat *customFormat) const
-{
-	// Don't use periods ('.') because we're going to have those in regular numbers (switch this for other languages?)
-	wxArrayString delimiterList;
-	delimiterList.Add(_T(" "));
-	delimiterList.Add(_T(","));
-	delimiterList.Add(_T("\t"));
-	delimiterList.Add(_T(";"));
-
-	if (customFormat)
-	{
-		if (!customFormat->GetDelimiter().IsEmpty())
-		{
-			delimiterList.Clear();
-			delimiterList.Add(customFormat->GetDelimiter());
-		}
-	}
-
-	return delimiterList;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		GetGenericDescriptions
-//
-// Description:		Parses the file and extracts curve descriptions.  This
-//					assumes that the file has been opened, but not read from.
-//					Also, prior to returning, all data prior to numeric data
-//					is discarded.
-//
-// Input Arguments:
-//		fileName		= const wxString&
-//		delimiterList	= const wxArrayString&
-//
-// Output Arguments:
-//		delimiter		= wxString& indicating the delimiter to use for this file
-//		headerLines		= unsigned int& indicating the number of lines read
-//
-// Return Value:
-//		wxArrayString containing data descriptions
-//
-//==========================================================================
-wxArrayString MainFrame::GetGenericDescriptions(const wxString &fileName, const wxArrayString &delimiterList,
-	wxString &delimiter, unsigned int &headerLines)
-{
-	wxArrayString descriptions;
-	std::ifstream file(fileName.c_str(), std::ios::in);
-	if (!file.is_open())
-	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
-		return descriptions;
-	}
-
-	std::string nextLine;
-	wxArrayString delimitedLine, previousLines;
-	unsigned int i;
-	while (std::getline(file, nextLine))
-	{
-		for (i = 0; i < delimiterList.size(); i++)// Try all delimiters until we find one that works
-		{
-			delimiter = delimiterList[i];
-			delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
-			if (delimitedLine.size() > 1)
-			{
-				if (!ListIsNumeric(delimitedLine))// If not all columns are numeric, this isn't a data row
-					break;
-
-				GenerateGenericNames(previousLines, delimitedLine, delimiter, descriptions);
-				headerLines = previousLines.size();
-				if (descriptions.size() == 0)
-					descriptions = GenerateDummyNames(delimitedLine.size());
-				return descriptions;
-			}
-		}
-		delimiter.Empty();
-		previousLines.Add(nextLine);
-	}
-
-	return descriptions;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		ListIsNumeric
-//
-// Description:		Checks to see if the input array contains only numeric values.
-//
-// Input Arguments:
-//		list	= const wxArrayString&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true if all values are numeric, false otherwise
-//
-//==========================================================================
-bool MainFrame::ListIsNumeric(const wxArrayString &list) const
-{
-	unsigned int j;
-	double value;
-	for (j = 0; j < list.size(); j++)
-	{
-		if (!list[j].ToDouble(&value))
-			return false;
-	}
-
-	return true;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		GenerateDummyNames
-//
-// Description:		Generates plot names for cases where no information was
-//					provided by the data file.
-//
-// Input Arguments:
-//		count	= const unsigned int& specifying the number of names to generate
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxArrayString containing dummy names
-//
-//==========================================================================
-wxArrayString MainFrame::GenerateDummyNames(const unsigned int &count) const
-{
-	unsigned int i;
-	wxArrayString names;
-	for (i = 0; i < count; i++)
-		names.Add(wxString::Format("[%i]", i));
-
-	return names;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		GenerateGenericNames
-//
-// Description:		Creates the first part of the plot name for generic files.
-//
-// Input Arguments:
-//		previousLines	= const wxArrayString&
-//		currentLin		= const wxArrayString&
-//		delimiter		= const wxString&
-//
-// Output Arguments:
-//		descriptions	= wxArrayString&
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::GenerateGenericNames(const wxArrayString &previousLines, const wxArrayString &currentLine,
-	const wxString &delimiter, wxArrayString &descriptions) const
-{
-	unsigned int i;
-	int line;
-	wxArrayString delimitedPreviousLine;
-	double value;
-	for (line = previousLines.size() - 1; line >= 0; line--)
-	{
-		delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
-		if (delimitedPreviousLine.size() != currentLine.size())
-			break;
-
-		bool prependText(true);
-		for (i = 0; i < delimitedPreviousLine.size(); i++)
-		{
-			prependText = !delimitedPreviousLine[i].ToDouble(&value);
-			if (!prependText)
-				break;
-		}
-
-		if (prependText)
-		{
-			for (i = 0; i < delimitedPreviousLine.size(); i++)
-			{
-				if (descriptions.size() < i + 1)
-					descriptions.Add(delimitedPreviousLine[i]);
-				else
-					descriptions[i].Prepend(delimitedPreviousLine[i] + _T(", "));
-			}
-		}
-	}
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		RemoveUnwantedDescriptions
-//
-// Description:		Makes descriptions for unselected items empty.
-//
-// Input Arguments:
-//		choices			= const wxArrayInt&
-//
-// Output Arguments:
-//		descriptions	= wxArrayString&
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::RemoveUnwantedDescriptions(wxArrayString &descriptions, const wxArrayInt &choices) const
-{
-	unsigned int i, j;
-	bool remove;
-	for (i = 0; i < descriptions.size(); i++)
-	{
-		remove = true;
-		for (j = 0; j < choices.size(); j++)
-		{
-			if (i == (unsigned int)choices[j])
-			{
-				remove = false;
-				break;
-			}
-		}
-
-		if (remove)
-			descriptions[i].Empty();
-	}
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		IsBaumullerFile
-//
-// Description:		Determines if the specified file is a Baumuller osilloscope trace.
-//
-// Input Arguments:
-//		pathAndFileName	= const wxString&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for Baumuller files, false otherwise
-//
-//==========================================================================
-bool MainFrame::IsBaumullerFile(const wxString &pathAndFileName)
-{
-	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-	if (!file.is_open())
-	{
-		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
-		return false;
-	}
-
-	std::string nextLine;
-	std::getline(file, nextLine);// Read first line
-	file.close();
-
-	// Wrap in wxString for robustness against varying line endings
-	if (wxString(nextLine).Trim().Cmp(_T("WinBASS_II_Oscilloscope_Data")) == 0)
-		return true;
-
-	return false;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		IsKollmorgenFile
-//
-// Description:		Determines if the specified file is a Baumuller osilloscope trace.
-//
-// Input Arguments:
-//		pathAndFileName	= const wxString&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for Baumuller files, false otherwise
-//
-//==========================================================================
-bool MainFrame::IsKollmorgenFile(const wxString &pathAndFileName)
-{
-	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-	if (!file.is_open())
-	{
-		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
-		return false;
-	}
-
-	SkipLines(file, 1);
-
-	std::string nextLine;
-	std::getline(file, nextLine);// Read second line
-	file.close();
-
-	// Kollmorgen format from S600 series drives
-	// There may be a better way to check this, but I haven't found it
-	// Wrap in wxString for robustness against varying line endings
-	if (wxString(nextLine).Trim().Mid(0, 7).Cmp(_T("MMI vom")) == 0)
-		return true;
-
-	return false;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		ExtractData
-//
-// Description:		Extracts numeric data from the file.  Columns with empty
-//					descriptions are ignored.
-//
-// Input Arguments:
-//		file			= std::ifstream&
-//		delimiter		= const wxString&
-//		data			= std::vector<double>*
-//		descriptions	= const wxArrayString&
-//
-// Output Arguments:
-//
-// Return Value:
-//		bool, true for success, false otherwise
-//
-//==========================================================================
-bool MainFrame::ExtractData(std::ifstream &file, const wxString &delimiter,
-	std::vector<double> *data, const wxArrayString &descriptions) const
-{
-	std::string nextLine;
-	wxArrayString parsed;
-	unsigned int i, set, curveCount(GetPopulatedCount(descriptions));
-	double tempDouble;
-
-	while (!file.eof())
-	{
-		std::getline(file, nextLine);
-		parsed = ParseLineIntoColumns(nextLine, delimiter);
-
-		if (parsed.size() < curveCount && parsed.size() > 0)
-		{
-			/*wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
-				_T("Column Count Mismatch"), wxICON_WARNING, this);*/// No warning here due to const method
-			return true;
-		}
-
-		set = 0;
-		for (i = 0; i < parsed.size(); i++)
-		{
-			if (!parsed[i].ToDouble(&tempDouble))
-				return false;
-
-			if (!descriptions[i].IsEmpty())
-			{
-				data[set].push_back(tempDouble);
-				set++;
-			}
-		}
-	}
-
-	return true;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		GetPopulatedCount
-//
-// Description:		Determines the number of non-empty members of the array.
-//
-// Input Arguments:
-//		list	= const wxArrayString&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		unsigned int
-//
-//==========================================================================
-unsigned int MainFrame::GetPopulatedCount(const wxArrayString &list) const
-{
-	unsigned int count(0), i;
-	for (i = 0; i < list.GetCount(); i++)
-	{
-		if (!list[i].IsEmpty())
-			count ++;
-	}
-
-	return count;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		AddData
-//
-// Description:		Creates datasets and adds the associated curves to the plot.
-//
-// Input Arguments:
-//		data			= const std::vector<double>*
-//		descriptions	= const wxArrayString&
-//		timeStep		= const double* (optional)
-//		scales			= const std::vector<double>* (optional)
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void MainFrame::AddData(const std::vector<double> *data, const wxArrayString &descriptions,
-	const double *timeStep, const std::vector<double> *scales)
-{
-	assert(data);
-
-	Dataset2D *dataSet;
-	unsigned int i, j;
-
-	for (i = 1; i < descriptions.size(); i++)
-	{
-		if (descriptions[i].IsEmpty())
-			continue;
-
-		dataSet = new Dataset2D(data[0].size());
-		for (j = 0; j < data[0].size(); j++)
-		{
-			if (timeStep)
-				dataSet->GetXPointer()[j] = *timeStep * (double)j;
-			else
-				dataSet->GetXPointer()[j] = data[0].at(j);
-			dataSet->GetYPointer()[j] = data[plotList.GetCount() + 1].at(j);
-		}
-
-		if (scales)
-			*dataSet *= (*scales)[i];
-
-		AddCurve(dataSet, descriptions[i]);
-	}
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		ParseLineIntoColumns
-//
-// Description:		Parses the specified line into pieces based on encountering
-//					the specified delimiting character (or characters).
-//
-// Input Arguments:
-//		line		= wxString containing the line to parse
-//		delimiter	= const wxString& specifying the characters to assume for
-//					  delimiting columns
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxArrayString containing one item for every column contained in the
-//		original line
-//
-//==========================================================================
-wxArrayString MainFrame::ParseLineIntoColumns(wxString line,
-	const wxString &delimiter, const bool &ignoreConsecutiveDelimiters) const
-{
-	// Remove \r character from end of line (required for GTK, etc.)
-	line.Trim();
-
-	wxArrayString parsed;
-
-	size_t start(0);
-	size_t end(0);
-
-	while (end != std::string::npos && start < line.length())
-	{
-		// Find the next delimiting character
-		end = line.find(delimiter.c_str(), start);
-
-		// If the next delimiting character is right next to the previous character
-		// (empty string between), ignore it (that is to say, we treat consecutive
-		// delimiters as one)
-		// Changed 4/29/2012 - For some Baumuller data, there are no units, which
-		// results in consecutive delimiters that should NOT be treated as one
-		if (end == start && ignoreConsecutiveDelimiters)
-		{
-			start++;
-			continue;
-		}
-
-		// If no character was found, add the rest of the line to the list
-		if (end == std::string::npos)
-			parsed.Add(line.substr(start));
-		else
-			parsed.Add(line.substr(start, end - start));
-
-		start = end + 1;
-	}
-
-	return parsed;
-}
+}*/
 
 //==========================================================================
 // Class:			MainFrame
@@ -2363,7 +1607,7 @@ bool MainFrame::XScalingFactorIsKnown(double &factor, wxString *label) const
 //		wxString containing the unit porition of the description
 //
 //==========================================================================
-wxString MainFrame::ExtractUnitFromDescription(const wxString &description) const
+wxString MainFrame::ExtractUnitFromDescription(const wxString &description)
 {
 	wxString unit;
 	if (FindWrappedString(description, unit, '[', ']'))
@@ -2413,7 +1657,7 @@ wxString MainFrame::ExtractUnitFromDescription(const wxString &description) cons
 //
 //==========================================================================
 bool MainFrame::FindWrappedString(const wxString &s, wxString &contents,
-	const wxChar &open, const wxChar &close) const
+	const wxChar &open, const wxChar &close)
 {
 	if (s.Last() == close)
 	{
@@ -2447,7 +1691,7 @@ bool MainFrame::FindWrappedString(const wxString &s, wxString &contents,
 //		bool, true if unit can be converted, false otherwise
 //
 //==========================================================================
-bool MainFrame::UnitStringToFactor(const wxString &unit, double &factor) const
+bool MainFrame::UnitStringToFactor(const wxString &unit, double &factor)
 {
 	// We'll recognize the following units:
 	// h, hr, hours -> factor = 1.0 / 3600.0
@@ -3820,6 +3064,40 @@ void MainFrame::SetMarkerSize(const unsigned int &curve, const int &size)
 {
 	optionsGrid->SetCellValue(curve + 1, colMarkerSize, wxString::Format("%i", size));
 	UpdateCurveProperties(curve);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GetDataFile
+//
+// Description:		Determines the correct DataFile object to use for the
+//					specified file, and returns a pointer to an instance of that
+//					object.
+//
+// Input Arguments:
+//		fileName	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		DataFile*
+//
+//==========================================================================
+DataFile* MainFrame::GetDataFile(const wxString &fileName) const
+{
+	if (BaumullerFile::IsType(fileName))
+		return new BaumullerFile(fileName);
+	else if (KollmorgenFile::IsType(fileName))
+		return new KollmorgenFile(fileName);
+	else if (CustomFile::IsType(fileName))
+		return new CustomFile(fileName);
+	else if (CustomXMLFile::IsType(fileName))
+		return new CustomXMLFile(fileName);
+
+	// Don't even check - if we can't open it with any other types,
+	// always try to open it with a generic type
+	return new GenericFile(fileName);
 }
 
 //==========================================================================
