@@ -10,7 +10,8 @@
 // File:  customFile.cpp
 // Created:  10/4/2012
 // Author:  K. Loux
-// Description:  File class for custom (non-XML) files defined by the user using an XML file.
+// Description:  File class for custom (non-XML) files defined by the user using
+//				 an XML file.
 // History:
 
 // Local headers
@@ -37,7 +38,7 @@
 bool CustomFile::IsType(const wxString &_fileName)
 {
 	CustomFileFormat format(_fileName);
-	return format.IsCustomFormat();// FIXME:  Needs to do better than this so we don't mistake custom XML files for this
+	return format.IsCustomFormat() && !format.IsXML();
 }
 
 //==========================================================================
@@ -92,7 +93,7 @@ wxArrayString CustomFile::CreateDelimiterList(void) const
 bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	std::vector<double> *rawData, std::vector<double> &factors) const
 {
-	if (fileFormat.GetIsAsynchronous() || !fileFormat.GetTimeFormat().IsEmpty())
+	if (fileFormat.IsAsynchronous() || !fileFormat.GetTimeFormat().IsEmpty())
 		return ExtractSpecialData(file, choices, rawData, factors);
 
 	return DataFile::ExtractData(file, choices, rawData, factors);
@@ -120,7 +121,7 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 void CustomFile::AssembleDatasets(const std::vector<double> *rawData,
 	const unsigned int &dataSize)
 {
-	if (fileFormat.GetIsAsynchronous())
+	if (fileFormat.IsAsynchronous())
 		AssembleAsynchronousDatasets(rawData, dataSize);
 	else
 		DataFile::AssembleDatasets(rawData, dataSize);
@@ -147,7 +148,8 @@ void CustomFile::AssembleDatasets(const std::vector<double> *rawData,
 //		wxArrayString containing the descriptions
 //
 //==========================================================================
-wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const
+wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
+	std::vector<double> &factors) const
 {
 	wxArrayString names = DataFile::GetCurveInformation(headerLineCount, factors);
 	fileFormat.ProcessChannels(names, factors);
@@ -186,7 +188,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 	while (!file.eof())
 	{
 		std::getline(file, nextLine);
-		parsed = ParseLineIntoColumns(nextLine, delimiter, !fileFormat.GetIsAsynchronous());
+		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		if (parsed.size() < curveCount && parsed.size() > 0)
 		{
 			wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
@@ -195,14 +197,22 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 		}
 
 		set = 0;
-		if (fileFormat.GetIsAsynchronous())
+		if (fileFormat.IsAsynchronous())
 		{
-			bool gotValue(false);
-			// FIXME:  What if we don't need to convert from format?
-			time = GetTimeValue(parsed[0], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
+			if (!fileFormat.GetTimeFormat().IsEmpty())
+			{
+				time = GetTimeValue(parsed[0], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
 
-			if (timeZero < 0.0)
-				timeZero = time;
+				if (timeZero < 0.0)
+					timeZero = time;
+			}
+			else
+			{
+				parsed[0].ToDouble(&time);
+				timeZero = 0.0;
+			}
+
+			bool gotValue(false);
 			for (i = 1; i < parsed.size(); i++)
 			{
 				if (!parsed[i].ToDouble(&tempDouble))
@@ -283,4 +293,26 @@ void CustomFile::AssembleAsynchronousDatasets(const std::vector<double> *rawData
 		*dataset *= scales[i / 2];
 		data.push_back(dataset);
 	}
+}
+
+//==========================================================================
+// Class:			CustomFile
+// Function:		DoTypeSpecificLoadTasks
+//
+// Description:		Sets non-standard flags for this class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void CustomFile::DoTypeSpecificLoadTasks(void)
+{
+	ignoreConsecutiveDelimiters = !fileFormat.IsAsynchronous();
+	timeIsFormatted = !fileFormat.GetTimeFormat().IsEmpty();
 }

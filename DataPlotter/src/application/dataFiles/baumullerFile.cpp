@@ -38,7 +38,8 @@ bool BaumullerFile::IsType(const wxString &_fileName)
 	std::ifstream file(_fileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + _fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
+		wxMessageBox(_T("Could not open file '") + _fileName + _T("'!"),
+			_T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}
 
@@ -50,14 +51,12 @@ bool BaumullerFile::IsType(const wxString &_fileName)
 	if (wxString(nextLine).Trim().Cmp(_T("WinBASS_II_Oscilloscope_Data")) == 0)
 		return true;
 
-	// FIXME:  This can be handled with custom format: just needs time units specified
-
 	return false;
 }
 
 //==========================================================================
 // Class:			BaumullerFile
-// Function:		GetDescriptions
+// Function:		GetCurveInformation
 //
 // Description:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
@@ -89,22 +88,77 @@ wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 	while (std::getline(file, nextLine))
 	{
 		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
-		if (delimitedLine.size() > 1)
+		if (delimitedLine.size() > 1 && delimitedLine[0].Cmp(_T("Par.number:")) == 0)
 		{
-			if (ListIsNumeric(delimitedLine))// If not all columns are numeric, this isn't a data row
+			unsigned int i, j;
+			for (i = 0; i < 3; i++)
 			{
-				names = GenerateNames(previousLines, delimitedLine);
-				headerLineCount = previousLines.size();
-				if (names.size() == 0)
-					names = GenerateDummyNames(delimitedLine.size());
-				factors.resize(names.size(), 1.0);
-				names[0] = _T("Time, [msec]");
-				return names;
+				for (j = 0; j < delimitedLine.Count() - 1; j++)
+				{
+					if (i == 0)
+						names.Add(delimitedLine[j]);
+					else
+						names[j].Append(_T(", ") + delimitedLine[j]);
+				}
+				if (!std::getline(file, nextLine))
+					break;
+				delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 			}
+
+			file.close();
+			factors.resize(names.size(), 1.0);
+			names[0] = _T("Time, [msec]");
+			headerLineCount = previousLines.size() + 5;// Extra two for min/max rows
+			return names;
 		}
 		previousLines.Add(nextLine);
 	}
 
+	file.close();
+
 	names.Empty();
 	return names;
+}
+
+//==========================================================================
+// Class:			BaumullerFile
+// Function:		DoTypeSpecificLoadTasks
+//
+// Description:		Sets flags to be used during initial loading operations
+//					(like building curve names).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void BaumullerFile::DoTypeSpecificLoadTasks(void)
+{
+	ignoreConsecutiveDelimiters = false;
+}
+
+//==========================================================================
+// Class:			BaumullerFile
+// Function:		DoTypeSpecificProcessTasks
+//
+// Description:		Sets flags to be used during data extraction operations.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void BaumullerFile::DoTypeSpecificProcessTasks(void)
+{
+	ignoreConsecutiveDelimiters = true;
 }

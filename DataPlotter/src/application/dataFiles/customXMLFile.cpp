@@ -35,7 +35,6 @@
 //==========================================================================
 bool CustomXMLFile::IsType(const wxString &_fileName)
 {
-	/*CustomFileFormat format(_fileName);
-	return format.IsCustomFormat();*/
-	return false;
+	CustomFileFormat format(_fileName);
+	return format.IsCustomFormat() && format.IsXML();
 }

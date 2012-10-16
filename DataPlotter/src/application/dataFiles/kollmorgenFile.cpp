@@ -60,7 +60,7 @@ bool KollmorgenFile::IsType(const wxString &_fileName)
 
 //==========================================================================
 // Class:			KollmorgenFile
-// Function:		GetDescriptions
+// Function:		GetCurveInformation
 //
 // Description:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
@@ -77,23 +77,129 @@ bool KollmorgenFile::IsType(const wxString &_fileName)
 //		wxArrayString containing the descriptions
 //
 //==========================================================================
-wxArrayString KollmorgenFile::GetCurveInformation(unsigned int &headerLineCount,
+wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 	std::vector<double> &factors) const
 {
-	/*SkipLines(file, 2);
+	std::ifstream file(fileName.c_str(), std::ios::in);
+	if (!file.is_open())
+	{
+		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
+			_T("Error Reading File"), wxICON_ERROR);
+		return descriptions;
+	}
+
+	SkipLines(file, 3);
+	headerLineCount = 4;
+
+	std::string nextLine;
+	std::getline(file, nextLine);// The fourth line contains the data set labels
+	wxArrayString names = ParseLineIntoColumns(nextLine, delimiter);
+	names.Insert(_T("Time, [sec]"), 0);
+
+	factors.resize(names.size(), 1.0);
+
+	file.close();
+	return names;
+}
+
+//==========================================================================
+// Class:			KollmorgenFile
+// Function:		DoTypeSpecificLoadTasks
+//
+// Description:		Finds and stores the sample rate for the file.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void KollmorgenFile::DoTypeSpecificLoadTasks(void)
+{
+	std::ifstream file(fileName.c_str(), std::ios::in);
+	if (!file.is_open())
+	{
+		wxMessageBox(_T("Could not determine sample rate!  Using 1 Hz."),
+			_T("Error Reading File"), wxICON_ERROR);
+		timeStep = 1.0;
+		return;
+	}
+
+	SkipLines(file, 2);
 
 	std::string nextLine;
 	std::getline(file, nextLine);
 
 	// The third line contains the number of data points and the sampling period in msec
 	// We use this information to generate the time series (file does not contain a time series)
-	samplingPeriod = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
+	timeStep = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
 
-	// The fourth line contains the data set labels (which also gives us the number of datasets we need)
-	std::getline(file, nextLine);
-	wxArrayString names = ParseLineIntoColumns(nextLine, delimiter);
+	file.close();
+}
 
-	return names;*/
-	wxArrayString a;
-	return a;
+//==========================================================================
+// Class:			KollmorgenFile
+// Function:		ExtractData
+//
+// Description:		Parses the file and reads data into vectors.  Only extracts
+//					the data the user selected for display.  Also creates time
+//					series based on timeStep.
+//
+// Input Arguments:
+//		file	= std::ifstream& previously opened input stream to read from
+//		choices	= const wxArrayInt& indicating the user's choices
+//		factors	= std::vector<double>& containing the list of scaling factors
+//
+// Output Arguments:
+//		rawData	= std::vector<double>* containing the data
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
+	std::vector<double> *rawData, std::vector<double> &factors) const
+{
+	std::string nextLine;
+	wxArrayString parsed;
+	unsigned int i, set, curveCount(choices.size() + 1);
+	double tempDouble, time(0.0);
+
+	while (!file.eof())
+	{
+		std::getline(file, nextLine);
+		parsed = ParseLineIntoColumns(nextLine, delimiter);
+		parsed.Insert(wxString::Format("%f", time), 0);
+
+		if (parsed.size() < curveCount)
+		{
+			wxString line(nextLine);
+			if (line.Trim().Len() > 0)
+				wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
+					_T("Column Count Mismatch"), wxICON_WARNING);
+			return true;
+		}
+
+		set = 0;
+		for (i = 0; i < parsed.size(); i++)
+		{
+			if (!parsed[i].ToDouble(&tempDouble))
+				return false;
+
+			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
+			{
+				rawData[set].push_back(tempDouble);
+				factors[set] = factors[i];// Update scales for cases where user didn't select a column
+				set++;
+			}
+		}
+
+		time += timeStep;
+	}
+
+	return true;
 }

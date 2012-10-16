@@ -9,6 +9,7 @@ TARGET = DataPlotter
 # Directories in which to search for source files
 DIRS = \
 	src/application \
+	src/application/dataFiles \
 	src/renderer \
 	src/renderer/primitives \
 	src/utilities \

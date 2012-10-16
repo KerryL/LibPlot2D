@@ -28,7 +28,14 @@ public:
 	static bool IsType(const wxString &_fileName);
 
 protected:
-	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const;
+	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
+		std::vector<double> &factors) const;
+	virtual void DoTypeSpecificLoadTasks(void);
+	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
+		std::vector<double> *rawData, std::vector<double> &factors) const;
+
+private:
+	double timeStep;// [sec]
 };
 
 #endif//_KOLLMORGEN_FILE_H_

@@ -28,7 +28,10 @@ public:
 	static bool IsType(const wxString &_fileName);
 
 protected:
-	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const;
+	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
+		std::vector<double> &factors) const;
+	virtual void DoTypeSpecificLoadTasks(void);
+	virtual void DoTypeSpecificProcessTasks(void);
 };
 
 #endif//_BAUMULLER_FILE_H_
