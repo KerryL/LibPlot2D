@@ -34,12 +34,12 @@ public:
 	CustomFileFormat(const wxString &_pathAndFileName);
 
 	bool IsCustomFormat(void) const { return !formatName.IsEmpty(); };
+	bool IsAsynchronous(void) const { return asynchronous; };
+	bool IsXML(void) const { return isXML; };
 
 	wxString GetDelimiter(void) const { return delimiter; };
 	wxString GetTimeUnits(void) const { return timeUnits; };
 	wxString GetTimeFormat(void) const { return timeFormat; };
-
-	bool GetIsAsynchronous(void) const { return asynchronous; };
 
 	void ProcessChannels(wxArrayString &names, std::vector<double> &scales) const;
 
@@ -58,6 +58,7 @@ private:
 	wxString timeFormat;
 
 	bool asynchronous;
+	bool isXML;
 
 	struct Identifier
 	{

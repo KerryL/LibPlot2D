@@ -39,6 +39,9 @@ DataFile::DataFile(const wxString& _fileName)
 {
 	fileName = _fileName;
 	headerLines = 0;
+
+	ignoreConsecutiveDelimiters = true;
+	timeIsFormatted = false;
 }
 
 //==========================================================================
@@ -87,6 +90,7 @@ bool DataFile::Load(void)
 		return false;
 	}
 
+	DoTypeSpecificLoadTasks();
 	descriptions = GetCurveInformation(headerLines, scales);
 	if (descriptions.size() < 2)
 	{
@@ -140,14 +144,19 @@ wxString DataFile::DetermineBestDelimiter(void) const
 			delimitedLine = ParseLineIntoColumns(nextLine, delimiterList[i]);
 			if (delimitedLine.size() > 1)
 			{
-				if (ListIsNumeric(delimitedLine) && columnCount == delimitedLine.size())// Number of number columns == number of text columns
+				if (ListIsNumeric(delimitedLine)
+					&& columnCount == delimitedLine.size())// Number of number columns == number of text columns
+				{
+					file.close();
 					return delimiterList[i];
+				}
 				else
 					columnCount = delimitedLine.size();
 			}
 		}
 	}
 
+	file.close();
 	return wxEmptyString;
 }
 
@@ -169,7 +178,8 @@ wxString DataFile::DetermineBestDelimiter(void) const
 //==========================================================================
 wxArrayString DataFile::CreateDelimiterList(void) const
 {
-	// Don't use periods ('.') because we're going to have those in regular numbers (switch this for other languages?)
+	// Don't use periods ('.') because we're going to have those in regular
+	// numbers (switch this for other languages?)
 	wxArrayString delimiterList;
 	delimiterList.Add(_T(" "));
 	delimiterList.Add(_T(","));
@@ -204,7 +214,8 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::ifstream file(fileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
+		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
+			_T("Error Reading File"), wxICON_ERROR);
 		return descriptions;
 	}
 
@@ -212,10 +223,9 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 	wxArrayString delimitedLine, previousLines, names;
 	while (std::getline(file, nextLine))
 	{
-		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);// FIXME:  Needs to know how to handle consecutive delimiters
+		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 		if (delimitedLine.size() > 1)
 		{
-			// FIXME:  Needs to know if we're allowing zero length and formatted time!
 			if (ListIsNumeric(delimitedLine))// If not all columns are numeric, this isn't a data row
 			{
 				names = GenerateNames(previousLines, delimitedLine);
@@ -223,6 +233,7 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 				if (names.size() == 0)
 					names = GenerateDummyNames(delimitedLine.size());
 				factors.resize(names.size(), 1.0);
+				file.close();
 				return names;
 			}
 		}
@@ -230,6 +241,7 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 	}
 
 	names.Empty();
+	file.close();
 	return names;
 }
 
@@ -254,10 +266,9 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 //
 //==========================================================================
 wxArrayString DataFile::ParseLineIntoColumns(wxString line,
-	const wxString &delimiter, const bool &ignoreConsecutiveDelimiters) const
+	const wxString &delimiter) const
 {
-	// Remove \r character from end of line (required for GTK, etc.)
-	line.Trim();
+	line.Trim();// Remove \r character from end of line (required for GTK, etc.)
 
 	wxArrayString parsed;
 
@@ -266,7 +277,6 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 
 	while (end != std::string::npos && start < line.length())
 	{
-		// Find the next delimiting character
 		end = line.find(delimiter.c_str(), start);
 
 		// If the next delimiting character is right next to the previous character
@@ -280,7 +290,6 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 			continue;
 		}
 
-		// If no character was found, add the rest of the line to the list
 		if (end == std::string::npos)
 			parsed.Add(line.substr(start));
 		else
@@ -414,6 +423,7 @@ bool DataFile::ProcessFile(void)
 		return false;
 	}
 	SkipLines(file, headerLines);
+	DoTypeSpecificProcessTasks();
 
 	std::vector<double> *rawData = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
 	if (!ExtractData(file, choices, rawData, scales))
@@ -461,10 +471,12 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 
-		if (parsed.size() < curveCount && parsed.size() > 0)
+		if (parsed.size() < curveCount)
 		{
-			wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
-				_T("Column Count Mismatch"), wxICON_WARNING);
+			wxString line(nextLine);
+			if (line.Trim().Len() > 0)
+				wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
+					_T("Column Count Mismatch"), wxICON_WARNING);
 			return true;
 		}
 
@@ -616,10 +628,6 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 //
 // Input Arguments:
 //		list				= const wxArrayString&
-//		timeIsFormatted		= const bool& indicates time column should be treated as
-//							  numeric, even when it's not
-//		allowEmptyValues	= const bool&, indicating that consecutive delimiters
-//							  should not be discarded
 //
 // Output Arguments:
 //		None
@@ -628,14 +636,13 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 //		bool, true if all values are numeric, false otherwise
 //
 //==========================================================================
-bool DataFile::ListIsNumeric(const wxArrayString &list, const bool &timeIsFormatted,
-	const bool &allowEmptyValues) const
+bool DataFile::ListIsNumeric(const wxArrayString &list) const
 {
 	unsigned int j;
 	double value;
 	for (j = (unsigned int)timeIsFormatted; j < list.size(); j++)
 	{
-		if (!list[j].ToDouble(&value) && !(allowEmptyValues && list[j].IsEmpty()))
+		if (!list[j].ToDouble(&value) && (ignoreConsecutiveDelimiters && !list[j].IsEmpty()))
 			return false;
 	}
 
@@ -680,7 +687,9 @@ double DataFile::GetTimeValue(const wxString &timeString,
 		timeCount = timeString.Mid(timeStart).Find(delimiter);
 		if (!timeString.Mid(timeStart, timeCount).ToDouble(&value))
 		{
-			// FIXME:  What to do in this case?
+			// TODO:  Add warning for user in this case?
+			// What if user opens file with 100,000 data points, all containing
+			// the same error - don't want to spam them with warnings, though.
 			value = 0.0;
 		}
 
@@ -700,7 +709,7 @@ double DataFile::GetTimeValue(const wxString &timeString,
 
 		time += value;
 
-		if (formatCount == wxNOT_FOUND || timeCount == wxNOT_FOUND)
+		if ((int)formatCount == wxNOT_FOUND || (int)timeCount == wxNOT_FOUND)
 			break;
 
 		formatStart += formatCount + 1;
@@ -709,31 +718,3 @@ double DataFile::GetTimeValue(const wxString &timeString,
 
 	return time * factor;
 }
-
-//==========================================================================
-// Class:			DataFile
-// Function:		GetPopulatedCount
-//
-// Description:		Determines the number of non-empty members of the array.
-//
-// Input Arguments:
-//		list	= const wxArrayString&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		unsigned int
-//
-//==========================================================================
-/*unsigned int DataFile::GetPopulatedCount(const wxArrayString &list) const
-{
-	unsigned int count(0), i;
-	for (i = 0; i < list.GetCount(); i++)
-	{
-		if (!list[i].IsEmpty())
-			count ++;
-	}
-
-	return count;
-}*/

@@ -53,37 +53,29 @@ protected:
 	wxString delimiter;
 
 	unsigned int headerLines;
+	bool ignoreConsecutiveDelimiters;
+	bool timeIsFormatted;
 
 	wxString DetermineBestDelimiter(void) const;
 
 	virtual wxArrayString CreateDelimiterList(void) const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors) const;
-	virtual void AssembleDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
-	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const;
+	virtual void AssembleDatasets(const std::vector<double> *rawData,
+		const unsigned int &dataSize);
+	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
+		std::vector<double> &factors) const;
+	virtual void DoTypeSpecificLoadTasks(void) {};
+	virtual void DoTypeSpecificProcessTasks(void) {};
 
-	/*bool ExtractCustomData(std::ifstream &file, const wxString &delimiter, std::vector<double> *data,
-		const wxArrayString &descriptions, const CustomFileFormat &customFormat) const;
-	void AddAsynchronousData(const std::vector<double> *data, const wxArrayString &descriptions,
-		const std::vector<double> *scales = NULL);*/
-	//wxArrayString GetKollmorgenDescriptions(std::ifstream &file, const wxString &delimiter, double &samplingPeriod) const;
-	/*bool ProcessCustomFile(const wxString &fileName, wxArrayString &descriptions,
-		const unsigned int &headerLines, const wxString &delimiter, const std::vector<double> &scales,
-		const CustomFileFormat &customFormat);*/
-	/*bool LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat);
-	bool LoadKollmorgenFile(wxString pathAndFileName);
-
-	bool IsKollmorgenFile(const wxString &pathAndFileName);*/
-
-	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter,
-		const bool &ignoreConsecutiveDelimiters = true) const;
+	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter) const;
 	double GetTimeValue(const wxString &timeString,
 		const wxString &timeFormat, const wxString &timeUnits) const;
 
-	wxArrayString GenerateNames(const wxArrayString &previousLines, const wxArrayString &currentLine) const;
+	wxArrayString GenerateNames(const wxArrayString &previousLines,
+		const wxArrayString &currentLine) const;
 	wxArrayString GenerateDummyNames(const unsigned int &count) const;
-	bool ListIsNumeric(const wxArrayString &list,
-		const bool &timeIsFormatted = false, const bool &allowEmptyValues = false) const;
+	bool ListIsNumeric(const wxArrayString &list) const;
 
 	bool ProcessFile(void);
 	bool ArrayContainsValue(const int &value, const wxArrayInt &a) const;

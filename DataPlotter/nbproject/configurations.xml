@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="79">
+<configurationDescriptor version="80">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df name="DataPlotter" root=".">
       <df name=".obj">
         <df name="src">
           <df name="application">
+            <df name="dataFiles">
+            </df>
           </df>
           <df name="renderer">
             <df name="primitives">
@@ -35,8 +37,22 @@
       </df>
       <df name="src">
         <df name="application">
-          <in>customFileFormat.cpp</in>
-          <in>customFileFormat.h</in>
+          <df name="dataFiles">
+            <in>baumullerFile.cpp</in>
+            <in>baumullerFile.h</in>
+            <in>customFile.cpp</in>
+            <in>customFile.h</in>
+            <in>customFileFormat.cpp</in>
+            <in>customFileFormat.h</in>
+            <in>customXMLFile.cpp</in>
+            <in>customXMLFile.h</in>
+            <in>dataFile.cpp</in>
+            <in>dataFile.h</in>
+            <in>genericFile.cpp</in>
+            <in>genericFile.h</in>
+            <in>kollmorgenFile.cpp</in>
+            <in>kollmorgenFile.h</in>
+          </df>
           <in>dropTarget.cpp</in>
           <in>dropTarget.h</in>
           <in>fftDialog.cpp</in>

@@ -765,7 +765,8 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 		for (i = 0; i < file->GetDataCount(); i++)
 			AddCurve(file->GetDataset(i), file->GetDescription(i + 1));
 		SetTitleFromFileName(pathAndFileName);
-		SetXDataLabel(file->GetDescription(0));
+		genericXAxisLabel = file->GetDescription(0);
+		SetXDataLabel(genericXAxisLabel);
 		plotArea->SaveCurrentZoom();
 
 		delete file;
@@ -775,170 +776,6 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 	delete file;
 	return false;
 }
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		LoadCustomFile
-//
-// Description:		Method for loading a custom (defined in XML file) format.
-//
-// Input Arguments:
-//		pathAndFileName	= wxString
-//		customFormat	= CustomFileFormat
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		true for file successfully loaded, false otherwise
-//
-//==========================================================================
-/*bool MainFrame::LoadCustomFile(wxString pathAndFileName, CustomFileFormat &customFormat)
-{
-	if (!customFormat.GetIsAsynchronous() && !customFormat.GetTimeFormat().IsEmpty())
-		return LoadGenericDelimitedFile(pathAndFileName, &customFormat);
-
-	wxString delimiter;
-	unsigned int headerLines;
-	wxArrayString descriptions = GetGenericDescriptions(pathAndFileName,
-		GetDelimiterList(&customFormat), delimiter, headerLines,
-		!customFormat.GetTimeFormat().IsEmpty(), customFormat.GetIsAsynchronous());
-	if (descriptions.size() < 2)
-	{
-		wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR, this);
-		return false;
-	}
-
-	std::vector<double> scales(descriptions.size(), 1.0);
-	customFormat.ProcessChannels(descriptions, scales);
-
-	genericXAxisLabel = descriptions[0];
-
-	if (!ProcessCustomFile(pathAndFileName, descriptions, headerLines, delimiter, scales, customFormat))
-		return false;
-	currentFileFormat = FormatGeneric;
-
-	if (!customFormat.GetTimeUnits().IsEmpty())
-		genericXAxisLabel = _T("Time, [") + customFormat.GetTimeUnits() + _T("]");
-
-	return true;
-}
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		LoadKollmorgenFile
-//
-// Description:		Loads Kollmorgen data trace (from S600 series drive).
-//
-// Input Arguments:
-//		pathAndFileName	= wxString
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		true for file successfully loaded, false otherwise
-//
-//==========================================================================
-bool MainFrame::LoadKollmorgenFile(wxString pathAndFileName)
-{
-	std::ifstream file(pathAndFileName.c_str(), std::ios::in);
-	if (!file.is_open())
-	{
-		wxMessageBox(_T("Could not open file '") + pathAndFileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
-		return false;
-	}
-
-	wxString delimiter(',');
-	double samplingPeriod;
-	wxArrayString descriptions = GetKollmorgenDescriptions(file, delimiter, samplingPeriod);
-
-	std::vector<double> *data = new std::vector<double>[GetPopulatedCount(descriptions)];
-	if (!ExtractData(file, delimiter, data, descriptions))
-	{
-		wxMessageBox(_T("ERROR:  Non-numeric entry encountered while parsing file!"),
-			_T("Error Generating Plot"), wxICON_ERROR, this);
-		delete [] data;
-		return false;
-	}
-	file.close();
-
-	AddData(data, descriptions, &samplingPeriod);
-	currentFileFormat = FormatKollmorgen;
-
-	delete [] data;
-
-	return true;
-}*/
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		ProcessCustomFile
-//
-// Description:		Performs necessary actions to extract desired data from
-//					the specified file.
-//
-// Input Arguments:
-//		fileName	= const wxString&
-//		descriptions	= wxArrayString&
-//		headerLines		= const unsigned int&
-//		delimiter		= const wxString&
-//		scales			= const std::vector<double>&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for success, false otherwise
-//
-//==========================================================================
-/*bool MainFrame::ProcessCustomFile(const wxString &fileName, wxArrayString &descriptions,
-	const unsigned int &headerLines, const wxString &delimiter, const std::vector<double> &scales,
-	const CustomFileFormat &customFormat)
-{
-	MultiChoiceDialog dialog(this, _T("Select data to plot:"), _T("Select Data"),
-		wxArrayString(descriptions.begin() + 1, descriptions.end()));
-	if (dialog.ShowModal() == wxID_CANCEL)
-		return false;
-
-	wxArrayInt choices = dialog.GetSelections();
-	if (choices.size() == 0)
-	{
-		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR, this);
-		return false;
-	}
-
-	std::ifstream file(fileName.c_str(), std::ios::in);
-	if (!file.is_open())
-	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR, this);
-		return false;
-	}
-	SkipLines(file, headerLines);
-
-	unsigned int dataSize(choices.size());
-	if (customFormat.GetIsAsynchronous())
-		dataSize *= 2;// each set of data gets it's own time column
-	else
-		dataSize += 1;// +1 for time column, which isn't displayed for user to select
-	std::vector<double> *data = new std::vector<double>[dataSize];
-	CompensateGenericChoices(choices);
-	RemoveUnwantedDescriptions(descriptions, choices);
-	if (!ExtractCustomData(file, delimiter, data, descriptions, customFormat))
-	{
-		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR, this);
-		return false;
-	}
-	file.close();
-
-	if (customFormat.GetIsAsynchronous())
-		AddAsynchronousData(data, descriptions, &scales);
-	else
-		AddData(data, descriptions, NULL, &scales);
-	delete [] data;
-
-	return true;
-}*/
 
 //==========================================================================
 // Class:			MainFrame
@@ -1032,14 +869,6 @@ void MainFrame::SetXDataLabel(const FileFormat &format)
 {
 	switch (format)
 	{
-	case FormatBaumuller:
-		SetXDataLabel(_T("Time [msec]"));
-		break;
-
-	case FormatKollmorgen:
-		SetXDataLabel(_T("Time [sec]"));
-		break;
-
 	case FormatFrequency:
 		SetXDataLabel(_T("Frequency [Hz]"));
 		break;
@@ -1659,6 +1488,9 @@ wxString MainFrame::ExtractUnitFromDescription(const wxString &description)
 bool MainFrame::FindWrappedString(const wxString &s, wxString &contents,
 	const wxChar &open, const wxChar &close)
 {
+	if (s.Len() < 3)
+		return false;
+
 	if (s.Last() == close)
 	{
 		int i;
