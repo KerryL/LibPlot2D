@@ -129,7 +129,6 @@ wxString DataFile::DetermineBestDelimiter(void) const
 
 	if (delimiterList.size() == 1)
 		return delimiterList[0];
-
 	std::ifstream file(fileName.c_str(), std::ios::in);
 	if (!file.is_open())
 	{
@@ -425,7 +424,7 @@ bool DataFile::ProcessFile(void)
 	SkipLines(file, headerLines);
 	DoTypeSpecificProcessTasks();
 
-	std::vector<double> *rawData = new std::vector<double>[choices.size() + 1];// +1 for time column, which isn't displayed for user to select
+	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(choices.size())];
 	if (!ExtractData(file, choices, rawData, scales))
 	{
 		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR);
@@ -433,10 +432,32 @@ bool DataFile::ProcessFile(void)
 	}
 	file.close();
 
-	AssembleDatasets(rawData, choices.size() + 1);
+	AssembleDatasets(rawData, GetRawDataSize(choices.size()));
 	delete [] rawData;
 
 	return true;
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		GetRawDataSize
+//
+// Description:		Returns the size to use when allocating the raw data array.
+//
+// Input Arguments:
+//		selectedCount	= const unsigned int& indicating number of curves the
+//						  user selected to display
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int DataFile::GetRawDataSize(const unsigned int &selectedCount) const
+{
+	return selectedCount + 1;// +1 for time data
 }
 
 //==========================================================================
@@ -485,7 +506,6 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		{
 			if (!parsed[i].ToDouble(&tempDouble))
 				return false;
-
 			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
 			{
 				rawData[set].push_back(tempDouble);
@@ -627,7 +647,7 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 // Description:		Checks to see if the input array contains only numeric values.
 //
 // Input Arguments:
-//		list				= const wxArrayString&
+//		list	= const wxArrayString&
 //
 // Output Arguments:
 //		None
@@ -642,7 +662,8 @@ bool DataFile::ListIsNumeric(const wxArrayString &list) const
 	double value;
 	for (j = (unsigned int)timeIsFormatted; j < list.size(); j++)
 	{
-		if (!list[j].ToDouble(&value) && (ignoreConsecutiveDelimiters && !list[j].IsEmpty()))
+		if (!list[j].ToDouble(&value) && (ignoreConsecutiveDelimiters ||
+			(!ignoreConsecutiveDelimiters && !list[j].IsEmpty())))
 			return false;
 	}
 

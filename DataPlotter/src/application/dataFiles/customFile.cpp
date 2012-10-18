@@ -72,6 +72,31 @@ wxArrayString CustomFile::CreateDelimiterList(void) const
 
 //==========================================================================
 // Class:			CustomFile
+// Function:		GetRawDataSize
+//
+// Description:		Returns the size to use when allocating the raw data array.
+//
+// Input Arguments:
+//		selectedCount	= const unsigned int& indicating number of curves the
+//						  user selected to display
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const
+{
+	if (fileFormat.IsAsynchronous())
+		return selectedCount * 2;
+
+	return DataFile::GetRawDataSize(selectedCount);
+}
+
+//==========================================================================
+// Class:			CustomFile
 // Function:		ExtractData
 //
 // Description:		Parses the file and reads data into vectors.  Only extracts
@@ -154,6 +179,9 @@ wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 	wxArrayString names = DataFile::GetCurveInformation(headerLineCount, factors);
 	fileFormat.ProcessChannels(names, factors);
 
+	if (!fileFormat.GetTimeUnits().IsEmpty())
+		names[0] = _T("Time, [") + fileFormat.GetTimeUnits() + _T("]");
+
 	return names;
 }
 
@@ -189,7 +217,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 	{
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
-		if (parsed.size() < curveCount && parsed.size() > 0)
+		if (parsed.size() < curveCount && parsed.size() > 0)// FIXME:  Parker files end with "DATA BLOCK END" and will generate this warning every time.  Some option to ignore?
 		{
 			wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
 				_T("Column Count Mismatch"), wxICON_WARNING);
@@ -224,8 +252,8 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 
 				if (!descriptions[i].IsEmpty())
 				{
-					rawData[set * 2].push_back(time - timeZero);
-					rawData[set * 2 + 1].push_back(tempDouble);
+					rawData[set * 2].push_back((time - timeZero) * factors[0]);
+					rawData[set * 2 + 1].push_back(tempDouble * factors[i]);
 					set++;
 				}
 			}
@@ -249,7 +277,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 
 				if (!descriptions[i].IsEmpty())
 				{
-					rawData[set].push_back(tempDouble);
+					rawData[set].push_back(tempDouble * factors[i]);
 					set++;
 				}
 			}

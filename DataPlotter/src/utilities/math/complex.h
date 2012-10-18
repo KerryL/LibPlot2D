@@ -34,6 +34,9 @@ public:
 	// Gets the complex conjugate of this object
 	const Complex GetConjugate(void) const;
 
+	double GetPolarLength(void) const;
+	double GetPolarAngle(void) const;
+
 	// Operators
 	const Complex operator + (const Complex &complex) const;
 	const Complex operator - (const Complex &complex) const;
@@ -52,6 +55,9 @@ public:
 
 	// Raises this object to the specified power
 	Complex& ToPower(const double &power);
+	const Complex ToPower(const double &power) const;
+	Complex& ToPower(const Complex &power);
+	const Complex ToPower(const Complex &power) const;
 
 	// For streaming the value
 	friend ostream &operator << (ostream &writeOut, const Complex &complex);

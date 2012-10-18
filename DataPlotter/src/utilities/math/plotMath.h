@@ -55,6 +55,8 @@ namespace PlotMath
 
 	void Unwrap(Dataset2D &data);
 
+	bool XDataConsistentlySpaced(const Dataset2D &data, const double &tolerancePercent = 0.01);
+
 	// Returns the sign of the argument
 	double Sign(const double &value);
 

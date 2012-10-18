@@ -7,31 +7,34 @@
 
 ===================================================================================*/
 
-// File:  filterBase.h
+// File:  filter.h
 // Created:  5/16/2011
 // Author:  K. Loux
-// Description:  Base class (abstract) for digital filters.
+// Description:  Class for digital filters.
 // History:
 
-#ifndef _FILTER_BASE_H_
-#define _FILTER_BASE_H_
+#ifndef _FILTER_H_
+#define _FILTER_H_
 
-class FilterBase
+class Filter
 {
 public:
 	// Constructor
 	// NOTE:  Constructor MUST initialize the filter parameters a and b, and the input/output vectors y and u
-	FilterBase(const double &_sampleRate);
-	FilterBase(const FilterBase &f);
+	Filter(const double &_sampleRate);
+	Filter(const double &_sampleRate, const double *numerator,
+		const unsigned int &numeratorSize, const double *denominator,
+		const unsigned int &denominatorSize, const double &initialValue);
+	Filter(const Filter &f);
 
 	// Desctructor
-	virtual ~FilterBase();
+	virtual ~Filter();
 
 	// Resets all internal variables to initialize the filter to the specified value
-	virtual void Initialize(const double &initialValue) = 0;
+	void Initialize(const double &initialValue);
 
 	// Main method for filtering incoming data
-	virtual double Apply(const double &_u) = 0;
+	double Apply(const double &_u);
 
 	// Returns latest raw data
 	double GetRawValue(void) const { return u[0]; };
@@ -40,7 +43,7 @@ public:
 	double GetFilteredValue(void) const { return y[0]; };
 
 	// Assignment operator (avoids MSVC Warning C4512)
-	FilterBase& operator = (const FilterBase &f);
+	Filter& operator=(const Filter &f);
 
 protected:
 	// Filter coefficients
@@ -49,7 +52,14 @@ protected:
 	double *y;
 	double *u;
 
+	unsigned int outSize;
+	unsigned int inSize;
+
 	const double sampleRate;// [Hz]
+
+	void AllocateArrays(const unsigned int &_inSize, const unsigned int &_outSize);
+	void ShiftArray(double *s, const unsigned int &size);
+	void DeleteArrays(void);
 };
 
-#endif// _FILTER_BASE_H_
+#endif// _FILTER_H_

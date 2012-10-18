@@ -1613,6 +1613,11 @@ void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 	if (dialog.GetComputeCoherence())
 		coherence = new Dataset2D;
 
+	if (!PlotMath::XDataConsistentlySpaced(*plotList[dialog.GetInputIndex()]) ||
+		!PlotMath::XDataConsistentlySpaced(*plotList[dialog.GetOutputIndex()]))
+		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
+
 	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
 		*plotList[dialog.GetOutputIndex()], dialog.GetNumberOfAverages(),
 		FastFourierTransform::WindowHann, dialog.GetModuloPhase(), *amplitude, phase, coherence);
@@ -1812,18 +1817,10 @@ void MainFrame::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 {
-	double factor;
-	if (!GetXAxisScalingFactor(factor))
-		// Warn the user if we cannot determine the time units, but create the plot anyway
-		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"),
-			_T("Accuracy Warning"), wxICON_WARNING, this);
-
 	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = GetFFTData(plotList[row - 1], factor);
+	Dataset2D *newData = GetFFTData(plotList[row - 1]);
 	if (!newData)
 		return;
-
-	newData->MultiplyXData(factor);
 
 	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
@@ -1873,7 +1870,6 @@ void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 //
 // Input Arguments:
 //		data				= const Dataset2D&
-//		timeScalingFactor	= const double& factor required to get seconds
 //
 // Output Arguments:
 //		None
@@ -1882,22 +1878,39 @@ void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 //		Dataset2D* pointing to a dataset contining the new FFT data
 //
 //==========================================================================
-Dataset2D* MainFrame::GetFFTData(const Dataset2D* data, const double &timeScalingFactor)
+Dataset2D* MainFrame::GetFFTData(const Dataset2D* data)
 {
+	double factor;
+	if (!GetXAxisScalingFactor(factor))
+		// Warn the user if we cannot determine the time units, but create the plot anyway
+		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
+
 	FFTDialog dialog(this, data->GetNumberOfPoints(),
 		data->GetNumberOfZoomedPoints(plotArea->GetXMin(), plotArea->GetXMax()),
-		(data->GetXData(1) - data->GetXData(0)) / timeScalingFactor);
+		(data->GetXData(1) - data->GetXData(0)) / factor);
+
 	if (dialog.ShowModal() != wxID_OK)
 		return NULL;
 
+	if (!PlotMath::XDataConsistentlySpaced(*data))
+		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
+
+	Dataset2D *newData;
+
 	if (dialog.GetUseZoomedData())
-		return new Dataset2D(FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
+		newData = new Dataset2D(FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
+			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
+			dialog.GetSubtractMean()));
+	else
+		newData = new Dataset2D(FastFourierTransform::ComputeFFT(*data,
 			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
 			dialog.GetSubtractMean()));
 
-	return new Dataset2D(FastFourierTransform::ComputeFFT(*data,
-		dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
-		dialog.GetSubtractMean()));
+	newData->MultiplyXData(factor);
+
+	return newData;
 }
 
 //==========================================================================
@@ -2745,7 +2758,11 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
 			_T("Accuracy Warning"), wxICON_WARNING, this);
 
-	FilterBase *filter = GetFilter(parameters, factor / (data.GetXData(1) - data.GetXData(0)), data.GetYData(0));
+	if (!PlotMath::XDataConsistentlySpaced(data))
+		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
+			_T("Accuracy Warning"), wxICON_WARNING, this);
+
+	Filter *filter = GetFilter(parameters, factor / (data.GetXData(1) - data.GetXData(0)), data.GetYData(0));
 
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
@@ -2779,19 +2796,19 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 //		None
 //
 // Return Value:
-//		FilterBase*
+//		Filter*
 //
 //==========================================================================
-FilterBase* MainFrame::GetFilter(const FilterParameters &parameters,
+Filter* MainFrame::GetFilter(const FilterParameters &parameters,
 	const double &sampleRate, const double &initialValue) const
 {
-	FilterBase *filter = NULL;
+	Filter *filter = NULL;
 	switch (parameters.type)
 	{
 	case FilterParameters::TypeLowPass:
-		if ((parameters.order == 1 && !parameters.phaseless) || (parameters.order == 2 && parameters.phaseless))
+		if (parameters.order == 1)
 			filter = new LowPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, initialValue);
-		else if ((parameters.order == 2 && !parameters.phaseless) || (parameters.order == 4 && parameters.phaseless))
+		else if (parameters.order == 2)
 			filter = new LowPassSecondOrderFilter(parameters.cutoffFrequency, parameters.dampingRatio, sampleRate, initialValue);
 		else
 			assert(false);
@@ -2807,6 +2824,7 @@ FilterBase* MainFrame::GetFilter(const FilterParameters &parameters,
 	}
 
 	return filter;
+	//return new FilterBase(sampleRate, numerator, numeratorSize, denominator, denominatorSize, initialValue);
 }
 
 //==========================================================================

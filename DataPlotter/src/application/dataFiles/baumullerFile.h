@@ -32,6 +32,9 @@ protected:
 		std::vector<double> &factors) const;
 	virtual void DoTypeSpecificLoadTasks(void);
 	virtual void DoTypeSpecificProcessTasks(void);
+
+	bool ConstructNames(std::string &nextLine, std::ifstream &file,
+		wxArrayString &names, wxArrayString &previousLines) const;
 };
 
 #endif//_BAUMULLER_FILE_H_

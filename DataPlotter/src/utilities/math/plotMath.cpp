@@ -285,3 +285,50 @@ unsigned int PlotMath::ApplyBitMask(const unsigned &value, const unsigned int &b
 {
 	return (value >> bit) & 1;
 }
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		XDataConsistentlySpaced
+//
+// Description:		Checks to see if the X-data has consistent deltas.
+//
+// Input Arguments:
+//		data				= const Dataset2D&
+//		tolerancePercent	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if the x-data spacing is within the tolerance
+//
+//==========================================================================
+bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tolerancePercent)
+{
+	assert(data.GetNumberOfPoints() > 1);
+
+	unsigned int i;
+	double minSpacing, maxSpacing, spacing;
+
+	minSpacing = data.GetXData(1) - data.GetXData(0);
+	maxSpacing = minSpacing;
+
+	for (i = 2; i < data.GetNumberOfPoints(); i++)
+	{
+		spacing = data.GetXData(i) - data.GetXData(i - 1);
+		if (spacing < minSpacing)
+			minSpacing = spacing;
+		if (spacing > maxSpacing)
+			maxSpacing = spacing;
+	}
+
+	// Handle decreasing data, too
+	if (fabs(minSpacing) > fabs(maxSpacing))
+	{
+		double temp(minSpacing);
+		minSpacing = maxSpacing;
+		maxSpacing = temp;
+	}
+
+	return 1.0 - minSpacing / maxSpacing < tolerancePercent;
+}

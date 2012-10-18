@@ -299,6 +299,85 @@ Complex& Complex::ToPower(const double &power)
 
 //==========================================================================
 // Class:			Complex
+// Function:		ToPower
+//
+// Description:		Raises this object to the specified power (const version).
+//
+// Input Arguments:
+//		power	= const double& specifiying the power to which this will be raised
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Complex result of the power
+//
+//==========================================================================
+const Complex Complex::ToPower(const double &power) const
+{
+	Complex result(*this);
+	result.ToPower(power);
+
+	return result;
+}
+
+//==========================================================================
+// Class:			Complex
+// Function:		ToPower
+//
+// Description:		Raises this object to the specified complex power.
+//
+// Input Arguments:
+//		power	= const Complex& specifiying the power to which this will be raised
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Complex& result of the power
+//
+//==========================================================================
+Complex& Complex::ToPower(const Complex &power)
+{
+	Complex original(*this);
+
+	double r = GetPolarLength();
+	double theta = GetPolarAngle();
+
+	double factor = pow(r, power.real) * exp(-power.imaginary * theta);
+	double angle = power.imaginary * log(r) + power.real * theta;
+
+	real = factor * cos(angle);
+	imaginary = factor * sin(angle);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Complex
+// Function:		ToPower
+//
+// Description:		Raises this object to the specified complex power (const version).
+//
+// Input Arguments:
+//		power	= const Complex& specifiying the power to which this will be raised
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Complex result of the power
+//
+//==========================================================================
+const Complex Complex::ToPower(const Complex &power) const
+{
+	Complex result(*this);
+
+	return result.ToPower(power);
+}
+
+//==========================================================================
+// Class:			Complex
 // Function:		operator +=
 //
 // Description:		Addition assignment operator for the Complex class.
@@ -487,6 +566,48 @@ const Complex Complex::GetConjugate(void) const
 	temp.imaginary = -imaginary;
 
 	return temp;
+}
+
+//==========================================================================
+// Class:			Complex
+// Function:		GetPolarLength
+//
+// Description:		Converts to polar coordinates, returns the length (r).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Complex::GetPolarLength(void) const
+{
+	return sqrt(real * real + imaginary * imaginary);
+}
+
+//==========================================================================
+// Class:			Complex
+// Function:		GetPolarAngle
+//
+// Description:		Converts to polar coordinates, returns the angle (theta).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Complex::GetPolarAngle(void) const
+{
+	return atan2(imaginary, real);
 }
 
 //==========================================================================

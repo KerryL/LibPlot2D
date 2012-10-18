@@ -84,40 +84,69 @@ wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 	}
 
 	std::string nextLine;
-	wxArrayString delimitedLine, previousLines, names;
+	wxArrayString previousLines, names;
 	while (std::getline(file, nextLine))
 	{
-		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
-		if (delimitedLine.size() > 1 && delimitedLine[0].Cmp(_T("Par.number:")) == 0)
+		if (ConstructNames(nextLine, file, names, previousLines))
 		{
-			unsigned int i, j;
-			for (i = 0; i < 3; i++)
-			{
-				for (j = 0; j < delimitedLine.Count() - 1; j++)
-				{
-					if (i == 0)
-						names.Add(delimitedLine[j]);
-					else
-						names[j].Append(_T(", ") + delimitedLine[j]);
-				}
-				if (!std::getline(file, nextLine))
-					break;
-				delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
-			}
-
 			file.close();
 			factors.resize(names.size(), 1.0);
 			names[0] = _T("Time, [msec]");
 			headerLineCount = previousLines.size() + 5;// Extra two for min/max rows
 			return names;
 		}
-		previousLines.Add(nextLine);
 	}
 
 	file.close();
 
 	names.Empty();
 	return names;
+}
+
+//==========================================================================
+// Class:			BaumullerFile
+// Function:		ConstructNames
+//
+// Description:		Generates names when the appropriate part of the file is
+//					reached.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		names			= wxArrayString&
+//		previousLines	= wxArrayString&
+//
+// Return Value:
+//		wxArrayString containing the descriptions
+//
+//==========================================================================
+bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
+	wxArrayString &names, wxArrayString &previousLines) const
+{
+	wxArrayString delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
+	if (delimitedLine.size() > 1 && delimitedLine[0].Cmp(_T("Par.number:")) == 0)
+	{
+		unsigned int i, j;
+		for (i = 0; i < 3; i++)
+		{
+			for (j = 0; j < delimitedLine.Count() - 1; j++)
+			{
+				if (i == 0)
+					names.Add(delimitedLine[j]);
+				else
+					names[j].Append(_T(", ") + delimitedLine[j]);
+			}
+			if (!std::getline(file, nextLine))
+				break;
+			delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
+		}
+
+		return true;
+	}
+	previousLines.Add(nextLine);
+
+	return false;
 }
 
 //==========================================================================

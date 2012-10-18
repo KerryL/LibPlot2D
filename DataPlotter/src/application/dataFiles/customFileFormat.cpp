@@ -108,7 +108,7 @@ CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFi
 //==========================================================================
 bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 {
-	channels.empty();
+	channels.clear();
 
 	if (!formatNode.GetPropVal(_T("NAME"), &formatName))
 	{
@@ -135,6 +135,7 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 		timeUnits = formatNode.GetPropVal(_T("TIME_UNITS"), wxEmptyString);
 		timeFormat = formatNode.GetPropVal(_T("TIME_FORMAT"), wxEmptyString);
 		asynchronous = formatNode.GetPropVal(_T("ASYNC"), "FALSE").CmpNoCase("TRUE") == 0;
+		isXML = formatNode.GetPropVal(_T("XML"), "FALSE").CmpNoCase("TRUE") == 0;
 		return true;
 	}
 
@@ -358,13 +359,11 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 {
 	assert(scales.size() == names.size());
 
-	// Check each name against each channel definition (or until we find a match)
 	unsigned int i, j;//, location;
 	for (i = 0; i < names.size(); i++)
 	{
 		for (j = 0; j < channels.size(); j++)
 		{
-			// Check for a column match
 			if (channels[j].code.IsEmpty())
 			{
 				if (i == (unsigned int)channels[j].column)
@@ -375,7 +374,6 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 					scales[i] = channels[j].scale;
 				}
 			}
-			// Check for a code match
 			else if (names[i].Contains(channels[j].code))
 			{
 				/*location = names[i].Find(channels[j].code);

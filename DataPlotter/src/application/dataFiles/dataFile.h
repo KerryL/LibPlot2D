@@ -67,6 +67,7 @@ protected:
 		std::vector<double> &factors) const;
 	virtual void DoTypeSpecificLoadTasks(void) {};
 	virtual void DoTypeSpecificProcessTasks(void) {};
+	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
 
 	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter) const;
 	double GetTimeValue(const wxString &timeString,

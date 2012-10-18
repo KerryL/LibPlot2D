@@ -127,7 +127,7 @@
     <ClInclude Include="src\utilities\signals\curveFit.h" />
     <ClInclude Include="src\utilities\signals\derivative.h" />
     <ClInclude Include="src\utilities\signals\fft.h" />
-    <ClInclude Include="src\utilities\signals\filters\filterBase.h" />
+    <ClInclude Include="src\utilities\signals\filters\filter.h" />
     <ClInclude Include="src\utilities\signals\filters\highPassOrder1.h" />
     <ClInclude Include="src\utilities\signals\filters\lowPassOrder1.h" />
     <ClInclude Include="src\utilities\signals\filters\lowPassOrder2.h" />
@@ -170,7 +170,7 @@
     <ClCompile Include="src\utilities\signals\curveFit.cpp" />
     <ClCompile Include="src\utilities\signals\derivative.cpp" />
     <ClCompile Include="src\utilities\signals\fft.cpp" />
-    <ClCompile Include="src\utilities\signals\filters\filterBase.cpp" />
+    <ClCompile Include="src\utilities\signals\filters\filter.cpp" />
     <ClCompile Include="src\utilities\signals\filters\highPassOrder1.cpp" />
     <ClCompile Include="src\utilities\signals\filters\lowPassOrder1.cpp" />
     <ClCompile Include="src\utilities\signals\filters\lowPassOrder2.cpp" />

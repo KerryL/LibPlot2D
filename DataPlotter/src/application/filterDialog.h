@@ -31,28 +31,22 @@ struct FilterParameters
 		TypeHighPass,
 		TypeBandPass,
 		TypeBandStop,
-		TypeNotch
+		TypeNotch,
+		TypeCustom
 	} type;
 
 	bool phaseless;
+	bool butterworth;
+
 	unsigned int order;
+
 	double cutoffFrequency;// [Hz]
 	double dampingRatio;
-};
+	double width;
+	double depth;
 
-struct FilterOrderLimits
-{
-	struct MinOrder
-	{
-		static const unsigned int lowPass = 1;
-		static const unsigned int highPass = 1;
-	};
-
-	struct MaxOrder
-	{
-		static const unsigned int lowPass = 2;
-		static const unsigned int highPass = 1;
-	};
+	wxString numerator;
+	wxString denominator;
 };
 
 class FilterDialog : public wxDialog
@@ -67,50 +61,97 @@ public:
 private:
 	wxTextCtrl *cutoffFrequencyBox;
 	wxTextCtrl *dampingRatioBox;
+	wxTextCtrl *widthBox;
+	wxTextCtrl *depthBox;
 
 	wxCheckBox *phaselessCheckBox;
+	wxCheckBox *butterworthCheckBox;
+
 	wxSpinCtrl *orderSpin;
 
 	wxRadioButton *lowPassRadio;
 	wxRadioButton *highPassRadio;
+	wxRadioButton *bandStopRadio;
+	wxRadioButton *bandPassRadio;
+	wxRadioButton *notchRadio;
+	wxRadioButton *customRadio;
+
+	wxTextCtrl *numeratorBox;
+	wxTextCtrl *denominatorBox;
 
 	FilterParameters parameters;
 
 	// Overload from wxDialog
 	virtual void OnOKButton(wxCommandEvent &event);
+	virtual bool TransferDataFromWindow(void);
 
 	// Event handlers
 	void OnSpinChange(wxSpinEvent &event);
 	void OnSpinUp(wxSpinEvent &event);
 	void OnSpinDown(wxSpinEvent &event);
 	void OnRadioChange(wxCommandEvent &event);
-	void OnCheckboxChange(wxCommandEvent &event);
+//	void OnPhaselessChange(wxCommandEvent &event);
+	void OnButterworthChange(wxCommandEvent &event);
+	void OnTransferFunctionChange(wxCommandEvent &event);
+	void OnInputTextChange(wxCommandEvent &event);
 
-	virtual bool TransferDataFromWindow(void);
-
-	void HandleSpin(wxSpinEvent &event);
-	bool OrderIsValid(const unsigned int &order) const;
-	void UpdateSpin(void);
-	void UpdateDamping(void);
+	void HandleSpin(void);
+	//bool OrderIsValid(const unsigned int &order) const;
+	void UpdateTransferFunction(void);
+	void UpdateEnabledControls(void);
 
 	FilterParameters::Type GetType(void) const;
-	unsigned int GetMinOrder(const FilterParameters::Type &type) const;
-	unsigned int GetMaxOrder(const FilterParameters::Type &type) const;
+
+	void GetLowPassTF(wxString &numerator, wxString &denominator) const;
+	void GetHighPassTF(wxString &numerator, wxString &denominator) const;
+	void GetBandStopTF(wxString &numerator, wxString &denominator) const;
+	void GetBandPassTF(wxString &numerator, wxString &denominator) const;
+	void GetNotchTF(wxString &numerator, wxString &denominator) const;
+
+	wxString GenerateButterworthDenominator(const unsigned int &order,
+		const double &cutoff) const;
+	wxString GenerateStandardDenominator(const unsigned int &order,
+		const double &cutoff, const double &dampingRatio) const;
 
 	enum EventIDs
 	{
-		RadioID,
-		CheckboxID,
-		SpinID
+		RadioID = wxID_HIGHEST + 200,
+//		PhaselessID,
+		ButterworthID,
+		SpinID,
+		TransferFunctionID,
+		InputTextID
 	};
 
 	void CreateControls(void);
-	void CreateTextBoxes(wxFlexGridSizer *sizer);
-	wxBoxSizer* CreateRadioButtons(void);
-	wxBoxSizer* CreateDialogButtons(void);
+	wxSizer* CreateTextBoxes(void);
+	wxSizer* CreateCheckBoxes(void);
+	wxSizer* CreateRadioButtons(void);
+	wxSizer* CreateTransferFunctionControls(void);
+	wxSizer* CreateDialogButtons(void);
 
 	bool CutoffFrequencyIsValid(void);
 	bool DampingRatioIsValid(void);
+	bool WidthIsValid(void);
+	bool DepthIsValid(void);
+	bool NumeratorIsValid(void);
+	bool DenominatorIsValid(void);
+
+	static wxString GetOrderString(const unsigned int &order);
+	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);
+	static wxString AddDampingName(const wxString& name, const FilterParameters &parameters);
+	static wxString AddWidthDepthName(const wxString& name, const FilterParameters &parameters);
+
+	static wxString GetHighPassName(const FilterParameters &parameters);
+	static wxString GetLowPassName(const FilterParameters &parameters);
+	static wxString GetBandStopName(const FilterParameters &parameters);
+	static wxString GetBandPassName(const FilterParameters &parameters);
+	static wxString GetNotchName(const FilterParameters &parameters);
+	static wxString GetCustomName(const FilterParameters &parameters);
+
+	static unsigned int GetPrecision(const double &value);
+
+	bool initialized;
 
 	// For the event table
 	DECLARE_EVENT_TABLE();

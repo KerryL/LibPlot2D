@@ -36,7 +36,7 @@ class PlotRenderer;
 struct FilterParameters;
 class CustomFileFormat;
 class Color;
-class FilterBase;
+class Filter;
 class DataFile;
 
 // The main frame class
@@ -241,7 +241,7 @@ private:
 	static bool FindWrappedString(const wxString &s, wxString &contents,
 		const wxChar &open, const wxChar &close);
 
-	Dataset2D *GetFFTData(const Dataset2D* data, const double &timeScalingFactor);
+	Dataset2D *GetFFTData(const Dataset2D* data);
 	Dataset2D *GetCurveFitData(const unsigned int &order, const Dataset2D* data, wxString &name) const;
 	wxString GetCurveFitName(const CurveFit::PolynomialFit &fitData, const unsigned int &row) const;
 
@@ -254,7 +254,7 @@ private:
 	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
 	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);
 
-	FilterBase* GetFilter(const FilterParameters &parameters,
+	Filter* GetFilter(const FilterParameters &parameters,
 		const double &sampleRate, const double &initialValue) const;
 
 	DataFile* GetDataFile(const wxString &fileName) const;
