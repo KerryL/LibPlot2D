@@ -17,6 +17,7 @@
 #include "application/filterDialog.h"
 #include "utilities/math/complex.h"
 #include "utilities/math/plotMath.h"
+#include "utilities/math/expressionTree.h"
 
 // Standard C++ headers
 #include <vector>
@@ -388,8 +389,8 @@ void FilterDialog::OnOKButton(wxCommandEvent &event)
 		!DampingRatioIsValid() ||
 		!WidthIsValid() ||
 		!DepthIsValid() ||
-		!NumeratorIsValid() ||
-		!DenominatorIsValid())
+		!ExpressionIsValid(numeratorBox->GetValue()) ||
+		!ExpressionIsValid(denominatorBox->GetValue()))
 		return;
 
 	event.Skip();
@@ -716,12 +717,12 @@ bool FilterDialog::CutoffFrequencyIsValid(void)
 {
 	if (!cutoffFrequencyBox->GetValue().ToDouble(&parameters.cutoffFrequency))
 	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Error Defining Filter"));
+		wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Error Defining Filter"));
 		return false;
 	}
 	else if (parameters.cutoffFrequency <= 0.0)
 	{
-		::wxMessageBox(_T("ERROR:  Cutoff frequency must be positive!"), _T("Error Defining Filter"));
+		wxMessageBox(_T("ERROR:  Cutoff frequency must be positive!"), _T("Error Defining Filter"));
 		return false;
 	}
 
@@ -750,12 +751,12 @@ bool FilterDialog::DampingRatioIsValid(void)
 	{
 		if (!dampingRatioBox->GetValue().ToDouble(&parameters.dampingRatio))
 		{
-			::wxMessageBox(_T("ERROR:  Damping ratio must be numeric!"), _T("Error Defining Filter"));
+			wxMessageBox(_T("ERROR:  Damping ratio must be numeric!"), _T("Error Defining Filter"));
 			return false;
 		}
 		else if (parameters.dampingRatio <= 0.0)
 		{
-			::wxMessageBox(_T("ERROR:  Damping ratio must be strictly positive!"), _T("Error Defining Filter"));
+			wxMessageBox(_T("ERROR:  Damping ratio must be strictly positive!"), _T("Error Defining Filter"));
 			return false;
 		}
 	}
@@ -786,12 +787,12 @@ bool FilterDialog::WidthIsValid(void)
 	{
 		if (!widthBox->GetValue().ToDouble(&parameters.width))
 		{
-			::wxMessageBox(_T("ERROR:  Width must be numeric!"), _T("Error Defining Filter"));
+			wxMessageBox(_T("ERROR:  Width must be numeric!"), _T("Error Defining Filter"));
 			return false;
 		}
 		else if (parameters.width < 0.0)
 		{
-			::wxMessageBox(_T("ERROR:  Width must be positive!"), _T("Error Defining Filter"));
+			wxMessageBox(_T("ERROR:  Width must be positive!"), _T("Error Defining Filter"));
 			return false;
 		}
 	}
@@ -822,7 +823,7 @@ bool FilterDialog::DepthIsValid(void)
 	{
 		if (!depthBox->GetValue().ToDouble(&parameters.depth))
 		{
-			::wxMessageBox(_T("ERROR:  Depth must be numeric!"), _T("Error Defining Filter"));
+			wxMessageBox(_T("ERROR:  Depth must be numeric!"), _T("Error Defining Filter"));
 			return false;
 		}
 		/*else if (parameters.depth <= 0.0)
@@ -837,12 +838,12 @@ bool FilterDialog::DepthIsValid(void)
 
 //==========================================================================
 // Class:			FilterDialog
-// Function:		NumeratorIsValid
+// Function:		ExpressionIsValid
 //
-// Description:		Validates the numerator.
+// Description:		Validates the expression.
 //
 // Input Arguments:
-//		None
+//		expression	= const wxString&
 //
 // Output Arguments:
 //		None
@@ -851,37 +852,20 @@ bool FilterDialog::DepthIsValid(void)
 //		bool, true if dialog contents are valid
 //
 //==========================================================================
-bool FilterDialog::NumeratorIsValid(void)
+bool FilterDialog::ExpressionIsValid(const wxString &expression)
 {
 	if (parameters.type != FilterParameters::TypeCustom)
 		return true;
 
-	// FIXME:  Additional checks required
-	return true;
-}
+	ExpressionTree e;
+	std::string temp, errorString;
+	errorString = e.Solve(expression.c_str(), temp);
+	if (!errorString.empty())
+	{
+		wxMessageBox(_T("ERROR:  ") + errorString, _T("Error Defining Filter"));
+		return false;
+	}
 
-//==========================================================================
-// Class:			FilterDialog
-// Function:		DenominatorIsValid
-//
-// Description:		Validates the denominator.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true if dialog contents are valid
-//
-//==========================================================================
-bool FilterDialog::DenominatorIsValid(void)
-{
-	if (parameters.type != FilterParameters::TypeCustom)
-		return true;
-
-	// FIXME:  Additional checks required
 	return true;
 }
 

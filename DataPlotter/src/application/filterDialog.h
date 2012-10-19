@@ -134,8 +134,7 @@ private:
 	bool DampingRatioIsValid(void);
 	bool WidthIsValid(void);
 	bool DepthIsValid(void);
-	bool NumeratorIsValid(void);
-	bool DenominatorIsValid(void);
+	bool ExpressionIsValid(const wxString& expression);
 
 	static wxString GetOrderString(const unsigned int &order);
 	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);

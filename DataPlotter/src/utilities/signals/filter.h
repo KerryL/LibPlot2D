@@ -16,15 +16,18 @@
 #ifndef _FILTER_H_
 #define _FILTER_H_
 
+// Standard C++ headers
+#include <vector>
+#include <string>
+
 class Filter
 {
 public:
 	// Constructor
 	// NOTE:  Constructor MUST initialize the filter parameters a and b, and the input/output vectors y and u
 	Filter(const double &_sampleRate);
-	Filter(const double &_sampleRate, const double *numerator,
-		const unsigned int &numeratorSize, const double *denominator,
-		const unsigned int &denominatorSize, const double &initialValue);
+	Filter(const double &_sampleRate, const std::vector<double> &numerator,
+		const std::vector<double> &denominator, const double &initialValue = 0.0);
 	Filter(const Filter &f);
 
 	// Desctructor
@@ -45,6 +48,8 @@ public:
 	// Assignment operator (avoids MSVC Warning C4512)
 	Filter& operator=(const Filter &f);
 
+	static std::vector<double> CoefficientsFromString(const std::string &s);
+
 protected:
 	// Filter coefficients
 	double *a;
@@ -60,6 +65,10 @@ protected:
 	void AllocateArrays(const unsigned int &_inSize, const unsigned int &_outSize);
 	void ShiftArray(double *s, const unsigned int &size);
 	void DeleteArrays(void);
+
+	void GenerateCoefficients(const std::vector<double> &numerator, const std::vector<double> &denominator);
+	std::string AssembleZExpression(const std::vector<double>& coefficients, const unsigned int &highestPower) const;
+	static std::vector<std::pair<int, double> > CollectLikeTerms(std::vector<std::pair<int, double> > terms);
 };
 
 #endif// _FILTER_H_

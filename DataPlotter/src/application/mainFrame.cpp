@@ -46,9 +46,7 @@
 #include "utilities/signals/rms.h"
 #include "utilities/signals/fft.h"
 #include "utilities/math/expressionTree.h"
-#include "utilities/signals/filters/lowPassOrder1.h"
-#include "utilities/signals/filters/lowPassOrder2.h"
-#include "utilities/signals/filters/highPassOrder1.h"
+#include "utilities/signals/filter.h"
 
 // *nix Icons
 #ifdef __WXGTK__
@@ -903,7 +901,7 @@ void MainFrame::AddCurve(wxString mathString)
 		return;
 
 	// Parse string and determine what the new dataset should look like
-	ExpressionTree expression(plotList);
+	ExpressionTree expression(&plotList);
 	Dataset2D *mathChannel = new Dataset2D;
 
 	double xAxisFactor;
@@ -2802,29 +2800,8 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 Filter* MainFrame::GetFilter(const FilterParameters &parameters,
 	const double &sampleRate, const double &initialValue) const
 {
-	Filter *filter = NULL;
-	switch (parameters.type)
-	{
-	case FilterParameters::TypeLowPass:
-		if (parameters.order == 1)
-			filter = new LowPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, initialValue);
-		else if (parameters.order == 2)
-			filter = new LowPassSecondOrderFilter(parameters.cutoffFrequency, parameters.dampingRatio, sampleRate, initialValue);
-		else
-			assert(false);
-		break;
-
-	case FilterParameters::TypeHighPass:
-		assert(parameters.order == 1);
-		filter = new HighPassFirstOrderFilter(parameters.cutoffFrequency, sampleRate, initialValue);
-		break;
-
-	default:
-		assert(false);
-	}
-
-	return filter;
-	//return new FilterBase(sampleRate, numerator, numeratorSize, denominator, denominatorSize, initialValue);
+	return new Filter(sampleRate, Filter::CoefficientsFromString(parameters.numerator.c_str()),
+		Filter::CoefficientsFromString(parameters.denominator.c_str()), initialValue);
 }
 
 //==========================================================================

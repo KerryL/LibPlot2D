@@ -15,9 +15,12 @@
 
 // Standard C++ headers
 #include <cstdlib>
+#include <algorithm>
 
 // Local headers
-#include "utilities/signals/filters/filter.h"
+#include "utilities/signals/filter.h"
+#include "utilities/math/expressionTree.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			Filter
@@ -54,12 +57,10 @@ Filter::Filter(const double &_sampleRate) : sampleRate(_sampleRate)
 //
 // Input Arguments:
 //		_sampleRate		= const double& specifying the sampling rate in Hz
-//		numerator		= const double* array containing the numerator
-//						  coefficients from highest power to zero power (constant)
-//		numeratorSize	= const unsigned int& number of numerator coefficients
-//		denominaotr		= const double* array containing the denominator
-//						  coefficients from highest power to zero power (constant)
-//		denominatorSize	= const unsigned int& number of denominator coefficients
+//		numerator		= const std::vector<double> containing the numerator
+//						  coefficients from highest power to zero power
+//		denominaotr		= const std::vector<double> containing the denominator
+//						  coefficients from highest power to zero power
 //		initialValue	= const double&
 //
 // Output Arguments:
@@ -69,12 +70,10 @@ Filter::Filter(const double &_sampleRate) : sampleRate(_sampleRate)
 //		None
 //
 //==========================================================================
-Filter::Filter(const double &_sampleRate, const double *numerator,
-		const unsigned int &numeratorSize, const double *denominator,
-		const unsigned int &denominatorSize, const double &initialValue) : sampleRate(_sampleRate)
+Filter::Filter(const double &_sampleRate, const std::vector<double> &numerator,
+	const std::vector<double> &denominator, const double &initialValue) : sampleRate(_sampleRate)
 {
-	// FIXME:  Needs to be implemented
-
+	GenerateCoefficients(numerator, denominator);
 	Initialize(initialValue);
 }
 
@@ -118,6 +117,105 @@ Filter::Filter(const Filter &f) : sampleRate(f.sampleRate)
 Filter::~Filter()
 {
 	DeleteArrays();
+}
+
+//==========================================================================
+// Class:			Filter
+// Function:		GenerateCoefficients
+//
+// Description:		Generates the discrete-time (z-domain) coefficients for
+//					a filter equivalent to the continuous-time (s-domain)
+//					arguments.  Uses bilinear transform:
+//					s = 2 * (1 - z^-1) / (T * (1 + z^-1)).
+//
+// Input Arguments:
+//		numerator	= const std::vector<double>& continuous time coefficients,
+//					  highest power of s to lowest power of s
+//		denominator	= const std::vector<double>& continuous time coefficients,
+//					  highest power of s to lowest power of s
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Filter::GenerateCoefficients(const std::vector<double> &numerator,
+	const std::vector<double> &denominator)
+{
+	unsigned int highestPower = std::max(numerator.size(), denominator.size()) - 1;
+	std::string numString = AssembleZExpression(numerator, highestPower);
+	std::string denString = AssembleZExpression(denominator, highestPower);
+
+	std::vector<double> zNum = CoefficientsFromString(numString);
+	std::vector<double> zDen = CoefficientsFromString(denString);
+	AllocateArrays(zNum.size(), zDen.size());
+
+	unsigned int i;
+	for (i = 0; i < zNum.size(); i++)
+		a[i] = zNum[i];
+	for (i = 0; i < zDen.size(); i++)
+		b[i] = zDen[i];
+}
+
+//==========================================================================
+// Class:			Filter
+// Function:		AssembleZExpression
+//
+// Description:		Assembles the z-domain expression equivalent to the s-domain
+//					coefficients provided.
+//
+// Input Arguments:
+//		coefficients	= const std::vector<double>& continuous time coefficients,
+//						  highest power of s to lowest power of s
+//		highestPower	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		std::string
+//
+//==========================================================================
+std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
+	const unsigned int &highestPower) const
+{
+	const unsigned int tempSize(256);
+	char temp[tempSize];
+	sprintf_s(temp, tempSize, "(%f*(1+z^-1))", 1.0 / sampleRate);
+	std::string posBilinTerm(temp), negBilinTerm("(2*(1-z^-1))");
+	std::string result;
+
+	unsigned int i;
+	for (i = 0; i < coefficients.size(); i++)
+	{
+		if (PlotMath::IsZero(coefficients[i]))
+			continue;
+
+		sprintf_s(temp, tempSize, "%f", coefficients[i]);
+		if (!result.empty() && coefficients[i] > 0.0)
+			result.append("+");
+		result.append(temp);
+
+		if (coefficients.size() - 1 > i)
+			result.append("*" + negBilinTerm);
+		if (coefficients.size() - 1 > 1 + i)
+		{
+			sprintf_s(temp, tempSize, "^%i", coefficients.size() - i - 1);
+			result.append(temp);
+		}
+
+		if (highestPower + i > coefficients.size() - 1)
+			result.append("*" + posBilinTerm);
+		if (highestPower + i > coefficients.size())
+		{
+			sprintf_s(temp, tempSize, "^%i", highestPower - coefficients.size() + 1 + i);
+			result.append(temp);
+		}
+	}
+
+	return result;
 }
 
 //==========================================================================
@@ -269,7 +367,7 @@ double Filter::Apply(const double &_u)
 void Filter::ShiftArray(double *s, const unsigned int &size)
 {
 	unsigned int i;
-	for (i = 1; i < size; i++)
+	for (i = size - 1; i > 0; i--)
 		s[i] = s[i - 1];
 }
 
@@ -299,4 +397,83 @@ void Filter::AllocateArrays(const unsigned int &_inSize, const unsigned int &_ou
 	b = new double[outSize];
 	u = new double[inSize];
 	y = new double[outSize];
+}
+
+//==========================================================================
+// Class:			Filter
+// Function:		CoefficientsFromString
+//
+// Description:		Creates a vector of coefficients from highes power to lowest
+//					power, based on a string representing the expression.
+//
+// Input Arguments:
+//		s	= const std::string&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		std::vector<double>
+//
+//==========================================================================
+std::vector<double> Filter::CoefficientsFromString(const std::string &s)
+{
+	ExpressionTree e;
+	std::string expression;
+	std::string errorString = e.Solve(s, expression);
+	if (!errorString.empty())
+	{
+		// FIXME:  Warning here?
+	}
+	// FIXME:  Can we cound on it always going Coefficient * s ^ power?  Or could it be s ^ power * Coefficient?
+
+	std::vector<std::pair<int, double> > terms =
+		ExpressionTree::FindPowersAndCoefficients(ExpressionTree::BreakApartTerms(expression));
+
+	terms = CollectLikeTerms(terms);
+	// FIXME:  What if a power is missing:  need to insert a zero coefficient element for that power
+	std::sort(terms.begin(), terms.end());
+
+	std::vector<double> coefficients;
+	unsigned int i;
+	for (i = 0; i < terms.size(); i++)
+		coefficients.push_back(terms[terms.size() - 1 - i].second);
+
+	return coefficients;
+}
+
+//==========================================================================
+// Class:			Filter
+// Function:		CollectLikeTerms
+//
+// Description:		Collects all terms with the same exponent and adds the
+//					coefficients together.
+//
+// Input Arguments:
+//		terms	= std::vector<std::pair<int, double> >
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		std::vector<std::pair<int, double> >
+//
+//==========================================================================
+std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::pair<int, double> > terms)
+{
+	unsigned int i, j;
+	for (i = 0; i < terms.size(); i++)
+	{
+		for (j = i + 1; j < terms.size(); j++)
+		{
+			if (terms[i].first == terms[j].first)
+			{
+				terms[i].second += terms[j].second;
+				terms.erase(terms.begin() + j);
+				j--;
+			}
+		}
+	}
+
+	return terms;
 }

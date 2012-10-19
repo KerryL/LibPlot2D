@@ -30,7 +30,7 @@
 // Description:		Constructor for ExpressionTree class.
 //
 // Input Arguments:
-//		_list		= const ManagedList<const Dataset2D>& reference to the
+//		_list		= const ManagedList<const Dataset2D>* reference to the
 //					  other datasets which may be required to complete the calculation
 //
 // Output Arguments:
@@ -40,7 +40,7 @@
 //		None
 //
 //==========================================================================
-ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> &_list) : list(_list)
+ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> *_list) : list(_list)
 {
 }
 
@@ -82,6 +82,39 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		Solve
+//
+// Description:		Main solving method for the tree.
+//
+// Input Arguments:
+//		expression			= wxString containing the expression to parse
+//		solvedExpression	= 
+//
+// Output Arguments:
+//		solvedData		= Dataset2D& containing the evaluated data
+//
+// Return Value:
+//		std::string, empty for success, error string if unsuccessful
+//
+//==========================================================================
+std::string ExpressionTree::Solve(std::string expression, std::string &solvedExpression)
+{
+	if (!ParenthesesBalanced(expression))
+		return _T("Imbalanced parentheses!");
+
+	std::string errorString;
+	errorString = ParseExpression(expression).c_str();
+
+	if (!errorString.empty())
+		return errorString;
+
+	errorString = EvaluateExpression(solvedExpression);
+
+	return errorString;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		GetSetFromList
 //
 // Description:		Retrieves the proper set from the list.  Handles i=0
@@ -99,10 +132,15 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const
 //==========================================================================
 Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 {
+	if (!list)
+	{
+		// FIXME:  Warn the user
+	}
+
 	// If user is requesting time, we need to assign the x values to the y values
 	if (i == 0)
 	{
-		Dataset2D set(*list[0]);
+		Dataset2D set(*(*list)[0]);
 		unsigned int j;
 		for (j = 0; j < set.GetNumberOfPoints(); j++)
 			set.GetYPointer()[j] = set.GetXData(j);
@@ -110,7 +148,7 @@ Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 		return set;
 	}
 
-	return *list[i - 1];
+	return *(*list)[i - 1];
 }
 
 //==========================================================================
@@ -176,23 +214,35 @@ wxString ExpressionTree::ParseExpression(const wxString &expression)
 {
 	std::stack<wxString> operatorStack;
 	unsigned int i, advance;
+	bool lastWasOperator(true), thisWasOperator;
 	for (i = 0; i < expression.Len(); i++)
 	{
 		if (expression.Mid(i, 1).Trim().IsEmpty())
 			continue;
 
-		if (NextIsNumber(expression.Mid(i), &advance))
+		thisWasOperator = false;
+
+		if (NextIsNumber(expression.Mid(i), &advance, lastWasOperator))
 			outputQueue.push(expression.Mid(i, advance));
 		else if (NextIsDataset(expression.Mid(i), &advance))
 			outputQueue.push(expression.Mid(i, advance));
+		else if (NextIsS(expression.Mid(i), &advance))
+			outputQueue.push(expression.Mid(i, advance));
 		else if (NextIsFunction(expression.Mid(i), &advance))
+		{
 			operatorStack.push(expression.Mid(i, advance));
+			thisWasOperator = true;
+		}
 		else if (NextIsOperator(expression.Mid(i), &advance))
+		{
 			ProcessOperator(operatorStack, expression.Mid(i, advance));
+			thisWasOperator = true;
+		}
 		else if (expression[i] == '(')
 		{
 			operatorStack.push(expression.Mid(i, 1));
 			advance = 1;
+			thisWasOperator = true;
 		}
 		else if (expression[i] == ')')
 		{
@@ -201,6 +251,8 @@ wxString ExpressionTree::ParseExpression(const wxString &expression)
 		}
 		else
 			return _T("Unrecognized character:  '") + expression.Mid(i, 1) + _T("'.");
+
+		lastWasOperator = thisWasOperator;
 
 		i += advance - 1;
 	}
@@ -331,6 +383,51 @@ wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		EvaluateExpression
+//
+// Description:		Evaluates the expression in the queue using Reverse Polish
+//					Notation.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		results	= std::string&
+//
+// Return Value:
+//		std::string containing a description of any errors, or empty string on success
+//
+//==========================================================================
+std::string ExpressionTree::EvaluateExpression(std::string &results)
+{
+	wxString next, errorString;
+
+	std::stack<double> doubleStack;
+	std::stack<wxString> stringStack;
+	std::stack<bool> useDoubleStack;
+
+	while (!outputQueue.empty())
+	{
+		next = outputQueue.front();
+		outputQueue.pop();
+
+		if (!EvaluateNext(next, doubleStack, stringStack, useDoubleStack, errorString))
+			return errorString.c_str();
+	}
+
+	if (useDoubleStack.top())
+	{
+		unsigned int precision(10);// FIXME:  Automate
+		results = wxString::Format("%0.*f", precision, doubleStack.top()).c_str();
+	}
+	else
+		results = stringStack.top();
+
+	return "";
+}
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		PopStackToQueue
 //
 // Description:		Removes the top entry of the stack and puts it in the queue.
@@ -384,9 +481,13 @@ bool ExpressionTree::EmptyStackToQueue(std::stack<wxString> &stack)
 // Function:		NextIsNumber
 //
 // Description:		Determines if the next portion of the expression is a number.
+//					Some cleverness is required to tell the difference between
+//					a minus sign and a negative sign (minus sign would return false).
 //
 // Input Arguments:
-//		s		= const wxString& containing the expression
+//		s				= const wxString& containing the expression
+//		lastWasOperator	= const bool& indicating whether or not the last thing
+//						  on the stack is an operator
 //
 // Output Arguments:
 //		stop	= unsigned int* (optional) indicating length of number
@@ -395,14 +496,15 @@ bool ExpressionTree::EmptyStackToQueue(std::stack<wxString> &stack)
 //		bool, true if a number is next in the expression
 //
 //==========================================================================
-bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop) const
+bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop, const bool &lastWasOperator)
 {
 	if (s.Len() == 0)
 		return false;
 
 	bool foundDecimal = s[0] == '.';
 	if (foundDecimal ||
-		(int(s[0]) >= int('0') && int(s[0]) <= int('9')))
+		(int(s[0]) >= int('0') && int(s[0]) <= int('9')) ||
+		(s[0] == '-' && lastWasOperator && NextIsNumber(s.Mid(1), NULL, false)))
 	{
 		unsigned int i;
 		for (i = 1; i < s.Len(); i++)
@@ -427,6 +529,35 @@ bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop) const
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		NextIsS
+//
+// Description:		Determines if the next portion of the expression is
+//					complex frequency (s) or discrete time (z).
+//
+// Input Arguments:
+//		s		= const wxString& containing the expression
+//
+// Output Arguments:
+//		stop	= unsigned int* (optional) indicating length
+//
+// Return Value:
+//		bool, true if a dataset is next in the expression
+//
+//==========================================================================
+bool ExpressionTree::NextIsS(const wxString &s, unsigned int *stop)
+{
+	if (s[0] == 's' || s[0] == 'z')
+	{
+		if (stop)
+			*stop = 1;
+		return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		NextIsDataset
 //
 // Description:		Determines if the next portion of the expression is a dataset.
@@ -441,7 +572,7 @@ bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop) const
 //		bool, true if a dataset is next in the expression
 //
 //==========================================================================
-bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop) const
+bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop)
 {
 	if (s.Len() < 3)
 		return false;
@@ -483,7 +614,7 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop) const
 //		bool, true if a function is next in the expression
 //
 //==========================================================================
-bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop) const
+bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop)
 {
 	// List these in order of longest to shortest
 	if (BeginningMatchesNoCase(s, _T("log10"), stop))
@@ -524,7 +655,7 @@ bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop) const
 //		bool, true if an operator is next in the expression
 //
 //==========================================================================
-bool ExpressionTree::NextIsOperator(const wxString &s, unsigned int *stop) const
+bool ExpressionTree::NextIsOperator(const wxString &s, unsigned int *stop)
 {
 	if (s.Len() == 0)
 		return false;
@@ -697,6 +828,31 @@ void ExpressionTree::PushToStack(const Dataset2D &dataset, std::stack<Dataset2D>
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		PushToStack
+//
+// Description:		Pushes the specified dataset onto the stack.
+//
+// Input Arguments:
+//		s				= const wxString&
+//		stringStack		= std::stack<wxString>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ExpressionTree::PushToStack(const wxString &s, std::stack<wxString> &stringStack,
+	std::stack<bool> &useDoubleStack) const
+{
+	stringStack.push(s);
+	useDoubleStack.push(false);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		PopFromStack
 //
 // Description:		Pops the next value from the top of the appropriate stack.
@@ -733,6 +889,47 @@ bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<Da
 		assert(!setStack.empty());
 		dataset = setStack.top();
 		setStack.pop();
+	}
+
+	return useDouble;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		PopFromStack
+//
+// Description:		Pops the next value from the top of the appropriate stack.
+//
+// Input Arguments:
+//		doubleStack		= std::stack<double>&
+//		stringStack		= std::stack<wxString>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		string			= wxString&
+//		value			= double&
+//
+// Return Value:
+//		bool, true if a double was popped, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<wxString> &stringStack,
+	std::stack<bool> &useDoubleStack, wxString& string, double &value) const
+{
+	bool useDouble = useDoubleStack.top();
+	useDoubleStack.pop();
+
+	if (useDouble)
+	{
+		assert(!doubleStack.empty());
+		value = doubleStack.top();
+		doubleStack.pop();
+	}
+	else
+	{
+		assert(!stringStack.empty());
+		string = stringStack.top();
+		stringStack.pop();
 	}
 
 	return useDouble;
@@ -930,6 +1127,107 @@ double ExpressionTree::ApplyOperation(const wxString &operation,
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		ApplyOperation
+//
+// Description:		Applies the specified operation to the specified operands.
+//
+// Input Arguments:
+//		operation	= const wxString& describing the function to apply
+//		first		= const wxString&
+//		second		= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing the result of the operation
+//
+//==========================================================================
+wxString ExpressionTree::ApplyOperation(const wxString &operation,
+	const wxString &first, const wxString &second) const
+{
+	/*if (operation.Cmp(_T("+")) == 0)
+		return second + first;
+	else if (operation.Cmp(_T("-")) == 0)
+		return second - first;
+	else */if (operation.Cmp(_T("*")) == 0)
+		return StringMultiply(first, second);
+	return second + operation.c_str() + first;
+
+/*	assert(false);
+	return "";*/
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyOperation
+//
+// Description:		Applies the specified operation to the specified operands.
+//
+// Input Arguments:
+//		operation	= const wxString& describing the function to apply
+//		first		= const wxString&
+//		second		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing the result of the operation
+//
+//==========================================================================
+wxString ExpressionTree::ApplyOperation(const wxString &operation,
+	const wxString &first, const double &second) const
+{
+	if (operation.Cmp(_T("+")) == 0)
+		return StringAdd(first, second);
+	else if (operation.Cmp(_T("-")) == 0)
+		return StringSubtract(first, second);
+	else if (operation.Cmp(_T("*")) == 0)
+		return StringMultiply(first, second);
+
+	assert(false);
+	return "";
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyOperation
+//
+// Description:		Applies the specified operation to the specified operands.
+//
+// Input Arguments:
+//		operation	= const wxString& describing the function to apply
+//		first		= const double&
+//		second		= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing the result of the operation
+//
+//==========================================================================
+wxString ExpressionTree::ApplyOperation(const wxString &operation,
+	const double &first, const wxString &second) const
+{
+	if (operation.Cmp(_T("+")) == 0)
+		return StringAdd(first, second);
+	else if (operation.Cmp(_T("-")) == 0)
+		return StringSubtract(first, second);
+	else if (operation.Cmp(_T("*")) == 0)
+		return StringMultiply(first, second);
+	else if (operation.Cmp(_T("/")) == 0)
+		return StringDivide(first, second);
+	else if (operation.Cmp(_T("^")) == 0)
+		return StringPower(first, second);
+
+	assert(false);
+	return "";
+}
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		EvaluateFunction
 //
 // Description:		Evaluates the function specified.
@@ -1031,6 +1329,51 @@ bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<doub
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		EvaluateOperator
+//
+// Description:		Evaluates the operator specified.
+//
+// Input Arguments:
+//		operator		= const wxString& describing the function to apply
+//		doubleStack		= std::stack<double>&
+//		stringStack		= std::stack<wxString>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<double> &doubleStack,
+	std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	double value1, value2;
+	wxString string1, string2;
+
+	if (useDoubleStack.size() < 2)
+	{
+		errorString = _T("Attempting to apply operator without two operands!");
+		return false;
+	}
+	else if (PopFromStack(doubleStack, stringStack, useDoubleStack, string1, value1))
+	{
+		if (PopFromStack(doubleStack, stringStack, useDoubleStack, string2, value2))
+			PushToStack(ApplyOperation(operation, value1, value2), doubleStack, useDoubleStack);
+		else
+			PushToStack(ApplyOperation(operation, value1, string2), stringStack, useDoubleStack);
+	}
+	else if (PopFromStack(doubleStack, stringStack, useDoubleStack, string2, value2))
+		PushToStack(ApplyOperation(operation, string1, value2), stringStack, useDoubleStack);
+	else
+		PushToStack(ApplyOperation(operation, string1, string2), stringStack, useDoubleStack);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		EvaluateNumber
 //
 // Description:		Evaluates the number specified.
@@ -1085,13 +1428,19 @@ bool ExpressionTree::EvaluateNumber(const wxString &number, std::stack<double> &
 bool ExpressionTree::EvaluateDataset(const wxString &dataset, std::stack<Dataset2D> &setStack,
 	std::stack<bool> &useDoubleStack, wxString &errorString) const
 {
+	if (!list)
+	{
+		errorString = _T("No datasets available!");
+		return false;
+	}
+
 	unsigned long set;
 	if (!dataset.Mid(1, dataset.Len() - 2).ToULong(&set))
 	{
 		errorString = _T("Could not convert '") + dataset + _T("' to set ID.");
 		return false;
 	}
-	else if (set > (unsigned int)list.GetCount())
+	else if (set > (unsigned int)(*list).GetCount())
 	{
 		errorString = wxString::Format("Set ID %lu is not a valid set ID", set);
 		return false;
@@ -1145,11 +1494,13 @@ bool ExpressionTree::SetOperatorValid(const wxString &operation, const bool &lef
 //					appropriate action.
 //
 // Input Arguments:
-//		operation			= const wxString&
-//		leftOperandIsDouble	= const bool&
+//		next			= const wxString&
+//		doubleStack		= std::stack<double>&
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
 //
 // Output Arguments:
-//		None
+//		errorString		= wxString&
 //
 // Return Value:
 //		bool, true for valid operation, false otherwise
@@ -1166,6 +1517,44 @@ bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doub
 		return EvaluateOperator(next, doubleStack, setStack, useDoubleStack, errorString);
 	else if (NextIsDataset(next))
 		return EvaluateDataset(next, setStack, useDoubleStack, errorString);
+	else
+		errorString = _T("Unable to evaluate '") + next + _T("'.");
+
+	return false;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateNext
+//
+// Description:		Determines how to evaluate the specified term and takes
+//					appropriate action.
+//
+// Input Arguments:
+//		next			= const wxString&
+//		doubleStack		= std::stack<double>&
+//		stringStack		= std::stack<wxString>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for valid operation, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doubleStack,
+		std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	if (NextIsNumber(next))
+		return EvaluateNumber(next, doubleStack, useDoubleStack, errorString);
+	else if(NextIsOperator(next))
+		return EvaluateOperator(next, doubleStack, stringStack, useDoubleStack, errorString);
+	else if (NextIsS(next))
+	{
+		PushToStack(next, stringStack, useDoubleStack);
+		return true;
+	}
 	else
 		errorString = _T("Unable to evaluate '") + next + _T("'.");
 
@@ -1192,7 +1581,7 @@ bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doub
 //
 //==========================================================================
 bool ExpressionTree::BeginningMatchesNoCase(const wxString &s, const wxString &target,
-	unsigned int *length) const
+	unsigned int *length)
 {
 	if (s.Len() < target.Len())
 		return false;
@@ -1204,4 +1593,415 @@ bool ExpressionTree::BeginningMatchesNoCase(const wxString &s, const wxString &t
 		*length = target.Len();
 
 	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringAdd
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const wxString&
+//		second	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringAdd(const wxString &first, const double &second) const
+{
+	unsigned int precision(10);// FIXME:  Automate
+	return wxString::Format("%0.*f+%s", precision, second, first);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringAdd
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const double&
+//		second	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringAdd(const double &first, const wxString &second) const
+{
+	unsigned int precision(10);// FIXME:  Automate
+	return wxString::Format("%s+%0.*f", second, precision, first);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringSubtract
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const wxString&
+//		second	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringSubtract(const wxString &first, const double &second) const
+{
+	unsigned int precision(10);// FIXME:  Automate
+	return wxString::Format("%0.*f-%s", precision, second, first);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringSubtract
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const double&
+//		second	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringSubtract(const double &first, const wxString &second) const
+{
+	unsigned int precision(10);// FIXME:  Automate
+	return wxString::Format("%s-%0.*f", second, precision, first);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringMultiply
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const wxString&
+//		second	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringMultiply(const wxString &first, const double &second) const
+{
+	std::vector<std::pair<int, double> > terms(FindPowersAndCoefficients(BreakApartTerms(first)));
+	unsigned int i;
+	wxString expression;
+	for (i = 0; i < terms.size(); i++)
+		AddToExpressionString(expression, terms[i].second * second, terms[i].first);
+
+	return expression;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringMultiply
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const wxString&
+//		second	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringMultiply(const wxString &first, const wxString &second) const
+{
+	std::vector<std::pair<int, double> > firstTerms(FindPowersAndCoefficients(BreakApartTerms(first)));
+	std::vector<std::pair<int, double> > secondTerms(FindPowersAndCoefficients(BreakApartTerms(second)));
+	std::vector<std::pair<int, double> > terms;
+	unsigned int i, j;
+	for (i = 0; i < firstTerms.size(); i++)
+	{
+		for (j = 0; j < secondTerms.size(); j++)
+			terms.push_back(std::pair<int, double>(firstTerms[i].first + secondTerms[j].first, firstTerms[i].second * secondTerms[j].second));
+	}
+
+	wxString expression;
+	for (i = 0; i < terms.size(); i++)
+		AddToExpressionString(expression, terms[i].second, terms[i].first);
+
+	return expression;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringMultiply
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const double&
+//		second	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringMultiply(const double &first, const wxString &second) const
+{
+	return StringMultiply(second, first);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringDivide
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//
+// Input Arguments:
+//		first	= const double&
+//		second	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringDivide(const double &first, const wxString &second) const
+{
+	return StringMultiply(second, 1.0 / first);
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		StringPower
+//
+// Description:		Performs arithmatic on the arguments, returns a string.
+//					For positive powers, expand and do the multiplication.
+//					For negative powers (i.e. z-domain stuff), add them to the
+//					string.  Assumes exponent is an integer.
+//
+// Input Arguments:
+//		first	= const double&
+//		second	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString ExpressionTree::StringPower(const double &first, const wxString &second) const
+{
+	if (first < 0.0)
+		return wxString::Format("%s^%i", second, (int)first);
+
+	wxString result(second);
+	unsigned int i;
+	for (i = 1; i < (unsigned int)first; i++)
+		result = StringMultiply(result, second);
+
+	return result;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		BreakApartTerms
+//
+// Description:		Breaks apart all the terms in the string expression.  Be
+//					wary of negative signs preceded by another operator!
+//
+// Input Arguments:
+//		s	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxArrayString
+//
+//==========================================================================
+wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
+{
+	wxArrayString terms;
+	unsigned int start(0), end(0), plusEnd, minusEnd;
+	while (end != wxNOT_FOUND)
+	{
+		plusEnd = s.Mid(start).Find('+');
+		minusEnd = s.Mid(start).Find('-');
+
+		if (minusEnd < plusEnd && start + minusEnd > 0 && NextIsOperator(s[start + minusEnd - 1]))
+		{
+			unsigned int nextMinus = s.Mid(start + minusEnd + 1).Find('-');
+			if (nextMinus != wxNOT_FOUND)
+				minusEnd += nextMinus + 1;
+			else
+				minusEnd = nextMinus;
+		}
+		end = std::min(plusEnd, minusEnd);
+
+		if (end != wxNOT_FOUND && NextIsOperator(s.Mid(start + end - 1)))
+		{
+			plusEnd = s.Mid(start + end).Find('+');
+			minusEnd = s.Mid(start + end).Find('-');
+			end += std::min(plusEnd, minusEnd);
+		}
+
+		if (start > 0 && s.Mid(start - 1, 1).Cmp(_T("-")) == 0)
+		{
+			if (end != wxNOT_FOUND)
+				terms.Add(s.Mid(start - 1, end + 1));
+			else
+				terms.Add(s.Mid(start - 1));
+		}
+		else
+			terms.Add(s.Mid(start, end));
+
+		start += end + 1;
+	}
+
+	return terms;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		FindPowersAndCoefficients
+//
+// Description:		Breaks a (previously separated) set of terms into a coefficient
+//					and a power of the algebraic variable.
+//
+// Input Arguments:
+//		terms	= const wxArrayString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		std::vector<std::pair<int, double> >
+//
+//==========================================================================
+std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(const wxArrayString &terms)
+{
+	std::vector<std::pair<int, double> > processedTerms;
+	unsigned int i, start, end;
+	int count;
+	long power;
+	double temp, coefficient;
+	for (i = 0; i < terms.Count(); i++)
+	{
+		count = 0;
+		start = 0;
+		end = 0;
+		coefficient = 1.0;
+		while (end != wxNOT_FOUND)
+		{
+			end = terms[i].Mid(start).Find('*');
+			if (terms[i].Mid(start, end).ToDouble(&temp))
+				coefficient = temp;
+			else
+			{
+				if (terms[i][0] == '-' && coefficient == 1.0)
+				{
+					coefficient = -1.0;
+					start++;
+					if (end != wxNOT_FOUND)
+						end++;
+				}
+
+				if (terms[i].Mid(start, 1).Cmp(_T("s")) == 0 || terms[i].Mid(start, 1).Cmp(_T("z")) == 0)
+				{
+					power = terms[i].Mid(start).Find('^');
+					if (power == wxNOT_FOUND)
+						count++;
+					else
+					{
+						start += power + 1;
+						end = terms[i].Mid(start).Find('*');
+						if (terms[i].Mid(start, end).ToLong(&power))
+							count += power;
+					}
+				}
+			}
+			start += end + 1;
+		}
+
+		processedTerms.push_back(std::pair<int, double>(count, coefficient));
+	}
+
+	return processedTerms;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		AddToExpressionString
+//
+// Description:		Adds the next term to the string.  Handles signed terms,
+//					cleans up for terms with coefficient == 1.0, etc.
+//
+// Input Arguments:
+//		coefficient	= const double&
+//		power		= const int&
+//
+// Output Arguments:
+//		expression	= wxString&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ExpressionTree::AddToExpressionString(wxString &expression,
+	const double &coefficient, const int &power) const
+{
+	unsigned int precision(10);// FIXME:  Automate
+	if (coefficient == 1.0 && power != 0)
+	{
+		if (!expression.IsEmpty())
+			expression.Append(_T("+"));
+		if (power == 1)
+				expression.Append(_T("s"));
+		else
+			expression.Append(wxString::Format("s^%i", power));
+	}
+	else if (expression.IsEmpty())
+	{
+		if (power == 0)
+			expression.Printf("%0.*f", precision, coefficient);
+		else if (power == 1)
+			expression.Printf("%0.*f*s", precision, coefficient);
+		else
+			expression.Printf("%0.*f*s^%i", precision, coefficient, power);
+	}
+	else
+	{
+		if (power == 0)
+			expression.Append(wxString::Format("%+0.*f", precision, coefficient));
+		else if (power == 1)
+			expression.Append(wxString::Format("%+0.*f*s", precision, coefficient));
+		else
+			expression.Append(wxString::Format("%+0.*f*s^%i", precision, coefficient, power));
+	}
 }

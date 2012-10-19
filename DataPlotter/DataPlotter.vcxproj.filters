@@ -49,12 +49,6 @@
     <Filter Include="Header Files\utilities\signals">
       <UniqueIdentifier>{61ee11d1-4439-45b7-bd60-5002528e8066}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\utilities\signals\filters">
-      <UniqueIdentifier>{18a484e4-060b-4f0f-bc5b-813c7f8e8200}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\utilities\signals\filters">
-      <UniqueIdentifier>{470ade42-4f64-4f7b-a029-59870c1cc4ab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\application\dataFiles">
       <UniqueIdentifier>{230ae823-c77d-4b86-9334-0cc3b3f520dc}</UniqueIdentifier>
     </Filter>
@@ -141,15 +135,6 @@
     <ClInclude Include="src\utilities\signals\curveFit.h">
       <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\filters\lowPassOrder2.h">
-      <Filter>Header Files\utilities\signals\filters</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\signals\filters\highPassOrder1.h">
-      <Filter>Header Files\utilities\signals\filters</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\signals\filters\lowPassOrder1.h">
-      <Filter>Header Files\utilities\signals\filters</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\fontFinder.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
@@ -189,8 +174,8 @@
     <ClInclude Include="src\application\dataFiles\kollmorgenFile.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\filters\filter.h">
-      <Filter>Header Files\utilities\signals\filters</Filter>
+    <ClInclude Include="src\utilities\signals\filter.h">
+      <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -269,15 +254,6 @@
     <ClCompile Include="src\utilities\signals\curveFit.cpp">
       <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\filters\lowPassOrder2.cpp">
-      <Filter>Source Files\utilities\signals\filters</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utilities\signals\filters\highPassOrder1.cpp">
-      <Filter>Source Files\utilities\signals\filters</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utilities\signals\filters\lowPassOrder1.cpp">
-      <Filter>Source Files\utilities\signals\filters</Filter>
-    </ClCompile>
     <ClCompile Include="src\utilities\fontFinder.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
@@ -314,8 +290,8 @@
     <ClCompile Include="src\application\dataFiles\kollmorgenFile.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\filters\filter.cpp">
-      <Filter>Source Files\utilities\signals\filters</Filter>
+    <ClCompile Include="src\utilities\signals\filter.cpp">
+      <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
