@@ -37,7 +37,7 @@ protected:
 	virtual void AssembleDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const;
 	virtual void DoTypeSpecificLoadTasks(void);
-	virtual unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const;
+	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
 
 	bool ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors) const;

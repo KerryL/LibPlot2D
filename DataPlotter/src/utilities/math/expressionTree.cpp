@@ -88,7 +88,7 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const
 //
 // Input Arguments:
 //		expression			= wxString containing the expression to parse
-//		solvedExpression	= 
+//		solvedExpression	=
 //
 // Output Arguments:
 //		solvedData		= Dataset2D& containing the evaluated data
@@ -1615,7 +1615,7 @@ bool ExpressionTree::BeginningMatchesNoCase(const wxString &s, const wxString &t
 wxString ExpressionTree::StringAdd(const wxString &first, const double &second) const
 {
 	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%0.*f+%s", precision, second, first);
+	return wxString::Format("%0.*f+%s", precision, second, first.c_str());
 }
 
 //==========================================================================
@@ -1638,7 +1638,7 @@ wxString ExpressionTree::StringAdd(const wxString &first, const double &second) 
 wxString ExpressionTree::StringAdd(const double &first, const wxString &second) const
 {
 	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%s+%0.*f", second, precision, first);
+	return wxString::Format("%s+%0.*f", second.c_str(), precision, first);
 }
 
 //==========================================================================
@@ -1661,7 +1661,7 @@ wxString ExpressionTree::StringAdd(const double &first, const wxString &second) 
 wxString ExpressionTree::StringSubtract(const wxString &first, const double &second) const
 {
 	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%0.*f-%s", precision, second, first);
+	return wxString::Format("%0.*f-%s", precision, second, first.c_str());
 }
 
 //==========================================================================
@@ -1684,7 +1684,7 @@ wxString ExpressionTree::StringSubtract(const wxString &first, const double &sec
 wxString ExpressionTree::StringSubtract(const double &first, const wxString &second) const
 {
 	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%s-%0.*f", second, precision, first);
+	return wxString::Format("%s-%0.*f", second.c_str(), precision, first);
 }
 
 //==========================================================================
@@ -1818,7 +1818,7 @@ wxString ExpressionTree::StringDivide(const double &first, const wxString &secon
 wxString ExpressionTree::StringPower(const double &first, const wxString &second) const
 {
 	if (first < 0.0)
-		return wxString::Format("%s^%i", second, (int)first);
+		return wxString::Format("%s^%i", second.c_str(), (int)first);
 
 	wxString result(second);
 	unsigned int i;
@@ -1849,7 +1849,7 @@ wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 {
 	wxArrayString terms;
 	unsigned int start(0), end(0), plusEnd, minusEnd;
-	while (end != wxNOT_FOUND)
+	while (end != (unsigned int)wxNOT_FOUND)
 	{
 		plusEnd = s.Mid(start).Find('+');
 		minusEnd = s.Mid(start).Find('-');
@@ -1857,14 +1857,14 @@ wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 		if (minusEnd < plusEnd && start + minusEnd > 0 && NextIsOperator(s[start + minusEnd - 1]))
 		{
 			unsigned int nextMinus = s.Mid(start + minusEnd + 1).Find('-');
-			if (nextMinus != wxNOT_FOUND)
+			if (nextMinus != (unsigned int)wxNOT_FOUND)
 				minusEnd += nextMinus + 1;
 			else
 				minusEnd = nextMinus;
 		}
 		end = std::min(plusEnd, minusEnd);
 
-		if (end != wxNOT_FOUND && NextIsOperator(s.Mid(start + end - 1)))
+		if (end != (unsigned int)wxNOT_FOUND && NextIsOperator(s.Mid(start + end - 1)))
 		{
 			plusEnd = s.Mid(start + end).Find('+');
 			minusEnd = s.Mid(start + end).Find('-');
@@ -1873,7 +1873,7 @@ wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 
 		if (start > 0 && s.Mid(start - 1, 1).Cmp(_T("-")) == 0)
 		{
-			if (end != wxNOT_FOUND)
+			if (end != (unsigned int)wxNOT_FOUND)
 				terms.Add(s.Mid(start - 1, end + 1));
 			else
 				terms.Add(s.Mid(start - 1));
@@ -1917,7 +1917,7 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 		start = 0;
 		end = 0;
 		coefficient = 1.0;
-		while (end != wxNOT_FOUND)
+		while (end != (unsigned int)wxNOT_FOUND)
 		{
 			end = terms[i].Mid(start).Find('*');
 			if (terms[i].Mid(start, end).ToDouble(&temp))
@@ -1928,14 +1928,14 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 				{
 					coefficient = -1.0;
 					start++;
-					if (end != wxNOT_FOUND)
+					if (end != (unsigned int)wxNOT_FOUND)
 						end++;
 				}
 
 				if (terms[i].Mid(start, 1).Cmp(_T("s")) == 0 || terms[i].Mid(start, 1).Cmp(_T("z")) == 0)
 				{
 					power = terms[i].Mid(start).Find('^');
-					if (power == wxNOT_FOUND)
+					if (power == (unsigned int)wxNOT_FOUND)
 						count++;
 					else
 					{

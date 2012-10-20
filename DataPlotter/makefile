@@ -14,8 +14,7 @@ DIRS = \
 	src/renderer/primitives \
 	src/utilities \
 	src/utilities/math \
-	src/utilities/signals \
-	src/utilities/signals/filters
+	src/utilities/signals
 
 # Source files
 SRC = $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))

@@ -964,7 +964,7 @@ wxString FilterDialog::GenerateButterworthDenominator(const unsigned int &order,
 			else if (i == terms.size() - 2)
 				s.Append(coefficient + _T("s"));
 			else
-				s.Append(wxString::Format("%ss^%i", coefficient, terms.size() - i - 1));	
+				s.Append(wxString::Format("%ss^%li", coefficient.c_str(), terms.size() - i - 1));
 		}
 	}
 
@@ -1015,7 +1015,7 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 		if (s[0] == '(')
 			s.Append(_T(")"));
 	}
-	
+
 	return s;
 }
 
@@ -1468,7 +1468,7 @@ wxString FilterDialog::GetCustomName(const FilterParameters &parameters)
 wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(GetOrderString(parameters.order));
-	s.Append(wxString::Format(" %s, %0.*f Hz", name,
+	s.Append(wxString::Format(" %s, %0.*f Hz", name.c_str(),
 		GetPrecision(parameters.cutoffFrequency), parameters.cutoffFrequency));
 
 	return s;
@@ -1526,7 +1526,7 @@ wxString FilterDialog::AddDampingName(const wxString& name, const FilterParamete
 wxString FilterDialog::AddWidthDepthName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(name);
-	s.Append(wxString::Format(" x %0.*f Hz, %0.*f dB", name,
+	s.Append(wxString::Format(" x %0.*f Hz, %0.*f dB",
 		GetPrecision(parameters.width), parameters.width,
 		GetPrecision(parameters.depth), parameters.depth));
 

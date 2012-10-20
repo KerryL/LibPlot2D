@@ -2,26 +2,6 @@
 <configurationDescriptor version="80">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df name="DataPlotter" root=".">
-      <df name=".obj">
-        <df name="src">
-          <df name="application">
-            <df name="dataFiles">
-            </df>
-          </df>
-          <df name="renderer">
-            <df name="primitives">
-            </df>
-          </df>
-          <df name="utilities">
-            <df name="math">
-            </df>
-            <df name="signals">
-              <df name="filters">
-              </df>
-            </df>
-          </df>
-        </df>
-      </df>
       <df name="bin">
       </df>
       <df name="res">

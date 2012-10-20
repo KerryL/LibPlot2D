@@ -183,7 +183,11 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 {
 	const unsigned int tempSize(256);
 	char temp[tempSize];
+#ifdef __WXWIN__
 	sprintf_s(temp, tempSize, "(%f*(1+z^-1))", 1.0 / sampleRate);
+#else
+	sprintf(temp, "(%f*(1+z^-1))", 1.0 / sampleRate);
+#endif
 	std::string posBilinTerm(temp), negBilinTerm("(2*(1-z^-1))");
 	std::string result;
 
@@ -193,7 +197,11 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 		if (PlotMath::IsZero(coefficients[i]))
 			continue;
 
+#ifdef __WXWIN__
 		sprintf_s(temp, tempSize, "%f", coefficients[i]);
+#else
+		sprintf(temp, "%f", coefficients[i]);
+#endif
 		if (!result.empty() && coefficients[i] > 0.0)
 			result.append("+");
 		result.append(temp);
@@ -202,7 +210,11 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 			result.append("*" + negBilinTerm);
 		if (coefficients.size() - 1 > 1 + i)
 		{
-			sprintf_s(temp, tempSize, "^%i", coefficients.size() - i - 1);
+#ifdef __WXWIN__
+			sprintf_s(temp, tempSize, "^%lu", coefficients.size() - i - 1);
+#else
+			sprintf(temp, "^%lu", coefficients.size() - i - 1);
+#endif
 			result.append(temp);
 		}
 
@@ -210,7 +222,11 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 			result.append("*" + posBilinTerm);
 		if (highestPower + i > coefficients.size())
 		{
-			sprintf_s(temp, tempSize, "^%i", highestPower - coefficients.size() + 1 + i);
+#ifdef __WXWIN__
+				sprintf_s(temp, tempSize, "^%lu", highestPower - coefficients.size() + 1 + i);
+#else
+				sprintf(temp, "^%lu", highestPower - coefficients.size() + 1 + i);
+#endif
 			result.append(temp);
 		}
 	}
