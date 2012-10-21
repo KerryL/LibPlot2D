@@ -88,22 +88,14 @@
             <in>vector.h</in>
           </df>
           <df name="signals">
-            <df name="filters">
-              <in>filterBase.cpp</in>
-              <in>filterBase.h</in>
-              <in>highPassOrder1.cpp</in>
-              <in>highPassOrder1.h</in>
-              <in>lowPassOrder1.cpp</in>
-              <in>lowPassOrder1.h</in>
-              <in>lowPassOrder2.cpp</in>
-              <in>lowPassOrder2.h</in>
-            </df>
             <in>curveFit.cpp</in>
             <in>curveFit.h</in>
             <in>derivative.cpp</in>
             <in>derivative.h</in>
             <in>fft.cpp</in>
             <in>fft.h</in>
+            <in>filter.cpp</in>
+            <in>filter.h</in>
             <in>integral.cpp</in>
             <in>integral.h</in>
             <in>rms.cpp</in>

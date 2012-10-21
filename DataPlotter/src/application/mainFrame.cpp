@@ -2787,7 +2787,7 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 //
 // Input Arguments:
 //		parameters		= const FilterParameters&
-//		sampleRate		= const double& [sec]
+//		sampleRate		= const double& [Hz]
 //		initialValue	= const double&
 //
 // Output Arguments:
