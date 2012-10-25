@@ -238,16 +238,19 @@ void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned 
 		glBegin(GL_LINE_STRIP);
 	}
 
-	if (PointsCrossBottomAxis(first, second))
-		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
-	else if (PointsCrossTopAxis(first, second))
-		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
-	else if (PointsCrossLeftAxis(first, second))
-		PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
-	else if (PointsCrossRightAxis(first, second))
-		PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
-	else
-		assert(false);
+	if (PointIsValid(first) && PointIsValid(second))
+	{
+		if (PointsCrossBottomAxis(first, second))
+			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
+		else if (PointsCrossTopAxis(first, second))
+			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
+		else if (PointsCrossLeftAxis(first, second))
+			PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
+		else if (PointsCrossRightAxis(first, second))
+			PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
+		else
+			assert(false);
+	}
 
 	if (!startingPoint)
 	{
@@ -278,19 +281,47 @@ void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned 
 void PlotCurve::PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second) const
 {
 	glEnd();
-	glBegin(GL_LINE_STRIP);
 
-	if (PointsCrossBottomAxis(first, second))
-		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
-	if (PointsCrossTopAxis(first, second))
-		PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
-	if (PointsCrossLeftAxis(first, second))
-		PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
-	if (PointsCrossRightAxis(first, second))
-		PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
+	if (PointIsValid(first) && PointIsValid(second))
+	{
+		glBegin(GL_LINE_STRIP);
 
-	glEnd();
+		if (PointsCrossBottomAxis(first, second))
+			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
+		if (PointsCrossTopAxis(first, second))
+			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
+		if (PointsCrossLeftAxis(first, second))
+			PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
+		if (PointsCrossRightAxis(first, second))
+			PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
+
+		glEnd();
+	}
 	glBegin(GL_LINE_STRIP);
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		PointIsValid
+//
+// Description:		Checks to see if the specified point is a real, finite number.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for valid, false otherwise
+//
+//==========================================================================
+bool PlotCurve::PointIsValid(const unsigned int &i) const
+{
+	assert(i < data->GetNumberOfPoints());
+
+	return PlotMath::IsValid<double>(data->GetXData(i)) &&
+		PlotMath::IsValid<double>(data->GetYData(i));
 }
 
 //==========================================================================

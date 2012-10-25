@@ -174,7 +174,6 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		parsed.Insert(wxString::Format("%f", time), 0);
-
 		if (parsed.size() < curveCount)
 		{
 			wxString line(nextLine);
@@ -189,7 +188,6 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		{
 			if (!parsed[i].ToDouble(&tempDouble))
 				return false;
-
 			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
 			{
 				rawData[set].push_back(tempDouble);
@@ -197,9 +195,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 				set++;
 			}
 		}
-
 		time += timeStep;
 	}
-
 	return true;
 }

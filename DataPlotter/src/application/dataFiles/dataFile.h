@@ -72,6 +72,7 @@ protected:
 	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter) const;
 	double GetTimeValue(const wxString &timeString,
 		const wxString &timeFormat, const wxString &timeUnits) const;
+	double GetTimeScalingFactor(const wxString &format) const;
 
 	wxArrayString GenerateNames(const wxArrayString &previousLines,
 		const wxArrayString &currentLine) const;

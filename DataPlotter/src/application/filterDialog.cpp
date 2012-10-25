@@ -15,12 +15,8 @@
 
 // Local headers
 #include "application/filterDialog.h"
-#include "utilities/math/complex.h"
 #include "utilities/math/plotMath.h"
 #include "utilities/math/expressionTree.h"
-
-// Standard C++ headers
-#include <vector>
 
 // wxWidgets headers
 #include <wx/spinctrl.h>
@@ -163,24 +159,19 @@ wxSizer* FilterDialog::CreateTextBoxes(void)
 	sizer->AddGrowableCol(1);
 
 	cutoffFrequencyBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		GetPrecision(parameters.cutoffFrequency), parameters.cutoffFrequency));
+		PlotMath::GetPrecision(parameters.cutoffFrequency), parameters.cutoffFrequency));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Cutoff Frequency [Hz]")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(cutoffFrequencyBox, 0, wxEXPAND);
 
 	dampingRatioBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		GetPrecision(parameters.dampingRatio), parameters.dampingRatio));
+		PlotMath::GetPrecision(parameters.dampingRatio), parameters.dampingRatio));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Damping Ratio")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(dampingRatioBox, 0, wxEXPAND);
 
 	widthBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		GetPrecision(parameters.width), parameters.width));
+		PlotMath::GetPrecision(parameters.width), parameters.width));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Width [Hz]")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(widthBox, 0, wxEXPAND);
-
-	depthBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		GetPrecision(parameters.depth), parameters.depth));
-	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Depth [dB]")), wxALIGN_CENTER_VERTICAL);
-	sizer->Add(depthBox, 0, wxEXPAND);
 
 	orderSpin = new wxSpinCtrl(this, SpinID, wxString::Format("%i", parameters.order));
 	orderSpin->SetRange(1, 10000);
@@ -248,14 +239,12 @@ wxSizer* FilterDialog::CreateRadioButtons(void)
 	highPassRadio = new wxRadioButton(this, RadioID, _T("High-Pass"));
 	bandStopRadio = new wxRadioButton(this, RadioID, _T("Band-Stop"));
 	bandPassRadio = new wxRadioButton(this, RadioID, _T("Band-Pass"));
-	notchRadio = new wxRadioButton(this, RadioID, _T("Notch"));
 	customRadio = new wxRadioButton(this, RadioID, _T("Custom"));
 
 	typeSizer->Add(lowPassRadio, 0, wxALL, 2);
 	typeSizer->Add(highPassRadio, 0, wxALL, 2);
 	typeSizer->Add(bandStopRadio, 0, wxALL, 2);
 	typeSizer->Add(bandPassRadio, 0, wxALL, 2);
-	typeSizer->Add(notchRadio, 0, wxALL, 2);
 	typeSizer->Add(customRadio, 0, wxALL, 2);
 
 	if (parameters.type == FilterParameters::TypeHighPass)
@@ -266,8 +255,6 @@ wxSizer* FilterDialog::CreateRadioButtons(void)
 		bandStopRadio->SetValue(true);
 	else if (parameters.type == FilterParameters::TypeBandPass)
 		bandPassRadio->SetValue(true);
-	else if (parameters.type == FilterParameters::TypeNotch)
-		notchRadio->SetValue(true);
 	else if (parameters.type == FilterParameters::TypeCustom)
 		customRadio->SetValue(true);
 	else
@@ -378,8 +365,6 @@ void FilterDialog::OnOKButton(wxCommandEvent &event)
 		parameters.type = FilterParameters::TypeBandStop;
 	else if (bandPassRadio->GetValue())
 		parameters.type = FilterParameters::TypeBandPass;
-	else if (notchRadio->GetValue())
-		parameters.type = FilterParameters::TypeNotch;
 	else if (customRadio->GetValue())
 		parameters.type = FilterParameters::TypeCustom;
 	else
@@ -388,7 +373,6 @@ void FilterDialog::OnOKButton(wxCommandEvent &event)
 	if (!CutoffFrequencyIsValid() ||
 		!DampingRatioIsValid() ||
 		!WidthIsValid() ||
-		!DepthIsValid() ||
 		!ExpressionIsValid(numeratorBox->GetValue()) ||
 		!ExpressionIsValid(denominatorBox->GetValue()))
 		return;
@@ -414,14 +398,6 @@ void FilterDialog::OnOKButton(wxCommandEvent &event)
 //==========================================================================
 void FilterDialog::OnSpinChange(wxSpinEvent& WXUNUSED(event))
 {
-	/*if (!initialized)
-		return;
-
-	if (!OrderIsValid(event.GetInt()))
-		event.Veto();
-
-	UpdateEnabledControls();
-	UpdateTransferFunction();*/
 	HandleSpin();
 }
 
@@ -453,7 +429,7 @@ void FilterDialog::OnSpinUp(wxSpinEvent& WXUNUSED(event))
 // Description:		Processes spin control change events (order selection).
 //
 // Input Arguments:
-//		event	= wxSpinEvent& (unused)
+//		event	= wxSpinEvent&
 //
 // Output Arguments:
 //		None
@@ -462,8 +438,12 @@ void FilterDialog::OnSpinUp(wxSpinEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void FilterDialog::OnSpinDown(wxSpinEvent& WXUNUSED(event))
+void FilterDialog::OnSpinDown(wxSpinEvent& event)
 {
+	if (event.GetInt() < 2 &&
+		(bandPassRadio->GetValue() || bandStopRadio->GetValue()))
+		event.Veto();
+
 	HandleSpin();
 }
 
@@ -485,28 +465,6 @@ void FilterDialog::OnSpinDown(wxSpinEvent& WXUNUSED(event))
 //==========================================================================
 void FilterDialog::HandleSpin(void)
 {
-	/*if (!initialized)
-		return;
-
-	if (!OrderIsValid(event.GetInt()))
-	{
-		unsigned int order(orderSpin->GetValue());
-		if ((unsigned)event.GetInt() > order)// increasing value
-		{
-			order = event.GetInt();
-			while (!OrderIsValid(order))
-				order++;
-		}
-		else if (event.GetInt() > 1)// decreasing value AND greater than 1
-		{
-			order = event.GetInt();
-			while (!OrderIsValid(order))
-				order--;
-		}
-		event.Veto();
-		orderSpin->SetValue(order);
-	}*/
-
 	UpdateEnabledControls();
 	UpdateTransferFunction();
 }
@@ -532,40 +490,13 @@ void FilterDialog::OnRadioChange(wxCommandEvent& WXUNUSED(event))
 	if (!initialized)
 		return;
 
+	if (orderSpin->GetValue() < 2 &&
+		(bandPassRadio->GetValue() || bandStopRadio->GetValue()))
+		orderSpin->SetValue(2);
+
 	UpdateEnabledControls();
 	UpdateTransferFunction();
 }
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		OnPhaselessChange
-//
-// Description:		Processes checkbox change events (phaseless selection).
-//
-// Input Arguments:
-//		event	= wxCommandEvent& (unused)
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-/*void FilterDialog::OnPhaselessChange(wxCommandEvent& WXUNUSED(event))
-{
-	if (!initialized)
-		return;
-
-	unsigned int originalOrder = orderSpin->GetValue();
-	if (phaselessCheckBox->GetValue())
-		orderSpin->SetValue(originalOrder * 2);
-	else
-		orderSpin->SetValue(originalOrder / 2);
-
-	UpdateEnabledControls();
-	UpdateTransferFunction();
-}*/
 
 //==========================================================================
 // Class:			FilterDialog
@@ -607,36 +538,9 @@ void FilterDialog::OnButterworthChange(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void FilterDialog::OnInputTextChange(wxCommandEvent& WXUNUSED(event))
 {
+	UpdateEnabledControls();
 	UpdateTransferFunction();
 }
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		OrderIsValid
-//
-// Description:		Verifies that the specified order is acceptable given the
-//					other filter parameters
-//
-// Input Arguments:
-//		order	= const unsigned int& specifying the desired order
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true if order is OK
-//
-//==========================================================================
-/*bool FilterDialog::OrderIsValid(const unsigned int &order) const
-{
-	if (!initialized)
-		return false;
-
-	if (phaselessCheckBox->GetValue() && order % 2 != 0)
-		return false;
-
-	return true;
-}*/
 
 //==========================================================================
 // Class:			FilterDialog
@@ -667,8 +571,6 @@ FilterParameters::Type FilterDialog::GetType(void) const
 		return FilterParameters::TypeBandStop;
 	else if (bandPassRadio->GetValue())
 		return FilterParameters::TypeBandPass;
-	else if (notchRadio->GetValue())
-		return FilterParameters::TypeNotch;
 	else if (customRadio->GetValue())
 		return FilterParameters::TypeCustom;
 
@@ -694,7 +596,7 @@ FilterParameters::Type FilterDialog::GetType(void) const
 //==========================================================================
 bool FilterDialog::TransferDataFromWindow(void)
 {
-	return true;//OrderIsValid(orderSpin->GetValue());
+	return true;
 }
 
 //==========================================================================
@@ -802,42 +704,6 @@ bool FilterDialog::WidthIsValid(void)
 
 //==========================================================================
 // Class:			FilterDialog
-// Function:		DepthIsValid
-//
-// Description:		Validates the depth value.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true if dialog contents are valid
-//
-//==========================================================================
-bool FilterDialog::DepthIsValid(void)
-{
-	if (parameters.type == FilterParameters::TypeBandStop ||
-		parameters.type == FilterParameters::TypeBandPass)
-	{
-		if (!depthBox->GetValue().ToDouble(&parameters.depth))
-		{
-			wxMessageBox(_T("ERROR:  Depth must be numeric!"), _T("Error Defining Filter"));
-			return false;
-		}
-		/*else if (parameters.depth <= 0.0)
-		{
-			::wxMessageBox(_T("ERROR:  Depth must be strictly positive!"), _T("Error Defining Filter"));
-			return false;
-		}*/
-	}
-
-	return true;
-}
-
-//==========================================================================
-// Class:			FilterDialog
 // Function:		ExpressionIsValid
 //
 // Description:		Validates the expression.
@@ -899,8 +765,6 @@ void FilterDialog::UpdateTransferFunction(void)
 		GetBandStopTF(num, den);
 	else if (bandPassRadio->GetValue())
 		GetBandPassTF(num, den);
-	else if (notchRadio->GetValue())
-		GetNotchTF(num, den);
 	else
 		assert(false);
 
@@ -929,46 +793,14 @@ void FilterDialog::UpdateTransferFunction(void)
 wxString FilterDialog::GenerateButterworthDenominator(const unsigned int &order,
 	const double &cutoff) const
 {
-	std::vector<Complex> poles, terms(order + 1, Complex(0.0, 0.0));
+	std::vector<Complex> poles;
 	unsigned int i;
 	for (i = 0; i < order; i++)
 		poles.push_back(Complex(cutoff, 0.0)
 			* Complex(exp(1.0), 0.0).ToPower(
 			Complex(0.0, (2.0 * (i + 1.0) + order - 1.0) * M_PI / (2.0 * order))));
 
-	terms[0].real = 1.0;
-	unsigned int j;
-	for (i = 0; i < order; i++)// from MATLAB's poly.m
-	{
-		for (j = i + 1; j > 0; j--)
-			terms[j] -= poles[i] * Complex(terms[j - 1]);
-	}
-
-	wxString s, coefficient;
-	for (i = 0; i < terms.size(); i++)
-	{
-		// FIXME:  Check to ensure imaginary part is zero?
-		if (!PlotMath::IsZero(terms[i].real))
-		{
-			if (PlotMath::IsZero(terms[i].real - 1.0))
-				coefficient.Clear();
-			else
-			{
-				coefficient.Printf("+%0.*f", GetPrecision(terms[i].real), terms[i].real);
-				if (i != terms.size() - 1)
-					coefficient.Append(_T("*"));
-			}
-
-			if (i == terms.size() - 1)
-				s.Append(coefficient);
-			else if (i == terms.size() - 2)
-				s.Append(coefficient + _T("s"));
-			else
-				s.Append(wxString::Format("%ss^%li", coefficient.c_str(), terms.size() - i - 1));
-		}
-	}
-
-	return s;
+	return GenerateExpressionFromComplexRoots(poles);
 }
 
 //==========================================================================
@@ -996,8 +828,9 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 	wxString s;
 	if (order > 1)
 		s = wxString::Format("s^2+%0.*f*s+%0.*f",
-			GetPrecision(2.0 * cutoff * dampingRatio),
-			2.0 * cutoff * dampingRatio, GetPrecision(cutoff * cutoff), cutoff * cutoff);
+			PlotMath::GetPrecision(2.0 * cutoff * dampingRatio),
+			2.0 * cutoff * dampingRatio,
+			PlotMath::GetPrecision(cutoff * cutoff), cutoff * cutoff);
 
 	if (order > 2)
 	{
@@ -1011,9 +844,65 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 	{
 		if (!s.IsEmpty())
 			s.Append(_T("*("));
-		s.Append(wxString::Format("s+%0.*f", GetPrecision(cutoff), cutoff));
+		s.Append(wxString::Format("s+%0.*f", PlotMath::GetPrecision(cutoff), cutoff));
 		if (s[0] == '(')
 			s.Append(_T(")"));
+	}
+
+	return s;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GenerateExpressionFromComplexRoots
+//
+// Description:		Generates a string expression for the characteristic
+//					equation with the specified complex roots.
+//
+// Input Arguments:
+//		roots	= const std::vector<Complex>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString FilterDialog::GenerateExpressionFromComplexRoots(
+	const std::vector<Complex> &roots) const
+{
+	std::vector<Complex> terms(roots.size() + 1, Complex(0.0, 0.0));
+	terms[0].real = 1.0;
+	unsigned int i, j;
+	for (i = 0; i < roots.size(); i++)// from MATLAB's poly.m
+	{
+		for (j = i + 1; j > 0; j--)
+			terms[j] -= roots[i] * terms[j - 1];
+	}
+
+	wxString s, coefficient;
+	for (i = 0; i < terms.size(); i++)
+	{
+		// TODO:  Check to ensure imaginary part is zero?  I think this is guaranteed through the above math?
+		if (!PlotMath::IsZero(terms[i].real))
+		{
+			if (PlotMath::IsZero(terms[i].real - 1.0))
+				coefficient.Clear();
+			else
+			{
+				coefficient.Printf("+%0.*f", PlotMath::GetPrecision(terms[i].real), terms[i].real);
+				if (i != terms.size() - 1)
+					coefficient.Append(_T("*"));
+			}
+
+			if (i == terms.size() - 1)
+				s.Append(coefficient);
+			else if (i == terms.size() - 2)
+				s.Append(coefficient + _T("s"));
+			else
+				s.Append(wxString::Format("%ss^%li", coefficient.c_str(), terms.size() - i - 1));
+		}
 	}
 
 	return s;
@@ -1040,21 +929,10 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 //==========================================================================
 void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator) const
 {
-	double cutoff, damping;
+	double cutoff;
 	if (!cutoffFrequencyBox->GetValue().ToDouble(&cutoff))
 		return;
-	else if (orderSpin->GetValue() > 1 && !dampingRatioBox->GetValue().ToDouble(&damping))
-		return;
-
-	cutoff *= 2.0 * M_PI;// [rad/sec]
-	if (orderSpin->GetValue() > 1)
-		numerator = wxString::Format("%0.*f^%i", GetPrecision(cutoff), cutoff, orderSpin->GetValue());
-	else
-		numerator = wxString::Format("%0.*f", GetPrecision(cutoff), cutoff);
-	if (butterworthCheckBox->GetValue())
-		denominator = GenerateButterworthDenominator(orderSpin->GetValue(), cutoff);
-	else
-		denominator = GenerateStandardDenominator(orderSpin->GetValue(), cutoff, damping);
+	GetLowPassTF(numerator, denominator, cutoff * 2.0 * M_PI, orderSpin->GetValue());
 }
 
 //==========================================================================
@@ -1078,20 +956,85 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator) cons
 //==========================================================================
 void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator) const
 {
-	double cutoff, damping;
+	double cutoff;
 	if (!cutoffFrequencyBox->GetValue().ToDouble(&cutoff))
 		return;
-	else if (orderSpin->GetValue() > 1 && !dampingRatioBox->GetValue().ToDouble(&damping))
+	GetHighPassTF(numerator, denominator, cutoff * 2.0 * M_PI, orderSpin->GetValue());
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GetLowPassTF
+//
+// Description:		Populates the arguments with string descriptors for the
+//					numerator and denominator of a low-pass filter as specified
+//					by the user.
+//
+// Input Arguments:
+//		cutoff		= const double& [rad/sec]
+//		order		= const unisgned int&
+//
+// Output Arguments:
+//		numerator	= wxString&
+//		denominator	= wxString&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator,
+	const double &cutoff, const unsigned int &order) const
+{
+	double damping;
+	if (order > 1 && !dampingRatioBox->GetValue().ToDouble(&damping))
 		return;
 
-	if (orderSpin->GetValue() > 1)
-		numerator = wxString::Format("s^%i", orderSpin->GetValue());
+	if (order > 1)
+		numerator = wxString::Format("%0.*f^%i", PlotMath::GetPrecision(cutoff),
+			cutoff, order);
+	else
+		numerator = wxString::Format("%0.*f", PlotMath::GetPrecision(cutoff), cutoff);
+	if (butterworthCheckBox->GetValue())
+		denominator = GenerateButterworthDenominator(order, cutoff);
+	else
+		denominator = GenerateStandardDenominator(order, cutoff, damping);
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GetHighPassTF
+//
+// Description:		Populates the arguments with string descriptors for the
+//					numerator and denominator of a high-pass filter as specified
+//					by the user.
+//
+// Input Arguments:
+//		cutoff		= const double& [rad/sec]
+//		order		= const unisgned int&
+//
+// Output Arguments:
+//		numerator	= wxString&
+//		denominator	= wxString&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator,
+	const double &cutoff, const unsigned int &order) const
+{
+	double damping;
+	if (order > 1 && !dampingRatioBox->GetValue().ToDouble(&damping))
+		return;
+
+	if (order > 1)
+		numerator = wxString::Format("s^%i", order);
 	else
 		numerator = _T("s");
 	if (butterworthCheckBox->GetValue())
-		denominator = GenerateButterworthDenominator(orderSpin->GetValue(), cutoff);
+		denominator = GenerateButterworthDenominator(order, cutoff);
 	else
-		denominator = GenerateStandardDenominator(orderSpin->GetValue(), cutoff, damping);
+		denominator = GenerateStandardDenominator(order, cutoff, damping);
 }
 
 //==========================================================================
@@ -1115,14 +1058,30 @@ void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator) con
 //==========================================================================
 void FilterDialog::GetBandStopTF(wxString &numerator, wxString &denominator) const
 {
-	/*wxString highNum, highDen, lowNum, lowDen;
-	GetLowPassTF(lowNum, lowDen, );
-	GetHighPassTF(highNum, highDen);
-	numerator = _T("(") + highNum + _T(")*(") + lowNum + _T(")");
-	denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");*/
-	// FIXME:  Implement
-	numerator.Clear();
-	denominator.Clear();
+	double cutoff, width(0.0);
+	if (!cutoffFrequencyBox->GetValue().ToDouble(&cutoff) ||
+		!widthBox->GetValue().ToDouble(&width))
+		return;
+	cutoff *= 2.0 * M_PI;
+	width *= 2.0 * M_PI;
+
+	// If the upper -3dB frequency is more than double the lower -3dB frequency,
+	// generate a wide-band transfer function (separate high- and low-pass portions)
+	if (IsWideBand(cutoff, width))
+	{
+		unsigned int order = orderSpin->GetValue() / 2;
+		wxString highNum, highDen, lowNum, lowDen;
+		GetLowPassTF(lowNum, lowDen, cutoff - width * 0.5, order);
+		GetHighPassTF(highNum, highDen, cutoff + width * 0.5, orderSpin->GetValue() - order);
+		numerator = _T("(") + highNum + _T(")*(") + lowNum + _T(")");
+		denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
+	}
+	else
+	{
+		// Note that the numerator cutoff can be varied to get a high-pass notch or low-pass notch
+		numerator.Printf("s^2+%0.*f", PlotMath::GetPrecision(cutoff * cutoff), cutoff * cutoff);
+		denominator = GenerateStandardDenominator(2, cutoff, width / cutoff * 0.5);
+	}
 }
 
 //==========================================================================
@@ -1146,35 +1105,29 @@ void FilterDialog::GetBandStopTF(wxString &numerator, wxString &denominator) con
 //==========================================================================
 void FilterDialog::GetBandPassTF(wxString &numerator, wxString &denominator) const
 {
-	numerator.Clear();
-	denominator.Clear();
-	// FIXME:  Implement
-}
+	double cutoff, width(0.0);
+	if (!cutoffFrequencyBox->GetValue().ToDouble(&cutoff) ||
+		!widthBox->GetValue().ToDouble(&width))
+		return;
+	cutoff *= 2.0 * M_PI;
+	width *= 2.0 * M_PI;
 
-//==========================================================================
-// Class:			FilterDialog
-// Function:		GetNotchTF
-//
-// Description:		Populates the arguments with string descriptors for the
-//					numerator and denominator of a notch filter as specified
-//					by the user.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		numerator	= wxString&
-//		denominator	= wxString&
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void FilterDialog::GetNotchTF(wxString &numerator, wxString &denominator) const
-{
-	numerator.Clear();
-	denominator.Clear();
-	// FIXME:  Implement
+	// If the upper -3dB frequency is more than double the lower -3dB frequency,
+	// generate a wide-band transfer function (separate high- and low-pass portions)
+	if (IsWideBand(cutoff, width))
+	{
+		unsigned int order = orderSpin->GetValue() / 2;
+		wxString highNum, highDen, lowNum, lowDen;
+		GetLowPassTF(lowNum, lowDen, cutoff + width * 0.5, order);
+		GetHighPassTF(highNum, highDen, cutoff - width * 0.5, orderSpin->GetValue() - order);
+		numerator = _T("(") + highNum + _T(")*(") + lowNum + _T(")");
+		denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
+	}
+	else
+	{
+		numerator.Printf("%0.*f*s", PlotMath::GetPrecision(width), width);
+		denominator = GenerateStandardDenominator(2, cutoff, width / cutoff * 0.5);
+	}
 }
 
 //==========================================================================
@@ -1224,16 +1177,68 @@ void FilterDialog::UpdateEnabledControls(void)
 	if (!initialized)
 		return;
 
-	butterworthCheckBox->Enable(!customRadio->GetValue());
-
 	cutoffFrequencyBox->Enable(!customRadio->GetValue());
-	dampingRatioBox->Enable((orderSpin->GetValue() > 2 ||
-		(orderSpin->GetValue() > 1 && !phaselessCheckBox->GetValue())) &&
-		!customRadio->GetValue() && !butterworthCheckBox->GetValue());
+	butterworthCheckBox->Enable(lowPassRadio->GetValue()
+		|| highPassRadio->GetValue() || IsWideBand());
+	dampingRatioBox->Enable(butterworthCheckBox->IsEnabled() && orderSpin->GetValue() > 1);
 
-	orderSpin->Enable(!customRadio->GetValue() && !bandStopRadio->GetValue() && !bandPassRadio->GetValue());
+	orderSpin->Enable(lowPassRadio->GetValue() || highPassRadio->GetValue() || IsWideBand());
 	widthBox->Enable(bandStopRadio->GetValue() || bandPassRadio->GetValue());
-	depthBox->Enable(bandStopRadio->GetValue() || bandPassRadio->GetValue());
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		IsWideBand
+//
+// Description:		Determines if the band-pass or band-stop parameters
+//					specified by the user constitue a wide-band filter.
+//
+// Input Arguments:
+//		cutoff	= const double&
+//		width	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FilterDialog::IsWideBand(const double &cutoff, const double &width) const
+{
+	if (bandStopRadio->GetValue())
+		return cutoff <= width * 1.5;
+	else if (bandPassRadio->GetValue())
+		return cutoff <= width * 5.0 / 6.0;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		IsWideBand
+//
+// Description:		Determines if the band-pass or band-stop parameters
+//					specified by the user constitue a wide-band filter.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FilterDialog::IsWideBand(void) const
+{
+	double cutoff, width;
+	if (!cutoffFrequencyBox->GetValue().ToDouble(&cutoff) ||
+		!widthBox->GetValue().ToDouble(&width))
+		return false;
+
+	return IsWideBand(cutoff, width);
 }
 
 //==========================================================================
@@ -1263,8 +1268,6 @@ wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 		name = GetBandStopName(parameters);
 	else if (parameters.type == FilterParameters::TypeBandPass)
 		name = GetBandPassName(parameters);
-	else if (parameters.type == FilterParameters::TypeNotch)
-		name = GetNotchName(parameters);
 	else if (parameters.type == FilterParameters::TypeCustom)
 		name = GetCustomName(parameters);
 	else
@@ -1405,30 +1408,6 @@ wxString FilterDialog::GetBandPassName(const FilterParameters &parameters)
 
 //==========================================================================
 // Class:			FilterDialog
-// Function:		GetNotchName
-//
-// Description:		Returns a name for the specified filter parameters.
-//
-// Input Arguments:
-//		parameters	= const FilterParameters&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxString
-//
-//==========================================================================
-wxString FilterDialog::GetNotchName(const FilterParameters &parameters)
-{
-	wxString s(GetPrimaryName(_T("Notch"), parameters));
-	s = AddWidthDepthName(s, parameters);
-
-	return s;
-}
-
-//==========================================================================
-// Class:			FilterDialog
 // Function:		GetHighPassName
 //
 // Description:		Returns a name for the specified filter parameters.
@@ -1469,7 +1448,7 @@ wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParamete
 {
 	wxString s(GetOrderString(parameters.order));
 	s.Append(wxString::Format(" %s, %0.*f Hz", name.c_str(),
-		GetPrecision(parameters.cutoffFrequency), parameters.cutoffFrequency));
+		PlotMath::GetPrecision(parameters.cutoffFrequency), parameters.cutoffFrequency));
 
 	return s;
 }
@@ -1500,7 +1479,7 @@ wxString FilterDialog::AddDampingName(const wxString& name, const FilterParamete
 			s.Append(_T(", Butterworth"));
 		else
 			s.Append(wxString::Format(", zeta = %0.*f",
-			GetPrecision(parameters.dampingRatio), parameters.dampingRatio));
+			PlotMath::GetPrecision(parameters.dampingRatio), parameters.dampingRatio));
 	}
 
 	return s;
@@ -1527,30 +1506,8 @@ wxString FilterDialog::AddWidthDepthName(const wxString& name, const FilterParam
 {
 	wxString s(name);
 	s.Append(wxString::Format(" x %0.*f Hz, %0.*f dB",
-		GetPrecision(parameters.width), parameters.width,
-		GetPrecision(parameters.depth), parameters.depth));
+		PlotMath::GetPrecision(parameters.width), parameters.width,
+		PlotMath::GetPrecision(parameters.depth), parameters.depth));
 
 	return s;
-}
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		GetPrecision
-//
-// Description:		Determines the appropriate number of significant digits
-//					to use when representing the specified value.
-//
-// Input Arguments:
-//		value	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		unsigned int, number of places after the decimal
-//
-//==========================================================================
-unsigned int FilterDialog::GetPrecision(const double &value)
-{
-	return 1;// FIXME:  Implement
 }

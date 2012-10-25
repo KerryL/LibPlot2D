@@ -154,9 +154,9 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 
 	unsigned int i;
 	for (i = 0; i < zNum.size(); i++)
-		a[i] = zNum[i];
-	for (i = 0; i < zDen.size(); i++)
-		b[i] = zDen[i];
+		a[i] = zNum[i] / zDen[0];
+	for (i = 0; i < zDen.size() - 1; i++)
+		b[i] = zDen[i + 1] / zDen[0];
 }
 
 //==========================================================================
@@ -183,11 +183,8 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 {
 	const unsigned int tempSize(256);
 	char temp[tempSize];
-#ifdef __WXWIN__
-	sprintf_s(temp, tempSize, "(%f*(1+z^-1))", 1.0 / sampleRate);
-#else
-	sprintf(temp, "(%f*(1+z^-1))", 1.0 / sampleRate);
-#endif
+
+	PlotMath::KRLsprintf(temp, tempSize, "(%f*(1+z^-1))", 1.0 / sampleRate);
 	std::string posBilinTerm(temp), negBilinTerm("(2*(1-z^-1))");
 	std::string result;
 
@@ -196,12 +193,7 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	{
 		if (PlotMath::IsZero(coefficients[i]))
 			continue;
-
-#ifdef __WXWIN__
-		sprintf_s(temp, tempSize, "%f", coefficients[i]);
-#else
-		sprintf(temp, "%f", coefficients[i]);
-#endif
+		PlotMath::KRLsprintf(temp, tempSize, "%f", coefficients[i]);
 		if (!result.empty() && coefficients[i] > 0.0)
 			result.append("+");
 		result.append(temp);
@@ -210,23 +202,14 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 			result.append("*" + negBilinTerm);
 		if (coefficients.size() - 1 > 1 + i)
 		{
-#ifdef __WXWIN__
-			sprintf_s(temp, tempSize, "^%lu", coefficients.size() - i - 1);
-#else
-			sprintf(temp, "^%lu", coefficients.size() - i - 1);
-#endif
+			PlotMath::KRLsprintf(temp, tempSize, "^%lu", coefficients.size() - i - 1);
 			result.append(temp);
 		}
-
 		if (highestPower + i > coefficients.size() - 1)
 			result.append("*" + posBilinTerm);
 		if (highestPower + i > coefficients.size())
 		{
-#ifdef __WXWIN__
-				sprintf_s(temp, tempSize, "^%lu", highestPower - coefficients.size() + 1 + i);
-#else
-				sprintf(temp, "^%lu", highestPower - coefficients.size() + 1 + i);
-#endif
+			PlotMath::KRLsprintf(temp, tempSize, "^%lu", highestPower - coefficients.size() + 1 + i);
 			result.append(temp);
 		}
 	}
@@ -256,11 +239,7 @@ Filter& Filter::operator=(const Filter &f)
 		return *this;
 
 	DeleteArrays();
-
-	a = new double[f.inSize];
-	b = new double[f.outSize];
-	u = new double[f.inSize];
-	y = new double[f.outSize];
+	AllocateArrays(f.inSize, f.outSize);
 
 	unsigned int i;
 	for (i = 0; i < inSize; i++)
@@ -271,7 +250,8 @@ Filter& Filter::operator=(const Filter &f)
 
 	for (i = 0; i < outSize; i++)
 	{
-		b[i] = f.b[i];
+		if (i < outSize - 1)
+			b[i] = f.b[i];
 		y[i] = f.y[i];
 	}
 
@@ -356,8 +336,7 @@ double Filter::Apply(const double &_u)
 	for (i = 0; i < inSize; i++)
 		y[0] += a[i] * u[i];
 	for (i = 1; i < outSize; i++)
-		y[0] -= b[i] * y[i];
-	y[0] /= b[0];
+		y[0] -= b[i - 1] * y[i];
 
 	return y[0];
 }
@@ -410,7 +389,7 @@ void Filter::AllocateArrays(const unsigned int &_inSize, const unsigned int &_ou
 	outSize = _outSize;
 
 	a = new double[inSize];
-	b = new double[outSize];
+	b = new double[outSize - 1];
 	u = new double[inSize];
 	y = new double[outSize];
 }
@@ -439,15 +418,14 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 	std::string errorString = e.Solve(s, expression);
 	if (!errorString.empty())
 	{
-		// FIXME:  Warning here?
+		// TODO:  Generate a warning here?
 	}
-	// FIXME:  Can we cound on it always going Coefficient * s ^ power?  Or could it be s ^ power * Coefficient?
 
 	std::vector<std::pair<int, double> > terms =
 		ExpressionTree::FindPowersAndCoefficients(ExpressionTree::BreakApartTerms(expression));
 
 	terms = CollectLikeTerms(terms);
-	// FIXME:  What if a power is missing:  need to insert a zero coefficient element for that power
+	terms = PadMissingTerms(terms);
 	std::sort(terms.begin(), terms.end());
 
 	std::vector<double> coefficients;
@@ -489,6 +467,50 @@ std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::p
 				j--;
 			}
 		}
+	}
+
+	return terms;
+}
+
+//==========================================================================
+// Class:			Filter
+// Function:		PadMissingTerms
+//
+// Description:		If a power between the maximum power and zero is missing,
+//					a zero-coefficient value for that power is inserted at
+//					the appropriate location in the vector.  Assumes the input
+//					vector is sorted highest power to lowest power.
+//
+// Input Arguments:
+//		terms	= std::vector<std::pair<int, double> >
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		std::vector<std::pair<int, double> >
+//
+//==========================================================================
+std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pair<int, double> > terms)
+{
+	int i, expectedPower(terms[0].first - 1);
+	while (expectedPower < -1)
+	{
+		expectedPower++;
+		terms.insert(terms.begin(), std::pair<int, double>(expectedPower + 1, 0.0));
+	}
+
+	for (i = 1; i < (int)terms.size(); i++)
+	{
+		if (terms[i].first != expectedPower)
+			terms.insert(terms.begin() + i, std::pair<int, double>(expectedPower, 0.0));
+		expectedPower--;
+	}
+
+	while (expectedPower >= 0)
+	{
+		terms.insert(terms.end(), std::pair<int, double>(expectedPower, 0.0));
+		expectedPower--;
 	}
 
 	return terms;

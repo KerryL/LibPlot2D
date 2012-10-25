@@ -210,77 +210,131 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 {
 	std::string nextLine;
 	wxArrayString parsed;
-	unsigned int i, set, curveCount(choices.size() + 1);
-	double tempDouble, time, timeZero(-1.0);
+	unsigned int curveCount(choices.size() + 1);
+	double timeZero(-1.0);
 
 	while (!file.eof())
 	{
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
-		if (parsed.size() < curveCount && parsed.size() > 0)// FIXME:  Parker files end with "DATA BLOCK END" and will generate this warning every time.  Some option to ignore?
+		if (parsed.size() < curveCount && parsed.size() > 0)// TODO:  Parker files end with "DATA BLOCK END" and will generate this warning every time.  Some option to ignore?
 		{
 			wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
 				_T("Column Count Mismatch"), wxICON_WARNING);
 			return true;
 		}
 
-		set = 0;
 		if (fileFormat.IsAsynchronous())
 		{
-			if (!fileFormat.GetTimeFormat().IsEmpty())
-			{
-				time = GetTimeValue(parsed[0], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
-
-				if (timeZero < 0.0)
-					timeZero = time;
-			}
-			else
-			{
-				parsed[0].ToDouble(&time);
-				timeZero = 0.0;
-			}
-
-			bool gotValue(false);
-			for (i = 1; i < parsed.size(); i++)
-			{
-				if (!parsed[i].ToDouble(&tempDouble))
-				{
-					set++;
-					continue;
-				}
-				gotValue = true;
-
-				if (!descriptions[i].IsEmpty())
-				{
-					rawData[set * 2].push_back((time - timeZero) * factors[0]);
-					rawData[set * 2 + 1].push_back(tempDouble * factors[i]);
-					set++;
-				}
-			}
-
-			if (!gotValue)
+			if (!ExtractAsynchronousData(timeZero, parsed, rawData, factors))
 				return false;
 		}
 		else
 		{
-			for (i = 0; i < parsed.size(); i++)
-			{
-				if (i == 0 && !fileFormat.GetTimeFormat().IsEmpty())
-				{
-					time = GetTimeValue(parsed[i], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
-					if (timeZero < 0.0)
-						timeZero = time;
-					tempDouble = time - timeZero;
-				}
-				else if (!parsed[i].ToDouble(&tempDouble))
-					return false;
+			if (!ExtractSynchronousData(timeZero, parsed, rawData, factors))
+				return false;
+		}
+	}
 
-				if (!descriptions[i].IsEmpty())
-				{
-					rawData[set].push_back(tempDouble * factors[i]);
-					set++;
-				}
-			}
+	return true;
+}
+
+//==========================================================================
+// Class:			CustomFile
+// Function:		ExtractAsynchronousData
+//
+// Description:		Extracts data from asynchronous data line.
+//
+// Input Arguments:
+//		timeZero	= double&
+//		parsedLine	= const wxArrayString&
+//		factors		= std::vector<double>&
+//
+// Output Arguments:
+//		rawData	= std::vector<double>* containing the data
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &parsedLine,
+	std::vector<double> *rawData, std::vector<double> &factors) const
+{
+	double time, value;
+	unsigned int set(0);
+	if (!fileFormat.GetTimeFormat().IsEmpty())
+	{
+		time = GetTimeValue(parsedLine[0], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
+		if (timeZero < 0.0)
+			timeZero = time;
+	}
+	else
+	{
+		parsedLine[0].ToDouble(&time);
+		timeZero = 0.0;
+	}
+
+	bool gotValue(false);
+	unsigned int i;
+	for (i = 1; i < parsedLine.size(); i++)
+	{
+		if (!parsedLine[i].ToDouble(&value))
+		{
+			set++;
+			continue;
+		}
+		gotValue = true;
+
+		if (!descriptions[i].IsEmpty())
+		{
+			rawData[set * 2].push_back((time - timeZero) * factors[0]);
+			rawData[set * 2 + 1].push_back(value * factors[i]);
+			set++;
+		}
+	}
+
+	return gotValue;
+}
+
+//==========================================================================
+// Class:			CustomFile
+// Function:		ExtractSynchronousData
+//
+// Description:		Extracts data from synchronous data line.
+//
+// Input Arguments:
+//		timeZero	= double&
+//		parsedLine	= const wxArrayString&
+//		factors		= std::vector<double>&
+//
+// Output Arguments:
+//		rawData	= std::vector<double>* containing the data
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
+	std::vector<double> *rawData, std::vector<double> &factors) const
+{
+	double time, value;
+	unsigned int i, set(0);
+	for (i = 0; i < parsedLine.size(); i++)
+	{
+		if (i == 0 && !fileFormat.GetTimeFormat().IsEmpty())
+		{
+			time = GetTimeValue(parsedLine[i], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
+			if (timeZero < 0.0)
+				timeZero = time;
+			value = time - timeZero;
+		}
+		else if (!parsedLine[i].ToDouble(&value))
+			return false;
+
+		if (!descriptions[i].IsEmpty())
+		{
+			rawData[set].push_back(value * factors[i]);
+			set++;
 		}
 	}
 

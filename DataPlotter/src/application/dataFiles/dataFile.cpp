@@ -677,6 +677,10 @@ bool DataFile::ListIsNumeric(const wxArrayString &list) const
 // Description:		Converts the time string with the given format into the
 //					specified units.  Converts to seconds first, then applies
 //					a scaling factor.
+//					Will recognize (case insensitive) H as hour, m as minute,
+//					s as second and x as millisecond.
+//					Same formatting is assummed between delimiters (i.e. hm:s
+//					is interpreted as h:s).
 //
 // Input Arguments:
 //		timeString	= const wxString&
@@ -697,8 +701,6 @@ double DataFile::GetTimeValue(const wxString &timeString,
 	if (!MainFrame::UnitStringToFactor(timeUnits, factor))
 		factor = 1.0;
 
-	// Recognize (case insensitive) H as hour, m as minute, s as second and x as millisecond
-	// Assume all the same formatting between delimiters
 	wxChar delimiter(':');
 	unsigned int formatStart(0), formatCount(0), timeStart(0), timeCount(0);
 	double time(0.0), value;
@@ -713,23 +715,10 @@ double DataFile::GetTimeValue(const wxString &timeString,
 			// the same error - don't want to spam them with warnings, though.
 			value = 0.0;
 		}
-
-		if (timeFormat.Mid(formatStart, 1).CmpNoCase(_T("H")) == 0)// Hour
-			value *= 3600.0;
-		else if (timeFormat.Mid(formatStart, 1).CmpNoCase(_T("M")) == 0)// Minute
-			value *= 60.0;
-		else if (timeFormat.Mid(formatStart, 1).CmpNoCase(_T("S")) == 0) {}// Second (Do nothing)
-		else if (timeFormat.Mid(formatStart, 1).CmpNoCase(_T("X")) == 0)// Millisecond
-			value /= 1000.0;
-		else
-		{
-			// FIMXE:  Tell the user we don't understand their format?
-		}
+		value *= GetTimeScalingFactor(timeFormat.Mid(formatStart, 1));
 
 		// TODO:  Handle rollovers (i.e. going from 23:59:59 to 00:00:00)
-
 		time += value;
-
 		if ((int)formatCount == wxNOT_FOUND || (int)timeCount == wxNOT_FOUND)
 			break;
 
@@ -738,4 +727,37 @@ double DataFile::GetTimeValue(const wxString &timeString,
 	}
 
 	return time * factor;
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		GetTimeScalingFactor
+//
+// Description:		Returns the proper scaling factor for the specified
+//					format code.
+//
+// Input Arguments:
+//		format	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double DataFile::GetTimeScalingFactor(const wxString &format) const
+{
+	if (format.CmpNoCase(_T("H")) == 0)// Hour
+		return 3600.0;
+	else if (format.CmpNoCase(_T("M")) == 0)// Minute
+		return 60.0;
+	else if (format.CmpNoCase(_T("S")) == 0)// Second (Do nothing)
+		return 1.0;
+	else if (format.CmpNoCase(_T("X")) == 0)// Millisecond
+		return 0.001;
+
+	// TODO:  Generate a warning to tell the user we didn't understand their format
+
+	return 0.0;
 }

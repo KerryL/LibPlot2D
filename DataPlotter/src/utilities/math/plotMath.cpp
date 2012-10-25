@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <assert.h>
 #include <limits>
+#include <cstdarg>
 
 // Local headers
 #include "utilities/math/plotMath.h"
@@ -331,4 +332,86 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 	}
 
 	return 1.0 - minSpacing / maxSpacing < tolerancePercent;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		GetPrecision
+//
+// Description:		Determines the best number of digits after the decimal place
+//					for a string representation of the specified value (for
+//					use with printf-style %0.*f formatting.
+//
+// Input Arguments:
+//		value				= const double&
+//		significantDigits	= const unsigned int&
+//		dropTrailingZeros	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if the x-data spacing is within the tolerance
+//
+//==========================================================================
+unsigned int PlotMath::GetPrecision(const double &value,
+	const unsigned int &significantDigits, const bool &dropTrailingZeros)
+{
+	int precision(significantDigits - (unsigned int)floor(log10(value)) - 1);
+	if (precision < 0)
+		precision = 0;
+	if (!dropTrailingZeros)
+		return precision;
+
+	const unsigned int sSize(512);
+	char s[sSize];
+	KRLsprintf(s, sSize, "%0.*f", precision, value);
+
+	std::string number(s);
+	unsigned int i;
+	for (i = number.size() - 1; i > 0; i--)
+	{
+		if (s[i] == '0')
+			precision--;
+		else
+			break;
+	}
+
+	if (precision < 0)
+		precision = 0;
+
+	return precision;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		KRLsprintf
+//
+// Description:		Cross-platform friendly sprintf(_s) macro.  Calls sprintf_s
+//					under MSW, sprintf otherwise.
+//
+// Input Arguments:
+//		dest	= char*
+//		size	= const unsigned int&
+//		format	= const char*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotMath::KRLsprintf(char *dest, const unsigned int &size, const char *format, ...)
+{
+	va_list list;
+	va_start(list, format);
+
+#ifdef __WXMSW__
+	vsprintf_s(dest, size, format, list);
+#else
+	vsprintf(dest, format, list);
+#endif
+
+	va_end(list);
 }

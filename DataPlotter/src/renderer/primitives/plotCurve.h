@@ -85,6 +85,8 @@ private:
 
 	bool PointsJumpPlotArea(const unsigned int &first, const unsigned int &second) const;
 
+	bool PointIsValid(const unsigned int &i) const;
+
 	double GetInterpolatedXOrdinate(const unsigned int &first, const unsigned int &second, const double &yValue) const;
 	double GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const;
 

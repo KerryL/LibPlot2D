@@ -46,6 +46,24 @@ ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> *_list) : list
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		Constant Declarations
+//
+// Description:		Constant declarations for ExpressionTree class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const unsigned int ExpressionTree::printfPrecision = 15;
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		Solve
 //
 // Description:		Main solving method for the tree.
@@ -132,10 +150,7 @@ std::string ExpressionTree::Solve(std::string expression, std::string &solvedExp
 //==========================================================================
 Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 {
-	if (!list)
-	{
-		// FIXME:  Warn the user
-	}
+	assert(list);
 
 	// If user is requesting time, we need to assign the x values to the y values
 	if (i == 0)
@@ -416,10 +431,9 @@ std::string ExpressionTree::EvaluateExpression(std::string &results)
 	}
 
 	if (useDoubleStack.top())
-	{
-		unsigned int precision(10);// FIXME:  Automate
-		results = wxString::Format("%0.*f", precision, doubleStack.top()).c_str();
-	}
+		results = wxString::Format("%0.*f",
+			PlotMath::GetPrecision(doubleStack.top(), printfPrecision),
+			doubleStack.top()).c_str();
 	else
 		results = stringStack.top();
 
@@ -1442,7 +1456,7 @@ bool ExpressionTree::EvaluateDataset(const wxString &dataset, std::stack<Dataset
 	}
 	else if (set > (unsigned int)(*list).GetCount())
 	{
-		errorString = wxString::Format("Set ID %lu is not a valid set ID", set);
+		errorString = wxString::Format("Set ID %lu is not a valid set ID.", set);
 		return false;
 	}
 
@@ -1614,8 +1628,8 @@ bool ExpressionTree::BeginningMatchesNoCase(const wxString &s, const wxString &t
 //==========================================================================
 wxString ExpressionTree::StringAdd(const wxString &first, const double &second) const
 {
-	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%0.*f+%s", precision, second, first.c_str());
+	return wxString::Format("%0.*f+%s",
+		PlotMath::GetPrecision(second, printfPrecision), second, first.c_str());
 }
 
 //==========================================================================
@@ -1637,8 +1651,8 @@ wxString ExpressionTree::StringAdd(const wxString &first, const double &second) 
 //==========================================================================
 wxString ExpressionTree::StringAdd(const double &first, const wxString &second) const
 {
-	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%s+%0.*f", second.c_str(), precision, first);
+	return wxString::Format("%s+%0.*f", second.c_str(),
+		PlotMath::GetPrecision(first, printfPrecision), first);
 }
 
 //==========================================================================
@@ -1660,8 +1674,8 @@ wxString ExpressionTree::StringAdd(const double &first, const wxString &second) 
 //==========================================================================
 wxString ExpressionTree::StringSubtract(const wxString &first, const double &second) const
 {
-	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%0.*f-%s", precision, second, first.c_str());
+	return wxString::Format("%0.*f-%s",
+		PlotMath::GetPrecision(second, printfPrecision), second, first.c_str());
 }
 
 //==========================================================================
@@ -1683,8 +1697,8 @@ wxString ExpressionTree::StringSubtract(const wxString &first, const double &sec
 //==========================================================================
 wxString ExpressionTree::StringSubtract(const double &first, const wxString &second) const
 {
-	unsigned int precision(10);// FIXME:  Automate
-	return wxString::Format("%s-%0.*f", second.c_str(), precision, first);
+	return wxString::Format("%s-%0.*f", second.c_str(),
+		PlotMath::GetPrecision(first, printfPrecision), first);
 }
 
 //==========================================================================
@@ -1976,7 +1990,6 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 void ExpressionTree::AddToExpressionString(wxString &expression,
 	const double &coefficient, const int &power) const
 {
-	unsigned int precision(10);// FIXME:  Automate
 	if (coefficient == 1.0 && power != 0)
 	{
 		if (!expression.IsEmpty())
@@ -1989,19 +2002,22 @@ void ExpressionTree::AddToExpressionString(wxString &expression,
 	else if (expression.IsEmpty())
 	{
 		if (power == 0)
-			expression.Printf("%0.*f", precision, coefficient);
+			expression.Printf("%0.*f", PlotMath::GetPrecision(coefficient, printfPrecision), coefficient);
 		else if (power == 1)
-			expression.Printf("%0.*f*s", precision, coefficient);
+			expression.Printf("%0.*f*s", PlotMath::GetPrecision(coefficient, printfPrecision), coefficient);
 		else
-			expression.Printf("%0.*f*s^%i", precision, coefficient, power);
+			expression.Printf("%0.*f*s^%i", PlotMath::GetPrecision(coefficient, printfPrecision), coefficient, power);
 	}
 	else
 	{
 		if (power == 0)
-			expression.Append(wxString::Format("%+0.*f", precision, coefficient));
+			expression.Append(wxString::Format("%+0.*f",
+				PlotMath::GetPrecision(coefficient, printfPrecision), coefficient));
 		else if (power == 1)
-			expression.Append(wxString::Format("%+0.*f*s", precision, coefficient));
+			expression.Append(wxString::Format("%+0.*f*s",
+				PlotMath::GetPrecision(coefficient, printfPrecision), coefficient));
 		else
-			expression.Append(wxString::Format("%+0.*f*s^%i", precision, coefficient, power));
+			expression.Append(wxString::Format("%+0.*f*s^%i",
+				PlotMath::GetPrecision(coefficient, printfPrecision), coefficient, power));
 	}
 }

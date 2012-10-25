@@ -42,6 +42,7 @@ public:
 	static std::vector<std::pair<int, double> > FindPowersAndCoefficients(const wxArrayString &terms);
 
 private:
+	static const unsigned int printfPrecision;
 	const ManagedList<const Dataset2D> *list;
 
 	double xAxisFactor;

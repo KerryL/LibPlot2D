@@ -58,6 +58,9 @@
 #include "../../res/icons/plots128.xpm"
 #endif
 
+// Testing prototypes
+//void TestSignalOperations(void);
+
 //==========================================================================
 // Class:			MainFrame
 // Function:		MainFrame
@@ -85,6 +88,8 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 		wxMessageBox(_T("Warning:  Custom file definitions not found!"), _T("Custom File Formats"), wxICON_WARNING, this);
 
 	currentFileFormat = FormatGeneric;
+
+	//TestSignalOperations();
 }
 
 //==========================================================================
@@ -2928,7 +2933,7 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName) const
 }
 
 //==========================================================================
-// Class:			MainFrame
+// Class:			None
 // Function:		TestSignalOperations
 //
 // Description:		Performs tests on signal operation classes.
@@ -2943,7 +2948,7 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName) const
 //		None
 //
 //==========================================================================
-/*void MainFrame::TestSignalOperations(void)
+/*void TestSignalOperations(void)
 {
 	// Create test data:
 	Dataset2D set1(500);
@@ -2952,8 +2957,8 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName) const
 	for (i = 0; i < set1.GetNumberOfPoints(); i++)
 		set1.GetXPointer()[i] = i * dt;
 
-	double f1 = 5.0 * PlotMath::PI * 2.0;
-	double f2 = 2.0 * PlotMath::PI * 2.0;
+	double f1 = 5.0 * M_PI * 2.0;
+	double f2 = 2.0 * M_PI * 2.0;
 
 	Dataset2D set2(set1);
 	Dataset2D set3(set1);
@@ -2970,50 +2975,70 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName) const
 		set5.GetYPointer()[i] = 3.0 + 0.45 * t;
 	}
 
-	// Derivative	= OK
-	// RMS			= OK
-	// Integral		= OK
-	// FFT			= OK
-
-	// Save data to file
+	// Save original data to file
 	set1.ExportDataToFile(_T("set1.txt"));
 	set2.ExportDataToFile(_T("set2.txt"));
 	set3.ExportDataToFile(_T("set3.txt"));
 	set4.ExportDataToFile(_T("set4.txt"));
 	set5.ExportDataToFile(_T("set5.txt"));
 
-	// Test integrals and derivatives on sets 1 and 2 and 5
+	// Integral
 	Dataset2D intTest1 = DiscreteIntegral::ComputeTimeHistory(set1);
 	Dataset2D intTest2 = DiscreteIntegral::ComputeTimeHistory(set2);
-	Dataset2D derTest1 = DiscreteDerivative::ComputeTimeHistory(set1);
-	Dataset2D derTest2 = DiscreteDerivative::ComputeTimeHistory(set2);
 	Dataset2D intTest5 = DiscreteIntegral::ComputeTimeHistory(set5);
-
-	// Save results to file
 	intTest1.ExportDataToFile(_T("integral set 1.txt"));
 	intTest2.ExportDataToFile(_T("integral set 2.txt"));
-	derTest1.ExportDataToFile(_T("derivative set 1.txt"));
-	derTest2.ExportDataToFile(_T("derivative set 2.txt"));
 	intTest5.ExportDataToFile(_T("integral set 5.txt"));
+
+	// Derivative
+	DiscreteDerivative::ComputeTimeHistory(set1).ExportDataToFile(_T("derivative set 1.txt"));
+	DiscreteDerivative::ComputeTimeHistory(set2).ExportDataToFile(_T("derivative set 2.txt"));
 	DiscreteDerivative::ComputeTimeHistory(intTest1).ExportDataToFile(_T("dofint1.txt"));
 
-	// Test RMS and FFT on all four sets
+	// Root Mean Square
 	Dataset2D rms1 = RootMeanSquare::ComputeTimeHistory(set1);
 	Dataset2D rms2 = RootMeanSquare::ComputeTimeHistory(set2);
 	Dataset2D rms3 = RootMeanSquare::ComputeTimeHistory(set3);
 	Dataset2D rms4 = RootMeanSquare::ComputeTimeHistory(set4);
-	Dataset2D fft1 = FastFourierTransform::Compute(set1);
-	Dataset2D fft2 = FastFourierTransform::Compute(set2);
-	Dataset2D fft3 = FastFourierTransform::Compute(set3);
-	Dataset2D fft4 = FastFourierTransform::Compute(set4);
-
-	// Save results to file
 	rms1.ExportDataToFile(_T("rms1.txt"));
 	rms2.ExportDataToFile(_T("rms2.txt"));
 	rms3.ExportDataToFile(_T("rms3.txt"));
 	rms4.ExportDataToFile(_T("rms4.txt"));
+	
+	// Fast Fourier Transform
+	Dataset2D fft1 = FastFourierTransform::ComputeFFT(set1);
+	Dataset2D fft2 = FastFourierTransform::ComputeFFT(set2);
+	Dataset2D fft3 = FastFourierTransform::ComputeFFT(set3);
+	Dataset2D fft4 = FastFourierTransform::ComputeFFT(set4);
 	fft1.ExportDataToFile(_T("fft1.txt"));
 	fft2.ExportDataToFile(_T("fft2.txt"));
 	fft3.ExportDataToFile(_T("fft3.txt"));
 	fft4.ExportDataToFile(_T("fft4.txt"));
-}*/
+
+	// Filters
+	std::vector<double> num, den;
+	double wc(5.0), z(1.0);
+	num.push_back(wc * wc);
+	den.push_back(1.0);
+	den.push_back(2.0 * z * wc);
+	den.push_back(wc * wc);
+	Filter f(100.0, num, den);
+	// Coefficients should be:
+	// a[0] = 0.00059488399762046393
+	// a[1] = 0.0011897679952409279
+	// a[2] = 0.00059488399762046393
+	// b[0] = -1.9024390243902431
+	// b[1] = 0.90481856038072561
+
+	num.clear();
+	num.push_back(1.0);
+	num.push_back(0.0);
+	num.push_back(0.0);
+	Filter g(100.0, num, den);
+	// Coefficients should be:
+	// a[0] = 0.95181439619274233
+	// a[1] = -1.9036287923854847
+	// a[2] = 0.95181439619274233
+	// b[0] = -1.9024390243902431
+	// b[1] = 0.90481856038072561
+}//*/

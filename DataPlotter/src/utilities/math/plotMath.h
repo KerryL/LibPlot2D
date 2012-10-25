@@ -27,7 +27,6 @@ class Dataset2D;
 
 namespace PlotMath
 {
-
 	// Constant declarations
 	const double NEARLY_ZERO = 1.0e-12;
 	//const double QNAN = std::numeric_limits<double>::quiet_NaN();// Not currently used
@@ -65,6 +64,11 @@ namespace PlotMath
 
 	Dataset2D ApplyBitMask(const Dataset2D &data, const unsigned int &bit);
 	unsigned int ApplyBitMask(const unsigned &value, const unsigned int &bit);
+
+	unsigned int GetPrecision(const double &value,
+		const unsigned int &significantDigits = 2, const bool &dropTrailingZeros = true);
+
+	void KRLsprintf(char *dest, const unsigned int &size, const char *format, ...);
 }
 
 // Template methods must be defined here:

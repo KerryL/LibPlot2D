@@ -16,10 +16,16 @@
 #ifndef _FILTER_DIALOG_H_
 #define _FILTER_DIALOG_H_
 
+// Standard C++ headers
+#include <vector>
+
 // wxWidgets headers
 #include <wx/wx.h>
 
-// wxWidgets forward
+// Local headers
+#include "utilities/math/complex.h"
+
+// wxWidgets forward declarations
 class wxSpinCtrl;
 class wxSpinEvent;
 
@@ -31,7 +37,6 @@ struct FilterParameters
 		TypeHighPass,
 		TypeBandPass,
 		TypeBandStop,
-		TypeNotch,
 		TypeCustom
 	} type;
 
@@ -62,7 +67,6 @@ private:
 	wxTextCtrl *cutoffFrequencyBox;
 	wxTextCtrl *dampingRatioBox;
 	wxTextCtrl *widthBox;
-	wxTextCtrl *depthBox;
 
 	wxCheckBox *phaselessCheckBox;
 	wxCheckBox *butterworthCheckBox;
@@ -73,7 +77,6 @@ private:
 	wxRadioButton *highPassRadio;
 	wxRadioButton *bandStopRadio;
 	wxRadioButton *bandPassRadio;
-	wxRadioButton *notchRadio;
 	wxRadioButton *customRadio;
 
 	wxTextCtrl *numeratorBox;
@@ -90,13 +93,11 @@ private:
 	void OnSpinUp(wxSpinEvent &event);
 	void OnSpinDown(wxSpinEvent &event);
 	void OnRadioChange(wxCommandEvent &event);
-//	void OnPhaselessChange(wxCommandEvent &event);
 	void OnButterworthChange(wxCommandEvent &event);
 	void OnTransferFunctionChange(wxCommandEvent &event);
 	void OnInputTextChange(wxCommandEvent &event);
 
 	void HandleSpin(void);
-	//bool OrderIsValid(const unsigned int &order) const;
 	void UpdateTransferFunction(void);
 	void UpdateEnabledControls(void);
 
@@ -104,19 +105,22 @@ private:
 
 	void GetLowPassTF(wxString &numerator, wxString &denominator) const;
 	void GetHighPassTF(wxString &numerator, wxString &denominator) const;
+	void GetLowPassTF(wxString &numerator, wxString &denominator,
+		const double &cutoff, const unsigned int &order) const;
+	void GetHighPassTF(wxString &numerator, wxString &denominator,
+		const double &cutoff, const unsigned int &order) const;
 	void GetBandStopTF(wxString &numerator, wxString &denominator) const;
 	void GetBandPassTF(wxString &numerator, wxString &denominator) const;
-	void GetNotchTF(wxString &numerator, wxString &denominator) const;
 
 	wxString GenerateButterworthDenominator(const unsigned int &order,
 		const double &cutoff) const;
 	wxString GenerateStandardDenominator(const unsigned int &order,
 		const double &cutoff, const double &dampingRatio) const;
+	wxString GenerateExpressionFromComplexRoots(const std::vector<Complex> &roots) const;
 
 	enum EventIDs
 	{
 		RadioID = wxID_HIGHEST + 200,
-//		PhaselessID,
 		ButterworthID,
 		SpinID,
 		TransferFunctionID,
@@ -133,8 +137,10 @@ private:
 	bool CutoffFrequencyIsValid(void);
 	bool DampingRatioIsValid(void);
 	bool WidthIsValid(void);
-	bool DepthIsValid(void);
 	bool ExpressionIsValid(const wxString& expression);
+
+	bool IsWideBand(const double &cutoff, const double &width) const;
+	bool IsWideBand(void) const;
 
 	static wxString GetOrderString(const unsigned int &order);
 	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);
@@ -145,10 +151,7 @@ private:
 	static wxString GetLowPassName(const FilterParameters &parameters);
 	static wxString GetBandStopName(const FilterParameters &parameters);
 	static wxString GetBandPassName(const FilterParameters &parameters);
-	static wxString GetNotchName(const FilterParameters &parameters);
 	static wxString GetCustomName(const FilterParameters &parameters);
-
-	static unsigned int GetPrecision(const double &value);
 
 	bool initialized;
 

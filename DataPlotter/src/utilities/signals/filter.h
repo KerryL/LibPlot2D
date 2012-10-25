@@ -50,7 +50,7 @@ public:
 
 	static std::vector<double> CoefficientsFromString(const std::string &s);
 
-protected:
+private:
 	// Filter coefficients
 	double *a;
 	double *b;
@@ -69,6 +69,7 @@ protected:
 	void GenerateCoefficients(const std::vector<double> &numerator, const std::vector<double> &denominator);
 	std::string AssembleZExpression(const std::vector<double>& coefficients, const unsigned int &highestPower) const;
 	static std::vector<std::pair<int, double> > CollectLikeTerms(std::vector<std::pair<int, double> > terms);
+	static std::vector<std::pair<int, double> > PadMissingTerms(std::vector<std::pair<int, double> > terms);
 };
 
 #endif// _FILTER_H_
