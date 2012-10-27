@@ -226,12 +226,12 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 
 		if (fileFormat.IsAsynchronous())
 		{
-			if (!ExtractAsynchronousData(timeZero, parsed, rawData, factors))
+			if (!ExtractAsynchronousData(timeZero, parsed, rawData, factors, choices))
 				return false;
 		}
 		else
 		{
-			if (!ExtractSynchronousData(timeZero, parsed, rawData, factors))
+			if (!ExtractSynchronousData(timeZero, parsed, rawData, factors, choices))
 				return false;
 		}
 	}
@@ -249,6 +249,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 //		timeZero	= double&
 //		parsedLine	= const wxArrayString&
 //		factors		= std::vector<double>&
+//		choices		= const wxArrayInt&
 //
 // Output Arguments:
 //		rawData	= std::vector<double>* containing the data
@@ -258,7 +259,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 //
 //==========================================================================
 bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &parsedLine,
-	std::vector<double> *rawData, std::vector<double> &factors) const
+	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const
 {
 	double time, value;
 	unsigned int set(0);
@@ -274,26 +275,23 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &
 		timeZero = 0.0;
 	}
 
-	bool gotValue(false);
 	unsigned int i;
 	for (i = 1; i < parsedLine.size(); i++)
 	{
+		if (!ArrayContainsValue(i - 1, choices))
+			continue;
+
 		if (!parsedLine[i].ToDouble(&value))
 		{
 			set++;
 			continue;
 		}
-		gotValue = true;
-
-		if (!descriptions[i].IsEmpty())
-		{
-			rawData[set * 2].push_back((time - timeZero) * factors[0]);
-			rawData[set * 2 + 1].push_back(value * factors[i]);
-			set++;
-		}
+		rawData[set * 2].push_back((time - timeZero) * factors[0]);
+		rawData[set * 2 + 1].push_back(value * factors[i]);
+		set++;
 	}
 
-	return gotValue;
+	return true;
 }
 
 //==========================================================================
@@ -306,6 +304,7 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &
 //		timeZero	= double&
 //		parsedLine	= const wxArrayString&
 //		factors		= std::vector<double>&
+//		choices		= const wxArrayInt&
 //
 // Output Arguments:
 //		rawData	= std::vector<double>* containing the data
@@ -315,7 +314,7 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &
 //
 //==========================================================================
 bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
-	std::vector<double> *rawData, std::vector<double> &factors) const
+	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const
 {
 	double time, value;
 	unsigned int i, set(0);
@@ -331,7 +330,7 @@ bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &p
 		else if (!parsedLine[i].ToDouble(&value))
 			return false;
 
-		if (!descriptions[i].IsEmpty())
+		if (i == 0 || ArrayContainsValue(i - 1, choices))
 		{
 			rawData[set].push_back(value * factors[i]);
 			set++;

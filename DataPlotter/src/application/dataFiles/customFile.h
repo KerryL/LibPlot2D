@@ -42,9 +42,9 @@ protected:
 	bool ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors) const;
 	bool ExtractAsynchronousData(double &timeZero, const wxArrayString &parsedLine,
-		std::vector<double> *rawData, std::vector<double> &factors) const;
+		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const;
 	bool ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
-		std::vector<double> *rawData, std::vector<double> &factors) const;
+		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const;
 	void AssembleAsynchronousDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
 };
 

@@ -35,11 +35,20 @@ public:
 
 	bool IsCustomFormat(void) const { return !formatName.IsEmpty(); };
 	bool IsAsynchronous(void) const { return asynchronous; };
-	bool IsXML(void) const { return isXML; };
 
 	wxString GetDelimiter(void) const { return delimiter; };
 	wxString GetTimeUnits(void) const { return timeUnits; };
 	wxString GetTimeFormat(void) const { return timeFormat; };
+
+	bool IsXML(void) const { return isXML; };
+
+	wxString GetXMLXDataNode(void) const { return xDataNode; };
+	wxString GetXMLXDataKey(void) const { return xDataKey; };
+	wxString GetXMLYDataNode(void) const { return yDataNode; };
+	wxString GetXMLYDataKey(void) const { return yDataKey; };
+	wxString GetXMLChannelParentNode(void) const { return channelParentNode; };
+	wxString GetXMLChannelNode(void) const { return channelNode; };
+	wxString GetXMLCodeKey(void) const { return codeKey; };
 
 	void ProcessChannels(wxArrayString &names, std::vector<double> &scales) const;
 
@@ -60,12 +69,21 @@ private:
 	bool asynchronous;
 	bool isXML;
 
+	wxString xDataNode;
+	wxString xDataKey;
+	wxString yDataNode;
+	wxString yDataKey;
+	wxString channelParentNode;
+	wxString channelNode;
+	wxString codeKey;
+
 	struct Identifier
 	{
 		enum Location
 		{
 			BOF,	// beginning of file
-			BOL		// beginning of any pre-data line
+			BOL,	// beginning of any pre-data line
+			ROOT	// XML types only (match root node)
 		} location;
 
 		long bolNumber;
@@ -98,6 +116,7 @@ private:
 	bool ReadFormatTag(wxXmlNode &formatNode);
 	bool ReadIdentifierTag(wxXmlNode &idNode, Identifier &id);
 	bool ReadChannelTag(wxXmlNode &channelNode);
+	bool ReadAdditionalXMLProperties(wxXmlNode &formatNode);
 
 	void ClearData(void);
 

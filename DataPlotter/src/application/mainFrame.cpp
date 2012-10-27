@@ -1014,7 +1014,7 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 	optionsGrid->SetCellEditor(index, colMarkerSize, new wxGridCellNumberEditor(-1, maxMarkerSize));
 
 	unsigned int i;
-	for (i = 0; i < colDifference; i++)
+	for (i = 1; i < colDifference; i++)
 			optionsGrid->SetReadOnly(index, i, true);
 	optionsGrid->SetReadOnly(index, colLineSize, false);
 	optionsGrid->SetReadOnly(index, colMarkerSize, false);

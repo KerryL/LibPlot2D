@@ -190,11 +190,10 @@ wxArrayString DataFile::CreateDelimiterList(void) const
 
 //==========================================================================
 // Class:			DataFile
-// Function:		GetDescriptions
+// Function:		GetCurveInformation
 //
-// Description:		Parses the file and assembles descriptions for each column
-//					based on the contents of the header rows.  Also reports
-//					the number of header rows back to the calling function.
+// Description:		Parses the file and assembles information for each column
+//					based on the contents of the header rows.
 //
 // Input Arguments:
 //		None
@@ -414,6 +413,7 @@ bool DataFile::ProcessFile(void)
 		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR);
 		return false;
 	}
+	descriptions = RemoveUnwantedDescriptions(descriptions, choices);
 
 	std::ifstream file(fileName.c_str(), std::ios::in);
 	if (!file.is_open())
@@ -436,6 +436,41 @@ bool DataFile::ProcessFile(void)
 	delete [] rawData;
 
 	return true;
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		RemoveUnwantedDescriptions
+//
+// Description:		Returns the size to use when allocating the raw data array.
+//
+// Input Arguments:
+//		selectedCount	= const unsigned int& indicating number of curves the
+//						  user selected to display
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+wxArrayString DataFile::RemoveUnwantedDescriptions(const wxArrayString &names,
+	const wxArrayInt &choices) const
+{
+	if (names.Count() == 0)
+		return names;
+
+	wxArrayString selectedNames;
+	selectedNames.Add(names[0]);
+	unsigned int i;
+	for (i = 1; i < names.size(); i++)
+	{
+		if (ArrayContainsValue(i - 1, choices))
+			selectedNames.Add(names[i]);
+	}
+
+	return selectedNames;
 }
 
 //==========================================================================
@@ -486,12 +521,11 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	wxArrayString parsed;
 	unsigned int i, set, curveCount(choices.size() + 1);
 	double tempDouble;
-
+	std::vector<double> newFactors(choices.size() + 1, 1.0);
 	while (!file.eof())
 	{
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
-
 		if (parsed.size() < curveCount)
 		{
 			wxString line(nextLine);
@@ -509,11 +543,12 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
 			{
 				rawData[set].push_back(tempDouble);
-				factors[set] = factors[i];// Update scales for cases where user didn't select a column
+				newFactors[set] = factors[i];// Update scales for cases where user didn't select a column
 				set++;
 			}
 		}
 	}
+	factors = newFactors;
 
 	return true;
 }

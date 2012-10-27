@@ -20,6 +20,9 @@
 #include "application/dataFiles/dataFile.h"
 #include "application/dataFiles/customFileFormat.h"
 
+// wxWidgets headers
+#include <wx/xml/xml.h>
+
 class CustomXMLFile : public DataFile
 {
 public:
@@ -30,7 +33,16 @@ public:
 
 protected:
 	CustomFileFormat fileFormat;
-	//virtual wxArrayString GetDescriptions(unsigned int &headerLineCount) const;
+
+	virtual wxArrayString CreateDelimiterList(void) const;
+	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
+		std::vector<double> *rawData, std::vector<double> &factors) const;
+	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const;
+
+	wxArrayString SeparateNodes(const wxString &nodePath) const;
+	wxXmlNode* FollowNodePath(const wxXmlDocument &document, const wxString &path) const;
+
+	bool DataStringToVector(const wxString &data, std::vector<double> &dataVector, const double &factor) const;
 };
 
 #endif//_CUSTOM_XML_FILE_H_
