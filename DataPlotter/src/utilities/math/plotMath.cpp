@@ -17,7 +17,8 @@
 
 // Standard C++ headers
 #include <cstdlib>
-#include <assert.h>
+#include <cstdio>
+#include <cassert>
 #include <limits>
 #include <cstdarg>
 

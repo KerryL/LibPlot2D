@@ -1862,7 +1862,7 @@ wxString ExpressionTree::StringPower(const double &first, const wxString &second
 wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 {
 	wxArrayString terms;
-	unsigned int start(0), end(0), plusEnd, minusEnd;
+	unsigned int start(0), end(0), plusEnd, minusEnd;// FIXME:  Linux doesn't handle this correctly
 	while (end != (unsigned int)wxNOT_FOUND)
 	{
 		plusEnd = s.Mid(start).Find('+');

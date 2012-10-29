@@ -3004,7 +3004,7 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName) const
 	rms2.ExportDataToFile(_T("rms2.txt"));
 	rms3.ExportDataToFile(_T("rms3.txt"));
 	rms4.ExportDataToFile(_T("rms4.txt"));
-	
+
 	// Fast Fourier Transform
 	Dataset2D fft1 = FastFourierTransform::ComputeFFT(set1);
 	Dataset2D fft2 = FastFourierTransform::ComputeFFT(set2);

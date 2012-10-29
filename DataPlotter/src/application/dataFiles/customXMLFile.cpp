@@ -151,7 +151,7 @@ bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt 
 		}
 
 		node = node->GetNext();
-	}
+	}// FIXME: Check to make sure each set has the same number of points as x-data?
 
 	return true;
 }
@@ -270,7 +270,7 @@ wxXmlNode* CustomXMLFile::FollowNodePath(const wxXmlDocument &document, const wx
 wxArrayString CustomXMLFile::SeparateNodes(const wxString &nodePath) const
 {
 	wxArrayString nodes;
-	unsigned int start(0), end(0);
+	int start(0), end(0);
 
 	while (end != wxNOT_FOUND)
 	{
