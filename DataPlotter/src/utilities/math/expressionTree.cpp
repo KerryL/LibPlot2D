@@ -1946,10 +1946,10 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 						end++;
 				}
 
-				if (terms[i].Mid(start, 1).Cmp(_T("s")) == 0 || terms[i].Mid(start, 1).Cmp(_T("z")) == 0)
+				if (terms[i][start] == 's' || terms[i][start] == 'z')
 				{
 					power = terms[i].Mid(start).Find('^');
-					if (power == (unsigned int)wxNOT_FOUND)
+					if (power == wxNOT_FOUND)
 						count++;
 					else
 					{
