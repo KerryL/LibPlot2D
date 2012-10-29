@@ -129,13 +129,13 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 	if (!ProcessFormatChildren(formatNode.GetChildren(), id))
 		return false;
 
+	isXML = formatNode.GetPropVal(_T("XML"), "FALSE").CmpNoCase("TRUE") == 0;
 	if (IsFormat(pathAndFileName, id))
 	{
 		delimiter = formatNode.GetPropVal(_T("DELIMITER"), wxEmptyString);
 		timeUnits = formatNode.GetPropVal(_T("TIME_UNITS"), wxEmptyString);
 		timeFormat = formatNode.GetPropVal(_T("TIME_FORMAT"), wxEmptyString);
 		asynchronous = formatNode.GetPropVal(_T("ASYNC"), "FALSE").CmpNoCase("TRUE") == 0;
-		isXML = formatNode.GetPropVal(_T("XML"), "FALSE").CmpNoCase("TRUE") == 0;
 		if (isXML && ReadAdditionalXMLProperties(formatNode))
 			return true;
 		return true;
@@ -393,7 +393,7 @@ void CustomFileFormat::ClearData(void)
 	formatName.Empty();
 	delimiter.Empty();
 	timeUnits.Empty();
-	
+
 	xDataNode.Empty();
 	xDataKey.Empty();
 }

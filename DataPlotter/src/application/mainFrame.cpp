@@ -454,7 +454,7 @@ void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 {
 	wxArrayString pathAndFileName = GetFileNameFromUser(_T("Save Image File"), wxEmptyString, wxEmptyString,
-		_T("Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|PNG Image (*.png)|*.png|TIFF Image (*.tif)|*.tif"),
+		_T("PNG Image (*.png)|*.png|Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|TIFF Image (*.tif)|*.tif"),
 		wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	if (pathAndFileName.IsEmpty())
