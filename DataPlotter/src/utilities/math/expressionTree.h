@@ -50,6 +50,8 @@ private:
 	std::queue<wxString> outputQueue;
 
 	wxString ParseExpression(const wxString &expression);
+	wxString ParseNext(const wxString &expression, bool &lastWasOperator,
+		unsigned int &advance, std::stack<wxString> &operatorStack);
 	wxString EvaluateExpression(Dataset2D &results);
 	std::string EvaluateExpression(std::string &results);
 
@@ -63,6 +65,9 @@ private:
 	static bool NextIsFunction(const wxString &s, unsigned int *stop = NULL);
 	static bool NextIsOperator(const wxString &s, unsigned int *stop = NULL);
 	static bool NextIsS(const wxString &s, unsigned int *stop = NULL);
+
+	static unsigned int FindEndOfNextTerm(const wxString &s, const unsigned int &start);
+	static int GetTermPower(const wxString &s, unsigned int &start, unsigned int &end);
 
 	bool IsLeftAssociative(const wxChar &c) const;
 	bool OperatorShift(const wxString &stackString, const wxString &newString) const;

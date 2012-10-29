@@ -229,51 +229,78 @@ wxString ExpressionTree::ParseExpression(const wxString &expression)
 {
 	std::stack<wxString> operatorStack;
 	unsigned int i, advance;
-	bool lastWasOperator(true), thisWasOperator;
+	bool lastWasOperator(true);
+	wxString errorString;
+
 	for (i = 0; i < expression.Len(); i++)
 	{
 		if (expression.Mid(i, 1).Trim().IsEmpty())
 			continue;
 
-		thisWasOperator = false;
-
-		if (NextIsNumber(expression.Mid(i), &advance, lastWasOperator))
-			outputQueue.push(expression.Mid(i, advance));
-		else if (NextIsDataset(expression.Mid(i), &advance))
-			outputQueue.push(expression.Mid(i, advance));
-		else if (NextIsS(expression.Mid(i), &advance))
-			outputQueue.push(expression.Mid(i, advance));
-		else if (NextIsFunction(expression.Mid(i), &advance))
-		{
-			operatorStack.push(expression.Mid(i, advance));
-			thisWasOperator = true;
-		}
-		else if (NextIsOperator(expression.Mid(i), &advance))
-		{
-			ProcessOperator(operatorStack, expression.Mid(i, advance));
-			thisWasOperator = true;
-		}
-		else if (expression[i] == '(')
-		{
-			operatorStack.push(expression.Mid(i, 1));
-			advance = 1;
-			thisWasOperator = true;
-		}
-		else if (expression[i] == ')')
-		{
-			ProcessCloseParenthese(operatorStack);
-			advance = 1;
-		}
-		else
-			return _T("Unrecognized character:  '") + expression.Mid(i, 1) + _T("'.");
-
-		lastWasOperator = thisWasOperator;
-
+		errorString = ParseNext(expression.Mid(i), lastWasOperator, advance, operatorStack);
+		if (!errorString.IsEmpty())
+			return errorString;
 		i += advance - 1;
 	}
 
 	if (!EmptyStackToQueue(operatorStack))
-		return _T("Imbalanced parentheses!");
+		errorString = _T("Imbalanced parentheses!");
+
+	return errorString;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ParseNext
+//
+// Description:		Parses the expression and processes the next item.
+//
+// Input Arguments:
+//		expression	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing any errors
+//
+//==========================================================================
+wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOperator,
+	unsigned int &advance, std::stack<wxString> &operatorStack)
+{
+	bool thisWasOperator(false);
+
+	if (NextIsNumber(expression, &advance, lastWasOperator))
+		outputQueue.push(expression.Mid(0, advance));
+	else if (NextIsDataset(expression, &advance))
+		outputQueue.push(expression.Mid(0, advance));
+	else if (NextIsS(expression, &advance))
+		outputQueue.push(expression.Mid(0, advance));
+	else if (NextIsFunction(expression, &advance))
+	{
+		operatorStack.push(expression.Mid(0, advance));
+		thisWasOperator = true;
+	}
+	else if (NextIsOperator(expression, &advance))
+	{
+		ProcessOperator(operatorStack, expression.Mid(0, advance));
+		thisWasOperator = true;
+	}
+	else if (expression[0] == '(')
+	{
+		operatorStack.push(expression[0]);
+		advance = 1;
+		thisWasOperator = true;
+	}
+	else if (expression[0] == ')')
+	{
+		ProcessCloseParenthese(operatorStack);
+		advance = 1;
+	}
+	else
+		return _T("Unrecognized character:  '") + expression.Mid(0, 1) + _T("'.");
+
+	lastWasOperator = thisWasOperator;
 	return wxEmptyString;
 }
 
@@ -1862,28 +1889,10 @@ wxString ExpressionTree::StringPower(const double &first, const wxString &second
 wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 {
 	wxArrayString terms;
-	unsigned int start(0), end(0), plusEnd, minusEnd;// FIXME:  Linux doesn't handle this correctly
+	unsigned int start(0), end(0);
 	while (end != (unsigned int)wxNOT_FOUND)
 	{
-		plusEnd = s.Mid(start).Find('+');
-		minusEnd = s.Mid(start).Find('-');
-
-		if (minusEnd < plusEnd && start + minusEnd > 0 && NextIsOperator(s[start + minusEnd - 1]))
-		{
-			unsigned int nextMinus = s.Mid(start + minusEnd + 1).Find('-');
-			if (nextMinus != (unsigned int)wxNOT_FOUND)
-				minusEnd += nextMinus + 1;
-			else
-				minusEnd = nextMinus;
-		}
-		end = std::min(plusEnd, minusEnd);
-
-		if (end != (unsigned int)wxNOT_FOUND && NextIsOperator(s.Mid(start + end - 1)))
-		{
-			plusEnd = s.Mid(start + end).Find('+');
-			minusEnd = s.Mid(start + end).Find('-');
-			end += std::min(plusEnd, minusEnd);
-		}
+		end = FindEndOfNextTerm(s, start);
 
 		if (start > 0 && s.Mid(start - 1, 1).Cmp(_T("-")) == 0)
 		{
@@ -1899,6 +1908,50 @@ wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 	}
 
 	return terms;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		FindEndOfNextTerm
+//
+// Description:		Finds the end of the next term in the string.
+//
+// Input Arguments:
+//		s		= const wxString&
+//		start	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int ExpressionTree::FindEndOfNextTerm(const wxString &s, const unsigned int &start)
+{
+	unsigned int end, plusEnd, minusEnd;
+
+	plusEnd = s.Mid(start).Find('+');
+	minusEnd = s.Mid(start).Find('-');
+
+	if (minusEnd < plusEnd && start + minusEnd > 0 && NextIsOperator(s[start + minusEnd - 1]))
+	{
+		unsigned int nextMinus = s.Mid(start + minusEnd + 1).Find('-');
+		if (nextMinus != (unsigned int)wxNOT_FOUND)
+			minusEnd += nextMinus + 1;
+		else
+			minusEnd = nextMinus;
+	}
+	end = std::min(plusEnd, minusEnd);
+
+	if (end != (unsigned int)wxNOT_FOUND && NextIsOperator(s.Mid(start + end - 1)))
+	{
+		plusEnd = s.Mid(start + end).Find('+');
+		minusEnd = s.Mid(start + end).Find('-');
+		end += std::min(plusEnd, minusEnd);
+	}
+
+	return end;
 }
 
 //==========================================================================
@@ -1923,7 +1976,6 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 	std::vector<std::pair<int, double> > processedTerms;
 	unsigned int i, start, end;
 	int count;
-	long power;
 	double temp, coefficient;
 	for (i = 0; i < terms.Count(); i++)
 	{
@@ -1946,19 +1998,7 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 						end++;
 				}
 
-				if (terms[i][start] == 's' || terms[i][start] == 'z')
-				{
-					power = terms[i].Mid(start).Find('^');
-					if (power == wxNOT_FOUND)
-						count++;
-					else
-					{
-						start += power + 1;
-						end = terms[i].Mid(start).Find('*');
-						if (terms[i].Mid(start, end).ToLong(&power))
-							count += power;
-					}
-				}
+				count += GetTermPower(terms[i].Mid(start), start, end);
 			}
 			start += end + 1;
 		}
@@ -1967,6 +2007,44 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 	}
 
 	return processedTerms;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		GetTermPower
+//
+// Description:		Returns the value of the power for the specified term
+//					(power of s or z).
+//
+// Input Arguments:
+//		s		= const wxString&
+//
+// Output Arguments:
+//		start	= unsigned int&
+//		end		= unsigned int&
+//
+// Return Value:
+//		int
+//
+//==========================================================================
+int ExpressionTree::GetTermPower(const wxString &s, unsigned int &start, unsigned int &end)
+{
+	long power;
+	if (s[0] == 's' || s[0] == 'z')
+	{
+		power = s.Find('^');
+		if (power == wxNOT_FOUND)
+			return 1;
+		else
+		{
+			start += power + 1;
+			end = s.Find('*');
+			if (s.Mid(power + 1, end).ToLong(&power))
+				return power;
+		}
+	}
+
+	return 0;
 }
 
 //==========================================================================

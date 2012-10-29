@@ -112,6 +112,8 @@ private:
 
 	bool IsFormat(const wxString &pathAndFileName, const Identifier &id);
 	bool MatchNextLine(std::ifstream &inFile, const Identifier &id) const;
+	bool MatchNextLine(std::ifstream &inFile, const wxString &textToMatch,
+		const bool &matchCase = false) const;
 
 	bool ReadFormatTag(wxXmlNode &formatNode);
 	bool ReadIdentifierTag(wxXmlNode &idNode, Identifier &id);
@@ -125,6 +127,8 @@ private:
 	bool MatchSpecifiedLine(std::ifstream &inFile, const Identifier &id) const;
 
 	bool ReadCodeOrColumn(wxXmlNode &channelNode, Channel &channel) const;
+	bool ReadCode(wxXmlNode &channelNode, Channel &channel) const;
+	bool ReadColumn(wxXmlNode &channelNode, Channel &channel) const;
 };
 
 #endif//_CUSTOM_FILE_FORMAT_H_

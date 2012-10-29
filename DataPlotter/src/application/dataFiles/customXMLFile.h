@@ -37,12 +37,18 @@ protected:
 	virtual wxArrayString CreateDelimiterList(void) const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors) const;
-	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const;
+	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
+		std::vector<double> &factors) const;
 
 	wxArrayString SeparateNodes(const wxString &nodePath) const;
 	wxXmlNode* FollowNodePath(const wxXmlDocument &document, const wxString &path) const;
+	wxXmlNode* FollowNodePath(wxXmlNode *node, const wxString &path) const;
 
 	bool DataStringToVector(const wxString &data, std::vector<double> &dataVector, const double &factor) const;
+
+	bool ExtractXData(std::vector<double> *rawData, std::vector<double> &factors) const;
+	bool ExtractYData(wxXmlNode *channel, std::vector<double> *rawData,
+		std::vector<double> &factors, const unsigned int &set) const;
 };
 
 #endif//_CUSTOM_XML_FILE_H_

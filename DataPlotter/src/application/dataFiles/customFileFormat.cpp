@@ -312,7 +312,6 @@ bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifie
 
 	bool formatMatches(false);
 	wxXmlDocument document;
-
 	switch (id.location)
 	{
 	case Identifier::BOF:
@@ -325,12 +324,15 @@ bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifie
 
 	case Identifier::ROOT:
 		formatMatches = isXML &&
+			MatchNextLine(dataFile, _T("<?xml")) &&
 			document.Load(pathAndFileName) &&
 			document.GetRoot()->GetName().Cmp(id.textToMatch) == 0;
 		break;
 
 	default:
-		assert(false);
+		wxMessageBox(_T("Missing identifier tag for format '") + formatName + _T("'."),
+			_T("Error Reading Custom Format Definitions"));
+		return false;
 	}
 
 	dataFile.close();
@@ -356,16 +358,43 @@ bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifie
 //==========================================================================
 bool CustomFileFormat::MatchNextLine(std::ifstream &inFile, const Identifier &id) const
 {
+	return MatchNextLine(inFile, id.textToMatch, id.matchCase);
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		MatchNextLine
+//
+// Description:		Determines if the next line matches the specified text.
+//
+// Input Arguments:
+//		inFile		= std::ifstream&
+//		textTomatch	= const wxString&
+//		matchCase	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for match, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::MatchNextLine(std::ifstream &inFile, const wxString &textToMatch, const bool &matchCase) const
+{
 	std::string nextLine;
 	std::getline(inFile, nextLine);
-	if (id.matchCase)
+
+	if (nextLine.length() < textToMatch.Len())
+		return false;
+
+	if (matchCase)
 	{
-		if (id.textToMatch.Cmp(nextLine.substr(0, id.textToMatch.Len())) == 0)
+		if (textToMatch.Cmp(nextLine.substr(0, textToMatch.Len())) == 0)
 			return true;
 	}
 	else
 	{
-		if (id.textToMatch.CmpNoCase(nextLine.substr(0, id.textToMatch.Len())) == 0)
+		if (textToMatch.CmpNoCase(nextLine.substr(0, textToMatch.Len())) == 0)
 			return true;
 	}
 
@@ -647,42 +676,82 @@ bool CustomFileFormat::ProcessFormatChildren(wxXmlNode *formatChild, Identifier 
 //==========================================================================
 bool CustomFileFormat::ReadCodeOrColumn(wxXmlNode &channelNode, Channel &channel) const
 {
-	wxString temp;
 	if (!channelNode.GetPropVal(_T("CODE"), &channel.code))
+		return ReadCode(channelNode, channel);
+
+	return ReadColumn(channelNode, channel);
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		ReadCode
+//
+// Description:		Reads the information pertaining to CODE tags.
+//
+// Input Arguments:
+//		channelNode	= wxXmlNode& containing CODE or COLUMN tags
+//
+// Output Arguments:
+//		channel	= Channel&
+//
+// Return Value:
+//		bool, true if code is successfully read, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::ReadCode(wxXmlNode &channelNode, Channel &channel) const
+{
+	wxString temp;
+	if (isXML)
 	{
-		if (isXML)
-		{
-			wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  XML types require that CODE is specified."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
-		else if (!channelNode.GetPropVal(_T("COLUMN"), &temp))
-		{
-			wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE or COLUMN must be specified."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
-		else if (!temp.ToLong(&channel.column))
-		{
-			wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must have integer value."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
-		else if (channel.column <= 0)
-		{
-			wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must be greater than zero."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
+		wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  XML types require that CODE is specified."),
+			_T("Error Reading Custom Format Definitions"));
+		return false;
 	}
-	else
+	else if (!channelNode.GetPropVal(_T("COLUMN"), &temp))
 	{
-		if (channel.code.IsEmpty())
-		{
-			wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE must not be empty."),
-				_T("Error Reading Custom Format Definitions"));
-			return false;
-		}
+		wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE or COLUMN must be specified."),
+			_T("Error Reading Custom Format Definitions"));
+		return false;
+	}
+	else if (!temp.ToLong(&channel.column))
+	{
+		wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must have integer value."),
+			_T("Error Reading Custom Format Definitions"));
+		return false;
+	}
+	else if (channel.column <= 0)
+	{
+		wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  COLUMN must be greater than zero."),
+			_T("Error Reading Custom Format Definitions"));
+		return false;
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			CustomFileFormat
+// Function:		ReadColumn
+//
+// Description:		Reads the information pertaining to COLUMN tags.
+//
+// Input Arguments:
+//		channelNode	= wxXmlNode& containing CODE or COLUMN tags
+//
+// Output Arguments:
+//		channel	= Channel&
+//
+// Return Value:
+//		bool, true if column is successfully read, false otherwise
+//
+//==========================================================================
+bool CustomFileFormat::ReadColumn(wxXmlNode& WXUNUSED(channelNode), Channel &channel) const
+{
+	if (channel.code.IsEmpty())
+	{
+		wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE must not be empty."),
+			_T("Error Reading Custom Format Definitions"));
+		return false;
 	}
 
 	return true;

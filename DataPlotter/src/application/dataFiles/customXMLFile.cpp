@@ -69,7 +69,7 @@ wxArrayString CustomXMLFile::CreateDelimiterList(void) const
 }
 
 //==========================================================================
-// Class:			CustomFile
+// Class:			CustomXMLFile
 // Function:		ExtractData
 //
 // Description:		Parses the file and reads data into vectors.  Only extracts
@@ -90,27 +90,12 @@ wxArrayString CustomXMLFile::CreateDelimiterList(void) const
 bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt &choices,
 	std::vector<double> *rawData, std::vector<double> &factors) const
 {
+	if (!ExtractXData(rawData, factors))
+		return false;
+
 	wxXmlDocument document(fileName);
-
-	wxXmlNode *node = FollowNodePath(document, fileFormat.GetXMLXDataNode());
-	if (!node)
-	{
-		wxMessageBox(_T("Could not follow path to x-data node:  ") + fileFormat.GetXMLXDataNode(),
-			_T("Error Reading File"), wxICON_ERROR);
-		return false;
-	}
-
-	wxString data = node->GetPropVal(fileFormat.GetXMLXDataKey(), wxEmptyString);
-	if (data.IsEmpty())
-	{
-		wxMessageBox(_T("Could not read x-data!"), _T("Error Reading File"), wxICON_ERROR);
-		return false;
-	}
-	if (!DataStringToVector(data, rawData[0], factors[0]))
-		return false;
-
 	unsigned int channelCount(0), set(1);
-	node = FollowNodePath(document, fileFormat.GetXMLChannelParentNode());
+	wxXmlNode *node = FollowNodePath(document, fileFormat.GetXMLChannelParentNode());
 	if (!node)
 	{
 		wxMessageBox(_T("Could not follow path to channel parent node:  ") + fileFormat.GetXMLChannelParentNode(),
@@ -129,35 +114,103 @@ bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt 
 				continue;
 			}
 
-			wxXmlNode *channel = node->GetChildren();
-			while (channel)
-			{
-				// FIXME:  What if we need to go more than one level deep here?
-				if (channel->GetName() == fileFormat.GetXMLYDataNode())
-				{
-					data = channel->GetPropVal(fileFormat.GetXMLYDataKey(), wxEmptyString);
-					if (data.IsEmpty())
-					{
-						wxMessageBox(_T("Could not read y-data!"), _T("Error Reading File"), wxICON_ERROR);
-						return false;
-					}
-					if (!DataStringToVector(data, rawData[set], factors[set]))
-						return false;
-					set++;
-					break;
-				}
-				channel = channel->GetNext();
-			}
+			if (ExtractYData(node, rawData, factors, set))
+				set++;
+			else
+				return false;
 		}
-
 		node = node->GetNext();
-	}// FIXME: Check to make sure each set has the same number of points as x-data?
+	}
 
 	return true;
 }
 
 //==========================================================================
-// Class:			CustomFile
+// Class:			CustomXMLFile
+// Function:		ExtractXData
+//
+// Description:		Reads the X-data into the rawData array.
+//
+// Input Arguments:
+//		factors	= std::vector<double>& containing the list of scaling factors
+//
+// Output Arguments:
+//		rawData	= std::vector<double>* containing the data
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool CustomXMLFile::ExtractXData(std::vector<double> *rawData, std::vector<double> &factors) const
+{
+	wxXmlDocument document(fileName);
+	wxXmlNode *node = FollowNodePath(document, fileFormat.GetXMLXDataNode());
+	if (!node)
+	{
+		wxMessageBox(_T("Could not follow path to x-data node:  ") + fileFormat.GetXMLXDataNode(),
+			_T("Error Reading File"), wxICON_ERROR);
+		return false;
+	}
+
+	wxString data = node->GetPropVal(fileFormat.GetXMLXDataKey(), wxEmptyString);
+	if (data.IsEmpty())
+	{
+		wxMessageBox(_T("Could not read x-data!"), _T("Error Reading File"), wxICON_ERROR);
+		return false;
+	}
+	if (!DataStringToVector(data, rawData[0], factors[0]))
+		return false;
+
+	return true;
+}
+
+//==========================================================================
+// Class:			CustomXMLFile
+// Function:		ExtractYData
+//
+// Description:		Reads the Y-data into the rawData array.
+//
+// Input Arguments:
+//		channel		= wxXmlNode*
+//		factors		= std::vector<double>& containing the list of scaling factors
+//		set			= const unsigned int&
+//
+// Output Arguments:
+//		rawData	= std::vector<double>* containing the data
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawData,
+	std::vector<double> &factors, const unsigned int &set) const
+{
+	channel = FollowNodePath(channel, fileFormat.GetXMLYDataNode());
+	if (!channel)
+	{
+		wxMessageBox(_T("Could not find y-data node!"), _T("Error Reading File"), wxICON_ERROR);
+		return false;
+	}
+
+	wxString data = channel->GetPropVal(fileFormat.GetXMLYDataKey(), wxEmptyString);
+	if (data.IsEmpty())
+	{
+		wxMessageBox(_T("Could not read y-data!"), _T("Error Reading File"), wxICON_ERROR);
+		return false;
+	}
+	if (!DataStringToVector(data, rawData[set], factors[set]))
+		return false;
+	if (rawData[set].size() != rawData[0].size())
+	{
+		wxMessageBox(_T("Number of y-data points differs from number of x-data points!"),
+			_T("Error Reading File"), wxICON_ERROR);
+		return false;
+	}
+	return true;
+}
+
+//==========================================================================
+// Class:			CustomXMLFile
 // Function:		GetCurveInformation
 //
 // Description:		Parses the file and assembles descriptions for each column
@@ -214,7 +267,7 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount, 
 }
 
 //==========================================================================
-// Class:			CustomFile
+// Class:			CustomXMLFile
 // Function:		FollowNodePath
 //
 // Description:		Follows the specified node path and returns the final node.
@@ -232,9 +285,32 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount, 
 //==========================================================================
 wxXmlNode* CustomXMLFile::FollowNodePath(const wxXmlDocument &document, const wxString &path) const
 {
+	return FollowNodePath(document.GetRoot(), path);
+}
+
+//==========================================================================
+// Class:			CustomXMLFile
+// Function:		FollowNodePath
+//
+// Description:		Follows the specified node path and returns the final node.
+//
+// Input Arguments:
+//		node	= const wxXmlNode*
+//		path	= const wxArrayString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxXmlNode*
+//
+//==========================================================================
+wxXmlNode* CustomXMLFile::FollowNodePath(wxXmlNode *node, const wxString &path) const
+{
+	node = node->GetChildren();
 	wxArrayString nodeStrings(SeparateNodes(path));
 	unsigned int i(0);
-	wxXmlNode *node = document.GetRoot()->GetChildren();
+
 	while (node && i < nodeStrings.Count())
 	{
 		if (node->GetName() == nodeStrings[i])
@@ -251,7 +327,7 @@ wxXmlNode* CustomXMLFile::FollowNodePath(const wxXmlDocument &document, const wx
 }
 
 //==========================================================================
-// Class:			CustomFile
+// Class:			CustomXMLFile
 // Function:		SeparateNodes
 //
 // Description:		Takes a node path string (slash-separated) and chops it
@@ -286,7 +362,7 @@ wxArrayString CustomXMLFile::SeparateNodes(const wxString &nodePath) const
 }
 
 //==========================================================================
-// Class:			CustomFile
+// Class:			CustomXMLFile
 // Function:		DataStringToVector
 //
 // Description:		Parses the contents of the string and separates discrete
