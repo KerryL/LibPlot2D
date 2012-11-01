@@ -27,7 +27,7 @@ class CustomXMLFile : public DataFile
 {
 public:
 	// Constructor
-	CustomXMLFile(const wxString& _fileName) : DataFile(_fileName), fileFormat(_fileName) {};
+	CustomXMLFile(const wxString& _fileName, wxWindow *_parent = NULL) : DataFile(_fileName, _parent), fileFormat(_fileName) {};
 
 	static bool IsType(const wxString &_fileName);
 

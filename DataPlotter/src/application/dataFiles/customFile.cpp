@@ -217,10 +217,14 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 	{
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
-		if (parsed.size() < curveCount && parsed.size() > 0)// TODO:  Parker files end with "DATA BLOCK END" and will generate this warning every time.  Some option to ignore?
+		if (parsed.size() < curveCount && parsed.size() > 0)
 		{
-			wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
-				_T("Column Count Mismatch"), wxICON_WARNING);
+			if (!file.eof() &&
+				(fileFormat.GetEndIdentifier().IsEmpty() ||
+				(!fileFormat.GetEndIdentifier().IsEmpty() &&
+				parsed[0].Cmp(fileFormat.GetEndIdentifier()) != 0)))
+				wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
+					_T("Column Count Mismatch"), wxICON_WARNING);
 			return true;
 		}
 

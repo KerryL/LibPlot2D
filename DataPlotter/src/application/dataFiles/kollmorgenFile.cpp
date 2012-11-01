@@ -176,8 +176,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		parsed.Insert(wxString::Format("%f", time), 0);
 		if (parsed.size() < curveCount)
 		{
-			wxString line(nextLine);
-			if (line.Trim().Len() > 0)
+			if (!file.eof())
 				wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
 					_T("Column Count Mismatch"), wxICON_WARNING);
 			return true;

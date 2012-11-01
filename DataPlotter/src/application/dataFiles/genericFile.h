@@ -23,7 +23,7 @@ class GenericFile : public DataFile
 {
 public:
 	// Constructor
-	GenericFile(const wxString& _fileName) : DataFile(_fileName) {};
+	GenericFile(const wxString& _fileName, wxWindow *_parent = NULL) : DataFile(_fileName, _parent) {};
 
 	static bool IsType(const wxString &_fileName);
 };

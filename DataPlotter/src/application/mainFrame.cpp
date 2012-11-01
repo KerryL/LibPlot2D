@@ -85,7 +85,8 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 	SetProperties();
 
 	if (!CustomFileFormat::CustomDefinitionsExist())
-		wxMessageBox(_T("Warning:  Custom file definitions not found!"), _T("Custom File Formats"), wxICON_WARNING, this);
+		wxMessageBox(_T("Warning:  Custom file definitions not found!"),
+		_T("Custom File Formats"), wxICON_WARNING, this);
 
 	currentFileFormat = FormatGeneric;
 
@@ -2916,16 +2917,16 @@ void MainFrame::SetMarkerSize(const unsigned int &curve, const int &size)
 //		DataFile*
 //
 //==========================================================================
-DataFile* MainFrame::GetDataFile(const wxString &fileName) const
+DataFile* MainFrame::GetDataFile(const wxString &fileName)
 {
 	if (BaumullerFile::IsType(fileName))
-		return new BaumullerFile(fileName);
+		return new BaumullerFile(fileName, this);
 	else if (KollmorgenFile::IsType(fileName))
-		return new KollmorgenFile(fileName);
+		return new KollmorgenFile(fileName, this);
 	else if (CustomFile::IsType(fileName))
-		return new CustomFile(fileName);
+		return new CustomFile(fileName, this);
 	else if (CustomXMLFile::IsType(fileName))
-		return new CustomXMLFile(fileName);
+		return new CustomXMLFile(fileName, this);
 
 	// Don't even check - if we can't open it with any other types,
 	// always try to open it with a generic type

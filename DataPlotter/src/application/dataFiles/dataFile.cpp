@@ -27,6 +27,7 @@
 //
 // Input Arguments:
 //		fileName	= const wxString& file which this object represents
+//		_parent		= wxWindow* parent for centering curve choice dialog
 //
 // Output Arguments:
 //		None
@@ -35,9 +36,11 @@
 //		None
 //
 //==========================================================================
-DataFile::DataFile(const wxString& _fileName)
+DataFile::DataFile(const wxString& _fileName, wxWindow *_parent)
 {
 	fileName = _fileName;
+	parent = _parent;
+
 	headerLines = 0;
 
 	ignoreConsecutiveDelimiters = true;
@@ -402,7 +405,7 @@ wxArrayString DataFile::GenerateDummyNames(const unsigned int &count) const
 //==========================================================================
 bool DataFile::ProcessFile(void)
 {
-	MultiChoiceDialog dialog(NULL, _T("Select data to plot:"), _T("Select Data"),
+	MultiChoiceDialog dialog(parent, _T("Select data to plot:"), _T("Select Data"),
 		wxArrayString(descriptions.begin() + 1, descriptions.end()));
 	if (dialog.ShowModal() == wxID_CANCEL)
 		return false;
@@ -528,8 +531,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		if (parsed.size() < curveCount)
 		{
-			wxString line(nextLine);
-			if (line.Trim().Len() > 0)
+			if (!file.eof())
 				wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
 					_T("Column Count Mismatch"), wxICON_WARNING);
 			return true;

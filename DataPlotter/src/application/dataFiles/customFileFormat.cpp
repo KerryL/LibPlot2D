@@ -133,6 +133,7 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 	if (IsFormat(pathAndFileName, id))
 	{
 		delimiter = formatNode.GetPropVal(_T("DELIMITER"), wxEmptyString);
+		endIdentifier = formatNode.GetPropVal(_T("END_IDENTIFIER"), wxEmptyString);
 		timeUnits = formatNode.GetPropVal(_T("TIME_UNITS"), wxEmptyString);
 		timeFormat = formatNode.GetPropVal(_T("TIME_FORMAT"), wxEmptyString);
 		asynchronous = formatNode.GetPropVal(_T("ASYNC"), "FALSE").CmpNoCase("TRUE") == 0;

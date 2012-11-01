@@ -288,6 +288,8 @@ wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOper
 	}
 	else if (expression[0] == '(')
 	{
+		if (!lastWasOperator)
+			operatorStack.push(_T("*"));
 		operatorStack.push(expression[0]);
 		advance = 1;
 		thisWasOperator = true;
@@ -415,6 +417,9 @@ wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
 			return errorString;
 	}
 
+	if (useDoubleStack.size() > 1)
+		return _T("Not enough operators!");
+
 	if (useDoubleStack.top())
 		return _T("Expression evaluates to a number!");
 	else
@@ -456,6 +461,9 @@ std::string ExpressionTree::EvaluateExpression(std::string &results)
 		if (!EvaluateNext(next, doubleStack, stringStack, useDoubleStack, errorString))
 			return errorString.c_str();
 	}
+
+	if (useDoubleStack.size() > 1)
+		return "Not enough operators!";
 
 	if (useDoubleStack.top())
 		results = wxString::Format("%0.*f",

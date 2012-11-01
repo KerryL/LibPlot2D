@@ -257,7 +257,7 @@ private:
 	Filter* GetFilter(const FilterParameters &parameters,
 		const double &sampleRate, const double &initialValue) const;
 
-	DataFile* GetDataFile(const wxString &fileName) const;
+	DataFile* GetDataFile(const wxString &fileName);
 
 	enum FileFormat
 	{

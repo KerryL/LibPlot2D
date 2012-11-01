@@ -39,6 +39,7 @@ public:
 	wxString GetDelimiter(void) const { return delimiter; };
 	wxString GetTimeUnits(void) const { return timeUnits; };
 	wxString GetTimeFormat(void) const { return timeFormat; };
+	wxString GetEndIdentifier(void) const { return endIdentifier; };
 
 	bool IsXML(void) const { return isXML; };
 
@@ -65,6 +66,7 @@ private:
 	wxString delimiter;
 	wxString timeUnits;
 	wxString timeFormat;
+	wxString endIdentifier;
 
 	bool asynchronous;
 	bool isXML;

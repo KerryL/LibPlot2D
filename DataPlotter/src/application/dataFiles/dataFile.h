@@ -30,7 +30,7 @@ class DataFile
 {
 public:
 	// Constructor
-	DataFile(const wxString& _fileName);
+	DataFile(const wxString& _fileName, wxWindow *_parent = NULL);
 
 	// Destructor
 	virtual ~DataFile();
@@ -47,6 +47,8 @@ public:
 
 protected:
 	wxString fileName;
+	wxWindow *parent;
+
 	std::vector<Dataset2D*> data;
 	std::vector<double> scales;
 	wxArrayString descriptions;
