@@ -1574,7 +1574,7 @@ bool MainFrame::UnitStringToFactor(const wxString &unit, double &factor)
 //==========================================================================
 void MainFrame::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 {
-	DisplayMathChannelDialog();
+	DisplayMathChannelDialog(wxString::Format("[%i]", optionsGrid->GetSelectedRows()[0]));
 }
 
 //==========================================================================
