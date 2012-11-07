@@ -103,6 +103,8 @@ private:
 
 	FilterParameters::Type GetType(void) const;
 
+	unsigned int stringPrecision;
+
 	void GetLowPassTF(wxString &numerator, wxString &denominator) const;
 	void GetHighPassTF(wxString &numerator, wxString &denominator) const;
 	void GetLowPassTF(wxString &numerator, wxString &denominator,
