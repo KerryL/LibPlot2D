@@ -22,6 +22,9 @@
 #include <limits>
 #include <cstdarg>
 
+// wxWidgets headers
+#include <wx/wx.h>
+
 // Local headers
 #include "utilities/math/plotMath.h"
 #include "utilities/math/vector.h"
@@ -382,6 +385,55 @@ unsigned int PlotMath::GetPrecision(const double &value,
 		precision = 0;
 
 	return precision;
+}
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		CountSignificantDigits
+//
+// Description:		Returns the number of significant digits in the string.
+//
+// Input Arguments:
+//		valueString	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int PlotMath::CountSignificantDigits(const wxString &valueString)
+{
+	double value;
+	if (!valueString.ToDouble(&value))
+		return 0;
+
+	wxString trimmedValueString = wxString::Format("%+0.15f", value);
+	unsigned int firstDigit, lastDigit;
+	for (firstDigit = 1; firstDigit < trimmedValueString.Len(); firstDigit++)
+	{
+		if (trimmedValueString[firstDigit] != '0' && trimmedValueString[firstDigit] != '.')
+			break;
+	}
+
+	for (lastDigit = trimmedValueString.Len() - 1; lastDigit > firstDigit; lastDigit--)
+	{
+		if (trimmedValueString[lastDigit] != '0' && trimmedValueString[lastDigit] != '.')
+			break;
+	}
+
+	unsigned int i;
+	for (i = firstDigit + 1; i < lastDigit - 1; i++)
+	{
+		if (trimmedValueString[i] == '.')
+		{
+			firstDigit++;
+			break;
+		}
+	}
+
+	return lastDigit - firstDigit + 1;
 }
 
 //==========================================================================

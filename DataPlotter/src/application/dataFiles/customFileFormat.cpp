@@ -109,7 +109,6 @@ CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFi
 bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 {
 	channels.clear();
-
 	if (!formatNode.GetPropVal(_T("NAME"), &formatName))
 	{
 		wxMessageBox(_T("Ignoring custom file formats:  Each FORMAT tag must have NAME attribute."),
@@ -120,7 +119,6 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 	wxString extension;
 	if (!formatNode.GetPropVal(_T("EXTENSION"), &extension))
 		extension = _T("*");
-
 	unsigned int lastDot = pathAndFileName.find_last_of(_T("."));
 	if (!extension.Cmp(_T("*")) && !pathAndFileName.Mid(lastDot).CmpNoCase(extension))
 		return false;

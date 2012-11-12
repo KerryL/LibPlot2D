@@ -65,8 +65,6 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 
 	initialized = true;
 
-	stringPrecision = 2;// Display precision
-
 	UpdateEnabledControls();
 	UpdateTransferFunction();
 }
@@ -356,6 +354,7 @@ void FilterDialog::OnOKButton(wxCommandEvent &event)
 	if (!customRadio->GetValue())
 	{
 		stringPrecision = 15;// Extended precision for computation
+		automaticStringPrecision = false;
 		UpdateTransferFunction();
 	}
 
@@ -764,6 +763,8 @@ void FilterDialog::UpdateTransferFunction(void)
 	if (!initialized || customRadio->GetValue())
 		return;
 
+	stringPrecision = DetermineStringPrecision();
+
 	wxString num, den;
 	if (highPassRadio->GetValue())
 		GetHighPassTF(num, den);
@@ -778,6 +779,42 @@ void FilterDialog::UpdateTransferFunction(void)
 
 	numeratorBox->ChangeValue(num);
 	denominatorBox->ChangeValue(den);
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		DetermineStringPrecision
+//
+// Description:		Determines the best number of digits to use to display the
+//					transfer function.  Returns stringPrecision if
+//					automaticStringPrecision is false.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int FilterDialog::DetermineStringPrecision(void) const
+{
+	if (!automaticStringPrecision)
+		return stringPrecision;
+
+	unsigned int cutoffSigFig, dampingSigFig(0), widthSigFig(0);
+
+	cutoffSigFig = PlotMath::CountSignificantDigits(cutoffFrequencyBox->GetValue());
+
+	if (dampingRatioBox->IsEnabled())
+		dampingSigFig = PlotMath::CountSignificantDigits(dampingRatioBox->GetValue());
+
+	if (widthBox->IsEnabled())
+		widthSigFig = PlotMath::CountSignificantDigits(widthBox->GetValue());
+
+	return std::max<unsigned int>(cutoffSigFig, std::max<unsigned int>(dampingSigFig, widthSigFig));
 }
 
 //==========================================================================

@@ -269,7 +269,6 @@ wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOper
 	unsigned int &advance, std::stack<wxString> &operatorStack)
 {
 	bool thisWasOperator(false);
-
 	if (NextIsNumber(expression, &advance, lastWasOperator))
 		outputQueue.push(expression.Mid(0, advance));
 	else if (NextIsDataset(expression, &advance))
@@ -301,7 +300,6 @@ wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOper
 	}
 	else
 		return _T("Unrecognized character:  '") + expression.Mid(0, 1) + _T("'.");
-
 	lastWasOperator = thisWasOperator;
 	return wxEmptyString;
 }

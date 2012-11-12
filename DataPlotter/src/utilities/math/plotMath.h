@@ -24,6 +24,7 @@
 // Local forward declarations
 class Vector;
 class Dataset2D;
+class wxString;
 
 namespace PlotMath
 {
@@ -67,6 +68,8 @@ namespace PlotMath
 
 	unsigned int GetPrecision(const double &value,
 		const unsigned int &significantDigits = 2, const bool &dropTrailingZeros = true);
+
+	unsigned int CountSignificantDigits(const wxString &valueString);
 
 	void KRLsprintf(char *dest, const unsigned int &size, const char *format, ...);
 }
