@@ -225,7 +225,6 @@ PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 wxGrid* MainFrame::CreateOptionsGrid(wxWindow *parent)
 {
 	optionsGrid = new wxGrid(parent, wxID_ANY);
-
 	optionsGrid->BeginBatch();
 
 	optionsGrid->CreateGrid(0, colCount, wxGrid::wxGridSelectRows);
@@ -250,6 +249,7 @@ wxGrid* MainFrame::CreateOptionsGrid(wxWindow *parent)
 
 	optionsGrid->SetColLabelAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 	optionsGrid->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
+	optionsGrid->EnableDragRowSize(false);
 
 	unsigned int i;
 	for (i = 1; i < colCount; i++)// Skip the name column
@@ -1029,7 +1029,7 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 	optionsGrid->SetCellValue(index, colVisible, _T("1"));
 
 	int width = optionsGrid->GetColumnWidth(colName);
-	optionsGrid->AutoSizeColumn(colName);
+	optionsGrid->AutoSizeColumn(colName, false);
 	if (optionsGrid->GetColumnWidth(colName) < width)
 		optionsGrid->SetColumnWidth(colName, width);
 
@@ -2930,7 +2930,7 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName)
 
 	// Don't even check - if we can't open it with any other types,
 	// always try to open it with a generic type
-	return new GenericFile(fileName);
+	return new GenericFile(fileName, this);
 }
 
 //==========================================================================

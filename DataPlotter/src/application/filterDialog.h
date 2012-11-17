@@ -47,8 +47,7 @@ struct FilterParameters
 
 	double cutoffFrequency;// [Hz]
 	double dampingRatio;
-	double width;
-	double depth;
+	double width;// [Hz]
 
 	wxString numerator;
 	wxString denominator;
@@ -149,7 +148,7 @@ private:
 	static wxString GetOrderString(const unsigned int &order);
 	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);
 	static wxString AddDampingName(const wxString& name, const FilterParameters &parameters);
-	static wxString AddWidthDepthName(const wxString& name, const FilterParameters &parameters);
+	static wxString AddWidthName(const wxString& name, const FilterParameters &parameters);
 
 	static wxString GetHighPassName(const FilterParameters &parameters);
 	static wxString GetLowPassName(const FilterParameters &parameters);

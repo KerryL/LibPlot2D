@@ -271,7 +271,7 @@ wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOper
 	bool thisWasOperator(false);
 	if (NextIsNumber(expression, &advance, lastWasOperator))
 		outputQueue.push(expression.Mid(0, advance));
-	else if (NextIsDataset(expression, &advance))
+	else if (NextIsDataset(expression, &advance))// TODO:  Add lastWasOperator here and do something tricky if we want to handle unary - for datasets
 		outputQueue.push(expression.Mid(0, advance));
 	else if (NextIsS(expression, &advance))
 		outputQueue.push(expression.Mid(0, advance));
@@ -402,9 +402,6 @@ wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
 	std::stack<double> doubleStack;
 	std::stack<Dataset2D> setStack;
 	std::stack<bool> useDoubleStack;
-
-	if (NextIsOperator(outputQueue.front()))// Special handling in case of "-3*..."
-		PushToStack(0.0, doubleStack, useDoubleStack);
 
 	while (!outputQueue.empty())
 	{
@@ -1342,10 +1339,7 @@ bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<doub
 	Dataset2D dataset1, dataset2;
 
 	if (useDoubleStack.size() < 2)
-	{
-		errorString = _T("Attempting to apply operator without two operands!");
-		return false;
-	}
+		return EvaluateUnaryOperator(operation, doubleStack, setStack, useDoubleStack, errorString);
 	else if (PopFromStack(doubleStack, setStack, useDoubleStack, value1, dataset1))
 	{
 		if (PopFromStack(doubleStack, setStack, useDoubleStack, value2, dataset2))
@@ -1376,6 +1370,45 @@ bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<doub
 
 //==========================================================================
 // Class:			ExpressionTree
+// Function:		EvaluateUnaryOperator
+//
+// Description:		Evaluates the operator specified.  The only unary operator
+//					we recognize is minus (negation).
+//
+// Input Arguments:
+//		operator		= const wxString& describing the function to apply
+//		doubleStack		= std::stack<double>&
+//		setStack		= std::stack<Dataset2D>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateUnaryOperator(const wxString &operation, std::stack<double> &doubleStack,
+	std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	if (operation.Cmp(_T("-")) != 0)
+	{
+		errorString = _T("Attempting to apply operator without two operands!");
+		return false;
+	}
+
+	double value;
+	Dataset2D dataset;
+	if (PopFromStack(doubleStack, setStack, useDoubleStack, value, dataset))
+		PushToStack(ApplyOperation(_T("*"), -1.0, value), doubleStack, useDoubleStack);
+	else
+		PushToStack(ApplyOperation(_T("*"), -1.0, dataset), setStack, useDoubleStack);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
 // Function:		EvaluateOperator
 //
 // Description:		Evaluates the operator specified.
@@ -1400,10 +1433,7 @@ bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<doub
 	wxString string1, string2;
 
 	if (useDoubleStack.size() < 2)
-	{
-		errorString = _T("Attempting to apply operator without two operands!");
-		return false;
-	}
+		return EvaluateUnaryOperator(operation, doubleStack, stringStack, useDoubleStack, errorString);
 	else if (PopFromStack(doubleStack, stringStack, useDoubleStack, string1, value1))
 	{
 		if (PopFromStack(doubleStack, stringStack, useDoubleStack, string2, value2))
@@ -1415,6 +1445,45 @@ bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<doub
 		PushToStack(ApplyOperation(operation, string1, value2), stringStack, useDoubleStack);
 	else
 		PushToStack(ApplyOperation(operation, string1, string2), stringStack, useDoubleStack);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		EvaluateUnaryOperator
+//
+// Description:		Evaluates the operator specified.  The only unary operator
+//					we recognize is minus (negation).
+//
+// Input Arguments:
+//		operator		= const wxString& describing the function to apply
+//		doubleStack		= std::stack<double>&
+//		stringStack		= std::stack<wxString>&
+//		useDoubleStack	= std::stack<bool>&
+//
+// Output Arguments:
+//		errorString		= wxString&
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool ExpressionTree::EvaluateUnaryOperator(const wxString &operation, std::stack<double> &doubleStack,
+	std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack, wxString &errorString) const
+{
+	if (operation.Cmp(_T("-")) != 0)
+	{
+		errorString = _T("Attempting to apply operator without two operands!");
+		return false;
+	}
+
+	double value;
+	wxString string;
+	if (PopFromStack(doubleStack, stringStack, useDoubleStack, string, value))
+		PushToStack(ApplyOperation(_T("*"), -1.0, value), doubleStack, useDoubleStack);
+	else
+		PushToStack(ApplyOperation(_T("*"), -1.0, string), stringStack, useDoubleStack);
 
 	return true;
 }

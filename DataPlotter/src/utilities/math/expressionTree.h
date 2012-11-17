@@ -95,6 +95,8 @@ private:
 		std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const;
 	bool EvaluateOperator(const wxString &operation, std::stack<double> &doubleStack,
 		std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const;
+	bool EvaluateUnaryOperator(const wxString &operation, std::stack<double> &doubleStack,
+		std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const;
 	bool EvaluateNumber(const wxString &number, std::stack<double> &doubleStack,
 		std::stack<bool> &useDoubleStack, wxString &errorString) const;
 	bool EvaluateDataset(const wxString &dataset, std::stack<Dataset2D> &setStack,
@@ -108,6 +110,8 @@ private:
 	bool EvaluateNext(const wxString &next, std::stack<double> &doubleStack,
 		std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack, wxString &errorString) const;
 	bool EvaluateOperator(const wxString &operation, std::stack<double> &doubleStack,
+		std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack, wxString &errorString) const;
+	bool EvaluateUnaryOperator(const wxString &operation, std::stack<double> &doubleStack,
 		std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack, wxString &errorString) const;
 
 	wxString ApplyOperation(const wxString &operation, const wxString &first, const wxString &second) const;

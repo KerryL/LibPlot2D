@@ -56,10 +56,12 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 		parameters.phaseless = false;
 		parameters.butterworth = false;
 		parameters.width = parameters.cutoffFrequency;
-		parameters.depth = -10.0;
 		parameters.numerator.Clear();
 		parameters.denominator.Clear();
 	}
+
+	automaticStringPrecision = true;
+	stringPrecision = 2;
 
 	CreateControls();
 
@@ -631,7 +633,7 @@ bool FilterDialog::CutoffFrequencyIsValid(void)
 	}
 	else if (parameters.cutoffFrequency <= 0.0)
 	{
-		wxMessageBox(_T("ERROR:  Cutoff frequency must be positive!"), _T("Error Defining Filter"));
+		wxMessageBox(_T("ERROR:  Cutoff frequency must be strictly positive!"), _T("Error Defining Filter"));
 		return false;
 	}
 
@@ -1420,7 +1422,7 @@ wxString FilterDialog::GetLowPassName(const FilterParameters &parameters)
 wxString FilterDialog::GetBandStopName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("Band-Stop"), parameters));
-	s = AddWidthDepthName(s, parameters);
+	s = AddWidthName(s, parameters);
 
 	return s;
 }
@@ -1444,7 +1446,7 @@ wxString FilterDialog::GetBandStopName(const FilterParameters &parameters)
 wxString FilterDialog::GetBandPassName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("Band-Pass"), parameters));
-	s = AddWidthDepthName(s, parameters);
+	s = AddWidthName(s, parameters);
 
 	return s;
 }
@@ -1530,7 +1532,7 @@ wxString FilterDialog::AddDampingName(const wxString& name, const FilterParamete
 
 //==========================================================================
 // Class:			FilterDialog
-// Function:		AddWidthDepthName
+// Function:		AddWidthName
 //
 // Description:		Adds width and depth fields to the name.
 //
@@ -1545,12 +1547,11 @@ wxString FilterDialog::AddDampingName(const wxString& name, const FilterParamete
 //		wxString
 //
 //==========================================================================
-wxString FilterDialog::AddWidthDepthName(const wxString& name, const FilterParameters &parameters)
+wxString FilterDialog::AddWidthName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(name);
-	s.Append(wxString::Format(" x %0.*f Hz, %0.*f dB",
-		PlotMath::GetPrecision(parameters.width), parameters.width,
-		PlotMath::GetPrecision(parameters.depth), parameters.depth));
+	s.Append(wxString::Format(" x %0.*f Hz",
+		PlotMath::GetPrecision(parameters.width), parameters.width));
 
 	return s;
 }
