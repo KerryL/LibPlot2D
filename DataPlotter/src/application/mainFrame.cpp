@@ -21,6 +21,7 @@
 #include <wx/grid.h>
 #include <wx/colordlg.h>
 #include <wx/splitter.h>
+#include <wx/file.h>
 
 // Local headers
 #include "application/mainFrame.h"
@@ -376,6 +377,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idPlotContextToggleGridlines,			MainFrame::ContextToggleGridlines)
 	EVT_MENU(idPlotContextAutoScale,				MainFrame::ContextAutoScale)
 	EVT_MENU(idPlotContextWriteImageFile,			MainFrame::ContextWriteImageFile)
+	EVT_MENU(idPlotContextExportData,				MainFrame::ContextExportData)
 
 	EVT_MENU(idPlotContextBGColor,					MainFrame::ContextPlotBGColor)
 	EVT_MENU(idPlotContextGridColor,				MainFrame::ContextGridColor)
@@ -462,6 +464,97 @@ void MainFrame::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 		return;
 
 	plotArea->WriteImageToFile(pathAndFileName[0]);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContexExportData
+//
+// Description:		Exports the data to file.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextExportData(wxCommandEvent& WXUNUSED(event))
+{
+	wxString wildcard(_T("Comma Separated (*.csv)|*.csv"));
+	wildcard.append("|Tab Delimited (*.txt)|*.txt");
+
+	wxArrayString pathAndFileName = GetFileNameFromUser(_T("Save As"),
+		wxEmptyString, wxEmptyString, wildcard, wxFD_SAVE);
+
+	if (pathAndFileName.Count() == 0)
+		return;
+
+	if (wxFile::Exists(pathAndFileName[0]))
+	{
+		if (wxMessageBox(_T("File exists.  Overwrite?"), _T("Overwrite File?"), wxYES_NO, this) == wxNO)
+			return;
+	}
+
+	wxString delimiter;
+	if (pathAndFileName[0].Mid(pathAndFileName[0].Last('.')).CmpNoCase(_T(".txt")) == 0)
+		delimiter = _T("\t");
+	else
+		delimiter = _T(",");// FIXME:  Need to handle descriptions containing commas so we don't have problems with import later on
+
+	// Export both x and y data in case of asynchronous data or FFT, etc.
+	std::ofstream outFile(pathAndFileName[0].c_str(), std::ios::out);
+	if (!outFile.is_open() || !outFile.good())
+	{
+		wxMessageBox(_T("Could not open '") + pathAndFileName[0] + _T("' for output."),
+			_T("Error Writing File"), wxICON_ERROR, this);
+		return;
+	}
+
+	unsigned int i, j(0);
+	for (i = 1; i < plotList.GetCount() + 1; i++)
+	{
+		if (optionsGrid->GetCellValue(i, colName).Contains(_T("FFT")) ||
+			optionsGrid->GetCellValue(i, colName).Contains(_T("FRF")))
+			outFile << _T("Frequency [Hz]") << delimiter;
+		else
+			outFile << genericXAxisLabel << delimiter;
+
+		outFile << optionsGrid->GetCellValue(i, colName);
+
+		if (i == plotList.GetCount())
+			outFile << endl;
+		else
+			outFile << delimiter;
+	}
+
+	bool done(false);
+	while (!done)
+	{
+		done = true;
+		for (i = 0; i < plotList.GetCount(); i++)
+		{
+			if (j < plotList[i]->GetNumberOfPoints())
+				outFile << plotList[i]->GetXData(j) << delimiter << plotList[i]->GetYData(j);
+			else
+				outFile << delimiter;
+
+			if (i == plotList.GetCount() - 1)
+				outFile << endl;
+			else
+				outFile << delimiter;
+
+			if (j + 1 < plotList[i]->GetNumberOfPoints())
+				done = false;
+		}
+
+		j++;
+	}
+
+	outFile.close();
 }
 
 //==========================================================================
@@ -653,6 +746,7 @@ wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
 	contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
 	contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
 	contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
+	contextMenu->Append(idPlotContextExportData, _T("Export Data"));
 	contextMenu->AppendSeparator();
 	contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
 	contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));

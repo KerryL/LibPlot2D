@@ -144,12 +144,12 @@ private:
 		idContextBitMask,
 
 		idContextFilter,
-
 		idContextFitCurve,
 
 		idPlotContextToggleGridlines,
 		idPlotContextAutoScale,
 		idPlotContextWriteImageFile,
+		idPlotContextExportData,
 
 		idPlotContextBGColor,
 		idPlotContextGridColor,
@@ -202,12 +202,12 @@ private:
 	void ContextBitMaskEvent(wxCommandEvent &event);
 
 	void ContextFilterEvent(wxCommandEvent &event);
-
 	void ContextFitCurve(wxCommandEvent &event);
 
 	void ContextToggleGridlines(wxCommandEvent &event);
 	void ContextAutoScale(wxCommandEvent &event);
 	void ContextWriteImageFile(wxCommandEvent &event);
+	void ContextExportData(wxCommandEvent &event);
 
 	void ContextPlotBGColor(wxCommandEvent &event);
 	void ContextGridColor(wxCommandEvent &event);
