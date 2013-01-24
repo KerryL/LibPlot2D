@@ -16,7 +16,6 @@
 // Standard C++ headers
 #include <cmath>
 #include <algorithm>
-#include <fstream>// FIXME: Remove
 
 // Local headers
 #include "utilities/signals/fft.h"

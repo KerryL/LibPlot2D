@@ -521,7 +521,15 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 // Function:		ComputeSteadyStateGain
 //
 // Description:		Returns the steady-state value resluting from a unity step
-//					input.
+//					input.  Returns zero if the results of this analysis are
+//					not guaranteed valid - den must have these properties for
+//					Final Value Theorem to yield valid results:
+//					1.  Roots of den must have negative real parts
+//					2.  den must have no more than one zero root
+//					The final value is evaluated by multiplying by s and the
+//					input (step input is 1/s, so we multiply by s/s, which
+//					means we do nothing), canceling esses, then evaluating for
+//					s=0.
 //
 // Input Arguments:
 //		num	= const std::string&
@@ -536,11 +544,36 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 //==========================================================================
 double Filter::ComputeSteadyStateGain(const std::string &num, const std::string &den)
 {
-	// For results to be valid (using final value theorem):
-	// 1.  Roots of den must have negative real parts
-	// 2.  den must not have more than one zero root
+	std::vector<double> numeratorCoefficients = CoefficientsFromString(num);
+	std::vector<double> denominatorCoefficients = CoefficientsFromString(den);
 
-	// Add s/s, cancel esses, then evaluate for s = 0
+	unsigned int numEndZeros(0), denEndZeros(0);
+	int i;
+	for (i = numeratorCoefficients.size() - 1; i >= 0; i--)
+	{
+		if (PlotMath::IsZero(numeratorCoefficients[i]))
+			numEndZeros++;
+		else
+			break;
+	}
 
-	return 0.0;// FIXME:  Implement
+	for (i = denominatorCoefficients.size() - 1; i >= 0; i--)
+	{
+		if (PlotMath::IsZero(denominatorCoefficients[i]))
+			denEndZeros++;
+		else
+			break;
+	}
+
+	// TODO:  Check condition 1
+
+	// Check condition 2
+	if (denEndZeros > 1)
+		return 0.0;
+
+	unsigned int essesToCancel(std::min<unsigned int>(numEndZeros, denEndZeros));
+
+	// When evaluating for s=0, everything except the polynomial's constant term drops out
+	return numeratorCoefficients[numeratorCoefficients.size() - 1 - essesToCancel] /
+		denominatorCoefficients[denominatorCoefficients.size() - 1 - essesToCancel];
 }

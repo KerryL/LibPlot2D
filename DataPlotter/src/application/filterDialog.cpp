@@ -610,16 +610,15 @@ bool FilterDialog::TransferDataFromWindow(void)
 	}
 
 	double steadyStateGain = Filter::ComputeSteadyStateGain(numeratorBox->GetValue().c_str(), denominatorBox->GetValue().c_str());
-	double tolerance(1.0e-6);
 
-	if (fabs(steadyStateGain - 1.0) > tolerance && fabs(steadyStateGain) > tolerance)
+	if (!PlotMath::IsZero(steadyStateGain - 1.0) && !PlotMath::IsZero(steadyStateGain))
 	{
 		if (wxMessageBox(wxString::Format(
 			"The steady-state gain for the specified filter is %f (typically 1.0 or 0.0).  Continue anyway?",
 			steadyStateGain), _T("Unusual Filter Gain"), wxICON_QUESTION + wxYES_NO, GetParent()) == wxNO)
 		{
 			numeratorBox->SetValue(originalNumerator);
-			numeratorBox->SetValue(originalDenominator);
+			denominatorBox->SetValue(originalDenominator);
 
 			return false;
 		}
