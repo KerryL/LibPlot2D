@@ -17,6 +17,7 @@
 #include "application/filterDialog.h"
 #include "utilities/math/plotMath.h"
 #include "utilities/math/expressionTree.h"
+#include "utilities/signals/filter.h"
 
 // wxWidgets headers
 #include <wx/spinctrl.h>
@@ -353,13 +354,6 @@ wxSizer* FilterDialog::CreateDialogButtons(void)
 //==========================================================================
 void FilterDialog::OnOKButton(wxCommandEvent &event)
 {
-	if (!customRadio->GetValue())
-	{
-		stringPrecision = 15;// Extended precision for computation
-		automaticStringPrecision = false;
-		UpdateTransferFunction();
-	}
-
 	parameters.order = orderSpin->GetValue();
 	parameters.phaseless = phaselessCheckBox->GetValue();
 	parameters.butterworth = butterworthCheckBox->GetValue();
@@ -605,6 +599,32 @@ FilterParameters::Type FilterDialog::GetType(void) const
 //==========================================================================
 bool FilterDialog::TransferDataFromWindow(void)
 {
+	wxString originalNumerator = numeratorBox->GetValue();
+	wxString originalDenominator = denominatorBox->GetValue();
+
+	if (!customRadio->GetValue())
+	{
+		stringPrecision = 15;// Extended precision for computation
+		automaticStringPrecision = false;
+		UpdateTransferFunction();
+	}
+
+	double steadyStateGain = Filter::ComputeSteadyStateGain(numeratorBox->GetValue().c_str(), denominatorBox->GetValue().c_str());
+	double tolerance(1.0e-6);
+
+	if (fabs(steadyStateGain - 1.0) > tolerance && fabs(steadyStateGain) > tolerance)
+	{
+		if (wxMessageBox(wxString::Format(
+			"The steady-state gain for the specified filter is %f (typically 1.0 or 0.0).  Continue anyway?",
+			steadyStateGain), _T("Unusual Filter Gain"), wxICON_QUESTION + wxYES_NO, GetParent()) == wxNO)
+		{
+			numeratorBox->SetValue(originalNumerator);
+			numeratorBox->SetValue(originalDenominator);
+
+			return false;
+		}
+	}
+
 	return true;
 }
 

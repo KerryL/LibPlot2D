@@ -18,6 +18,8 @@
 
 // Standard C++ headers
 #include <string>
+#include <set>
+#include <vector>
 
 // Local forward declarations
 class Dataset2D;
@@ -64,6 +66,18 @@ public:
 	*/
 	static Dataset2D ComputeFFT(Dataset2D data, const FFTWindow &window,
 		unsigned int windowSize, const double &overlap, const bool &subtractMean);
+
+	/// Performs basic checking to recognize possible frequency aliasing.
+	/*! Compares a decimated FFT with the full spectrum FFT and looks for unexpected
+		frequency shifts.  Only capable of detecting aliasing that appears in the
+		lower half of the detectable freuqency range.
+
+		\param[in] fullFFT		previously computed FFT data at full sample rate
+		\param[in] decimatedFFT	previously computed FFT data at reduced sample rate
+
+		\return String warning of any possible detected aliasing.
+	*/
+	static std::string DetectAliasing(const Dataset2D &fullFFT, const Dataset2D &decimatedFFT);
 
 	/// Computes the Frequency Response Function for the specified signals.
 	/*! Determines the frequency-dependent relationship between the specified signals.
@@ -133,6 +147,8 @@ public:
 		\return The largest allowable power of two for the specified sample size
 	*/
 	static unsigned int GetMaxPowerOfTwo(const unsigned int &sampleSize);
+
+	static Dataset2D DecimateData(const Dataset2D& data, const unsigned int &reductionFactor = 2);
 
 private:
 	/// Applies the specified window to the dataset.
@@ -326,6 +342,13 @@ private:
 
 	static unsigned int ComputeRequiredOverlapPoints(const unsigned int &dataSize,
 		const unsigned int &windowSize, const unsigned int &averages);
+
+	static std::set<unsigned int> FindSignificantFrequencies(const Dataset2D &fft);
+	static bool IsPeak(const Dataset2D &data, const unsigned int &i);
+
+	static std::vector<double> MatchAliasedFrequencies(std::set<unsigned int> &set1,
+		const Dataset2D &fft1, std::set<unsigned int> &set2, const Dataset2D &fft2,
+		const unsigned int& shiftTolerance = 6, const double &amplitudeTolerance = 0.3);
 };
 
 #endif// _FFT_H_

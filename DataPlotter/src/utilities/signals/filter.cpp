@@ -515,3 +515,32 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 
 	return terms;
 }
+
+//==========================================================================
+// Class:			Filter
+// Function:		ComputeSteadyStateGain
+//
+// Description:		Returns the steady-state value resluting from a unity step
+//					input.
+//
+// Input Arguments:
+//		num	= const std::string&
+//		den = const std::string&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Filter::ComputeSteadyStateGain(const std::string &num, const std::string &den)
+{
+	// For results to be valid (using final value theorem):
+	// 1.  Roots of den must have negative real parts
+	// 2.  den must not have more than one zero root
+
+	// Add s/s, cancel esses, then evaluate for s = 0
+
+	return 0.0;// FIXME:  Implement
+}
