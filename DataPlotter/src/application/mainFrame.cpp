@@ -1995,35 +1995,18 @@ Dataset2D* MainFrame::GetFFTData(const Dataset2D* data)
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
 			_T("Accuracy Warning"), wxICON_WARNING, this);
 
-	Dataset2D *newData;//, decimatedData;
+	Dataset2D *newData;
 
 	if (dialog.GetUseZoomedData())
-	{
 		newData = new Dataset2D(FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
 			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
 			dialog.GetSubtractMean()));
-		/*decimatedData = Dataset2D(FastFourierTransform::ComputeFFT(
-			FastFourierTransform::DecimateData(GetXZoomedDataset(*data)),
-			dialog.GetFFTWindow(), dialog.GetWindowSize() / 2, dialog.GetOverlap(),
-			dialog.GetSubtractMean()));*/
-	}
 	else
-	{
 		newData = new Dataset2D(FastFourierTransform::ComputeFFT(*data,
 			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
 			dialog.GetSubtractMean()));
-		/*decimatedData = Dataset2D(FastFourierTransform::ComputeFFT(
-			FastFourierTransform::DecimateData(*data), dialog.GetFFTWindow(),
-			dialog.GetWindowSize() / 2, dialog.GetOverlap(), dialog.GetSubtractMean()));*/
-	}
 
 	newData->MultiplyXData(factor);
-	/*decimatedData.MultiplyXData(factor);
-
-	wxString aliasWarning = FastFourierTransform::DetectAliasing(*newData, decimatedData);
-	if (!aliasWarning.IsEmpty())
-		wxMessageBox(_T("Warning:  Possible aliasing detected.") + aliasWarning,
-		_T("Aliasing Detected"), wxICON_WARNING, this);*/
 
 	return newData;
 }
