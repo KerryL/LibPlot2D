@@ -159,6 +159,8 @@ protected:
 	void ProcessRightClick(wxMouseEvent &event);
 	void ProcessZoomBoxEnd(void);
 
+	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
+
 	struct Zoom
 	{
 		double xMin;

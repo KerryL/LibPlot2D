@@ -1681,25 +1681,22 @@ void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::ProcessZoomWithBox(wxMouseEvent &event)
 {
+	unsigned int x;
+	unsigned int y;
+
 	if (!zoomBox->GetIsVisible())
 	{
+		x = lastMousePosition[0];
+		y = lastMousePosition[1];
+		ForcePointWithinPlotArea(x, y);
+
 		zoomBox->SetVisibility(true);
-		zoomBox->SetAnchorCorner(lastMousePosition[0], GetSize().GetHeight() - lastMousePosition[1]);
+		zoomBox->SetAnchorCorner(x, GetSize().GetHeight() - y);
 	}
 
-	unsigned int x = event.GetX();
-	unsigned int y = event.GetY();
-
-	// Make sure we're still over the plot area - if we're not, draw the box as if we were
-	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge())
-		x = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
-	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		x = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
-
-	if (y < plot->GetTopAxis()->GetOffsetFromWindowEdge())
-		y = plot->GetTopAxis()->GetOffsetFromWindowEdge();
-	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		y = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge();
+	x = event.GetX();
+	y = event.GetY();
+	ForcePointWithinPlotArea(x, y);
 
 	// Tell the zoom box where to draw the floaing corner
 	zoomBox->SetFloatingCorner(x, GetSize().GetHeight() - y);
@@ -2002,4 +1999,35 @@ void PlotRenderer::ProcessZoomBoxEnd(void)
 		SetLeftYLimits(yLeftMin, yLeftMax);
 		SetRightYLimits(yRightMin, yRightMax);
 	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ForcePointWithinPlotArea
+//
+// Description:		If the specified point is not within the plot area, it
+//					modifies the coordinates such that it is.
+//
+// Input Arguments:
+//		x	= unsigned int&
+//		y	= unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ForcePointWithinPlotArea(unsigned int &x, unsigned int &y)
+{
+	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge())
+		x = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
+	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
+		x = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
+
+	if (y < plot->GetTopAxis()->GetOffsetFromWindowEdge())
+		y = plot->GetTopAxis()->GetOffsetFromWindowEdge();
+	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		y = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge();
 }
