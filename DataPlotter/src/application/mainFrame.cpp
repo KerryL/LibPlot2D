@@ -1017,7 +1017,7 @@ void MainFrame::AddCurve(wxString mathString)
 		return;
 	}
 
-	AddCurve(mathChannel, mathString.Upper());// TODO:  Get better name from user
+	AddCurve(mathChannel, mathString.Upper());
 }
 
 //==========================================================================
@@ -1046,6 +1046,8 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 		AddTimeRowToGrid();
 	unsigned int index = AddDataRowToGrid(name);
 	optionsGrid->EndBatch();
+
+	optionsGrid->Scroll(-1, optionsGrid->GetNumberRows());
 
 	plotArea->AddCurve(*data);
 	UpdateCurveProperties(index - 1, GetNextColor(index), true, false);

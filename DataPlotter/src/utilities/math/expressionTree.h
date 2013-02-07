@@ -61,7 +61,7 @@ private:
 	Dataset2D GetSetFromList(const unsigned int &i) const;
 
 	static bool NextIsNumber(const wxString &s, unsigned int *stop = NULL, const bool &lastWasOperator = true);
-	static bool NextIsDataset(const wxString &s, unsigned int *stop = NULL);
+	static bool NextIsDataset(const wxString &s, unsigned int *stop = NULL, const bool &lastWasOperator = true);
 	static bool NextIsFunction(const wxString &s, unsigned int *stop = NULL);
 	static bool NextIsOperator(const wxString &s, unsigned int *stop = NULL);
 	static bool NextIsS(const wxString &s, unsigned int *stop = NULL);

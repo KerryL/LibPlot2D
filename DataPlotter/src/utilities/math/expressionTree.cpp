@@ -271,7 +271,7 @@ wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOper
 	bool thisWasOperator(false);
 	if (NextIsNumber(expression, &advance, lastWasOperator))
 		outputQueue.push(expression.Mid(0, advance));
-	else if (NextIsDataset(expression, &advance))// TODO:  Add lastWasOperator here and do something tricky if we want to handle unary - for datasets
+	else if (NextIsDataset(expression, &advance, lastWasOperator))
 		outputQueue.push(expression.Mid(0, advance));
 	else if (NextIsS(expression, &advance))
 		outputQueue.push(expression.Mid(0, advance));
@@ -607,7 +607,9 @@ bool ExpressionTree::NextIsS(const wxString &s, unsigned int *stop)
 // Description:		Determines if the next portion of the expression is a dataset.
 //
 // Input Arguments:
-//		s		= const wxString& containing the expression
+//		s				= const wxString& containing the expression
+//		lastWasOperator	= const bool& indicating whether or not the last
+//						  item pushed to the stack was an operator or not
 //
 // Output Arguments:
 //		stop	= unsigned int* (optional) indicating length of dataset ID
@@ -616,19 +618,20 @@ bool ExpressionTree::NextIsS(const wxString &s, unsigned int *stop)
 //		bool, true if a dataset is next in the expression
 //
 //==========================================================================
-bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop)
+bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const bool &lastWasOperator)
 {
 	if (s.Len() < 3)
 		return false;
 
-	if (s[0] == '[')
+	if (s[0] == '[' ||
+		s[0] == '-' && lastWasOperator && NextIsDataset(s.Mid(1), NULL, false))
 	{
 		unsigned int close = s.Find(']');
 		if (close == (unsigned int)wxNOT_FOUND)
 			return false;
 
 		unsigned int i;
-		for (i = 1; i < close; i++)
+		for (i = 1 + (unsigned int)lastWasOperator; i < close; i++)
 		{
 			if (int(s[i]) < '0' || int(s[i]) > '9')
 				return false;
@@ -1550,8 +1553,10 @@ bool ExpressionTree::EvaluateDataset(const wxString &dataset, std::stack<Dataset
 		return false;
 	}
 
+	bool unaryMinus = dataset[0] == '-';
+
 	unsigned long set;
-	if (!dataset.Mid(1, dataset.Len() - 2).ToULong(&set))
+	if (!dataset.Mid(1 + (int)unaryMinus, dataset.Len() - 2 - (int)unaryMinus).ToULong(&set))
 	{
 		errorString = _T("Could not convert '") + dataset + _T("' to set ID.");
 		return false;
@@ -1562,7 +1567,10 @@ bool ExpressionTree::EvaluateDataset(const wxString &dataset, std::stack<Dataset
 		return false;
 	}
 
-	PushToStack(GetSetFromList(set), setStack, useDoubleStack);
+	if (unaryMinus)
+		PushToStack(GetSetFromList(set) * -1.0, setStack, useDoubleStack);
+	else
+		PushToStack(GetSetFromList(set), setStack, useDoubleStack);
 
 	return true;
 }
@@ -1629,10 +1637,10 @@ bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doub
 		return EvaluateFunction(next, doubleStack, setStack, useDoubleStack, errorString);
 	else if (NextIsNumber(next))
 		return EvaluateNumber(next, doubleStack, useDoubleStack, errorString);
-	else if(NextIsOperator(next))
-		return EvaluateOperator(next, doubleStack, setStack, useDoubleStack, errorString);
 	else if (NextIsDataset(next))
 		return EvaluateDataset(next, setStack, useDoubleStack, errorString);
+	else if(NextIsOperator(next))
+		return EvaluateOperator(next, doubleStack, setStack, useDoubleStack, errorString);
 	else
 		errorString = _T("Unable to evaluate '") + next + _T("'.");
 
