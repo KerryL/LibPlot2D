@@ -158,7 +158,7 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 	{
 		wxTextDataObject textData;
 		textData.SetData(bufferSize, buffer);
-		return OnDropText(textData.GetText()) ? def : wxDragNone;
+		return OnDropText(textData.GetText()) ? wxDragCopy : wxDragNone;
 	}
 	
 	assert(false);
