@@ -54,7 +54,8 @@ public:
 		wxString defaultFileName, wxString wildcard, long style);
 
 	// Load a plot from file
-	bool LoadFile(wxString pathAndFileName);
+	bool LoadFile(const wxString &pathAndFileName);
+	bool LoadText(const wxString &textData);
 
 	enum PlotContext
 	{
@@ -275,6 +276,8 @@ private:
 	wxString genericXAxisLabel;
 
 	Dataset2D GetXZoomedDataset(const Dataset2D &fullData) const;
+
+	wxString GenerateTemporaryFileName(const unsigned int &length = 10) const;
 
 	DECLARE_EVENT_TABLE();
 

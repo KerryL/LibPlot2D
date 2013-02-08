@@ -91,6 +91,9 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 
 	currentFileFormat = FormatGeneric;
 
+	// Also initialize the random number generator
+	srand(time(NULL));
+
 	//TestSignalOperations();
 }
 
@@ -836,7 +839,7 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 // Description:		Public method for loading a single object from file.
 //
 // Input Arguments:
-//		pathAndFileName	= wxString
+//		pathAndFileName	= const wxString&
 //
 // Output Arguments:
 //		None
@@ -845,16 +848,10 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //		true for file successfully loaded, false otherwise
 //
 //==========================================================================
-bool MainFrame::LoadFile(wxString pathAndFileName)
+bool MainFrame::LoadFile(const wxString &pathAndFileName)
 {
-	int startOfExtension;
-	wxString fileExtension;
-
 	// NOTE:  If we ever choose to allow multiple files to be opened, this will need to go
 	ClearAllCurves();
-
-	startOfExtension = pathAndFileName.Last('.') + 1;
-	fileExtension = pathAndFileName.Mid(startOfExtension);
 
 	DataFile *file = GetDataFile(pathAndFileName);
 	if (file->Load())
@@ -873,6 +870,83 @@ bool MainFrame::LoadFile(wxString pathAndFileName)
 
 	delete file;
 	return false;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		LoadText
+//
+// Description:		Public method for loading a single object from text.
+//					This writes the text to a temporary file, then tries to
+//					open it using normal methods.
+//
+// Input Arguments:
+//		textData	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true for file successfully loaded, false otherwise
+//
+//==========================================================================
+bool MainFrame::LoadText(const wxString &textData)
+{
+	wxString tempFileName(GenerateTemporaryFileName());
+	while (wxFile::Exists(tempFileName))
+		tempFileName = GenerateTemporaryFileName();
+
+	std::ofstream tempFile(tempFileName.c_str(), std::ios::out);
+	if (!tempFile.good() || !tempFile.is_open())
+	{
+		tempFile.close();
+		if (remove(tempFileName.c_str()) != 0)
+			wxMessageBox(_T("Error deleting temporary file '") + tempFileName + _T("'."),
+			_T("Could Not Delete File"), wxICON_ERROR, this);
+		return false;
+	}
+
+	tempFile << textData;
+	tempFile.close();
+
+	bool fileLoaded = LoadFile(tempFileName);
+	if (remove(tempFileName.c_str()) != 0)
+		wxMessageBox(_T("Error deleting temporary file '") + tempFileName + _T("'."),
+		_T("Could Not Delete File"), wxICON_ERROR, this);
+
+	if (fileLoaded)
+		SetTitle(_T("Clipboard Data - ") + DataPlotterApp::dataPlotterTitle);
+
+	return fileLoaded;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		GenerateTemporaryFileName
+//
+// Description:		Generates a random string of characters to use as a file
+//					name (always ends with .tmp).
+//
+// Input Arguments:
+//		length	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString MainFrame::GenerateTemporaryFileName(const unsigned int &length) const
+{
+	wxString name;
+	unsigned int i;
+	for (i = 0; i < length; i++)
+		name.Append((char)((rand() % 52) + 65));
+
+	name.Append(_T(".tmp"));
+
+	return name;
 }
 
 //==========================================================================

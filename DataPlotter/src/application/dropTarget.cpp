@@ -25,7 +25,7 @@
 // Description:		Constructor for DROP_TARGET class.
 //
 // Input Arguments:
-//		_MainFrame	= &MAIN_FRAME, reference to main application window
+//		_mainFrame	= &MainFrame, reference to main application window
 //
 // Output Arguments:
 //		None
@@ -36,6 +36,14 @@
 //==========================================================================
 DropTarget::DropTarget(MainFrame &_mainFrame) : mainFrame(_mainFrame)
 {
+	wxDataObjectComposite *dataObject = new wxDataObjectComposite;
+
+	dataObject->Add(new wxFileDataObject);
+	dataObject->Add(new wxTextDataObject);
+
+	SetDataObject(dataObject);
+
+	buffer = NULL;
 }
 
 //==========================================================================
@@ -56,17 +64,16 @@ DropTarget::DropTarget(MainFrame &_mainFrame) : mainFrame(_mainFrame)
 //==========================================================================
 DropTarget::~DropTarget()
 {
+	ClearBuffer();
 }
 
 //==========================================================================
 // Class:			DropTarget
 // Function:		OnDropFiles
 //
-// Description:		Overloaded virtual method from wxFileDropTarget.
+// Description:		Handles dragging and dropping of files.
 //
 // Input Arguments:
-//		x			= wxCoord (unused)
-//		y			= wxCoord (unused)
 //		filenames	= const &wxArrayString containing the list of filenames
 //					  being dropped
 //
@@ -77,13 +84,106 @@ DropTarget::~DropTarget()
 //		true to accept the data, false to veto
 //
 //==========================================================================
-bool DropTarget::OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
-							  const wxArrayString &filenames)
+bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 {
-	// Load each file
 	unsigned int i;
 	for (i = 0; i < filenames.Count(); i++)
 		mainFrame.LoadFile(filenames[i]);
 
 	return true;
+}
+
+//==========================================================================
+// Class:			DropTarget
+// Function:		OnDropText
+//
+// Description:		Handles dragging and dropping text.
+//
+// Input Arguments:
+//		data	= const &wxString containing the text being dropped
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true to accept the data, false to veto
+//
+//==========================================================================
+bool DropTarget::OnDropText(const wxString& data)
+{
+	mainFrame.LoadText(data);
+
+	return true;
+}
+
+//==========================================================================
+// Class:			DropTarget
+// Function:		OnData
+//
+// Description:		Overloaded virtual method from wxTextDropTarget.
+//
+// Input Arguments:
+//		x		= wxCoord (unused)
+//		y		= wxCoord (unused)
+//		def		= wxDragResult
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxDragResult
+//
+//==========================================================================
+wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDragResult def)
+{
+    if (!GetData())
+        return wxDragNone;
+
+	ClearBuffer();
+
+	wxDataObjectComposite *dataObject = static_cast<wxDataObjectComposite*>(m_dataObject);
+	size_t bufferSize = dataObject->GetDataSize(dataObject->GetReceivedFormat());
+
+	buffer = new char[bufferSize];
+	if (!dataObject->GetDataHere(dataObject->GetReceivedFormat(), buffer))
+		return wxDragNone;
+
+	if (dataObject->GetReceivedFormat().GetType() == wxDF_FILENAME)
+	{
+		wxFileDataObject fileData;
+		fileData.SetData(bufferSize, buffer);
+		return OnDropFiles(fileData.GetFilenames()) ? def : wxDragNone;
+	}
+	else if (dataObject->GetReceivedFormat().GetType() == wxDF_TEXT)
+	{
+		wxTextDataObject textData;
+		textData.SetData(bufferSize, buffer);
+		return OnDropText(textData.GetText()) ? def : wxDragNone;
+	}
+	
+	assert(false);
+	return wxDragNone;
+}
+
+//==========================================================================
+// Class:			DropTarget
+// Function:		ClearBuffer
+//
+// Description:		Safely deletes the buffer contents.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void DropTarget::ClearBuffer(void)
+{
+	if (buffer)
+		delete [] buffer;
+	buffer = NULL;
 }

@@ -24,21 +24,27 @@
 class MainFrame;
 
 // The main class declaration
-class DropTarget : public wxFileDropTarget
+class DropTarget : public wxDropTarget
 {
 public:
 	// Constructor
 	DropTarget(MainFrame &_mainFrame);
 
 	// Destructor
-	~DropTarget();
+	virtual ~DropTarget();
+
+	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);
 
 private:
 	// Reference to main frame
 	MainFrame &mainFrame;
 
-	// Required override of virtual OnDropFiles handler
-	virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString &filenames);
+	bool OnDropFiles(const wxArrayString &filenames);
+	bool OnDropText(const wxString& data);
+
+	char *buffer;
+
+	void ClearBuffer(void);
 };
 
 #endif//  _DROP_TARGET_H_
