@@ -972,6 +972,40 @@ bool RenderWindow::WriteImageToFile(wxString pathAndFileName) const
 
 //==========================================================================
 // Class:			RenderWindow
+// Function:		GetImage
+//
+// Description:		Returns an image object representing the contents of the
+//					window.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxImage
+//
+//==========================================================================
+wxImage RenderWindow::GetImage(void) const
+{
+	unsigned int height = GetSize().GetHeight();
+	unsigned int width = GetSize().GetWidth();
+
+	GLubyte *imageBuffer = (GLubyte*)malloc(width * height * sizeof(GLubyte) * 3);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, imageBuffer);
+
+	wxImage newImage(width, height, imageBuffer, true);
+	newImage = newImage.Mirror(false);
+
+	free(imageBuffer);
+
+	return newImage;
+}
+
+//==========================================================================
+// Class:			RenderWindow
 // Function:		IsThisRendererSelected
 //
 // Description:		Writes the contents of the render window to file.  Various

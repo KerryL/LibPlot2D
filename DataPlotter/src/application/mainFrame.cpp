@@ -22,6 +22,7 @@
 #include <wx/colordlg.h>
 #include <wx/splitter.h>
 #include <wx/file.h>
+#include <wx/clipbrd.h>
 
 // Local headers
 #include "application/mainFrame.h"
@@ -284,9 +285,9 @@ wxBoxSizer* MainFrame::CreateButtons(wxWindow *parent)
 {
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxVERTICAL);
 
-	openButton = new wxButton(parent, idButtonOpen, _T("Open"));
-	autoScaleButton = new wxButton(parent, idButtonAutoScale, _T("Auto Scale"));
-	removeCurveButton = new wxButton(parent, idButtonRemoveCurve, _T("Remove"));
+	openButton = new wxButton(parent, idButtonOpen, _T("&Open"));
+	autoScaleButton = new wxButton(parent, idButtonAutoScale, _T("&Auto Scale"));
+	removeCurveButton = new wxButton(parent, idButtonRemoveCurve, _T("&Remove"));
 	buttonSizer->Add(openButton, 0, wxEXPAND);
 	buttonSizer->Add(autoScaleButton, 0, wxEXPAND);
 	buttonSizer->Add(removeCurveButton, 0, wxEXPAND);
@@ -332,6 +333,16 @@ void MainFrame::SetProperties(void)
 #endif
 
 	SetDropTarget(dynamic_cast<wxDropTarget*>(new DropTarget(*this)));
+
+	const int entryCount(4);//5);
+	wxAcceleratorEntry entries[entryCount];
+	entries[0].Set(wxACCEL_CTRL, (int)'c', idPlotContextCopy);
+	entries[1].Set(wxACCEL_CTRL, (int)'v', idPlotContextPaste);
+	entries[2].Set(wxACCEL_CTRL, (int)'o', idButtonOpen);
+	entries[2].Set(wxACCEL_CTRL, (int)'a', idButtonAutoScale);
+	//entries[2].Set(wxACCEL_CTRL, (int)'r', idButtonRemoveCurve);
+	wxAcceleratorTable accel(entryCount, entries);
+	SetAcceleratorTable(accel);
 }
 
 //==========================================================================
@@ -377,6 +388,8 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idContextFilter,						MainFrame::ContextFilterEvent)
 	EVT_MENU(idContextFitCurve,						MainFrame::ContextFitCurve)
 
+	EVT_MENU(idPlotContextCopy,						MainFrame::ContextCopy)
+	EVT_MENU(idPlotContextPaste,					MainFrame::ContextPaste)
 	EVT_MENU(idPlotContextToggleGridlines,			MainFrame::ContextToggleGridlines)
 	EVT_MENU(idPlotContextAutoScale,				MainFrame::ContextAutoScale)
 	EVT_MENU(idPlotContextWriteImageFile,			MainFrame::ContextWriteImageFile)
@@ -746,13 +759,24 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
 {
 	wxMenu *contextMenu = new wxMenu();
-	contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
-	contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
+	contextMenu->Append(idPlotContextCopy, _T("Copy"));
+	contextMenu->Append(idPlotContextPaste, _T("Paste"));
 	contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
 	contextMenu->Append(idPlotContextExportData, _T("Export Data"));
 	contextMenu->AppendSeparator();
+	contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
+	contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
 	contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
 	contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));
+
+	if (wxTheClipboard->Open())
+	{
+		if (!wxTheClipboard->IsSupported(wxDF_TEXT))
+			contextMenu->Enable(idPlotContextPaste, false);
+		wxTheClipboard->Close();
+	}
+	else
+		contextMenu->Enable(idPlotContextPaste, false);
 
 	return contextMenu;
 }
@@ -2324,6 +2348,48 @@ wxString MainFrame::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		ContextCopy
+//
+// Description:		Handles context menu copy command events.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextCopy(wxCommandEvent& WXUNUSED(event))
+{
+	DoCopy();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextPaste
+//
+// Description:		Handles context menu paste command events.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextPaste(wxCommandEvent& WXUNUSED(event))
+{
+	DoPaste();
+}
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		ContextToggleGridlines
 //
 // Description:		Toggles gridlines for the entire plot on and off.
@@ -3101,6 +3167,61 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName)
 	// Don't even check - if we can't open it with any other types,
 	// always try to open it with a generic type
 	return new GenericFile(fileName, this);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		DoCopy
+//
+// Description:		Handles "copy to clipboard" actions.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::DoCopy(void)
+{
+	if (wxTheClipboard->Open())
+	{
+		wxTheClipboard->SetData(new wxBitmapDataObject(plotArea->GetImage()));
+		wxTheClipboard->Close();
+	}
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		DoPaste
+//
+// Description:		Handles "paste from clipboard" actions.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::DoPaste(void)
+{
+	if (wxTheClipboard->Open())
+	{
+		if (wxTheClipboard->IsSupported(wxDF_TEXT))
+		{
+			wxTextDataObject data;
+			wxTheClipboard->GetData(data);
+			LoadText(data.GetText());
+		}
+		wxTheClipboard->Close();
+	}
 }
 
 //==========================================================================

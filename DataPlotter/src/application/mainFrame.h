@@ -147,6 +147,8 @@ private:
 		idContextFilter,
 		idContextFitCurve,
 
+		idPlotContextCopy,
+		idPlotContextPaste,
 		idPlotContextToggleGridlines,
 		idPlotContextAutoScale,
 		idPlotContextWriteImageFile,
@@ -205,6 +207,8 @@ private:
 	void ContextFilterEvent(wxCommandEvent &event);
 	void ContextFitCurve(wxCommandEvent &event);
 
+	void ContextCopy(wxCommandEvent &event);
+	void ContextPaste(wxCommandEvent &event);
 	void ContextToggleGridlines(wxCommandEvent &event);
 	void ContextAutoScale(wxCommandEvent &event);
 	void ContextWriteImageFile(wxCommandEvent &event);
@@ -278,6 +282,9 @@ private:
 	Dataset2D GetXZoomedDataset(const Dataset2D &fullData) const;
 
 	wxString GenerateTemporaryFileName(const unsigned int &length = 10) const;
+
+	void DoCopy(void);
+	void DoPaste(void);
 
 	DECLARE_EVENT_TABLE();
 

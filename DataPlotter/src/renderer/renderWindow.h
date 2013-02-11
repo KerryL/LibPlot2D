@@ -84,6 +84,7 @@ public:
 
 	// Writes the current image to file
 	bool WriteImageToFile(wxString pathAndFileName) const;
+	wxImage GetImage(void) const;
 
 	// Determines if a particular primitive is in the scene owned by this object
 	bool IsThisRendererSelected(const Primitive *pickedObject) const;
