@@ -227,12 +227,13 @@ void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 //
 // Output Arguments:
 //		value	= double& specifying the Y-value
+//		exactValue	= bool* indicating whether or not the exact value is being returned
 //
 // Return Value:
-//		True if interpolation was used, false otherwise
+//		true if specified x is within range of data, false otherwise
 //
 //==========================================================================
-bool Dataset2D::GetYAt(double &x) const
+bool Dataset2D::GetYAt(double &x, bool *exactValue) const
 {
 	// This assumes data is entered from small x to large x and that y is a function of x
 	unsigned int i;
@@ -241,6 +242,10 @@ bool Dataset2D::GetYAt(double &x) const
 		if (xData[i] == x)
 		{
 			x = yData[i];
+
+			if (exactValue)
+				*exactValue = true;
+
 			return true;
 		}
 		else if (xData[i] > x)
@@ -250,7 +255,10 @@ bool Dataset2D::GetYAt(double &x) const
 			else
 				x = yData[i];
 
-			break;
+			if (exactValue)
+				*exactValue = false;
+
+			return true;
 		}
 	}
 

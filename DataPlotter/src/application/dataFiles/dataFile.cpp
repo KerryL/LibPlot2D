@@ -45,6 +45,7 @@ DataFile::DataFile(const wxString& _fileName, wxWindow *_parent)
 
 	ignoreConsecutiveDelimiters = true;
 	timeIsFormatted = false;
+	removeExistingCurves = true;
 }
 
 //==========================================================================
@@ -417,6 +418,7 @@ bool DataFile::ProcessFile(void)
 		return false;
 	}
 	descriptions = RemoveUnwantedDescriptions(descriptions, choices);
+	removeExistingCurves = dialog.RemoveExistingCurves();
 
 	std::ifstream file(fileName.c_str(), std::ios::in);
 	if (!file.is_open())

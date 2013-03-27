@@ -118,17 +118,22 @@ void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayStr
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 5);
+	topSizer->Add(mainSizer, 1, wxALL | wxEXPAND, 5);
 
 	wxStaticText *instructions = new wxStaticText(this, wxID_ANY, message);
 	mainSizer->Add(instructions, 0, wxALL, 8);
 
-	choiceListBox = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxSize(300, 200), choices, wxLB_ALWAYS_SB);
+	choiceListBox = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition,
+		wxSize(300, 200), choices, wxLB_ALWAYS_SB);
 	SetAllChoices(true);
-	mainSizer->Add(choiceListBox, 0, wxALL, 10);
+	mainSizer->Add(choiceListBox, 1, wxALL | wxEXPAND, 10);
+
+	removeCheckBox = new wxCheckBox(this, wxID_ANY, _T("Remove Existing Curves"));
+	mainSizer->Add(removeCheckBox, 0, wxALL & ~wxTOP, 10);
+	removeCheckBox->SetValue(true);
 
 	mainSizer->Add(new wxStaticLine(this), wxSizerFlags().Expand().DoubleBorder(wxLEFT | wxRIGHT));
-	mainSizer->Add(CreateButtons(), 1, wxGROW | wxALL, 5);
+	mainSizer->Add(CreateButtons(), 0, wxALL | wxEXPAND, 5);
 
 	SetSizer(topSizer);
 	topSizer->SetSizeHints(this);
@@ -225,4 +230,25 @@ void MultiChoiceDialog::SetAllChoices(const bool &selected)
 	unsigned int i;
 	for (i = 0; i < choiceListBox->GetCount(); i++)
 		choiceListBox->Check(i, selected);
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		RemoveExistingCurves
+//
+// Description:		Returns the value of the "Remove Existing Curves" checkbox.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool MultiChoiceDialog::RemoveExistingCurves(void) const
+{
+	return removeCheckBox->GetValue();
 }

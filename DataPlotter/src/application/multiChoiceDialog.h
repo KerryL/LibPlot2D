@@ -29,11 +29,14 @@ public:
 
 	virtual  wxArrayInt GetSelections(void) const;
 
+	bool RemoveExistingCurves(void) const;
+
 private:
 	void CreateControls(const wxString& message, const wxArrayString& choices);
 	wxSizer* CreateButtons(void);
 
 	wxCheckListBox *choiceListBox;
+	wxCheckBox *removeCheckBox;
 
 	// Object IDs
 	enum

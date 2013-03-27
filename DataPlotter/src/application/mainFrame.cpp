@@ -661,6 +661,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 
 	contextMenu->Append(idContextAddMathChannel, _T("Add Math Channel"));
 	contextMenu->Append(idContextFRF, _T("Frequency Response"));
+	//contextMenu->Append(idContextSetXData, _T("Use as X-Axis"));
 
 	if (row == 0 && currentFileFormat == FormatGeneric)
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
@@ -874,12 +875,13 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //==========================================================================
 bool MainFrame::LoadFile(const wxString &pathAndFileName)
 {
-	// NOTE:  If we ever choose to allow multiple files to be opened, this will need to go
-	ClearAllCurves();
 
 	DataFile *file = GetDataFile(pathAndFileName);
 	if (file->Load())
 	{
+		if (file->RemoveExistingCurves())
+			ClearAllCurves();
+
 		unsigned int i;
 		for (i = 0; i < file->GetDataCount(); i++)
 			AddCurve(file->GetDataset(i), file->GetDescription(i + 1));
@@ -1205,7 +1207,7 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 
 	optionsGrid->SetCellEditor(index, colVisible, new wxGridCellBoolEditor);
 	optionsGrid->SetCellEditor(index, colRightAxis, new wxGridCellBoolEditor);
-	optionsGrid->SetCellEditor(index, colLineSize, new wxGridCellNumberEditor(1, maxLineSize));
+	optionsGrid->SetCellEditor(index, colLineSize, new wxGridCellNumberEditor(0, maxLineSize));
 	optionsGrid->SetCellEditor(index, colMarkerSize, new wxGridCellNumberEditor(-1, maxMarkerSize));
 
 	unsigned int i;
@@ -2468,6 +2470,7 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 
 	// For each curve, update the cursor values
 	int i;
+	bool showXDifference(false);
 	for (i = 1; i < optionsGrid->GetRows(); i++)
 	{
 		UpdateSingleCursorValue(i, leftValue, colLeftCursor, leftVisible);
@@ -2476,12 +2479,18 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 		if (leftVisible && rightVisible)
 		{
 			double left(leftValue), right(rightValue);
-			plotList[i - 1]->GetYAt(left);
-			plotList[i - 1]->GetYAt(right);
-			optionsGrid->SetCellValue(i, colDifference, wxString::Format("%f", right - left));
-			optionsGrid->SetCellValue(0, colDifference, wxString::Format("%f", rightValue - leftValue));
+			if (plotList[i - 1]->GetYAt(left) && plotList[i - 1]->GetYAt(right))
+			{
+				optionsGrid->SetCellValue(i, colDifference, wxString::Format("%f", right - left));
+				showXDifference = true;
+			}
+			else
+				optionsGrid->SetCellValue(i, colDifference, wxEmptyString);
 		}
 	}
+
+	if (showXDifference)
+		optionsGrid->SetCellValue(0, colDifference, wxString::Format("%f", rightValue - leftValue));
 }
 
 //==========================================================================
@@ -2491,9 +2500,10 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 // Description:		Updates a single cursor value.
 //
 // Input Arguments:
-//		row		= const unsigned int& specifying the grid row
-//		value	= const double& specifying the value to populate
-//		column	= const unsigned int& specifying which grid column to populate
+//		row			= const unsigned int& specifying the grid row
+//		value		= const double& specifying the value to populate
+//		column		= const unsigned int& specifying which grid column to populate
+//		isVisible	= const bool& indicating whether or not the cursor is visible
 //
 // Output Arguments:
 //		None
@@ -2509,10 +2519,16 @@ void MainFrame::UpdateSingleCursorValue(const unsigned int &row,
 	{
 		optionsGrid->SetCellValue(0, column, wxString::Format("%f", value));
 
-		if (plotList[row - 1]->GetYAt(value))
-			optionsGrid->SetCellValue(row, column, _T("*") + wxString::Format("%f", value));
+		bool exact;
+		if (plotList[row - 1]->GetYAt(value, &exact))
+		{
+			if (exact)
+				optionsGrid->SetCellValue(row, column, _T("*") + wxString::Format("%f", value));
+			else
+				optionsGrid->SetCellValue(row, column, wxString::Format("%f", value));
+		}
 		else
-			optionsGrid->SetCellValue(row, column, wxString::Format("%f", value));
+			optionsGrid->SetCellValue(row, column, wxEmptyString);
 	}
 	else
 	{

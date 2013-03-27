@@ -106,25 +106,28 @@ PlotCurve::~PlotCurve()
 //==========================================================================
 void PlotCurve::GenerateGeometry(void)
 {
-	glLineWidth((float)lineSize);
-	glBegin(GL_LINE_STRIP);
-
-	unsigned int i;
-	for (i = 0; i < data->GetNumberOfPoints(); i++)
+	if (lineSize > 0)
 	{
-		if (PointIsWithinPlotArea(i))
-		{
-			if (i > 0 && !PointIsWithinPlotArea(i - 1))
-				PlotInterpolatedPoint(i - 1, i, true);
-			PlotPoint(i);
-		}
-		else if (i > 0 && PointIsWithinPlotArea(i - 1))
-			PlotInterpolatedPoint(i - 1, i, false);
-		else if (i > 0 && PointsJumpPlotArea(i - 1, i))
-			PlotInterpolatedJumpPoints(i - 1, i);
-	}
+		glLineWidth((float)lineSize);
+		glBegin(GL_LINE_STRIP);
 
-	glEnd();
+		unsigned int i;
+		for (i = 0; i < data->GetNumberOfPoints(); i++)
+		{
+			if (PointIsWithinPlotArea(i))
+			{
+				if (i > 0 && !PointIsWithinPlotArea(i - 1))
+					PlotInterpolatedPoint(i - 1, i, true);
+				PlotPoint(i);
+			}
+			else if (i > 0 && PointIsWithinPlotArea(i - 1))
+				PlotInterpolatedPoint(i - 1, i, false);
+			else if (i > 0 && PointsJumpPlotArea(i - 1, i))
+				PlotInterpolatedJumpPoints(i - 1, i);
+		}
+
+		glEnd();
+	}
 
 	if (markerSize > 0 || (markerSize < 0 && SmallRange()))
 	{

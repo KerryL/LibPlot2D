@@ -17,6 +17,7 @@
 #define _DATASET_H_
 
 // Standard C++ headers
+#include <cstdlib>
 #include <assert.h>
 
 // wxWidgets forward declarations
@@ -51,7 +52,7 @@ public:
 	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; };
 
 	Dataset2D& MultiplyXData(const double &target);
-	bool GetYAt(double &x) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
+	bool GetYAt(double &x, bool *exactValue = NULL) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
 
 	Dataset2D& XShift(const double &shift);
 

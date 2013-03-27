@@ -42,8 +42,10 @@ public:
 	wxString GetDescription(const unsigned int &i) const { return descriptions[i]; };
 	unsigned int GetDataCount(void) { return data.size(); };
 
+	bool RemoveExistingCurves(void) const { return removeExistingCurves; };
+
 	// Classes derived from this should have this method:
-	//static bool IsType(const wxWidgets& _fileName);
+	//static bool IsType(const wxString& _fileName);
 
 protected:
 	wxString fileName;
@@ -57,6 +59,7 @@ protected:
 	unsigned int headerLines;
 	bool ignoreConsecutiveDelimiters;
 	bool timeIsFormatted;
+	bool removeExistingCurves;
 
 	wxString DetermineBestDelimiter(void) const;
 
