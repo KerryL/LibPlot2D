@@ -624,7 +624,7 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const 
 		return false;
 
 	if (s[0] == '[' ||
-		s[0] == '-' && lastWasOperator && NextIsDataset(s.Mid(1), NULL, false))
+		s[0] == '-' && lastWasOperator && NextIsDataset(s.Mid(1), NULL, false))// FIXME:  Use parenthesis to make this clearer... no time to think through and add them now...
 	{
 		unsigned int close = s.Find(']');
 		if (close == (unsigned int)wxNOT_FOUND)
