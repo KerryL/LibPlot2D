@@ -614,6 +614,8 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
 	// Known bug with wxGrid::GetSelectedRows() - returns empty set
 	// This is the cleanest way to do it, after the bug is fixed
+	// Actually - this method might require sorting and removing rows in reverse
+	// order to avoide changing row indices during deletion process
 	/*wxArrayInt rows = optionsGrid->GetSelectedRows();
 
 	// Must have row selected
@@ -629,7 +631,7 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 
 	// Workaround for now
 	int i;
-	for (i = 1; i < optionsGrid->GetRows(); i++)
+	for (i = optionsGrid->GetRows() - 1; i > 0; i--)
 	{
 		if (optionsGrid->IsInSelection(i, 0))
 			RemoveCurve(i - 1);
