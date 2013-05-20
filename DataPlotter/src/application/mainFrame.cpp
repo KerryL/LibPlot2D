@@ -286,15 +286,12 @@ wxBoxSizer* MainFrame::CreateButtons(wxWindow *parent)
 {
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxVERTICAL);
 
-	openButton = new wxButton(parent, idButtonOpen, _T("&Open"));
-	autoScaleButton = new wxButton(parent, idButtonAutoScale, _T("&Auto Scale"));
-	removeCurveButton = new wxButton(parent, idButtonRemoveCurve, _T("&Remove"));
-	buttonSizer->Add(openButton, 0, wxEXPAND);
-	buttonSizer->Add(autoScaleButton, 0, wxEXPAND);
-	buttonSizer->Add(removeCurveButton, 0, wxEXPAND);
+	buttonSizer->Add(new wxButton(parent, idButtonOpen, _T("&Open")));
+	buttonSizer->Add(new wxButton(parent, idButtonAutoScale, _T("&Auto Scale")));
+	buttonSizer->Add(new wxButton(parent, idButtonRemoveCurve, _T("&Remove")));
 
-	wxStaticText *versionText = new wxStaticText(parent, wxID_ANY, DataPlotterApp::versionString);
-	buttonSizer->Add(versionText, 0, wxEXPAND | wxALIGN_BOTTOM);
+	buttonSizer->AddStretchSpacer();
+	buttonSizer->Add(new wxStaticText(parent, wxID_ANY, DataPlotterApp::versionString));
 
 	return buttonSizer;
 }

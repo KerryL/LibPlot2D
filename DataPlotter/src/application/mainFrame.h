@@ -84,11 +84,7 @@ private:
 	wxBoxSizer* CreateButtons(wxWindow *parent);
 
 	// Controls
-	wxButton *openButton;
-	wxButton *autoScaleButton;
-	wxButton *removeCurveButton;
 	wxGrid *optionsGrid;
-
 	PlotRenderer *plotArea;
 
 	enum Columns
