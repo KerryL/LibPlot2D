@@ -595,7 +595,7 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 
 	if (preserveDCValue)
 	{
-		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2);
+		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2 + 1);
 
 		halfSpectrum.GetXPointer()[0] = fullSpectrum.GetXData(0);
 		halfSpectrum.GetYPointer()[0] = fullSpectrum.GetYData(0);// No factor of 2 for DC point
@@ -608,7 +608,7 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 	}
 	else
 	{
-		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2 - 1);
+		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2);
 
 		for (i = 0; i < halfSpectrum.GetNumberOfPoints(); i++)
 		{
