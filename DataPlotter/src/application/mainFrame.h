@@ -161,6 +161,7 @@ private:
 		idPlotContextAutoScaleBottom,
 		idPlotContextSetBottomRange,
 		idPlotContextSetBottomLogarithmic,
+		idPlotContextEditBottomLabel,
 
 		/*idPlotContextToggleTopGridlines,
 		idPlotContextAutoScaleTop,
@@ -171,11 +172,13 @@ private:
 		idPlotContextAutoScaleLeft,
 		idPlotContextSetLeftRange,
 		idPlotContextSetLeftLogarithmic,
+		idPlotContextEditLeftLabel,
 
 		idPlotContextToggleRightGridlines,
 		idPlotContextAutoScaleRight,
 		idPlotContextSetRightRange,
-		idPlotContextSetRightLogarithmic
+		idPlotContextSetRightLogarithmic,
+		idPlotContextEditRightLabel
 	};
 
 	wxMenu *CreateAxisContextMenu(const unsigned int &baseEventId) const;
@@ -221,16 +224,19 @@ private:
 	void ContextAutoScaleBottom(wxCommandEvent &event);
 	void ContextSetRangeBottom(wxCommandEvent &event);
 	void ContextSetLogarithmicBottom(wxCommandEvent &event);
+	void ContextEditBottomLabel(wxCommandEvent &event);
 
 	void ContextToggleGridlinesLeft(wxCommandEvent &event);
 	void ContextAutoScaleLeft(wxCommandEvent &event);
 	void ContextSetRangeLeft(wxCommandEvent &event);
 	void ContextSetLogarithmicLeft(wxCommandEvent &event);
+	void ContextEditLeftLabel(wxCommandEvent &event);
 
 	void ContextToggleGridlinesRight(wxCommandEvent &event);
 	void ContextAutoScaleRight(wxCommandEvent &event);
 	void ContextSetRangeRight(wxCommandEvent &event);
 	void ContextSetLogarithmicRight(wxCommandEvent &event);
+	void ContextEditRightLabel(wxCommandEvent &event);
 	// End event handlers-------------------------------------------------
 
 	void SetMarkerSize(const unsigned int &curve, const int &size);

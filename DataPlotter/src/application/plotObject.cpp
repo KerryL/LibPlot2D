@@ -1741,3 +1741,87 @@ void PlotObject::FormatCurves(void)
 		plotList[i]->SetModified();
 	}
 }
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetXLabel
+//
+// Description:		Returns the x label text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotObject::GetXLabel(void) const
+{
+	return axisBottom->GetLabel();
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetXLabel
+//
+// Description:		Returns the left y label text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotObject::GetLeftYLabel(void) const
+{
+	return axisLeft->GetLabel();
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetXLabel
+//
+// Description:		Returns the right y label text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotObject::GetRightYLabel(void) const
+{
+	return axisRight->GetLabel();
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetTitle
+//
+// Description:		Returns the title text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotObject::GetTitle(void) const
+{
+	return titleObject->GetText();
+}

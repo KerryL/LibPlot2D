@@ -1161,3 +1161,29 @@ double Dataset2D::ComputeYMean(void) const
 
 	return sum / (double)numberOfPoints;
 }
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		GetAverageDeltaX
+//
+// Description:		Computes the average spacing of the X-values.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Dataset2D::GetAverageDeltaX(void) const
+{
+	double sum(0.0);
+	unsigned int i;
+	for (i = 1; i < numberOfPoints; i++)
+		sum += xData[i] - xData[i - 1];
+
+	return sum / ((double)numberOfPoints - 1.0);
+}

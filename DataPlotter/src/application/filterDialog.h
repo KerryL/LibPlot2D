@@ -135,7 +135,6 @@ private:
 	wxSizer* CreateCheckBoxes(void);
 	wxSizer* CreateRadioButtons(void);
 	wxSizer* CreateTransferFunctionControls(void);
-	wxSizer* CreateDialogButtons(void);
 
 	bool CutoffFrequencyIsValid(void);
 	bool DampingRatioIsValid(void);

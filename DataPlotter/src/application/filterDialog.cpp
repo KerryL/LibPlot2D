@@ -133,7 +133,9 @@ void FilterDialog::CreateControls(void)
 	mainSizer->Add(CreateTransferFunctionControls(), 1, wxGROW);
 
 	mainSizer->AddSpacer(10);
-	mainSizer->Add(CreateDialogButtons(), 0, wxALIGN_CENTER_HORIZONTAL);
+	wxSizer *buttons = CreateButtonSizer(wxOK | wxCANCEL);
+	if (buttons)
+		mainSizer->Add(buttons, 0, wxALIGN_CENTER_HORIZONTAL);
 
 	SetSizerAndFit(topSizer);
 
@@ -303,37 +305,6 @@ wxSizer* FilterDialog::CreateTransferFunctionControls(void)
 	sizer->Add(tfSizer, 1, wxGROW);
 
 	return sizer;
-}
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		CreateDialogButtons
-//
-// Description:		Creates the OK and Cancel buttons at the bottom of the dialog.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxSizer* containing the buttons
-//
-//==========================================================================
-wxSizer* FilterDialog::CreateDialogButtons(void)
-{
-	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
-	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
-
-	okButton->SetDefault();
-
-	buttonSizer->Add(okButton, 1, wxALL, 5);
-	buttonSizer->Add(cancelButton, 1, wxALL, 5);
-
-	return buttonSizer;
 }
 
 //==========================================================================

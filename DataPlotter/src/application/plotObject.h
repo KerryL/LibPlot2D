@@ -86,6 +86,11 @@ public:
 	void SetRightYLabel(wxString text);
 	void SetTitle(wxString text);
 
+	wxString GetXLabel(void) const;
+	wxString GetLeftYLabel(void) const;
+	wxString GetRightYLabel(void) const;
+	wxString GetTitle(void) const;
+
 	void SetGridColor(const Color &color);
 	Color GetGridColor(void) const;
 

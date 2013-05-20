@@ -101,7 +101,10 @@ void FFTDialog::CreateControls(void)
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(CreateOutputControls());
 	mainSizer->AddSpacer(10);
-	mainSizer->Add(CreateButtons(), 1, wxGROW);
+
+	wxSizer *buttons = CreateButtonSizer(wxOK | wxCANCEL);
+	if (buttons)
+		mainSizer->Add(buttons, 1, wxGROW);
 
 	SetSizerAndFit(topSizer);
 	Center();
@@ -199,38 +202,6 @@ wxSizer* FFTDialog::CreateOutputControls(void)
 	sizer->Add(numberOfAverages, 1, wxGROW | wxALL, 2);
 
 	UpdateOutputControls();
-
-	return sizer;
-}
-
-//==========================================================================
-// Class:			FFTDialog
-// Function:		CreateButtons
-//
-// Description:		Creates the dialog buttons.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxSizer*
-//
-//==========================================================================
-wxSizer* FFTDialog::CreateButtons(void)
-{
-	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-
-	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
-	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
-
-	sizer->AddStretchSpacer();
-	sizer->Add(okButton, 0, wxALIGN_RIGHT | wxALL, 2);
-	sizer->Add(cancelButton, 0, wxALIGN_RIGHT | wxALL, 2);
-
-	okButton->SetDefault();
 
 	return sizer;
 }

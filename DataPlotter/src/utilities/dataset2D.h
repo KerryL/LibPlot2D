@@ -41,6 +41,7 @@ public:
 	void Reverse(void);
 
 	double ComputeYMean(void) const;
+	double GetAverageDeltaX(void) const;
 
 	unsigned int GetNumberOfPoints(void) const { return numberOfPoints; };
 	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;

@@ -83,6 +83,11 @@ public:
 	void SetRightYLabel(wxString text);
 	void SetTitle(wxString text);
 
+	wxString GetXLabel(void) const;
+	wxString GetLeftYLabel(void) const;
+	wxString GetRightYLabel(void) const;
+	wxString GetTitle(void) const;
+
 	void AddCurve(const Dataset2D &data);
 	void RemoveAllCurves(void);
 	void RemoveCurve(const unsigned int &index);

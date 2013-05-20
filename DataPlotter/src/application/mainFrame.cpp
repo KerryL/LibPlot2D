@@ -39,6 +39,7 @@
 #include "application/dataFiles/customFileFormat.h"
 #include "application/frfDialog.h"
 #include "application/fftDialog.h"
+#include "application/textInputDialog.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "utilities/dataset2D.h"
@@ -402,6 +403,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idPlotContextSetBottomRange,			MainFrame::ContextSetRangeBottom)
 	EVT_MENU(idPlotContextSetBottomLogarithmic,		MainFrame::ContextSetLogarithmicBottom)
 	EVT_MENU(idPlotContextAutoScaleBottom,			MainFrame::ContextAutoScaleBottom)
+	EVT_MENU(idPlotContextEditBottomLabel,			MainFrame::ContextEditBottomLabel)
 
 	//EVT_MENU(idPlotContextToggleTopGridlines,		MainFrame::)
 	//EVT_MENU(idPlotContextSetTopRange,			MainFrame::)
@@ -412,11 +414,13 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idPlotContextSetLeftRange,				MainFrame::ContextSetRangeLeft)
 	EVT_MENU(idPlotContextSetLeftLogarithmic,		MainFrame::ContextSetLogarithmicLeft)
 	EVT_MENU(idPlotContextAutoScaleLeft,			MainFrame::ContextAutoScaleLeft)
+	EVT_MENU(idPlotContextEditLeftLabel,			MainFrame::ContextEditLeftLabel)
 
 	EVT_MENU(idPlotContextToggleRightGridlines,		MainFrame::ContextToggleGridlinesRight)
 	EVT_MENU(idPlotContextSetRightRange,			MainFrame::ContextSetRangeRight)
 	EVT_MENU(idPlotContextSetRightLogarithmic,		MainFrame::ContextSetLogarithmicRight)
 	EVT_MENU(idPlotContextAutoScaleRight,			MainFrame::ContextAutoScaleRight)
+	EVT_MENU(idPlotContextEditRightLabel,			MainFrame::ContextEditRightLabel)
 END_EVENT_TABLE();
 
 //==========================================================================
@@ -808,6 +812,7 @@ wxMenu* MainFrame::CreateAxisContextMenu(const unsigned int &baseEventId) const
 	contextMenu->Append(baseEventId + 1, _T("Auto Scale Axis"));
 	contextMenu->Append(baseEventId + 2, _T("Set Range"));
 	contextMenu->AppendCheckItem(baseEventId + 3, _T("Logarithmic Scale"));
+	contextMenu->Append(baseEventId + 4, _T("Edit Label"));
 
 	return contextMenu;
 }
@@ -2090,7 +2095,7 @@ Dataset2D* MainFrame::GetFFTData(const Dataset2D* data)
 
 	FFTDialog dialog(this, data->GetNumberOfPoints(),
 		data->GetNumberOfZoomedPoints(plotArea->GetXMin(), plotArea->GetXMax()),
-		(data->GetXData(1) - data->GetXData(0)) / factor);
+		data->GetAverageDeltaX() / factor);
 
 	if (dialog.ShowModal() != wxID_OK)
 		return NULL;
@@ -3020,7 +3025,7 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
 			_T("Accuracy Warning"), wxICON_WARNING, this);
 
-	Filter *filter = GetFilter(parameters, factor / (data.GetXData(1) - data.GetXData(0)), data.GetYData(0));
+	Filter *filter = GetFilter(parameters, factor / data.GetAverageDeltaX(), data.GetYData(0));
 
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
@@ -3128,6 +3133,78 @@ void MainFrame::ContextSetLogarithmicRight(wxCommandEvent& WXUNUSED(event))
 {
 	plotArea->SetRightLogarithmic(!plotArea->GetRightLogarithmic());
 	plotArea->ClearZoomStack();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextEditBottomLabel
+//
+// Description:		Displays a message box asking the user to specify the text
+//					for the label.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextEditBottomLabel(wxCommandEvent& WXUNUSED(event))
+{
+	TextInputDialog dialog(_T("Specify label text:"), _T("Edit Label"), plotArea->GetXLabel(), this);
+	if (dialog.ShowModal() == wxID_OK)
+		plotArea->SetXLabel(dialog.GetText());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextEditLeftLabel
+//
+// Description:		Displays a message box asking the user to specify the text
+//					for the label.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextEditLeftLabel(wxCommandEvent& WXUNUSED(event))
+{
+	TextInputDialog dialog(_T("Specify label text:"), _T("Edit Label"), plotArea->GetLeftYLabel(), this);
+	if (dialog.ShowModal() == wxID_OK)
+		plotArea->SetLeftYLabel(dialog.GetText());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextEditRightLabel
+//
+// Description:		Displays a message box asking the user to specify the text
+//					for the label.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextEditRightLabel(wxCommandEvent& WXUNUSED(event))
+{
+	TextInputDialog dialog(_T("Specify label text:"), _T("Edit Label"), plotArea->GetRightYLabel(), this);
+	if (dialog.ShowModal() == wxID_OK)
+		plotArea->SetRightYLabel(dialog.GetText());
 }
 
 //==========================================================================

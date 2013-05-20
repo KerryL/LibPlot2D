@@ -39,7 +39,6 @@ private:
 	void CreateControls(void);
 	wxSizer* CreateInputControls(void);
 	wxSizer* CreateOutputControls(void);
-	wxSizer* CreateButtons(void);
 	void ConfigureControls(void);
 	void SetCheckBoxDefaults(void);
 

@@ -164,15 +164,12 @@ wxSizer* MultiChoiceDialog::CreateButtons(void)
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxButton *selectAllButton = new wxButton(this, ID_SELECT_ALL, _T("Select All"));
-	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
-	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
-
-	sizer->Add(selectAllButton, 0, wxALIGN_LEFT | wxLEFT | wxRIGHT | wxTOP, 3);
+	sizer->Add(selectAllButton, 0, wxALIGN_LEFT);
 	sizer->AddStretchSpacer();
-	sizer->Add(okButton, 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxTOP, 3);
-	sizer->Add(cancelButton, 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxTOP, 3);
 
-	okButton->SetDefault();
+	wxSizer *okCancel = CreateButtonSizer(wxOK | wxCANCEL);
+	if (okCancel)
+		sizer->Add(okCancel);
 
 	return sizer;
 }

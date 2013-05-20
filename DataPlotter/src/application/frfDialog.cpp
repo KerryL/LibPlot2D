@@ -64,7 +64,10 @@ void FRFDialog::CreateControls(const wxArrayString &descriptions)
 	mainSizer->Add(CreateSelectionControls(descriptions));
 	mainSizer->Add(CreateTextBox());
 	mainSizer->Add(CreateCheckBoxes());
-	mainSizer->Add(CreateButtons(), 1, wxGROW);
+
+	wxSizer *buttons = CreateButtonSizer(wxOK | wxCANCEL);
+	if (buttons)
+		mainSizer->Add(buttons, 1, wxGROW);
 
 	SetSizerAndFit(topSizer);
 	Center();
@@ -168,35 +171,6 @@ wxSizer *FRFDialog::CreateCheckBoxes(void)
 	sizer->Add(phaseCheckBox, 0, wxALL, 5);
 	sizer->Add(moduloSizer, 0, wxALL, 5);
 	sizer->Add(coherenceCheckBox, 0, wxALL, 5);
-
-	return sizer;
-}
-
-//==========================================================================
-// Class:			FRFDialog
-// Function:		CreateButtons
-//
-// Description:		Returns a sizer containing the button controls.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxSizer*
-//
-//==========================================================================
-wxSizer* FRFDialog::CreateButtons(void)
-{
-	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-
-	wxButton *okButton = new wxButton(this, wxID_OK, _T("OK"));
-	wxButton *cancelButton = new wxButton(this, wxID_CANCEL, _T("Cancel"));
-	sizer->AddStretchSpacer();
-	sizer->Add(okButton, 0, wxALIGN_RIGHT | wxALL, 5);
-	sizer->Add(cancelButton, 0, wxALIGN_RIGHT | wxALL, 5);
 
 	return sizer;
 }

@@ -74,7 +74,7 @@ Dataset2D FastFourierTransform::ComputeFFT(const Dataset2D &data)
 Dataset2D FastFourierTransform::ComputeFFT(Dataset2D data, const FFTWindow &window,
 		unsigned int windowSize, const double &overlap, const bool &subtractMean)
 {
-	double sampleRate = 1.0 / (data.GetXData(1) - data.GetXData(0));// [Hz]
+	double sampleRate = 1.0 / data.GetAverageDeltaX();// [Hz]
 
 	if (subtractMean)
 		data -= data.ComputeYMean();
@@ -310,7 +310,7 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &o
 	power = ComplexDivide(power, size);
 	Dataset2D rawFRF = ComplexDivide(crossPower, power);
 
-	double sampleRate = 1.0 / (input.GetXData(1) - input.GetXData(0));// [Hz]
+	double sampleRate = 1.0 / input.GetAverageDeltaX();// [Hz]
 	amplitude = ConvertDoubleSidedToSingleSided(GetAmplitudeData(rawFRF, sampleRate), false);
 	if (phase)
 		*phase = ConvertDoubleSidedToSingleSided(GetPhaseData(rawFRF, sampleRate, moduloPhase), false);
@@ -409,7 +409,7 @@ Dataset2D FastFourierTransform::ComputeCoherence(const Dataset2D& input, const D
 		ComplexMultiply(inputPower, outputPower));
 	rawCoherence = ConvertDoubleSidedToSingleSided(rawCoherence);
 
-	double sampleRate = 1.0 / (input.GetXData(1) - input.GetXData(0));// [Hz]
+	double sampleRate = 1.0 / input.GetAverageDeltaX();// [Hz]
 
 	return GetAmplitudeData(rawCoherence, sampleRate);
 }

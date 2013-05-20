@@ -315,7 +315,7 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 	unsigned int i;
 	double minSpacing, maxSpacing, spacing;
 
-	minSpacing = data.GetXData(1) - data.GetXData(0);
+	minSpacing = data.GetAverageDeltaX();
 	maxSpacing = minSpacing;
 
 	for (i = 2; i < data.GetNumberOfPoints(); i++)

@@ -38,7 +38,6 @@ private:
 	wxSizer *CreateSelectionControls(const wxArrayString &descriptions);
 	wxSizer *CreateTextBox(void);
 	wxSizer *CreateCheckBoxes(void);
-	wxSizer *CreateButtons(void);
 
 	wxListBox *inputList;
 	wxListBox *outputList;

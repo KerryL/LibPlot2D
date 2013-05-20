@@ -2031,3 +2031,87 @@ void PlotRenderer::ForcePointWithinPlotArea(unsigned int &x, unsigned int &y)
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
 		y = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge();
 }
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetXLabel
+//
+// Description:		Return the value of the label text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotRenderer::GetXLabel(void) const
+{
+	return plot->GetXLabel();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetLeftYLabel
+//
+// Description:		Return the value of the label text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotRenderer::GetLeftYLabel(void) const
+{
+	return plot->GetLeftYLabel();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetRightYLabel
+//
+// Description:		Return the value of the label text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotRenderer::GetRightYLabel(void) const
+{
+	return plot->GetRightYLabel();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetTitle
+//
+// Description:		Return the value of the label text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString PlotRenderer::GetTitle(void) const
+{
+	return plot->GetTitle();
+}
