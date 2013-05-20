@@ -1207,13 +1207,13 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 	unsigned int maxLineSize(5);
 	unsigned int maxMarkerSize(5);
 
-	optionsGrid->SetCellEditor(index, colVisible, new wxGridCellBoolEditor);
-	optionsGrid->SetCellEditor(index, colRightAxis, new wxGridCellBoolEditor);
+	optionsGrid->SetCellRenderer(index, colVisible, new wxGridCellBoolRenderer);
+	optionsGrid->SetCellRenderer(index, colRightAxis, new wxGridCellBoolRenderer);
 	optionsGrid->SetCellEditor(index, colLineSize, new wxGridCellNumberEditor(0, maxLineSize));
 	optionsGrid->SetCellEditor(index, colMarkerSize, new wxGridCellNumberEditor(-1, maxMarkerSize));
 
 	unsigned int i;
-	for (i = 1; i < colDifference; i++)
+	for (i = 1; i < colCount; i++)
 			optionsGrid->SetReadOnly(index, i, true);
 	optionsGrid->SetReadOnly(index, colLineSize, false);
 	optionsGrid->SetReadOnly(index, colMarkerSize, false);
