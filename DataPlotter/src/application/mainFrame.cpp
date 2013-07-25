@@ -1,9 +1,9 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2012
+                          Copyright Kerry R. Loux 2011-2013
 
-     No requirement for distribution of wxWidgets libraries, source, or binaries.
-                             (http://www.wxwidgets.org/)
+                   This code is licensed under the GPLv2 License
+                     (http://opensource.org/licenses/GPL-2.0).
 
 ===================================================================================*/
 
@@ -332,13 +332,13 @@ void MainFrame::SetProperties(void)
 
 	SetDropTarget(dynamic_cast<wxDropTarget*>(new DropTarget(*this)));
 
-	const int entryCount(4);//5);
+	const int entryCount(5);
 	wxAcceleratorEntry entries[entryCount];
 	entries[0].Set(wxACCEL_CTRL, (int)'c', idPlotContextCopy);
 	entries[1].Set(wxACCEL_CTRL, (int)'v', idPlotContextPaste);
 	entries[2].Set(wxACCEL_CTRL, (int)'o', idButtonOpen);
-	entries[2].Set(wxACCEL_CTRL, (int)'a', idButtonAutoScale);
-	//entries[2].Set(wxACCEL_CTRL, (int)'r', idButtonRemoveCurve);
+	entries[3].Set(wxACCEL_CTRL, (int)'a', idButtonAutoScale);
+	entries[4].Set(wxACCEL_CTRL, (int)'r', idButtonRemoveCurve);
 	wxAcceleratorTable accel(entryCount, entries);
 	SetAcceleratorTable(accel);
 }
