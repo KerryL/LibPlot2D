@@ -1059,8 +1059,8 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 // Function:		ApplyExponentialWindow (static)
 //
 // Description:		Applies an exponential window to the data.  Denominator of
-//					exponent (5.0) is chosen somewhat arbitrarily to provide a
-//					nice decay.
+//					exponent is chosen based on sample length to reduce
+//					amplitude to 2% of original value at the end of the window.
 //
 // Input Arguments:
 //		data	= Dataset2D&
@@ -1075,8 +1075,9 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 {
 	unsigned int i;
+	double tau(-((double)data.GetNumberOfPoints() - 1.0) / log(0.02));
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
-		data.GetXPointer()[i] *= exp(-(double)i / (double)data.GetNumberOfPoints() * 5.0);
+		data.GetXPointer()[i] *= exp(-(double)i / tau);
 }
 
 //==========================================================================

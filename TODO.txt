@@ -1,7 +1,0 @@
-zoom box stops in plot area
-z-order should be (back to front - draw in this order):
-	grid lines
-	plots
-	axes
-	cursors
-	zoom box
