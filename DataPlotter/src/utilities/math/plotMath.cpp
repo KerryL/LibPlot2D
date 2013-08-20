@@ -340,6 +340,27 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 
 //==========================================================================
 // Namespace:		PlotMath
+// Function:		GetAverageXSpacing
+//
+// Description:		Finds the average period of the data in the set.
+//
+// Input Arguments:
+//		data	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotMath::GetAverageXSpacing(const Dataset2D &data)
+{
+	return data.GetXData(data.GetNumberOfPoints() - 1) / data.GetNumberOfPoints();
+}
+
+//==========================================================================
+// Namespace:		PlotMath
 // Function:		GetPrecision
 //
 // Description:		Determines the best number of digits after the decimal place

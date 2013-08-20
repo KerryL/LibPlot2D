@@ -132,6 +132,9 @@ private:
 
 		idContextAddMathChannel,
 		idContextFRF,
+
+		idContextCreateSignal,
+
 		idContextSetTimeUnits,
 		idContextPlotDerivative,
 		idContextPlotIntegral,
@@ -191,10 +194,12 @@ private:
 	void GridDoubleClickEvent(wxGridEvent &event);
 	void GridLeftClickEvent(wxGridEvent &event);
 	void GridCellChangeEvent(wxGridEvent &event);
+	void GridLabelRightClickEvent(wxGridEvent &event);
 
 	// Context menu events
 	void ContextAddMathChannelEvent(wxCommandEvent &event);
 	void ContextFRFEvent(wxCommandEvent &event);
+	void ContextCreateSignalEvent(wxCommandEvent &event);
 	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
 	void ContextPlotDerivativeEvent(wxCommandEvent &event);
 	void ContextPlotIntegralEvent(wxCommandEvent &event);

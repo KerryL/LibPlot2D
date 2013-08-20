@@ -90,6 +90,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\application\createSignalDialog.h" />
     <ClInclude Include="src\application\dataFiles\baumullerFile.h" />
     <ClInclude Include="src\application\dataFiles\customFile.h" />
     <ClInclude Include="src\application\dataFiles\customFileFormat.h" />
@@ -133,6 +134,7 @@
     <ClInclude Include="src\utilities\signals\rms.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\application\createSignalDialog.cpp" />
     <ClCompile Include="src\application\dataFiles\baumullerFile.cpp" />
     <ClCompile Include="src\application\dataFiles\customFile.cpp" />
     <ClCompile Include="src\application\dataFiles\customFileFormat.cpp" />

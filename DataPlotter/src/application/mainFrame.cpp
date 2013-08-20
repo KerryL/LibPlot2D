@@ -30,6 +30,7 @@
 #include "application/dropTarget.h"
 #include "application/rangeLimitsDialog.h"
 #include "application/filterDialog.h"
+#include "application/createSignalDialog.h"
 #include "application/dataFiles/dataFile.h"
 #include "application/dataFiles/genericFile.h"
 #include "application/dataFiles/baumullerFile.h"
@@ -370,10 +371,12 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_GRID_CELL_LEFT_DCLICK(MainFrame::GridDoubleClickEvent)
 	EVT_GRID_CELL_LEFT_CLICK(MainFrame::GridLeftClickEvent)
 	EVT_GRID_CELL_CHANGE(MainFrame::GridCellChangeEvent)
+	EVT_GRID_LABEL_RIGHT_CLICK(MainFrame::GridLabelRightClickEvent)
 
 	// Context menu
 	EVT_MENU(idContextAddMathChannel,				MainFrame::ContextAddMathChannelEvent)
 	EVT_MENU(idContextFRF,							MainFrame::ContextFRFEvent)
+	EVT_MENU(idContextCreateSignal,					MainFrame::ContextCreateSignalEvent)
 	EVT_MENU(idContextSetTimeUnits,					MainFrame::ContextSetTimeUnitsEvent)
 	EVT_MENU(idContextPlotDerivative,				MainFrame::ContextPlotDerivativeEvent)
 	EVT_MENU(idContextPlotIntegral,					MainFrame::ContextPlotIntegralEvent)
@@ -665,6 +668,12 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 	contextMenu->Append(idContextAddMathChannel, _T("Add Math Channel"));
 	contextMenu->Append(idContextFRF, _T("Frequency Response"));
 	//contextMenu->Append(idContextSetXData, _T("Use as X-Axis"));
+
+	contextMenu->AppendSeparator();
+
+	contextMenu->Append(idContextCreateSignal, _T("Create Signal"));// FIXME:  Eventually, maybe this can be integrated into the "Add Math Channel" dialog?
+
+	contextMenu->AppendSeparator();
 
 	if (row == 0 && currentFileFormat == FormatGeneric)
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
@@ -1553,6 +1562,35 @@ void MainFrame::GridCellChangeEvent(wxGridEvent &event)
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		GridLabelRightClickEvent
+//
+// Description:		Handles right-click events in blank areas of grid control.
+//
+// Input Arguments:
+//		event	= wxGridEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::GridLabelRightClickEvent(wxGridEvent &event)
+{
+	wxMenu *contextMenu = new wxMenu();
+
+	contextMenu->Append(idContextCreateSignal, _T("Create Signal"));
+
+	PopupMenu(contextMenu, event.GetPosition() + optionsGrid->GetPosition()
+		+ optionsGrid->GetParent()->GetPosition());
+
+	delete contextMenu;
+	contextMenu = NULL;
+}
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		GetXAxisScalingFactor
 //
 // Description:		Attempts to determine the scaling factor required to convert
@@ -1828,6 +1866,47 @@ void MainFrame::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 
 	AddFFTCurves(factor, amplitude, phase, coherence, wxString::Format("[%u] to [%u]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextCreateSignalEvent
+//
+// Description:		Displays dialog for creating various signals.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextCreateSignalEvent(wxCommandEvent& WXUNUSED(event))
+{
+	double startTime(0.0);// [sec]
+	double duration(10.0);// [sec]
+	double sampleRate(100.0);// [Hz]
+
+	double factor(1.0);
+	if (plotList.GetCount() > 0)
+	{
+		GetXAxisScalingFactor(factor);
+
+		// Use first curve to pull time and frequency information
+		sampleRate = 1.0 / PlotMath::GetAverageXSpacing(*plotList[0]) * factor;
+		startTime = plotList[0]->GetXData(0) / factor;
+		duration = plotList[0]->GetXData(plotList[0]->GetNumberOfPoints() - 1) / factor - startTime;
+	}
+
+	CreateSignalDialog dialog(this, startTime, duration, sampleRate);
+
+	if (dialog.ShowModal() != wxID_OK)
+		return;
+
+	AddCurve(&dialog.GetSignal()->MultiplyXData(factor), dialog.GetSignalName());
 }
 
 //==========================================================================
