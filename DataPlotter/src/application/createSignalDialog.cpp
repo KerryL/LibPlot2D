@@ -139,21 +139,21 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 	inputSizer->AddStretchSpacer();
 
 	wxStaticText *startTimeLabel = new wxStaticText(this, wxID_ANY, _T("Start Time"));
-	startTimeTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%f"), startTime));
+	startTimeTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(startTime), startTime));
 	wxStaticText *startTimeUnits = new wxStaticText(this, wxID_ANY, _T("seconds"));
 	inputSizer->Add(startTimeLabel);
 	inputSizer->Add(startTimeTextBox);
 	inputSizer->Add(startTimeUnits);
 
 	wxStaticText *durationLabel = new wxStaticText(this, wxID_ANY, _T("Duration"));
-	durationTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%f"), duration));
+	durationTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(duration), duration));
 	wxStaticText *durationUnits = new wxStaticText(this, wxID_ANY, _T("seconds"));
 	inputSizer->Add(durationLabel);
 	inputSizer->Add(durationTextBox);
 	inputSizer->Add(durationUnits);
 
 	wxStaticText *sampleRateLabel = new wxStaticText(this, wxID_ANY, _T("Sample Rate"));
-	sampleRateTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%f"), sampleRate));
+	sampleRateTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(sampleRate), sampleRate));
 	wxStaticText *sampleRateUnits = new wxStaticText(this, wxID_ANY, _T("Hz"));
 	inputSizer->Add(sampleRateLabel);
 	inputSizer->Add(sampleRateTextBox);
@@ -807,7 +807,7 @@ void CreateSignalDialog::OnFrequencyChangeEvent(wxCommandEvent& WXUNUSED(event))
 	double value;
 	if (!frequencyTextBox->GetValue().ToDouble(&value))
 		return;
-	periodTextBox->ChangeValue(wxString::Format(_T("%f"), 1.0 / value));
+	periodTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(1.0 / value), 1.0 / value));
 
 	if (keepPhaseAngle)
 		UpdatePhaseTime();
@@ -841,7 +841,7 @@ void CreateSignalDialog::OnPeriodChangeEvent(wxCommandEvent& WXUNUSED(event))
 	double value;
 	if (!periodTextBox->GetValue().ToDouble(&value))
 		return;
-	frequencyTextBox->ChangeValue(wxString::Format(_T("%f"), 1.0 / value));
+	frequencyTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(1.0 / value), 1.0 / value));
 
 	if (keepPhaseAngle)
 		UpdatePhaseTime();
@@ -916,7 +916,7 @@ void CreateSignalDialog::UpdatePhaseAngle(void)
 		!phaseTimeTextBox->GetValue().ToDouble(&phase))
 		return;
 
-	phaseAngleTextBox->ChangeValue(wxString::Format(_T("%f"), phase * 360.0 * frequency));
+	phaseAngleTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(phase * 360.0 * frequency), phase * 360.0 * frequency));
 }
 
 //==========================================================================
@@ -942,7 +942,7 @@ void CreateSignalDialog::UpdatePhaseTime(void)
 		!phaseAngleTextBox->GetValue().ToDouble(&phase))
 		return;
 
-	phaseTimeTextBox->ChangeValue(wxString::Format(_T("%f"), phase / 360.0 / frequency));
+	phaseTimeTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(phase / 360.0 / frequency), phase / 360.0 / frequency));
 }
 
 //==========================================================================
@@ -972,7 +972,7 @@ void CreateSignalDialog::UpdateAmplitude(void)
 	if (lastSelection == SignalTriangle)
 		factor = 2.0;
 
-	initialValueTextBox->ChangeValue(wxString::Format(_T("%f"), period * slope / factor));
+	initialValueTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(period * slope / factor), period * slope / factor));
 }
 
 //==========================================================================
@@ -1002,5 +1002,5 @@ void CreateSignalDialog::UpdateSlope(void)
 	if (lastSelection == SignalTriangle)
 		factor = 2.0;
 
-	slopeTextBox->ChangeValue(wxString::Format(_T("%f"), amplitude / period * factor));
+	slopeTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(amplitude / period * factor), amplitude / period * factor));
 }
