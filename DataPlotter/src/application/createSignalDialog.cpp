@@ -127,7 +127,8 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 	topSizer->Add(mainSizer, 0, wxALL, 5);
 
 	const unsigned int spacing(5);
-	wxSizer *inputSizer = new wxGridSizer(3, spacing, spacing);
+	wxFlexGridSizer *inputSizer = new wxFlexGridSizer(3, spacing, spacing);
+	inputSizer->AddGrowableCol(1);
 	mainSizer->Add(inputSizer);
 
 	lastSelection = (SignalType)0;
@@ -135,28 +136,28 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 	wxStaticText *signalNameLabel = new wxStaticText(this, wxID_ANY, _T("Signal Name"));
 	signalNameTextBox = new wxTextCtrl(this, wxID_ANY, GetSignalName(lastSelection));
 	inputSizer->Add(signalNameLabel);
-	inputSizer->Add(signalNameTextBox);
+	inputSizer->Add(signalNameTextBox, 0, wxGROW);
 	inputSizer->AddStretchSpacer();
 
 	wxStaticText *startTimeLabel = new wxStaticText(this, wxID_ANY, _T("Start Time"));
 	startTimeTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(startTime), startTime));
 	wxStaticText *startTimeUnits = new wxStaticText(this, wxID_ANY, _T("seconds"));
 	inputSizer->Add(startTimeLabel);
-	inputSizer->Add(startTimeTextBox);
+	inputSizer->Add(startTimeTextBox, 0, wxGROW);
 	inputSizer->Add(startTimeUnits);
 
 	wxStaticText *durationLabel = new wxStaticText(this, wxID_ANY, _T("Duration"));
 	durationTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(duration), duration));
 	wxStaticText *durationUnits = new wxStaticText(this, wxID_ANY, _T("seconds"));
 	inputSizer->Add(durationLabel);
-	inputSizer->Add(durationTextBox);
+	inputSizer->Add(durationTextBox, 0, wxGROW);
 	inputSizer->Add(durationUnits);
 
 	wxStaticText *sampleRateLabel = new wxStaticText(this, wxID_ANY, _T("Sample Rate"));
 	sampleRateTextBox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(sampleRate), sampleRate));
 	wxStaticText *sampleRateUnits = new wxStaticText(this, wxID_ANY, _T("Hz"));
 	inputSizer->Add(sampleRateLabel);
-	inputSizer->Add(sampleRateTextBox);
+	inputSizer->Add(sampleRateTextBox, 0, wxGROW);
 	inputSizer->Add(sampleRateUnits);
 
 	wxArrayString signalList;
@@ -174,48 +175,48 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 	initialValueLabel = new wxStaticText(this, wxID_ANY, _T("Initial Value"));
 	initialValueTextBox = new wxTextCtrl(this, idInitialValue);
 	inputSizer->Add(initialValueLabel);
-	inputSizer->Add(initialValueTextBox);
+	inputSizer->Add(initialValueTextBox, 0, wxGROW);
 	inputSizer->AddStretchSpacer();
 
 	finalValueLabel = new wxStaticText(this, wxID_ANY, _T("Final Value"));
 	finalValueTextBox = new wxTextCtrl(this, idFinalValue);
 	inputSizer->Add(finalValueLabel);
-	inputSizer->Add(finalValueTextBox);
+	inputSizer->Add(finalValueTextBox, 0, wxGROW);
 	inputSizer->AddStretchSpacer();
 
 	slopeLabel = new wxStaticText(this, wxID_ANY, _T("Slope"));
 	slopeTextBox = new wxTextCtrl(this, idSlope, _T("1.0"));
 	slopeUnits = new wxStaticText(this, wxID_ANY, _T("1 / seconds"));
 	inputSizer->Add(slopeLabel);
-	inputSizer->Add(slopeTextBox);
+	inputSizer->Add(slopeTextBox, 0, wxGROW);
 	inputSizer->Add(slopeUnits);
 
 	frequencyLabel = new wxStaticText(this, wxID_ANY, _T("Frequency"));
 	frequencyTextBox = new wxTextCtrl(this, idFrequency);
 	frequencyUnits = new wxStaticText(this, wxID_ANY, _T("Hz"));
 	inputSizer->Add(frequencyLabel);
-	inputSizer->Add(frequencyTextBox);
+	inputSizer->Add(frequencyTextBox, 0, wxGROW);
 	inputSizer->Add(frequencyUnits);
 
 	wxStaticText *periodLabel = new wxStaticText(this, wxID_ANY, _T("Period"));
 	periodTextBox = new wxTextCtrl(this, idPeriod, _T("0.0"));
 	wxStaticText *periodUnits = new wxStaticText(this, wxID_ANY, _T("seconds"));
 	inputSizer->Add(periodLabel);
-	inputSizer->Add(periodTextBox);
+	inputSizer->Add(periodTextBox, 0, wxGROW);
 	inputSizer->Add(periodUnits);
 
 	wxStaticText *phaseAngleLabel = new wxStaticText(this, wxID_ANY, _T("Phase Angle"));
 	phaseAngleTextBox = new wxTextCtrl(this, idPhaseAngle, _T("0.0"));
 	wxStaticText *phaseAngleUnits = new wxStaticText(this, wxID_ANY, _T("deg"));
 	inputSizer->Add(phaseAngleLabel);
-	inputSizer->Add(phaseAngleTextBox);
+	inputSizer->Add(phaseAngleTextBox, 0, wxGROW);
 	inputSizer->Add(phaseAngleUnits);
 
 	wxStaticText *phaseTimeLabel = new wxStaticText(this, wxID_ANY, _T("Phase Delay"));
 	phaseTimeTextBox = new wxTextCtrl(this, idPhaseTime, _T("0.0"));
 	wxStaticText *phaseTimeUnits = new wxStaticText(this, wxID_ANY, _T("seconds"));
 	inputSizer->Add(phaseTimeLabel);
-	inputSizer->Add(phaseTimeTextBox);
+	inputSizer->Add(phaseTimeTextBox, 0, wxGROW);
 	inputSizer->Add(phaseTimeUnits);
 
 	SetTextBoxLabelsAndEnables();
