@@ -1488,6 +1488,7 @@ void MainFrame::UpdateCurveProperties(const unsigned int &index, const Color &co
 	optionsGrid->GetCellValue(index + 1, colLineSize).ToULong(&lineSize);
 	optionsGrid->GetCellValue(index + 1, colMarkerSize).ToLong(&markerSize);
 	plotArea->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
+	plotArea->SaveCurrentZoom();
 }
 
 //==========================================================================
