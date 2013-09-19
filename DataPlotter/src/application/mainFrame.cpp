@@ -1908,6 +1908,15 @@ void MainFrame::ContextCreateSignalEvent(wxCommandEvent& WXUNUSED(event))
 		return;
 
 	AddCurve(&dialog.GetSignal()->MultiplyXData(factor), dialog.GetSignalName());
+
+	// Set time units if it hasn't been done already
+	double dummy;
+	if (!GetXAxisScalingFactor(dummy))
+	{
+		genericXAxisLabel = _T("Time [sec]");
+		SetXDataLabel(genericXAxisLabel);
+		//plotArea->SaveCurrentZoom();// TODO:  Is this necessary?
+	}
 }
 
 //==========================================================================
