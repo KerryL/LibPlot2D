@@ -290,6 +290,7 @@ wxBoxSizer* MainFrame::CreateButtons(wxWindow *parent)
 	buttonSizer->Add(new wxButton(parent, idButtonOpen, _T("&Open")));
 	buttonSizer->Add(new wxButton(parent, idButtonAutoScale, _T("&Auto Scale")));
 	buttonSizer->Add(new wxButton(parent, idButtonRemoveCurve, _T("&Remove")));
+	buttonSizer->Add(new wxButton(parent, idButtonReloadData, _T("Reload &Data")));
 
 	buttonSizer->AddStretchSpacer();
 	buttonSizer->Add(new wxStaticText(parent, wxID_ANY, DataPlotterApp::versionString));
@@ -365,6 +366,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_BUTTON(idButtonOpen,						MainFrame::ButtonOpenClickedEvent)
 	EVT_BUTTON(idButtonAutoScale,					MainFrame::ButtonAutoScaleClickedEvent)
 	EVT_BUTTON(idButtonRemoveCurve,					MainFrame::ButtonRemoveCurveClickedEvent)
+	EVT_BUTTON(idButtonReloadData,					MainFrame::ButtonReloadDataClickedEvent)
 
 	// Grid control
 	EVT_GRID_CELL_RIGHT_CLICK(MainFrame::GridRightClickEvent)
@@ -602,7 +604,7 @@ void MainFrame::ButtonAutoScaleClickedEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			MainFrame
 // Function:		ButtonRemoveCurveClickedEvent
 //
-// Description:		Event fires when user clicks "RemoveCurve" button.
+// Description:		Event fires when user clicks "Remove" button.
 //
 // Input Arguments:
 //		event	= &wxCommandEvent
@@ -642,6 +644,30 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 	}
 
 	plotArea->UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ButtonReloadDataClickedEvent
+//
+// Description:		Event fires when user clicks "Reload Data" button.
+//
+// Input Arguments:
+//		event	= &wxCommandEvent (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ButtonReloadDataClickedEvent(wxCommandEvent& WXUNUSED(event))
+{
+	if (lastFileLoaded.IsEmpty())
+		return;
+
+	LoadFile(lastFileLoaded);
 }
 
 //==========================================================================
@@ -902,6 +928,8 @@ bool MainFrame::LoadFile(const wxString &pathAndFileName)
 		genericXAxisLabel = file->GetDescription(0);
 		SetXDataLabel(genericXAxisLabel);
 		plotArea->SaveCurrentZoom();
+
+		lastFileLoaded = pathAndFileName;
 
 		delete file;
 		return true;

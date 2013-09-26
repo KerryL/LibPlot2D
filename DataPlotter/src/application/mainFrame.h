@@ -129,6 +129,7 @@ private:
 		idButtonOpen = wxID_HIGHEST + 100,
 		idButtonAutoScale,
 		idButtonRemoveCurve,
+		idButtonReloadData,
 
 		idContextAddMathChannel,
 		idContextFRF,
@@ -188,6 +189,7 @@ private:
 	void ButtonOpenClickedEvent(wxCommandEvent &event);
 	void ButtonAutoScaleClickedEvent(wxCommandEvent &event);
 	void ButtonRemoveCurveClickedEvent(wxCommandEvent &event);
+	void ButtonReloadDataClickedEvent(wxCommandEvent &event);
 
 	// Grid events
 	void GridRightClickEvent(wxGridEvent &event);
@@ -285,6 +287,7 @@ private:
 	void SetXDataLabel(wxString label);
 	void SetXDataLabel(const FileFormat &format);
 	wxString genericXAxisLabel;
+	wxString lastFileLoaded;
 
 	Dataset2D GetXZoomedDataset(const Dataset2D &fullData) const;
 
