@@ -23,7 +23,9 @@ class GenericFile : public DataFile
 {
 public:
 	// Constructor
-	GenericFile(const wxString& _fileName, wxWindow *_parent = NULL) : DataFile(_fileName, _parent) {};
+	GenericFile(const wxString& _fileName, wxWindow *_parent = NULL,
+		wxArrayInt *selections = NULL, bool *removeExisting = NULL)
+		: DataFile(_fileName, _parent, selections, removeExisting) {};
 
 	static bool IsType(const wxString &_fileName);
 };

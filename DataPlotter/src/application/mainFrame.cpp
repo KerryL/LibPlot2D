@@ -667,7 +667,7 @@ void MainFrame::ButtonReloadDataClickedEvent(wxCommandEvent& WXUNUSED(event))
 	if (lastFileLoaded.IsEmpty())
 		return;
 
-	LoadFile(lastFileLoaded);
+	LoadFile(lastFileLoaded, true);
 }
 
 //==========================================================================
@@ -904,6 +904,7 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //
 // Input Arguments:
 //		pathAndFileName	= const wxString&
+//		useLastPreferences	= bool
 //
 // Output Arguments:
 //		None
@@ -912,14 +913,18 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //		true for file successfully loaded, false otherwise
 //
 //==========================================================================
-bool MainFrame::LoadFile(const wxString &pathAndFileName)
+bool MainFrame::LoadFile(const wxString &pathAndFileName, bool useLastPreferences)
 {
-
-	DataFile *file = GetDataFile(pathAndFileName);
+	DataFile *file = GetDataFile(pathAndFileName, useLastPreferences);
 	if (file->Load())
 	{
 		if (file->RemoveExistingCurves())
+		{
 			ClearAllCurves();
+			lastUserRemovedExisting = true;
+		}
+		else
+			lastUserRemovedExisting = false;
 
 		unsigned int i;
 		for (i = 0; i < file->GetDataCount(); i++)
@@ -930,6 +935,7 @@ bool MainFrame::LoadFile(const wxString &pathAndFileName)
 		plotArea->SaveCurrentZoom();
 
 		lastFileLoaded = pathAndFileName;
+		lastUserSelections = file->GetUserSelections();
 
 		delete file;
 		return true;
@@ -3353,7 +3359,8 @@ void MainFrame::SetMarkerSize(const unsigned int &curve, const int &size)
 //					object.
 //
 // Input Arguments:
-//		fileName	= const wxString&
+//		fileName				= const wxString&
+//		useLastUserPreferences	= bool
 //
 // Output Arguments:
 //		None
@@ -3362,20 +3369,30 @@ void MainFrame::SetMarkerSize(const unsigned int &curve, const int &size)
 //		DataFile*
 //
 //==========================================================================
-DataFile* MainFrame::GetDataFile(const wxString &fileName)
+DataFile* MainFrame::GetDataFile(const wxString &fileName, bool useLastUserPreferences)
 {
 	if (BaumullerFile::IsType(fileName))
-		return new BaumullerFile(fileName, this);
+		return new BaumullerFile(fileName, this,
+		useLastUserPreferences ? &lastUserSelections : NULL,
+		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
 	else if (KollmorgenFile::IsType(fileName))
-		return new KollmorgenFile(fileName, this);
+		return new KollmorgenFile(fileName, this,
+		useLastUserPreferences ? &lastUserSelections : NULL,
+		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
 	else if (CustomFile::IsType(fileName))
-		return new CustomFile(fileName, this);
+		return new CustomFile(fileName, this,
+		useLastUserPreferences ? &lastUserSelections : NULL,
+		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
 	else if (CustomXMLFile::IsType(fileName))
-		return new CustomXMLFile(fileName, this);
+		return new CustomXMLFile(fileName, this,
+		useLastUserPreferences ? &lastUserSelections : NULL,
+		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
 
 	// Don't even check - if we can't open it with any other types,
 	// always try to open it with a generic type
-	return new GenericFile(fileName, this);
+	return new GenericFile(fileName, this,
+		useLastUserPreferences ? &lastUserSelections : NULL,
+		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
 }
 
 //==========================================================================

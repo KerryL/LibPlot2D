@@ -25,7 +25,8 @@ class MultiChoiceDialog : public wxDialog
 public:
 	// Constructor
 	MultiChoiceDialog(wxWindow* parent, const wxString& message, const wxString& caption,
-		const wxArrayString& choices, long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition);
+		const wxArrayString& choices, long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
+		wxArrayInt *defaultChoices = NULL, bool *removeExisting = NULL);
 
 	virtual  wxArrayInt GetSelections(void) const;
 
@@ -48,6 +49,8 @@ private:
 	void OnSelectAllButton(wxCommandEvent &event);
 
 	void SetAllChoices(const bool &selected);
+
+	void ApplyDefaults(wxArrayInt *defaultChoices, bool *removeExisting);
 
 	DECLARE_EVENT_TABLE();
 };

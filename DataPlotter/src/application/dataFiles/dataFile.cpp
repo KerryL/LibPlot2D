@@ -26,8 +26,10 @@
 //					default values.
 //
 // Input Arguments:
-//		fileName	= const wxString& file which this object represents
-//		_parent		= wxWindow* parent for centering curve choice dialog
+//		fileName		= const wxString& file which this object represents
+//		_parent			= wxWindow* parent for centering curve choice dialog
+//		selections		= wxArrayInt*, optional, default selections
+//		removeExisting	= bool*, optional, default value of checkbox
 //
 // Output Arguments:
 //		None
@@ -36,7 +38,8 @@
 //		None
 //
 //==========================================================================
-DataFile::DataFile(const wxString& _fileName, wxWindow *_parent)
+DataFile::DataFile(const wxString& _fileName, wxWindow *_parent,
+		wxArrayInt *selections, bool *removeExisting)
 {
 	fileName = _fileName;
 	parent = _parent;
@@ -46,6 +49,9 @@ DataFile::DataFile(const wxString& _fileName, wxWindow *_parent)
 	ignoreConsecutiveDelimiters = true;
 	timeIsFormatted = false;
 	removeExistingCurves = true;
+
+	defaultRemoveExisting = removeExisting;
+	defaultSelections = selections;
 }
 
 //==========================================================================
@@ -407,17 +413,18 @@ wxArrayString DataFile::GenerateDummyNames(const unsigned int &count) const
 bool DataFile::ProcessFile(void)
 {
 	MultiChoiceDialog dialog(parent, _T("Select data to plot:"), _T("Select Data"),
-		wxArrayString(descriptions.begin() + 1, descriptions.end()));
+		wxArrayString(descriptions.begin() + 1, descriptions.end()), wxCHOICEDLG_STYLE,
+		wxDefaultPosition, defaultSelections, defaultRemoveExisting);
 	if (dialog.ShowModal() == wxID_CANCEL)
 		return false;
 
-	wxArrayInt choices = dialog.GetSelections();
-	if (choices.size() == 0)
+	userSelections = dialog.GetSelections();
+	if (userSelections.size() == 0)
 	{
 		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR);
 		return false;
 	}
-	descriptions = RemoveUnwantedDescriptions(descriptions, choices);
+	descriptions = RemoveUnwantedDescriptions(descriptions, userSelections);
 	removeExistingCurves = dialog.RemoveExistingCurves();
 
 	std::ifstream file(fileName.c_str(), std::ios::in);
@@ -429,15 +436,15 @@ bool DataFile::ProcessFile(void)
 	SkipLines(file, headerLines);
 	DoTypeSpecificProcessTasks();
 
-	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(choices.size())];
-	if (!ExtractData(file, choices, rawData, scales))
+	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(userSelections.size())];
+	if (!ExtractData(file, userSelections, rawData, scales))
 	{
 		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}
 	file.close();
 
-	AssembleDatasets(rawData, GetRawDataSize(choices.size()));
+	AssembleDatasets(rawData, GetRawDataSize(userSelections.size()));
 	delete [] rawData;
 
 	return true;

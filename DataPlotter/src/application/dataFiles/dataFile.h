@@ -30,7 +30,8 @@ class DataFile
 {
 public:
 	// Constructor
-	DataFile(const wxString& _fileName, wxWindow *_parent = NULL);
+	DataFile(const wxString& _fileName, wxWindow *_parent = NULL,
+		wxArrayInt *selections = NULL, bool *removeExisting = NULL);
 
 	// Destructor
 	virtual ~DataFile();
@@ -43,6 +44,7 @@ public:
 	unsigned int GetDataCount(void) { return data.size(); };
 
 	bool RemoveExistingCurves(void) const { return removeExistingCurves; };
+	wxArrayInt GetUserSelections(void) const { return userSelections; };
 
 	// Classes derived from this should have this method:
 	//static bool IsType(const wxString& _fileName);
@@ -60,6 +62,9 @@ protected:
 	bool ignoreConsecutiveDelimiters;
 	bool timeIsFormatted;
 	bool removeExistingCurves;
+	bool *defaultRemoveExisting;
+	wxArrayInt userSelections;
+	wxArrayInt *defaultSelections;
 
 	wxString DetermineBestDelimiter(void) const;
 

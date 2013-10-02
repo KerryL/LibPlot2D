@@ -23,7 +23,9 @@ class KollmorgenFile : public DataFile
 {
 public:
 	// Constructor
-	KollmorgenFile(const wxString& _fileName, wxWindow *_parent = NULL) : DataFile(_fileName, _parent) {};
+	KollmorgenFile(const wxString& _fileName, wxWindow *_parent = NULL,
+		wxArrayInt *selections = NULL, bool *removeExisting = NULL)
+		: DataFile(_fileName, _parent, selections, removeExisting) {};
 
 	static bool IsType(const wxString &_fileName);
 

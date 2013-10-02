@@ -54,7 +54,7 @@ public:
 		wxString defaultFileName, wxString wildcard, long style);
 
 	// Load a plot from file
-	bool LoadFile(const wxString &pathAndFileName);
+	bool LoadFile(const wxString &pathAndFileName, bool useLastPreferences = false);
 	bool LoadText(const wxString &textData);
 
 	enum PlotContext
@@ -271,7 +271,7 @@ private:
 	Filter* GetFilter(const FilterParameters &parameters,
 		const double &sampleRate, const double &initialValue) const;
 
-	DataFile* GetDataFile(const wxString &fileName);
+	DataFile* GetDataFile(const wxString &fileName, bool useLastUserPreferences = false);
 
 	enum FileFormat
 	{
@@ -287,7 +287,10 @@ private:
 	void SetXDataLabel(wxString label);
 	void SetXDataLabel(const FileFormat &format);
 	wxString genericXAxisLabel;
+
 	wxString lastFileLoaded;
+	wxArrayInt lastUserSelections;
+	bool lastUserRemovedExisting;
 
 	Dataset2D GetXZoomedDataset(const Dataset2D &fullData) const;
 

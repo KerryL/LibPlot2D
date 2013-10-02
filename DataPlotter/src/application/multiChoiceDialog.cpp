@@ -33,6 +33,8 @@
 //		choices	= const wxArrayString& containing list of user choices
 //		style	= long specifying dialog style flags
 //		pos		= const wxPoint& specifying on-screen position
+//		defaultChoices	= wxArrayInt*, default choices
+//		removeExisting	= bool*, default value of remove existing curves checkbox
 //
 // Output Arguments:
 //		None
@@ -42,10 +44,13 @@
 //
 //==========================================================================
 MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, const wxString& caption,
-		const wxArrayString& choices, long style, const wxPoint& pos)
+		const wxArrayString& choices, long style, const wxPoint& pos,
+		wxArrayInt *defaultChoices, bool *removeExisting)
 		: wxDialog(parent, wxID_ANY, caption, pos, wxDefaultSize, style)
 {
 	CreateControls(message, choices);
+
+	ApplyDefaults(defaultChoices, removeExisting);
 }
 
 //==========================================================================
@@ -248,4 +253,37 @@ void MultiChoiceDialog::SetAllChoices(const bool &selected)
 bool MultiChoiceDialog::RemoveExistingCurves(void) const
 {
 	return removeCheckBox->GetValue();
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		ApplyDefaults
+//
+// Description:		Applies the specified defaults to the available user selections.
+//
+// Input Arguments:
+//		defaultChoices	= wxArrayInt*
+//		removeExisting	= bool*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeExisting)
+{
+	if (defaultChoices)
+	{
+		unsigned int i;
+		for (i = 0; i < choiceListBox->GetCount(); i++)
+			choiceListBox->Check(i, false);
+
+		for (i = 0; i < defaultChoices->Count(); i++)
+			choiceListBox->Check((*defaultChoices)[i], true);
+	}
+
+	if (removeExisting)
+		removeCheckBox->SetValue(*removeExisting);
 }

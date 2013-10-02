@@ -24,7 +24,9 @@ class CustomFile : public DataFile
 {
 public:
 	// Constructor
-	CustomFile(const wxString& _fileName, wxWindow *_parent = NULL) : DataFile(_fileName, _parent), fileFormat(_fileName) {};
+	CustomFile(const wxString& _fileName, wxWindow *_parent = NULL,
+		wxArrayInt *selections = NULL, bool *removeExisting = NULL)
+		: DataFile(_fileName, _parent, selections, removeExisting), fileFormat(_fileName) {};
 
 	static bool IsType(const wxString &_fileName);
 
