@@ -325,7 +325,7 @@ wxSizer* FilterDialog::CreateTransferFunctionControls(void)
 //==========================================================================
 void FilterDialog::OnOKButton(wxCommandEvent &event)
 {
-	parameters.order = orderSpin->GetValue();
+	/*parameters.order = orderSpin->GetValue();
 	parameters.phaseless = phaselessCheckBox->GetValue();
 	parameters.butterworth = butterworthCheckBox->GetValue();
 	parameters.numerator = numeratorBox->GetValue();
@@ -349,7 +349,7 @@ void FilterDialog::OnOKButton(wxCommandEvent &event)
 		!WidthIsValid() ||
 		!ExpressionIsValid(numeratorBox->GetValue()) ||
 		!ExpressionIsValid(denominatorBox->GetValue()))
-		return;
+		return;*/
 
 	event.Skip();
 }
@@ -593,6 +593,37 @@ bool FilterDialog::TransferDataFromWindow(void)
 
 			return false;
 		}
+	}
+
+	parameters.order = orderSpin->GetValue();
+	parameters.phaseless = phaselessCheckBox->GetValue();
+	parameters.butterworth = butterworthCheckBox->GetValue();
+	parameters.numerator = numeratorBox->GetValue();
+	parameters.denominator = denominatorBox->GetValue();
+
+	if (lowPassRadio->GetValue())
+		parameters.type = FilterParameters::TypeLowPass;
+	else if (highPassRadio->GetValue())
+		parameters.type = FilterParameters::TypeHighPass;
+	else if (bandStopRadio->GetValue())
+		parameters.type = FilterParameters::TypeBandStop;
+	else if (bandPassRadio->GetValue())
+		parameters.type = FilterParameters::TypeBandPass;
+	else if (customRadio->GetValue())
+		parameters.type = FilterParameters::TypeCustom;
+	else
+		assert(false);
+
+	if (!CutoffFrequencyIsValid() ||
+		!DampingRatioIsValid() ||
+		!WidthIsValid() ||
+		!ExpressionIsValid(numeratorBox->GetValue()) ||
+		!ExpressionIsValid(denominatorBox->GetValue()))
+	{
+		numeratorBox->SetValue(originalNumerator);
+		denominatorBox->SetValue(originalDenominator);
+
+		return false;
 	}
 
 	return true;
