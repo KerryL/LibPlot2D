@@ -147,7 +147,7 @@ template <class T>
 T *ManagedList<T>::operator[](const unsigned int &index) const
 {
 	// Make sure the index is valid
-	assert(index >= 0 && index < list.size());
+	assert(index < list.size());
 
 	return list[index];
 }

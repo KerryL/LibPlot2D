@@ -476,7 +476,11 @@ unsigned int PlotMath::CountSignificantDigits(const wxString &valueString)
 //		None
 //
 //==========================================================================
+#ifdef __WXMSW__
 void PlotMath::KRLsprintf(char *dest, const unsigned int &size, const char *format, ...)
+#else
+void PlotMath::KRLsprintf(char *dest, const unsigned int&, const char *format, ...)
+#endif
 {
 	va_list list;
 	va_start(list, format);
