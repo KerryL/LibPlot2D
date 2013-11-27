@@ -118,7 +118,7 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const
 std::string ExpressionTree::Solve(std::string expression, std::string &solvedExpression)
 {
 	if (!ParenthesesBalanced(expression))
-		return _T("Imbalanced parentheses!");
+		return "Imbalanced parentheses!";
 
 	std::string errorString;
 	errorString = ParseExpression(expression).c_str();
@@ -454,7 +454,7 @@ std::string ExpressionTree::EvaluateExpression(std::string &results)
 		outputQueue.pop();
 
 		if (!EvaluateNext(next, doubleStack, stringStack, useDoubleStack, errorString))
-			return errorString.c_str();
+			return std::string(errorString.mb_str());
 	}
 
 	if (useDoubleStack.size() > 1)
@@ -463,7 +463,7 @@ std::string ExpressionTree::EvaluateExpression(std::string &results)
 	if (useDoubleStack.top())
 		results = wxString::Format("%0.*f",
 			PlotMath::GetPrecision(doubleStack.top(), printfPrecision),
-			doubleStack.top()).c_str();
+			doubleStack.top()).mb_str();
 	else
 		results = stringStack.top();
 
@@ -1199,7 +1199,7 @@ wxString ExpressionTree::ApplyOperation(const wxString &operation,
 		return second - first;
 	else */if (operation.Cmp(_T("*")) == 0)
 		return StringMultiply(first, second);
-	return second + operation.c_str() + first;
+	return second + operation + first;
 
 /*	assert(false);
 	return "";*/

@@ -152,7 +152,7 @@ bool CustomXMLFile::ExtractXData(std::vector<double> *rawData, std::vector<doubl
 		return false;
 	}
 
-	wxString data = node->GetPropVal(fileFormat.GetXMLXDataKey(), wxEmptyString);
+	wxString data = node->GetAttribute(fileFormat.GetXMLXDataKey(), wxEmptyString);
 	if (data.IsEmpty())
 	{
 		wxMessageBox(_T("Could not read x-data!"), _T("Error Reading File"), wxICON_ERROR);
@@ -192,7 +192,7 @@ bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawDat
 		return false;
 	}
 
-	wxString data = channel->GetPropVal(fileFormat.GetXMLYDataKey(), wxEmptyString);
+	wxString data = channel->GetAttribute(fileFormat.GetXMLYDataKey(), wxEmptyString);
 	if (data.IsEmpty())
 	{
 		wxMessageBox(_T("Could not read y-data!"), _T("Error Reading File"), wxICON_ERROR);
@@ -253,7 +253,7 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount, 
 	while (channel)
 	{
 		if (channel->GetName() == fileFormat.GetXMLChannelNode())
-			names.Add(channel->GetPropVal(fileFormat.GetXMLCodeKey(), _T("Unnamed Channel")));
+			names.Add(channel->GetAttribute(fileFormat.GetXMLCodeKey(), _T("Unnamed Channel")));
 		channel = channel->GetNext();
 	}
 

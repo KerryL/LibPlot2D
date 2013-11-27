@@ -324,12 +324,12 @@ void MainFrame::SetProperties(void)
 #ifdef __WXMSW__
 	SetIcon(wxIcon(_T("ICON_ID_MAIN"), wxBITMAP_TYPE_ICO_RESOURCE));
 #elif __WXGTK__
-	SetIcon(wxIcon(plots16_xpm, wxBITMAP_TYPE_XPM));
-	SetIcon(wxIcon(plots24_xpm, wxBITMAP_TYPE_XPM));
-	SetIcon(wxIcon(plots32_xpm, wxBITMAP_TYPE_XPM));
-	SetIcon(wxIcon(plots48_xpm, wxBITMAP_TYPE_XPM));
-	SetIcon(wxIcon(plots64_xpm, wxBITMAP_TYPE_XPM));
-	SetIcon(wxIcon(plots128_xpm, wxBITMAP_TYPE_XPM));
+	SetIcon(wxIcon(plots16_xpm));
+	SetIcon(wxIcon(plots24_xpm));
+	SetIcon(wxIcon(plots32_xpm));
+	SetIcon(wxIcon(plots48_xpm));
+	SetIcon(wxIcon(plots64_xpm));
+	SetIcon(wxIcon(plots128_xpm));
 #endif
 
 	SetDropTarget(dynamic_cast<wxDropTarget*>(new DropTarget(*this)));
@@ -528,7 +528,7 @@ void MainFrame::ContextExportData(wxCommandEvent& WXUNUSED(event))
 		delimiter = _T(",");// FIXME:  Need to handle descriptions containing commas so we don't have problems with import later on
 
 	// Export both x and y data in case of asynchronous data or FFT, etc.
-	std::ofstream outFile(pathAndFileName[0].c_str(), std::ios::out);
+	std::ofstream outFile(pathAndFileName[0].mb_str(), std::ios::out);
 	if (!outFile.is_open() || !outFile.good())
 	{
 		wxMessageBox(_T("Could not open '") + pathAndFileName[0] + _T("' for output."),
@@ -969,11 +969,11 @@ bool MainFrame::LoadText(const wxString &textData)
 	while (wxFile::Exists(tempFileName))
 		tempFileName = GenerateTemporaryFileName();
 
-	std::ofstream tempFile(tempFileName.c_str(), std::ios::out);
+	std::ofstream tempFile(tempFileName.mb_str(), std::ios::out);
 	if (!tempFile.good() || !tempFile.is_open())
 	{
 		tempFile.close();
-		if (remove(tempFileName.c_str()) != 0)
+		if (remove(tempFileName.mb_str()) != 0)
 			wxMessageBox(_T("Error deleting temporary file '") + tempFileName + _T("'."),
 			_T("Could Not Delete File"), wxICON_ERROR, this);
 		return false;
@@ -983,7 +983,7 @@ bool MainFrame::LoadText(const wxString &textData)
 	tempFile.close();
 
 	bool fileLoaded = LoadFile(tempFileName);
-	if (remove(tempFileName.c_str()) != 0)
+	if (remove(tempFileName.mb_str()) != 0)
 		wxMessageBox(_T("Error deleting temporary file '") + tempFileName + _T("'."),
 		_T("Could Not Delete File"), wxICON_ERROR, this);
 
@@ -1732,7 +1732,7 @@ wxString MainFrame::ExtractUnitFromDescription(const wxString &description)
 	unsigned int i;
 	for (i = 0; i < delimiters.size(); i++)
 	{
-		location = description.Find(delimiters[i].c_str());
+		location = description.Find(delimiters[i].mb_str());
 		if (location != wxNOT_FOUND && location < (int)description.Len() - 1)
 		{
 			unit = description.Mid(location + 1);
@@ -3185,8 +3185,8 @@ void MainFrame::ApplyFilter(const FilterParameters &parameters, Dataset2D &data)
 Filter* MainFrame::GetFilter(const FilterParameters &parameters,
 	const double &sampleRate, const double &initialValue) const
 {
-	return new Filter(sampleRate, Filter::CoefficientsFromString(parameters.numerator.c_str()),
-		Filter::CoefficientsFromString(parameters.denominator.c_str()), initialValue);
+	return new Filter(sampleRate, Filter::CoefficientsFromString(std::string(parameters.numerator.mb_str())),
+		Filter::CoefficientsFromString(std::string(parameters.denominator.mb_str())), initialValue);
 }
 
 //==========================================================================

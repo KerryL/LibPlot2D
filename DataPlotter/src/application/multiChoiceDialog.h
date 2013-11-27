@@ -42,7 +42,7 @@ private:
 	// Object IDs
 	enum
 	{
-		ID_SELECT_ALL = wxID_HIGHEST + 100
+		idSelectAll = wxID_HIGHEST + 300
 	};
 
 	// Event handlers

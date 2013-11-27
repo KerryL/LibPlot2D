@@ -70,7 +70,7 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 //
 //==========================================================================
 BEGIN_EVENT_TABLE(MultiChoiceDialog, wxDialog)
-	EVT_BUTTON(ID_SELECT_ALL,	MultiChoiceDialog::OnSelectAllButton)
+	EVT_BUTTON(idSelectAll,	MultiChoiceDialog::OnSelectAllButton)
 END_EVENT_TABLE()
 
 //==========================================================================
@@ -168,7 +168,7 @@ wxSizer* MultiChoiceDialog::CreateButtons(void)
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
-	wxButton *selectAllButton = new wxButton(this, ID_SELECT_ALL, _T("Select All"));
+	wxButton *selectAllButton = new wxButton(this, idSelectAll, _T("Select All"));
 	sizer->Add(selectAllButton, 0, wxALIGN_LEFT);
 	sizer->AddStretchSpacer();
 

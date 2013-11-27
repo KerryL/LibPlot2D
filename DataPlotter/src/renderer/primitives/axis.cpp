@@ -504,7 +504,7 @@ void Axis::DrawAxisLabel(void) const
 	glPushMatrix();
 		glLoadIdentity();
 
-		boundingBox = font->BBox(label.c_str());
+		boundingBox = font->BBox(label.mb_str());
 
 		if (IsHorizontal())
 			glTranslated((renderWindow.GetSize().GetWidth() + boundingBox.Lower().X()
@@ -516,7 +516,7 @@ void Axis::DrawAxisLabel(void) const
 				+ renderWindow.GetSize().GetHeight()) / 2.0, -yTranslation, 0.0);
 		}
 
-		font->Render(label.c_str());
+		font->Render(label.mb_str());
 	glPopMatrix();
 }
 
@@ -601,9 +601,9 @@ void Axis::DrawTickLabels(void)
 
 		glPushMatrix();
 			glLoadIdentity();
-			ComputeTranslations(value, xTranslation, yTranslation, font->BBox(valueLabel), valueOffsetFromEdge);
+			ComputeTranslations(value, xTranslation, yTranslation, font->BBox(valueLabel.mb_str()), valueOffsetFromEdge);
 			glTranslated(xTranslation, yTranslation, 0.0);
-			font->Render(valueLabel);
+			font->Render(valueLabel.mb_str());
 		glPopMatrix();
 	}
 

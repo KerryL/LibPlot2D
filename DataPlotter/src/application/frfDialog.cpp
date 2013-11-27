@@ -159,7 +159,7 @@ wxSizer *FRFDialog::CreateCheckBoxes(void)
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
 	phaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Phase Data"));
-	moduloPhaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Keep Phase Data Within ±180 deg"));
+	moduloPhaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Keep Phase Data Within \241180 deg"));
 	coherenceCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Coherence Data"));
 
 	phaseCheckBox->SetValue(true);

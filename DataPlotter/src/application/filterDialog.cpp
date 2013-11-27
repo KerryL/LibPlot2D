@@ -580,7 +580,7 @@ bool FilterDialog::TransferDataFromWindow(void)
 		UpdateTransferFunction();
 	}
 
-	double steadyStateGain = Filter::ComputeSteadyStateGain(numeratorBox->GetValue().c_str(), denominatorBox->GetValue().c_str());
+	double steadyStateGain = Filter::ComputeSteadyStateGain(std::string(numeratorBox->GetValue().mb_str()), std::string(denominatorBox->GetValue().mb_str()));
 
 	if (!PlotMath::IsZero(steadyStateGain - 1.0) && !PlotMath::IsZero(steadyStateGain))
 	{
@@ -755,7 +755,7 @@ bool FilterDialog::ExpressionIsValid(const wxString &expression)
 
 	ExpressionTree e;
 	std::string temp, errorString;
-	errorString = e.Solve(expression.c_str(), temp);
+	errorString = e.Solve(std::string(expression.mb_str()), temp);
 	if (!errorString.empty())
 	{
 		wxMessageBox(_T("ERROR:  ") + errorString, _T("Error Defining Filter"));
@@ -969,7 +969,7 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 			else if (i == terms.size() - 2)
 				s.Append(coefficient + _T("s"));
 			else
-				s.Append(wxString::Format("%ss^%li", coefficient.c_str(), terms.size() - i - 1));
+				s.Append(wxString::Format("%ss^%li", std::string(coefficient.mb_str()), terms.size() - i - 1));
 		}
 	}
 
@@ -1513,7 +1513,7 @@ wxString FilterDialog::GetCustomName(const FilterParameters &parameters)
 wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(GetOrderString(parameters.order));
-	s.Append(wxString::Format(" %s, %0.*f Hz", name.c_str(),
+	s.Append(wxString::Format(" %s, %0.*f Hz", std::string(name.mb_str()),
 		PlotMath::GetPrecision(parameters.cutoffFrequency), parameters.cutoffFrequency));
 
 	return s;

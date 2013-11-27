@@ -68,7 +68,7 @@ private:
 
 	enum EventIDs
 	{
-		idInitialValue,
+		idInitialValue = wxID_HIGHEST + 400,
 		idFinalValue,
 		idSlope,
 		idFrequency,

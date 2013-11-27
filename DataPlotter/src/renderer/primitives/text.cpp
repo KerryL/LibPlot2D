@@ -107,7 +107,7 @@ void TextRendering::GenerateGeometry(void)
 			glRotated(angle, 0.0, 0.0, 1.0);
 
 			// Render the text
-			font->Render(text.c_str());
+			font->Render(text.mb_str());
 		glPopMatrix();
 	}
 }
@@ -160,7 +160,7 @@ double TextRendering::GetTextHeight(void) const
 	if (!font)
 		return 0.0;
 
-	FTBBox boundingBox = font->BBox(text.c_str());
+	FTBBox boundingBox = font->BBox(text.mb_str());
 
 	return boundingBox.Upper().Y() - boundingBox.Lower().Y();
 }
@@ -187,7 +187,7 @@ double TextRendering::GetTextWidth(void) const
 	if (!font)
 		return 0.0;
 
-	FTBBox boundingBox = font->BBox(text.c_str());
+	FTBBox boundingBox = font->BBox(text.mb_str());
 
 	return boundingBox.Upper().X() - boundingBox.Lower().X();
 }

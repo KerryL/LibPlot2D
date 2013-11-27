@@ -1377,7 +1377,7 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *r
 
 		if (i < U.rows && i != V.rows - 1)
 		{
-			for (k = l - 1; k < (int)V.rows; k++)
+			for (k = l - 1; k < V.rows; k++)
 				scale += fabs(U.elements[i][k]);
 
 			if (scale != 0.0)

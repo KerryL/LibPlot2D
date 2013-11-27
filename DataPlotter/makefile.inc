@@ -25,7 +25,7 @@ LIBDIRS = $(addprefix -L,$(LIBDIRS_TEMP))
 # will be added automatically
 LIBS_TEMP = \
 	ftgl \
-	wx_gtk2d_gl-2.8 \
+	wx_gtk2u_gl-3.0 \
 	GL
 
 LIBS = $(addprefix -l,$(LIBS_TEMP))
@@ -45,7 +45,8 @@ AR = ar rcs
 RANLIB = ranlib
 
 # Compiler flags
-CFLAGS = -g -Wall -Wextra -Werror $(INCDIRS) `wx-config --cppflags` `freetype-config --cflags` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
+#CFLAGS = -g -Wall -Wextra -Werror $(INCDIRS) `wx-config --cppflags` `freetype-config --cflags` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
+CFLAGS = -g -Wall -Wextra $(INCDIRS) `wx-config --cppflags` `freetype-config --cflags` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
 
 # Linker flags
 LDFLAGS = $(LIBDIRS) $(LIBS) `wx-config --libs` `freetype-config --libs`

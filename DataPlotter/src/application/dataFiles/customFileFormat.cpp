@@ -109,7 +109,7 @@ CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFi
 bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 {
 	channels.clear();
-	if (!formatNode.GetPropVal(_T("NAME"), &formatName))
+	if (!formatNode.GetAttribute(_T("NAME"), &formatName))
 	{
 		wxMessageBox(_T("Ignoring custom file formats:  Each FORMAT tag must have NAME attribute."),
 			_T("Error Reading Custom Format Definitions"));
@@ -117,7 +117,7 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 	}
 
 	wxString extension;
-	if (!formatNode.GetPropVal(_T("EXTENSION"), &extension))
+	if (!formatNode.GetAttribute(_T("EXTENSION"), &extension))
 		extension = _T("*");
 	unsigned int lastDot = pathAndFileName.find_last_of(_T("."));
 	if (!extension.Cmp(_T("*")) && !pathAndFileName.Mid(lastDot).CmpNoCase(extension))
@@ -127,14 +127,14 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 	if (!ProcessFormatChildren(formatNode.GetChildren(), id))
 		return false;
 
-	isXML = formatNode.GetPropVal(_T("XML"), "FALSE").CmpNoCase("TRUE") == 0;
+	isXML = formatNode.GetAttribute(_T("XML"), "FALSE").CmpNoCase("TRUE") == 0;
 	if (IsFormat(pathAndFileName, id))
 	{
-		delimiter = formatNode.GetPropVal(_T("DELIMITER"), wxEmptyString);
-		endIdentifier = formatNode.GetPropVal(_T("END_IDENTIFIER"), wxEmptyString);
-		timeUnits = formatNode.GetPropVal(_T("TIME_UNITS"), wxEmptyString);
-		timeFormat = formatNode.GetPropVal(_T("TIME_FORMAT"), wxEmptyString);
-		asynchronous = formatNode.GetPropVal(_T("ASYNC"), "FALSE").CmpNoCase("TRUE") == 0;
+		delimiter = formatNode.GetAttribute(_T("DELIMITER"), wxEmptyString);
+		endIdentifier = formatNode.GetAttribute(_T("END_IDENTIFIER"), wxEmptyString);
+		timeUnits = formatNode.GetAttribute(_T("TIME_UNITS"), wxEmptyString);
+		timeFormat = formatNode.GetAttribute(_T("TIME_FORMAT"), wxEmptyString);
+		asynchronous = formatNode.GetAttribute(_T("ASYNC"), "FALSE").CmpNoCase("TRUE") == 0;
 		if (isXML && ReadAdditionalXMLProperties(formatNode))
 			return true;
 		return true;
@@ -161,13 +161,13 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 //==========================================================================
 bool CustomFileFormat::ReadIdentifierTag(wxXmlNode &idNode, Identifier &id)
 {
-	wxString temp = idNode.GetPropVal(_T("MATCH_CASE"), _T("1"));
+	wxString temp = idNode.GetAttribute(_T("MATCH_CASE"), _T("1"));
 	if (temp.Cmp(_T("1")) == 0)
 		id.matchCase = true;
 	else
 		id.matchCase = false;
 
-	if (!idNode.GetPropVal(_T("LOCATION"), &temp))
+	if (!idNode.GetAttribute(_T("LOCATION"), &temp))
 	{
 		wxMessageBox(_T("Ignoring custom file formats:  Each IDENTIFIER tag must have LOCATION attribute."),
 			_T("Error Reading Custom Format Definitions"));
@@ -217,16 +217,16 @@ bool CustomFileFormat::ReadChannelTag(wxXmlNode &channelNode)
 	if (!ReadCodeOrColumn(channelNode, channel))// Must have code or column(>0)
 		return false;
 
-	if (!channelNode.GetPropVal(_T("NAME"), &channel.name))
+	if (!channelNode.GetAttribute(_T("NAME"), &channel.name))
 	{
 		wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  NAME must not be empty."),
 			_T("Error Reading Custom Format Definitions"));
 		return false;
 	}
 
-	channel.discardCode = channelNode.GetPropVal(_T("DISCARD_CODE"), "FALSE").CmpNoCase(_T("TRUE")) == 0;
-	channel.units = channelNode.GetPropVal(_T("UNITS"), wxEmptyString);
-	temp = channelNode.GetPropVal(_T("SCALE"), _T("1"));
+	channel.discardCode = channelNode.GetAttribute(_T("DISCARD_CODE"), "FALSE").CmpNoCase(_T("TRUE")) == 0;
+	channel.units = channelNode.GetAttribute(_T("UNITS"), wxEmptyString);
+	temp = channelNode.GetAttribute(_T("SCALE"), _T("1"));
 	if (!temp.ToDouble(&channel.scale))
 	{
 		wxMessageBox(_T("Could not set scale for ") + formatName + _T(":") + channel.name + _T(".  Using scale = 1."),
@@ -257,13 +257,13 @@ bool CustomFileFormat::ReadChannelTag(wxXmlNode &channelNode)
 //==========================================================================
 bool CustomFileFormat::ReadAdditionalXMLProperties(wxXmlNode &formatNode)
 {
-	xDataNode = formatNode.GetPropVal(_T("XDATA_NODE"), wxEmptyString);
-	xDataKey = formatNode.GetPropVal(_T("XDATA_KEY"), wxEmptyString);
-	yDataNode = formatNode.GetPropVal(_T("YDATA_NODE"), wxEmptyString);
-	yDataKey = formatNode.GetPropVal(_T("YDATA_KEY"), wxEmptyString);
-	channelParentNode = formatNode.GetPropVal(_T("CHANNEL_PARENT_NODE"), wxEmptyString);
-	channelNode = formatNode.GetPropVal(_T("CHANNEL_NODE"), wxEmptyString);
-	codeKey = formatNode.GetPropVal(_T("CODE_KEY"), wxEmptyString);
+	xDataNode = formatNode.GetAttribute(_T("XDATA_NODE"), wxEmptyString);
+	xDataKey = formatNode.GetAttribute(_T("XDATA_KEY"), wxEmptyString);
+	yDataNode = formatNode.GetAttribute(_T("YDATA_NODE"), wxEmptyString);
+	yDataKey = formatNode.GetAttribute(_T("YDATA_KEY"), wxEmptyString);
+	channelParentNode = formatNode.GetAttribute(_T("CHANNEL_PARENT_NODE"), wxEmptyString);
+	channelNode = formatNode.GetAttribute(_T("CHANNEL_NODE"), wxEmptyString);
+	codeKey = formatNode.GetAttribute(_T("CODE_KEY"), wxEmptyString);
 
 	// Also check that a delimiter was specified - this is required for XML types
 	// TODO:  What if instead of a string of values, the format is a new node for each data point?
@@ -509,7 +509,7 @@ bool CustomFileFormat::CheckRootAndVersion(const wxXmlDocument &document) const
 
 	// Check file version
 	unsigned long version;
-	if (!document.GetRoot()->GetPropVal(_T("VERSION"), &temp))
+	if (!document.GetRoot()->GetAttribute(_T("VERSION"), &temp))
 	{
 		wxMessageBox(_T("Ignoring custom file formats:  XML root must contain VERSION attribute."),
 			_T("Error Reading Custom Format Definitions"));
@@ -675,7 +675,7 @@ bool CustomFileFormat::ProcessFormatChildren(wxXmlNode *formatChild, Identifier 
 //==========================================================================
 bool CustomFileFormat::ReadCodeOrColumn(wxXmlNode &channelNode, Channel &channel) const
 {
-	if (!channelNode.GetPropVal(_T("CODE"), &channel.code))
+	if (!channelNode.GetAttribute(_T("CODE"), &channel.code))
 		return ReadCode(channelNode, channel);
 
 	return ReadColumn(channelNode, channel);
@@ -706,7 +706,7 @@ bool CustomFileFormat::ReadCode(wxXmlNode &channelNode, Channel &channel) const
 			_T("Error Reading Custom Format Definitions"));
 		return false;
 	}
-	else if (!channelNode.GetPropVal(_T("COLUMN"), &temp))
+	else if (!channelNode.GetAttribute(_T("COLUMN"), &temp))
 	{
 		wxMessageBox(_T("Ignoring channel definition for '") + formatName + _T("' format:  CODE or COLUMN must be specified."),
 			_T("Error Reading Custom Format Definitions"));
