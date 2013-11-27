@@ -59,12 +59,6 @@ private:
 	wxStaticText *slopeUnits;
 	wxStaticText *frequencyLabel;
 	wxStaticText *frequencyUnits;
-	/*wxStaticText *periodLabel;
-	wxStaticText *periodUnits;
-	wxStaticText *phaseAngleLabel;
-	wxStaticText *phaseAngleUnits;
-	wxStaticText *phaseTimeLabel;
-	wxStaticText *phaseTimeUnits;*/
 
 	enum EventIDs
 	{

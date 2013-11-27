@@ -48,6 +48,14 @@ CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime
 	const double &duration, const double &sampleRate) : wxDialog(parent, wxID_ANY,
 	_T("Create Signal"))
 {
+	initialValueTextBox = NULL;
+	finalValueTextBox = NULL;
+	slopeTextBox = NULL;
+	frequencyTextBox = NULL;
+	periodTextBox = NULL;
+	phaseAngleTextBox = NULL;
+	phaseTimeTextBox = NULL;
+
 	dataset = NULL;
 	keepPhaseAngle = true;
 	keepAmplitude = true;
@@ -839,6 +847,10 @@ void CreateSignalDialog::OnFrequencyChangeEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void CreateSignalDialog::OnPeriodChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
+	// Don't execute until we've been fully created
+	if (!periodTextBox)
+		return;
+
 	double value;
 	if (!periodTextBox->GetValue().ToDouble(&value))
 		return;
@@ -912,6 +924,10 @@ void CreateSignalDialog::OnPhaseTimeChangeEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void CreateSignalDialog::UpdatePhaseAngle(void)
 {
+	// Don't execute until we've been fully created
+	if (!frequencyTextBox || !phaseTimeTextBox)
+		return;
+
 	double phase(0.0), frequency(0.0);
 	if (!frequencyTextBox->GetValue().ToDouble(&frequency) ||
 		!phaseTimeTextBox->GetValue().ToDouble(&phase))
@@ -938,6 +954,10 @@ void CreateSignalDialog::UpdatePhaseAngle(void)
 //==========================================================================
 void CreateSignalDialog::UpdatePhaseTime(void)
 {
+	// Don't execute until we've been fully created
+	if (!frequencyTextBox || !phaseTimeTextBox)
+		return;
+
 	double phase(0.0), frequency(0.0);
 	if (!frequencyTextBox->GetValue().ToDouble(&frequency) ||
 		!phaseAngleTextBox->GetValue().ToDouble(&phase))
@@ -964,6 +984,10 @@ void CreateSignalDialog::UpdatePhaseTime(void)
 //==========================================================================
 void CreateSignalDialog::UpdateAmplitude(void)
 {
+	// Don't execute until we've been fully created
+	if (!periodTextBox || !slopeTextBox)
+		return;
+
 	double period(0.0), slope(0.0);
 	if (!periodTextBox->GetValue().ToDouble(&period) ||
 		!slopeTextBox->GetValue().ToDouble(&slope))
@@ -994,6 +1018,10 @@ void CreateSignalDialog::UpdateAmplitude(void)
 //==========================================================================
 void CreateSignalDialog::UpdateSlope(void)
 {
+	// Don't execute until we've been fully created
+	if (!periodTextBox || !initialValueTextBox)
+		return;
+
 	double period(0.0), amplitude(0.0);
 	if (!periodTextBox->GetValue().ToDouble(&period) ||
 		!initialValueTextBox->GetValue().ToDouble(&amplitude))
