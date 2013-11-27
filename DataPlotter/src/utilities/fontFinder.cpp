@@ -55,7 +55,7 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 #else
 	// Unknown platform - warn the user
 #	warning "Unrecognized platform - unable to locate font files!"
-	return wxEmptyString
+	return wxEmptyString;
 #endif
 
 	wxArrayString fontFiles;
@@ -279,11 +279,12 @@ bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offset
 	for (i = 0; i < offsetTable.numOfTables; i++)
 	{
 		file.read((char*)&table, sizeof(TT_TABLE_DIRECTORY));
-		tempTagString.clear();
 
 		// Table's tag is <= 4 characters
-		tempTagString.assign(table.tag);
-		tempTagString.resize(4);
+		tempTagString = table.tag[0];
+		tempTagString += table.tag[1];
+		tempTagString += table.tag[2];
+		tempTagString += table.tag[3];
 		if(tempTagString.CmpNoCase(tableName) == 0)
 		{
 			SwapEndian(table.length);

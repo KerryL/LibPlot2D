@@ -150,7 +150,14 @@ void PlotObject::InitializeFonts(void)
 	if (!foundFont)
 	{
 		if (!fontFile.IsEmpty())
-			wxMessageBox(_T("Could not find preferred plot font; using ") + fontFile);
+		{
+			wxString fontName;
+			if (FontFinder::GetFontName(fontFile, fontName))
+				wxMessageBox(_T("Could not find preferred plot font; using ") + fontName + _T(" from ") + fontFile);
+			else
+				wxMessageBox(_T("Could not find preferred plot font; using ") + fontFile);
+
+		}
 		else
 			wxMessageBox(_T("Could not find any *.ttf files - cannot generate plot fonts"));
 	}
