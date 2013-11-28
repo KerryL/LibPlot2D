@@ -969,7 +969,7 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 			else if (i == terms.size() - 2)
 				s.Append(coefficient + _T("s"));
 			else
-				s.Append(wxString::Format("%ss^%li", std::string(coefficient.mb_str()), terms.size() - i - 1));
+				s.Append(wxString::Format("%ss^%li", coefficient.mb_str(), terms.size() - i - 1));
 		}
 	}
 
@@ -1513,7 +1513,7 @@ wxString FilterDialog::GetCustomName(const FilterParameters &parameters)
 wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(GetOrderString(parameters.order));
-	s.Append(wxString::Format(" %s, %0.*f Hz", std::string(name.mb_str()),
+	s.Append(wxString::Format(" %s, %0.*f Hz", name.mb_str(),
 		PlotMath::GetPrecision(parameters.cutoffFrequency), parameters.cutoffFrequency));
 
 	return s;

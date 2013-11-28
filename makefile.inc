@@ -25,7 +25,6 @@ LIBDIRS = $(addprefix -L,$(LIBDIRS_TEMP))
 # will be added automatically
 LIBS_TEMP = \
 	ftgl \
-	wx_gtk2u_gl-3.0 \
 	GL
 
 LIBS = $(addprefix -l,$(LIBS_TEMP))
@@ -49,7 +48,7 @@ RANLIB = ranlib
 CFLAGS = -g -Wall -Wextra $(INCDIRS) `wx-config --cppflags` `freetype-config --cflags` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
 
 # Linker flags
-LDFLAGS = $(LIBDIRS) $(LIBS) `wx-config --libs` `freetype-config --libs`
+LDFLAGS = $(LIBDIRS) $(LIBS) `wx-config --libs std,gl` `freetype-config --libs`
 
 # Object file output directory
 OBJDIR = $(PWD)/.obj/

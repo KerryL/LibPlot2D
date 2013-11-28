@@ -52,7 +52,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;FTGL_LIBRARY_STATIC;_DATAPLOTTER_64_BIT_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_dll\mswd;$(WXWIN)\include;$(FTGL)\src;./src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/;$(FREETYPE)\include;$(WXWIN)\lib\vc_dll\mswd;$(WXWIN)\include;$(FTGL)\src;./src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
