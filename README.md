@@ -1,9 +1,9 @@
 DataPlotter
 ===========
 
-2D Data Plotting application
+Data Plotter is a lightweight 2D data plotting and analysis application.  It is licsensed under the GPLv2 license.  See [the wiki](http://github.com/KerryL/DataPlotter/wiki/Home) for more information.
 
-DataPlotter is built upon wxWidgets 2.8, OpenGL, and FTGL 2.1 (which requires freetype2).  It has been tested under MSW and GTK.
+DataPlotter is built upon wxWidgets, OpenGL, and FTGL (which is built on freetype2).  It compiles and runs under both MSW and GTK.
 
 DataPlotter was created as a simple and fast means for visualizing data.  Simply drag-and-drop a file containing delimited numerical data, choose which columns to draw, and look at your data.
 
