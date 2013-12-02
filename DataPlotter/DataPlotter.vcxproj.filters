@@ -57,257 +57,257 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\renderer\primitives\axis.h">
+    <ClInclude Include="../src\renderer\primitives\axis.h">
       <Filter>Header Files\renderer\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\primitives\primitive.h">
+    <ClInclude Include="../src\renderer\primitives\primitive.h">
       <Filter>Header Files\renderer\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\rms.h">
+    <ClInclude Include="../src\utilities\signals\rms.h">
       <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\derivative.h">
+    <ClInclude Include="../src\utilities\signals\derivative.h">
       <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\fft.h">
+    <ClInclude Include="../src\utilities\signals\fft.h">
       <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\integral.h">
+    <ClInclude Include="../src\utilities\signals\integral.h">
       <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\dataset2D.h">
+    <ClInclude Include="../src\utilities\dataset2D.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\rangeLimitsDialog.h">
+    <ClInclude Include="../src\application\rangeLimitsDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dropTarget.h">
+    <ClInclude Include="../src\application\dropTarget.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\mainFrame.h">
+    <ClInclude Include="../src\application\mainFrame.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\plotObject.h">
+    <ClInclude Include="../src\application\plotObject.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\plotterApp.h">
+    <ClInclude Include="../src\application\plotterApp.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\renderWindow.h">
+    <ClInclude Include="../src\renderer\renderWindow.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\color.h">
+    <ClInclude Include="../src\renderer\color.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\plotRenderer.h">
+    <ClInclude Include="../src\renderer\plotRenderer.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\primitives\zoomBox.h">
+    <ClInclude Include="../src\renderer\primitives\zoomBox.h">
       <Filter>Header Files\renderer\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\primitives\plotCursor.h">
+    <ClInclude Include="../src\renderer\primitives\plotCursor.h">
       <Filter>Header Files\renderer\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\primitives\plotCurve.h">
+    <ClInclude Include="../src\renderer\primitives\plotCurve.h">
       <Filter>Header Files\renderer\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\primitives\text.h">
+    <ClInclude Include="../src\renderer\primitives\text.h">
       <Filter>Header Files\renderer\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\managedList.h">
+    <ClInclude Include="../src\utilities\managedList.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\math\vector.h">
+    <ClInclude Include="../src\utilities\math\vector.h">
       <Filter>Header Files\utilities\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\math\complex.h">
+    <ClInclude Include="../src\utilities\math\complex.h">
       <Filter>Header Files\utilities\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\math\expressionTree.h">
+    <ClInclude Include="../src\utilities\math\expressionTree.h">
       <Filter>Header Files\utilities\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\math\matrix.h">
+    <ClInclude Include="../src\utilities\math\matrix.h">
       <Filter>Header Files\utilities\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\math\plotMath.h">
+    <ClInclude Include="../src\utilities\math\plotMath.h">
       <Filter>Header Files\utilities\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\curveFit.h">
+    <ClInclude Include="../src\utilities\signals\curveFit.h">
       <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\fontFinder.h">
+    <ClInclude Include="../src\utilities\fontFinder.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\machineDefinitions.h">
+    <ClInclude Include="../src\utilities\machineDefinitions.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\filterDialog.h">
+    <ClInclude Include="../src\application\filterDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\multiChoiceDialog.h">
+    <ClInclude Include="../src\application\multiChoiceDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\fftDialog.h">
+    <ClInclude Include="../src\application\fftDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\frfDialog.h">
+    <ClInclude Include="../src\application\frfDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dataFiles\dataFile.h">
+    <ClInclude Include="../src\application\dataFiles\dataFile.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dataFiles\customFileFormat.h">
+    <ClInclude Include="../src\application\dataFiles\customFileFormat.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dataFiles\customFile.h">
+    <ClInclude Include="../src\application\dataFiles\customFile.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dataFiles\customXMLFile.h">
+    <ClInclude Include="../src\application\dataFiles\customXMLFile.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dataFiles\genericFile.h">
+    <ClInclude Include="../src\application\dataFiles\genericFile.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dataFiles\baumullerFile.h">
+    <ClInclude Include="../src\application\dataFiles\baumullerFile.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\dataFiles\kollmorgenFile.h">
+    <ClInclude Include="../src\application\dataFiles\kollmorgenFile.h">
       <Filter>Header Files\application\dataFiles</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\signals\filter.h">
+    <ClInclude Include="../src\utilities\signals\filter.h">
       <Filter>Header Files\utilities\signals</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\textInputDialog.h">
+    <ClInclude Include="../src\application\textInputDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\createSignalDialog.h">
+    <ClInclude Include="../src\application\createSignalDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\renderer\primitives\axis.cpp">
+    <ClCompile Include="../src\renderer\primitives\axis.cpp">
       <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\primitives\primitive.cpp">
+    <ClCompile Include="../src\renderer\primitives\primitive.cpp">
       <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\derivative.cpp">
+    <ClCompile Include="../src\utilities\signals\derivative.cpp">
       <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\fft.cpp">
+    <ClCompile Include="../src\utilities\signals\fft.cpp">
       <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\integral.cpp">
+    <ClCompile Include="../src\utilities\signals\integral.cpp">
       <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\rms.cpp">
+    <ClCompile Include="../src\utilities\signals\rms.cpp">
       <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\dataset2D.cpp">
+    <ClCompile Include="../src\utilities\dataset2D.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\rangeLimitsDialog.cpp">
+    <ClCompile Include="../src\application\rangeLimitsDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dropTarget.cpp">
+    <ClCompile Include="../src\application\dropTarget.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\mainFrame.cpp">
+    <ClCompile Include="../src\application\mainFrame.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\plotObject.cpp">
+    <ClCompile Include="../src\application\plotObject.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\plotterApp.cpp">
+    <ClCompile Include="../src\application\plotterApp.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\renderWindow.cpp">
+    <ClCompile Include="../src\renderer\renderWindow.cpp">
       <Filter>Source Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\color.cpp">
+    <ClCompile Include="../src\renderer\color.cpp">
       <Filter>Source Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\plotRenderer.cpp">
+    <ClCompile Include="../src\renderer\plotRenderer.cpp">
       <Filter>Source Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\primitives\zoomBox.cpp">
+    <ClCompile Include="../src\renderer\primitives\zoomBox.cpp">
       <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\primitives\plotCursor.cpp">
+    <ClCompile Include="../src\renderer\primitives\plotCursor.cpp">
       <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\primitives\plotCurve.cpp">
+    <ClCompile Include="../src\renderer\primitives\plotCurve.cpp">
       <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\primitives\text.cpp">
+    <ClCompile Include="../src\renderer\primitives\text.cpp">
       <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\math\vector.cpp">
+    <ClCompile Include="../src\utilities\math\vector.cpp">
       <Filter>Source Files\utilities\math</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\math\complex.cpp">
+    <ClCompile Include="../src\utilities\math\complex.cpp">
       <Filter>Source Files\utilities\math</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\math\expressionTree.cpp">
+    <ClCompile Include="../src\utilities\math\expressionTree.cpp">
       <Filter>Source Files\utilities\math</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\math\matrix.cpp">
+    <ClCompile Include="../src\utilities\math\matrix.cpp">
       <Filter>Source Files\utilities\math</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\math\plotMath.cpp">
+    <ClCompile Include="../src\utilities\math\plotMath.cpp">
       <Filter>Source Files\utilities\math</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\curveFit.cpp">
+    <ClCompile Include="../src\utilities\signals\curveFit.cpp">
       <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\fontFinder.cpp">
+    <ClCompile Include="../src\utilities\fontFinder.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\filterDialog.cpp">
+    <ClCompile Include="../src\application\filterDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\multiChoiceDialog.cpp">
+    <ClCompile Include="../src\application\multiChoiceDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\fftDialog.cpp">
+    <ClCompile Include="../src\application\fftDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\frfDialog.cpp">
+    <ClCompile Include="../src\application\frfDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dataFiles\dataFile.cpp">
+    <ClCompile Include="../src\application\dataFiles\dataFile.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dataFiles\customFileFormat.cpp">
+    <ClCompile Include="../src\application\dataFiles\customFileFormat.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dataFiles\customFile.cpp">
+    <ClCompile Include="../src\application\dataFiles\customFile.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dataFiles\customXMLFile.cpp">
+    <ClCompile Include="../src\application\dataFiles\customXMLFile.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dataFiles\genericFile.cpp">
+    <ClCompile Include="../src\application\dataFiles\genericFile.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dataFiles\baumullerFile.cpp">
+    <ClCompile Include="../src\application\dataFiles\baumullerFile.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\dataFiles\kollmorgenFile.cpp">
+    <ClCompile Include="../src\application\dataFiles\kollmorgenFile.cpp">
       <Filter>Source Files\application\dataFiles</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\signals\filter.cpp">
+    <ClCompile Include="../src\utilities\signals\filter.cpp">
       <Filter>Source Files\utilities\signals</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\textInputDialog.cpp">
+    <ClCompile Include="../src\application\textInputDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\createSignalDialog.cpp">
+    <ClCompile Include="../src\application\createSignalDialog.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="res\DataPlotter.rc">
+    <ResourceCompile Include="../res\DataPlotter.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

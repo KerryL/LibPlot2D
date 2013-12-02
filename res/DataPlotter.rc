@@ -14,7 +14,7 @@
 // History:
 
 // Main application icon (MUST be first alphabetically)
-ICON_ID_MAIN			ICON		"res\\icons\\plots.ico"
+ICON_ID_MAIN			ICON		"..\\res\\icons\\plots.ico"
 
 // wxWidgets definitions
 #define wxUSE_NO_MANIFEST 1
