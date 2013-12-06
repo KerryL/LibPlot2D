@@ -56,9 +56,10 @@
 //==========================================================================
 RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, id, position, size, style | wxFULL_REPAINT_ON_RESIZE, wxEmptyString,
-	args)
+	&parent, id, args, position, size, style | wxFULL_REPAINT_ON_RESIZE)
 {
+	context = NULL;
+
 	wireFrame = false;
 	view3D = true;
 	viewOrthogonal = false;
@@ -106,6 +107,9 @@ RenderWindow::~RenderWindow()
 
 	delete viewToModel;
 	viewToModel = NULL;
+
+	delete GetContext();
+	context = NULL;
 }
 
 //==========================================================================
@@ -140,6 +144,30 @@ END_EVENT_TABLE()
 
 //==========================================================================
 // Class:			RenderWindow
+// Function:		GetContext
+//
+// Description:		Gets (or creates, if it doesn't yet exist) the GL context.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxGLContext*
+//
+//==========================================================================
+wxGLContext* RenderWindow::GetContext(void)
+{
+	if (!context)
+		context = new wxGLContext(this);
+
+	return context;
+}
+
+//==========================================================================
+// Class:			RenderWindow
 // Function:		Render
 //
 // Description:		Updates the scene with all of this object's options and
@@ -160,7 +188,7 @@ void RenderWindow::Render()
 	if (!GetContext() || !IsShownOnScreen())
 		return;
 
-	SetCurrent();
+	SetCurrent(*context);
 	wxPaintDC(this);
 
 	if (modified)
@@ -216,7 +244,7 @@ void RenderWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
 // Description:		Event handler for the window re-size event.
 //
 // Input Arguments:
-//		event	= wxSizeEvent&
+//		event	= wxSizeEvent& (unused)
 //
 // Output Arguments:
 //		None
@@ -225,18 +253,15 @@ void RenderWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void RenderWindow::OnSize(wxSizeEvent& event)
+void RenderWindow::OnSize(wxSizeEvent& WXUNUSED(event))
 {
-    // This is also necessary to update the context on some platforms
-    wxGLCanvas::OnSize(event);
-
     // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 	int w, h;
 	GetClientSize(&w, &h);
 
 	if (GetContext() && IsShownOnScreen())
 	{
-		SetCurrent();
+		SetCurrent(*context);
 		glViewport(0, 0, (GLint) w, (GLint) h);
 	}
 	Refresh();
@@ -440,7 +465,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 //==========================================================================
 void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent &event)
 {
-	SetCurrent();
+	SetCurrent(*GetContext());
 	UpdateTransformationMatricies();
 	glMatrixMode(GL_MODELVIEW);
 
@@ -727,7 +752,7 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 //==========================================================================
 void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection)
 {
-	SetCurrent();
+	SetCurrent(*GetContext());
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

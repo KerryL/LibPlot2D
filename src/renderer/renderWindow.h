@@ -90,6 +90,9 @@ public:
 	bool IsThisRendererSelected(const Primitive *pickedObject) const;
 
 private:
+	wxGLContext *context;
+	wxGLContext* GetContext(void);
+
 	// Flags describing the options for this object's functionality
 	bool wireFrame;
 	bool viewOrthogonal;
