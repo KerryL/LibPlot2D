@@ -139,7 +139,7 @@ wxString DataFile::DetermineBestDelimiter(void) const
 
 	if (delimiterList.size() == 1)
 		return delimiterList[0];
-	std::ifstream file(fileName.c_str(), std::ios::in);
+	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
@@ -219,7 +219,7 @@ wxArrayString DataFile::CreateDelimiterList(void) const
 wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors) const
 {
-	std::ifstream file(fileName.c_str(), std::ios::in);
+	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
@@ -427,7 +427,7 @@ bool DataFile::ProcessFile(void)
 	descriptions = RemoveUnwantedDescriptions(descriptions, userSelections);
 	removeExistingCurves = dialog.RemoveExistingCurves();
 
-	std::ifstream file(fileName.c_str(), std::ios::in);
+	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);

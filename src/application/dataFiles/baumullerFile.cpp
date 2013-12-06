@@ -35,7 +35,7 @@
 //==========================================================================
 bool BaumullerFile::IsType(const wxString &_fileName)
 {
-	std::ifstream file(_fileName.c_str(), std::ios::in);
+	std::ifstream file(_fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not open file '") + _fileName + _T("'!"),
@@ -76,7 +76,7 @@ bool BaumullerFile::IsType(const wxString &_fileName)
 wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors) const
 {
-	std::ifstream file(fileName.c_str(), std::ios::in);
+	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);

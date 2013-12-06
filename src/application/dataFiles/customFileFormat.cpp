@@ -302,7 +302,7 @@ bool CustomFileFormat::ReadAdditionalXMLProperties(wxXmlNode &formatNode)
 //==========================================================================
 bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifier &id)
 {
-	std::ifstream dataFile(pathAndFileName.c_str(), std::ios::in);
+	std::ifstream dataFile(pathAndFileName.mb_str(), std::ios::in);
 	if (!dataFile.is_open() || !dataFile.good())
 	{
 		dataFile.close();

@@ -35,7 +35,7 @@
 //==========================================================================
 bool KollmorgenFile::IsType(const wxString &_fileName)
 {
-	std::ifstream file(_fileName.c_str(), std::ios::in);
+	std::ifstream file(_fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not open file '") + _fileName + _T("'!"),
@@ -80,7 +80,7 @@ bool KollmorgenFile::IsType(const wxString &_fileName)
 wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 	std::vector<double> &factors) const
 {
-	std::ifstream file(fileName.c_str(), std::ios::in);
+	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
@@ -120,7 +120,7 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 //==========================================================================
 void KollmorgenFile::DoTypeSpecificLoadTasks(void)
 {
-	std::ifstream file(fileName.c_str(), std::ios::in);
+	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not determine sample rate!  Using 1 Hz."),

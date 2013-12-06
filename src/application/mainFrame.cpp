@@ -2299,8 +2299,8 @@ void MainFrame::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
 {
 	double shift(0.0);
 	wxString shiftText = ::wxGetTextFromUser(
-		_T("Specify the time to add to time data in original data:\n"
-		"Use same units as time series.  Positive values shift curve to the right."),
+		_T("Specify the time to add to time data in original data:\n")
+		_T("Use same units as time series.  Positive values shift curve to the right."),
 		_T("Time Shift"), _T("0"), this);
 
 	if (!shiftText.ToDouble(&shift) || shift == 0.0)

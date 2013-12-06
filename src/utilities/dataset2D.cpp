@@ -203,7 +203,7 @@ void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 	else
 		return;
 
-	std::ofstream exportFile(pathAndFileName.c_str(), std::ios::out);
+	std::ofstream exportFile(pathAndFileName.mb_str(), std::ios::out);
 	if (!exportFile.is_open() || !exportFile.good())
 		return;
 
