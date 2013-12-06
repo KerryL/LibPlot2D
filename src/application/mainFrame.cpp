@@ -177,6 +177,7 @@ void MainFrame::CreateControls(void)
 	splitter->SetMinimumPaneSize(150);
 
 	SetSizerAndFit(topSizer);
+	splitter->SetSashPosition(splitter->GetSashPosition(), false);
 }
 
 //==========================================================================
