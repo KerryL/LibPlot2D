@@ -13,6 +13,10 @@
       <Configuration>Release wx 2.8</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release wx2.8|Win32">
+      <Configuration>Release wx2.8</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -40,6 +44,12 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx2.8|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx 2.8|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -58,6 +68,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release wx2.8|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release wx 2.8|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -69,6 +82,9 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx2.8|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx 2.8|Win32'">
@@ -133,6 +149,30 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_lib;$(FREETYPE)\objs\win32\vc2010;$(FTGL)\msvc\Build</AdditionalLibraryDirectories>
       <AdditionalDependencies>wxbase30u.lib;wxmsw30u_adv.lib;wxbase30u_xml.lib;wxexpat.lib;wxmsw30u_core.lib;wxmsw30u_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;ftgl_static.lib;freetype2410MT.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release wx2.8|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;FTGL_LIBRARY_STATIC;_DATAPLOTTER_64_BIT_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_lib\msw;$(WXWIN)\include;$(FTGL)\src;../src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_lib;$(FREETYPE)\objs\win32\vc2010;$(FTGL)\msvc\Build</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase28.lib;wxmsw28_adv.lib;wxbase28_xml.lib;wxexpat.lib;wxmsw28_core.lib;wxmsw28_gl.lib;wxzlib.lib;wxpng.lib;wxtiff.lib;wxjpeg.lib;opengl32.lib;ftgl_static.lib;freetype2410MT.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
