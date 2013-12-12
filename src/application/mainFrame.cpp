@@ -173,6 +173,7 @@ void MainFrame::CreateControls(void)
 
 	CreatePlotArea(splitter);
 	splitter->SplitHorizontally(plotArea, lowerPanel, plotArea->GetSize().GetHeight());
+	splitter->SetSize(GetClientSize());
 	splitter->SetSashGravity(1.0);
 	splitter->SetMinimumPaneSize(150);
 
@@ -288,12 +289,15 @@ wxBoxSizer* MainFrame::CreateButtons(wxWindow *parent)
 {
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxVERTICAL);
 
-	buttonSizer->Add(new wxButton(parent, idButtonOpen, _T("&Open")), 1, wxGROW);
-	buttonSizer->Add(new wxButton(parent, idButtonAutoScale, _T("&Auto Scale")), 1, wxGROW);
-	buttonSizer->Add(new wxButton(parent, idButtonRemoveCurve, _T("&Remove")), 1, wxGROW);
-	buttonSizer->Add(new wxButton(parent, idButtonReloadData, _T("Reload &Data")), 1, wxGROW);
+	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
+	buttonSizer->Add(topSizer);
 
-	buttonSizer->AddStretchSpacer();
+	topSizer->Add(new wxButton(parent, idButtonOpen, _T("&Open")), 1, wxGROW);
+	topSizer->Add(new wxButton(parent, idButtonAutoScale, _T("&Auto Scale")), 1, wxGROW);
+	topSizer->Add(new wxButton(parent, idButtonRemoveCurve, _T("&Remove")), 1, wxGROW);
+	topSizer->Add(new wxButton(parent, idButtonReloadData, _T("Reload &Data")), 1, wxGROW);
+
+	buttonSizer->AddStretchSpacer(1);
 	buttonSizer->Add(new wxStaticText(parent, wxID_ANY, DataPlotterApp::versionString));
 
 	return buttonSizer;
