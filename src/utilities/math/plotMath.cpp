@@ -356,7 +356,7 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 //==========================================================================
 double PlotMath::GetAverageXSpacing(const Dataset2D &data)
 {
-	return data.GetXData(data.GetNumberOfPoints() - 1) / data.GetNumberOfPoints();
+	return data.GetXData(data.GetNumberOfPoints() - 1) / (data.GetNumberOfPoints() - 1.0);
 }
 
 //==========================================================================
