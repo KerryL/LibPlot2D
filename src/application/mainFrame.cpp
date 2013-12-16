@@ -385,6 +385,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idContextFRF,							MainFrame::ContextFRFEvent)
 	EVT_MENU(idContextCreateSignal,					MainFrame::ContextCreateSignalEvent)
 	EVT_MENU(idContextSetTimeUnits,					MainFrame::ContextSetTimeUnitsEvent)
+	EVT_MENU(idContextScaleXData,					MainFrame::ContextScaleXDataEvent)
 	EVT_MENU(idContextPlotDerivative,				MainFrame::ContextPlotDerivativeEvent)
 	EVT_MENU(idContextPlotIntegral,					MainFrame::ContextPlotIntegralEvent)
 	EVT_MENU(idContextPlotRMS,						MainFrame::ContextPlotRMSEvent)
@@ -623,23 +624,6 @@ void MainFrame::ButtonAutoScaleClickedEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
-	// Known bug with wxGrid::GetSelectedRows() - returns empty set
-	// This is the cleanest way to do it, after the bug is fixed
-	// Actually - this method might require sorting and removing rows in reverse
-	// order to avoide changing row indices during deletion process
-	/*wxArrayInt rows = optionsGrid->GetSelectedRows();
-
-	// Must have row selected
-	unsigned int i;
-	for (i = 0; i < rows.Count(); i++)
-	{
-		// Cannot remove time row
-		if (rows[i] == 0)
-			continue;
-
-		RemoveCurve(rows[i] - 1);
-	}*/
-
 	// Workaround for now
 	int i;
 	for (i = optionsGrid->GetRows() - 1; i > 0; i--)
@@ -707,7 +691,10 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 	contextMenu->AppendSeparator();
 
 	if (row == 0 && currentFileFormat == FormatGeneric)
+	{
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
+		contextMenu->Append(idContextScaleXData, _T("Scale X-Data"));
+	}
 	else if (row > 0)
 	{
 		contextMenu->Append(idContextPlotDerivative, _T("Plot Derivative"));
@@ -715,6 +702,7 @@ void MainFrame::CreateGridContextMenu(const wxPoint &position, const unsigned in
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
 		contextMenu->Append(idContextTimeShift, _T("Plot Time-Shifted"));
+		contextMenu->Append(idContextScaleXData, _T("Plot Time-Scaled"));
 		contextMenu->Append(idContextBitMask, _T("Plot Bit"));
 
 		contextMenu->AppendSeparator();
@@ -2046,6 +2034,79 @@ void MainFrame::ContextSetTimeUnitsEvent(wxCommandEvent& WXUNUSED(event))
 		// Set the label back to what it used to be and warn the user
 		SetXDataLabel(currentLabel);
 		wxMessageBox(_T("Could not understand units \"") + userUnits + _T("\"."), _T("Error Setting Units"), wxICON_ERROR, this);
+	}
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextScaleXDataEvent
+//
+// Description:		Scales the X-data by the specified factor.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextScaleXDataEvent(wxCommandEvent& WXUNUSED(event))
+{
+	double factor(0.0);
+	wxString factorText(_T("0.0"));
+
+	while (!factorText.ToDouble(&factor) || factor == 0.0)
+	{
+		factorText = ::wxGetTextFromUser(_T("Specify scaling factor:"),
+		_T("Specify Factor"), _T("1"), this);
+		if (factorText.IsEmpty())
+			return;
+	}
+
+	wxArrayInt selectedRows = optionsGrid->GetSelectedRows();
+	unsigned int i;
+
+	// If applied to the row 0, apply to all curves
+	if (selectedRows.Count() == 1 && selectedRows[0] == 0)
+	{
+		unsigned int stopIndex(plotList.GetCount());
+		for (i = 0; i < stopIndex; i++)
+		{
+			Dataset2D *scaledData = new Dataset2D(*plotList[i]);
+			scaledData->MultiplyXData(factor);
+			AddCurve(scaledData, optionsGrid->GetCellValue(i + 1, colName));
+
+			optionsGrid->SetCellBackgroundColour(
+				optionsGrid->GetCellBackgroundColour(i + 1, colColor),
+				i + stopIndex + 1, colColor);
+			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colLineSize),
+				i + stopIndex + 1, colLineSize);
+			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colMarkerSize),
+				i + stopIndex + 1, colMarkerSize);
+			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colVisible),
+				i + stopIndex + 1, colVisible);
+			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colRightAxis),
+				i + stopIndex + 1, colRightAxis);
+
+			UpdateCurveProperties(i + stopIndex);
+		}
+
+		for (i = stopIndex; i > 0; i--)
+			RemoveCurve(i - 1);
+	}
+	// If applied to any other row, apply only to that row (by duplicating curve)
+	else
+	{
+		for (i = 0; i < selectedRows.Count(); i++)
+		{
+			Dataset2D *scaledData = new Dataset2D(*plotList[selectedRows[i] - 1]);
+			scaledData->MultiplyXData(factor);
+			AddCurve(scaledData, optionsGrid->GetCellValue(selectedRows[i], colName)
+				+ wxString::Format(", X-scaled by %f", factor));
+		}
 	}
 }
 

@@ -137,6 +137,7 @@ private:
 		idContextCreateSignal,
 
 		idContextSetTimeUnits,
+		idContextScaleXData,
 		idContextPlotDerivative,
 		idContextPlotIntegral,
 		idContextPlotRMS,
@@ -203,6 +204,7 @@ private:
 	void ContextFRFEvent(wxCommandEvent &event);
 	void ContextCreateSignalEvent(wxCommandEvent &event);
 	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
+	void ContextScaleXDataEvent(wxCommandEvent &event);
 	void ContextPlotDerivativeEvent(wxCommandEvent &event);
 	void ContextPlotIntegralEvent(wxCommandEvent &event);
 	void ContextPlotRMSEvent(wxCommandEvent &event);
