@@ -16,8 +16,6 @@
 #ifndef _Complex_H_
 #define _Complex_H_
 
-using namespace std;
-
 class Complex
 {
 public:
