@@ -22,6 +22,8 @@
 // Local headers
 #include "utilities/math/complex.h"
 
+using namespace std;
+
 //==========================================================================
 // Class:			Complex
 // Function:		Complex
