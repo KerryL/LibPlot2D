@@ -543,21 +543,40 @@ void MainFrame::ContextExportData(wxCommandEvent& WXUNUSED(event))
 	}
 
 	unsigned int i, j(0);
+	wxString temp;
 	for (i = 1; i < plotList.GetCount() + 1; i++)
 	{
 		if (optionsGrid->GetCellValue(i, colName).Contains(_T("FFT")) ||
 			optionsGrid->GetCellValue(i, colName).Contains(_T("FRF")))
 			outFile << _T("Frequency [Hz]") << delimiter;
 		else
-			outFile << genericXAxisLabel << delimiter;
+		{
+			if (delimiter.Cmp(",") == 0)
+			{
+				temp = genericXAxisLabel;
+				temp.Replace(",", ";");
+				outFile << temp << delimiter;
+			}
+			else
+				outFile << genericXAxisLabel << delimiter;
+		}
 
-		outFile << optionsGrid->GetCellValue(i, colName);
+		if (delimiter.Cmp(",") == 0)
+		{
+			temp = optionsGrid->GetCellValue(i, colName);
+			temp.Replace(",", ";");
+			outFile << temp;
+		}
+		else
+			outFile << optionsGrid->GetCellValue(i, colName);
 
 		if (i == plotList.GetCount())
 			outFile << endl;
 		else
 			outFile << delimiter;
 	}
+
+	outFile.precision(14);
 
 	bool done(false);
 	while (!done)
