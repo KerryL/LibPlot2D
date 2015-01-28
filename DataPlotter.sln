@@ -7,7 +7,6 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug wx2.8|Win32 = Debug wx2.8|Win32
 		Debug|Win32 = Debug|Win32
-		Release wx 2.8 - broke|Win32 = Release wx 2.8 - broke|Win32
 		Release wx2.8|Win32 = Release wx2.8|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
@@ -16,8 +15,6 @@ Global
 		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Debug wx2.8|Win32.Build.0 = Debug wx2.8|Win32
 		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Debug|Win32.ActiveCfg = Debug|Win32
 		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Debug|Win32.Build.0 = Debug|Win32
-		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Release wx 2.8 - broke|Win32.ActiveCfg = Release wx 2.8|Win32
-		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Release wx 2.8 - broke|Win32.Build.0 = Release wx 2.8|Win32
 		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Release wx2.8|Win32.ActiveCfg = Release wx2.8|Win32
 		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Release wx2.8|Win32.Build.0 = Release wx2.8|Win32
 		{BB25E2EF-CD0E-45E1-8B71-95E40F975CDB}.Release|Win32.ActiveCfg = Release|Win32
