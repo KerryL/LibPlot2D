@@ -26,6 +26,7 @@
 #include "utilities/dataset2D.h"
 #include "utilities/managedList.h"
 #include "utilities/signals/curveFit.h"
+#include "application/dataFiles/dataFile.h"
 
 // wxWidgets forward declarations
 class wxGrid;
@@ -54,7 +55,8 @@ public:
 		wxString defaultFileName, wxString wildcard, long style);
 
 	// Load a plot from file
-	bool LoadFile(const wxString &pathAndFileName, bool useLastPreferences = false);
+	bool LoadFile(const wxString &pathAndFileName);
+	bool LoadFiles(const wxArrayString &fileList);
 	bool LoadText(const wxString &textData);
 
 	enum PlotContext
@@ -273,7 +275,7 @@ private:
 	Filter* GetFilter(const FilterParameters &parameters,
 		const double &sampleRate, const double &initialValue) const;
 
-	DataFile* GetDataFile(const wxString &fileName, bool useLastUserPreferences = false);
+	DataFile* GetDataFile(const wxString &fileName);
 
 	enum FileFormat
 	{
@@ -290,9 +292,11 @@ private:
 	void SetXDataLabel(const FileFormat &format);
 	wxString genericXAxisLabel;
 
+	wxString ExtractFileNameFromPath(const wxString &pathAndFileName) const;
+
 	wxString lastFileLoaded;
-	wxArrayInt lastUserSelections;
-	bool lastUserRemovedExisting;
+	DataFile::SelectionData lastSelectionInfo;
+	wxArrayString lastDescriptions;
 
 	Dataset2D GetXZoomedDataset(const Dataset2D &fullData) const;
 

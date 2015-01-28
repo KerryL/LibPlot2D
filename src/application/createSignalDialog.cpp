@@ -46,7 +46,7 @@
 //==========================================================================
 CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime,
 	const double &duration, const double &sampleRate) : wxDialog(parent, wxID_ANY,
-	_T("Create Signal"))
+	_T("Create Signal"), wxPoint(-1,-1))
 {
 	initialValueTextBox = NULL;
 	finalValueTextBox = NULL;

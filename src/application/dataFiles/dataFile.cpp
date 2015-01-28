@@ -27,7 +27,7 @@
 //
 // Input Arguments:
 //		fileName		= const wxString& file which this object represents
-//		_parent			= wxWindow* parent for centering curve choice dialog
+//		parent			= wxWindow* parent for centering curve choice dialog
 //		selections		= wxArrayInt*, optional, default selections
 //		removeExisting	= bool*, optional, default value of checkbox
 //
@@ -38,20 +38,16 @@
 //		None
 //
 //==========================================================================
-DataFile::DataFile(const wxString& _fileName, wxWindow *_parent,
-		wxArrayInt *selections, bool *removeExisting)
+DataFile::DataFile(const wxString& fileName) : fileName(fileName)
 {
-	fileName = _fileName;
-	parent = _parent;
-
 	headerLines = 0;
 
 	ignoreConsecutiveDelimiters = true;
 	timeIsFormatted = false;
-	removeExistingCurves = true;
 
-	defaultRemoveExisting = removeExisting;
-	defaultSelections = selections;
+	delimiter = DetermineBestDelimiter();
+	DoTypeSpecificLoadTasks();
+	descriptions = GetCurveInformation(headerLines, scales);
 }
 
 //==========================================================================
@@ -76,13 +72,61 @@ DataFile::~DataFile()
 
 //==========================================================================
 // Class:			DataFile
+// Function:		GetSelectionsFromUser
+//
+// Description:		Reads header info from the file and asks the user to
+//					specify curves to plot.
+//
+// Input Arguments:
+//		selectionInfo	= const SelectionData& indicating defaults
+//
+// Output Arguments:
+//		selectionInfo	= const SelectionData& indicating user specified options
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+void DataFile::GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *parent)
+{
+	if (delimiter.IsEmpty())
+	{
+		wxMessageBox(_T("Could not find an appropriate delimiter."), _T("Error Parsing File"), wxICON_ERROR);
+		return;
+	}
+	else if (descriptions.size() < 2)
+	{
+		wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR);
+		return;
+	}
+
+	MultiChoiceDialog dialog(parent, _T("Select data to plot:"), _T("Select Data"),
+		wxArrayString(descriptions.begin() + 1, descriptions.end()), wxCHOICEDLG_STYLE,
+		wxDefaultPosition, &selectionInfo.selections, &selectionInfo.removeExisting);
+	if (dialog.ShowModal() == wxID_CANCEL)
+	{
+		selectionInfo.selections.Clear();
+		return;
+	}
+
+	selectionInfo.selections = dialog.GetSelections();
+	if (selectionInfo.selections.Count() == 0)
+	{
+		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR);
+		return;
+	}
+	selectionInfo.removeExisting = dialog.RemoveExistingCurves();
+}
+
+//==========================================================================
+// Class:			DataFile
 // Function:		Load
 //
 // Description:		Performs the actions necessary to load the file contents
 //					into datasets.
 //
 // Input Arguments:
-//		None
+//		selectionInfo	= const SelectionData&
 //
 // Output Arguments:
 //		None
@@ -91,25 +135,29 @@ DataFile::~DataFile()
 //		bool, true for success, false otherwise
 //
 //==========================================================================
-bool DataFile::Load(void)
+bool DataFile::Load(const SelectionData &selectionInfo)
 {
-	delimiter = DetermineBestDelimiter();
-	if (delimiter.IsEmpty())
+	selectedDescriptions = RemoveUnwantedDescriptions(descriptions, selectionInfo.selections);
+
+	std::ifstream file(fileName.mb_str(), std::ios::in);
+	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not find an appropriate delimiter."), _T("Error Parsing File"), wxICON_ERROR);
+		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}
+	SkipLines(file, headerLines);
+	DoTypeSpecificProcessTasks();
 
-	DoTypeSpecificLoadTasks();
-	descriptions = GetCurveInformation(headerLines, scales);
-	if (descriptions.size() < 2)
+	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(selectionInfo.selections.size())];
+	if (!ExtractData(file, selectionInfo.selections, rawData, scales))
 	{
-		wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR);
+		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}
+	file.close();
 
-	if (!ProcessFile())
-		return false;
+	AssembleDatasets(rawData, GetRawDataSize(selectionInfo.selections.size()));
+	delete [] rawData;
 
 	return true;
 }
@@ -390,64 +438,6 @@ wxArrayString DataFile::GenerateDummyNames(const unsigned int &count) const
 		names.Add(wxString::Format("[%i]", i));
 
 	return names;
-}
-
-//==========================================================================
-// Class:			DataFile
-// Function:		ProcessFile
-//
-// Description:		Performs actions from asking the user which data columns
-//					to extract through extracting the data and putting it in
-//					Dataset2D format.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for success, false otherwise
-//
-//==========================================================================
-bool DataFile::ProcessFile(void)
-{
-	MultiChoiceDialog dialog(parent, _T("Select data to plot:"), _T("Select Data"),
-		wxArrayString(descriptions.begin() + 1, descriptions.end()), wxCHOICEDLG_STYLE,
-		wxDefaultPosition, defaultSelections, defaultRemoveExisting);
-	if (dialog.ShowModal() == wxID_CANCEL)
-		return false;
-
-	userSelections = dialog.GetSelections();
-	if (userSelections.size() == 0)
-	{
-		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR);
-		return false;
-	}
-	descriptions = RemoveUnwantedDescriptions(descriptions, userSelections);
-	removeExistingCurves = dialog.RemoveExistingCurves();
-
-	std::ifstream file(fileName.mb_str(), std::ios::in);
-	if (!file.is_open())
-	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
-		return false;
-	}
-	SkipLines(file, headerLines);
-	DoTypeSpecificProcessTasks();
-
-	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(userSelections.size())];
-	if (!ExtractData(file, userSelections, rawData, scales))
-	{
-		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR);
-		return false;
-	}
-	file.close();
-
-	AssembleDatasets(rawData, GetRawDataSize(userSelections.size()));
-	delete [] rawData;
-
-	return true;
 }
 
 //==========================================================================
@@ -806,4 +796,58 @@ double DataFile::GetTimeScalingFactor(const wxString &format) const
 	// TODO:  Generate a warning to tell the user we didn't understand their format
 
 	return 0.0;
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		DescriptionsMatch
+//
+// Description:		Determines if the list of descriptions in this file match
+//					the descriptions given in the specified file.
+//
+// Input Arguments:
+//		file	= const DataFile&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool DataFile::DescriptionsMatch(const DataFile &file) const
+{
+	return DescriptionsMatch(file.descriptions);
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		DescriptionsMatch
+//
+// Description:		Determines if the list of descriptions in this file match
+//					the descriptions given in the specified file.
+//
+// Input Arguments:
+//		descriptions	= const wxArrayString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool DataFile::DescriptionsMatch(const wxArrayString &descriptions) const
+{
+	if (this->descriptions.Count() != descriptions.Count())
+		return false;
+
+	unsigned int i;
+	for (i = 0; i < descriptions.Count(); i++)
+	{
+		if (this->descriptions[i].compare(descriptions[i]) != 0)
+			return false;
+	}
+
+	return true;
 }

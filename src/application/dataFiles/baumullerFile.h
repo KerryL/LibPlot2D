@@ -23,9 +23,7 @@ class BaumullerFile : public DataFile
 {
 public:
 	// Constructor
-	BaumullerFile(const wxString& _fileName, wxWindow *_parent = NULL,
-		wxArrayInt *selections = NULL, bool *removeExisting = NULL)
-		: DataFile(_fileName, _parent, selections, removeExisting) {};
+	BaumullerFile(const wxString& fileName) : DataFile(fileName) {};
 
 	static bool IsType(const wxString &_fileName);
 

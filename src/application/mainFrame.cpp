@@ -16,6 +16,7 @@
 
 // Standard C++ headers
 #include <algorithm>
+#include <map>
 
 // wxWidgets headers
 #include <wx/grid.h>
@@ -31,7 +32,6 @@
 #include "application/rangeLimitsDialog.h"
 #include "application/filterDialog.h"
 #include "application/createSignalDialog.h"
-#include "application/dataFiles/dataFile.h"
 #include "application/dataFiles/genericFile.h"
 #include "application/dataFiles/baumullerFile.h"
 #include "application/dataFiles/kollmorgenFile.h"
@@ -51,6 +51,7 @@
 #include "utilities/signals/fft.h"
 #include "utilities/math/expressionTree.h"
 #include "utilities/signals/filter.h"
+#include "utilities/arrayStringCompare.h"
 
 // *nix Icons
 #ifdef __WXGTK__
@@ -456,14 +457,14 @@ void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 	wildcard.append("|Tab Delimited (*.txt)|*.txt");
 
 	wxArrayString fileList = GetFileNameFromUser(_T("Open Data File"), wxEmptyString, wxEmptyString,
-		wildcard, wxFD_OPEN /*| wxFD_MULTIPLE*/ | wxFD_FILE_MUST_EXIST);
+		wildcard, wxFD_OPEN | wxFD_MULTIPLE | wxFD_FILE_MUST_EXIST);
 
 	if (fileList.GetCount() == 0)
 		return;
-
-	unsigned int i;
-	for (i = 0; i < fileList.GetCount(); i++)
-		LoadFile(fileList[i]);
+	else if (fileList.GetCount() > 1)
+		LoadFiles(fileList);
+	else
+		LoadFile(fileList[0]);
 }
 
 //==========================================================================
@@ -675,7 +676,7 @@ void MainFrame::ButtonReloadDataClickedEvent(wxCommandEvent& WXUNUSED(event))
 	if (lastFileLoaded.IsEmpty())
 		return;
 
-	LoadFile(lastFileLoaded, true);
+	LoadFile(lastFileLoaded/*, true*/);// TODO:  How does this work now?
 }
 
 //==========================================================================
@@ -916,7 +917,6 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //
 // Input Arguments:
 //		pathAndFileName	= const wxString&
-//		useLastPreferences	= bool
 //
 // Output Arguments:
 //		None
@@ -925,36 +925,116 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //		true for file successfully loaded, false otherwise
 //
 //==========================================================================
-bool MainFrame::LoadFile(const wxString &pathAndFileName, bool useLastPreferences)
+bool MainFrame::LoadFile(const wxString &pathAndFileName)
 {
-	DataFile *file = GetDataFile(pathAndFileName, useLastPreferences);
-	if (file->Load())
+	DataFile *file = GetDataFile(pathAndFileName);
+
+	DataFile::SelectionData selectionInfo;
+	if (file->DescriptionsMatch(lastDescriptions))
+		selectionInfo = lastSelectionInfo;
+
+	file->GetSelectionsFromUser(selectionInfo, this);
+	if (selectionInfo.selections.Count() < 1 || !file->Load(selectionInfo))
 	{
-		if (file->RemoveExistingCurves())
-		{
-			ClearAllCurves();
-			lastUserRemovedExisting = true;
-		}
-		else
-			lastUserRemovedExisting = false;
-
-		unsigned int i;
-		for (i = 0; i < file->GetDataCount(); i++)
-			AddCurve(file->GetDataset(i), file->GetDescription(i + 1));
-		SetTitleFromFileName(pathAndFileName);
-		genericXAxisLabel = file->GetDescription(0);
-		SetXDataLabel(genericXAxisLabel);
-		plotArea->SaveCurrentZoom();
-
-		lastFileLoaded = pathAndFileName;
-		lastUserSelections = file->GetUserSelections();
-
 		delete file;
-		return true;
+		return false;
 	}
 
+	if (selectionInfo.removeExisting)
+		ClearAllCurves();
+
+	unsigned int i;
+	for (i = 0; i < file->GetDataCount(); i++)
+		AddCurve(file->GetDataset(i), file->GetDescription(i + 1));
+
+	SetTitleFromFileName(pathAndFileName);
+	genericXAxisLabel = file->GetDescription(0);
+	SetXDataLabel(genericXAxisLabel);
+	plotArea->SaveCurrentZoom();
+
+	lastFileLoaded = pathAndFileName;
+	lastSelectionInfo = selectionInfo;
+	lastDescriptions = file->GetAllDescriptions();
+
 	delete file;
-	return false;
+	return true;
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		LoadFiles
+//
+// Description:		Method for loading a multiple files.
+//
+// Input Arguments:
+//		fileList	= const wxArrayString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		true for files successfully loaded, false otherwise
+//
+//==========================================================================
+bool MainFrame::LoadFiles(const wxArrayString &fileList)
+{
+	unsigned int i, j;
+	std::vector<bool> loaded(fileList.size());
+	std::vector<DataFile*> files(fileList.size());
+	typedef std::map<wxArrayString, DataFile::SelectionData, ArrayStringCompare> SelectionMap;
+	SelectionMap selectionInfoMap;
+	SelectionMap::const_iterator it;
+	DataFile::SelectionData selectionInfo;
+	for (i = 0; i < fileList.Count(); i++)
+	{
+		files[i] = GetDataFile(fileList[i]);
+		it = selectionInfoMap.find(files[i]->GetAllDescriptions());
+		if (it == selectionInfoMap.end())
+		{
+			if (files[i]->DescriptionsMatch(lastDescriptions))
+				selectionInfo = lastSelectionInfo;
+			else
+				selectionInfo.selections.Clear();
+			files[i]->GetSelectionsFromUser(selectionInfo, this);
+			if (selectionInfo.selections.Count() < 1)
+			{
+				for (j = 0; j <= i; j++)
+					delete files[j];
+				return false;
+			}
+			selectionInfoMap[files[i]->GetAllDescriptions()] = selectionInfo;
+		}
+		else
+			selectionInfo = it->second;
+
+		loaded[i] = selectionInfo.selections.Count() > 0 && files[i]->Load(selectionInfo);
+	}
+
+	if (selectionInfo.removeExisting)
+		ClearAllCurves();
+
+	for (i = 0; i < fileList.Count(); i++)
+	{
+		if (!loaded[i])
+			continue;
+
+		for (j = 0; j < files[i]->GetDataCount(); j++)
+			AddCurve(files[i]->GetDataset(j), files[i]->GetDescription(j + 1) + _T(" : ") + ExtractFileNameFromPath(fileList[i]));
+	}
+
+	SetTitle(_T("Multiple Files - ") + DataPlotterApp::dataPlotterTitle);
+	genericXAxisLabel = files[0]->GetDescription(0);
+	SetXDataLabel(genericXAxisLabel);
+	plotArea->SaveCurrentZoom();
+
+	lastFileLoaded = fileList[fileList.Count() - 1];
+	lastSelectionInfo = selectionInfo;
+	lastDescriptions = files[files.size() - 1]->GetAllDescriptions();
+
+	for (i = 0; i < files.size(); i++)
+		delete files[i];
+
+	return true;
 }
 
 //==========================================================================
@@ -1052,14 +1132,36 @@ wxString MainFrame::GenerateTemporaryFileName(const unsigned int &length) const
 //==========================================================================
 void MainFrame::SetTitleFromFileName(wxString pathAndFileName)
 {
+	wxString fileName(ExtractFileNameFromPath(pathAndFileName));
+	unsigned int end(fileName.find_last_of(_T(".")));
+	SetTitle(fileName.Mid(0, end) + _T(" - ") + DataPlotterApp::dataPlotterTitle);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ExtractFileNameFromPath
+//
+// Description:		Removes the path from the path and file name.
+//
+// Input Arguments:
+//		pathAndFileName	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString MainFrame::ExtractFileNameFromPath(const wxString &pathAndFileName) const
+{
 	unsigned int start;
 #ifdef __WXMSW__
 	start = pathAndFileName.find_last_of(_T("\\")) + 1;
 #else
 	start = pathAndFileName.find_last_of(_T("/")) + 1;
 #endif
-	unsigned int end(pathAndFileName.find_last_of(_T(".")));
-	SetTitle(pathAndFileName.Mid(start, end - start) + _T(" - ") + DataPlotterApp::dataPlotterTitle);
+	return pathAndFileName.Mid(start);
 }
 
 //==========================================================================
@@ -3444,8 +3546,7 @@ void MainFrame::SetMarkerSize(const unsigned int &curve, const int &size)
 //					object.
 //
 // Input Arguments:
-//		fileName				= const wxString&
-//		useLastUserPreferences	= bool
+//		fileName	= const wxString&
 //
 // Output Arguments:
 //		None
@@ -3454,30 +3555,20 @@ void MainFrame::SetMarkerSize(const unsigned int &curve, const int &size)
 //		DataFile*
 //
 //==========================================================================
-DataFile* MainFrame::GetDataFile(const wxString &fileName, bool useLastUserPreferences)
+DataFile* MainFrame::GetDataFile(const wxString &fileName)
 {
 	if (BaumullerFile::IsType(fileName))
-		return new BaumullerFile(fileName, this,
-		useLastUserPreferences ? &lastUserSelections : NULL,
-		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
+		return new BaumullerFile(fileName);
 	else if (KollmorgenFile::IsType(fileName))
-		return new KollmorgenFile(fileName, this,
-		useLastUserPreferences ? &lastUserSelections : NULL,
-		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
+		return new KollmorgenFile(fileName);
 	else if (CustomFile::IsType(fileName))
-		return new CustomFile(fileName, this,
-		useLastUserPreferences ? &lastUserSelections : NULL,
-		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
+		return new CustomFile(fileName);
 	else if (CustomXMLFile::IsType(fileName))
-		return new CustomXMLFile(fileName, this,
-		useLastUserPreferences ? &lastUserSelections : NULL,
-		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
+		return new CustomXMLFile(fileName);
 
 	// Don't even check - if we can't open it with any other types,
 	// always try to open it with a generic type
-	return new GenericFile(fileName, this,
-		useLastUserPreferences ? &lastUserSelections : NULL,
-		useLastUserPreferences ? &lastUserRemovedExisting : NULL);
+	return new GenericFile(fileName);
 }
 
 //==========================================================================
@@ -3500,6 +3591,7 @@ void MainFrame::DoCopy(void)
 {
 	if (wxTheClipboard->Open())
 	{
+		// TODO:  Can we also copy text data here, and choose which to paste depending on context later?  What about copy from one window/paste to another of DataPlotter?
 		wxTheClipboard->SetData(new wxBitmapDataObject(plotArea->GetImage()));
 		wxTheClipboard->Close();
 	}

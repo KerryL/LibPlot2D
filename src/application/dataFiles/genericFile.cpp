@@ -24,7 +24,7 @@
 //					type of file.
 //
 // Input Arguments:
-//		_fileName	= const wxString&
+//		fileName	= const wxString&
 //
 // Output Arguments:
 //		None
@@ -33,7 +33,7 @@
 //		bool, true if this object can process the specified file, false otherwise
 //
 //==========================================================================
-bool GenericFile::IsType(const wxString& WXUNUSED(_fileName))
+bool GenericFile::IsType(const wxString& WXUNUSED(fileName))
 {
 	return true;
 }

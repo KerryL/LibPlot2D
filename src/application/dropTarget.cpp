@@ -86,10 +86,7 @@ DropTarget::~DropTarget()
 //==========================================================================
 bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 {
-	unsigned int i;
-	for (i = 0; i < filenames.Count(); i++)
-		mainFrame.LoadFile(filenames[i]);
-
+	mainFrame.LoadFiles(filenames);
 	return true;
 }
 

@@ -24,7 +24,7 @@
 //					type of file.
 //
 // Input Arguments:
-//		_fileName	= const wxString&
+//		fileName	= const wxString&
 //
 // Output Arguments:
 //		None
@@ -33,9 +33,9 @@
 //		bool, true if this object can process the specified file, false otherwise
 //
 //==========================================================================
-bool CustomXMLFile::IsType(const wxString &_fileName)
+bool CustomXMLFile::IsType(const wxString &fileName)
 {
-	CustomFileFormat format(_fileName);
+	CustomFileFormat format(fileName);
 	return format.IsCustomFormat() && format.IsXML();
 }
 

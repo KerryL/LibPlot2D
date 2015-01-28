@@ -16,8 +16,6 @@
 #ifndef _Complex_H_
 #define _Complex_H_
 
-using namespace std;
-
 class Complex
 {
 public:
@@ -60,7 +58,7 @@ public:
 	const Complex ToPower(const Complex &power) const;
 
 	// For streaming the value
-	friend ostream &operator << (ostream &writeOut, const Complex &complex);
+	friend std::ostream &operator << (std::ostream &writeOut, const Complex &complex);
 
 	// The actual data contents of this class
 	double real;
