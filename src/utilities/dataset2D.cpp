@@ -79,7 +79,7 @@ Dataset2D::Dataset2D(const Dataset2D& target)
 // Description:		Constructor for the Dataset class.
 //
 // Input Arguments:
-//		_numberOfPoints = const unsigned int &
+//		numberOfPoints = const unsigned int &
 //
 // Output Arguments:
 //		None
@@ -88,11 +88,11 @@ Dataset2D::Dataset2D(const Dataset2D& target)
 //		None
 //
 //==========================================================================
-Dataset2D::Dataset2D(const unsigned int &_numberOfPoints)
+Dataset2D::Dataset2D(const unsigned int &numberOfPoints)
 {
 	xData = NULL;
 	yData = NULL;
-	Resize(_numberOfPoints);
+	Resize(numberOfPoints);
 }
 
 //==========================================================================
@@ -154,7 +154,7 @@ void Dataset2D::Reverse(void)
 //					resizing.
 //
 // Input Arguments:
-//		_numberOfPoints = const unsigned int &
+//		numberOfPoints = const unsigned int &
 //
 // Output Arguments:
 //		None
@@ -163,12 +163,12 @@ void Dataset2D::Reverse(void)
 //		None
 //
 //==========================================================================
-void Dataset2D::Resize(const unsigned int &_numberOfPoints)
+void Dataset2D::Resize(const unsigned int &numberOfPoints)
 {
 	delete [] xData;
 	delete [] yData;
 
-	numberOfPoints = _numberOfPoints;
+	this->numberOfPoints = numberOfPoints;
 
 	xData = new double[numberOfPoints];
 	yData = new double[numberOfPoints];
@@ -223,17 +223,17 @@ void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 //					it interpolated.
 //
 // Input Arguments:
-//		value	= double& specifying the X-value
+//		x	= const double& specifying the X-value
 //
 // Output Arguments:
-//		value	= double& specifying the Y-value
+//		y	= double& specifying the Y-value
 //		exactValue	= bool* indicating whether or not the exact value is being returned
 //
 // Return Value:
 //		true if specified x is within range of data, false otherwise
 //
 //==========================================================================
-bool Dataset2D::GetYAt(double &x, bool *exactValue) const
+bool Dataset2D::GetYAt(const double &x, double &y, bool *exactValue) const
 {
 	// This assumes data is entered from small x to large x and that y is a function of x
 	unsigned int i;
@@ -241,7 +241,7 @@ bool Dataset2D::GetYAt(double &x, bool *exactValue) const
 	{
 		if (xData[i] == x)
 		{
-			x = yData[i];
+			y = yData[i];
 
 			if (exactValue)
 				*exactValue = true;
@@ -251,9 +251,9 @@ bool Dataset2D::GetYAt(double &x, bool *exactValue) const
 		else if (xData[i] > x)
 		{
 			if (i > 0)
-				x = yData[i - 1] + (yData[i] - yData[i - 1]) * (x - xData[i - 1]) / (xData[i] - xData[i - 1]);
+				y = yData[i - 1] + (yData[i] - yData[i - 1]) * (x - xData[i - 1]) / (xData[i] - xData[i - 1]);
 			else
-				x = yData[i];
+				y = yData[i];
 
 			if (exactValue)
 				*exactValue = false;
@@ -1186,4 +1186,184 @@ double Dataset2D::GetAverageDeltaX(void) const
 		sum += xData[i] - xData[i - 1];
 
 	return sum / ((double)numberOfPoints - 1.0);
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoUnsyncrhonizedAdd
+//
+// Description:		Returns a datset representing the sum of the arguments,
+//					but only over the range where the arguments inersect.
+//
+// Input Arguments:
+//		d1	= const Dataset2D&
+//		d2	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D Dataset2D::DoUnsyncrhonizedAdd(const Dataset2D &d1, const Dataset2D &d2)
+{
+	Dataset2D common1, common2;
+	GetOverlappingOnSameTimebase(d1, d2, common1, common2);
+	return common1 + common2;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoUnsyncrhonizedSubtract
+//
+// Description:		Returns a datset representing the difference of the arguments,
+//					but only over the range where the arguments inersect.
+//
+// Input Arguments:
+//		d1	= const Dataset2D&
+//		d2	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D Dataset2D::DoUnsyncrhonizedSubtract(const Dataset2D &d1, const Dataset2D &d2)
+{
+	Dataset2D common1, common2;
+	GetOverlappingOnSameTimebase(d1, d2, common1, common2);
+	return common1 - common2;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoUnsyncrhonizedMultiply
+//
+// Description:		Returns a datset representing the product of the arguments,
+//					but only over the range where the arguments inersect.
+//
+// Input Arguments:
+//		d1	= const Dataset2D&
+//		d2	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D Dataset2D::DoUnsyncrhonizedMultiply(const Dataset2D &d1, const Dataset2D &d2)
+{
+	Dataset2D common1, common2;
+	GetOverlappingOnSameTimebase(d1, d2, common1, common2);
+	return common1 * common2;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoUnsyncrhonizedDivide
+//
+// Description:		Returns a datset representing the quotient of the arguments,
+//					but only over the range where the arguments inersect.
+//
+// Input Arguments:
+//		d1	= const Dataset2D&
+//		d2	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D Dataset2D::DoUnsyncrhonizedDivide(const Dataset2D &d1, const Dataset2D &d2)
+{
+	Dataset2D common1, common2;
+	GetOverlappingOnSameTimebase(d1, d2, common1, common2);
+	return common1 / common2;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoUnsyncrhonizedExponentiation
+//
+// Description:		Returns a datset representing the power of the arguments,
+//					but only over the range where the arguments inersect.
+//
+// Input Arguments:
+//		d1	= const Dataset2D&
+//		d2	= const Dataset2D&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+Dataset2D Dataset2D::DoUnsyncrhonizedExponentiation(const Dataset2D &d1, const Dataset2D &d2)
+{
+	Dataset2D common1, common2;
+	GetOverlappingOnSameTimebase(d1, d2, common1, common2);
+	return common1.ToPower(common2);
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		GetOverlappingOnSameTimebase
+//
+// Description:		Modifies the output datasets so they contain the information
+//					in the original datasets, but only for the overlapping portion.
+//					The first dataset is used as the master clock, so the second (d2)
+//					is resampled as necessary to ensure that both output datasets
+//					have a common timebase.
+//
+// Input Arguments:
+//		d1	= const Dataset2D&
+//		d2	= const Dataset2D&
+//
+// Output Arguments:
+//		d1Out	= Dataset2D&
+//		d2Out	= Dataset2D&
+//
+// Return Value:
+//		Dataset2D
+//
+//==========================================================================
+void Dataset2D::GetOverlappingOnSameTimebase(const Dataset2D &d1,
+	const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out)
+{
+	unsigned int start(0);
+	if (d1.GetXData(start) < d2.GetXData(0))
+	{
+		while (d1.GetXData(start) < d2.GetXData(0))
+			start++;
+	}
+
+	unsigned int end1(d1.GetNumberOfPoints() - 1);
+	const unsigned int end2(d2.GetNumberOfPoints() - 1);
+	if (d1.GetXData(end1) > d2.GetXData(end2))
+	{
+		while (d2.GetXData(end2) < d1.GetXData(end1))
+			end1--;
+	}
+
+	d1Out.Resize(end1 - start);
+	d2Out.Resize(end1 - start);
+
+	double x;
+	unsigned int i;
+	for (i = 0; i < end1 - start; i++)
+	{
+		x = d1.GetXData(start + i);
+		d1Out.GetXPointer()[i] = x;
+		d2Out.GetXPointer()[i] = x;
+		d1.GetYAt(x, d1Out.GetYPointer()[i]);
+		d2.GetYAt(x, d2Out.GetYPointer()[i]);
+	}
 }

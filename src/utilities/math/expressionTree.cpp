@@ -1047,15 +1047,15 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 	const Dataset2D &first, const Dataset2D &second) const
 {
 	if (operation.Cmp(_T("+")) == 0)
-		return second + first;
+		return Dataset2D::DoUnsyncrhonizedAdd(second, first);
 	else if (operation.Cmp(_T("-")) == 0)
-		return second - first;
+		return Dataset2D::DoUnsyncrhonizedSubtract(second, first);
 	else if (operation.Cmp(_T("*")) == 0)
-		return second * first;
+		return Dataset2D::DoUnsyncrhonizedMultiply(second, first);
 	else if (operation.Cmp(_T("/")) == 0)
-		return second / first;
+		return Dataset2D::DoUnsyncrhonizedDivide(second, first);
 	else if (operation.Cmp(_T("^")) == 0)
-		return second.ToPower(first);
+		return Dataset2D::DoUnsyncrhonizedExponentiation(second, first);
 
 	assert(false);
 	return first;

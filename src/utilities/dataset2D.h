@@ -29,7 +29,7 @@ public:
 	// Constructors
 	Dataset2D();
 	Dataset2D(const Dataset2D& target);
-	Dataset2D(const unsigned int &_numberOfPoints);
+	Dataset2D(const unsigned int &numberOfPoints);
 
 	// Destructor
 	~Dataset2D();
@@ -37,7 +37,7 @@ public:
 	// For exporting the data to a comma or tab delimited text file
 	void ExportDataToFile(wxString pathAndFileName) const;
 
-	void Resize(const unsigned int &_numberOfPoints);
+	void Resize(const unsigned int &numberOfPoints);
 	void Reverse(void);
 
 	double ComputeYMean(void) const;
@@ -53,7 +53,7 @@ public:
 	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; };
 
 	Dataset2D& MultiplyXData(const double &target);
-	bool GetYAt(double &x, bool *exactValue = NULL) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
+	bool GetYAt(const double &x, double &y, bool *exactValue = NULL) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
 
 	Dataset2D& XShift(const double &shift);
 
@@ -97,12 +97,18 @@ public:
 	const Dataset2D DoExp(void) const;
 	const Dataset2D DoAbs(void) const;
 
-private:
-	// The number of points contained within this object
-	unsigned int numberOfPoints;
+	static Dataset2D DoUnsyncrhonizedAdd(const Dataset2D &d1, const Dataset2D &d2);
+	static Dataset2D DoUnsyncrhonizedSubtract(const Dataset2D &d1, const Dataset2D &d2);
+	static Dataset2D DoUnsyncrhonizedMultiply(const Dataset2D &d1, const Dataset2D &d2);
+	static Dataset2D DoUnsyncrhonizedDivide(const Dataset2D &d1, const Dataset2D &d2);
+	static Dataset2D DoUnsyncrhonizedExponentiation(const Dataset2D &d1, const Dataset2D &d2);
 
-	// The data
+private:
+	unsigned int numberOfPoints;
 	double *xData, *yData;
+
+	static void GetOverlappingOnSameTimebase(const Dataset2D &d1,
+		const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out);
 };
 
 #endif// _DATASET_H_

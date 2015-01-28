@@ -2797,8 +2797,8 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 
 		if (leftVisible && rightVisible)
 		{
-			double left(leftValue), right(rightValue);
-			if (plotList[i - 1]->GetYAt(left) && plotList[i - 1]->GetYAt(right))
+			double left, right;
+			if (plotList[i - 1]->GetYAt(leftValue, left) && plotList[i - 1]->GetYAt(rightValue, right))
 			{
 				optionsGrid->SetCellValue(i, colDifference, wxString::Format("%f", right - left));
 				showXDifference = true;
@@ -2839,12 +2839,13 @@ void MainFrame::UpdateSingleCursorValue(const unsigned int &row,
 		optionsGrid->SetCellValue(0, column, wxString::Format("%f", value));
 
 		bool exact;
-		if (plotList[row - 1]->GetYAt(value, &exact))
+		double valueOut;
+		if (plotList[row - 1]->GetYAt(value, valueOut, &exact))
 		{
 			if (exact)
-				optionsGrid->SetCellValue(row, column, _T("*") + wxString::Format("%f", value));
+				optionsGrid->SetCellValue(row, column, _T("*") + wxString::Format("%f", valueOut));
 			else
-				optionsGrid->SetCellValue(row, column, wxString::Format("%f", value));
+				optionsGrid->SetCellValue(row, column, wxString::Format("%f", valueOut));
 		}
 		else
 			optionsGrid->SetCellValue(row, column, wxEmptyString);
