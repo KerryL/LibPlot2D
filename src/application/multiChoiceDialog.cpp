@@ -274,7 +274,7 @@ bool MultiChoiceDialog::RemoveExistingCurves(void) const
 //==========================================================================
 void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeExisting)
 {
-	if (defaultChoices)
+	if (defaultChoices && defaultChoices->size() > 0)
 	{
 		unsigned int i;
 		for (i = 0; i < choiceListBox->GetCount(); i++)

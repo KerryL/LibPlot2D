@@ -50,7 +50,7 @@ const unsigned long CustomFileFormat::customFormatsVersion = 1;
 // Description:		Constructor for CustomFileFormat class.
 //
 // Input Arguments:
-//		_pathAndFileName	= const wxString&
+//		pathAndFileName	= const wxString&
 //
 // Output Arguments:
 //		None
@@ -59,7 +59,7 @@ const unsigned long CustomFileFormat::customFormatsVersion = 1;
 //		wxString, name of format if a match, wxEmptyString otherwise
 //
 //==========================================================================
-CustomFileFormat::CustomFileFormat(const wxString &_pathAndFileName) : pathAndFileName(_pathAndFileName)
+CustomFileFormat::CustomFileFormat(const wxString &pathAndFileName) : pathAndFileName(pathAndFileName)
 {
 	wxXmlDocument customFormatDefinitions;
 	if (!wxFileExists(customFormatsXMLFileName) ||

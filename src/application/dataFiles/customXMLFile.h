@@ -27,9 +27,7 @@ class CustomXMLFile : public DataFile
 {
 public:
 	// Constructor
-	CustomXMLFile(const wxString& _fileName, wxWindow *_parent = NULL,
-		wxArrayInt *selections = NULL, bool *removeExisting = NULL)
-		: DataFile(_fileName, _parent, selections, removeExisting), fileFormat(_fileName) {};
+	CustomXMLFile(const wxString& fileName) : DataFile(fileName), fileFormat(fileName) {};
 
 	static bool IsType(const wxString &_fileName);
 

@@ -183,6 +183,9 @@
     <ClInclude Include="../src\application\createSignalDialog.h">
       <Filter>Header Files\application</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\utilities\arrayStringCompare.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="../src\renderer\primitives\axis.cpp">
@@ -304,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="../src\application\createSignalDialog.cpp">
       <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utilities\arrayStringCompare.cpp">
+      <Filter>Source Files\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

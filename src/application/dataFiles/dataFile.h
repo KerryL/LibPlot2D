@@ -30,41 +30,43 @@ class DataFile
 {
 public:
 	// Constructor
-	DataFile(const wxString& _fileName, wxWindow *_parent = NULL,
-		wxArrayInt *selections = NULL, bool *removeExisting = NULL);
+	DataFile(const wxString& fileName);
 
 	// Destructor
 	virtual ~DataFile();
 
-	bool Load(void);
+	struct SelectionData
+	{
+		wxArrayInt selections;
+		bool removeExisting;
+	};
+	
+	void GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *parent);
 
+	bool Load(const SelectionData &selectionInfo);
 
 	Dataset2D* GetDataset(const unsigned int &i) const { return data[i]; };
-	wxString GetDescription(const unsigned int &i) const { return descriptions[i]; };
+	wxString GetDescription(const unsigned int &i) const { return selectedDescriptions[i]; };
+	wxArrayString GetAllDescriptions() const { return descriptions; };
 	unsigned int GetDataCount(void) { return data.size(); };
 
-	bool RemoveExistingCurves(void) const { return removeExistingCurves; };
-	wxArrayInt GetUserSelections(void) const { return userSelections; };
+	bool DescriptionsMatch(const DataFile &file) const;
+	bool DescriptionsMatch(const wxArrayString &descriptions) const;
 
 	// Classes derived from this should have this method:
 	//static bool IsType(const wxString& _fileName);
 
 protected:
-	wxString fileName;
-	wxWindow *parent;
+	const wxString fileName;
 
 	std::vector<Dataset2D*> data;
 	std::vector<double> scales;
-	wxArrayString descriptions;
+	wxArrayString descriptions, selectedDescriptions;
 	wxString delimiter;
 
 	unsigned int headerLines;
 	bool ignoreConsecutiveDelimiters;
 	bool timeIsFormatted;
-	bool removeExistingCurves;
-	bool *defaultRemoveExisting;
-	wxArrayInt userSelections;
-	wxArrayInt *defaultSelections;
 
 	wxString DetermineBestDelimiter(void) const;
 
@@ -89,7 +91,6 @@ protected:
 	wxArrayString GenerateDummyNames(const unsigned int &count) const;
 	bool ListIsNumeric(const wxArrayString &list) const;
 
-	bool ProcessFile(void);
 	bool ArrayContainsValue(const int &value, const wxArrayInt &a) const;
 	void TransferVectorToArray(const std::vector<double> &source, double *destination) const;
 	wxArrayString RemoveUnwantedDescriptions(const wxArrayString &names, const wxArrayInt &choices) const;
