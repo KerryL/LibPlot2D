@@ -44,10 +44,12 @@ private:
 	wxCheckBox *removeCheckBox;
 	wxTextCtrl *filterText;
 
+	wxArrayString descriptions;
 	wxArrayInt selections;
 	std::vector<bool> shown;
 	unsigned int GetCorrectedIndex(const unsigned int &index) const;
 	void UpdateSelectionList(const unsigned int &index);
+	bool IsSelected(const int &i) const;
 
 	// Object IDs
 	enum

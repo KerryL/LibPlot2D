@@ -51,6 +51,7 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 		wxArrayInt *defaultChoices, bool *removeExisting)
 		: wxDialog(parent, wxID_ANY, caption, pos, wxDefaultSize, style)
 {
+	descriptions = choices;
 	shown.resize(choices.Count());
 	unsigned int i;
 	for (i = 0; i < choices.Count(); i++)
@@ -237,7 +238,21 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
 {
-	// TODO:  Implement
+	choiceListBox->Clear();
+	wxString filter(filterText->GetValue());
+	unsigned int i;
+	for (i = 0; i < shown.size(); i++)
+	{
+		if (filter.IsEmpty() || descriptions[i].Contains(filter))
+		{
+			choiceListBox->Insert(descriptions[i], choiceListBox->GetCount());
+			shown[i] = true;
+
+			choiceListBox->Check(choiceListBox->GetCount() - 1, IsSelected(i));
+		}
+		else
+			shown[i] = false;
+	}
 }
 
 //==========================================================================
@@ -280,9 +295,9 @@ void MultiChoiceDialog::OnCheckListBoxSelection(wxCommandEvent &event)
 //==========================================================================
 void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
 {
-	if (choiceListBox->IsChecked(index))
+	if (choiceListBox->IsChecked(index) && !IsSelected(GetCorrectedIndex(index)))
 		selections.Add(GetCorrectedIndex(index));
-	else
+	else if (!choiceListBox->IsChecked(index) && IsSelected(GetCorrectedIndex(index)))
 		selections.Remove(GetCorrectedIndex(index));
 }
 
@@ -304,14 +319,16 @@ void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
 //==========================================================================
 unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) const
 {
-	unsigned int i, fakeIndex(0);
+	unsigned int i, trueIndex(0), fakeIndex(0);
 	for (i = 0; i < shown.size(); i++)
 	{
-		if (index == fakeIndex)
-			break;
-
 		if (shown[i])
+		{
+			if (index == fakeIndex)
+				break;
 			fakeIndex++;
+		}
+		trueIndex++;
 	}
 
 	return i;
@@ -399,4 +416,33 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 
 	if (removeExisting)
 		removeCheckBox->SetValue(*removeExisting);
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		IsSelected
+//
+// Description:		Checks to see if the specified index is contained in the
+//					list of selected items.
+//
+// Input Arguments:
+//		i	= const int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if selected, false otherwise
+//
+//==========================================================================
+bool MultiChoiceDialog::IsSelected(const int &i) const
+{
+	unsigned int j;
+	for (j = 0; j < selections.GetCount(); j++)
+	{
+		if (selections[j] == i)
+			return true;
+	}
+
+	return false;
 }
