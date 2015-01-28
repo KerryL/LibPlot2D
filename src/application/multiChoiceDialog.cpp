@@ -14,6 +14,9 @@
 //				 but with a select all button.
 // History:
 
+// Standard C++ headers
+#include <algorithm>
+
 // wxWidgets headers
 #include <wx/statline.h>
 
@@ -48,8 +51,11 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 		wxArrayInt *defaultChoices, bool *removeExisting)
 		: wxDialog(parent, wxID_ANY, caption, pos, wxDefaultSize, style)
 {
+	shown.resize(choices.Count());
+	unsigned int i;
+	for (i = 0; i < choices.Count(); i++)
+		shown[i] = true;
 	CreateControls(message, choices);
-
 	ApplyDefaults(defaultChoices, removeExisting);
 }
 
@@ -71,36 +77,9 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 //==========================================================================
 BEGIN_EVENT_TABLE(MultiChoiceDialog, wxDialog)
 	EVT_BUTTON(idSelectAll,	MultiChoiceDialog::OnSelectAllButton)
+	EVT_TEXT(idFilterText, MultiChoiceDialog::OnFilterTextChange)
+	EVT_CHECKLISTBOX(wxID_ANY, MultiChoiceDialog::OnCheckListBoxSelection)
 END_EVENT_TABLE()
-
-//==========================================================================
-// Class:			MultiChoiceDialog
-// Function:		GetSelections
-//
-// Description:		Returns the user-selected items in the list.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		wxArrayInt containing a list of checked items
-//
-//==========================================================================
-wxArrayInt MultiChoiceDialog::GetSelections(void) const
-{
-	wxArrayInt selections;
-	unsigned int i;
-	for (i = 0; i < choiceListBox->GetCount(); i++)
-	{
-		if (choiceListBox->IsChecked(i))
-			selections.Add(i);
-	}
-
-	return selections;
-}
 
 //==========================================================================
 // Class:			MultiChoiceDialog
@@ -121,15 +100,21 @@ wxArrayInt MultiChoiceDialog::GetSelections(void) const
 //==========================================================================
 void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayString& choices)
 {
-	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
-	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+	wxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
+	wxFlexGridSizer *mainSizer = new wxFlexGridSizer(1);
 	topSizer->Add(mainSizer, 1, wxALL | wxEXPAND, 5);
+	mainSizer->AddGrowableCol(0, 1);
 
-	wxStaticText *instructions = new wxStaticText(this, wxID_ANY, message);
-	mainSizer->Add(instructions, 0, wxALL, 8);
+	wxSizer *headerSizer = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(headerSizer, 1, wxGROW | wxLEFT | wxRIGHT | wxTOP, 10);
+	headerSizer->Add(new wxStaticText(this, wxID_ANY, message));
+	headerSizer->AddStretchSpacer();
+	headerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Filter:")));
+	filterText = new wxTextCtrl(this, idFilterText);
+	headerSizer->Add(filterText, 0, wxLEFT, 5);
 
 	choiceListBox = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition,
-		wxSize(300, 200), choices, wxLB_ALWAYS_SB);
+		wxSize(400, ComputeListBoxHeight(choices)), choices, wxLB_ALWAYS_SB);
 	SetAllChoices(true);
 	mainSizer->Add(choiceListBox, 1, wxALL | wxEXPAND, 10);
 
@@ -146,6 +131,29 @@ void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayStr
 
 	Center();
 	choiceListBox->SetFocus();
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		ComputeListBoxHeight
+//
+// Description:		Computes the ideal height of the list box based on the number
+//					of choices to display.
+//
+// Input Arguments:
+//		choices	= const wxArrayString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		int
+//
+//==========================================================================
+int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
+{
+	int value(choices.Count() * 20);
+	return std::min(std::max(200, value), 600);
 }
 
 //==========================================================================
@@ -192,7 +200,7 @@ wxSizer* MultiChoiceDialog::CreateButtons(void)
 //		None
 //
 // Return Value:
-//		wxArrayInt containing a list of checked items
+//		None
 //
 //==========================================================================
 void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
@@ -209,6 +217,104 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 	}
 
 	SetAllChoices(!allSelected);
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		OnFilterTextChange
+//
+// Description:		Event handler for text change in the filter text box.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
+{
+	// TODO:  Implement
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		OnCheckListBoxSelection
+//
+// Description:		Event handler for check list box selection changes.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MultiChoiceDialog::OnCheckListBoxSelection(wxCommandEvent &event)
+{
+	UpdateSelectionList(event.GetInt());
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		UpdateSelectionList
+//
+// Description:		Updates the list of selected items making corrections for
+//					hidden items.
+//
+// Input Arguments:
+//		index	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
+{
+	if (choiceListBox->IsChecked(index))
+		selections.Add(GetCorrectedIndex(index));
+	else
+		selections.Remove(GetCorrectedIndex(index));
+}
+
+//==========================================================================
+// Class:			MultiChoiceDialog
+// Function:		GetCorrectedIndex
+//
+// Description:		Corrects the index based on which items are hidden.
+//
+// Input Arguments:
+//		index	= cosnt unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) const
+{
+	unsigned int i, fakeIndex(0);
+	for (i = 0; i < shown.size(); i++)
+	{
+		if (index == fakeIndex)
+			break;
+
+		if (shown[i])
+			fakeIndex++;
+	}
+
+	return i;
 }
 
 //==========================================================================
@@ -231,7 +337,10 @@ void MultiChoiceDialog::SetAllChoices(const bool &selected)
 {
 	unsigned int i;
 	for (i = 0; i < choiceListBox->GetCount(); i++)
+	{
 		choiceListBox->Check(i, selected);
+		UpdateSelectionList(i);
+	}
 }
 
 //==========================================================================
@@ -274,11 +383,15 @@ bool MultiChoiceDialog::RemoveExistingCurves(void) const
 //==========================================================================
 void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeExisting)
 {
+	unsigned int i;
 	if (defaultChoices && defaultChoices->size() > 0)
 	{
-		unsigned int i;
+		selections = *defaultChoices;
 		for (i = 0; i < choiceListBox->GetCount(); i++)
+		{
 			choiceListBox->Check(i, false);
+			shown[i] = true;
+		}
 
 		for (i = 0; i < defaultChoices->Count(); i++)
 			choiceListBox->Check((*defaultChoices)[i], true);

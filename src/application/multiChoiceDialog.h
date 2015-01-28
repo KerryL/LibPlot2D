@@ -17,6 +17,9 @@
 #ifndef _MULTI_CHOICE_DIALOG_H_
 #define _MULTI_CHOICE_DIALOG_H_
 
+// Standard C++ headers
+#include <vector>
+
 // wxWidgets headers
 #include <wx/wx.h>
 
@@ -28,28 +31,37 @@ public:
 		const wxArrayString& choices, long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
 		wxArrayInt *defaultChoices = NULL, bool *removeExisting = NULL);
 
-	virtual  wxArrayInt GetSelections(void) const;
+	virtual wxArrayInt GetSelections(void) const { return selections; };
 
 	bool RemoveExistingCurves(void) const;
 
 private:
 	void CreateControls(const wxString& message, const wxArrayString& choices);
 	wxSizer* CreateButtons(void);
+	int ComputeListBoxHeight(const wxArrayString& choices) const;
 
 	wxCheckListBox *choiceListBox;
 	wxCheckBox *removeCheckBox;
+	wxTextCtrl *filterText;
+
+	wxArrayInt selections;
+	std::vector<bool> shown;
+	unsigned int GetCorrectedIndex(const unsigned int &index) const;
+	void UpdateSelectionList(const unsigned int &index);
 
 	// Object IDs
 	enum
 	{
-		idSelectAll = wxID_HIGHEST + 300
+		idSelectAll = wxID_HIGHEST + 300,
+		idFilterText
 	};
 
 	// Event handlers
 	void OnSelectAllButton(wxCommandEvent &event);
+	void OnFilterTextChange(wxCommandEvent &event);
+	void OnCheckListBoxSelection(wxCommandEvent &event);
 
 	void SetAllChoices(const bool &selected);
-
 	void ApplyDefaults(wxArrayInt *defaultChoices, bool *removeExisting);
 
 	DECLARE_EVENT_TABLE();

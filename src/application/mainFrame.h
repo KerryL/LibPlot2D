@@ -55,7 +55,6 @@ public:
 		wxString defaultFileName, wxString wildcard, long style);
 
 	// Load a plot from file
-	bool LoadFile(const wxString &pathAndFileName);
 	bool LoadFiles(const wxArrayString &fileList);
 	bool LoadText(const wxString &textData);
 

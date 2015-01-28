@@ -37,6 +37,7 @@ public:
 
 	struct SelectionData
 	{
+		SelectionData();
 		wxArrayInt selections;
 		bool removeExisting;
 	};

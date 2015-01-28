@@ -461,10 +461,8 @@ void MainFrame::ButtonOpenClickedEvent(wxCommandEvent& WXUNUSED(event))
 
 	if (fileList.GetCount() == 0)
 		return;
-	else if (fileList.GetCount() > 1)
-		LoadFiles(fileList);
-	else
-		LoadFile(fileList[0]);
+
+	LoadFiles(fileList);
 }
 
 //==========================================================================
@@ -676,7 +674,7 @@ void MainFrame::ButtonReloadDataClickedEvent(wxCommandEvent& WXUNUSED(event))
 	if (lastFileLoaded.IsEmpty())
 		return;
 
-	LoadFile(lastFileLoaded/*, true*/);// TODO:  How does this work now?
+	LoadFiles(wxArrayString(1, &lastFileLoaded));
 }
 
 //==========================================================================
@@ -925,7 +923,7 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 //		true for file successfully loaded, false otherwise
 //
 //==========================================================================
-bool MainFrame::LoadFile(const wxString &pathAndFileName)
+/*bool MainFrame::LoadFile(const wxString &pathAndFileName)
 {
 	DataFile *file = GetDataFile(pathAndFileName);
 
@@ -958,7 +956,7 @@ bool MainFrame::LoadFile(const wxString &pathAndFileName)
 
 	delete file;
 	return true;
-}
+}*/
 
 //==========================================================================
 // Class:			MainFrame
@@ -1013,13 +1011,20 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 	if (selectionInfo.removeExisting)
 		ClearAllCurves();
 
+	wxString curveName;
 	for (i = 0; i < fileList.Count(); i++)
 	{
 		if (!loaded[i])
 			continue;
 
 		for (j = 0; j < files[i]->GetDataCount(); j++)
-			AddCurve(files[i]->GetDataset(j), files[i]->GetDescription(j + 1) + _T(" : ") + ExtractFileNameFromPath(fileList[i]));
+		{
+			if (fileList.Count() > 1)
+				curveName = files[i]->GetDescription(j + 1) + _T(" : ") + ExtractFileNameFromPath(fileList[i]);
+			else
+				curveName = files[i]->GetDescription(j + 1);
+			AddCurve(files[i]->GetDataset(j), curveName);
+		}
 	}
 
 	SetTitle(_T("Multiple Files - ") + DataPlotterApp::dataPlotterTitle);
@@ -1074,7 +1079,7 @@ bool MainFrame::LoadText(const wxString &textData)
 	tempFile << textData;
 	tempFile.close();
 
-	bool fileLoaded = LoadFile(tempFileName);
+	bool fileLoaded = LoadFiles(wxArrayString(1, &tempFileName));
 	if (remove(tempFileName.mb_str()) != 0)
 		wxMessageBox(_T("Error deleting temporary file '") + tempFileName + _T("'."),
 		_T("Could Not Delete File"), wxICON_ERROR, this);
