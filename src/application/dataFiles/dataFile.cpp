@@ -44,10 +44,6 @@ DataFile::DataFile(const wxString& fileName) : fileName(fileName)
 
 	ignoreConsecutiveDelimiters = true;
 	timeIsFormatted = false;
-
-	delimiter = DetermineBestDelimiter();
-	DoTypeSpecificLoadTasks();
-	descriptions = GetCurveInformation(headerLines, scales);
 }
 
 //==========================================================================
@@ -68,6 +64,29 @@ DataFile::DataFile(const wxString& fileName) : fileName(fileName)
 //==========================================================================
 DataFile::~DataFile()
 {
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		Initialize
+//
+// Description:		Initializes with type-specific class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void DataFile::Initialize()
+{
+	delimiter = DetermineBestDelimiter();
+	DoTypeSpecificLoadTasks();
+	descriptions = GetCurveInformation(headerLines, scales);
 }
 
 //==========================================================================

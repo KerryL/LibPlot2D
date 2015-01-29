@@ -35,6 +35,8 @@ public:
 	// Destructor
 	virtual ~DataFile();
 
+	void Initialize();
+
 	struct SelectionData
 	{
 		SelectionData();

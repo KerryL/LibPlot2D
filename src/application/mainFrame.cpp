@@ -986,6 +986,7 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 	for (i = 0; i < fileList.Count(); i++)
 	{
 		files[i] = GetDataFile(fileList[i]);
+		files[i]->Initialize();
 		it = selectionInfoMap.find(files[i]->GetAllDescriptions());
 		if (it == selectionInfoMap.end())
 		{
