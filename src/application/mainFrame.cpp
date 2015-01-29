@@ -1027,7 +1027,10 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 		}
 	}
 
-	SetTitle(_T("Multiple Files - ") + DataPlotterApp::dataPlotterTitle);
+	if (fileList.Count() > 1)
+		SetTitle(_T("Multiple Files - ") + DataPlotterApp::dataPlotterTitle);
+	else
+		SetTitle(ExtractFileNameFromPath(fileList[0]) + _T( "- ") + DataPlotterApp::dataPlotterTitle);
 	genericXAxisLabel = files[0]->GetDescription(0);
 	SetXDataLabel(genericXAxisLabel);
 	plotArea->SaveCurrentZoom();
