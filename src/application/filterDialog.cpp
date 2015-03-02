@@ -244,12 +244,14 @@ wxSizer* FilterDialog::CreateRadioButtons(void)
 	highPassRadio = new wxRadioButton(this, RadioID, _T("High-Pass"));
 	bandStopRadio = new wxRadioButton(this, RadioID, _T("Band-Stop"));
 	bandPassRadio = new wxRadioButton(this, RadioID, _T("Band-Pass"));
+	notchRadio = new wxRadioButton(this, RadioID, _T("Notch"));
 	customRadio = new wxRadioButton(this, RadioID, _T("Custom"));
 
 	typeSizer->Add(lowPassRadio, 0, wxALL, 2);
 	typeSizer->Add(highPassRadio, 0, wxALL, 2);
 	typeSizer->Add(bandStopRadio, 0, wxALL, 2);
 	typeSizer->Add(bandPassRadio, 0, wxALL, 2);
+	typeSizer->Add(notchRadio, 0, wxALL, 2);
 	typeSizer->Add(customRadio, 0, wxALL, 2);
 
 	if (parameters.type == FilterParameters::TypeHighPass)
@@ -260,6 +262,8 @@ wxSizer* FilterDialog::CreateRadioButtons(void)
 		bandStopRadio->SetValue(true);
 	else if (parameters.type == FilterParameters::TypeBandPass)
 		bandPassRadio->SetValue(true);
+	else if (parameters.type == FilterParameters::TypeNotch)
+		notchRadio->SetValue(true);
 	else if (parameters.type == FilterParameters::TypeCustom)
 		customRadio->SetValue(true);
 	else
@@ -545,6 +549,8 @@ FilterParameters::Type FilterDialog::GetType(void) const
 		return FilterParameters::TypeBandStop;
 	else if (bandPassRadio->GetValue())
 		return FilterParameters::TypeBandPass;
+	else if (notchRadio->GetValue())
+		return FilterParameters::TypeNotch;
 	else if (customRadio->GetValue())
 		return FilterParameters::TypeCustom;
 
@@ -580,7 +586,8 @@ bool FilterDialog::TransferDataFromWindow(void)
 		UpdateTransferFunction();
 	}
 
-	double steadyStateGain = Filter::ComputeSteadyStateGain(std::string(numeratorBox->GetValue().mb_str()), std::string(denominatorBox->GetValue().mb_str()));
+	double steadyStateGain = Filter::ComputeSteadyStateGain(
+		std::string(numeratorBox->GetValue().mb_str()), std::string(denominatorBox->GetValue().mb_str()));
 
 	if (!PlotMath::IsZero(steadyStateGain - 1.0) && !PlotMath::IsZero(steadyStateGain))
 	{
@@ -600,19 +607,7 @@ bool FilterDialog::TransferDataFromWindow(void)
 	parameters.butterworth = butterworthCheckBox->GetValue();
 	parameters.numerator = numeratorBox->GetValue();
 	parameters.denominator = denominatorBox->GetValue();
-
-	if (lowPassRadio->GetValue())
-		parameters.type = FilterParameters::TypeLowPass;
-	else if (highPassRadio->GetValue())
-		parameters.type = FilterParameters::TypeHighPass;
-	else if (bandStopRadio->GetValue())
-		parameters.type = FilterParameters::TypeBandStop;
-	else if (bandPassRadio->GetValue())
-		parameters.type = FilterParameters::TypeBandPass;
-	else if (customRadio->GetValue())
-		parameters.type = FilterParameters::TypeCustom;
-	else
-		assert(false);
+	parameters.type = GetType();
 
 	if (!CutoffFrequencyIsValid() ||
 		!DampingRatioIsValid() ||
@@ -797,6 +792,8 @@ void FilterDialog::UpdateTransferFunction(void)
 		GetBandStopTF(num, den);
 	else if (bandPassRadio->GetValue())
 		GetBandPassTF(num, den);
+	else if (notchRadio->GetValue())
+		GetNotchTF(num, den);
 	else
 		assert(false);
 
@@ -1131,23 +1128,48 @@ void FilterDialog::GetBandStopTF(wxString &numerator, wxString &denominator) con
 	cutoff *= 2.0 * M_PI;
 	width *= 2.0 * M_PI;
 
-	// If the upper -3dB frequency is more than double the lower -3dB frequency,
-	// generate a wide-band transfer function (separate high- and low-pass portions)
-	if (IsWideBand(cutoff, width))
-	{
-		unsigned int order = orderSpin->GetValue() / 2;
-		wxString highNum, highDen, lowNum, lowDen;
-		GetLowPassTF(lowNum, lowDen, cutoff - width * 0.5, order);
-		GetHighPassTF(highNum, highDen, cutoff + width * 0.5, orderSpin->GetValue() - order);
-		numerator = _T("(") + highNum + _T(")*(") + lowNum + _T(")");
-		denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
-	}
-	else
-	{
-		// Note that the numerator cutoff can be varied to get a high-pass notch or low-pass notch
-		numerator.Printf("s^2+%0.*f", PlotMath::GetPrecision(cutoff * cutoff, stringPrecision), cutoff * cutoff);
-		denominator = GenerateStandardDenominator(2, cutoff, width / cutoff * 0.5);
-	}
+	double lowCutoff, highCutoff;
+	ComputeLogCutoffs(cutoff, width, lowCutoff, highCutoff);
+
+	unsigned int order = orderSpin->GetValue() / 2;
+	wxString highNum, highDen, lowNum, lowDen;
+	GetLowPassTF(lowNum, lowDen, lowCutoff, order);
+	GetHighPassTF(highNum, highDen, highCutoff, orderSpin->GetValue() - order);
+	numerator = _T("(") + highNum + _T(")*(") + lowDen + _T(")+(") + lowNum + _T(")*(") + highDen + _T(")");
+	denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GetNotchTF
+//
+// Description:		Populates the arguments with string descriptors for the
+//					numerator and denominator of a band-stop filter as specified
+//					by the user.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		numerator	= wxString&
+//		denominator	= wxString&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::GetNotchTF(wxString &numerator, wxString &denominator) const
+{
+	double cutoff, width(0.0);
+	if (!cutoffFrequencyBox->GetValue().ToDouble(&cutoff) ||
+		!widthBox->GetValue().ToDouble(&width))
+		return;
+	cutoff *= 2.0 * M_PI;
+	width *= 2.0 * M_PI;
+
+	// Note that the numerator cutoff can be varied to get a high-pass notch or low-pass notch
+	numerator.Printf("s^2+%0.*f", PlotMath::GetPrecision(cutoff * cutoff, stringPrecision), cutoff * cutoff);
+	denominator = GenerateStandardDenominator(2, cutoff, width / cutoff * 0.5);
 }
 
 //==========================================================================
@@ -1178,22 +1200,15 @@ void FilterDialog::GetBandPassTF(wxString &numerator, wxString &denominator) con
 	cutoff *= 2.0 * M_PI;
 	width *= 2.0 * M_PI;
 
-	// If the upper -3dB frequency is more than double the lower -3dB frequency,
-	// generate a wide-band transfer function (separate high- and low-pass portions)
-	if (IsWideBand(cutoff, width))
-	{
-		unsigned int order = orderSpin->GetValue() / 2;
-		wxString highNum, highDen, lowNum, lowDen;
-		GetLowPassTF(lowNum, lowDen, cutoff + width * 0.5, order);
-		GetHighPassTF(highNum, highDen, cutoff - width * 0.5, orderSpin->GetValue() - order);
-		numerator = _T("(") + highNum + _T(")*(") + lowNum + _T(")");
-		denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
-	}
-	else
-	{
-		numerator.Printf("%0.*f*s", PlotMath::GetPrecision(width, stringPrecision), width);
-		denominator = GenerateStandardDenominator(2, cutoff, width / cutoff * 0.5);
-	}
+	double lowCutoff, highCutoff;
+	ComputeLogCutoffs(cutoff, width, lowCutoff, highCutoff);
+
+	unsigned int order = orderSpin->GetValue() / 2;
+	wxString highNum, highDen, lowNum, lowDen;
+	GetLowPassTF(lowNum, lowDen, highCutoff, order);
+	GetHighPassTF(highNum, highDen, lowCutoff, orderSpin->GetValue() - order);
+	numerator = _T("(") + highNum + _T(")*(") + lowNum + _T(")");
+	denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
 }
 
 //==========================================================================
@@ -1244,67 +1259,15 @@ void FilterDialog::UpdateEnabledControls(void)
 		return;
 
 	cutoffFrequencyBox->Enable(!customRadio->GetValue());
-	butterworthCheckBox->Enable(lowPassRadio->GetValue()
-		|| highPassRadio->GetValue() || IsWideBand());
-	dampingRatioBox->Enable(butterworthCheckBox->IsEnabled() && orderSpin->GetValue() > 1);
+	butterworthCheckBox->Enable(lowPassRadio->GetValue() || highPassRadio->GetValue() ||
+		bandStopRadio->GetValue() || bandPassRadio->GetValue());
+	dampingRatioBox->Enable(butterworthCheckBox->IsEnabled() && orderSpin->GetValue() > 1 &&
+		!butterworthCheckBox->GetValue());
 
-	orderSpin->Enable(lowPassRadio->GetValue() || highPassRadio->GetValue() || IsWideBand());
-	widthBox->Enable(bandStopRadio->GetValue() || bandPassRadio->GetValue());
-}
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		IsWideBand
-//
-// Description:		Determines if the band-pass or band-stop parameters
-//					specified by the user constitue a wide-band filter.
-//
-// Input Arguments:
-//		cutoff	= const double&
-//		width	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool
-//
-//==========================================================================
-bool FilterDialog::IsWideBand(const double &cutoff, const double &width) const
-{
-	if (bandStopRadio->GetValue())
-		return cutoff <= width * 1.5;
-	else if (bandPassRadio->GetValue())
-		return cutoff <= width * 5.0 / 6.0;
-
-	return false;
-}
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		IsWideBand
-//
-// Description:		Determines if the band-pass or band-stop parameters
-//					specified by the user constitue a wide-band filter.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool
-//
-//==========================================================================
-bool FilterDialog::IsWideBand(void) const
-{
-	double cutoff, width;
-	if (!cutoffFrequencyBox->GetValue().ToDouble(&cutoff) ||
-		!widthBox->GetValue().ToDouble(&width))
-		return false;
-
-	return IsWideBand(cutoff, width);
+	orderSpin->Enable(lowPassRadio->GetValue() || highPassRadio->GetValue() ||
+		bandStopRadio->GetValue() || bandPassRadio->GetValue());
+	widthBox->Enable(bandStopRadio->GetValue() || bandPassRadio->GetValue() ||
+		notchRadio->GetValue());
 }
 
 //==========================================================================
@@ -1334,6 +1297,8 @@ wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 		name = GetBandStopName(parameters);
 	else if (parameters.type == FilterParameters::TypeBandPass)
 		name = GetBandPassName(parameters);
+	else if (parameters.type == FilterParameters::TypeNotch)
+		name = GetNotchName(parameters);
 	else if (parameters.type == FilterParameters::TypeCustom)
 		name = GetCustomName(parameters);
 	else
@@ -1443,6 +1408,30 @@ wxString FilterDialog::GetLowPassName(const FilterParameters &parameters)
 wxString FilterDialog::GetBandStopName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("Band-Stop"), parameters));
+	s = AddWidthName(s, parameters);
+
+	return s;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		GetNotchName
+//
+// Description:		Returns a name for the specified filter parameters.
+//
+// Input Arguments:
+//		parameters	= const FilterParameters&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString FilterDialog::GetNotchName(const FilterParameters &parameters)
+{
+	wxString s(GetPrimaryName(_T("Notch"), parameters));
 	s = AddWidthName(s, parameters);
 
 	return s;
@@ -1575,4 +1564,32 @@ wxString FilterDialog::AddWidthName(const wxString& name, const FilterParameters
 		PlotMath::GetPrecision(parameters.width), parameters.width));
 
 	return s;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		ComputeLogCutoffs
+//
+// Description:		Computes upper and lower cutoff frequencies for wide-band
+//					filters given the center frequency and width.
+//
+// Input Arguments:
+//		center	= const double&
+//		width	= const double&
+//
+// Output Arguments:
+//		lowCutoff	= double&
+//		highCutoff	= double&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::ComputeLogCutoffs(const double &center, const double &width,
+	double &lowCutoff, double &highCutoff) const
+{
+	// Let the parameters exactly set the center frequency and upper cutoff
+	// Compute the lower cutoff using our log() method
+	highCutoff = center + width * 0.5;
+	lowCutoff = pow(10.0, 2.0 * log10(center) - log10(highCutoff));
 }

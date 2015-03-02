@@ -37,6 +37,7 @@ struct FilterParameters
 		TypeHighPass,
 		TypeBandPass,
 		TypeBandStop,
+		TypeNotch,
 		TypeCustom
 	} type;
 
@@ -76,6 +77,7 @@ private:
 	wxRadioButton *highPassRadio;
 	wxRadioButton *bandStopRadio;
 	wxRadioButton *bandPassRadio;
+	wxRadioButton *notchRadio;
 	wxRadioButton *customRadio;
 
 	wxTextCtrl *numeratorBox;
@@ -113,6 +115,7 @@ private:
 	void GetHighPassTF(wxString &numerator, wxString &denominator,
 		const double &cutoff, const unsigned int &order) const;
 	void GetBandStopTF(wxString &numerator, wxString &denominator) const;
+	void GetNotchTF(wxString &numerator, wxString &denominator) const;
 	void GetBandPassTF(wxString &numerator, wxString &denominator) const;
 
 	wxString GenerateButterworthDenominator(const unsigned int &order,
@@ -141,9 +144,6 @@ private:
 	bool WidthIsValid(void);
 	bool ExpressionIsValid(const wxString& expression);
 
-	bool IsWideBand(const double &cutoff, const double &width) const;
-	bool IsWideBand(void) const;
-
 	static wxString GetOrderString(const unsigned int &order);
 	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);
 	static wxString AddDampingName(const wxString& name, const FilterParameters &parameters);
@@ -153,7 +153,11 @@ private:
 	static wxString GetLowPassName(const FilterParameters &parameters);
 	static wxString GetBandStopName(const FilterParameters &parameters);
 	static wxString GetBandPassName(const FilterParameters &parameters);
+	static wxString GetNotchName(const FilterParameters &parameters);
 	static wxString GetCustomName(const FilterParameters &parameters);
+
+	void ComputeLogCutoffs(const double &center, const double &width,
+		double &lowCutoff, double &highCutoff) const;
 
 	bool initialized;
 
