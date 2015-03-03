@@ -145,8 +145,6 @@ void Axis::DrawFullAxis(void)
 	glLineWidth(1.0f);
 	glBegin(GL_LINES);
 
-	DrawMainAxis(mainAxisLocation);
-
 	if (IsHorizontal())
 	{
 		if ((majorGrid || minorGrid) && oppositeAxis)
@@ -163,6 +161,8 @@ void Axis::DrawFullAxis(void)
 		if (tickStyle != TickStyleNone)
 			DrawVerticalTicks(numberOfTicks, mainAxisLocation);
 	}
+
+	DrawMainAxis(mainAxisLocation);
 
 	glEnd();
 }
@@ -899,5 +899,5 @@ double Axis::GetNextGridValue(const unsigned int &tick) const
 		return pow(10.0, floor(log10(minimum)) + floor(tick / 9.0))
 			* (tick - 9.0 * floor(tick / 9.0) + 1.0);
 
-	return minimum + (double)tick * majorResolution;
+	return minimum + (double)tick * minorResolution;
 }
