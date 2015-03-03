@@ -43,9 +43,13 @@ public:
 	~PlotRenderer();
 
 	// Gets properties for actors
-	bool GetBottomGrid(void) const;
-	bool GetLeftGrid(void) const;
-	bool GetRightGrid(void) const;
+	bool GetBottomMajorGrid(void) const;
+	bool GetLeftMajorGrid(void) const;
+	bool GetRightMajorGrid(void) const;
+
+	bool GetBottomMinorGrid(void) const;
+	bool GetLeftMinorGrid(void) const;
+	bool GetRightMinorGrid(void) const;
 
 	Color GetGridColor(void) const;
 
@@ -63,11 +67,16 @@ public:
 	bool GetXAxisZoomed(void) const;
 
 	// Sets properties for actors
-	void SetGridOn(void);
-	void SetGridOff(void);
-	void SetBottomGrid(const bool &grid);
-	void SetLeftGrid(const bool &grid);
-	void SetRightGrid(const bool &grid);
+	void SetMajorGridOn(void);
+	void SetMajorGridOff(void);
+	void SetMinorGridOn(void);
+	void SetMinorGridOff(void);
+	void SetBottomMajorGrid(const bool &grid);
+	void SetLeftMajorGrid(const bool &grid);
+	void SetRightMajorGrid(const bool &grid);
+	void SetBottomMinorGrid(const bool &grid);
+	void SetLeftMinorGrid(const bool &grid);
+	void SetRightMinorGrid(const bool &grid);
 
 	void SetGridColor(const Color &color);
 
@@ -101,7 +110,8 @@ public:
 	void SetLeftLogarithmic(const bool &log);
 	void SetRightLogarithmic(const bool &log);
 
-	bool GetGridOn(void);
+	bool GetMajorGridOn(void);
+	bool GetMinorGridOn(void);
 
 	// Called to update the screen
 	void UpdateDisplay(void);

@@ -151,7 +151,8 @@ private:
 
 		idPlotContextCopy,
 		idPlotContextPaste,
-		idPlotContextToggleGridlines,
+		idPlotContextMajorGridlines,
+		idPlotContextMinorGridlines,
 		idPlotContextAutoScale,
 		idPlotContextWriteImageFile,
 		idPlotContextExportData,
@@ -159,27 +160,36 @@ private:
 		idPlotContextBGColor,
 		idPlotContextGridColor,
 
-		idPlotContextToggleBottomGridlines,// Maintain this order for each axis' context IDs
+		idPlotContextBottomMajorGridlines,// Maintain this order for each axis' context IDs
+		idPlotContextBottomMinorGridlines,
 		idPlotContextAutoScaleBottom,
 		idPlotContextSetBottomRange,
-		idPlotContextSetBottomLogarithmic,
+		idPlotContextSetBottomMajorResolution,
+		idPlotContextBottomLogarithmic,
 		idPlotContextEditBottomLabel,
 
-		/*idPlotContextToggleTopGridlines,
+		/*idPlotContextTopMajorGridlines,
+		idPlotContextTopMinorGridlines,
 		idPlotContextAutoScaleTop,
 		idPlotContextSetTopRange,
-		idPlotContextSetTopLogarithmic,*/
+		idPlotContextSetTopMajorResolution,
+		idPlotContextTopLogarithmic,
+		idPlotContextEditTopLabel,*/
 
-		idPlotContextToggleLeftGridlines,
+		idPlotContextLeftMajorGridlines,
+		idPlotContextLeftMinorGridlines,
 		idPlotContextAutoScaleLeft,
 		idPlotContextSetLeftRange,
-		idPlotContextSetLeftLogarithmic,
+		idPlotContextSetLeftMajorResolution,
+		idPlotContextLeftLogarithmic,
 		idPlotContextEditLeftLabel,
 
-		idPlotContextToggleRightGridlines,
+		idPlotContextRightMajorGridlines,
+		idPlotContextRightMinorGridlines,
 		idPlotContextAutoScaleRight,
 		idPlotContextSetRightRange,
-		idPlotContextSetRightLogarithmic,
+		idPlotContextSetRightMajorResolution,
+		idPlotContextRightLogarithmic,
 		idPlotContextEditRightLabel
 	};
 
@@ -218,7 +228,8 @@ private:
 
 	void ContextCopy(wxCommandEvent &event);
 	void ContextPaste(wxCommandEvent &event);
-	void ContextToggleGridlines(wxCommandEvent &event);
+	void ContextToggleMajorGridlines(wxCommandEvent &event);
+	void ContextToggleMinorGridlines(wxCommandEvent &event);
 	void ContextAutoScale(wxCommandEvent &event);
 	void ContextWriteImageFile(wxCommandEvent &event);
 	void ContextExportData(wxCommandEvent &event);
@@ -226,21 +237,27 @@ private:
 	void ContextPlotBGColor(wxCommandEvent &event);
 	void ContextGridColor(wxCommandEvent &event);
 
-	void ContextToggleGridlinesBottom(wxCommandEvent &event);
+	void ContextToggleMajorGridlinesBottom(wxCommandEvent &event);
+	void ContextToggleMinorGridlinesBottom(wxCommandEvent &event);
 	void ContextAutoScaleBottom(wxCommandEvent &event);
 	void ContextSetRangeBottom(wxCommandEvent &event);
+	void ContextSetMajorResolutionBottom(wxCommandEvent &event);
 	void ContextSetLogarithmicBottom(wxCommandEvent &event);
 	void ContextEditBottomLabel(wxCommandEvent &event);
 
-	void ContextToggleGridlinesLeft(wxCommandEvent &event);
+	void ContextToggleMajorGridlinesLeft(wxCommandEvent &event);
+	void ContextToggleMinorGridlinesLeft(wxCommandEvent &event);
 	void ContextAutoScaleLeft(wxCommandEvent &event);
 	void ContextSetRangeLeft(wxCommandEvent &event);
+	void ContextSetMajorResolutionLeft(wxCommandEvent &event);
 	void ContextSetLogarithmicLeft(wxCommandEvent &event);
 	void ContextEditLeftLabel(wxCommandEvent &event);
 
-	void ContextToggleGridlinesRight(wxCommandEvent &event);
+	void ContextToggleMajorGridlinesRight(wxCommandEvent &event);
+	void ContextToggleMinorGridlinesRight(wxCommandEvent &event);
 	void ContextAutoScaleRight(wxCommandEvent &event);
 	void ContextSetRangeRight(wxCommandEvent &event);
+	void ContextSetMajorResolutionRight(wxCommandEvent &event);
 	void ContextSetLogarithmicRight(wxCommandEvent &event);
 	void ContextEditRightLabel(wxCommandEvent &event);
 	// End event handlers-------------------------------------------------

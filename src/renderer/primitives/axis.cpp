@@ -55,7 +55,8 @@ Axis::Axis(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 
 	offsetFromWindowEdge = 75;// [pixels]
 
-	grid = false;
+	majorGrid = false;
+	minorGrid = false;
 
 	logarithmic = false;
 
@@ -148,7 +149,7 @@ void Axis::DrawFullAxis(void)
 
 	if (IsHorizontal())
 	{
-		if (grid && oppositeAxis)
+		if ((majorGrid || minorGrid) && oppositeAxis)
 			DrawHorizontalGrid(numberOfGridLines);
 
 		if (tickStyle != TickStyleNone)
@@ -156,7 +157,7 @@ void Axis::DrawFullAxis(void)
 	}
 	else
 	{
-		if (grid && oppositeAxis)
+		if ((majorGrid || minorGrid) && oppositeAxis)
 			DrawVerticalGrid(numberOfGridLines);
 
 		if (tickStyle != TickStyleNone)
@@ -227,9 +228,9 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 	}
 	else
 	{
-		tickCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
+		tickCount = (unsigned int)((maximum - minimum) / majorResolution + 0.5) - 1;
 		if (gridCount)
-			*gridCount = (unsigned int)((maximum - minimum) / majorResolution + 0.5) - 1;
+			*gridCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
 	}
 }
 
@@ -328,7 +329,15 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 	int location;
 	for (grid = 1; grid <= count; grid++)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, grid));
+		if (minorGrid)
+			location = ValueToPixel(GetNextGridValue(grid));
+		else
+			location = ValueToPixel(GetNextTickValue(false, false, grid));
+
+		if (location < (int)minAxis->GetOffsetFromWindowEdge() ||
+			location > (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
+			continue;
+
 		glVertex2i(location, offsetFromWindowEdge);
 		glVertex2i(location, renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
 	}
@@ -394,7 +403,15 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 	int location;
 	for (grid = 1; grid <= count; grid++)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, grid));
+		if (minorGrid)
+			location = ValueToPixel(GetNextGridValue(grid));
+		else
+			location = ValueToPixel(GetNextTickValue(false, false, grid));
+
+		if (location < (int)minAxis->GetOffsetFromWindowEdge() ||
+			location > (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
+			continue;
+
 		glVertex2i(offsetFromWindowEdge, location);
 		glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(), location);
 	}
@@ -858,4 +875,29 @@ double Axis::PixelToValue(const int &pixel) const
 		return pow(10.0, fraction * (log10(maximum) - log10(minimum)) + log10(minimum));
 
 	return fraction * (maximum - minimum) + minimum;
+}
+
+//==========================================================================
+// Class:			Axis
+// Function:		GetNextGridValue
+//
+// Description:		Computes value to display at the next grid line.
+//
+// Input Arguments:
+//		tick	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Axis::GetNextGridValue(const unsigned int &tick) const
+{
+	if (logarithmic)
+		return pow(10.0, floor(log10(minimum)) + floor(tick / 9.0))
+			* (tick - 9.0 * floor(tick / 9.0) + 1.0);
+
+	return minimum + (double)tick * majorResolution;
 }

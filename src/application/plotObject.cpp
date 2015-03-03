@@ -242,9 +242,9 @@ void PlotObject::Update(void)
 
 //==========================================================================
 // Class:			PlotObject
-// Function:		SetXGrid
+// Function:		SetXMajorGrid
 //
-// Description:		Sets the status of the x-axis grid.
+// Description:		Sets the status of the x-axis major grid.
 //
 // Input Arguments:
 //		None
@@ -256,16 +256,16 @@ void PlotObject::Update(void)
 //		None
 //
 //==========================================================================
-void PlotObject::SetXGrid(const bool &gridOn)
+void PlotObject::SetXMajorGrid(const bool &gridOn)
 {
-	axisBottom->SetGrid(gridOn);
+	axisBottom->SetMajorGrid(gridOn);
 }
 
 //==========================================================================
 // Class:			PlotObject
-// Function:		SetLeftYGrid
+// Function:		SetXMinorGrid
 //
-// Description:		Sets the status of the left y-axis grid.
+// Description:		Sets the status of the x-axis minor grid.
 //
 // Input Arguments:
 //		None
@@ -277,16 +277,16 @@ void PlotObject::SetXGrid(const bool &gridOn)
 //		None
 //
 //==========================================================================
-void PlotObject::SetLeftYGrid(const bool &gridOn)
+void PlotObject::SetXMinorGrid(const bool &gridOn)
 {
-	axisLeft->SetGrid(gridOn);
+	axisBottom->SetMinorGrid(gridOn);
 }
 
 //==========================================================================
 // Class:			PlotObject
-// Function:		SetRightYGrid
+// Function:		SetLeftYMajorGrid
 //
-// Description:		Sets the status of the right y-axis grid.
+// Description:		Sets the status of the left y-axis major grid.
 //
 // Input Arguments:
 //		None
@@ -298,9 +298,72 @@ void PlotObject::SetLeftYGrid(const bool &gridOn)
 //		None
 //
 //==========================================================================
-void PlotObject::SetRightYGrid(const bool &gridOn)
+void PlotObject::SetLeftYMajorGrid(const bool &gridOn)
 {
-	axisRight->SetGrid(gridOn);
+	axisLeft->SetMajorGrid(gridOn);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetLeftYMinorGrid
+//
+// Description:		Sets the status of the left y-axis minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetLeftYMinorGrid(const bool &gridOn)
+{
+	axisLeft->SetMinorGrid(gridOn);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetRightYMajorGrid
+//
+// Description:		Sets the status of the right y-axis major grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetRightYMajorGrid(const bool &gridOn)
+{
+	axisRight->SetMajorGrid(gridOn);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetRightYMinorGrid
+//
+// Description:		Sets the status of the right y-axis minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetRightYMinorGrid(const bool &gridOn)
+{
+	axisRight->SetMinorGrid(gridOn);
 }
 
 //==========================================================================
@@ -407,11 +470,11 @@ void PlotObject::FormatPlot(void)
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
 	double xMajor = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
-	double xMinor = xMajor;
+	double xMinor = ComputeMinorResolution(xMin, xMax, xMajor);
 	double yLeftMajor = AutoScaleAxis(yLeftMin, yLeftMax, 10, axisLeft->IsLogarithmic(), !autoScaleLeftY);
-	double yLeftMinor = yLeftMajor;
+	double yLeftMinor = ComputeMinorResolution(yLeftMin, yLeftMax, yLeftMajor);
 	double yRightMajor = AutoScaleAxis(yRightMin, yRightMax, 10, axisRight->IsLogarithmic(), !autoScaleRightY);
-	double yRightMinor = yRightMajor;
+	double yRightMinor = ComputeMinorResolution(yRightMin, yRightMax, yRightMajor);
 
 	ValidateRangeLimits(xMin, xMax, autoScaleX, xMajor, xMinor);
 	ValidateRangeLimits(yLeftMin, yLeftMax, autoScaleLeftY, yLeftMajor, yLeftMinor);
@@ -1250,6 +1313,31 @@ void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing
 
 //==========================================================================
 // Class:			PlotObject
+// Function:		ComputeMinorResolution
+//
+// Description:		Returns the title text.
+//
+// Input Arguments:
+//		min				= const double&
+//		max				= const double&
+//		majorResolution	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotObject::ComputeMinorResolution(const double &min, const double &max,
+	const double &majorResolution) const
+{
+	// TODO:  Need better algorithm for this
+	return majorResolution * 0.25;
+}
+
+//==========================================================================
+// Class:			PlotObject
 // Function:		SetXMin
 //
 // Description:		Sets the lower X limit.
@@ -1482,9 +1570,9 @@ void PlotObject::SetCurveProperties(const unsigned int &index, const Color &colo
 
 //==========================================================================
 // Class:			PlotObject
-// Function:		SetGrid
+// Function:		SetMajorGrid
 //
-// Description:		Resets auto-scaling for all axes.
+// Description:		Resets major grid for all axes.
 //
 // Input Arguments:
 //		None
@@ -1496,21 +1584,21 @@ void PlotObject::SetCurveProperties(const unsigned int &index, const Color &colo
 //		None
 //
 //==========================================================================
-void PlotObject::SetGrid(const bool &gridOn)
+void PlotObject::SetMajorGrid(const bool &gridOn)
 {
-	axisBottom->SetGrid(gridOn);
-	axisLeft->SetGrid(gridOn);
+	axisBottom->SetMajorGrid(gridOn);
+	axisLeft->SetMajorGrid(gridOn);
 
 	// These axis default to off, but can be specifically turned on via a right-click
-	axisTop->SetGrid(false);
-	axisRight->SetGrid(false);
+	axisTop->SetMajorGrid(false);
+	axisRight->SetMajorGrid(false);
 }
 
 //==========================================================================
 // Class:			PlotObject
-// Function:		GetGrid
+// Function:		SetMinorGrid
 //
-// Description:		Returns status of gridlines.
+// Description:		Resets minor grid for all axes.
 //
 // Input Arguments:
 //		None
@@ -1522,12 +1610,62 @@ void PlotObject::SetGrid(const bool &gridOn)
 //		None
 //
 //==========================================================================
-bool PlotObject::GetGrid(void)
+void PlotObject::SetMinorGrid(const bool &gridOn)
+{
+	axisBottom->SetMinorGrid(gridOn);
+	axisLeft->SetMinorGrid(gridOn);
+
+	// These axis default to off, but can be specifically turned on via a right-click
+	axisTop->SetMinorGrid(false);
+	axisRight->SetMinorGrid(false);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetMajorGrid
+//
+// Description:		Returns status of major gridlines.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+bool PlotObject::GetMajorGrid(void)
 {
 	if (axisBottom == NULL)
 		return false;
 
-	return axisBottom->GetGrid();
+	return axisBottom->GetMajorGrid();
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetMinorGrid
+//
+// Description:		Returns status of minor gridlines.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+bool PlotObject::GetMinorGrid(void)
+{
+	if (axisBottom == NULL)
+		return false;
+
+	return axisBottom->GetMinorGrid();
 }
 
 //==========================================================================

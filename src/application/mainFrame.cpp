@@ -211,7 +211,7 @@ PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 #endif
 
 	plotArea->SetMinSize(wxSize(650, 320));
-	plotArea->SetGridOn();
+	plotArea->SetMajorGridOn();
 
 	return plotArea;
 }
@@ -400,7 +400,8 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 
 	EVT_MENU(idPlotContextCopy,						MainFrame::ContextCopy)
 	EVT_MENU(idPlotContextPaste,					MainFrame::ContextPaste)
-	EVT_MENU(idPlotContextToggleGridlines,			MainFrame::ContextToggleGridlines)
+	EVT_MENU(idPlotContextMajorGridlines,			MainFrame::ContextToggleMajorGridlines)
+	EVT_MENU(idPlotContextMinorGridlines,			MainFrame::ContextToggleMinorGridlines)
 	EVT_MENU(idPlotContextAutoScale,				MainFrame::ContextAutoScale)
 	EVT_MENU(idPlotContextWriteImageFile,			MainFrame::ContextWriteImageFile)
 	EVT_MENU(idPlotContextExportData,				MainFrame::ContextExportData)
@@ -408,26 +409,35 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idPlotContextBGColor,					MainFrame::ContextPlotBGColor)
 	EVT_MENU(idPlotContextGridColor,				MainFrame::ContextGridColor)
 
-	EVT_MENU(idPlotContextToggleBottomGridlines,	MainFrame::ContextToggleGridlinesBottom)
+	EVT_MENU(idPlotContextBottomMajorGridlines,		MainFrame::ContextToggleMajorGridlinesBottom)
+	EVT_MENU(idPlotContextBottomMinorGridlines,		MainFrame::ContextToggleMinorGridlinesBottom)
 	EVT_MENU(idPlotContextSetBottomRange,			MainFrame::ContextSetRangeBottom)
-	EVT_MENU(idPlotContextSetBottomLogarithmic,		MainFrame::ContextSetLogarithmicBottom)
+	EVT_MENU(idPlotContextSetBottomMajorResolution,	MainFrame::ContextSetMajorResolutionBottom)
+	EVT_MENU(idPlotContextBottomLogarithmic,		MainFrame::ContextSetLogarithmicBottom)
 	EVT_MENU(idPlotContextAutoScaleBottom,			MainFrame::ContextAutoScaleBottom)
 	EVT_MENU(idPlotContextEditBottomLabel,			MainFrame::ContextEditBottomLabel)
 
-	//EVT_MENU(idPlotContextToggleTopGridlines,		MainFrame::)
+	//EVT_MENU(idPlotContextTopMajorGridlines,		MainFrame::)
+	//EVT_MENU(idPlotContextTopMinorGridlines,		MainFrame::)
 	//EVT_MENU(idPlotContextSetTopRange,			MainFrame::)
-	//EVT_MENU(idPlotContextSetTopLogarithmic,		MainFrame::)
+	//EVT_MENU(idPlotContextSetTopMajorResolution,	MainFrame::)
+	//EVT_MENU(idPlotContextTopLogarithmic,			MainFrame::)
 	//EVT_MENU(idPlotContextAutoScaleTop,			MainFrame::)
+	//EVT_MENU(idPlotContextEditTopLabel,			MainFrame::)
 
-	EVT_MENU(idPlotContextToggleLeftGridlines,		MainFrame::ContextToggleGridlinesLeft)
+	EVT_MENU(idPlotContextLeftMajorGridlines,		MainFrame::ContextToggleMajorGridlinesLeft)
+	EVT_MENU(idPlotContextLeftMinorGridlines,		MainFrame::ContextToggleMinorGridlinesLeft)
 	EVT_MENU(idPlotContextSetLeftRange,				MainFrame::ContextSetRangeLeft)
-	EVT_MENU(idPlotContextSetLeftLogarithmic,		MainFrame::ContextSetLogarithmicLeft)
+	EVT_MENU(idPlotContextSetLeftMajorResolution,	MainFrame::ContextSetMajorResolutionLeft)
+	EVT_MENU(idPlotContextLeftLogarithmic,			MainFrame::ContextSetLogarithmicLeft)
 	EVT_MENU(idPlotContextAutoScaleLeft,			MainFrame::ContextAutoScaleLeft)
 	EVT_MENU(idPlotContextEditLeftLabel,			MainFrame::ContextEditLeftLabel)
 
-	EVT_MENU(idPlotContextToggleRightGridlines,		MainFrame::ContextToggleGridlinesRight)
+	EVT_MENU(idPlotContextRightMajorGridlines,		MainFrame::ContextToggleMajorGridlinesRight)
+	EVT_MENU(idPlotContextRightMinorGridlines,		MainFrame::ContextToggleMinorGridlinesRight)
 	EVT_MENU(idPlotContextSetRightRange,			MainFrame::ContextSetRangeRight)
-	EVT_MENU(idPlotContextSetRightLogarithmic,		MainFrame::ContextSetLogarithmicRight)
+	EVT_MENU(idPlotContextSetRightMajorResolution,	MainFrame::ContextSetMajorResolutionRight)
+	EVT_MENU(idPlotContextRightLogarithmic,			MainFrame::ContextSetLogarithmicRight)
 	EVT_MENU(idPlotContextAutoScaleRight,			MainFrame::ContextAutoScaleRight)
 	EVT_MENU(idPlotContextEditRightLabel,			MainFrame::ContextEditRightLabel)
 END_EVENT_TABLE();
@@ -764,18 +774,24 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 	switch (context)
 	{
 	case plotContextXAxis:
-		contextMenu = CreateAxisContextMenu(idPlotContextToggleBottomGridlines);
-		contextMenu->Check(idPlotContextSetBottomLogarithmic, plotArea->GetXLogarithmic());
+		contextMenu = CreateAxisContextMenu(idPlotContextBottomMajorGridlines);
+		contextMenu->Check(idPlotContextBottomLogarithmic, plotArea->GetXLogarithmic());
+		contextMenu->Check(idPlotContextBottomMajorGridlines, plotArea->GetBottomMajorGrid());
+		contextMenu->Check(idPlotContextBottomMinorGridlines, plotArea->GetBottomMinorGrid());
 		break;
 
 	case plotContextLeftYAxis:
-		contextMenu = CreateAxisContextMenu(idPlotContextToggleLeftGridlines);
-		contextMenu->Check(idPlotContextSetLeftLogarithmic, plotArea->GetLeftLogarithmic());
+		contextMenu = CreateAxisContextMenu(idPlotContextLeftMajorGridlines);
+		contextMenu->Check(idPlotContextLeftLogarithmic, plotArea->GetLeftLogarithmic());
+		contextMenu->Check(idPlotContextLeftMajorGridlines, plotArea->GetLeftMajorGrid());
+		contextMenu->Check(idPlotContextLeftMinorGridlines, plotArea->GetLeftMinorGrid());
 		break;
 
 	case plotContextRightYAxis:
-		contextMenu = CreateAxisContextMenu(idPlotContextToggleRightGridlines);
-		contextMenu->Check(idPlotContextSetRightLogarithmic, plotArea->GetRightLogarithmic());
+		contextMenu = CreateAxisContextMenu(idPlotContextRightMajorGridlines);
+		contextMenu->Check(idPlotContextRightLogarithmic, plotArea->GetRightLogarithmic());
+		contextMenu->Check(idPlotContextRightMajorGridlines, plotArea->GetRightMajorGrid());
+		contextMenu->Check(idPlotContextRightMinorGridlines, plotArea->GetRightMinorGrid());
 		break;
 
 	default:
@@ -814,7 +830,8 @@ wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
 	contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
 	contextMenu->Append(idPlotContextExportData, _T("Export Data"));
 	contextMenu->AppendSeparator();
-	contextMenu->Append(idPlotContextToggleGridlines, _T("Toggle Gridlines"));
+	contextMenu->AppendCheckItem(idPlotContextMajorGridlines, _T("Major Gridlines"));
+	contextMenu->AppendCheckItem(idPlotContextMinorGridlines, _T("Minor Gridlines"));
 	contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
 	contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
 	contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));
@@ -827,6 +844,9 @@ wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
 	}
 	else
 		contextMenu->Enable(idPlotContextPaste, false);
+
+	contextMenu->Check(idPlotContextMajorGridlines, plotArea->GetMajorGridOn());
+	contextMenu->Check(idPlotContextMinorGridlines, plotArea->GetMinorGridOn());
 
 	return contextMenu;
 }
@@ -851,11 +871,14 @@ wxMenu* MainFrame::CreateAxisContextMenu(const unsigned int &baseEventId) const
 {
 	wxMenu* contextMenu = new wxMenu();
 
-	contextMenu->Append(baseEventId, _T("Toggle Axis Gridlines"));
-	contextMenu->Append(baseEventId + 1, _T("Auto Scale Axis"));
-	contextMenu->Append(baseEventId + 2, _T("Set Range"));
-	contextMenu->AppendCheckItem(baseEventId + 3, _T("Logarithmic Scale"));
-	contextMenu->Append(baseEventId + 4, _T("Edit Label"));
+	unsigned int i = baseEventId;
+	contextMenu->AppendCheckItem(i++, _T("Major Gridlines"));
+	contextMenu->AppendCheckItem(i++, _T("Minor Gridlines"));
+	contextMenu->Append(i++, _T("Auto Scale Axis"));
+	contextMenu->Append(i++, _T("Set Range"));
+	contextMenu->Append(i++, _T("Set Major Resolution"));
+	contextMenu->AppendCheckItem(i++, _T("Logarithmic Scale"));
+	contextMenu->Append(i++, _T("Edit Label"));
 
 	return contextMenu;
 }
@@ -906,57 +929,6 @@ wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defa
 
 	return pathsAndFileNames;
 }
-
-//==========================================================================
-// Class:			MainFrame
-// Function:		LoadFile
-//
-// Description:		Public method for loading a single object from file.
-//
-// Input Arguments:
-//		pathAndFileName	= const wxString&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		true for file successfully loaded, false otherwise
-//
-//==========================================================================
-/*bool MainFrame::LoadFile(const wxString &pathAndFileName)
-{
-	DataFile *file = GetDataFile(pathAndFileName);
-
-	DataFile::SelectionData selectionInfo;
-	if (file->DescriptionsMatch(lastDescriptions))
-		selectionInfo = lastSelectionInfo;
-
-	file->GetSelectionsFromUser(selectionInfo, this);
-	if (selectionInfo.selections.Count() < 1 || !file->Load(selectionInfo))
-	{
-		delete file;
-		return false;
-	}
-
-	if (selectionInfo.removeExisting)
-		ClearAllCurves();
-
-	unsigned int i;
-	for (i = 0; i < file->GetDataCount(); i++)
-		AddCurve(file->GetDataset(i), file->GetDescription(i + 1));
-
-	SetTitleFromFileName(pathAndFileName);
-	genericXAxisLabel = file->GetDescription(0);
-	SetXDataLabel(genericXAxisLabel);
-	plotArea->SaveCurrentZoom();
-
-	lastFileLoaded = pathAndFileName;
-	lastSelectionInfo = selectionInfo;
-	lastDescriptions = file->GetAllDescriptions();
-
-	delete file;
-	return true;
-}*/
 
 //==========================================================================
 // Class:			MainFrame
@@ -2715,9 +2687,9 @@ void MainFrame::ContextPaste(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextToggleGridlines
+// Function:		ContextToggleMajorGridlines
 //
-// Description:		Toggles gridlines for the entire plot on and off.
+// Description:		Toggles major gridlines for the entire plot on and off.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -2729,12 +2701,38 @@ void MainFrame::ContextPaste(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void MainFrame::ContextToggleGridlines(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ContextToggleMajorGridlines(wxCommandEvent& WXUNUSED(event))
 {
-	if (plotArea->GetGridOn())
-		plotArea->SetGridOff();
+	if (plotArea->GetMajorGridOn())
+		plotArea->SetMajorGridOff();
 	else
-		plotArea->SetGridOn();
+		plotArea->SetMajorGridOn();
+
+	plotArea->UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextToggleMinorGridlines
+//
+// Description:		Toggles minor gridlines for the entire plot on and off.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextToggleMinorGridlines(wxCommandEvent& WXUNUSED(event))
+{
+	if (plotArea->GetMinorGridOn())
+		plotArea->SetMinorGridOff();
+	else
+		plotArea->SetMinorGridOn();
 
 	plotArea->UpdateDisplay();
 }
@@ -3029,9 +3027,9 @@ void MainFrame::SetNewAxisRange(const PlotContext &axis, const double &min, cons
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextToggleGridlinesBottom
+// Function:		ContextToggleMajorGridlinesBottom
 //
-// Description:		Toggles gridlines for the bottom axis.
+// Description:		Toggles major gridlines for the bottom axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3043,9 +3041,30 @@ void MainFrame::SetNewAxisRange(const PlotContext &axis, const double &min, cons
 //		None
 //
 //==========================================================================
-void MainFrame::ContextToggleGridlinesBottom(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ContextToggleMajorGridlinesBottom(wxCommandEvent& WXUNUSED(event))
 {
-	plotArea->SetBottomGrid(!plotArea->GetBottomGrid());
+	plotArea->SetBottomMajorGrid(!plotArea->GetBottomMajorGrid());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextToggleMinorGridlinesBottom
+//
+// Description:		Toggles major gridlines for the bottom axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextToggleMinorGridlinesBottom(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetBottomMinorGrid(!plotArea->GetBottomMinorGrid());
 }
 
 //==========================================================================
@@ -3092,9 +3111,9 @@ void MainFrame::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextToggleGridlinesLeft
+// Function:		ContextSetMajorResolutionBottom
 //
-// Description:		Toggles gridlines for the bottom axis.
+// Description:		Dispalys a dialog box for setting the axis major resolution.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3106,9 +3125,51 @@ void MainFrame::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void MainFrame::ContextToggleGridlinesLeft(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ContextSetMajorResolutionBottom(wxCommandEvent& WXUNUSED(event))
 {
-	plotArea->SetLeftGrid(!plotArea->GetLeftGrid());
+	// TODO:  Implement
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextToggleMajorGridlinesLeft
+//
+// Description:		Toggles major gridlines for the left axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextToggleMajorGridlinesLeft(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetLeftMajorGrid(!plotArea->GetLeftMajorGrid());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextToggleMinorGridlinesLeft
+//
+// Description:		Toggles major gridlines for the left axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextToggleMinorGridlinesLeft(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetLeftMinorGrid(!plotArea->GetLeftMinorGrid());
 }
 
 //==========================================================================
@@ -3155,9 +3216,9 @@ void MainFrame::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			MainFrame
-// Function:		ContextToggleGridlinesRight
+// Function:		ContextSetMajorResolutionLeft
 //
-// Description:		Toggles gridlines for the bottom axis.
+// Description:		Dispalys a dialog box for setting the axis major resolution.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3169,9 +3230,51 @@ void MainFrame::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void MainFrame::ContextToggleGridlinesRight(wxCommandEvent& WXUNUSED(event))
+void MainFrame::ContextSetMajorResolutionLeft(wxCommandEvent& WXUNUSED(event))
 {
-	plotArea->SetRightGrid(!plotArea->GetRightGrid());
+	// TODO:  Implement
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextToggleMajorGridlinesRight
+//
+// Description:		Toggles major gridlines for the right axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextToggleMajorGridlinesRight(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetRightMajorGrid(!plotArea->GetRightMajorGrid());
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextToggleMinorGridlinesRight
+//
+// Description:		Toggles minor gridlines for the right axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextToggleMinorGridlinesRight(wxCommandEvent& WXUNUSED(event))
+{
+	plotArea->SetRightMinorGrid(!plotArea->GetRightMinorGrid());
 }
 
 //==========================================================================
@@ -3214,6 +3317,27 @@ void MainFrame::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 {
 	DisplayAxisRangeDialog(plotContextRightYAxis);
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextSetMajorResolutionRight
+//
+// Description:		Dispalys a dialog box for setting the axis major resolution.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextSetMajorResolutionRight(wxCommandEvent& WXUNUSED(event))
+{
+	// TODO:  Implement
 }
 
 //==========================================================================

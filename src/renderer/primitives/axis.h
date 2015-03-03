@@ -60,17 +60,18 @@ public:
 	};
 
 	// Set option methods
-	void SetOrientation(const AxisOrientation &_orientation) { orientation = _orientation; modified = true; };
-	void SetMinimum(const double &_minimum) { minimum = _minimum; modified = true; };
-	void SetMaximum(const double &_maximum) { maximum = _maximum; modified = true; };
-	void SetMajorResolution(const double &_majorResolution) { majorResolution = _majorResolution; modified = true; };
-	void SetMinorResolution(const double &_minorResolution) { minorResolution = _minorResolution; modified = true; };
-	void SetGrid(const bool &_grid) { grid = _grid; modified = true; };
-	void SetLabel(wxString _label) { label = _label; modified = true; };
-	void SetFont(FTFont *_font) { font = _font; modified = true; };
-	void SetGridColor(const Color &_gridColor) { gridColor = _gridColor; modified = true; };
-	void SetTickStyle(const TickStyle &_tickStyle) { tickStyle = _tickStyle; modified = true; };
-	void SetTickSize(const int &_tickSize) { tickSize = _tickSize; modified = true; };
+	void SetOrientation(const AxisOrientation &orientation) { this->orientation = orientation; modified = true; };
+	void SetMinimum(const double &minimum) { this->minimum = minimum; modified = true; };
+	void SetMaximum(const double &maximum) { this->maximum = maximum; modified = true; };
+	void SetMajorResolution(const double &majorResolution) { this->majorResolution = majorResolution; modified = true; };
+	void SetMinorResolution(const double &minorResolution) { this->minorResolution = minorResolution; modified = true; };
+	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; modified = true; };
+	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; modified = true; };
+	void SetLabel(wxString label) { this->label = label; modified = true; };
+	void SetFont(FTFont *font) { this->font = font; modified = true; };
+	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; modified = true; };
+	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; modified = true; };
+	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; modified = true; };
 	void SetOffsetFromWindowEdge(const unsigned int &offset) { offsetFromWindowEdge = offset; modified = true; };
 
 	void SetAxisAtMinEnd(const Axis *min) { minAxis = min; modified = true; };
@@ -84,7 +85,8 @@ public:
 	inline double GetMaximum(void) const { return maximum; };
 	bool IsHorizontal(void) const;
 	inline unsigned int GetOffsetFromWindowEdge(void) const { return offsetFromWindowEdge; };
-	inline bool GetGrid(void) const { return grid; };
+	inline bool GetMajorGrid(void) const { return majorGrid; };
+	inline bool GetMinorGrid(void) const { return minorGrid; };
 	inline Color GetGridColor(void) const { return gridColor; };
 
 	inline const Axis* GetAxisAtMinEnd(void) const { return minAxis; };
@@ -114,7 +116,8 @@ private:
 
 	// The tick options
 	TickStyle tickStyle;
-	bool grid;
+	bool majorGrid;
+	bool minorGrid;
 	int tickSize;
 
 	// Color of the grid
@@ -143,6 +146,7 @@ private:
 	void InitializeTickParameters(int &inside, int &outside, int &sign) const;
 	void GetNextLogValue(const bool &first, double &value) const;
 	double GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const;
+	double GetNextGridValue(const unsigned int &tick) const;
 
 	void DrawAxisLabel(void) const;
 	void DrawTickLabels(void);

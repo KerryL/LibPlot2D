@@ -478,9 +478,9 @@ void PlotRenderer::ClearZoomStack(void)
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetGridOn
+// Function:		GetMajorGridOn
 //
-// Description:		Returns status of the grid lines.
+// Description:		Returns status of the major grid lines.
 //
 // Input Arguments:
 //		None
@@ -492,16 +492,37 @@ void PlotRenderer::ClearZoomStack(void)
 //		bool, true for visible, false for hidden
 //
 //==========================================================================
-bool PlotRenderer::GetGridOn(void)
+bool PlotRenderer::GetMajorGridOn(void)
 {
-	return plot->GetGrid();
+	return plot->GetMajorGrid();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		SetGridOn
+// Function:		GetMinorGridOn
 //
-// Description:		Turns on plot grid.
+// Description:		Returns status of the minor grid lines.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for visible, false for hidden
+//
+//==========================================================================
+bool PlotRenderer::GetMinorGridOn(void)
+{
+	return plot->GetMinorGrid();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetMajorGridOn
+//
+// Description:		Turns on plot major grid.
 //
 // Input Arguments:
 //		None
@@ -513,17 +534,17 @@ bool PlotRenderer::GetGridOn(void)
 //		None
 //
 //==========================================================================
-void PlotRenderer::SetGridOn()
+void PlotRenderer::SetMajorGridOn()
 {
-	plot->SetGrid(true);
+	plot->SetMajorGrid(true);
 	UpdateDisplay();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		SetGridOn
+// Function:		SetMinorGridOn
 //
-// Description:		Turns off plot grid.
+// Description:		Turns on plot minor grid.
 //
 // Input Arguments:
 //		None
@@ -535,17 +556,61 @@ void PlotRenderer::SetGridOn()
 //		None
 //
 //==========================================================================
-void PlotRenderer::SetGridOff()
+void PlotRenderer::SetMinorGridOn()
 {
-	plot->SetGrid(false);
+	plot->SetMinorGrid(true);
 	UpdateDisplay();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetBottomGrid
+// Function:		SetMajorGridOff
 //
-// Description:		Returns the status of the bottom grid.
+// Description:		Turns off plot major grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetMajorGridOff()
+{
+	plot->SetMajorGrid(false);
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetMinorGridOff
+//
+// Description:		Turns off plot minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetMinorGridOff()
+{
+	plot->SetMinorGrid(false);
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetBottomMajorGrid
+//
+// Description:		Returns the status of the bottom major grid.
 //
 // Input Arguments:
 //		None
@@ -557,16 +622,37 @@ void PlotRenderer::SetGridOff()
 //		bool indicating status of bottom grid
 //
 //==========================================================================
-bool PlotRenderer::GetBottomGrid(void) const
+bool PlotRenderer::GetBottomMajorGrid(void) const
 {
-	return plot->GetBottomAxis()->GetGrid();
+	return plot->GetBottomAxis()->GetMajorGrid();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetLeftGrid
+// Function:		GetBottomMinorGrid
 //
-// Description:		Returns the status of the left grid.
+// Description:		Returns the status of the bottom minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool indicating status of bottom grid
+//
+//==========================================================================
+bool PlotRenderer::GetBottomMinorGrid(void) const
+{
+	return plot->GetBottomAxis()->GetMinorGrid();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetLeftMajorGrid
+//
+// Description:		Returns the status of the left major grid.
 //
 // Input Arguments:
 //		None
@@ -578,16 +664,37 @@ bool PlotRenderer::GetBottomGrid(void) const
 //		bool indicating status of left grid
 //
 //==========================================================================
-bool PlotRenderer::GetLeftGrid(void) const
+bool PlotRenderer::GetLeftMajorGrid(void) const
 {
-	return plot->GetLeftYAxis()->GetGrid();
+	return plot->GetLeftYAxis()->GetMajorGrid();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetRightGrid
+// Function:		GetLeftMinorGrid
 //
-// Description:		Returns the status of the right grid.
+// Description:		Returns the status of the left minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool indicating status of left grid
+//
+//==========================================================================
+bool PlotRenderer::GetLeftMinorGrid(void) const
+{
+	return plot->GetLeftYAxis()->GetMinorGrid();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetRightMajorGrid
+//
+// Description:		Returns the status of the right major grid.
 //
 // Input Arguments:
 //		None
@@ -599,16 +706,37 @@ bool PlotRenderer::GetLeftGrid(void) const
 //		bool indicating status of right grid
 //
 //==========================================================================
-bool PlotRenderer::GetRightGrid(void) const
+bool PlotRenderer::GetRightMajorGrid(void) const
 {
-	return plot->GetRightYAxis()->GetGrid();
+	return plot->GetRightYAxis()->GetMajorGrid();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		SetBottomGrid
+// Function:		GetRightMinorGrid
 //
-// Description:		Sets the status of the bottom axis' grid.
+// Description:		Returns the status of the right minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool indicating status of right grid
+//
+//==========================================================================
+bool PlotRenderer::GetRightMinorGrid(void) const
+{
+	return plot->GetRightYAxis()->GetMinorGrid();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetBottomMajorGrid
+//
+// Description:		Sets the status of the bottom axis' major grid.
 //
 // Input Arguments:
 //		None
@@ -620,18 +748,17 @@ bool PlotRenderer::GetRightGrid(void) const
 //		None
 //
 //==========================================================================
-void PlotRenderer::SetBottomGrid(const bool &grid)
+void PlotRenderer::SetBottomMajorGrid(const bool &grid)
 {
-	plot->SetXGrid(grid);
-
+	plot->SetXMajorGrid(grid);
 	UpdateDisplay();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		SetLeftGrid
+// Function:		SetBottomMinorGrid
 //
-// Description:		Sets the status of the left axis' grid.
+// Description:		Sets the status of the bottom axis' minor grid.
 //
 // Input Arguments:
 //		None
@@ -643,18 +770,17 @@ void PlotRenderer::SetBottomGrid(const bool &grid)
 //		None
 //
 //==========================================================================
-void PlotRenderer::SetLeftGrid(const bool &grid)
+void PlotRenderer::SetBottomMinorGrid(const bool &grid)
 {
-	plot->SetLeftYGrid(grid);
-
+	plot->SetXMinorGrid(grid);
 	UpdateDisplay();
 }
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		SetRightGrid
+// Function:		SetLeftMajorGrid
 //
-// Description:		Sets the status of the right axis' grid.
+// Description:		Sets the status of the left axis' major grid.
 //
 // Input Arguments:
 //		None
@@ -666,10 +792,75 @@ void PlotRenderer::SetLeftGrid(const bool &grid)
 //		None
 //
 //==========================================================================
-void PlotRenderer::SetRightGrid(const bool &grid)
+void PlotRenderer::SetLeftMajorGrid(const bool &grid)
 {
-	plot->SetRightYGrid(grid);
+	plot->SetLeftYMajorGrid(grid);
+	UpdateDisplay();
+}
 
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetLeftMinorGrid
+//
+// Description:		Sets the status of the left axis' minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetLeftMinorGrid(const bool &grid)
+{
+	plot->SetLeftYMinorGrid(grid);
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetRightMajorGrid
+//
+// Description:		Sets the status of the right axis' major grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetRightMajorGrid(const bool &grid)
+{
+	plot->SetRightYMajorGrid(grid);
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetRightMinorGrid
+//
+// Description:		Sets the status of the right axis' minor grid.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetRightMinorGrid(const bool &grid)
+{
+	plot->SetRightYMinorGrid(grid);
 	UpdateDisplay();
 }
 

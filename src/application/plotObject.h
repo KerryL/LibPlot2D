@@ -76,10 +76,14 @@ public:
 	void SetCurveProperties(const unsigned int &index, const Color &color,
 		const bool &visible, const bool &rightAxis, const unsigned int &size,
 		const int &markerSize);
-	void SetGrid(const bool &gridOn);
-	void SetXGrid(const bool &gridOn);
-	void SetLeftYGrid(const bool &gridOn);
-	void SetRightYGrid(const bool &gridOn);
+	void SetMajorGrid(const bool &gridOn);
+	void SetMinorGrid(const bool &gridOn);
+	void SetXMajorGrid(const bool &gridOn);
+	void SetXMinorGrid(const bool &gridOn);
+	void SetLeftYMajorGrid(const bool &gridOn);
+	void SetLeftYMinorGrid(const bool &gridOn);
+	void SetRightYMajorGrid(const bool &gridOn);
+	void SetRightYMinorGrid(const bool &gridOn);
 
 	void SetXLabel(wxString text);
 	void SetLeftYLabel(wxString text);
@@ -103,7 +107,8 @@ public:
 	const Axis* GetTopAxis(void) const { return axisTop; };
 	const Axis* GetLeftYAxis(void) const { return axisLeft; };
 	const Axis* GetRightYAxis(void) const { return axisRight; };
-	bool GetGrid(void);
+	bool GetMajorGrid(void);
+	bool GetMinorGrid(void);
 
 	void SetXLogarithmic(const bool &log);
 	void SetLeftLogarithmic(const bool &log);
@@ -159,6 +164,7 @@ private:
 	double AutoScaleLogAxis(double &min, double &max, const bool &forceLimits) const;
 	double AutoScaleLinearAxis(double &min, double &max, const int &maxTicks, const bool &forceLimits) const;
 	void RoundMinMax(double &min, double &max, const double &tickSpacing, const bool &forceLimits) const;
+	double ComputeMinorResolution(const double &min, const double &max, const double &majorResolution) const;
 
 	void FormatAxesBasics(void);
 	void FormatBottomBasics(const Axis::TickStyle &tickStyle);
