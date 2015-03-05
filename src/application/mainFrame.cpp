@@ -986,7 +986,7 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 	if (!atLeastOneFileLoaded)
 	{
 		for (i = 0; i < files.size(); i++)
-		delete files[i];
+			delete files[i];
 		return false;
 	}
 

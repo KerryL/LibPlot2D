@@ -172,6 +172,7 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 	if (!ExtractData(file, selectionInfo.selections, rawData, scales, errorString))
 	{
 		file.close();
+		delete [] rawData;
 		wxMessageBox(_T("Error during data extraction:\n") + errorString,
 			_T("Error Reading File"), wxICON_ERROR);
 		return false;
