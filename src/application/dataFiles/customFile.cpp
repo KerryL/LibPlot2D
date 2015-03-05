@@ -104,24 +104,26 @@ unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const
 //					and time-formatted data as special cases.
 //
 // Input Arguments:
-//		file	= std::ifstream& previously opened input stream to read from
-//		choices	= const wxArrayInt& indicating the user's choices
-//		factors	= std::vector<double>& containing the list of scaling factors
+//		file		= std::ifstream& previously opened input stream to read from
+//		choices		= const wxArrayInt& indicating the user's choices
+//		factors		= std::vector<double>& containing the list of scaling factors
 //
 // Output Arguments:
-//		rawData	= std::vector<double>* containing the data
+//		rawData		= std::vector<double>* containing the data
+//		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //==========================================================================
 bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
-	std::vector<double> *rawData, std::vector<double> &factors) const
+	std::vector<double> *rawData, std::vector<double> &factors,
+	wxString &errorString) const
 {
 	if (fileFormat.IsAsynchronous() || !fileFormat.GetTimeFormat().IsEmpty())
-		return ExtractSpecialData(file, choices, rawData, factors);
+		return ExtractSpecialData(file, choices, rawData, factors, errorString);
 
-	return DataFile::ExtractData(file, choices, rawData, factors);
+	return DataFile::ExtractData(file, choices, rawData, factors, errorString);
 }
 
 //==========================================================================
@@ -194,28 +196,30 @@ wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 //					special cases of asynchronous and time-formatted data.
 //
 // Input Arguments:
-//		file	= std::ifstream& previously opened input stream to read from
-//		choices	= const wxArrayInt& indicating the user's choices
-//		factors	= std::vector<double>& containing the list of scaling factors
+//		file		= std::ifstream& previously opened input stream to read from
+//		choices		= const wxArrayInt& indicating the user's choices
+//		factors		= std::vector<double>& containing the list of scaling factors
 //
 // Output Arguments:
-//		rawData	= std::vector<double>* containing the data
+//		rawData		= std::vector<double>* containing the data
+//		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //==========================================================================
 bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
-	std::vector<double> *rawData, std::vector<double> &factors) const
+	std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const
 {
 	std::string nextLine;
 	wxArrayString parsed;
 	unsigned int curveCount(choices.size() + 1);
+	unsigned int lineNumber(headerLines);
 	double timeZero(-1.0);
 
-	while (!file.eof())
+	while (std::getline(file, nextLine))
 	{
-		std::getline(file, nextLine);
+		lineNumber++;
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		if (parsed.size() < curveCount && parsed.size() > 0)
 		{
@@ -230,13 +234,19 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 
 		if (fileFormat.IsAsynchronous())
 		{
-			if (!ExtractAsynchronousData(timeZero, parsed, rawData, factors, choices))
+			if (!ExtractAsynchronousData(timeZero, parsed, rawData, factors, choices, errorString))
+			{
+				errorString.Append(wxString::Format(" at line %i", lineNumber));
 				return false;
+			}
 		}
 		else
 		{
-			if (!ExtractSynchronousData(timeZero, parsed, rawData, factors, choices))
+			if (!ExtractSynchronousData(timeZero, parsed, rawData, factors, choices, errorString))
+			{
+				errorString.Append(wxString::Format(" at line %i", lineNumber));
 				return false;
+			}
 		}
 	}
 
@@ -256,14 +266,16 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 //		choices		= const wxArrayInt&
 //
 // Output Arguments:
-//		rawData	= std::vector<double>* containing the data
+//		rawData		= std::vector<double>* containing the data
+//		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //==========================================================================
 bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &parsedLine,
-	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const
+	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
+	wxString& WXUNUSED(errorString)) const
 {
 	double time, value;
 	unsigned int set(0);
@@ -311,14 +323,16 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &
 //		choices		= const wxArrayInt&
 //
 // Output Arguments:
-//		rawData	= std::vector<double>* containing the data
+//		rawData		= std::vector<double>* containing the data
+//		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //==========================================================================
 bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
-	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const
+	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
+	wxString &errorString) const
 {
 	double time, value;
 	unsigned int i, set(0);
@@ -332,7 +346,10 @@ bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &p
 			value = time - timeZero;
 		}
 		else if (!parsedLine[i].ToDouble(&value))
+		{
+			errorString = _T("Failed to convert string to number");
 			return false;
+		}
 
 		if (i == 0 || ArrayContainsValue(i - 1, choices))
 		{

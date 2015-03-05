@@ -168,9 +168,12 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 	DoTypeSpecificProcessTasks();
 
 	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(selectionInfo.selections.size())];
-	if (!ExtractData(file, selectionInfo.selections, rawData, scales))
+	wxString errorString;
+	if (!ExtractData(file, selectionInfo.selections, rawData, scales, errorString))
 	{
-		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR);// TODO:  Display a line number here
+		file.close();
+		wxMessageBox(_T("Error during data extraction:\n") + errorString,
+			_T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}
 	file.close();
@@ -524,28 +527,31 @@ unsigned int DataFile::GetRawDataSize(const unsigned int &selectedCount) const
 //					the data the user selected for display.
 //
 // Input Arguments:
-//		file	= std::ifstream& previously opened input stream to read from
-//		choices	= const wxArrayInt& indicating the user's choices
-//		factors	= std::vector<double>& containing the list of scaling factors
+//		file		= std::ifstream& previously opened input stream to read from
+//		choices		= const wxArrayInt& indicating the user's choices
+//		factors		= std::vector<double>& containing the list of scaling factors
 //
 // Output Arguments:
-//		rawData	= std::vector<double>* containing the data
+//		rawData		= std::vector<double>* containing the data
+//		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //==========================================================================
 bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
-	std::vector<double> *rawData, std::vector<double> &factors) const
+	std::vector<double> *rawData, std::vector<double> &factors,
+	wxString &errorString) const
 {
 	std::string nextLine;
 	wxArrayString parsed;
 	unsigned int i, set, curveCount(choices.size() + 1);
+	unsigned int lineNumber(headerLines);
 	double tempDouble;
 	std::vector<double> newFactors(choices.size() + 1, 1.0);
-	while (!file.eof())
+	while (std::getline(file, nextLine))
 	{
-		std::getline(file, nextLine);
+		lineNumber++;
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		if (parsed.size() < curveCount)
 		{
@@ -558,10 +564,15 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		set = 0;
 		for (i = 0; i < parsed.size(); i++)
 		{
-			if (!parsed[i].ToDouble(&tempDouble))
-				return false;
 			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
 			{
+				if (!parsed[i].ToDouble(&tempDouble))
+				{
+					errorString.Printf("Failed to convert entry at row %i, column %i, to a number.",
+						lineNumber, i + 1);
+					return false;
+				}
+
 				rawData[set].push_back(tempDouble);
 				newFactors[set] = factors[i];// Update scales for cases where user didn't select a column
 				set++;

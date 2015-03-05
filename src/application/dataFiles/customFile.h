@@ -33,18 +33,20 @@ protected:
 
 	virtual wxArrayString CreateDelimiterList(void) const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors) const;
+		std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const;
 	virtual void AssembleDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const;
 	virtual void DoTypeSpecificLoadTasks(void);
 	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
 
 	bool ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors) const;
+		std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const;
 	bool ExtractAsynchronousData(double &timeZero, const wxArrayString &parsedLine,
-		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const;
+		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
+		wxString &errorString) const;
 	bool ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
-		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices) const;
+		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
+		wxString &errorString) const;
 	void AssembleAsynchronousDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
 };
 

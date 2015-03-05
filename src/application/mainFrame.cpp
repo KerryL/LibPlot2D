@@ -955,6 +955,7 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 	SelectionMap selectionInfoMap;
 	SelectionMap::const_iterator it;
 	DataFile::SelectionData selectionInfo;
+	bool atLeastOneFileLoaded(false);
 	for (i = 0; i < fileList.Count(); i++)
 	{
 		files[i] = GetDataFile(fileList[i]);
@@ -979,6 +980,14 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 			selectionInfo = it->second;
 
 		loaded[i] = selectionInfo.selections.Count() > 0 && files[i]->Load(selectionInfo);
+		atLeastOneFileLoaded = atLeastOneFileLoaded || loaded[i];
+	}
+
+	if (!atLeastOneFileLoaded)
+	{
+		for (i = 0; i < files.size(); i++)
+		delete files[i];
+		return false;
 	}
 
 	if (selectionInfo.removeExisting)
