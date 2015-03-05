@@ -368,6 +368,81 @@ void PlotObject::SetRightYMinorGrid(const bool &gridOn)
 
 //==========================================================================
 // Class:			PlotObject
+// Function:		SetXMajorResolution
+//
+// Description:		Sets the major resolution for the bottom axis.
+//
+// Input Arguments:
+//		resolution	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetXMajorResolution(const double &resolution)
+{
+	xMajorResolution = resolution;
+	if (resolution == 0.0 && xMin == xMinOriginal && xMax == xMaxOriginal)
+		autoScaleX = true;
+	else
+		autoScaleX = false;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetLeftYMajorResolution
+//
+// Description:		Sets the major resolution for the left axis.
+//
+// Input Arguments:
+//		resolution	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetLeftYMajorResolution(const double &resolution)
+{
+	yLeftMajorResolution = resolution;
+	if (resolution == 0.0 && yLeftMin == yLeftMinOriginal && yLeftMax == yLeftMaxOriginal)
+		autoScaleLeftY = true;
+	else
+		autoScaleLeftY = false;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetRightYMajorResolution
+//
+// Description:		Sets the major resolution for the right axis.
+//
+// Input Arguments:
+//		resolution	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetRightYMajorResolution(const double &resolution)
+{
+	yRightMajorResolution = resolution;
+	if (resolution == 0.0 && yRightMin == yRightMinOriginal && yRightMax == yRightMaxOriginal)
+		autoScaleRightY = true;
+	else
+		autoScaleRightY = false;
+}
+
+//==========================================================================
+// Class:			PlotObject
 // Function:		RemoveExistingPlots
 //
 // Description:		Deletes the existing plots.
@@ -468,10 +543,17 @@ void PlotObject::FormatPlot(void)
 	MatchYAxes();
 	FormatCurves();
 
+	const unsigned int maxXTicks(7);
+	const unsigned int maxYTicks(10);
+
+	double xMajor(xMajorResolution);
+	double yLeftMajor(yLeftMajorResolution);
+	double yRightMajor(yRightMajorResolution);
+
 	// Set up the axes resolution (and at the same time tweak the max and min)
-	double xMajor = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
-	double yLeftMajor = AutoScaleAxis(yLeftMin, yLeftMax, 10, axisLeft->IsLogarithmic(), !autoScaleLeftY);
-	double yRightMajor = AutoScaleAxis(yRightMin, yRightMax, 10, axisRight->IsLogarithmic(), !autoScaleRightY);
+	AutoScaleAxis(xMin, xMax, xMajor, maxXTicks, axisBottom->IsLogarithmic(), !autoScaleX);
+	AutoScaleAxis(yLeftMin, yLeftMax, yLeftMajor, maxYTicks, axisLeft->IsLogarithmic(), !autoScaleLeftY);
+	AutoScaleAxis(yRightMin, yRightMax, yRightMajor, maxYTicks, axisRight->IsLogarithmic(), !autoScaleRightY);
 
 	double xMinor = ComputeMinorResolution(xMin, xMax, xMajor, axisBottom->GetAxisLength());
 	double yLeftMinor = ComputeMinorResolution(yLeftMin, yLeftMax, yLeftMajor, axisLeft->GetAxisLength());
@@ -791,6 +873,7 @@ void PlotObject::MatchYAxes(void)
 		yRightMaxOriginal = yLeftMaxOriginal;
 		yRightMin = yLeftMin;
 		yRightMax = yLeftMax;
+		yRightMajorResolution = yLeftMajorResolution;
 	}
 	else if (!leftUsed && rightUsed)
 	{
@@ -799,6 +882,7 @@ void PlotObject::MatchYAxes(void)
 		yLeftMaxOriginal = yRightMaxOriginal;
 		yLeftMin = yRightMin;
 		yLeftMax = yRightMax;
+		yLeftMajorResolution = yRightMajorResolution;
 	}
 }
 
@@ -925,7 +1009,7 @@ void PlotObject::ValidateRangeLimits(double &min, double &max,
 	{
 		min = -1.0;
 		max = 1.0;
-		major = AutoScaleAxis(min, max, 7, false, !autoScale);
+		AutoScaleAxis(min, max, major, 7, false, !autoScale);// TODO:  Magic number here!
 		minor = major;
 	}
 }
@@ -1079,18 +1163,21 @@ void PlotObject::CheckAutoScaling()
 	{
 		xMin = xMinOriginal;
 		xMax = xMaxOriginal;
+		xMajorResolution = 0.0;
 	}
 
 	if (autoScaleLeftY)
 	{
 		yLeftMin = yLeftMinOriginal;
 		yLeftMax = yLeftMaxOriginal;
+		yLeftMajorResolution = 0.0;
 	}
 
 	if (autoScaleRightY)
 	{
 		yRightMin = yRightMinOriginal;
 		yRightMax = yRightMaxOriginal;
+		yRightMajorResolution = 0.0;
 	}
 }
 
@@ -1137,6 +1224,7 @@ void PlotObject::UpdateLimitValues(void)
 // Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
+//		majorRes	= double&
 //		maxTicks	= const int& specifying the maximum number of ticks to use
 //		logarithmic	= const bool& specifying whether or not to use a logarithmic scale
 //		forceLimits	= const bool& specifying whether or not to preserve the specified limits
@@ -1144,18 +1232,19 @@ void PlotObject::UpdateLimitValues(void)
 // Output Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
+//		majorRes	= double&
 //
 // Return Value:
-//		double, spacing between each tick mark for the axis (majorResolution)
+//		None
 //
 //==========================================================================
-double PlotObject::AutoScaleAxis(double &min, double &max, const int &maxTicks,
-	const bool &logarithmic, const bool &forceLimits) const
+void PlotObject::AutoScaleAxis(double &min, double &max, double &majorRes,
+	const int &maxTicks, const bool &logarithmic, const bool &forceLimits) const
 {
 	if (logarithmic)
-		return AutoScaleLogAxis(min, max, forceLimits);
-
-	return AutoScaleLinearAxis(min, max, maxTicks, forceLimits);
+		AutoScaleLogAxis(min, max, majorRes, forceLimits);
+	else
+		AutoScaleLinearAxis(min, max, majorRes, maxTicks, forceLimits);
 }
 
 //==========================================================================
@@ -1167,17 +1256,20 @@ double PlotObject::AutoScaleAxis(double &min, double &max, const int &maxTicks,
 // Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
+//		majorRes	= double&
 //		forceLimits	= const bool& specifying whether or not to preserve the specified limits
 //
 // Output Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
+//		majorRes	= double&
 //
 // Return Value:
-//		double, spacing between each tick mark for the axis (majorResolution)
+//		None
 //
 //==========================================================================
-double PlotObject::AutoScaleLogAxis(double &min, double &max, const bool &forceLimits) const
+void PlotObject::AutoScaleLogAxis(double &min, double &max, double &majorRes,
+	const bool &forceLimits) const
 {
 	if (!forceLimits)
 	{
@@ -1193,7 +1285,7 @@ double PlotObject::AutoScaleLogAxis(double &min, double &max, const bool &forceL
 			max = pow(10.0, ceil(log10(max)));
 	}
 
-	return 10.0;
+	majorRes = 10.0;
 }
 
 //==========================================================================
@@ -1205,18 +1297,21 @@ double PlotObject::AutoScaleLogAxis(double &min, double &max, const bool &forceL
 // Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
+//		majorRes	= double&
 //		maxTicks	= const int& specifying the maximum number of ticks to use
 //		forceLimits	= const bool& specifying whether or not to preserve the specified limits
 //
 // Output Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
 //		max			= double& specifying the maximum value for the axis (required for input and output)
+//		majorRes	= double&
 //
 // Return Value:
-//		double, spacing between each tick mark for the axis (majorResolution)
+//		None
 //
 //==========================================================================
-double PlotObject::AutoScaleLinearAxis(double &min, double &max, const int &maxTicks, const bool &forceLimits) const
+void PlotObject::AutoScaleLinearAxis(double &min, double &max, double &majorRes,
+	const int &maxTicks, const bool &forceLimits) const
 {
 	double range = max - min;
 	int orderOfMagnitude = (int)log10(range);
@@ -1231,11 +1326,7 @@ double PlotObject::AutoScaleLinearAxis(double &min, double &max, const int &maxT
 	// Scale the tick spacing so it is between 0.1 and 10.0
 	double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
 
-	// TODO:
-	// Adding this condition does allow us to specify exact axes limits, but it creates bugs
-	// with undoing zoom (and the results generally look ugly - might be nice to also allow
-	// user to specify major resolution)
-	//if (!forceLimits)
+	if (!forceLimits)
 	{
 		if (scaledSpacing > 5.0)
 			scaledSpacing = 10.0;
@@ -1254,10 +1345,9 @@ double PlotObject::AutoScaleLinearAxis(double &min, double &max, const int &maxT
 	}
 
 	tickSpacing = scaledSpacing * pow(10.0, orderOfMagnitude - 1);
-
-	RoundMinMax(min, max, tickSpacing, forceLimits);
-
-	return tickSpacing;
+	if (majorRes == 0.0)
+		majorRes = tickSpacing;
+	RoundMinMax(min, max, majorRes, forceLimits);
 }
 
 //==========================================================================
@@ -1360,14 +1450,11 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 void PlotObject::SetXMin(const double &_xMin)
 {
 	// If the both limits are at the original value, enable auto-scaling again
-	if (xMax == xMaxOriginal && _xMin == xMinOriginal)
+	if (xMax == xMaxOriginal && _xMin == xMinOriginal && xMajorResolution == 0.0)
 		autoScaleX = true;
 	else
-	{
-		// Make the assignment and disable auto-scaling
-		xMin = _xMin;
 		autoScaleX = false;
-	}
+	xMin = _xMin;
 }
 
 //==========================================================================
@@ -1388,15 +1475,12 @@ void PlotObject::SetXMin(const double &_xMin)
 //==========================================================================
 void PlotObject::SetXMax(const double &_xMax)
 {
-	// If the both limits are at the original value, enable auto-scaling again
-	if (xMin == xMinOriginal && _xMax == xMaxOriginal)
+	// If both limits are at the original value, enable auto-scaling again
+	if (xMin == xMinOriginal && _xMax == xMaxOriginal && xMajorResolution == 0.0)
 		autoScaleX = true;
 	else
-	{
-		// Make the assignment and disable auto-scaling
-		xMax = _xMax;
 		autoScaleX = false;
-	}
+	xMax = _xMax;
 }
 
 //==========================================================================
@@ -1417,15 +1501,12 @@ void PlotObject::SetXMax(const double &_xMax)
 //==========================================================================
 void PlotObject::SetLeftYMin(const double &_yMin)
 {
-	// If the both limits are at the original value, enable auto-scaling again
-	if (yLeftMax == yLeftMaxOriginal && _yMin == yLeftMinOriginal)
+	// If both limits are at the original value, enable auto-scaling again
+	if (yLeftMax == yLeftMaxOriginal && _yMin == yLeftMinOriginal && yLeftMajorResolution == 0.0)
 		autoScaleLeftY = true;
 	else
-	{
-		// Make the assignment and disable auto-scaling
-		yLeftMin = _yMin;
 		autoScaleLeftY = false;
-	}
+	yLeftMin = _yMin;
 }
 
 //==========================================================================
@@ -1446,15 +1527,12 @@ void PlotObject::SetLeftYMin(const double &_yMin)
 //==========================================================================
 void PlotObject::SetLeftYMax(const double &_yMax)
 {
-	// If the both limits are at the original value, enable auto-scaling again
-	if (yLeftMin == yLeftMinOriginal && _yMax == yLeftMaxOriginal)
+	// If both limits are at the original value, enable auto-scaling again
+	if (yLeftMin == yLeftMinOriginal && _yMax == yLeftMaxOriginal && yLeftMajorResolution == 0.0)
 		autoScaleLeftY = true;
 	else
-	{
-		// Make the assignment and disable auto-scaling
-		yLeftMax = _yMax;
 		autoScaleLeftY = false;
-	}
+	yLeftMax = _yMax;
 }
 
 //==========================================================================
@@ -1476,14 +1554,11 @@ void PlotObject::SetLeftYMax(const double &_yMax)
 void PlotObject::SetRightYMin(const double &_yMin)
 {
 	// If the both limits are at the original value, enable auto-scaling again
-	if (yRightMax == yRightMaxOriginal && _yMin == yRightMinOriginal)
+	if (yRightMax == yRightMaxOriginal && _yMin == yRightMinOriginal && yRightMajorResolution == 0.0)
 		autoScaleRightY = true;
 	else
-	{
-		// Make the assignment and disable auto-scaling
-		yRightMin = _yMin;
 		autoScaleRightY = false;
-	}
+	yRightMin = _yMin;
 }
 
 //==========================================================================
@@ -1505,14 +1580,11 @@ void PlotObject::SetRightYMin(const double &_yMin)
 void PlotObject::SetRightYMax(const double &_yMax)
 {
 	// If the both limits are at the original value, enable auto-scaling again
-	if (yRightMin == yRightMinOriginal && _yMax == yRightMaxOriginal)
+	if (yRightMin == yRightMinOriginal && _yMax == yRightMaxOriginal && yRightMajorResolution == 0.0)
 		autoScaleRightY = true;
 	else
-	{
-		// Make the assignment and disable auto-scaling
-		yRightMax = _yMax;
 		autoScaleRightY = false;
-	}
+	yRightMax = _yMax;
 }
 
 //==========================================================================
@@ -1536,6 +1608,10 @@ void PlotObject::ResetAutoScaling(void)
 	autoScaleX = true;
 	autoScaleLeftY = true;
 	autoScaleRightY = true;
+
+	xMajorResolution = 0.0;
+	yLeftMajorResolution = 0.0;
+	yRightMajorResolution = 0.0;
 }
 
 //==========================================================================

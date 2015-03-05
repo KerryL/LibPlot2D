@@ -378,10 +378,13 @@ bool PlotRenderer::ZoomChanged(void) const
 
 	if (lastZoom.xMin == plot->GetXMin() &&
 		lastZoom.xMax == plot->GetXMax() &&
+		lastZoom.xMajor == plot->GetXMajorResolution() &&
 		lastZoom.leftYMin == plot->GetLeftYMin() &&
 		lastZoom.leftYMax == plot->GetLeftYMax() &&
+		lastZoom.leftYMajor == plot->GetLeftYMajorResolution() &&
 		lastZoom.rightYMin == plot->GetRightYMin() &&
-		lastZoom.rightYMax == plot->GetRightYMax())
+		lastZoom.rightYMax == plot->GetRightYMax() &&
+		lastZoom.rightYMajor == plot->GetRightYMajorResolution())
 		return false;
 
 	return true;
@@ -412,10 +415,13 @@ void PlotRenderer::SaveCurrentZoom(void)
 
 	currentZoom.xMin = plot->GetXMin();
 	currentZoom.xMax = plot->GetXMax();
+	currentZoom.xMajor = plot->GetXMajorResolution();
 	currentZoom.leftYMin = plot->GetLeftYMin();
 	currentZoom.leftYMax = plot->GetLeftYMax();
+	currentZoom.leftYMajor = plot->GetLeftYMajorResolution();
 	currentZoom.rightYMin = plot->GetRightYMin();
 	currentZoom.rightYMax = plot->GetRightYMax();
+	currentZoom.rightYMajor = plot->GetRightYMajorResolution();
 
 	zoom.push(currentZoom);
 }
@@ -446,10 +452,13 @@ void PlotRenderer::UndoZoom(void)
 
 	plot->SetXMin(lastZoom.xMin);
 	plot->SetXMax(lastZoom.xMax);
+	plot->SetXMajorResolution(lastZoom.xMajor);
 	plot->SetLeftYMin(lastZoom.leftYMin);
 	plot->SetLeftYMax(lastZoom.leftYMax);
+	plot->SetLeftYMajorResolution(lastZoom.leftYMajor);
 	plot->SetRightYMin(lastZoom.rightYMin);
 	plot->SetRightYMax(lastZoom.rightYMax);
+	plot->SetRightYMajorResolution(lastZoom.rightYMajor);
 
 	UpdateDisplay();
 }
@@ -862,6 +871,138 @@ void PlotRenderer::SetRightMinorGrid(const bool &grid)
 {
 	plot->SetRightYMinorGrid(grid);
 	UpdateDisplay();
+	SaveCurrentZoom();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetBottomMajorResolution
+//
+// Description:		Sets the bottom axis' major resolution.
+//
+// Input Arguments:
+//		resolution	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetBottomMajorResolution(const double &resolution)
+{
+	plot->SetXMajorResolution(resolution);
+	UpdateDisplay();
+	SaveCurrentZoom();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetLeftMajorResolution
+//
+// Description:		Sets the left axis' major resolution.
+//
+// Input Arguments:
+//		resolution	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetLeftMajorResolution(const double &resolution)
+{
+	plot->SetLeftYMajorResolution(resolution);
+	UpdateDisplay();
+	SaveCurrentZoom();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetRightMajorResolution
+//
+// Description:		Sets the right axis' major resolution.
+//
+// Input Arguments:
+//		resolution	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetRightMajorResolution(const double &resolution)
+{
+	plot->SetRightYMajorResolution(resolution);
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetBottomMajorResolution
+//
+// Description:		Returns the bottom axis' major resolution.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotRenderer::GetBottomMajorResolution() const
+{
+	return plot->GetXMajorResolution();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetBottomMajorResolution
+//
+// Description:		Returns the left axis' major resolution.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotRenderer::GetLeftMajorResolution() const
+{
+	return plot->GetLeftYMajorResolution();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetBottomMajorResolution
+//
+// Description:		Returns the right axis' major resolution.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double PlotRenderer::GetRightMajorResolution() const
+{
+	return plot->GetRightYMajorResolution();
 }
 
 //==========================================================================
@@ -1174,7 +1315,6 @@ void PlotRenderer::AutoScaleRight()
 void PlotRenderer::SetXLabel(wxString text)
 {
 	plot->SetXLabel(text);
-
 	UpdateDisplay();
 }
 
@@ -1197,7 +1337,6 @@ void PlotRenderer::SetXLabel(wxString text)
 void PlotRenderer::SetLeftYLabel(wxString text)
 {
 	plot->SetLeftYLabel(text);
-
 	UpdateDisplay();
 }
 
@@ -1220,7 +1359,6 @@ void PlotRenderer::SetLeftYLabel(wxString text)
 void PlotRenderer::SetRightYLabel(wxString text)
 {
 	plot->SetRightYLabel(text);
-
 	UpdateDisplay();
 }
 
@@ -1243,7 +1381,6 @@ void PlotRenderer::SetRightYLabel(wxString text)
 void PlotRenderer::SetTitle(wxString text)
 {
 	plot->SetTitle(text);
-
 	UpdateDisplay();
 }
 

@@ -71,12 +71,21 @@ public:
 	void SetMajorGridOff(void);
 	void SetMinorGridOn(void);
 	void SetMinorGridOff(void);
+
 	void SetBottomMajorGrid(const bool &grid);
 	void SetLeftMajorGrid(const bool &grid);
 	void SetRightMajorGrid(const bool &grid);
 	void SetBottomMinorGrid(const bool &grid);
 	void SetLeftMinorGrid(const bool &grid);
 	void SetRightMinorGrid(const bool &grid);
+
+	void SetBottomMajorResolution(const double &resolution);
+	void SetLeftMajorResolution(const double &resolution);
+	void SetRightMajorResolution(const double &resolution);
+
+	double GetBottomMajorResolution() const;
+	double GetLeftMajorResolution() const;
+	double GetRightMajorResolution() const;
 
 	void SetGridColor(const Color &color);
 
@@ -180,10 +189,15 @@ protected:
 	{
 		double xMin;
 		double xMax;
+		double xMajor;
+
 		double leftYMin;
 		double leftYMax;
+		double leftYMajor;
+
 		double rightYMin;
 		double rightYMax;
+		double rightYMajor;
 	};
 
 	std::stack<Zoom> zoom;

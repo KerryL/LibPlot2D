@@ -76,6 +76,7 @@ public:
 	void SetCurveProperties(const unsigned int &index, const Color &color,
 		const bool &visible, const bool &rightAxis, const unsigned int &size,
 		const int &markerSize);
+
 	void SetMajorGrid(const bool &gridOn);
 	void SetMinorGrid(const bool &gridOn);
 	void SetXMajorGrid(const bool &gridOn);
@@ -84,6 +85,14 @@ public:
 	void SetLeftYMinorGrid(const bool &gridOn);
 	void SetRightYMajorGrid(const bool &gridOn);
 	void SetRightYMinorGrid(const bool &gridOn);
+
+	void SetXMajorResolution(const double &resolution);
+	void SetLeftYMajorResolution(const double &resolution);
+	void SetRightYMajorResolution(const double &resolution);
+
+	inline double GetXMajorResolution() const { return xMajorResolution; }
+	inline double GetLeftYMajorResolution() const { return yLeftMajorResolution; }
+	inline double GetRightYMajorResolution() const { return yRightMajorResolution; }
 
 	void SetXLabel(wxString text);
 	void SetLeftYLabel(wxString text);
@@ -147,6 +156,10 @@ private:
 	bool leftUsed;
 	bool rightUsed;
 
+	double xMajorResolution;
+	double yLeftMajorResolution;
+	double yRightMajorResolution;
+
 	// The actual plot objects
 	std::vector<PlotCurve*> plotList;
 	std::vector<const Dataset2D*> dataList;
@@ -159,10 +172,10 @@ private:
 	void FormatPlot(void);
 
 	// Handles the spacing of the axis ticks
-	double AutoScaleAxis(double &min, double &max, const int &maxTicks, const bool &logarithmic,
+	void AutoScaleAxis(double &min, double &max, double &majorRes, const int &maxTicks, const bool &logarithmic,
 		const bool &forceLimits = false) const;
-	double AutoScaleLogAxis(double &min, double &max, const bool &forceLimits) const;
-	double AutoScaleLinearAxis(double &min, double &max, const int &maxTicks, const bool &forceLimits) const;
+	void AutoScaleLogAxis(double &min, double &max, double &majorRes, const bool &forceLimits) const;
+	void AutoScaleLinearAxis(double &min, double &max, double &majorRes, const int &maxTicks, const bool &forceLimits) const;
 	void RoundMinMax(double &min, double &max, const double &tickSpacing, const bool &forceLimits) const;
 	double ComputeMinorResolution(const double &min, const double &max,
 		const double &majorResolution, const double &axisLength) const;

@@ -3136,7 +3136,18 @@ void MainFrame::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextSetMajorResolutionBottom(wxCommandEvent& WXUNUSED(event))
 {
-	// TODO:  Implement
+	double resolution(plotArea->GetBottomMajorResolution());
+	wxString resStr;
+	do {
+		resStr = wxGetTextFromUser(_T("Specify the major resolution (set to 0 for auto):"),
+			_T("Set Major Resolution"),
+			wxString::Format("%f", std::max(resolution, 0.0)), this);
+		if (resStr.IsEmpty())
+			return;
+		resStr.ToDouble(&resolution);
+	} while (resolution < 0.0);
+
+	plotArea->SetBottomMajorResolution(resolution);
 }
 
 //==========================================================================
@@ -3241,7 +3252,18 @@ void MainFrame::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextSetMajorResolutionLeft(wxCommandEvent& WXUNUSED(event))
 {
-	// TODO:  Implement
+	double resolution(plotArea->GetLeftMajorResolution());
+	wxString resStr;
+	do {
+		resStr = wxGetTextFromUser(_T("Specify the major resolution (set to 0 for auto):"),
+			_T("Set Major Resolution"),
+			wxString::Format("%f", std::max(resolution, 0.0)), this);
+		if (resStr.IsEmpty())
+			return;
+		resStr.ToDouble(&resolution);
+	} while (resolution < 0.0);
+
+	plotArea->SetLeftMajorResolution(resolution);
 }
 
 //==========================================================================
@@ -3346,7 +3368,18 @@ void MainFrame::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextSetMajorResolutionRight(wxCommandEvent& WXUNUSED(event))
 {
-	// TODO:  Implement
+	double resolution(plotArea->GetRightMajorResolution());
+	wxString resStr;
+	do {
+		resStr = wxGetTextFromUser(_T("Specify the major resolution (set to 0 for auto):"),
+			_T("Set Major Resolution"),
+			wxString::Format("%f", std::max(resolution, 0.0)), this);
+		if (resStr.IsEmpty())
+			return;
+		resStr.ToDouble(&resolution);
+	} while (resolution < 0.0);
+
+	plotArea->SetRightMajorResolution(resolution);
 }
 
 //==========================================================================

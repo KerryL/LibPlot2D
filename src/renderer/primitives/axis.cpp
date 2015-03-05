@@ -228,6 +228,8 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 	}
 	else
 	{
+		assert(majorResolution > 0.0);
+		assert(minorResolution > 0.0);
 		tickCount = (unsigned int)((maximum - minimum) / majorResolution + 0.5) - 1;
 		if (gridCount)
 			*gridCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
