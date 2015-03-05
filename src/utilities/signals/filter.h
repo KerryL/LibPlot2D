@@ -51,6 +51,7 @@ public:
 	static std::vector<double> CoefficientsFromString(const std::string &s);
 
 	static double ComputeSteadyStateGain(const std::string &num, const std::string &den);
+	double ComputeSteadyStateGain() const;
 
 private:
 	// Filter coefficients

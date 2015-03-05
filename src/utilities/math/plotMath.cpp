@@ -390,7 +390,7 @@ unsigned int PlotMath::GetPrecision(const double &value,
 
 	const unsigned int sSize(512);
 	char s[sSize];
-	KRLsprintf(s, sSize, "%0.*f", precision, value);
+	sprintf(s, sSize, "%0.*f", precision, value);
 
 	std::string number(s);
 	unsigned int i;
@@ -459,7 +459,7 @@ unsigned int PlotMath::CountSignificantDigits(const wxString &valueString)
 
 //==========================================================================
 // Namespace:		PlotMath
-// Function:		KRLsprintf
+// Function:		sprintf
 //
 // Description:		Cross-platform friendly sprintf(_s) macro.  Calls sprintf_s
 //					under MSW, sprintf otherwise.
@@ -477,9 +477,9 @@ unsigned int PlotMath::CountSignificantDigits(const wxString &valueString)
 //
 //==========================================================================
 #ifdef __WXMSW__
-void PlotMath::KRLsprintf(char *dest, const unsigned int &size, const char *format, ...)
+void PlotMath::sprintf(char *dest, const unsigned int &size, const char *format, ...)
 #else
-void PlotMath::KRLsprintf(char *dest, const unsigned int&, const char *format, ...)
+void PlotMath::sprintf(char *dest, const unsigned int&, const char *format, ...)
 #endif
 {
 	va_list list;

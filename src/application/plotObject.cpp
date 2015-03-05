@@ -1315,7 +1315,7 @@ void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing
 // Class:			PlotObject
 // Function:		ComputeMinorResolution
 //
-// Description:		Returns the title text.
+// Description:		Returns the optimal minor resolution for the axis.
 //
 // Input Arguments:
 //		min				= const double&

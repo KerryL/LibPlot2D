@@ -72,7 +72,7 @@ namespace PlotMath
 
 	unsigned int CountSignificantDigits(const wxString &valueString);
 
-	void KRLsprintf(char *dest, const unsigned int &size, const char *format, ...);
+	void sprintf(char *dest, const unsigned int &size, const char *format, ...);
 }
 
 // Template methods must be defined here:

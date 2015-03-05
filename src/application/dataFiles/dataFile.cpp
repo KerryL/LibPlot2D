@@ -170,7 +170,7 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(selectionInfo.selections.size())];
 	if (!ExtractData(file, selectionInfo.selections, rawData, scales))
 	{
-		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR);
+		wxMessageBox(_T("Error during data extraction."), _T("Error Reading File"), wxICON_ERROR);// TODO:  Display a line number here
 		return false;
 	}
 	file.close();

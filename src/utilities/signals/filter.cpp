@@ -184,7 +184,7 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	const unsigned int tempSize(256);
 	char temp[tempSize];
 
-	PlotMath::KRLsprintf(temp, tempSize, "(%f*(1+z^-1))", 1.0 / sampleRate);
+	PlotMath::sprintf(temp, tempSize, "(%f*(1+z^-1))", 1.0 / sampleRate);
 	std::string posBilinTerm(temp), negBilinTerm("(2*(1-z^-1))");
 	std::string result;
 
@@ -193,7 +193,7 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	{
 		if (PlotMath::IsZero(coefficients[i]))
 			continue;
-		PlotMath::KRLsprintf(temp, tempSize, "%f", coefficients[i]);
+		PlotMath::sprintf(temp, tempSize, "%f", coefficients[i]);
 		if (!result.empty() && coefficients[i] > 0.0)
 			result.append("+");
 		result.append(temp);
@@ -202,14 +202,14 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 			result.append("*" + negBilinTerm);
 		if (coefficients.size() - 1 > 1 + i)
 		{
-			PlotMath::KRLsprintf(temp, tempSize, "^%lu", coefficients.size() - i - 1);
+			PlotMath::sprintf(temp, tempSize, "^%lu", coefficients.size() - i - 1);
 			result.append(temp);
 		}
 		if (highestPower + i > coefficients.size() - 1)
 			result.append("*" + posBilinTerm);
 		if (highestPower + i > coefficients.size())
 		{
-			PlotMath::KRLsprintf(temp, tempSize, "^%lu", highestPower - coefficients.size() + 1 + i);
+			PlotMath::sprintf(temp, tempSize, "^%lu", highestPower - coefficients.size() + 1 + i);
 			result.append(temp);
 		}
 	}
@@ -305,7 +305,7 @@ void Filter::Initialize(const double &initialValue)
 		u[i] = initialValue;
 
 	for (i = 0; i < outSize; i++)
-		y[i] = initialValue;
+		y[i] = initialValue * ComputeSteadyStateGain();
 }
 
 //==========================================================================
@@ -576,4 +576,36 @@ double Filter::ComputeSteadyStateGain(const std::string &num, const std::string 
 	// When evaluating for s=0, everything except the polynomial's constant term drops out
 	return numeratorCoefficients[numeratorCoefficients.size() - 1 - essesToCancel] /
 		denominatorCoefficients[denominatorCoefficients.size() - 1 - essesToCancel];
+}
+
+//==========================================================================
+// Class:			Filter
+// Function:		ComputeSteadyStateGain
+//
+// Description:		Returns the steady-state value resluting from a unity step
+//					input.  Returns zero if the results of this analysis are
+//					not guaranteed valid (i.e. if the steady-state gain is
+//					undefined).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Filter::ComputeSteadyStateGain() const
+{
+	double numeratorSum(0.0);
+	double denominatorSum(1.0);
+	unsigned int i;
+	for (i = 0; i < inSize; i++)
+		numeratorSum += a[i];
+	for (i = 1; i < outSize; i++)
+		denominatorSum += b[i - 1];
+
+	return numeratorSum / denominatorSum;
 }
