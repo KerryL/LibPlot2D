@@ -93,6 +93,8 @@ public:
 	inline const Axis* GetAxisAtMaxEnd(void) const { return maxAxis; };
 	inline const Axis* GetOppositeAxis(void) const { return oppositeAxis; };
 
+	unsigned int GetAxisLength() const;
+
 	inline wxString GetLabel(void) const { return label; };
 
 	inline bool IsLogarithmic(void) const { return logarithmic; };

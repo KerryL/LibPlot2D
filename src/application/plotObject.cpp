@@ -470,11 +470,12 @@ void PlotObject::FormatPlot(void)
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
 	double xMajor = AutoScaleAxis(xMin, xMax, 7, axisBottom->IsLogarithmic(), !autoScaleX);
-	double xMinor = ComputeMinorResolution(xMin, xMax, xMajor);
 	double yLeftMajor = AutoScaleAxis(yLeftMin, yLeftMax, 10, axisLeft->IsLogarithmic(), !autoScaleLeftY);
-	double yLeftMinor = ComputeMinorResolution(yLeftMin, yLeftMax, yLeftMajor);
 	double yRightMajor = AutoScaleAxis(yRightMin, yRightMax, 10, axisRight->IsLogarithmic(), !autoScaleRightY);
-	double yRightMinor = ComputeMinorResolution(yRightMin, yRightMax, yRightMajor);
+
+	double xMinor = ComputeMinorResolution(xMin, xMax, xMajor, axisBottom->GetAxisLength());
+	double yLeftMinor = ComputeMinorResolution(yLeftMin, yLeftMax, yLeftMajor, axisLeft->GetAxisLength());
+	double yRightMinor = ComputeMinorResolution(yRightMin, yRightMax, yRightMajor, axisRight->GetAxisLength());
 
 	ValidateRangeLimits(xMin, xMax, autoScaleX, xMajor, xMinor);
 	ValidateRangeLimits(yLeftMin, yLeftMax, autoScaleLeftY, yLeftMajor, yLeftMinor);
@@ -1321,6 +1322,7 @@ void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing
 //		min				= const double&
 //		max				= const double&
 //		majorResolution	= const double&
+//		axisLength		= const double& on screen length (pixels)
 //
 // Output Arguments:
 //		None
@@ -1330,10 +1332,13 @@ void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing
 //
 //==========================================================================
 double PlotObject::ComputeMinorResolution(const double &min, const double &max,
-	const double &majorResolution) const
+	const double &majorResolution, const double &axisLength) const
 {
-	// TODO:  Need better algorithm for this
-	return majorResolution * 0.25;
+	const double idealDensity(1.0 / 30.0);// gridlines per pixel
+	unsigned int lines = idealDensity * axisLength;
+	double minorResolution = (max - min) / lines;
+	double majorMinorRatio = floor(majorResolution / minorResolution + 0.5);
+	return majorResolution / majorMinorRatio;
 }
 
 //==========================================================================

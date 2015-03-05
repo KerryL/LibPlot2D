@@ -901,3 +901,35 @@ double Axis::GetNextGridValue(const unsigned int &tick) const
 
 	return minimum + (double)tick * minorResolution;
 }
+
+//==========================================================================
+// Class:			Axis
+// Function:		GetAxisLength
+//
+// Description:		Returns the length of the axis in pixels.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int Axis::GetAxisLength() const
+{
+	if (orientation == OrientationTop || orientation == OrientationBottom)
+	{
+		return renderWindow.GetSize().GetWidth()
+			- minAxis->GetOffsetFromWindowEdge()
+			- maxAxis->GetOffsetFromWindowEdge();
+	}
+	else
+	{
+		return renderWindow.GetSize().GetHeight()
+			- minAxis->GetOffsetFromWindowEdge()
+			- maxAxis->GetOffsetFromWindowEdge();
+	}
+}
