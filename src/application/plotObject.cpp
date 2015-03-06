@@ -385,10 +385,6 @@ void PlotObject::SetRightYMinorGrid(const bool &gridOn)
 void PlotObject::SetXMajorResolution(const double &resolution)
 {
 	xMajorResolution = resolution;
-	if (resolution == 0.0 && xMin == xMinOriginal && xMax == xMaxOriginal)
-		autoScaleX = true;
-	else
-		autoScaleX = false;
 }
 
 //==========================================================================
@@ -410,10 +406,6 @@ void PlotObject::SetXMajorResolution(const double &resolution)
 void PlotObject::SetLeftYMajorResolution(const double &resolution)
 {
 	yLeftMajorResolution = resolution;
-	if (resolution == 0.0 && yLeftMin == yLeftMinOriginal && yLeftMax == yLeftMaxOriginal)
-		autoScaleLeftY = true;
-	else
-		autoScaleLeftY = false;
 }
 
 //==========================================================================
@@ -435,10 +427,6 @@ void PlotObject::SetLeftYMajorResolution(const double &resolution)
 void PlotObject::SetRightYMajorResolution(const double &resolution)
 {
 	yRightMajorResolution = resolution;
-	if (resolution == 0.0 && yRightMin == yRightMinOriginal && yRightMax == yRightMaxOriginal)
-		autoScaleRightY = true;
-	else
-		autoScaleRightY = false;
 }
 
 //==========================================================================
@@ -1428,6 +1416,8 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 	unsigned int lines = idealDensity * axisLength;
 	double minorResolution = (max - min) / lines;
 	double majorMinorRatio = floor(majorResolution / minorResolution + 0.5);
+	if (majorMinorRatio == 0.0)
+		return majorResolution;
 	return majorResolution / majorMinorRatio;
 }
 

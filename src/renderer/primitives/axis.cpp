@@ -228,8 +228,8 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 	}
 	else
 	{
-		assert(majorResolution > 0.0);
-		assert(minorResolution > 0.0);
+		assert(majorResolution > 0.0 && PlotMath::IsValid(majorResolution));
+		assert(minorResolution > 0.0 && PlotMath::IsValid(minorResolution));
 		tickCount = (unsigned int)((maximum - minimum) / majorResolution + 0.5) - 1;
 		if (gridCount)
 			*gridCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
@@ -443,7 +443,8 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
-	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
+	// The first inside tick never needs to be drawn
+	// The last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
 	int location;
 	for (tick = 1; tick <= count; tick++)
