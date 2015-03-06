@@ -174,6 +174,8 @@ private:
 	// transparent objects are at the end
 	void SortPrimitivesByAlpha(void);
 
+	void SortPrimitivesByDrawOrder();
+
 protected:
 	// Flag indicating whether or not this is a 3D rendering
 	bool view3D;

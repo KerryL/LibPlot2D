@@ -127,6 +127,8 @@ public:
 
 	unsigned int GetCurveCount(void) const { return plotList.size(); };
 
+	FTFont* GetAxisFont() const { return axisFont; }
+
 private:
 	// The renderer object
 	PlotRenderer &renderer;

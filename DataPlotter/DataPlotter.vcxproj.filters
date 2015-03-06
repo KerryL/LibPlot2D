@@ -186,6 +186,9 @@
     <ClInclude Include="..\src\utilities\arrayStringCompare.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\renderer\primitives\legend.h">
+      <Filter>Header Files\renderer\primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="../src\renderer\primitives\axis.cpp">
@@ -310,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="..\src\utilities\arrayStringCompare.cpp">
       <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\primitives\legend.cpp">
+      <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

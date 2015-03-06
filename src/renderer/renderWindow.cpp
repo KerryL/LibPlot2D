@@ -208,6 +208,8 @@ void RenderWindow::Render()
 	if (!view3D)// For 3D views, we need to render back-to-front
 		SortPrimitivesByAlpha();
 
+	SortPrimitivesByDrawOrder();
+
 	unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 		primitiveList[i]->Draw();
@@ -1093,7 +1095,38 @@ void RenderWindow::SortPrimitivesByAlpha(void)
 		order.push_back(primitiveOrder[i].i);
 
 	primitiveList.ReorderObjects(order);
+}
 
+//==========================================================================
+// Class:			RenderWindow
+// Function:		SortPrimitivesByDrawOrder
+//
+// Description:		Sorts the PrimitiveList by draw order.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::SortPrimitivesByDrawOrder()
+{
+	unsigned int i;
+	std::vector<ListItem> primitiveOrder;
+	for (i = 0; i < primitiveList.GetCount(); i++)
+		primitiveOrder.push_back(ListItem(primitiveList[i]->GetDrawOrder(), i));
+
+	std::stable_sort(primitiveOrder.begin(), primitiveOrder.end());
+
+	std::vector<unsigned int> order;
+	for (i = 0; i < primitiveOrder.size(); i++)
+		order.push_back(primitiveOrder[i].i);
+
+	primitiveList.ReorderObjects(order);
 }
 
 //==========================================================================

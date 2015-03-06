@@ -24,6 +24,7 @@
 #include "renderer/primitives/zoomBox.h"
 #include "renderer/primitives/plotCursor.h"
 #include "renderer/primitives/axis.h"
+#include "renderer/primitives/legend.h"
 
 //==========================================================================
 // Class:			PlotRenderer
@@ -54,6 +55,7 @@ PlotRenderer::PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFram
 
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
+	draggingLegend = false;
 
 	ignoreNextMouseMove = false;
 }
@@ -153,13 +155,44 @@ void PlotRenderer::UpdateDisplay(void)
 //==========================================================================
 void PlotRenderer::CreateActors(void)
 {
-	// Create plot area
 	plot = new PlotObject(*this);
 
 	// Also create the zoom box and cursors, even though they aren't drawn yet
 	zoomBox = new ZoomBox(*this);
 	leftCursor = new PlotCursor(*this, *plot->GetBottomAxis());
 	rightCursor = new PlotCursor(*this, *plot->GetBottomAxis());
+
+	if (plot->GetAxisFont())
+	{
+		plot->Update();// Need to make sure sizes update before we reference them to position the legend
+		const unsigned int offset(5);
+		legend = new Legend(*this);
+		legend->SetFont(plot->GetAxisFont());
+		legend->SetAnchor(Legend::TopRight);
+		legend->SetPositionReference(Legend::RefTopRight);
+		legend->SetPosition(plot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
+			plot->GetTopAxis()->GetOffsetFromWindowEdge() + offset);
+		// TODO:  Set legend to be invisible until we need it?
+
+		Legend::LegendEntryInfo info;
+		std::vector<Legend::LegendEntryInfo> e;
+		info.color = Color::ColorRed;
+		info.size = 2;
+		info.text = _T("Red 2");
+		e.push_back(info);
+
+		info.color = Color::ColorBlue;
+		info.size = 1;
+		info.text = _T("Blue 1");
+		e.push_back(info);
+
+		info.color = Color::ColorBlack;
+		info.size = 3;
+		info.text = _T("Black 3");
+		e.push_back(info);
+		legend->SetContents(e);
+		// TODO:  Remove this; also need to find way to update legend as curves are added/removed
+	}
 }
 
 //==========================================================================
@@ -187,6 +220,9 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 		leftCursor->SetVisibility(true);
 	if (rightCursor->GetIsVisible())
 		rightCursor->SetVisibility(true);
+
+	if (legend)
+		legend->SetModified();
 
 	UpdateDisplay();
 
@@ -279,7 +315,9 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	if (draggingLeftCursor)
+	if (draggingLegend)
+		legend->SetDeltaPosition(event.GetX() - lastMousePosition[0], lastMousePosition[1] - event.GetY());
+	else if (draggingLeftCursor)
 		leftCursor->SetLocation(event.GetX());
 	else if (draggingRightCursor)
 		rightCursor->SetLocation(event.GetX());
@@ -1406,6 +1444,7 @@ void PlotRenderer::OnMouseLeaveWindowEvent(wxMouseEvent& WXUNUSED(event))
 	if (zoomBox->GetIsVisible())
 		zoomBox->SetVisibility(false);
 
+	draggingLegend = false;
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
 
@@ -1464,8 +1503,10 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 {
-	// Check to see if we're on a cursor
-	if (leftCursor->IsUnder(event.GetX()))
+	// Check to see if we're on a cursor or the legend
+	if (legend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
+		draggingLegend = true;
+	else if (leftCursor->IsUnder(event.GetX()))
 		draggingLeftCursor = true;
 	else if (rightCursor->IsUnder(event.GetX()))
 		draggingRightCursor = true;
@@ -1489,6 +1530,7 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 {
+	draggingLegend = false;
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
 

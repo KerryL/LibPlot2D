@@ -245,6 +245,7 @@
     <ClInclude Include="../src\utilities\signals\filter.h" />
     <ClInclude Include="../src\utilities\signals\integral.h" />
     <ClInclude Include="../src\utilities\signals\rms.h" />
+    <ClInclude Include="..\src\renderer\primitives\legend.h" />
     <ClInclude Include="..\src\utilities\arrayStringCompare.h" />
   </ItemGroup>
   <ItemGroup>
@@ -288,6 +289,7 @@
     <ClCompile Include="../src\utilities\signals\filter.cpp" />
     <ClCompile Include="../src\utilities\signals\integral.cpp" />
     <ClCompile Include="../src\utilities\signals\rms.cpp" />
+    <ClCompile Include="..\src\renderer\primitives\legend.cpp" />
     <ClCompile Include="..\src\utilities\arrayStringCompare.cpp" />
   </ItemGroup>
   <ItemGroup>

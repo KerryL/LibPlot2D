@@ -45,6 +45,8 @@ Primitive::Primitive(RenderWindow &_renderWindow) : renderWindow(_renderWindow)
 	// Initialize the list index to zero
 	listIndex = 0;
 
+	drawOrder = 0;
+
 	// Add this object to the renderer
 	renderWindow.AddActor(this);
 }

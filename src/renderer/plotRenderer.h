@@ -32,6 +32,7 @@ class MainFrame;
 class Dataset2D;
 class ZoomBox;
 class PlotCursor;
+class Legend;
 
 class PlotRenderer : public RenderWindow
 {
@@ -164,9 +165,11 @@ private:
 	ZoomBox *zoomBox;
 	PlotCursor *leftCursor;
 	PlotCursor *rightCursor;
+	Legend *legend;
 
 	bool draggingLeftCursor;
 	bool draggingRightCursor;
+	bool draggingLegend;
 
 protected:
 	void ProcessZoom(wxMouseEvent &event);

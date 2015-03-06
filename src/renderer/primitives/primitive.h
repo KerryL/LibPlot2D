@@ -46,9 +46,11 @@ public:
 	void SetVisibility(const bool &_isVisible);
 	void SetColor(const Color &_color);
 	Color GetColor(void) { return color; };
+	void SetDrawOrder(const unsigned int &drawOrder) { this->drawOrder = drawOrder; };
 	void SetModified(void) { modified = true; };// Forces a re-draw
 
 	bool GetIsVisible(void) const { return isVisible; };
+	unsigned int GetDrawOrder() const { return drawOrder; }
 
 	// Overloaded operators
 	Primitive& operator = (const Primitive &primitive);
@@ -72,6 +74,7 @@ protected:
 private:
 	// The openGL list index
 	unsigned int listIndex;
+	unsigned int drawOrder;
 };
 
 #endif// _PRIMITIVE_H_
