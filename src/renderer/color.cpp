@@ -21,6 +21,7 @@
 
 // Local headers
 #include "renderer/color.h"
+#include "utilities/math/plotMath.h"
 
 //==========================================================================
 // Class:			Color
@@ -55,10 +56,10 @@ Color::Color()
 //					as specified by the arguments.
 //
 // Input Arguments:
-//		_red	= const double& specifying the amount of red in this color (0.0 - 1.0)
-//		_green	= const double& specifying the amount of green in this color (0.0 - 1.0)
-//		_blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
-//		_alpha	= double specifying the opacity of this color (0.0 - 1.0)
+//		red	= const double& specifying the amount of red in this color (0.0 - 1.0)
+//		green	= const double& specifying the amount of green in this color (0.0 - 1.0)
+//		blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
+//		alpha	= const double& specifying the opacity of this color (0.0 - 1.0)
 //
 // Output Arguments:
 //		None
@@ -67,35 +68,10 @@ Color::Color()
 //		None
 //
 //==========================================================================
-Color::Color(const double &_red, const double &_green, const double &_blue, double _alpha)
+Color::Color(const double &red, const double &green, const double &blue, const double &alpha)
 {
-	// Assign the arguments to the class members
-	red = _red;
-	green = _green;
-	blue = _blue;
-	alpha = _alpha;
-
+	Set(red, green, blue, alpha);
 	ValidateColor();
-}
-
-//==========================================================================
-// Class:			Color
-// Function:		Color
-//
-// Description:		Destructor for the Color class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-Color::~Color()
-{
 }
 
 //==========================================================================
@@ -138,15 +114,114 @@ const Color Color::ColorGray(0.5, 0.5, 0.5);
 
 //==========================================================================
 // Class:			Color
-// Function:		Set
+// Function:		GetHue
 //
-// Description:		Sets the RGBA values for this color.
+// Description:		Returns the hue for the color.
 //
 // Input Arguments:
-//		_red	= const double& specifying the amount of red in this color (0.0 - 1.0)
-//		_green	= const double& specifying the amount of green in this color (0.0 - 1.0)
-//		_blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
-//		_alpha	= double specifying the opacity of this color (0.0 - 1.0)
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Color::GetHue() const
+{
+	double chroma(GetChroma());
+	if (chroma == 0.0)
+		return 0.0;// Undefined
+
+	double maxColor = std::max(red, std::max(green, blue));
+
+	if (maxColor == red)
+		return fmod((green - blue) / chroma / 6.0, 1.0);
+	else if (maxColor == green)
+		return fmod(((blue - red) / chroma + 2.0) / 6.0, 1.0);
+	else
+		return fmod(((red - green) / chroma + 4.0) / 6.0, 1.0);
+}
+
+//==========================================================================
+// Class:			Color
+// Function:		GetSaturation
+//
+// Description:		Returns the saturation for the color.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Color::GetSaturation() const
+{
+	const double lum(GetLightness());
+	if (lum == 0.0 || lum == 1.0)
+		return 0.0;
+
+	return GetChroma() / (1.0 - fabs(2.0 * lum - 1.0));
+}
+
+//==========================================================================
+// Class:			Color
+// Function:		GetLightness
+//
+// Description:		Returns the lightness for the color (uses Rec. 601 NTSC).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Color::GetLightness() const
+{
+	return 0.5 * (std::max(red, std::max(green, blue)) + std::min(red, std::min(green, blue)));
+}
+
+//==========================================================================
+// Class:			Color
+// Function:		GetChroma
+//
+// Description:		Returns the chroma for the color.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Color::GetChroma() const
+{
+	return std::max(red, std::max(green, blue)) - std::min(red, std::min(green, blue));
+}
+
+//==========================================================================
+// Class:			Color
+// Function:		SetHSL
+//
+// Description:		Sets the HSLA values for this color.
+//
+// Input Arguments:
+//		hue		= const double& (0 to 1, indication 0 to 360 deg)
+//		sat		= const double&
+//		lum		= const double&
+//		alpha	= const double& specifying the opacity of this color (0.0 - 1.0)
 //
 // Output Arguments:
 //		None
@@ -155,13 +230,82 @@ const Color Color::ColorGray(0.5, 0.5, 0.5);
 //		None
 //
 //==========================================================================
-void Color::Set(const double &_red, const double &_green, const double &_blue, double _alpha)
+void Color::SetHSL(const double &hue, const double &sat, const double &lum, const double &alpha)
 {
-	// Assign the arguments to the class members
-	red = _red;
-	green = _green;
-	blue = _blue;
-	alpha = _alpha;
+	double chroma = (1.0 - fabs(2.0 * lum - 1.0)) * sat;
+	double huePrime = hue * 6.0;
+	double x = chroma * (1.0 - fabs(fmod(huePrime, 2.0) - 1.0));
+
+	if (huePrime < 1.0)
+	{
+		red = chroma;
+		green = x;
+		blue = 0.0;
+	}
+	else if (huePrime < 2.0)
+	{
+		red = x;
+		green = chroma;
+		blue = 0.0;
+	}
+	else if (huePrime < 3.0)
+	{
+		red = 0.0;
+		green = chroma;
+		blue = x;
+	}
+	else if (huePrime < 4.0)
+	{
+		red = 0.0;
+		green = x;
+		blue = chroma;
+	}
+	else if (huePrime < 5.0)
+	{
+		red = x;
+		green = 0.0;
+		blue = chroma;
+	}
+	else
+	{
+		red = chroma;
+		green = 0.0;
+		blue = x;
+	}
+
+	double m = lum - 0.5 * chroma;
+	red += m;
+	green += m;
+	blue += m;
+
+	this->alpha = alpha;
+}
+
+//==========================================================================
+// Class:			Color
+// Function:		Set
+//
+// Description:		Sets the RGBA values for this color.
+//
+// Input Arguments:
+//		red		= const double& specifying the amount of red in this color (0.0 - 1.0)
+//		green	= const double& specifying the amount of green in this color (0.0 - 1.0)
+//		blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
+//		alpha	= double specifying the opacity of this color (0.0 - 1.0)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Color::Set(const double &red, const double &green, const double &blue, const double &alpha)
+{
+	this->red = red;
+	this->green = green;
+	this->blue = blue;
+	this->alpha = alpha;
 
 	ValidateColor();
 }
@@ -213,7 +357,6 @@ void Color::Set(const wxColor &color)
 void Color::SetAlpha(const double &_alpha)
 {
 	alpha = _alpha;
-
 	ValidateColor();
 }
 
@@ -233,12 +376,9 @@ void Color::SetAlpha(const double &_alpha)
 //		wxColor that matches this color
 //
 //==========================================================================
-wxColor Color::ToWxColor(void) const
+wxColor Color::ToWxColor() const
 {
-	// Return object
 	wxColor color;
-
-	// Do the conversion to a wxColor object
 	color.Set(char(red * 255), char(green * 255), char(blue * 255), char(alpha * 255));
 
 	return color;
@@ -261,29 +401,76 @@ wxColor Color::ToWxColor(void) const
 //		None
 //
 //==========================================================================
-void Color::ValidateColor(void)
+void Color::ValidateColor()
 {
-	// Check red
 	if (red < 0.0)
 		red = 0.0;
 	else if (red > 1.0)
 		red = 1.0;
 
-	// Check green
 	if (green < 0.0)
 		green = 0.0;
 	else if (green > 1.0)
 		green = 1.0;
 
-	// Check blue
 	if (blue < 0.0)
 		blue = 0.0;
 	else if (blue > 1.0)
 		blue = 1.0;
 
-	// Check alpha
 	if (alpha < 0.0)
 		alpha= 0.0;
 	else if (alpha > 1.0)
 		alpha = 1.0;
+}
+
+//==========================================================================
+// Class:			Color
+// Function:		GetColorHSL
+//
+// Description:		Returns a color matching the specified RGBA value.
+//
+// Input Arguments:
+//		hue		= const double&
+//		sat	= const double&
+//		lum	= const double&
+//		alpha	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Color
+//
+//==========================================================================
+Color Color::GetColorHSL(const double &hue, const double &sat, const double &lum, const double &alpha)
+{
+	Color c;
+	c.SetHSL(hue, sat, lum, alpha);
+	return c;
+}
+
+//==========================================================================
+// Class:			Color
+// Function:		GetColor
+//
+// Description:		Returns a color matching the specified RGBA value.
+//
+// Input Arguments:
+//		red		= const double&
+//		green	= const double&
+//		blue	= const double&
+//		alpha	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Color
+//
+//==========================================================================
+Color Color::GetColor(const double &red, const double &green, const double &blue, const double &alpha)
+{
+	Color c(red, green, blue, alpha);
+	return c;
 }

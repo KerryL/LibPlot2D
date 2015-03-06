@@ -533,7 +533,7 @@ double CreateSignalDialog::GetValue(const double &time)
 			!slopeTextBox->GetValue().ToDouble(&duty))
 			return 0.0;
 
-		double counter(PlotMath::Modulo(time + phase, period));
+		double counter(fmod(time + phase, period));
 
 		if (counter < duty * period)
 			return offset + amplitude * 0.5;
@@ -549,10 +549,10 @@ double CreateSignalDialog::GetValue(const double &time)
 			!phaseTimeTextBox->GetValue().ToDouble(&phase))
 			return 0.0;
 
-		if (PlotMath::Modulo(phase + time, period) < period * 0.5)
-			return 2.0 * amplitude * PlotMath::Modulo(phase + time, period * 0.5) / period + offset - amplitude * 0.5;
+		if (fmod(phase + time, period) < period * 0.5)
+			return 2.0 * amplitude * fmod(phase + time, period * 0.5) / period + offset - amplitude * 0.5;
 		else
-			return -2.0 * amplitude * PlotMath::Modulo(phase + time, period * 0.5) / period + offset + amplitude * 0.5;
+			return -2.0 * amplitude * fmod(phase + time, period * 0.5) / period + offset + amplitude * 0.5;
 	}
 	else if (lastSelection == SignalSawtooth)
 	{
@@ -563,7 +563,7 @@ double CreateSignalDialog::GetValue(const double &time)
 			!phaseTimeTextBox->GetValue().ToDouble(&phase))
 			return 0.0;
 
-		return amplitude * PlotMath::Modulo(phase + time, period) + offset - amplitude * 0.5;
+		return amplitude * fmod(phase + time, period) + offset - amplitude * 0.5;
 	}
 	else if (lastSelection == SignalChirp)
 	{
@@ -588,7 +588,7 @@ double CreateSignalDialog::GetValue(const double &time)
 			!finalValueTextBox->GetValue().ToDouble(&offset))
 			return 0.0;
 
-		return PlotMath::Modulo((double)rand() / RAND_MAX * amplitude, amplitude) + offset - amplitude * 0.5;
+		return fmod((double)rand() / RAND_MAX * amplitude, amplitude) + offset - amplitude * 0.5;
 	}
 
 	assert(false);

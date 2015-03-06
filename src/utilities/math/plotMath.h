@@ -61,9 +61,6 @@ namespace PlotMath
 	// Returns the sign of the argument
 	double Sign(const double &value);
 
-	// Modulo operator defined for doubles (so not really a modulo, I guess)
-	double Modulo(const double &value, const double &div);
-
 	Dataset2D ApplyBitMask(const Dataset2D &data, const unsigned int &bit);
 	unsigned int ApplyBitMask(const unsigned &value, const unsigned int &bit);
 

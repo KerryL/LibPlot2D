@@ -134,7 +134,7 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit, const doub
 //==========================================================================
 double PlotMath::RangeToPlusMinusPi(const double &angle)
 {
-	return Modulo(angle + pi, 2.0 * pi) - pi;
+	return fmod(angle + pi, 2.0 * pi) - pi;
 }
 
 //==========================================================================
@@ -156,7 +156,7 @@ double PlotMath::RangeToPlusMinusPi(const double &angle)
 //==========================================================================
 double PlotMath::RangeToPlusMinus180(const double &angle)
 {
-	return Modulo(angle + 180.0, 360.0) - 180.0;
+	return fmod(angle + 180.0, 360.0) - 180.0;
 }
 
 //==========================================================================
@@ -213,34 +213,6 @@ double PlotMath::Sign(const double &value)
 		return -1.0;
 	else
 		return 0.0;
-}
-
-//==========================================================================
-// Namespace:		PlotMath
-// Function:		Modulo
-//
-// Description:		Modulo for doubles.  Returns a value between zero and divisor.
-//
-// Input Arguments:
-//		value		= const double&
-//		div			= cosnt double&, divisor
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		double
-//
-//==========================================================================
-double PlotMath::Modulo(const double &value, const double &div)
-{
-	double modulo(value);
-	while (modulo >= fabs(div))
-		modulo -= div;
-	while (modulo < 0.0)
-		modulo += div;
-
-	return modulo;
 }
 
 //==========================================================================

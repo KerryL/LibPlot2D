@@ -745,7 +745,7 @@ const Dataset2D Dataset2D::operator%(const double &target) const
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
-		yData[i] = PlotMath::Modulo(yData[i], target);
+		yData[i] = fmod(yData[i], target);
 
 	return *this;
 }

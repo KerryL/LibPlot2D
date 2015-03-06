@@ -1164,7 +1164,7 @@ double ExpressionTree::ApplyOperation(const wxString &operation,
 	else if (operation.Cmp(_T("/")) == 0)
 		return second / first;
 	else if (operation.Cmp(_T("%")) == 0)
-		return PlotMath::Modulo(second, first);
+		return fmod(second, first);
 	else if (operation.Cmp(_T("^")) == 0)
 		return pow(second, first);
 

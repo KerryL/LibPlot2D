@@ -1402,35 +1402,33 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 //==========================================================================
 Color MainFrame::GetNextColor(const unsigned int &index) const
 {
-	unsigned int colorIndex = (index - 1) % 10;
+	unsigned int colorIndex = (index - 1) % 12;
 	if (colorIndex == 0)
-		return Color::ColorBlue;
+		return Color::GetColorHSL(0.0, 1.0, 0.5);// (red)
 	else if (colorIndex == 1)
-		return Color::ColorRed;
+		return Color::GetColorHSL(2.0 / 3.0, 1.0, 0.5);// (blue)
 	else if (colorIndex == 2)
-		return Color::ColorGreen;
+		return Color::GetColorHSL(1.0 / 3.0, 1.0, 0.5);// (green)
 	else if (colorIndex == 3)
-		return Color::ColorMagenta;
+		return Color::GetColorHSL(0.125, 1.0, 0.5);// (gold)
 	else if (colorIndex == 4)
-		return Color::ColorCyan;
+		return Color::GetColorHSL(0.5, 0.5, 0.5);// (teal)
 	else if (colorIndex == 5)
-		return Color::ColorOrange;
+		return Color::GetColorHSL(5.0 / 6.0, 1.0, 0.5);// (magenta)
 	else if (colorIndex == 6)
-		return Color::ColorGray;
+		return Color::GetColorHSL(0.0, 0.5, 0.6);// (reddish brown)
 	else if (colorIndex == 7)
-		return Color::ColorPurple;
+		return Color::GetColorHSL(0.73, 0.5, 0.5);// (purple)
 	else if (colorIndex == 8)
-		return Color::ColorLightBlue;
+		return Color::GetColorHSL(1.0 / 3.0, 0.5, 0.5);// (dark green)
 	else if (colorIndex == 9)
+		return Color::GetColorHSL(1.0 / 6.0, 0.3, 0.5);// (gold brown)
+	else if (colorIndex == 10)
+		return Color::GetColorHSL(0.875, 0.5, 0.5);// (light purple)
+	else if (colorIndex == 11)
 		return Color::ColorBlack;
 	else
 		assert(false);
-
-	// The following colors we opt'ed not to use - either too hard to see or too similar to other colors
-	// Color::ColorYellow
-	// Color::ColorDrabGreen
-	// Color::ColorPaleGreen
-	// Color::ColorPink
 
 	return Color::ColorBlack;
 }
