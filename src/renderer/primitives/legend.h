@@ -85,7 +85,8 @@ public:
 	{
 		wxString text;
 		Color color;
-		unsigned int size;
+		unsigned int lineSize;
+		int markerSize;
 	};
 
 	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; };
@@ -110,6 +111,7 @@ private:
 	void DrawBackground() const;
 	void DrawBorder() const;
 	void DrawCornerVertices() const;
+	void DrawMarker(const unsigned int &x, const unsigned int &y, const unsigned int &size) const;
 
 	void UpdateBoundingBox();
 	unsigned int height;

@@ -43,6 +43,7 @@
 #include "application/textInputDialog.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
+#include "renderer/primitives/legend.h"
 #include "utilities/dataset2D.h"
 #include "utilities/math/plotMath.h"
 #include "utilities/signals/integral.h"
@@ -402,6 +403,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(idPlotContextPaste,					MainFrame::ContextPaste)
 	EVT_MENU(idPlotContextMajorGridlines,			MainFrame::ContextToggleMajorGridlines)
 	EVT_MENU(idPlotContextMinorGridlines,			MainFrame::ContextToggleMinorGridlines)
+	EVT_MENU(idPlotContextShowLegend,				MainFrame::ContextToggleLegend)
 	EVT_MENU(idPlotContextAutoScale,				MainFrame::ContextAutoScale)
 	EVT_MENU(idPlotContextWriteImageFile,			MainFrame::ContextWriteImageFile)
 	EVT_MENU(idPlotContextExportData,				MainFrame::ContextExportData)
@@ -832,6 +834,7 @@ wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
 	contextMenu->AppendSeparator();
 	contextMenu->AppendCheckItem(idPlotContextMajorGridlines, _T("Major Gridlines"));
 	contextMenu->AppendCheckItem(idPlotContextMinorGridlines, _T("Minor Gridlines"));
+	contextMenu->AppendCheckItem(idPlotContextShowLegend, _T("Legend"));
 	contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
 	contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
 	contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));
@@ -847,6 +850,7 @@ wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
 
 	contextMenu->Check(idPlotContextMajorGridlines, plotArea->GetMajorGridOn());
 	contextMenu->Check(idPlotContextMinorGridlines, plotArea->GetMinorGridOn());
+	contextMenu->Check(idPlotContextShowLegend, plotArea->LegendIsVisible());
 
 	return contextMenu;
 }
@@ -1625,6 +1629,47 @@ void MainFrame::UpdateCurveProperties(const unsigned int &index, const Color &co
 	optionsGrid->GetCellValue(index + 1, colMarkerSize).ToLong(&markerSize);
 	plotArea->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
 	plotArea->SaveCurrentZoom();
+	
+	UpdateLegend();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		UpdateLegend
+//
+// Description:		Updates the contents of the legend actor.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::UpdateLegend()
+{
+	unsigned long lineSize;
+	long markerSize;
+	std::vector<Legend::LegendEntryInfo> entries;
+	Legend::LegendEntryInfo info;
+	unsigned int i;
+	for (i = 1; i < optionsGrid->GetNumberRows(); i++)
+	{
+		if (optionsGrid->GetCellValue(i, colVisible).IsEmpty())
+			continue;
+			
+		optionsGrid->GetCellValue(i, colLineSize).ToULong(&lineSize);
+		optionsGrid->GetCellValue(i, colMarkerSize).ToLong(&markerSize);
+		info.color = Color(optionsGrid->GetCellBackgroundColour(i, colColor));
+		info.lineSize = lineSize;
+		info.markerSize = markerSize;
+		info.text = optionsGrid->GetCellValue(i, colName);
+		entries.push_back(info);
+	}
+	plotArea->UpdateLegend(entries);
 }
 
 //==========================================================================
@@ -1691,6 +1736,8 @@ void MainFrame::GridCellChangeEvent(wxGridEvent &event)
 	if (row == 0 || (event.GetCol() != colLineSize && event.GetCol() != colMarkerSize))
 	{
 		event.Skip();
+		UpdateLegend();// Included in case of text changes
+		// TODO:  Why doesn't legend text update here?  Event hasn't propogated yet?
 		return;
 	}
 
@@ -2740,6 +2787,32 @@ void MainFrame::ContextToggleMinorGridlines(wxCommandEvent& WXUNUSED(event))
 		plotArea->SetMinorGridOff();
 	else
 		plotArea->SetMinorGridOn();
+
+	plotArea->UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		ContextToggleLegend
+//
+// Description:		Toggles legend visibility on and off.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::ContextToggleLegend(wxCommandEvent& WXUNUSED(event))
+{
+	if (plotArea->LegendIsVisible())
+		plotArea->SetLegendOff();
+	else
+		plotArea->SetLegendOn();
 
 	plotArea->UpdateDisplay();
 }

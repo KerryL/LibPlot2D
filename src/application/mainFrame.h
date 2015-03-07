@@ -153,6 +153,7 @@ private:
 		idPlotContextPaste,
 		idPlotContextMajorGridlines,
 		idPlotContextMinorGridlines,
+		idPlotContextShowLegend,
 		idPlotContextAutoScale,
 		idPlotContextWriteImageFile,
 		idPlotContextExportData,
@@ -230,6 +231,7 @@ private:
 	void ContextPaste(wxCommandEvent &event);
 	void ContextToggleMajorGridlines(wxCommandEvent &event);
 	void ContextToggleMinorGridlines(wxCommandEvent &event);
+	void ContextToggleLegend(wxCommandEvent &event);
 	void ContextAutoScale(wxCommandEvent &event);
 	void ContextWriteImageFile(wxCommandEvent &event);
 	void ContextExportData(wxCommandEvent &event);
@@ -284,6 +286,8 @@ private:
 
 	void UpdateSingleCursorValue(const unsigned int &row, double value,
 		const unsigned int &column, const bool &isVisible);
+		
+	void UpdateLegend();
 
 	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
 	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);

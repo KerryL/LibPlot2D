@@ -19,9 +19,11 @@
 
 // Standard C++ headers
 #include <stack>
+#include <vector>
 
 // Local headers
 #include "renderer/renderWindow.h"
+#include "renderer/primitives/legend.h"
 
 // wxWidgets forward declarations
 class wxString;
@@ -32,7 +34,6 @@ class MainFrame;
 class Dataset2D;
 class ZoomBox;
 class PlotCursor;
-class Legend;
 
 class PlotRenderer : public RenderWindow
 {
@@ -122,6 +123,11 @@ public:
 
 	bool GetMajorGridOn(void);
 	bool GetMinorGridOn(void);
+	
+	bool LegendIsVisible(void);
+	void SetLegendOn(void);
+	void SetLegendOff(void);
+	void UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entries);
 
 	// Called to update the screen
 	void UpdateDisplay(void);

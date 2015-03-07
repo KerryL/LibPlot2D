@@ -636,6 +636,97 @@ void PlotRenderer::SetMinorGridOff()
 
 //==========================================================================
 // Class:			PlotRenderer
+// Function:		LegendIsVisible
+//
+// Description:		Returns the status of the legend visibility.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool PlotRenderer::LegendIsVisible(void)
+{
+	if (!legend)
+		return false;
+	return legend->GetIsVisible();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetLegendOn
+//
+// Description:		Sets the legend to visible.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetLegendOn(void)
+{
+	if (!legend)
+		return;
+	legend->SetVisibility(true);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetLegendOff
+//
+// Description:		Sets the legend to invisible.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetLegendOff(void)
+{
+	if (!legend)
+		return;
+	legend->SetVisibility(false);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		UpdateLegend
+//
+// Description:		Updates the contents of the legend.
+//
+// Input Arguments:
+//		entries	= const std::vector<Legend::LegendEntryInfo>
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entries)
+{
+	if (legend)
+		legend->SetContents(entries);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
 // Function:		GetBottomMajorGrid
 //
 // Description:		Returns the status of the bottom major grid.

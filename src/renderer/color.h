@@ -28,6 +28,7 @@ public:
 	// Constructors
 	Color();
 	Color(const double &red, const double &green, const double &blue, const double &alpha = 1.0);
+	Color(const wxColor &c);
 
 	// The color accessors
 	inline double GetRed() const { return red; }

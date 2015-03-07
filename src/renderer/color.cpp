@@ -76,6 +76,29 @@ Color::Color(const double &red, const double &green, const double &blue, const d
 
 //==========================================================================
 // Class:			Color
+// Function:		Color
+//
+// Description:		Constructor for the Color class.  Sets the class contents
+//					as specified by the specified wxColor.
+//
+// Input Arguments:
+//		c	= const wxColor&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Color::Color(const wxColor &c)
+{
+	Set(c.Red() * 255.0, c.Green() * 255.0, c.Blue() * 255.0, c.Alpha() * 255.0);
+	ValidateColor();
+}
+
+//==========================================================================
+// Class:			Color
 // Function:		Constant Declarations
 //
 // Description:		Constants for the Color class.

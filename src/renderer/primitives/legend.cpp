@@ -129,6 +129,9 @@ bool Legend::HasValidParameters(void)
 {
 	if (!font)
 		return false;
+	else if (entries.size() == 0)
+		return false;
+		
 	return true;
 }
 
@@ -158,13 +161,17 @@ void Legend::DrawNextEntry(const double &index) const
 	y -= (entrySpacing + boundingBox.Upper().Y()) * (index + 1);
 
 	// Draw sample line
-	glLineWidth(entries[index].size);
+	const unsigned int lineYOffset(entrySpacing);
+	glLineWidth(entries[index].lineSize);
 	glBegin(GL_LINES);
 	glColor4f(entries[index].color.GetRed(), entries[index].color.GetGreen(),
 		entries[index].color.GetBlue(), entries[index].color.GetAlpha());
-	glVertex2i(x + entrySpacing, y + entrySpacing);
-	glVertex2i(x + entrySpacing + sampleLength, y + entrySpacing);
+	glVertex2i(x + entrySpacing, y + lineYOffset);
+	glVertex2i(x + entrySpacing + sampleLength, y + lineYOffset);
 	glEnd();
+	
+	if (entries[index].markerSize > 0)
+		DrawMarker(x + entrySpacing + sampleLength * 0.5, y + lineYOffset, entries[index].markerSize);
 
 	// Draw label text
 	glPushMatrix();
@@ -173,6 +180,36 @@ void Legend::DrawNextEntry(const double &index) const
 		glTranslated(x + 2 * entrySpacing + sampleLength, y, 0.0);
 		font->Render(entries[index].text.mb_str());
 	glPopMatrix();
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		DrawMarker
+//
+// Description:		Draws the marker at the specified location.
+//
+// Input Arguments:
+//		x		= const unsigned int &
+//		y		= const unsigned int &
+//		size	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::DrawMarker(const unsigned int &x, const unsigned int &y,
+	const unsigned int &size) const
+{
+	const unsigned int halfSize(size * 2);
+	glBegin(GL_QUADS);
+	glVertex2i(x - halfSize, y - halfSize);
+	glVertex2i(x + halfSize, y - halfSize);
+	glVertex2i(x + halfSize, y + halfSize);
+	glVertex2i(x - halfSize, y + halfSize);
+	glEnd();
 }
 
 //==========================================================================
