@@ -269,9 +269,20 @@ void Legend::DrawCornerVertices() const
 //==========================================================================
 void Legend::UpdateBoundingBox()
 {
-	// TODO:  Implement
-	height = 100;
-	width = 100;
+	FTBBox boundingBox;
+	unsigned int maxStringWidth(0);
+	unsigned int i;
+	for (i = 0; i < entries.size(); i++)
+	{
+		boundingBox = font->BBox(entries[i].text.mb_str());
+		if (boundingBox.Upper().X() > maxStringWidth)
+			maxStringWidth = boundingBox.Upper().X();
+	}
+	
+	width = 3 * entrySpacing + sampleLength + maxStringWidth;
+	
+	boundingBox = font->BBox("H");
+	height = (boundingBox.Upper().Y() + entrySpacing) * i + entrySpacing;
 }
 
 //==========================================================================

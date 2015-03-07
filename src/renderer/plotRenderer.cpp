@@ -172,26 +172,7 @@ void PlotRenderer::CreateActors(void)
 		legend->SetPositionReference(Legend::RefTopRight);
 		legend->SetPosition(plot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
 			plot->GetTopAxis()->GetOffsetFromWindowEdge() + offset);
-		// TODO:  Set legend to be invisible until we need it?
-
-		Legend::LegendEntryInfo info;
-		std::vector<Legend::LegendEntryInfo> e;
-		info.color = Color::ColorRed;
-		info.size = 2;
-		info.text = _T("Red 2");
-		e.push_back(info);
-
-		info.color = Color::ColorBlue;
-		info.size = 1;
-		info.text = _T("Blue 1");
-		e.push_back(info);
-
-		info.color = Color::ColorBlack;
-		info.size = 3;
-		info.text = _T("Black 3");
-		e.push_back(info);
-		legend->SetContents(e);
-		// TODO:  Remove this; also need to find way to update legend as curves are added/removed
+		legend->SetVisibility(false);
 	}
 }
 
