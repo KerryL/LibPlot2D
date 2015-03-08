@@ -34,6 +34,24 @@
 
 //==========================================================================
 // Class:			RenderWindow
+// Function:		Constant declarations
+//
+// Description:		Constant declarations for RenderWindow class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const double RenderWindow::exactPixelShift(0.375);
+
+//==========================================================================
+// Class:			RenderWindow
 // Function:		RenderWindow
 //
 // Description:		Constructor for RenderWindow class.  Initializes the
@@ -1184,6 +1202,22 @@ void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const double gl[])
 	}
 }
 
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Initialize2D
+//
+// Description:		Configures openGL for drawing 2D scenes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 void RenderWindow::Initialize2D(void) const
 {
 	// Disable Z-buffering, but allow testing
@@ -1197,16 +1231,32 @@ void RenderWindow::Initialize2D(void) const
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	// Displacement trick for exact pixelization
-	glTranslated(0.375, 0.375, 0.0);
+	ShiftForExactPixelization();
 
 	// Enable the parameters required for anti-aliasing of lines
+	//glEnable();
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 }
 
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Initialize3D
+//
+// Description:		Configures openGL for drawing 3D scenes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 void RenderWindow::Initialize3D(void) const
 {
 	// Turn Z-buffering on
@@ -1236,6 +1286,22 @@ void RenderWindow::Initialize3D(void) const
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Generate2DProjectionMatrix
+//
+// Description:		Returns projection matrix for 2D scenes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Matrix
+//
+//==========================================================================
 Matrix RenderWindow::Generate2DProjectionMatrix(void) const
 {
 	// Set up an orthogonal 2D projection matrix (this puts (0,0) at the lower left-hand corner of the window)
@@ -1251,6 +1317,22 @@ Matrix RenderWindow::Generate2DProjectionMatrix(void) const
 	return projectionMatrix;
 }
 
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Generate3DProjectionMatrix
+//
+// Description:		Returns projection matrix for 3D scenes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Matrix
+//
+//==========================================================================
 Matrix RenderWindow::Generate3DProjectionMatrix(void) const
 {
 	Matrix projectionMatrix(4, 4);
@@ -1278,6 +1360,22 @@ Matrix RenderWindow::Generate3DProjectionMatrix(void) const
 	return projectionMatrix;
 }
 
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Determine2DInteraction
+//
+// Description:		Determines type of 2D interaction (if any).
+//
+// Input Arguments:
+//		event		= wxMouseEvent&
+//
+// Output Arguments:
+//		interaction	= InteractionType&
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
 bool RenderWindow::Determine2DInteraction(const wxMouseEvent &event, InteractionType &interaction) const
 {
 	// DOLLY:  Left mouse button + Ctrl OR Left mouse button + Alt OR Middle mouse button
@@ -1294,6 +1392,22 @@ bool RenderWindow::Determine2DInteraction(const wxMouseEvent &event, Interaction
 	return true;
 }
 
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Determine3DInteraction
+//
+// Description:		Determines type of 3D interaction (if any).
+//
+// Input Arguments:
+//		event		= wxMouseEvent&
+//
+// Output Arguments:
+//		interaction	= InteractionType&
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
 bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, InteractionType &interaction) const
 {
 	// PAN:  Left mouse button + Shift OR Right mouse button
@@ -1313,4 +1427,25 @@ bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, Interaction
 		return false;
 
 	return true;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		ShiftForExactPixelization
+//
+// Description:		Applies shift trick to enabled exact pixelization.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::ShiftForExactPixelization() const
+{
+	glTranslated(exactPixelShift, exactPixelShift, 0.0);
 }

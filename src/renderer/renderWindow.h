@@ -88,10 +88,14 @@ public:
 
 	// Determines if a particular primitive is in the scene owned by this object
 	bool IsThisRendererSelected(const Primitive *pickedObject) const;
+	
+	void ShiftForExactPixelization() const;
 
 private:
 	wxGLContext *context;
 	wxGLContext* GetContext(void);
+	
+	static const double exactPixelShift;
 
 	// Flags describing the options for this object's functionality
 	bool wireFrame;
