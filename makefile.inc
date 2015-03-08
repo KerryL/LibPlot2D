@@ -43,7 +43,7 @@ RANLIB = ranlib
 
 # Compiler flags
 #CFLAGS = -g -Wall -Wextra -Werror $(INCDIRS) `wx-config --cppflags` `pkg-config --cflags ftgl` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
-CFLAGS = -g -Wall -Wextra $(INCDIRS) `wx-config --cppflags` `pkg-config --cflags ftgl` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
+CFLAGS = -g -Wall -Wextra $(INCDIRS) `wx-config --cppflags` `pkg-config --cflags ftgl` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -Wno-unused-local-typedefs
 
 # Linker flags
 LDFLAGS = $(LIBDIRS) $(LIBS) `wx-config --libs std,gl` `pkg-config --libs ftgl,gl`
