@@ -1,36 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Session Name="/home/kerry/Projects/DataPlotter/DataPlotter.workspace">
-  <int Value="2" Name="m_selectedTab"/>
+  <int Value="1" Name="m_selectedTab"/>
   <wxString Value="/home/kerry/Projects/DataPlotter/DataPlotter.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
-      <wxString Value="/home/kerry/Projects/RigidBodyDynamics/include/threads/inverseDynamicsWorkerThread.h" Name="FileName"/>
-      <int Value="1" Name="FirstVisibleLine"/>
-      <int Value="10" Name="CurrentLine"/>
+      <wxString Value="/home/kerry/Projects/DataPlotter/src/application/mainFrame.cpp" Name="FileName"/>
+      <int Value="196" Name="FirstVisibleLine"/>
+      <int Value="207" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="/home/kerry/Projects/RigidBodyDynamics/src/threads/inverseDynamicsWorkerThread.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="28" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/kerry/Projects/RigidBodyDynamics/src/dynamics/inverseDynamics.cpp" Name="FileName"/>
-      <int Value="92" Name="FirstVisibleLine"/>
-      <int Value="120" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/kerry/Projects/RigidBodyDynamics/src/dynamics/recursiveNewtonEuler.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="8" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/kerry/Projects/RigidBodyDynamics/include/dynamics/recursiveNewtonEuler.h" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="7" Name="CurrentLine"/>
+      <wxString Value="/home/kerry/Projects/DataPlotter/src/renderer/renderWindow.cpp" Name="FileName"/>
+      <int Value="1231" Name="FirstVisibleLine"/>
+      <int Value="1239" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
   </TabInfoArray>

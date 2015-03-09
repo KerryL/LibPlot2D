@@ -201,11 +201,21 @@ void MainFrame::CreateControls(void)
 //==========================================================================
 PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 {
+	/*
+	int attrListDblmultis[] = { GLX_RGBA,
+GLX_DOUBLEBUFFER,		      GLX_RED_SIZE, 4,
+GLX_GREEN_SIZE, 4,		      GLX_BLUE_SIZE, 4,
+GLX_DEPTH_SIZE, 16,
+GLX_SAMPLES, 2,
+None };
+*/
+//WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0
 #ifdef __WXGTK__
 	// Under GTK, we get a segmentation fault or X error on call to SwapBuffers in RenderWindow.
 	// Adding the double-buffer arugment fixes this.  Under windows, the double-buffer argument
 	// causes the colors to go funky.  So we have this #if.
-	int args[] = {WX_GL_DOUBLEBUFFER, 0};
+	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, /*GLX_SAMPLE_BUFFERS, 1, GLX_SAMPLES, 4,*/ 0};
+	// TODO:  Test these options under windows
 	plotArea = new PlotRenderer(parent, wxID_ANY, args, *this);
 #else
 	plotArea = new PlotRenderer(parent, wxID_ANY, NULL, *this);
@@ -1655,7 +1665,7 @@ void MainFrame::UpdateLegend()
 	long markerSize;
 	std::vector<Legend::LegendEntryInfo> entries;
 	Legend::LegendEntryInfo info;
-	unsigned int i;
+	int i;
 	for (i = 1; i < optionsGrid->GetNumberRows(); i++)
 	{
 		if (optionsGrid->GetCellValue(i, colVisible).IsEmpty())
