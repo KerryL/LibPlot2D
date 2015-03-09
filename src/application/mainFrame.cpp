@@ -215,6 +215,7 @@ None };
 	// Adding the double-buffer arugment fixes this.  Under windows, the double-buffer argument
 	// causes the colors to go funky.  So we have this #if.
 	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, /*GLX_SAMPLE_BUFFERS, 1, GLX_SAMPLES, 4,*/ 0};
+	//wxGLCanvas::IsDisplaySupported();// Added in wxWidgets 3.0
 	// TODO:  Test these options under windows
 	plotArea = new PlotRenderer(parent, wxID_ANY, args, *this);
 #else
@@ -1747,7 +1748,7 @@ void MainFrame::GridCellChangeEvent(wxGridEvent &event)
 	{
 		event.Skip();
 		UpdateLegend();// Included in case of text changes
-		// TODO:  Why doesn't legend text update here?  Event hasn't propogated yet?
+		plotArea->Refresh();
 		return;
 	}
 
