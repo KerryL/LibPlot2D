@@ -1234,7 +1234,7 @@ void RenderWindow::Initialize2D(void) const
 	ShiftForExactPixelization();
 
 	// Enable the parameters required for anti-aliasing of lines
-	glDisable(GL_MULTISAMPLE);// Supposedly degrades quality of anti-aliasing
+	//glDisable(GL_MULTISAMPLE);// Supposedly degrades quality of anti-aliasing
 	/*glEnable(GL_MULTISAMPLE);
 	glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);*/
 	/*int a;
