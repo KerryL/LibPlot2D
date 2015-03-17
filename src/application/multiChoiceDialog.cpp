@@ -239,11 +239,11 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
 {
 	choiceListBox->Clear();
-	wxString filter(filterText->GetValue());
+	wxString filter(filterText->GetValue().Lower());
 	unsigned int i;
 	for (i = 0; i < shown.size(); i++)
 	{
-		if (filter.IsEmpty() || descriptions[i].Contains(filter))
+		if (filter.IsEmpty() || descriptions[i].Lower().Contains(filter))
 		{
 			choiceListBox->Insert(descriptions[i], choiceListBox->GetCount());
 			shown[i] = true;

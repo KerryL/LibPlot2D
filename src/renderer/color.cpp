@@ -43,9 +43,9 @@ Color::Color()
 {
 	// Assign default values to the class members (solid black)
 	red = 1.0;
-	green = 1.0;
-	blue = 1.0;
-	alpha = 1.0;
+	green = 0.0;
+	blue = 0.0;
+	alpha = 0.0;
 }
 
 //==========================================================================
@@ -93,7 +93,7 @@ Color::Color(const double &red, const double &green, const double &blue, const d
 //==========================================================================
 Color::Color(const wxColor &c)
 {
-	Set(c.Red() * 255.0, c.Green() * 255.0, c.Blue() * 255.0, c.Alpha() * 255.0);
+	Set(c.Red() / 255.0, c.Green() / 255.0, c.Blue() / 255.0, c.Alpha() / 255.0);
 	ValidateColor();
 }
 
