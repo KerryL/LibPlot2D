@@ -532,7 +532,11 @@ void PlotObject::FormatPlot(void)
 	MatchYAxes();
 	FormatCurves();
 
-	// TODO:  Set autoscale for unused Yaxes appropriately here
+	bool forceLeftYLimits(!autoScaleLeftY), forceRightYLimits(!autoScaleRightY);
+	if (leftUsed && !rightUsed)
+		forceRightYLimits = forceLeftYLimits;
+	else if (rightUsed && !leftUsed)
+		forceLeftYLimits = forceRightYLimits;
 
 	const unsigned int maxXTicks(7);
 	const unsigned int maxYTicks(10);
@@ -543,16 +547,16 @@ void PlotObject::FormatPlot(void)
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
 	AutoScaleAxis(xMin, xMax, xMajor, maxXTicks, axisBottom->IsLogarithmic(), !autoScaleX);
-	AutoScaleAxis(yLeftMin, yLeftMax, yLeftMajor, maxYTicks, axisLeft->IsLogarithmic(), !autoScaleLeftY);
-	AutoScaleAxis(yRightMin, yRightMax, yRightMajor, maxYTicks, axisRight->IsLogarithmic(), !autoScaleRightY);
+	AutoScaleAxis(yLeftMin, yLeftMax, yLeftMajor, maxYTicks, axisLeft->IsLogarithmic(), forceLeftYLimits);
+	AutoScaleAxis(yRightMin, yRightMax, yRightMajor, maxYTicks, axisRight->IsLogarithmic(), forceRightYLimits);
 
 	double xMinor = ComputeMinorResolution(xMin, xMax, xMajor, axisBottom->GetAxisLength());
 	double yLeftMinor = ComputeMinorResolution(yLeftMin, yLeftMax, yLeftMajor, axisLeft->GetAxisLength());
 	double yRightMinor = ComputeMinorResolution(yRightMin, yRightMax, yRightMajor, axisRight->GetAxisLength());
 
 	ValidateRangeLimits(xMin, xMax, autoScaleX, xMajor, xMinor);
-	ValidateRangeLimits(yLeftMin, yLeftMax, autoScaleLeftY, yLeftMajor, yLeftMinor);
-	ValidateRangeLimits(yRightMin, yRightMax, autoScaleRightY, yRightMajor, yRightMinor);
+	ValidateRangeLimits(yLeftMin, yLeftMax, !forceLeftYLimits, yLeftMajor, yLeftMinor);
+	ValidateRangeLimits(yRightMin, yRightMax, !forceRightYLimits, yRightMajor, yRightMinor);
 
 	ValidateLogarithmicLimits(*axisBottom, xMin);
 	ValidateLogarithmicLimits(*axisLeft, yLeftMin);
