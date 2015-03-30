@@ -1254,7 +1254,7 @@ void RenderWindow::Initialize2D(void) const
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	// TODO:  Something isn't right under GTK - MSW looks nice bt GTK does not
+	// TODO:  Something isn't right under GTK - MSW looks nice but GTK does not
 }
 
 //==========================================================================

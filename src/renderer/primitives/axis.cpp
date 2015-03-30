@@ -232,7 +232,12 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 		assert(minorResolution > 0.0 && PlotMath::IsValid(minorResolution));
 		tickCount = (unsigned int)((maximum - minimum) / majorResolution + 0.5) - 1;
 		if (gridCount)
-			*gridCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
+		{
+			if (minorGrid)
+				*gridCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
+			else
+				*gridCount = tickCount;
+		}
 	}
 }
 
@@ -329,15 +334,15 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	int location;
-	for (grid = 1; grid <= count; grid++)
+	for (grid = 1; grid <= count + 1; grid++)
 	{
 		if (minorGrid)
 			location = ValueToPixel(GetNextGridValue(grid));
 		else
 			location = ValueToPixel(GetNextTickValue(false, false, grid));
 
-		if (location < (int)minAxis->GetOffsetFromWindowEdge() ||
-			location > (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
+		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
+			location >= (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
 		glVertex2i(location, offsetFromWindowEdge);
@@ -372,9 +377,13 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
 	int location;
-	for (tick = 1; tick <= count; tick++)
+	for (tick = 1; tick <= count + 1; tick++)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
+			location >= (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
+			continue;
+
 		glVertex2i(location, mainAxisLocation - tickSize * outsideTick * sign);
 		glVertex2i(location, mainAxisLocation + tickSize * insideTick * sign);
 	}
@@ -403,15 +412,15 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	int location;
-	for (grid = 1; grid <= count; grid++)
+	for (grid = 1; grid <= count + 1; grid++)
 	{
 		if (minorGrid)
 			location = ValueToPixel(GetNextGridValue(grid));
 		else
 			location = ValueToPixel(GetNextTickValue(false, false, grid));
 
-		if (location < (int)minAxis->GetOffsetFromWindowEdge() ||
-			location > (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
+		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
+			location >= (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
 		glVertex2i(offsetFromWindowEdge, location);
@@ -447,9 +456,13 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 	// The last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
 	int location;
-	for (tick = 1; tick <= count; tick++)
+	for (tick = 1; tick <= count + 1; tick++)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
+			location >= (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
+			continue;
+
 		glVertex2i(mainAxisLocation - tickSize * outsideTick * sign, location);
 		glVertex2i(mainAxisLocation + tickSize * insideTick * sign, location);
 	}
@@ -619,6 +632,7 @@ void Axis::DrawTickLabels(void)
 		value = std::min(GetNextTickValue(tick == 0, tick == numberOfTicks + 1, tick), maximum);
 		valueLabel.Printf("%0.*f", precision, value);
 
+		// TODO:  Don't draw it if it's too close to the maximum (based on text size)
 		glPushMatrix();
 			glLoadIdentity();
 			ComputeTranslations(value, xTranslation, yTranslation, font->BBox(valueLabel.mb_str()), valueOffsetFromEdge);
@@ -627,6 +641,7 @@ void Axis::DrawTickLabels(void)
 		glPopMatrix();
 	}
 
+	valueLabel.Printf("%0.*f", precision, maximum);
 	if (!valueLabel.ToDouble(&maximum)) { /*Warn the user?*/ }
 }
 

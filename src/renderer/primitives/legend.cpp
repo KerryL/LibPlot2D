@@ -343,6 +343,9 @@ void Legend::UpdateBoundingBox()
 //==========================================================================
 bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 {
+	if (!isVisible)
+		return false;
+
 	double adjX, adjY;
 	GetAdjustedPosition(adjX, adjY);
 

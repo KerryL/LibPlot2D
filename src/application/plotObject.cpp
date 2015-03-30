@@ -532,6 +532,8 @@ void PlotObject::FormatPlot(void)
 	MatchYAxes();
 	FormatCurves();
 
+	// TODO:  Set autoscale for unused Yaxes appropriately here
+
 	const unsigned int maxXTicks(7);
 	const unsigned int maxYTicks(10);
 
@@ -1315,23 +1317,20 @@ void PlotObject::AutoScaleLinearAxis(double &min, double &max, double &majorRes,
 	// Scale the tick spacing so it is between 0.1 and 10.0
 	double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
 
-	if (!forceLimits)
-	{
-		if (scaledSpacing > 5.0)
-			scaledSpacing = 10.0;
-		else if (scaledSpacing > 2.0)
-			scaledSpacing = 5.0;
-		else if (scaledSpacing > 1.0)
-			scaledSpacing = 2.0;
-		else if (scaledSpacing > 0.5)
-			scaledSpacing = 1.0;
-		else if (scaledSpacing > 0.2)
-			scaledSpacing = 0.5;
-		else if (scaledSpacing > 0.1)
-			scaledSpacing = 0.2;
-		else
-			scaledSpacing = 0.1;
-	}
+	if (scaledSpacing > 5.0)
+		scaledSpacing = 10.0;
+	else if (scaledSpacing > 2.0)
+		scaledSpacing = 5.0;
+	else if (scaledSpacing > 1.0)
+		scaledSpacing = 2.0;
+	else if (scaledSpacing > 0.5)
+		scaledSpacing = 1.0;
+	else if (scaledSpacing > 0.2)
+		scaledSpacing = 0.5;
+	else if (scaledSpacing > 0.1)
+		scaledSpacing = 0.2;
+	else
+		scaledSpacing = 0.1;
 
 	tickSpacing = scaledSpacing * pow(10.0, orderOfMagnitude - 1);
 	if (majorRes == 0.0)

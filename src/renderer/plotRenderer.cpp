@@ -2418,7 +2418,7 @@ void PlotRenderer::ProcessZoomBoxEnd(void)
 	zoomBox->SetVisibility(false);
 
 	// Make sure the box isn't too small
-	int limit = 5;// [pixels]
+	const int limit = 5;// [pixels]
 	if (abs(int(zoomBox->GetXAnchor() - zoomBox->GetXFloat())) > limit &&
 		abs(int(zoomBox->GetYAnchor() - zoomBox->GetYFloat())) > limit)
 	{
@@ -2437,6 +2437,7 @@ void PlotRenderer::ProcessZoomBoxEnd(void)
 		double yRightMax = plot->GetRightYAxis()->PixelToValue(
 			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
 
+		// TODO:  Make limits pretty here
 		SetXLimits(xMin, xMax);
 		SetLeftYLimits(yLeftMin, yLeftMax);
 		SetRightYLimits(yRightMin, yRightMax);

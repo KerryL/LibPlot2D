@@ -175,9 +175,10 @@ private:
 
 	// Handles the spacing of the axis ticks
 	void AutoScaleAxis(double &min, double &max, double &majorRes, const int &maxTicks, const bool &logarithmic,
-		const bool &forceLimits = false) const;
+		const bool &forceLimits) const;
 	void AutoScaleLogAxis(double &min, double &max, double &majorRes, const bool &forceLimits) const;
-	void AutoScaleLinearAxis(double &min, double &max, double &majorRes, const int &maxTicks, const bool &forceLimits) const;
+	void AutoScaleLinearAxis(double &min, double &max, double &majorRes, const int &maxTicks,
+		const bool &forceLimits) const;
 	void RoundMinMax(double &min, double &max, const double &tickSpacing, const bool &forceLimits) const;
 	double ComputeMinorResolution(const double &min, const double &max,
 		const double &majorResolution, const double &axisLength) const;
