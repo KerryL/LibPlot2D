@@ -538,17 +538,14 @@ void PlotObject::FormatPlot(void)
 	else if (rightUsed && !leftUsed)
 		forceLeftYLimits = forceRightYLimits;
 
-	const unsigned int maxXTicks(7);
-	const unsigned int maxYTicks(10);
-
 	double xMajor(xMajorResolution);
 	double yLeftMajor(yLeftMajorResolution);
 	double yRightMajor(yRightMajorResolution);
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
-	AutoScaleAxis(xMin, xMax, xMajor, maxXTicks, axisBottom->IsLogarithmic(), !autoScaleX);
-	AutoScaleAxis(yLeftMin, yLeftMax, yLeftMajor, maxYTicks, axisLeft->IsLogarithmic(), forceLeftYLimits);
-	AutoScaleAxis(yRightMin, yRightMax, yRightMajor, maxYTicks, axisRight->IsLogarithmic(), forceRightYLimits);
+	AutoScaleAxis(xMin, xMax, xMajor, PlotRenderer::maxXTicks, axisBottom->IsLogarithmic(), !autoScaleX);
+	AutoScaleAxis(yLeftMin, yLeftMax, yLeftMajor, PlotRenderer::maxYTicks, axisLeft->IsLogarithmic(), forceLeftYLimits);
+	AutoScaleAxis(yRightMin, yRightMax, yRightMajor, PlotRenderer::maxYTicks, axisRight->IsLogarithmic(), forceRightYLimits);
 
 	double xMinor = ComputeMinorResolution(xMin, xMax, xMajor, axisBottom->GetAxisLength());
 	double yLeftMinor = ComputeMinorResolution(yLeftMin, yLeftMax, yLeftMajor, axisLeft->GetAxisLength());
@@ -1308,37 +1305,8 @@ void PlotObject::AutoScaleLogAxis(double &min, double &max, double &majorRes,
 void PlotObject::AutoScaleLinearAxis(double &min, double &max, double &majorRes,
 	const int &maxTicks, const bool &forceLimits) const
 {
-	double range = max - min;
-	int orderOfMagnitude = (int)log10(range);
-	double tickSpacing = range / maxTicks;
-
-	// Acceptable resolution steps are:
-	//	Ones,
-	//	Twos (even numbers), and
-	//	Fives (multiples of five),
-	// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5], and [20, 40, 60] are all acceptable)
-
-	// Scale the tick spacing so it is between 0.1 and 10.0
-	double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
-
-	if (scaledSpacing > 5.0)
-		scaledSpacing = 10.0;
-	else if (scaledSpacing > 2.0)
-		scaledSpacing = 5.0;
-	else if (scaledSpacing > 1.0)
-		scaledSpacing = 2.0;
-	else if (scaledSpacing > 0.5)
-		scaledSpacing = 1.0;
-	else if (scaledSpacing > 0.2)
-		scaledSpacing = 0.5;
-	else if (scaledSpacing > 0.1)
-		scaledSpacing = 0.2;
-	else
-		scaledSpacing = 0.1;
-
-	tickSpacing = scaledSpacing * pow(10.0, orderOfMagnitude - 1);
 	if (majorRes == 0.0)
-		majorRes = tickSpacing;
+		majorRes = PlotRenderer::ComputeTickSpacing(min, max, maxTicks);
 	RoundMinMax(min, max, majorRes, forceLimits);
 }
 

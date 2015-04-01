@@ -650,6 +650,8 @@ void Axis::DrawTickLabels(void)
 // Function:		GetPrecision
 //
 // Description:		Determines appropriate precision to use for axis resolution.
+//					Ideal precision is determined by the minimum number of digits
+//					to differentiate one tick mark from the next, plus two.
 //
 // Input Arguments:
 //		None
@@ -663,21 +665,10 @@ void Axis::DrawTickLabels(void)
 //==========================================================================
 unsigned int Axis::GetPrecision(void) const
 {
-	unsigned int precision;
-	double baseValue;
-	if (logarithmic)
-		baseValue = minimum;
-	else
-		baseValue = majorResolution;
-
-	if (log10(baseValue) >= 0.0)
-		precision = 0;
-	else
-		precision = -log10(baseValue) + 1;
-
-	precision += 2;
-
-	return precision;
+	// It does look nicer to use the raw return value of GetPrecision(), but it affects the function
+	// of dragging the plot around.  Because we always force the limits to actually
+	// match the printed values, it makes the dragging operation very coarse.  So we add two.
+	return PlotMath::GetPrecision(minimum, majorResolution, logarithmic) + 2;
 }
 
 //==========================================================================

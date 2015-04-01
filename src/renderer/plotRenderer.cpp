@@ -14,6 +14,9 @@
 //				 the screen.
 // History:
 
+// Standard C++ headers
+#include <cassert>
+
 // wxWidgets headers
 #include <wx/wx.h>
 
@@ -25,6 +28,26 @@
 #include "renderer/primitives/plotCursor.h"
 #include "renderer/primitives/axis.h"
 #include "renderer/primitives/legend.h"
+#include "utilities/math/plotMath.h"
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		Constant declarations
+//
+// Description:		Constant declarations for the PlotRenderer class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const unsigned int PlotRenderer::maxXTicks(7);
+const unsigned int PlotRenderer::maxYTicks(10);
 
 //==========================================================================
 // Class:			PlotRenderer
@@ -2437,11 +2460,50 @@ void PlotRenderer::ProcessZoomBoxEnd(void)
 		double yRightMax = plot->GetRightYAxis()->PixelToValue(
 			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
 
+		ComputePrettyLimits(xMin, xMax, maxXTicks);
+		ComputePrettyLimits(yLeftMin, yLeftMax, maxYTicks);
+		ComputePrettyLimits(yRightMin, yRightMax, maxYTicks);
+
 		// TODO:  Make limits pretty here
 		SetXLimits(xMin, xMax);
 		SetLeftYLimits(yLeftMin, yLeftMax);
 		SetRightYLimits(yRightMin, yRightMax);
 	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ComputePrettyLimits
+//
+// Description:		Computes new limits given the specified range to ensure
+//					pretty tick spacing.
+//
+// Input Arguments:
+//		min			= double&
+//		max			= double&
+//		maxTicks	= const unsigned int&
+//
+// Output Arguments:
+//		min	= double&
+//		max	= double&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const
+{
+	// Make the limits prettier by choosing a range that is exactly divisible
+	// into the ideal spacing
+	double spacing = ComputeTickSpacing(min, max, maxTicks);
+	assert(spacing > 0.0 && PlotMath::IsValid(spacing));
+	double range = floor((max - min) / spacing + 0.5) * spacing;
+
+	// Split the difference to force the range to the desired value (keep the center point
+	// the same before/after this adjustment)
+	double shift = 0.5 * (range - max + min);
+	max += shift;
+	min -= shift;
 }
 
 //==========================================================================
@@ -2557,4 +2619,65 @@ wxString PlotRenderer::GetRightYLabel(void) const
 wxString PlotRenderer::GetTitle(void) const
 {
 	return plot->GetTitle();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ComputeTickSpacing
+//
+// Description:		Computes the ideal tick spacing based on the specified range.
+//
+// Input Arguments:
+//		min		= const
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
+	const int &maxTicks)
+{
+	double range = max - min;
+	int orderOfMagnitude = (int)log10(range);
+
+	// To prevent changing the number of ticks as we drag, we should round the range here
+	// The issues is that a range of about 10 could be 9.99999... or 10.000...1
+	// and this changes the calculated order of magnitude
+	// TODO:  Would it be better to compute the precision and round the min/max values
+	// like we do in Axis?  When we do get undesired artifacts, moving the mouse off the
+	// edge of the plot will re-draw without these artifacts, due to the logic in Axis
+	const double roundingScale(pow(10.0, 2 - orderOfMagnitude));// So we don't loose too much precision
+	range = floor(range * roundingScale + 0.5) / roundingScale;
+
+	orderOfMagnitude = (int)log10(range);
+	double tickSpacing = range / maxTicks;
+
+	// Acceptable resolution steps are:
+	//	Ones,
+	//	Twos (even numbers), and
+	//	Fives (multiples of five),
+	// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5], and [20, 40, 60] are all acceptable)
+
+	// Scale the tick spacing so it is between 0.1 and 10.0
+	double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
+
+	if (scaledSpacing > 5.0)
+		scaledSpacing = 10.0;
+	else if (scaledSpacing > 2.0)
+		scaledSpacing = 5.0;
+	else if (scaledSpacing > 1.0)
+		scaledSpacing = 2.0;
+	else if (scaledSpacing > 0.5)
+		scaledSpacing = 1.0;
+	else if (scaledSpacing > 0.2)
+		scaledSpacing = 0.5;
+	else if (scaledSpacing > 0.1)
+		scaledSpacing = 0.2;
+	else
+		scaledSpacing = 0.1;
+
+	return scaledSpacing * pow(10.0, orderOfMagnitude - 1);
 }

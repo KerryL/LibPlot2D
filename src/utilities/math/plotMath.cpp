@@ -465,3 +465,36 @@ void PlotMath::sprintf(char *dest, const unsigned int&, const char *format, ...)
 
 	va_end(list);
 }
+
+//==========================================================================
+// Namespace:		PlotMath
+// Function:		GetPrecision
+//
+// Description:		Returns the required precision (digits past zero) to
+//					distinguish between adjacent graduations.
+//
+// Input Arguments:
+//		minimum			= const double&
+//		majorResolution	= const double&
+//		isLogarithmic	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int PlotMath::GetPrecision(const double &minimum, const double &majorResolution, const bool &isLogarithmic)
+{
+	double baseValue;
+	if (isLogarithmic)
+		baseValue = minimum;
+	else
+		baseValue = majorResolution;
+
+	if (log10(baseValue) >= 0.0)
+		return 0;
+
+	return -log10(baseValue) + 1;
+}

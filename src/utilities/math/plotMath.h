@@ -70,6 +70,8 @@ namespace PlotMath
 	unsigned int CountSignificantDigits(const wxString &valueString);
 
 	void sprintf(char *dest, const unsigned int &size, const char *format, ...);
+
+	unsigned int GetPrecision(const double &minimum, const double &majorResolution, const bool &isLogarithmic = false);
 }
 
 // Template methods must be defined here:

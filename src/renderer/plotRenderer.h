@@ -144,6 +144,10 @@ public:
 	void SaveCurrentZoom(void);
 	void ClearZoomStack(void);
 
+	static const unsigned int maxXTicks;
+	static const unsigned int maxYTicks;
+	static double ComputeTickSpacing(const double &min, const double &max, const int &maxTicks);
+
 private:
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors(void);
@@ -176,6 +180,8 @@ private:
 	bool draggingLeftCursor;
 	bool draggingRightCursor;
 	bool draggingLegend;
+
+	void ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const;
 
 protected:
 	void ProcessZoom(wxMouseEvent &event);
