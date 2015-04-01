@@ -3842,7 +3842,6 @@ void MainFrame::DoCopy(void)
 {
 	if (wxTheClipboard->Open())
 	{
-		// TODO:  Can we also copy text data here, and choose which to paste depending on context later?  What about copy from one window/paste to another of DataPlotter?
 		wxTheClipboard->SetData(new wxBitmapDataObject(plotArea->GetImage()));
 		wxTheClipboard->Close();
 	}

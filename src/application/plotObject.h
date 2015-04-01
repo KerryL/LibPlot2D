@@ -133,6 +133,11 @@ private:
 	// The renderer object
 	PlotRenderer &renderer;
 
+	static const unsigned int horizontalOffsetWithLabel;
+	static const unsigned int horizontalOffsetWithoutLabel;
+	static const unsigned int verticalOffsetWithLabel;
+	static const unsigned int verticalOffsetWithoutLabel;
+
 	// The actors (the non-plot actors that are always present)
 	Axis *axisTop;
 	Axis *axisBottom;

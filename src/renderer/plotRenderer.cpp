@@ -2464,7 +2464,6 @@ void PlotRenderer::ProcessZoomBoxEnd(void)
 		ComputePrettyLimits(yLeftMin, yLeftMax, maxYTicks);
 		ComputePrettyLimits(yRightMin, yRightMax, maxYTicks);
 
-		// TODO:  Make limits pretty here
 		SetXLimits(xMin, xMax);
 		SetLeftYLimits(yLeftMin, yLeftMax);
 		SetRightYLimits(yRightMin, yRightMax);
