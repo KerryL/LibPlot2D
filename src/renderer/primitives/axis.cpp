@@ -525,7 +525,6 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //==========================================================================
 void Axis::DrawAxisLabel(void) const
 {
-	// TODO:  Should add something here to center text over the plot area, not the render window
 	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
@@ -534,19 +533,19 @@ void Axis::DrawAxisLabel(void) const
 	FTBBox boundingBox = font->BBox("H");// Some capital letter to assure uniform spacing
 	double yTranslation = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.Upper().Y());
 
+	boundingBox = font->BBox(label.mb_str());
+	double textWidth = boundingBox.Upper().X() - boundingBox.Lower().X();
+	double plotOffset = (double)minAxis->GetOffsetFromWindowEdge() - (double)maxAxis->GetOffsetFromWindowEdge();
+
 	glPushMatrix();
 		glLoadIdentity();
 
-		boundingBox = font->BBox(label.mb_str());
-
 		if (IsHorizontal())
-			glTranslated((renderWindow.GetSize().GetWidth() + boundingBox.Lower().X()
-				- boundingBox.Upper().X()) / 2.0, yTranslation, 0.0);
+			glTranslated(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), yTranslation, 0.0);
 		else
 		{
 			glRotated(90.0, 0.0, 0.0, 1.0);
-			glTranslated((boundingBox.Lower().X() - boundingBox.Upper().X()
-				+ renderWindow.GetSize().GetHeight()) / 2.0, -yTranslation, 0.0);
+			glTranslated(0.5 * (renderWindow.GetSize().GetHeight() - textWidth + plotOffset), -yTranslation, 0.0);
 		}
 
 		font->Render(label.mb_str());
