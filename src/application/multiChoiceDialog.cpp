@@ -154,7 +154,7 @@ void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayStr
 int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
 {
 	int value(choices.Count() * 20);
-	return std::min(std::max(200, value), 600);
+	return std::min(std::max(200, value), 550);
 }
 
 //==========================================================================
