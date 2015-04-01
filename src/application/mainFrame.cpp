@@ -2574,7 +2574,7 @@ void MainFrame::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 
 	ApplyFilter(filterParameters, *newData);
 
-	wxString name = FilterDialog::GetFilterNamePrefix(filterParameters) + _T("(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+	wxString name = FilterDialog::GetFilterNamePrefix(filterParameters) + _T(" (") + optionsGrid->GetCellValue(row, colName) + _T(")");
 	AddCurve(newData, name);
 }
 
