@@ -1468,6 +1468,8 @@ void MainFrame::RemoveCurve(const unsigned int &i)
 
 	plotArea->RemoveCurve(i);
 	plotList.Remove(i);
+
+	UpdateLegend();
 }
 
 //==========================================================================
