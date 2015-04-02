@@ -262,6 +262,8 @@ void Line::Draw(const std::vector<std::pair<double, double> > &points) const
 void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	const double &y2, double &xOffset, double &yOffset) const
 {
+	// TODO:  Could improve line endings - instead of drawing them |- to core line,
+	//        we could instead "miter" the corners to nicely meet adjacent segments
 	if (PlotMath::IsZero(y2 - y1))
 	{
 		xOffset = 0.0;
@@ -269,14 +271,14 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	}
 	else if (PlotMath::IsZero(x2 - x1))
 	{
-		xOffset = -halfWidth * PlotMath::Sign(y2 - y1);
+		xOffset = halfWidth * PlotMath::Sign(y1 - y2);
 		yOffset = 0.0;
 	}
 	else
 	{
 		double slope = (y2 - y1) / (x2 - x1);
 
-		xOffset = halfWidth * slope * PlotMath::Sign(x2 - x1);
-		yOffset = halfWidth / slope * PlotMath::Sign(x2 - x1);
+		yOffset = sqrt(halfWidth * halfWidth / (1.0 + slope * slope)) * PlotMath::Sign(x2 - x1);
+		xOffset = fabs(slope * yOffset) * PlotMath::Sign(y1 - y2);
 	}
 }

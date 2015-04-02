@@ -164,13 +164,11 @@ void Legend::DrawNextEntry(const double &index) const
 
 	// Draw sample line
 	const unsigned int lineYOffset(entrySpacing);
-	glLineWidth(entries[index].lineSize);
-	glBegin(GL_LINES);
-	glColor4f(entries[index].color.GetRed(), entries[index].color.GetGreen(),
-		entries[index].color.GetBlue(), entries[index].color.GetAlpha());
-	glVertex2i(x + entrySpacing, y + lineYOffset);
-	glVertex2i(x + entrySpacing + sampleLength, y + lineYOffset);
-	glEnd();
+	Line line;
+	line.SetWidth(entries[index].lineSize);
+	line.SetLineColor(entries[index].color);
+	line.SetBackgroundColorForAlphaFade();
+	line.Draw(x + entrySpacing, y + lineYOffset, x + entrySpacing + sampleLength, y + lineYOffset);
 	
 	if (entries[index].markerSize > 0)
 		DrawMarker(x + entrySpacing + sampleLength * 0.5, y + lineYOffset, entries[index].markerSize);

@@ -110,6 +110,8 @@ void Axis::GenerateGeometry(void)
 {
 	DrawFullAxis();
 
+	glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
+
 	if (font)
 	{
 		if (!label.IsEmpty())
@@ -142,8 +144,9 @@ void Axis::DrawFullAxis(void)
 
 	ComputeGridAndTickCounts(numberOfTicks, &numberOfGridLines);
 
-	glLineWidth(1.0f);
-	glBegin(GL_LINES);
+	line.SetWidth(1.0);
+	line.SetLineColor(color);
+	line.SetBackgroundColorForAlphaFade();
 
 	if (IsHorizontal())
 	{
@@ -163,8 +166,6 @@ void Axis::DrawFullAxis(void)
 	}
 
 	DrawMainAxis(mainAxisLocation);
-
-	glEnd();
 }
 
 //==========================================================================
@@ -260,17 +261,13 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 void Axis::DrawMainAxis(const int &mainAxisLocation) const
 {
 	if (IsHorizontal())
-	{
-		glVertex2i(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
-		glVertex2i(renderWindow.GetSize().GetWidth()
-				- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
-	}
+		line.Draw(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation,
+			renderWindow.GetSize().GetWidth()
+			- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
 	else
-	{
-		glVertex2i(mainAxisLocation, minAxis->GetOffsetFromWindowEdge());
-		glVertex2i(mainAxisLocation, renderWindow.GetSize().GetHeight() -
-				maxAxis->GetOffsetFromWindowEdge());
-	}
+		line.Draw(mainAxisLocation, minAxis->GetOffsetFromWindowEdge(),
+			mainAxisLocation, renderWindow.GetSize().GetHeight() -
+			maxAxis->GetOffsetFromWindowEdge());
 }
 
 //==========================================================================
@@ -329,7 +326,9 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 //==========================================================================
 void Axis::DrawHorizontalGrid(const unsigned int &count) const
 {
-	glColor4d(gridColor.GetRed(), gridColor.GetGreen(), gridColor.GetBlue(), gridColor.GetAlpha());
+	Line gridLine;
+	gridLine.SetLineColor(gridColor);
+	gridLine.SetBackgroundColorForAlphaFade();
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
@@ -345,11 +344,9 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 			location >= (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		glVertex2i(location, offsetFromWindowEdge);
-		glVertex2i(location, renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
+		gridLine.Draw(location, offsetFromWindowEdge, location,
+			renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
 	}
-
-	glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 }
 
 //==========================================================================
@@ -376,7 +373,7 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
-	int location;
+	double location;
 	for (tick = 1; tick <= count + 1; tick++)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick));
@@ -384,8 +381,8 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 			location >= (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		glVertex2i(location, mainAxisLocation - tickSize * outsideTick * sign);
-		glVertex2i(location, mainAxisLocation + tickSize * insideTick * sign);
+		line.Draw(location, mainAxisLocation - tickSize * outsideTick * sign, location,
+			mainAxisLocation + tickSize * insideTick * sign);
 	}
 }
 
@@ -407,7 +404,9 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 //==========================================================================
 void Axis::DrawVerticalGrid(const unsigned int &count) const
 {
-	glColor4d(gridColor.GetRed(), gridColor.GetGreen(), gridColor.GetBlue(), gridColor.GetAlpha());
+	Line gridLine;
+	gridLine.SetLineColor(gridColor);
+	gridLine.SetBackgroundColorForAlphaFade();
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
@@ -423,11 +422,9 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 			location >= (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		glVertex2i(offsetFromWindowEdge, location);
-		glVertex2i(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(), location);
+		gridLine.Draw(offsetFromWindowEdge, location,
+			renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(), location);
 	}
-
-	glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 }
 
 //==========================================================================
@@ -455,7 +452,7 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 	// The first inside tick never needs to be drawn
 	// The last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
-	int location;
+	double location;
 	for (tick = 1; tick <= count + 1; tick++)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick));
@@ -463,8 +460,8 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 			location >= (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		glVertex2i(mainAxisLocation - tickSize * outsideTick * sign, location);
-		glVertex2i(mainAxisLocation + tickSize * insideTick * sign, location);
+		line.Draw(mainAxisLocation - tickSize * outsideTick * sign, location,
+			mainAxisLocation + tickSize * insideTick * sign, location);
 	}
 }
 

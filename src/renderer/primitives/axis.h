@@ -22,6 +22,7 @@
 
 // Local headers
 #include "renderer/primitives/primitive.h"
+#include "renderer/line.h"
 
 // FTGL forward declarations
 class FTFont;
@@ -136,6 +137,8 @@ private:
 	// The axis label and font
 	wxString label;
 	FTFont *font;
+
+	Line line;
 
 	void DrawFullAxis(void);
 	int ComputeMainAxisLocation(void) const;
