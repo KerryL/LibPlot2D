@@ -813,10 +813,10 @@ bool Axis::HasValidParameters(void)
 //		None
 //
 // Return Value:
-//		int specifying the location of the object in screen coordinates
+//		double specifying the location of the object in screen coordinates
 //
 //==========================================================================
-int Axis::ValueToPixel(const double &value) const
+double Axis::ValueToPixel(const double &value) const
 {
 	// Get the plot size
 	int plotDimension;

@@ -100,7 +100,7 @@ public:
 
 	inline bool IsLogarithmic(void) const { return logarithmic; };
 
-	int ValueToPixel(const double &value) const;
+	double ValueToPixel(const double &value) const;
 	double PixelToValue(const int &pixel) const;
 
 private:

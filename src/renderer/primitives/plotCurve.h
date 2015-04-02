@@ -19,6 +19,7 @@
 // Local headers
 #include "renderer/primitives/primitive.h"
 #include "utilities/managedList.h"
+#include "renderer/line.h"
 
 // Local forward declarations
 class Axis;
@@ -64,16 +65,19 @@ private:
 
 	const Dataset2D *data;
 
+	Line line;
+	std::vector<std::pair<double, double> > points;
+
 	unsigned int lineSize;
 	int markerSize;
 
-	void RescalePoint(const double *value, int *coordinate) const;
+	void RescalePoint(const double *value, double *coordinate) const;
 
 	bool PointIsWithinPlotArea(const unsigned int &i) const;
-	void PlotPoint(const unsigned int &i) const;
-	void PlotPoint(const double &x, const double &y) const;
-	void PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint) const;
-	void PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second) const;
+	void PlotPoint(const unsigned int &i);
+	void PlotPoint(const double &x, const double &y);
+	void PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint);
+	void PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second);
 
 	bool PointsCrossBottomAxis(const unsigned int &first, const unsigned int &second) const;
 	bool PointsCrossTopAxis(const unsigned int &first, const unsigned int &second) const;

@@ -108,8 +108,10 @@ void PlotCurve::GenerateGeometry(void)
 {
 	if (lineSize > 0)
 	{
-		glLineWidth((float)lineSize);
-		glBegin(GL_LINE_STRIP);
+		line.SetLineColor(color);
+		line.SetBackgroundColorForAlphaFade();
+		line.SetWidth(lineSize);
+		points.clear();
 
 		unsigned int i;
 		for (i = 0; i < data->GetNumberOfPoints(); i++)
@@ -126,11 +128,12 @@ void PlotCurve::GenerateGeometry(void)
 				PlotInterpolatedJumpPoints(i - 1, i);
 		}
 
-		glEnd();
+		line.Draw(points);
 	}
 
 	if (markerSize > 0 || (markerSize < 0 && SmallRange()))
 	{
+		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 		glBegin(GL_QUADS);
 		PlotMarkers();
 		glEnd();
@@ -181,7 +184,7 @@ bool PlotCurve::PointIsWithinPlotArea(const unsigned int &i) const
 //		None
 //
 //==========================================================================
-void PlotCurve::PlotPoint(const unsigned int &i) const
+void PlotCurve::PlotPoint(const unsigned int &i)
 {
 	PlotPoint(data->GetXData(i), data->GetYData(i));
 }
@@ -203,18 +206,18 @@ void PlotCurve::PlotPoint(const unsigned int &i) const
 //		None
 //
 //==========================================================================
-void PlotCurve::PlotPoint(const double &x, const double &y) const
+void PlotCurve::PlotPoint(const double &x, const double &y)
 {
 	double doublePoint[2] = {x, y};
-	int point[2];
+	double point[2];
 
 	RescalePoint(doublePoint, point);
-	glVertex2iv(point);
+	points.push_back(std::make_pair(point[0], point[1]));
 }
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		PlotPoint
+// Function:		PlotInterpolatedPoint
 //
 // Description:		Plots the coordinate where the line between the specified
 //					indecies crosses out of/in to the plot area.
@@ -233,12 +236,12 @@ void PlotCurve::PlotPoint(const double &x, const double &y) const
 //		None
 //
 //==========================================================================
-void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint) const
+void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint)
 {
 	if (startingPoint)
 	{
-		glEnd();
-		glBegin(GL_LINE_STRIP);
+		line.Draw(points);
+		points.clear();
 	}
 
 	if (PointIsValid(first) && PointIsValid(second))
@@ -257,8 +260,8 @@ void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned 
 
 	if (!startingPoint)
 	{
-		glEnd();
-		glBegin(GL_LINE_STRIP);
+		line.Draw(points);
+		points.clear();
 	}
 }
 
@@ -281,13 +284,13 @@ void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned 
 //		None
 //
 //==========================================================================
-void PlotCurve::PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second) const
+void PlotCurve::PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second)
 {
-	glEnd();
+	line.Draw(points);
 
 	if (PointIsValid(first) && PointIsValid(second))
 	{
-		glBegin(GL_LINE_STRIP);
+		points.clear();
 
 		if (PointsCrossBottomAxis(first, second))
 			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
@@ -298,9 +301,9 @@ void PlotCurve::PlotInterpolatedJumpPoints(const unsigned int &first, const unsi
 		if (PointsCrossRightAxis(first, second))
 			PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
 
-		glEnd();
+		line.Draw(points);
 	}
-	glBegin(GL_LINE_STRIP);
+	points.clear();
 }
 
 //==========================================================================
@@ -415,13 +418,13 @@ void PlotCurve::SetData(const Dataset2D *_data)
 //				  coordinates
 //
 // Output Arguments:
-//		coordinate	= int* specifying the location of the object in screen coordinates
+//		coordinate	= double* specifying the location of the object in screen coordinates
 //
 // Return Value:
 //		None
 //
 //==========================================================================
-void PlotCurve::RescalePoint(const double *value, int *coordinate) const
+void PlotCurve::RescalePoint(const double *value, double *coordinate) const
 {
 	if (!value || !coordinate)
 		return;
@@ -757,7 +760,7 @@ void PlotCurve::PlotMarkers(void) const
 void PlotCurve::DrawMarker(const double &x, const double &y) const
 {
 	double doublePoint[2] = {x, y};
-	int point[2];
+	double point[2];
 	RescalePoint(doublePoint, point);
 
 	int halfMarkerSize = 2 * markerSize;

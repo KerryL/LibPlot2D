@@ -175,6 +175,9 @@ void Line::Draw(const std::vector<std::pair<unsigned int, unsigned int> > &point
 //==========================================================================
 void Line::Draw(const std::vector<std::pair<double, double> > &points) const
 {
+	if (points.size() < 2)
+		return;
+
 	std::vector<std::pair<double, double> > offsets(points.size() - 1);
 	double xOffset, yOffset;
 
