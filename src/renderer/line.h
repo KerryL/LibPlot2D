@@ -32,7 +32,7 @@ class Line
 public:
 	Line();
 
-	inline void SetWidth(const double &width) { assert(width > 0.0); halfWidth = 0.75 * width; }
+	inline void SetWidth(const double &width) { assert(width > 0.0); halfWidth = 0.5 * width; }
 	inline void SetLineColor(const Color &color) { lineColor = color; }
 	inline void SetBackgroundColor(const Color &color) { backgroundColor = color; }
 	inline void SetBackgroundColorForAlphaFade() { backgroundColor = lineColor; backgroundColor.SetAlpha(0.0); }
@@ -44,12 +44,13 @@ public:
 	void Draw(const std::vector<std::pair<double, double> > &points) const;
 
 private:
+	static const double fadeDistance;
 	double halfWidth;// Due to the fading, setting the half width equal to the width seems to create a nice match for desired line width
 	Color lineColor;
 	Color backgroundColor;
 
 	void ComputeOffsets(const double &x1, const double &y1, const double &x2,
-		const double &y2, double &xOffset, double &yOffset) const;
+		const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const;
 };
 
 #endif// LINE_H_

@@ -74,7 +74,7 @@ public:
 	void SetRightYMax(const double &_yMax);
 
 	void SetCurveProperties(const unsigned int &index, const Color &color,
-		const bool &visible, const bool &rightAxis, const unsigned int &size,
+		const bool &visible, const bool &rightAxis, const double &lineSize,
 		const int &markerSize);
 
 	void SetMajorGrid(const bool &gridOn);

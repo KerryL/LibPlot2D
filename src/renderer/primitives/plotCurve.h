@@ -42,7 +42,7 @@ public:
 
 	void SetModified(void) { modified = true; };
 
-	void SetLineSize(const unsigned int &size) { lineSize = size; modified = true; };
+	void SetLineSize(const double &size) { lineSize = size; modified = true; };
 	void SetMarkerSize(const int &size) { markerSize = size; modified = true; };
 
 	// Remove all data from the plot
@@ -68,7 +68,7 @@ private:
 	Line line;
 	std::vector<std::pair<double, double> > points;
 
-	unsigned int lineSize;
+	double lineSize;
 	int markerSize;
 
 	void RescalePoint(const double *value, double *coordinate) const;

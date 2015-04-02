@@ -1351,12 +1351,11 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 	unsigned int index = optionsGrid->GetNumberRows();
 	optionsGrid->AppendRows();
 
-	unsigned int maxLineSize(5);
 	unsigned int maxMarkerSize(5);
 
 	optionsGrid->SetCellRenderer(index, colVisible, new wxGridCellBoolRenderer);
 	optionsGrid->SetCellRenderer(index, colRightAxis, new wxGridCellBoolRenderer);
-	optionsGrid->SetCellEditor(index, colLineSize, new wxGridCellNumberEditor(0, maxLineSize));
+	optionsGrid->SetCellEditor(index, colLineSize, new wxGridCellFloatEditor(1, 1));
 	optionsGrid->SetCellEditor(index, colMarkerSize, new wxGridCellNumberEditor(-1, maxMarkerSize));
 
 	unsigned int i;
@@ -1619,9 +1618,9 @@ void MainFrame::UpdateCurveProperties(const unsigned int &index)
 void MainFrame::UpdateCurveProperties(const unsigned int &index, const Color &color,
 	const bool &visible, const bool &rightAxis)
 {
-	unsigned long lineSize;
+	double lineSize;
 	long markerSize;
-	optionsGrid->GetCellValue(index + 1, colLineSize).ToULong(&lineSize);
+	optionsGrid->GetCellValue(index + 1, colLineSize).ToDouble(&lineSize);
 	optionsGrid->GetCellValue(index + 1, colMarkerSize).ToLong(&markerSize);
 	plotArea->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
 	plotArea->SaveCurrentZoom();

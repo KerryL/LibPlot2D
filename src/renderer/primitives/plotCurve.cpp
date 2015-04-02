@@ -108,9 +108,11 @@ void PlotCurve::GenerateGeometry(void)
 {
 	if (lineSize > 0)
 	{
+		const double lineSizeScale(1.2);
+
 		line.SetLineColor(color);
 		line.SetBackgroundColorForAlphaFade();
-		line.SetWidth(lineSize);
+		line.SetWidth(lineSize * lineSizeScale);
 		points.clear();
 
 		unsigned int i;

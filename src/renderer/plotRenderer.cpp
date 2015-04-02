@@ -1151,7 +1151,7 @@ double PlotRenderer::GetRightMajorResolution() const
 //					  be drawn
 //		rightAxis	= const bool& indicating whether the curve should be tied
 //					  to the left or right axis
-//		lineSize	= const unsigned int&
+//		lineSize	= const double&
 //		markerSize	= const int&
 //
 // Output Arguments:
@@ -1163,7 +1163,7 @@ double PlotRenderer::GetRightMajorResolution() const
 //==========================================================================
 void PlotRenderer::SetCurveProperties(const unsigned int &index, const Color &color,
 									  const bool &visible, const bool &rightAxis,
-									  const unsigned int &lineSize, const int &markerSize)
+									  const double &lineSize, const int &markerSize)
 {
 	plot->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
 	UpdateDisplay();
