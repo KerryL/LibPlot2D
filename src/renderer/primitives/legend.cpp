@@ -17,6 +17,7 @@
 #include "renderer/primitives/legend.h"
 #include "renderer/renderWindow.h"
 #include "utilities/math/plotMath.h"
+#include "renderer/line.h"
 
 // FTGL headers
 #include <FTGL/ftgl.h>
@@ -234,7 +235,15 @@ void Legend::DrawBackground() const
 {
 	glBegin(GL_QUADS);
 	glColor4d(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-	DrawCornerVertices();
+	
+	double x, y;
+	GetAdjustedPosition(x, y);
+
+	glVertex2i(x, y);
+	glVertex2i(x + width, y);
+	glVertex2i(x + width, y + height);
+	glVertex2i(x, y + height);
+
 	glEnd();
 }
 
@@ -256,18 +265,18 @@ void Legend::DrawBackground() const
 //==========================================================================
 void Legend::DrawBorder() const
 {
-	glLineWidth(borderSize);
-	glBegin(GL_LINE_LOOP);
-	glColor4d(borderColor.GetRed(), borderColor.GetGreen(), borderColor.GetBlue(), borderColor.GetAlpha());
-	DrawCornerVertices();
-	glEnd();
+	Line border;
+	border.SetWidth(borderSize);
+	border.SetLineColor(borderColor);
+	border.SetBackgroundColorForAlphaFade();
+	border.Draw(GetCornerVertices());
 }
 
 //==========================================================================
 // Class:			Legend
-// Function:		DrawCornerVertices
+// Function:		GetCornerVertices
 //
-// Description:		Draws the four corner points
+// Description:		Returns the four corner points in a vector.
 //
 // Input Arguments:
 //		None
@@ -276,18 +285,22 @@ void Legend::DrawBorder() const
 //		None
 //
 // Return Value:
-//		None
+//		std::vector<std::pair<double, double> >
 //
 //==========================================================================
-void Legend::DrawCornerVertices() const
+std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
 {
 	double x, y;
 	GetAdjustedPosition(x, y);
 
-	glVertex2i(x, y);
-	glVertex2i(x + width, y);
-	glVertex2i(x + width, y + height);
-	glVertex2i(x, y + height);
+	std::vector<std::pair<double, double> > points;
+	points.push_back(std::make_pair(x, y));
+	points.push_back(std::make_pair(x + width, y));
+	points.push_back(std::make_pair(x + width, y + height));
+	points.push_back(std::make_pair(x, y + height));
+	points.push_back(std::make_pair(x, y));
+
+	return points;
 }
 
 //==========================================================================

@@ -1234,27 +1234,10 @@ void RenderWindow::Initialize2D(void) const
 	ShiftForExactPixelization();
 
 	// Enable the parameters required for anti-aliasing of lines
-	//glDisable(GL_MULTISAMPLE);// Supposedly degrades quality of anti-aliasing
-	/*glEnable(GL_MULTISAMPLE);
-	glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);*/
-	/*int a;
-	glGetIntegerv(GL_SAMPLE_BUFFERS, &a);
-	wxString s;
-	s.Printf("%i", a);
-	wxMessageBox(s);
-	glGetIntegerv(GL_SAMPLES, &a);
-	s.Printf("%i", a);
-	wxMessageBox(s);//*/
-	//GL_SAMPLE_BUFFERS
-	//GL_SAMPLES
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	/*glEnable(GL_POINT_SMOOTH);
-	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);*/
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	// TODO:  Something isn't right under GTK - MSW looks nice but GTK does not
 }
 
 //==========================================================================

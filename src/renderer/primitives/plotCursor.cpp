@@ -18,6 +18,7 @@
 #include "renderer/primitives/plotCursor.h"
 #include "renderer/primitives/axis.h"
 #include "renderer/renderWindow.h"
+#include "renderer/line.h"
 
 //==========================================================================
 // Class:			PlotCursor
@@ -63,33 +64,19 @@ PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis)
 //==========================================================================
 void PlotCursor::GenerateGeometry(void)
 {
-	// Set the line width
-	glLineWidth(1.0f);
-
-	// Create the axis
-	glBegin(GL_LINES);
-
-	//unsigned int dimension;// [pixels]
+	Line line;
 	if (axis.IsHorizontal())
 	{
-		/*dimension = renderWindow.GetSize().GetWidth()
-				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();*/
-		glVertex2i(locationAlongAxis, axis.GetOffsetFromWindowEdge());
-		glVertex2i(locationAlongAxis, renderWindow.GetSize().GetHeight()
-				- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
+		line.Draw(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
+			locationAlongAxis, renderWindow.GetSize().GetHeight()
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
 	}
 	else
 	{
-		/*dimension = renderWindow.GetSize().GetHeight()
-				- axis.GetAxisAtMinEnd()->GetOffsetFromWindowEdge()
-				- axis.GetAxisAtMaxEnd()->GetOffsetFromWindowEdge();*/
-		glVertex2i(axis.GetOffsetFromWindowEdge(), locationAlongAxis);
-		glVertex2i(renderWindow.GetSize().GetWidth()
-				- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
+		line.Draw(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
+			renderWindow.GetSize().GetWidth()
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
 	}
-
-	glEnd();
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
 	value = axis.PixelToValue(locationAlongAxis);
@@ -99,7 +86,7 @@ void PlotCursor::GenerateGeometry(void)
 // Class:			PlotCursor
 // Function:		HasValidParameters
 //
-// Description:		Checks to see if we're OK to drawy the cursor.
+// Description:		Checks to see if we're OK to draw the cursor.
 //
 // Input Arguments:
 //		None

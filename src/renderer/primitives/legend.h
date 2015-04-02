@@ -18,6 +18,7 @@
 
 // Standard C++ headers
 #include <vector>
+#include <utility>
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -110,7 +111,7 @@ private:
 	void DrawNextEntry(const double &index) const;
 	void DrawBackground() const;
 	void DrawBorder() const;
-	void DrawCornerVertices() const;
+	std::vector<std::pair<double, double> > GetCornerVertices() const;
 	void DrawMarker(const unsigned int &x, const unsigned int &y, const unsigned int &size) const;
 
 	void UpdateBoundingBox();
