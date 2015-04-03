@@ -51,6 +51,14 @@ private:
 
 	void ComputeOffsets(const double &x1, const double &y1, const double &x2,
 		const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const;
+
+	struct Offsets
+	{
+		double dxLine;
+		double dyLine;
+		double dxEdge;
+		double dyEdge;
+	};
 };
 
 #endif// LINE_H_

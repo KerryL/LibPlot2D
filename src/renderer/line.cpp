@@ -199,14 +199,6 @@ void Line::Draw(const std::vector<std::pair<double, double> > &points) const
 	if (points.size() < 2)
 		return;
 
-	struct Offsets
-	{
-		double dxLine;
-		double dyLine;
-		double dxEdge;
-		double dyEdge;
-	};
-
 	std::vector<Offsets> offsets(points.size() - 1);
 	double dxLine, dyLine, dxEdge, dyEdge;
 
