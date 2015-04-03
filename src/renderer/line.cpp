@@ -39,7 +39,14 @@
 //		None
 //
 //==========================================================================
+// Under GTK, still having issues getting thin lines to appear smooth
+// Don't want to sacrifice crisp thin lines we can achieve under MSW, so
+// we add this #if
+#ifdef __WXMSW__
 const double Line::fadeDistance(0.05);
+#else
+const double Line::fadeDistance(0.6);
+#endif
 
 //==========================================================================
 // Class:			Line
