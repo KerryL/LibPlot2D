@@ -84,10 +84,13 @@ private:
 		std::stack<bool> &useDoubleStack, double &value, Dataset2D &dataset) const;
 
 	Dataset2D ApplyFunction(const wxString &function, const Dataset2D &set) const;
+	double ApplyFunction(const wxString &function, const double &value) const;
 	Dataset2D ApplyOperation(const wxString &operation, const Dataset2D &first, const Dataset2D &second) const;
 	Dataset2D ApplyOperation(const wxString &operation, const Dataset2D &first, const double &second) const;
 	Dataset2D ApplyOperation(const wxString &operation, const double &first, const Dataset2D &second) const;
 	double ApplyOperation(const wxString &operation, const double &first, const double &second) const;
+
+	bool FunctionRequiresDataset(const wxString &function) const;
 
 	bool EvaluateNext(const wxString &next, std::stack<double> &doubleStack,
 		std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack, wxString &errorString) const;

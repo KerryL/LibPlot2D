@@ -592,6 +592,11 @@ bool ExpressionTree::NextIsS(const wxString &s, unsigned int *stop)
 {
 	if (s[0] == 's' || s[0] == 'z')
 	{
+		if (s.length() > 1 &&
+			((s[1] >= 'a' && s[1] <= 'z') ||
+			((s[1] >= 'A' && s[1] <= 'Z'))))
+			return false;
+		
 		if (stop)
 			*stop = 1;
 		return true;
@@ -666,6 +671,12 @@ bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop)
 	// List these in order of longest to shortest
 	if (BeginningMatchesNoCase(s, _T("log10"), stop))
 		return true;
+	else if (BeginningMatchesNoCase(s, _T("asin"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("acos"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("atan"), stop))
+		return true;
 	else if (BeginningMatchesNoCase(s, _T("int"), stop))
 		return true;
 	else if (BeginningMatchesNoCase(s, _T("ddt"), stop))
@@ -681,6 +692,12 @@ bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop)
 	else if (BeginningMatchesNoCase(s, _T("abs"), stop))
 		return true;
 	else if (BeginningMatchesNoCase(s, _T("bit"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("sin"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("cos"), stop))
+		return true;
+	else if (BeginningMatchesNoCase(s, _T("tan"), stop))
 		return true;
 
 	return false;
@@ -990,7 +1007,7 @@ bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<wx
 //
 // Input Arguments:
 //		function	= const wxString& describing the function to apply
-//		set			= Dataset2D&
+//		set			= const Dataset2D&
 //
 // Output Arguments:
 //		None
@@ -1016,6 +1033,18 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 		return set.DoExp();
 	else if (function.CmpNoCase(_T("abs")) == 0)
 		return set.DoAbs();
+	else if (function.CmpNoCase(_T("sin")) == 0)
+		return set.DoSin();
+	else if (function.CmpNoCase(_T("cos")) == 0)
+		return set.DoCos();
+	else if (function.CmpNoCase(_T("tan")) == 0)
+		return set.DoTan();
+	else if (function.CmpNoCase(_T("asin")) == 0)
+		return set.DoArcSin();
+	else if (function.CmpNoCase(_T("acos")) == 0)
+		return set.DoArcCos();
+	else if (function.CmpNoCase(_T("atan")) == 0)
+		return set.DoArcTan();
 	/*else if (function.CmpNoCase(_T("bit")) == 0)
 		return PlotMath::ApplyBitMask(set, bit);
 	else if (function.CmpNoCase(_T("frf")) == 0)
@@ -1023,6 +1052,80 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 
 	assert(false);
 	return set;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		ApplyFunction
+//
+// Description:		Applies the specified function to the specified dataset.
+//
+// Input Arguments:
+//		function	= const wxString& describing the function to apply
+//		value		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double ExpressionTree::ApplyFunction(const wxString &function, const double &value) const
+{
+	if (function.CmpNoCase(_T("log")) == 0)
+		return log(value);
+	else if (function.CmpNoCase(_T("log10")) == 0)
+		return log10(value);
+	else if (function.CmpNoCase(_T("exp")) == 0)
+		return exp(value);
+	else if (function.CmpNoCase(_T("abs")) == 0)
+		return fabs(value);
+	else if (function.CmpNoCase(_T("sin")) == 0)
+		return sin(value);
+	else if (function.CmpNoCase(_T("cos")) == 0)
+		return cos(value);
+	else if (function.CmpNoCase(_T("tan")) == 0)
+		return tan(value);
+	else if (function.CmpNoCase(_T("asin")) == 0)
+		return asin(value);
+	else if (function.CmpNoCase(_T("acos")) == 0)
+		return acos(value);
+	else if (function.CmpNoCase(_T("atan")) == 0)
+		return atan(value);
+	/*else if (function.CmpNoCase(_T("bit")) == 0)
+		return PlotMath::ApplyBitMask(value, bit);*/
+
+	assert(false);
+	return 0.0;
+}
+
+//==========================================================================
+// Class:			ExpressionTree
+// Function:		FunctionRequiresDataset
+//
+// Description:		Determines if the specified function requires a dataset to
+//					operate on, or if it can also operate on values.
+//
+// Input Arguments:
+//		function	= const wxString& describing the function to apply
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool ExpressionTree::FunctionRequiresDataset(const wxString &function) const
+{
+	if (function.CmpNoCase(_T("int")) == 0 ||
+		function.CmpNoCase(_T("ddt")) == 0 ||
+		function.CmpNoCase(_T("fft")) == 0 ||
+		function.CmpNoCase(_T("frf")) == 0)
+		return true;
+
+	return false;
 }
 
 //==========================================================================
@@ -1305,12 +1408,18 @@ bool ExpressionTree::EvaluateFunction(const wxString &function, std::stack<doubl
 	}
 	else if (PopFromStack(doubleStack, setStack, useDoubleStack, value, dataset))
 	{
-		errorString = _T("Attempting to apply function to value (requires dataset).");
-		return false;
+		if (FunctionRequiresDataset(function))
+		{
+			errorString = _T("Attempting to apply function to value (requires dataset).");
+			return false;
+		}
+
+		// TODO:  Handle multiple args here
+		PushToStack(ApplyFunction(function, value), doubleStack, useDoubleStack);
+		return true;
 	}
 
 	// TODO:  Handle multiple args here
-
 	PushToStack(ApplyFunction(function, dataset), setStack, useDoubleStack);
 
 	return true;

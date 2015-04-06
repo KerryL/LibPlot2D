@@ -88,6 +88,12 @@ public:
 	Dataset2D& DoLog10(void);
 	Dataset2D& DoExp(void);
 	Dataset2D& DoAbs(void);
+	Dataset2D& DoSin(void);
+	Dataset2D& DoCos(void);
+	Dataset2D& DoTan(void);
+	Dataset2D& DoArcSin(void);
+	Dataset2D& DoArcCos(void);
+	Dataset2D& DoArcTan(void);
 
 	const Dataset2D ToPower(const double &target) const;
 	const Dataset2D ToPower(const Dataset2D &target) const;
@@ -96,6 +102,12 @@ public:
 	const Dataset2D DoLog10(void) const;
 	const Dataset2D DoExp(void) const;
 	const Dataset2D DoAbs(void) const;
+	const Dataset2D DoSin(void) const;
+	const Dataset2D DoCos(void) const;
+	const Dataset2D DoTan(void) const;
+	const Dataset2D DoArcSin(void) const;
+	const Dataset2D DoArcCos(void) const;
+	const Dataset2D DoArcTan(void) const;
 
 	static Dataset2D DoUnsyncrhonizedAdd(const Dataset2D &d1, const Dataset2D &d2);
 	static Dataset2D DoUnsyncrhonizedSubtract(const Dataset2D &d1, const Dataset2D &d2);

@@ -1002,6 +1002,156 @@ Dataset2D& Dataset2D::DoAbs(void)
 
 //==========================================================================
 // Class:			Dataset2D
+// Function:		DoSin
+//
+// Description:		Applies the sin function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoSin(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = sin(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoCos
+//
+// Description:		Applies the cos function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoCos(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = cos(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoTan
+//
+// Description:		Applies the tan function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoTan(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = tan(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoArcSin
+//
+// Description:		Applies the asin function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoArcSin(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = asin(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoArcCos
+//
+// Description:		Applies the acos function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoArcCos(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = acos(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoArcTan
+//
+// Description:		Applies the atan function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D&
+//
+//==========================================================================
+Dataset2D& Dataset2D::DoArcTan(void)
+{
+	unsigned int i;
+	for (i = 0; i < numberOfPoints; i++)
+		yData[i] = atan(yData[i]);
+
+	return *this;
+}
+
+//==========================================================================
+// Class:			Dataset2D
 // Function:		DoLog
 //
 // Description:		Applies the log function to each Y-value in the dataset.
@@ -1013,7 +1163,7 @@ Dataset2D& Dataset2D::DoAbs(void)
 //		None
 //
 // Return Value:
-//		const Dataset2D&
+//		const Dataset2D
 //
 //==========================================================================
 const Dataset2D Dataset2D::DoLog(void) const
@@ -1035,7 +1185,7 @@ const Dataset2D Dataset2D::DoLog(void) const
 //		None
 //
 // Return Value:
-//		const Dataset2D&
+//		const Dataset2D
 //
 //==========================================================================
 const Dataset2D Dataset2D::DoLog10(void) const
@@ -1057,7 +1207,7 @@ const Dataset2D Dataset2D::DoLog10(void) const
 //		None
 //
 // Return Value:
-//		const Dataset2D&
+//		const Dataset2D
 //
 //==========================================================================
 const Dataset2D Dataset2D::DoExp(void) const
@@ -1079,13 +1229,145 @@ const Dataset2D Dataset2D::DoExp(void) const
 //		None
 //
 // Return Value:
-//		const Dataset2D&
+//		const Dataset2D
 //
 //==========================================================================
 const Dataset2D Dataset2D::DoAbs(void) const
 {
 	Dataset2D result(*this);
 	return result.DoAbs();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoSin
+//
+// Description:		Applies the sin function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoSin(void) const
+{
+	Dataset2D result(*this);
+	return result.DoSin();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoCos
+//
+// Description:		Applies the cos function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoCos(void) const
+{
+	Dataset2D result(*this);
+	return result.DoCos();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoTan
+//
+// Description:		Applies the tan function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoTan(void) const
+{
+	Dataset2D result(*this);
+	return result.DoTan();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoArcSin
+//
+// Description:		Applies the asin function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoArcSin(void) const
+{
+	Dataset2D result(*this);
+	return result.DoArcSin();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoArcCos
+//
+// Description:		Applies the acos function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoArcCos(void) const
+{
+	Dataset2D result(*this);
+	return result.DoArcCos();
+}
+
+//==========================================================================
+// Class:			Dataset2D
+// Function:		DoArcTan
+//
+// Description:		Applies the atan function to each Y-value in the dataset.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		const Dataset2D
+//
+//==========================================================================
+const Dataset2D Dataset2D::DoArcTan(void) const
+{
+	Dataset2D result(*this);
+	return result.DoArcTan();
 }
 
 //==========================================================================
