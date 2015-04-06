@@ -478,8 +478,7 @@ std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::p
 //
 // Description:		If a power between the maximum power and zero is missing,
 //					a zero-coefficient value for that power is inserted at
-//					the appropriate location in the vector.  Assumes the input
-//					vector is sorted highest power to lowest power.
+//					the appropriate location in the vector.
 //
 // Input Arguments:
 //		terms	= std::vector<std::pair<int, double> >
@@ -493,6 +492,8 @@ std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::p
 //==========================================================================
 std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pair<int, double> > terms)
 {
+	std::sort(terms.begin(), terms.end(), std::greater<std::pair<int, double> >());// Sort in descending order of power
+
 	int i, expectedPower(terms[0].first - 1);
 	while (expectedPower < -1)
 	{
