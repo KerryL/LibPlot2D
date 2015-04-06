@@ -332,7 +332,7 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
-	int location;
+	double location;
 	for (grid = 1; grid <= count + 1; grid++)
 	{
 		if (minorGrid)
@@ -340,12 +340,12 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 		else
 			location = ValueToPixel(GetNextTickValue(false, false, grid));
 
-		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
-			location >= (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
+		if (location <= minAxis->GetOffsetFromWindowEdge() ||
+			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		gridLine.Draw(location, offsetFromWindowEdge, location,
-			renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge());
+		gridLine.Draw(location, static_cast<double>(offsetFromWindowEdge), location,
+			static_cast<double>(renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge()));
 	}
 }
 
@@ -377,12 +377,12 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 	for (tick = 1; tick <= count + 1; tick++)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick));
-		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
-			location >= (int)renderWindow.GetSize().GetWidth() - (int)maxAxis->GetOffsetFromWindowEdge())
+		if (location <= minAxis->GetOffsetFromWindowEdge() ||
+			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		line.Draw(location, mainAxisLocation - tickSize * outsideTick * sign, location,
-			mainAxisLocation + tickSize * insideTick * sign);
+		line.Draw(location, static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign),
+			location, static_cast<double>(mainAxisLocation + tickSize * insideTick * sign));
 	}
 }
 
@@ -410,7 +410,7 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
-	int location;
+	double location;
 	for (grid = 1; grid <= count + 1; grid++)
 	{
 		if (minorGrid)
@@ -418,12 +418,12 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 		else
 			location = ValueToPixel(GetNextTickValue(false, false, grid));
 
-		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
-			location >= (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
+		if (location <= minAxis->GetOffsetFromWindowEdge() ||
+			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		gridLine.Draw(offsetFromWindowEdge, location,
-			renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge(), location);
+		gridLine.Draw(static_cast<double>(offsetFromWindowEdge), location,
+			static_cast<double>(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge()), location);
 	}
 }
 
@@ -456,12 +456,12 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 	for (tick = 1; tick <= count + 1; tick++)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick));
-		if (location <= (int)minAxis->GetOffsetFromWindowEdge() ||
-			location >= (int)renderWindow.GetSize().GetHeight() - (int)maxAxis->GetOffsetFromWindowEdge())
+		if (location <= minAxis->GetOffsetFromWindowEdge() ||
+			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		line.Draw(mainAxisLocation - tickSize * outsideTick * sign, location,
-			mainAxisLocation + tickSize * insideTick * sign, location);
+		line.Draw(static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign), location,
+			static_cast<double>(mainAxisLocation + tickSize * insideTick * sign), location);
 	}
 }
 
