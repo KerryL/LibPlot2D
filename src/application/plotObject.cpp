@@ -68,8 +68,8 @@ const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 //==========================================================================
 PlotObject::PlotObject(PlotRenderer &_renderer) : renderer(_renderer)
 {
-	CreateAxisObjects();
 	InitializeFonts();
+	CreateAxisObjects();
 
 	ResetAutoScaling();
 	renderer.SetBackgroundColor(Color::ColorWhite);
@@ -139,6 +139,8 @@ void PlotObject::CreateAxisObjects(void)
 	axisRight->SetAxisAtMaxEnd(axisTop);
 	axisRight->SetAxisAtMinEnd(axisBottom);
 	axisRight->SetOppositeAxis(axisLeft);
+
+	FormatAxesBasics();
 }
 
 //==========================================================================
@@ -542,7 +544,7 @@ void PlotObject::AddCurve(const Dataset2D &data)
 //==========================================================================
 void PlotObject::FormatPlot(void)
 {
-	FormatAxesBasics();
+	UpdateAxesOffsets();
 	FormatTitle();
 	if (dataList.size() == 0)
 		return;
@@ -606,11 +608,53 @@ void PlotObject::FormatAxesBasics(void)
 	Axis::TickStyle tickStyle = Axis::TickStyleInside;
 
 	FormatBottomBasics(tickStyle);
-	FormatTopBasics(tickStyle);
+	FormatTopBasics(Axis::TickStyleNone);
 	FormatLeftBasics(tickStyle);
 	FormatRightBasics(tickStyle);
 
 	SetAxesColor(Color::ColorBlack);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		UpdateAxesOffsets
+//
+// Description:		Updates the offsets for each axis from the edge of the viewable area.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::UpdateAxesOffsets(void)
+{
+	if (axisBottom->GetLabel().IsEmpty())
+		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
+	else
+		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithLabel);
+
+	if (axisTop->GetLabel().IsEmpty())
+		axisTop->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
+	else
+		axisTop->SetOffsetFromWindowEdge(horizontalOffsetWithLabel);
+
+	if (!titleObject->GetText().IsEmpty())
+		axisTop->SetOffsetFromWindowEdge(axisTop->GetOffsetFromWindowEdge() + titleObject->GetTextHeight());
+
+	if (axisLeft->GetLabel().IsEmpty())
+		axisLeft->SetOffsetFromWindowEdge(verticalOffsetWithoutLabel);
+	else
+		axisLeft->SetOffsetFromWindowEdge(verticalOffsetWithLabel);
+
+	if (axisRight->GetLabel().IsEmpty())
+		axisRight->SetOffsetFromWindowEdge(verticalOffsetWithoutLabel);
+	else
+		axisRight->SetOffsetFromWindowEdge(verticalOffsetWithLabel);
 }
 
 //==========================================================================
@@ -634,11 +678,6 @@ void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 	axisBottom->SetOrientation(Axis::OrientationBottom);
 	axisBottom->SetFont(axisFont);
 	axisBottom->SetTickStyle(tickStyle);
-
-	if (axisBottom->GetLabel().IsEmpty())
-		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
-	else
-		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithLabel);
 }
 
 //==========================================================================
@@ -661,14 +700,6 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 {
 	axisTop->SetOrientation(Axis::OrientationTop);
 	axisTop->SetTickStyle(tickStyle);
-
-	if (axisTop->GetLabel().IsEmpty())
-		axisTop->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
-	else
-		axisTop->SetOffsetFromWindowEdge(horizontalOffsetWithLabel);
-
-	if (!titleObject->GetText().IsEmpty())
-		axisTop->SetOffsetFromWindowEdge(axisTop->GetOffsetFromWindowEdge() + titleObject->GetTextHeight());
 }
 
 //==========================================================================
@@ -692,11 +723,6 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 	axisLeft->SetOrientation(Axis::OrientationLeft);
 	axisLeft->SetFont(axisFont);
 	axisLeft->SetTickStyle(tickStyle);
-
-	if (axisLeft->GetLabel().IsEmpty())
-		axisLeft->SetOffsetFromWindowEdge(verticalOffsetWithoutLabel);
-	else
-		axisLeft->SetOffsetFromWindowEdge(verticalOffsetWithLabel);
 }
 
 //==========================================================================
@@ -720,11 +746,6 @@ void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 	axisRight->SetOrientation(Axis::OrientationRight);
 	axisRight->SetFont(axisFont);
 	axisRight->SetTickStyle(tickStyle);
-
-	if (axisRight->GetLabel().IsEmpty())
-		axisRight->SetOffsetFromWindowEdge(verticalOffsetWithoutLabel);
-	else
-		axisRight->SetOffsetFromWindowEdge(verticalOffsetWithLabel);
 }
 
 //==========================================================================

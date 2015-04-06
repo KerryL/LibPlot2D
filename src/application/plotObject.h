@@ -193,6 +193,7 @@ private:
 	void FormatTopBasics(const Axis::TickStyle &tickStyle);
 	void FormatLeftBasics(const Axis::TickStyle &tickStyle);
 	void FormatRightBasics(const Axis::TickStyle &tickStyle);
+	void UpdateAxesOffsets(void);
 	void SetAxesColor(const Color &color);
 	void FormatTitle(void);
 
