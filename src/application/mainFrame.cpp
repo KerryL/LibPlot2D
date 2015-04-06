@@ -1261,6 +1261,7 @@ void MainFrame::AddCurve(wxString mathString)
 	if (!errors.IsEmpty())
 	{
 		wxMessageBox(_T("Could not solve expression:\n\n") + errors, _T("Error Solving Expression"), wxICON_ERROR, this);
+		delete mathChannel;
 
 		DisplayMathChannelDialog(mathString);
 		return;
