@@ -372,7 +372,7 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 				names = GenerateNames(previousLines, delimitedLine, nonNumericColumns);
 				headerLineCount = previousLines.size();
 				if (names.size() == 0)
-					names = GenerateDummyNames(delimitedLine.size());
+					names = GenerateDummyNames(delimitedLine, nonNumericColumns);
 				factors.resize(names.size() + nonNumericColumns.size(), 1.0);
 				file.close();
 				return names;
@@ -512,21 +512,31 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 //					provided by the data file.
 //
 // Input Arguments:
-//		count	= const unsigned int& specifying the number of names to generate
+//		currentLine			= const wxArrayString&
 //
 // Output Arguments:
-//		None
+//		nonNumericColumns	= wxArrayInt&
 //
 // Return Value:
 //		wxArrayString containing dummy names
 //
 //==========================================================================
-wxArrayString DataFile::GenerateDummyNames(const unsigned int &count) const
+wxArrayString DataFile::GenerateDummyNames(const wxArrayString &currentLine,
+	wxArrayInt &nonNumericColumns) const
 {
 	unsigned int i;
+	double value;
 	wxArrayString names;
-	for (i = 0; i < count; i++)
+	for (i = 0; i < currentLine.size(); i++)
+	{
+		if (!currentLine[i].ToDouble(&value))
+		{
+			nonNumericColumns.Add(i);
+			continue;
+		}
+
 		names.Add(wxString::Format("[%i]", i));
+	}
 
 	return names;
 }
@@ -793,9 +803,16 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 //==========================================================================
 bool DataFile::IsDataRow(const wxArrayString &list) const
 {
-	unsigned int j;
 	double value;
-	for (j = (unsigned int)timeIsFormatted; j < list.size(); j++)
+	if (!timeIsFormatted)
+	{
+		if (list[0].IsEmpty() || !list[0].ToDouble(&value))
+			return false;
+	}
+	// TODO:  Check that first column time format is OK?
+
+	unsigned int j;
+	for (j = 1; j < list.size(); j++)
 	{
 		if (!list[j].IsEmpty() && list[j].ToDouble(&value))
 			return true;

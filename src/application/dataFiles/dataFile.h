@@ -93,7 +93,8 @@ protected:
 
 	wxArrayString GenerateNames(const wxArrayString &previousLines,
 		const wxArrayString &currentLine, wxArrayInt &nonNumericColumns) const;
-	wxArrayString GenerateDummyNames(const unsigned int &count) const;
+	wxArrayString GenerateDummyNames(const wxArrayString &currentLine,
+		wxArrayInt &nonNumericColumns) const;
 	bool IsDataRow(const wxArrayString &list) const;
 
 	bool ArrayContainsValue(const int &value, const wxArrayInt &a) const;
