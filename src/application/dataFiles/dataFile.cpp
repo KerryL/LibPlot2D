@@ -559,7 +559,7 @@ wxArrayString DataFile::RemoveUnwantedDescriptions(const wxArrayString &names,
 	unsigned int i;
 	for (i = 1; i < names.size(); i++)
 	{
-		if (ArrayContainsValue(i - 1, choices))
+		if (ArrayContainsValue(AdjustForSkippedColumns(i - 1), choices))
 			selectedNames.Add(names[i]);
 	}
 
