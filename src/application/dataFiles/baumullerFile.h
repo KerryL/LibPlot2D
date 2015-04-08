@@ -29,7 +29,7 @@ public:
 
 protected:
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
-		std::vector<double> &factors) const;
+		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
 	virtual void DoTypeSpecificLoadTasks(void);
 	virtual void DoTypeSpecificProcessTasks(void);
 

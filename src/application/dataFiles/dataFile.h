@@ -48,10 +48,10 @@ public:
 
 	bool Load(const SelectionData &selectionInfo);
 
-	Dataset2D* GetDataset(const unsigned int &i) const { return data[i]; };
-	wxString GetDescription(const unsigned int &i) const { return selectedDescriptions[i]; };
-	wxArrayString GetAllDescriptions() const { return descriptions; };
-	unsigned int GetDataCount(void) { return data.size(); };
+	Dataset2D* GetDataset(const unsigned int &i) const { return data[i]; }
+	wxString GetDescription(const unsigned int &i) const { return selectedDescriptions[i]; }
+	wxArrayString GetAllDescriptions() const { return descriptions; }
+	unsigned int GetDataCount(void) { return data.size(); }
 
 	bool DescriptionsMatch(const DataFile &file) const;
 	bool DescriptionsMatch(const wxArrayString &descriptions) const;
@@ -66,6 +66,7 @@ protected:
 	std::vector<double> scales;
 	wxArrayString descriptions, selectedDescriptions;
 	wxString delimiter;
+	wxArrayInt nonNumericColumns;
 
 	unsigned int headerLines;
 	bool ignoreConsecutiveDelimiters;
@@ -80,7 +81,7 @@ protected:
 	virtual void AssembleDatasets(const std::vector<double> *rawData,
 		const unsigned int &dataSize);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
-		std::vector<double> &factors) const;
+		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
 	virtual void DoTypeSpecificLoadTasks(void) {};
 	virtual void DoTypeSpecificProcessTasks(void) {};
 	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
@@ -91,15 +92,18 @@ protected:
 	double GetTimeScalingFactor(const wxString &format) const;
 
 	wxArrayString GenerateNames(const wxArrayString &previousLines,
-		const wxArrayString &currentLine) const;
+		const wxArrayString &currentLine, wxArrayInt &nonNumericColumns) const;
 	wxArrayString GenerateDummyNames(const unsigned int &count) const;
-	bool ListIsNumeric(const wxArrayString &list) const;
+	bool IsDataRow(const wxArrayString &list) const;
 
 	bool ArrayContainsValue(const int &value, const wxArrayInt &a) const;
 	void TransferVectorToArray(const std::vector<double> &source, double *destination) const;
 	wxArrayString RemoveUnwantedDescriptions(const wxArrayString &names, const wxArrayInt &choices) const;
 
 	static void SkipLines(std::ifstream &file, const unsigned int &count);
+
+	wxArrayInt AdjustForSkippedColumns(const wxArrayInt& selections) const;
+	unsigned int AdjustForSkippedColumns(const unsigned int &i) const;
 };
 
 #endif// _DATA_FILE_H_

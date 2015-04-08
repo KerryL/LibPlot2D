@@ -72,13 +72,14 @@ bool KollmorgenFile::IsType(const wxString &_fileName)
 // Output Arguments:
 //		headerLineCount	= unsigned int& number of lines making up this file's header
 //		factors			= std::vector<double>& containing scaling factors
+//		nonNumericColumns	= wxArrayInt&
 //
 // Return Value:
 //		wxArrayString containing the descriptions
 //
 //==========================================================================
 wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
-	std::vector<double> &factors) const
+	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
 	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())

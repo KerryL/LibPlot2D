@@ -225,12 +225,14 @@ bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawDat
 // Output Arguments:
 //		headerLineCount	= unsigned int& number of lines making up this file's header
 //		factors			= std::vector<double>& containing scaling factors
+//		nonNumericColumns	= wxArrayInt&
 //
 // Return Value:
 //		wxArrayString containing the descriptions
 //
 //==========================================================================
-wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount, std::vector<double> &factors) const
+wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount,
+	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
 	wxArrayString names;
 	headerLineCount = 0;// Unused for XML types

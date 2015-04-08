@@ -86,7 +86,7 @@ void DataFile::Initialize()
 {
 	delimiter = DetermineBestDelimiter();
 	DoTypeSpecificLoadTasks();
-	descriptions = GetCurveInformation(headerLines, scales);
+	descriptions = GetCurveInformation(headerLines, scales, nonNumericColumns);
 }
 
 //==========================================================================
@@ -128,13 +128,74 @@ void DataFile::GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *par
 		return;
 	}
 
-	selectionInfo.selections = dialog.GetSelections();
+	selectionInfo.selections = AdjustForSkippedColumns(dialog.GetSelections());
 	if (selectionInfo.selections.Count() == 0)
 	{
 		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR);
 		return;
 	}
 	selectionInfo.removeExisting = dialog.RemoveExistingCurves();
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		AdjustForSkippedColumns
+//
+// Description:		Adjusts the indices to account for columns that were not
+//					displayed as allowable selections.  Index 0 is first data
+//					column (not time column).
+//
+// Input Arguments:
+//		selections	= const wxArrayInt&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxArrayInt
+//
+//==========================================================================
+wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
+{
+	wxArrayInt trueIndices;
+	unsigned int i;
+	for (i = 0; i < selections.size(); i++)
+		trueIndices.Add(AdjustForSkippedColumns(selections[i]));
+
+	assert(selections.size() == trueIndices.size());
+	return trueIndices;
+}
+
+//==========================================================================
+// Class:			DataFile
+// Function:		AdjustForSkippedColumns
+//
+// Description:		Adjusts the indices to account for columns that were not
+//					displayed as allowable selections.  Index 0 is first data
+//					column (not time column).
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
+{
+	unsigned int j, adjustment(0);
+	for (j = 0; j < nonNumericColumns.size(); j++)
+	{
+		if (nonNumericColumns[j] - 1 <= (int)i)
+			adjustment++;
+		else
+			break;
+	}
+
+	return i + adjustment;
 }
 
 //==========================================================================
@@ -224,7 +285,8 @@ wxString DataFile::DetermineBestDelimiter(void) const
 			delimitedLine = ParseLineIntoColumns(nextLine, delimiterList[i]);
 			if (delimitedLine.size() > 1)
 			{
-				if (ListIsNumeric(delimitedLine)
+				// TODO:  This check could be more robust (what if header rows contain numberic label?)
+				if (IsDataRow(delimitedLine)
 					&& columnCount == delimitedLine.size())// Number of number columns == number of text columns
 				{
 					file.close();
@@ -288,7 +350,7 @@ wxArrayString DataFile::CreateDelimiterList(void) const
 //
 //==========================================================================
 wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
-	std::vector<double> &factors) const
+	std::vector<double> &factors, wxArrayInt &nonNumericColumns) const
 {
 	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
@@ -305,13 +367,13 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 		if (delimitedLine.size() > 1)
 		{
-			if (ListIsNumeric(delimitedLine))// If not all columns are numeric, this isn't a data row
+			if (IsDataRow(delimitedLine))
 			{
-				names = GenerateNames(previousLines, delimitedLine);
+				names = GenerateNames(previousLines, delimitedLine, nonNumericColumns);
 				headerLineCount = previousLines.size();
 				if (names.size() == 0)
 					names = GenerateDummyNames(delimitedLine.size());
-				factors.resize(names.size(), 1.0);
+				factors.resize(names.size() + nonNumericColumns.size(), 1.0);
 				file.close();
 				return names;
 			}
@@ -394,14 +456,14 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 //		currentLine		= const wxArrayString&
 //
 // Output Arguments:
-//		None
+//		nonNumericColumns	= wxArrayInt&
 //
 // Return Value:
 //		wxArrayString
 //
 //==========================================================================
 wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
-	const wxArrayString &currentLine) const
+	const wxArrayString &currentLine, wxArrayInt &nonNumericColumns) const
 {
 	unsigned int i;
 	int line;
@@ -425,10 +487,16 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 		{
 			for (i = 0; i < delimitedPreviousLine.size(); i++)
 			{
-				if (names.size() < i + 1)
+				if (!currentLine[i].ToDouble(&value))
+				{
+					nonNumericColumns.Add(i);
+					continue;
+				}
+
+				if (names.size() < i + 1 - nonNumericColumns.size())
 					names.Add(delimitedPreviousLine[i]);
 				else
-					names[i].Prepend(delimitedPreviousLine[i] + _T(", "));
+					names[i - nonNumericColumns.size()].Prepend(delimitedPreviousLine[i] + _T(", "));
 			}
 		}
 	}
@@ -709,9 +777,9 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 
 //==========================================================================
 // Class:			DataFile
-// Function:		ListIsNumeric
+// Function:		IsDataRow
 //
-// Description:		Checks to see if the input array contains only numeric values.
+// Description:		Checks to see if the input array could be a valid data row.
 //
 // Input Arguments:
 //		list	= const wxArrayString&
@@ -720,21 +788,20 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 //		None
 //
 // Return Value:
-//		bool, true if all values are numeric, false otherwise
+//		bool
 //
 //==========================================================================
-bool DataFile::ListIsNumeric(const wxArrayString &list) const
+bool DataFile::IsDataRow(const wxArrayString &list) const
 {
 	unsigned int j;
 	double value;
 	for (j = (unsigned int)timeIsFormatted; j < list.size(); j++)
 	{
-		if (!list[j].ToDouble(&value) && (ignoreConsecutiveDelimiters ||
-			(!ignoreConsecutiveDelimiters && !list[j].IsEmpty())))
-			return false;
+		if (!list[j].IsEmpty() && list[j].ToDouble(&value))
+			return true;
 	}
 
-	return true;
+	return false;
 }
 
 //==========================================================================
