@@ -26,6 +26,25 @@
 
 //==========================================================================
 // Class:			FilterDialog
+// Function:		Constant declarations
+//
+// Description:		Contant declarations for FilterDialog class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const unsigned int FilterDialog::defaultPrecision(2);
+const unsigned int FilterDialog::calculationPrecision(15);
+
+//==========================================================================
+// Class:			FilterDialog
 // Function:		FilterDialog
 //
 // Description:		Constructor for FilterDialog class.
@@ -42,7 +61,7 @@
 //
 //==========================================================================
 FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters)
-									 : wxDialog(parent, wxID_ANY, _T("Specify Filter"), wxDefaultPosition)
+	: wxDialog(parent, wxID_ANY, _T("Specify Filter"), wxDefaultPosition)
 {
 	initialized = false;
 
@@ -62,7 +81,7 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 	}
 
 	automaticStringPrecision = true;
-	stringPrecision = 2;
+	stringPrecision = defaultPrecision;
 
 	CreateControls();
 
@@ -89,10 +108,8 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 //
 //==========================================================================
 BEGIN_EVENT_TABLE(FilterDialog, wxDialog)
-	EVT_BUTTON(wxID_OK,				FilterDialog::OnOKButton)
 	EVT_SPINCTRL(SpinID,			FilterDialog::OnSpinChange)
-	EVT_SPIN_UP(SpinID,				FilterDialog::OnSpinUp)
-	EVT_SPIN_DOWN(SpinID,			FilterDialog::OnSpinDown)
+	EVT_SPIN(SpinID,				FilterDialog::OnSpin)
 	EVT_RADIOBUTTON(RadioID,		FilterDialog::OnRadioChange)
 	EVT_CHECKBOX(ButterworthID,		FilterDialog::OnButterworthChange)
 	EVT_TEXT(TransferFunctionID,	FilterDialog::OnTransferFunctionChange)
@@ -313,96 +330,7 @@ wxSizer* FilterDialog::CreateTransferFunctionControls(void)
 
 //==========================================================================
 // Class:			FilterDialog
-// Function:		OnOKButton
-//
-// Description:		Validates data and passes command to default handler.
-//
-// Input Arguments:
-//		event	= wxCommandEvent&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void FilterDialog::OnOKButton(wxCommandEvent &event)
-{
-	/*parameters.order = orderSpin->GetValue();
-	parameters.phaseless = phaselessCheckBox->GetValue();
-	parameters.butterworth = butterworthCheckBox->GetValue();
-	parameters.numerator = numeratorBox->GetValue();
-	parameters.denominator = denominatorBox->GetValue();
-
-	if (lowPassRadio->GetValue())
-		parameters.type = FilterParameters::TypeLowPass;
-	else if (highPassRadio->GetValue())
-		parameters.type = FilterParameters::TypeHighPass;
-	else if (bandStopRadio->GetValue())
-		parameters.type = FilterParameters::TypeBandStop;
-	else if (bandPassRadio->GetValue())
-		parameters.type = FilterParameters::TypeBandPass;
-	else if (customRadio->GetValue())
-		parameters.type = FilterParameters::TypeCustom;
-	else
-		assert(false);
-
-	if (!CutoffFrequencyIsValid() ||
-		!DampingRatioIsValid() ||
-		!WidthIsValid() ||
-		!ExpressionIsValid(numeratorBox->GetValue()) ||
-		!ExpressionIsValid(denominatorBox->GetValue()))
-		return;*/
-
-	event.Skip();
-}
-
-//==========================================================================
-// Class:			FilterDialog
 // Function:		OnSpinChange
-//
-// Description:		Processes spin control change events (order selection).
-//
-// Input Arguments:
-//		event	= wxSpinEvent& (unused)
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void FilterDialog::OnSpinChange(wxSpinEvent& WXUNUSED(event))
-{
-	HandleSpin();
-}
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		OnSpinUp
-//
-// Description:		Processes spin control change events (order selection).
-//
-// Input Arguments:
-//		event	= wxSpinEvent& (unused)
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void FilterDialog::OnSpinUp(wxSpinEvent& WXUNUSED(event))
-{
-	HandleSpin();
-}
-
-//==========================================================================
-// Class:			FilterDialog
-// Function:		OnSpinDown
 //
 // Description:		Processes spin control change events (order selection).
 //
@@ -416,13 +344,36 @@ void FilterDialog::OnSpinUp(wxSpinEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void FilterDialog::OnSpinDown(wxSpinEvent& event)
+void FilterDialog::OnSpinChange(wxSpinEvent& event)
 {
-	if (event.GetInt() < 2 &&
-		(bandPassRadio->GetValue() || bandStopRadio->GetValue()))
+	if (!OrderIsValid())
 		event.Veto();
+	else
+		HandleSpin();
+}
 
-	HandleSpin();
+//==========================================================================
+// Class:			FilterDialog
+// Function:		OnSpin
+//
+// Description:		Processes spin control change events (order selection).
+//
+// Input Arguments:
+//		event	= wxSpinEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::OnSpin(wxSpinEvent& event)
+{
+	if (!OrderIsValid())
+		event.Veto();
+	else
+		HandleSpin();
 }
 
 //==========================================================================
@@ -579,9 +530,11 @@ bool FilterDialog::TransferDataFromWindow(void)
 	wxString originalNumerator = numeratorBox->GetValue();
 	wxString originalDenominator = denominatorBox->GetValue();
 
+	unsigned int activePrecision = stringPrecision;
+
 	if (!customRadio->GetValue())
 	{
-		stringPrecision = 15;// Extended precision for computation
+		stringPrecision = calculationPrecision;// Extended precision for computation
 		automaticStringPrecision = false;
 		UpdateTransferFunction();
 	}
@@ -597,6 +550,7 @@ bool FilterDialog::TransferDataFromWindow(void)
 		{
 			numeratorBox->SetValue(originalNumerator);
 			denominatorBox->SetValue(originalDenominator);
+			stringPrecision = activePrecision;
 
 			return false;
 		}
@@ -617,6 +571,7 @@ bool FilterDialog::TransferDataFromWindow(void)
 	{
 		numeratorBox->SetValue(originalNumerator);
 		denominatorBox->SetValue(originalDenominator);
+		stringPrecision = activePrecision;
 
 		return false;
 	}
@@ -674,7 +629,7 @@ bool FilterDialog::CutoffFrequencyIsValid(void)
 //==========================================================================
 bool FilterDialog::DampingRatioIsValid(void)
 {
-	if (!parameters.butterworth && parameters.type != FilterParameters::TypeCustom)
+	if (DampingRatioInputRequired())
 	{
 		if (!dampingRatioBox->GetValue().ToDouble(&parameters.dampingRatio))
 		{
@@ -710,7 +665,8 @@ bool FilterDialog::DampingRatioIsValid(void)
 bool FilterDialog::WidthIsValid(void)
 {
 	if (parameters.type == FilterParameters::TypeBandStop ||
-		parameters.type == FilterParameters::TypeBandPass)
+		parameters.type == FilterParameters::TypeBandPass ||
+		parameters.type == FilterParameters::TypeNotch)
 	{
 		if (!widthBox->GetValue().ToDouble(&parameters.width))
 		{
@@ -1261,8 +1217,7 @@ void FilterDialog::UpdateEnabledControls(void)
 	cutoffFrequencyBox->Enable(!customRadio->GetValue());
 	butterworthCheckBox->Enable(lowPassRadio->GetValue() || highPassRadio->GetValue() ||
 		bandStopRadio->GetValue() || bandPassRadio->GetValue());
-	dampingRatioBox->Enable(butterworthCheckBox->IsEnabled() && orderSpin->GetValue() > 1 &&
-		!butterworthCheckBox->GetValue());
+	dampingRatioBox->Enable(DampingRatioInputRequired());
 
 	orderSpin->Enable(lowPassRadio->GetValue() || highPassRadio->GetValue() ||
 		bandStopRadio->GetValue() || bandPassRadio->GetValue());
@@ -1592,4 +1547,72 @@ void FilterDialog::ComputeLogCutoffs(const double &center, const double &width,
 	// Compute the lower cutoff using our log() method
 	highCutoff = center + width * 0.5;
 	lowCutoff = pow(10.0, 2.0 * log10(center) - log10(highCutoff));
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		DampingRatioInputRequired
+//
+// Description:		According to selected options, determines if the damping
+//					ratio input box needs to be enabled.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FilterDialog::DampingRatioInputRequired(void)
+{
+	if ((butterworthCheckBox->IsEnabled() && butterworthCheckBox->GetValue()) ||
+		customRadio->GetValue() ||
+		notchRadio->GetValue())
+		return false;
+
+	if ((lowPassRadio->GetValue() || highPassRadio->GetValue()) &&
+		orderSpin->GetValue() > 1)
+		return true;
+
+	if ((bandStopRadio->GetValue() || bandPassRadio->GetValue()) &&
+		orderSpin->GetValue() > 2)
+		return true;
+
+	return false;
+}
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		OrderIsValid
+//
+// Description:		Determines if the order value is valid, according to the
+//					other options.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool FilterDialog::OrderIsValid(void)
+{
+	if (customRadio->GetValue() ||
+		notchRadio->GetValue())
+		return true;
+
+	if (orderSpin->GetValue() < 1)
+		return false;
+
+	if ((bandPassRadio->GetValue() || bandStopRadio->GetValue()) &&
+		orderSpin->GetValue() < 2)
+		return false;
+
+	return true;
 }

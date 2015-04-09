@@ -64,6 +64,9 @@ public:
 	static wxString GetFilterNamePrefix(const FilterParameters &parameters);
 
 private:
+	static const unsigned int defaultPrecision;
+	static const unsigned int calculationPrecision;
+
 	wxTextCtrl *cutoffFrequencyBox;
 	wxTextCtrl *dampingRatioBox;
 	wxTextCtrl *widthBox;
@@ -86,13 +89,11 @@ private:
 	FilterParameters parameters;
 
 	// Overload from wxDialog
-	virtual void OnOKButton(wxCommandEvent &event);
 	virtual bool TransferDataFromWindow(void);
 
 	// Event handlers
 	void OnSpinChange(wxSpinEvent &event);
-	void OnSpinUp(wxSpinEvent &event);
-	void OnSpinDown(wxSpinEvent &event);
+	void OnSpin(wxSpinEvent &event);
 	void OnRadioChange(wxCommandEvent &event);
 	void OnButterworthChange(wxCommandEvent &event);
 	void OnTransferFunctionChange(wxCommandEvent &event);
@@ -143,6 +144,9 @@ private:
 	bool DampingRatioIsValid(void);
 	bool WidthIsValid(void);
 	bool ExpressionIsValid(const wxString& expression);
+
+	bool DampingRatioInputRequired(void);
+	bool OrderIsValid(void);
 
 	static wxString GetOrderString(const unsigned int &order);
 	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);
