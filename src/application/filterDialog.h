@@ -93,6 +93,7 @@ private:
 
 	// Event handlers
 	void OnSpinChange(wxSpinEvent &event);
+	void OnSpinChange(wxCommandEvent &event);
 	void OnSpin(wxSpinEvent &event);
 	void OnRadioChange(wxCommandEvent &event);
 	void OnButterworthChange(wxCommandEvent &event);

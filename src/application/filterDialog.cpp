@@ -110,6 +110,7 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters
 BEGIN_EVENT_TABLE(FilterDialog, wxDialog)
 	EVT_SPINCTRL(SpinID,			FilterDialog::OnSpinChange)
 	EVT_SPIN(SpinID,				FilterDialog::OnSpin)
+	EVT_TEXT(SpinID,				FilterDialog::OnSpinChange)
 	EVT_RADIOBUTTON(RadioID,		FilterDialog::OnRadioChange)
 	EVT_CHECKBOX(ButterworthID,		FilterDialog::OnButterworthChange)
 	EVT_TEXT(TransferFunctionID,	FilterDialog::OnTransferFunctionChange)
@@ -344,13 +345,53 @@ wxSizer* FilterDialog::CreateTransferFunctionControls(void)
 //		None
 //
 //==========================================================================
-void FilterDialog::OnSpinChange(wxSpinEvent& event)
+void FilterDialog::OnSpinChange(wxSpinEvent& /*event*/)
 {
 	if (!OrderIsValid())
-		event.Veto();
-	else
+	{
+		//event.Veto();// This causes a crash - see http://trac.wxwidgets.org/ticket/16948
+		// Workaround:
+		// The order can never be too high, and the only criteria is either
+		// >0 or >1, so we use this hack until the wxWidgets bug is fixed.
+		orderSpin->SetValue(1);
+		if (!OrderIsValid())
+			orderSpin->SetValue(2);
+	}
+	//else
 		HandleSpin();
 }
+
+//==========================================================================
+// Class:			FilterDialog
+// Function:		OnSpinChange
+//
+// Description:		Processes spin control change events (order selection).
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void FilterDialog::OnSpinChange(wxCommandEvent& /*event*/)
+{
+	if (!OrderIsValid())
+	{
+		// Workaround for issue with handling wxSpinEvents:
+		// The order can never be too high, and the only criteria is either
+		// >0 or >1, so we use this hack until the wxWidgets bug is fixed.
+		orderSpin->SetValue(1);
+		if (!OrderIsValid())
+			orderSpin->SetValue(2);
+	}
+	//else
+		HandleSpin();
+}
+
 
 //==========================================================================
 // Class:			FilterDialog
@@ -368,11 +409,19 @@ void FilterDialog::OnSpinChange(wxSpinEvent& event)
 //		None
 //
 //==========================================================================
-void FilterDialog::OnSpin(wxSpinEvent& event)
+void FilterDialog::OnSpin(wxSpinEvent& /*event*/)
 {
 	if (!OrderIsValid())
-		event.Veto();
-	else
+	{
+		//event.Veto();// This causes a crash - see http://trac.wxwidgets.org/ticket/16948
+		// Workaround:
+		// The order can never be too high, and the only criteria is either
+		// >0 or >1, so we use this hack until the wxWidgets bug is fixed.
+		orderSpin->SetValue(1);
+		if (!OrderIsValid())
+			orderSpin->SetValue(2);
+	}
+	//else
 		HandleSpin();
 }
 
