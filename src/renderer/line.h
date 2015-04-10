@@ -32,6 +32,7 @@ class Line
 public:
 	Line();
 
+	inline void SetPretty(const bool &pretty) { this->pretty = pretty; }
 	inline void SetWidth(const double &width) { assert(width > 0.0); halfWidth = 0.5 * width; }
 	inline void SetLineColor(const Color &color) { lineColor = color; }
 	inline void SetBackgroundColor(const Color &color) { backgroundColor = color; }
@@ -48,6 +49,7 @@ private:
 	double halfWidth;// Due to the fading, setting the half width equal to the width seems to create a nice match for desired line width
 	Color lineColor;
 	Color backgroundColor;
+	bool pretty;
 
 	void ComputeOffsets(const double &x1, const double &y1, const double &x2,
 		const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const;
@@ -59,6 +61,11 @@ private:
 		double dxEdge;
 		double dyEdge;
 	};
+
+	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const;
+	void DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const;
+	void DoUglyDraw(const std::vector<std::pair<double, double> > &points) const;
+	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points) const;
 };
 
 #endif// LINE_H_

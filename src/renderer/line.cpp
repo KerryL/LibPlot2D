@@ -66,6 +66,7 @@ const double Line::fadeDistance(0.6);
 //==========================================================================
 Line::Line()
 {
+	pretty = true;
 	SetWidth(1.0);
 	lineColor = Color::ColorBlack;
 	SetBackgroundColorForAlphaFade();
@@ -118,43 +119,10 @@ void Line::Draw(const unsigned int &x1, const unsigned int &y1, const unsigned i
 //==========================================================================
 void Line::Draw(const double &x1, const double &y1, const double &x2, const double &y2) const
 {
-	double dxLine, dyLine, dxEdge, dyEdge;
-	ComputeOffsets(x1, y1, x2, y2, dxLine, dyLine, dxEdge, dyEdge);
-
-	/* Six triangles per segment - two on each side of the core line, plus two for the line itself
-	   Triangles need to be drawn in counter clockwise direction
-	
-	We do this:
-
-	2    4    6    8
-	+----+----+----+
-	|\   |\   |\   |
-	| \  | \  | \  |
-	|  \ |  \ |  \ |
-	|   \|   \|   \|
-	+----+----+----+
-	1    3    5    7
-
-	where the line (x1, y1) to (x2, y2) passes halfway between points (3 and 5) and (4 and 6)
-	*/
-
-	glBegin(GL_TRIANGLE_STRIP);
-
-	glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-	glVertex2f(x1 - dxEdge, y1 - dyEdge);
-	glVertex2f(x2 - dxEdge, y2 - dyEdge);
-
-	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-	glVertex2f(x1 - dxLine, y1 - dyLine);
-	glVertex2f(x2 - dxLine, y2 - dyLine);
-	glVertex2f(x1 + dxLine, y1 + dyLine);
-	glVertex2f(x2 + dxLine, y2 + dyLine);
-
-	glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-	glVertex2f(x1 + dxEdge, y1 + dyEdge);
-	glVertex2f(x2 + dxEdge, y2 + dyEdge);
-
-	glEnd();
+	if (pretty)
+		DoPrettyDraw(x1, y1, x2, y2);
+	else
+		DoUglyDraw(x1, y1, x2, y2);
 }
 
 //==========================================================================
@@ -205,6 +173,215 @@ void Line::Draw(const std::vector<std::pair<double, double> > &points) const
 {
 	if (points.size() < 2)
 		return;
+
+	if (pretty)
+		DoPrettyDraw(points);
+	else
+		DoUglyDraw(points);
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		ComputeOffsets
+//
+// Description:		Computes the offsets for the outside vertices based on the
+//					line width and orientation.
+//
+// Input Arguments:
+//		x1	= const double&
+//		y1	= const double&
+//		x2	= const double&
+//		y2	= const double&
+//
+// Output Arguments:
+//		dxLine	= const double&
+//		dyLine	= const double&
+//		dxEdge	= const double&
+//		dyEdge	= const double&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
+	const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
+{
+	// TODO:  Could improve line endings - instead of drawing them |- to core line,
+	//        we could instead "miter" the corners to nicely meet adjacent segments
+	if (PlotMath::IsZero(y2 - y1))
+	{
+		dxLine = 0.0;
+		dyLine = halfWidth * PlotMath::Sign(x2 - x1);
+
+		dxEdge = 0.0;
+		dyEdge = (halfWidth + fadeDistance) * PlotMath::Sign(x2 - x1);
+	}
+	else if (PlotMath::IsZero(x2 - x1))
+	{
+		dxLine = halfWidth * PlotMath::Sign(y1 - y2);
+		dyLine = 0.0;
+
+		dxEdge = (halfWidth + fadeDistance) * PlotMath::Sign(y1 - y2);
+		dyEdge = 0.0;
+	}
+	else
+	{
+		double slope = (y2 - y1) / (x2 - x1);
+
+		dyLine = sqrt(halfWidth * halfWidth / (1.0 + slope * slope)) * PlotMath::Sign(x2 - x1);
+		dxLine = fabs(slope * dyLine) * PlotMath::Sign(y1 - y2);
+
+		dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
+		dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
+	}
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoUglyDraw
+//
+// Description:		Draws a line using OpenGL lines.
+//
+// Input Arguments:
+//		x1	= const double&
+//		y1	= const double&
+//		x2	= const double&
+//		y2	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const
+{
+	glLineWidth(2.0 * halfWidth);
+	glBegin(GL_LINES);
+
+	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
+	glVertex2f(x1, y1);
+	glVertex2f(x2, y2);
+
+	glEnd();
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoPrettyDraw
+//
+// Description:		Draws a line using OpenGL triangles.
+//
+// Input Arguments:
+//		x1	= const double&
+//		y1	= const double&
+//		x2	= const double&
+//		y2	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const
+{
+	double dxLine, dyLine, dxEdge, dyEdge;
+	ComputeOffsets(x1, y1, x2, y2, dxLine, dyLine, dxEdge, dyEdge);
+
+	/* Six triangles per segment - two on each side of the core line, plus two for the line itself
+	   Triangles need to be drawn in counter clockwise direction
+	
+	We do this:
+
+	2    4    6    8
+	+----+----+----+
+	|\   |\   |\   |
+	| \  | \  | \  |
+	|  \ |  \ |  \ |
+	|   \|   \|   \|
+	+----+----+----+
+	1    3    5    7
+
+	where the line (x1, y1) to (x2, y2) passes halfway between points (3 and 5) and (4 and 6)
+	*/
+
+	glBegin(GL_TRIANGLE_STRIP);
+
+	glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
+	glVertex2f(x1 - dxEdge, y1 - dyEdge);
+	glVertex2f(x2 - dxEdge, y2 - dyEdge);
+
+	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
+	glVertex2f(x1 - dxLine, y1 - dyLine);
+	glVertex2f(x2 - dxLine, y2 - dyLine);
+	glVertex2f(x1 + dxLine, y1 + dyLine);
+	glVertex2f(x2 + dxLine, y2 + dyLine);
+
+	glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
+	glVertex2f(x1 + dxEdge, y1 + dyEdge);
+	glVertex2f(x2 + dxEdge, y2 + dyEdge);
+
+	glEnd();
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoUglyDraw
+//
+// Description:		Draws a line strip using OpenGL lines.
+//
+// Input Arguments:
+//		points	= const std::vector<std::pair<double, double> >&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points) const
+{
+	glLineWidth(2.0 * halfWidth);
+	glBegin(GL_LINE_STRIP);
+
+	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
+
+	unsigned int i;
+	for (i = 0; i < points.size(); i++)
+		glVertex2f(points[i].first, points[i].second);
+
+	glEnd();
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoPrettyDraw
+//
+// Description:		Draws a line strip using OpenGL triangles.
+//
+// Input Arguments:
+//		points	= const std::vector<std::pair<double, double> >&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points) const
+{
+	struct Offsets
+	{
+		double dxLine;
+		double dyLine;
+		double dxEdge;
+		double dyEdge;
+	};
 
 	std::vector<Offsets> offsets(points.size() - 1);
 	double dxLine, dyLine, dxEdge, dyEdge;
@@ -282,60 +459,4 @@ void Line::Draw(const std::vector<std::pair<double, double> > &points) const
 	}
 
 	glEnd();
-}
-
-//==========================================================================
-// Class:			Line
-// Function:		ComputeOffsets
-//
-// Description:		Computes the offsets for the outside vertices based on the
-//					line width and orientation.
-//
-// Input Arguments:
-//		x1	= const double&
-//		y1	= const double&
-//		x2	= const double&
-//		y2	= const double&
-//
-// Output Arguments:
-//		dxLine	= const double&
-//		dyLine	= const double&
-//		dxEdge	= const double&
-//		dyEdge	= const double&
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
-	const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
-{
-	// TODO:  Could improve line endings - instead of drawing them |- to core line,
-	//        we could instead "miter" the corners to nicely meet adjacent segments
-	if (PlotMath::IsZero(y2 - y1))
-	{
-		dxLine = 0.0;
-		dyLine = halfWidth * PlotMath::Sign(x2 - x1);
-
-		dxEdge = 0.0;
-		dyEdge = (halfWidth + fadeDistance) * PlotMath::Sign(x2 - x1);
-	}
-	else if (PlotMath::IsZero(x2 - x1))
-	{
-		dxLine = halfWidth * PlotMath::Sign(y1 - y2);
-		dyLine = 0.0;
-
-		dxEdge = (halfWidth + fadeDistance) * PlotMath::Sign(y1 - y2);
-		dyEdge = 0.0;
-	}
-	else
-	{
-		double slope = (y2 - y1) / (x2 - x1);
-
-		dyLine = sqrt(halfWidth * halfWidth / (1.0 + slope * slope)) * PlotMath::Sign(x2 - x1);
-		dxLine = fabs(slope * dyLine) * PlotMath::Sign(y1 - y2);
-
-		dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
-		dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
-	}
 }
