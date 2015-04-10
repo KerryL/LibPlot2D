@@ -1972,37 +1972,12 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 //==========================================================================
 void PlotObject::FormatCurves(void)
 {
-	bool doPrettyDraw = ShouldDoPrettyLines();
 	unsigned int i;
 	for (i = 0; i < (unsigned int)plotList.size(); i++)
 	{
 		plotList[i]->SetModified();
-		plotList[i]->SetPretty(doPrettyDraw);
+		plotList[i]->SetPretty(pretty);
 	}
-}
-
-//==========================================================================
-// Class:			PlotObject
-// Function:		ShouldDoPrettyLines
-//
-// Description:		Determines if there are few enough things to draw that it
-//					is OK to use pretty lines.  If there is too much to draw,
-//					the performance hit when using pretty lines is unacceptable.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool
-//
-//==========================================================================
-bool PlotObject::ShouldDoPrettyLines(void) const
-{
-	// TODO:  Either implement this, or make it a user option in a context menu.
-	return false;
 }
 
 //==========================================================================

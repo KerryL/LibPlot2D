@@ -314,6 +314,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 
 	if (!event.Dragging() || ignoreNextMouseMove)// ignoreNextMouseMove prevents panning on maximize by double clicking title bar
 	{
+		plot->SetPrettyCurves(true);
 		ignoreNextMouseMove = false;
 		StoreMousePosition(event);
 		return;
@@ -340,6 +341,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
+	plot->SetPrettyCurves(false);
 	StoreMousePosition(event);
 	UpdateDisplay();
 }
@@ -362,6 +364,8 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 {
+	plot->SetPrettyCurves(true);
+
 	if (!zoomBox->GetIsVisible())
 	{
 		ProcessRightClick(event);
@@ -1625,11 +1629,14 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 //==========================================================================
 void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 {
+	plot->SetPrettyCurves(true);
+
 	draggingLegend = false;
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
 
 	SaveCurrentZoom();
+	UpdateDisplay();
 }
 
 //==========================================================================

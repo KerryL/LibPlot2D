@@ -90,6 +90,8 @@ public:
 	void SetLeftYMajorResolution(const double &resolution);
 	void SetRightYMajorResolution(const double &resolution);
 
+	void SetPrettyCurves(const bool &pretty) { this->pretty = pretty; }
+
 	inline double GetXMajorResolution() const { return xMajorResolution; }
 	inline double GetLeftYMajorResolution() const { return yLeftMajorResolution; }
 	inline double GetRightYMajorResolution() const { return yRightMajorResolution; }
@@ -163,6 +165,8 @@ private:
 	bool leftUsed;
 	bool rightUsed;
 
+	bool pretty;
+
 	double xMajorResolution;
 	double yLeftMajorResolution;
 	double yRightMajorResolution;
@@ -213,8 +217,6 @@ private:
 	void ResetOriginalLimits(void);
 	void MatchYAxes(void);
 	double GetFirstValidValue(const double* data, const unsigned int &size) const;
-
-	bool ShouldDoPrettyLines() const;
 };
 
 #endif// _PLOT_OBJECT_H_
