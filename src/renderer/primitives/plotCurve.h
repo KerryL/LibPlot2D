@@ -40,20 +40,21 @@ public:
 	void GenerateGeometry(void);
 	bool HasValidParameters(void);
 
-	void SetModified(void) { modified = true; };
+	void SetModified(void) { modified = true; }
 
-	void SetLineSize(const double &size) { lineSize = size; modified = true; };
-	void SetMarkerSize(const int &size) { markerSize = size; modified = true; };
+	void SetLineSize(const double &size) { lineSize = size; modified = true; }
+	void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
+	void SetPretty(const bool &pretty) { line.SetPretty(pretty); }
 
 	// Remove all data from the plot
 	void SetData(const Dataset2D *_data);
 	void ClearData(void) { data = NULL; };
 
 	// For setting up the plot
-	void BindToXAxis(Axis *_xAxis) { xAxis = _xAxis; modified = true; };
-	void BindToYAxis(Axis *_yAxis) { yAxis = _yAxis; modified = true; };
+	void BindToXAxis(Axis *_xAxis) { xAxis = _xAxis; modified = true; }
+	void BindToYAxis(Axis *_yAxis) { yAxis = _yAxis; modified = true; }
 
-	Axis *GetYAxis(void) { return yAxis; };
+	Axis *GetYAxis(void) { return yAxis; }
 
 	// Overloaded operators
 	PlotCurve& operator = (const PlotCurve &plotCurve);

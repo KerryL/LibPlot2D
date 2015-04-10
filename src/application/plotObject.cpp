@@ -1951,10 +1951,12 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 //==========================================================================
 void PlotObject::FormatCurves(void)
 {
+	bool doPrettyDraw = false;
 	unsigned int i;
 	for (i = 0; i < (unsigned int)plotList.size(); i++)
 	{
 		plotList[i]->SetModified();
+		plotList[i]->SetPretty(doPrettyDraw);
 	}
 }
 
