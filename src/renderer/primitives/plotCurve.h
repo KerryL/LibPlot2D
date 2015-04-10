@@ -44,7 +44,7 @@ public:
 
 	void SetLineSize(const double &size) { lineSize = size; modified = true; }
 	void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
-	void SetPretty(const bool &pretty) { line.SetPretty(pretty); }
+	void SetPretty(const bool &pretty) { line.SetPretty(pretty); modified = true; }
 
 	// Remove all data from the plot
 	void SetData(const Dataset2D *_data);

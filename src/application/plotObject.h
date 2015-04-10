@@ -212,6 +212,8 @@ private:
 	void ResetOriginalLimits(void);
 	void MatchYAxes(void);
 	double GetFirstValidValue(const double* data, const unsigned int &size) const;
+
+	bool ShouldDoPrettyLines() const;
 };
 
 #endif// _PLOT_OBJECT_H_
