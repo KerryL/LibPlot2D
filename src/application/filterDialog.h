@@ -93,7 +93,6 @@ private:
 
 	// Event handlers
 	void OnSpinChange(wxSpinEvent &event);
-	void OnSpinChange(wxCommandEvent &event);
 	void OnSpin(wxSpinEvent &event);
 	void OnRadioChange(wxCommandEvent &event);
 	void OnButterworthChange(wxCommandEvent &event);
@@ -147,7 +146,6 @@ private:
 	bool ExpressionIsValid(const wxString& expression);
 
 	bool DampingRatioInputRequired(void);
-	bool OrderIsValid(void);
 
 	static wxString GetOrderString(const unsigned int &order);
 	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);
