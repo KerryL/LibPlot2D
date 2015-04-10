@@ -182,6 +182,7 @@ private:
 	bool draggingLegend;
 
 	void ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const;
+	void UpdateLegendAnchor();
 
 protected:
 	void ProcessZoom(wxMouseEvent &event);

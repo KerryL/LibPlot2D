@@ -51,7 +51,7 @@ public:
 	void SetBorderSize(const unsigned int &size) { borderSize = size; modified = true; }
 	void SetSampleLineLength(const unsigned int &size) { sampleLength = size; modified = true; }
 
-	enum Anchor
+	enum PositionReference
 	{
 		Center,
 		BottomLeft,
@@ -64,23 +64,27 @@ public:
 		MiddleLeft
 	};
 
-	enum PositionReference
-	{
-		RefBottomLeft,
-		RefBottomRight,
-		RefTopLeft,
-		RefTopRight,
-	};
+	void SetWindowReference(const PositionReference &windowRef) { this->windowRef = windowRef; modified = true; }
+	void SetLegendReference(const PositionReference &legendRef) { this->legendRef = legendRef; modified = true; }
 
-	void SetAnchor(const Anchor &anchor) { this->anchor = anchor; modified = true; }
-	void SetPositionReference(const PositionReference &positionRef) { this->positionRef = positionRef; modified = true; }
+	PositionReference GetWindowReference() const { return windowRef; }
+	PositionReference GetLegendReference() const { return legendRef; }
 
 	// Specifies bottom left corner of legend
 	void SetPosition(const double &x, const double &y) { this->x = x; this->y = y; modified = true; }
 	void SetDeltaPosition(const double &x, const double &y);
 
-	unsigned int GetHeight() const { return height; }
-	unsigned int GetWidth() const { return width; }
+	// These are w.r.t. reference specified by SetWindowRef()
+	inline double GetXPos() const { return x; }
+	inline double GetYPos() const { return y; }
+	inline void GetPosition(double &x, double &y) const { x = this->x; y = this->y; }
+
+	double GetXPos(const PositionReference& legendRef, const PositionReference& windowRef) const;
+	double GetYPos(const PositionReference& legendRef, const PositionReference& windowRef) const;
+	void GetPosition(const PositionReference& legendRef, const PositionReference& windowRef, double &x, double &y) const;
+
+	inline unsigned int GetHeight() const { return height; }
+	inline unsigned int GetWidth() const { return width; }
 
 	struct LegendEntryInfo
 	{
@@ -118,8 +122,8 @@ private:
 	unsigned int height;
 	unsigned int width;
 
-	Anchor anchor;
-	PositionReference positionRef;
+	PositionReference windowRef;
+	PositionReference legendRef;
 	void GetAdjustedPosition(double &x, double &y) const;
 };
 

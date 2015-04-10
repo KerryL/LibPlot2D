@@ -67,8 +67,8 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 	borderSize = 1;
 	sampleLength = 15;
 
-	anchor = Center;
-	positionRef = RefBottomLeft;
+	windowRef = BottomLeft;
+	legendRef = Center;
 
 	font = NULL;
 
@@ -371,8 +371,9 @@ bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 // Class:			Legend
 // Function:		GetAdjustedPosition
 //
-// Description:		Adjusts the position based on the anchor and position reference
-//					(internally, we always use bottom left corner for both).
+// Description:		Adjusts the position based on the position references.
+//					The output is (x, y) of the lower LH corner of the legend
+//					w.r.t. the lower LH corner of the render window.
 //
 // Input Arguments:
 //		None
@@ -387,76 +388,94 @@ bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 //==========================================================================
 void Legend::GetAdjustedPosition(double &x, double &y) const
 {
-	switch (positionRef)
-	{
-	case RefBottomRight:
-		x = renderWindow.GetSize().GetWidth() - this->x;
-		y = this->y;
-		break;
-
-	case RefTopLeft:
-		x = this->x;
-		y = renderWindow.GetSize().GetHeight() - this->y;
-		break;
-
-	case RefTopRight:
-		x = renderWindow.GetSize().GetWidth() - this->x;
-		y = renderWindow.GetSize().GetHeight() - this->y;
-		break;
-
-	default:
-	case RefBottomLeft:
-		x = this->x;
-		y = this->y;
-	}
-
-	// At this point, x and y represent the lower left-hand corner of the legend w.r.t. the lower LH window corner
-	// this->x and this->y are given w.r.t. the specified position ref
-	// output arguments from this function are always w.r.t. lower left corner of render window
-
-	switch (anchor)
+	switch (windowRef)
 	{
 	default:
-	case Center:
-		x -= width * 0.5;
-		y -= height * 0.5;
-		break;
-
 	case BottomLeft:
-		// Matches internal representation, no adjustment required
+	case MiddleLeft:
+	case TopLeft:
+		x = this->x;
 		break;
 
 	case BottomCenter:
+	case Center:
+	case TopCenter:
+		x = renderWindow.GetSize().GetWidth() * 0.5 + this->x;
+		break;
+
+	case BottomRight:
+	case MiddleRight:
+	case TopRight:
+		x = renderWindow.GetSize().GetWidth() - this->x;
+		break;
+	}
+
+	switch (windowRef)
+	{
+	default:
+	case BottomLeft:
+	case BottomCenter:
+	case BottomRight:
+		y = this->y;
+		break;
+
+	case MiddleLeft:
+	case Center:
+	case MiddleRight:
+		y = renderWindow.GetSize().GetHeight() * 0.5 + this->y;
+		break;
+
+	case TopLeft:
+	case TopCenter:
+	case TopRight:
+		y = renderWindow.GetSize().GetHeight() - this->y;
+		break;
+	}
+
+	// At this point, x and y represent the legendRef corner of the
+	// legend w.r.t. the lower LH window corner of the render window
+
+	switch (legendRef)
+	{
+	case BottomLeft:
+	case MiddleLeft:
+	case TopLeft:
+		break;
+
+	default:
+	case BottomCenter:
+	case Center:
+	case TopCenter:
 		x -= width * 0.5;
 		break;
 
 	case BottomRight:
-		x -= width;
-		break;
-
 	case MiddleRight:
-		x -= width;
-		y -= height * 0.5;
-		break;
-
 	case TopRight:
 		x -= width;
-		y -= height;
+		break;
+	}
+
+	switch (legendRef)
+	{
+	case BottomLeft:
+	case BottomCenter:
+	case BottomRight:
 		break;
 
-	case TopCenter:
-		x -= width * 0.5;
-		y -= height;
+	default:
+	case MiddleLeft:
+	case Center:
+	case MiddleRight:
+		y -= height * 0.5;
 		break;
 
 	case TopLeft:
+	case TopCenter:
+	case TopRight:
 		y -= height;
 		break;
-
-	case MiddleLeft:
-		y -= height * 0.5;
-		break;
-	};
+	}
 }
 
 //==========================================================================
@@ -478,27 +497,307 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 //==========================================================================
 void Legend::SetDeltaPosition(const double &x, const double &y)
 {
-	switch (positionRef)
+	switch (windowRef)
 	{
-	case RefBottomRight:
+	default:
+	case BottomLeft:
+	case MiddleLeft:
+	case TopLeft:
+	case BottomCenter:
+	case Center:
+	case TopCenter:
+		this->x += x;
+		break;
+
+	case BottomRight:
+	case MiddleRight:
+	case TopRight:
 		this->x -= x;
+		break;
+	}
+
+	switch (windowRef)
+	{
+	default:
+	case BottomLeft:
+	case BottomCenter:
+	case BottomRight:
+	case MiddleLeft:
+	case Center:
+	case MiddleRight:
 		this->y += y;
 		break;
 
-	case RefTopLeft:
-		this->x += x;
+	case TopLeft:
+	case TopCenter:
+	case TopRight:
 		this->y -= y;
 		break;
+	}
+	
+	modified = true;
+}
 
-	case RefTopRight:
-		this->x -= x;
-		this->y -= y;
+//==========================================================================
+// Class:			Legend
+// Function:		GetXPos
+//
+// Description:		Gets the x-position w.r.t. the specified references.
+//
+// Input Arguments:
+//		legendRef	= const PositionReference&
+//		windowRef	= const PositionReference&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Legend::GetXPos(const PositionReference& legendRef, const PositionReference& windowRef) const
+{
+	double x, y;
+	GetPosition(legendRef, windowRef, x, y);
+	return x;
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		GetXPos
+//
+// Description:		Gets the y-position w.r.t. the specified references.
+//
+// Input Arguments:
+//		ref	= const PositionReference&
+//		windowRef	= const PositionReference&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//==========================================================================
+double Legend::GetYPos(const PositionReference& legendRef, const PositionReference& windowRef) const
+{
+	double x, y;
+	GetPosition(legendRef, windowRef, x, y);
+	return y;
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		GetPosition
+//
+// Description:		Gets the position w.r.t. the specified references.  Read
+//					this as position of specified legendRef w.r.t. specified
+//					windowRef.
+//
+// Input Arguments:
+//		legendRef	= const PositionReference&
+//		windowRef	= const PositionReference&
+//
+// Output Arguments:
+//		x			= double&
+//		y			= double&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::GetPosition(const PositionReference& legendRef,
+	const PositionReference& windowRef, double &x, double &y) const
+{
+	// Internally, x and y are location of legendRef w.r.t. windowRef, so first
+	// we need to back out to a common reference, then apply the specified references
+
+	switch (this->windowRef)
+	{
+	default:
+	case BottomLeft:
+	case MiddleLeft:
+	case TopLeft:
+		x = this->x;
+		break;
+
+	case BottomCenter:
+	case Center:
+	case TopCenter:
+		x = renderWindow.GetSize().GetWidth() * 0.5 + this->x;
+		break;
+
+	case BottomRight:
+	case MiddleRight:
+	case TopRight:
+		x = renderWindow.GetSize().GetWidth() - this->x;
+		break;
+	}
+
+	switch (this->windowRef)
+	{
+	default:
+	case BottomLeft:
+	case BottomCenter:
+	case BottomRight:
+		y = this->y;
+		break;
+
+	case MiddleLeft:
+	case Center:
+	case MiddleRight:
+		y = renderWindow.GetSize().GetHeight() * 0.5 + this->y;
+		break;
+
+	case TopLeft:
+	case TopCenter:
+	case TopRight:
+		y = renderWindow.GetSize().GetHeight() - this->y;
+		break;
+	}
+
+	// At this point, x and y represent the legendRef corner (class value, not argument) of the
+	// legend w.r.t. the lower LH window corner of the render window
+
+	switch (this->legendRef)
+	{
+	case BottomLeft:
+	case MiddleLeft:
+	case TopLeft:
 		break;
 
 	default:
-	case RefBottomLeft:
-		this->x += x;
-		this->y += y;
+	case BottomCenter:
+	case Center:
+	case TopCenter:
+		x -= width * 0.5;
+		break;
+
+	case BottomRight:
+	case MiddleRight:
+	case TopRight:
+		x -= width;
+		break;
 	}
-	modified = true;
+
+	switch (this->legendRef)
+	{
+	case BottomLeft:
+	case BottomCenter:
+	case BottomRight:
+		break;
+
+	default:
+	case MiddleLeft:
+	case Center:
+	case MiddleRight:
+		y -= height * 0.5;
+		break;
+
+	case TopLeft:
+	case TopCenter:
+	case TopRight:
+		y -= height;
+		break;
+	}
+
+	// At this point, x and y represent the lower left-hand corner of the
+	// legend w.r.t. the lower LH window corner of the render window
+
+	switch (windowRef)
+	{
+	default:
+	case BottomLeft:
+	case MiddleLeft:
+	case TopLeft:
+		break;
+
+	case BottomCenter:
+	case Center:
+	case TopCenter:
+		x -= renderWindow.GetSize().GetWidth() * 0.5;
+		break;
+
+	case BottomRight:
+	case MiddleRight:
+	case TopRight:
+		x = renderWindow.GetSize().GetWidth() - x;
+		break;
+	}
+
+	switch (windowRef)
+	{
+	default:
+	case BottomLeft:
+	case BottomCenter:
+	case BottomRight:
+		break;
+
+	case MiddleLeft:
+	case Center:
+	case MiddleRight:
+		y -= renderWindow.GetSize().GetHeight() * 0.5;
+		break;
+
+	case TopLeft:
+	case TopCenter:
+	case TopRight:
+		y = renderWindow.GetSize().GetHeight() - y;
+		break;
+	}
+
+	// At this point, x and y represent the lower left-hand corner of the
+	// legend w.r.t. the specified windowRef
+
+	switch (legendRef)
+	{
+	case BottomLeft:
+	case MiddleLeft:
+	case TopLeft:
+		break;
+
+	default:
+	case BottomCenter:
+	case Center:
+	case TopCenter:
+		x += width * 0.5;
+		break;
+
+	case BottomRight:
+	case MiddleRight:
+	case TopRight:
+		if (windowRef == BottomRight ||
+			windowRef == MiddleRight ||
+			windowRef == TopRight)
+			x -= width;
+		else
+			x += width;
+		break;
+	}
+
+	switch (legendRef)
+	{
+	case BottomLeft:
+	case BottomCenter:
+	case BottomRight:
+		break;
+
+	default:
+	case MiddleLeft:
+	case Center:
+	case MiddleRight:
+		y += height * 0.5;
+		break;
+
+	case TopLeft:
+	case TopCenter:
+	case TopRight:
+		if (windowRef == TopLeft ||
+			windowRef == TopCenter ||
+			windowRef == TopRight)
+			y -= height;
+		else
+			y += height;
+		break;
+	}
 }

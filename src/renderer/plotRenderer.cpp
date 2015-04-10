@@ -16,6 +16,7 @@
 
 // Standard C++ headers
 #include <cassert>
+#include <algorithm>
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -191,8 +192,8 @@ void PlotRenderer::CreateActors(void)
 		const unsigned int offset(5);
 		legend = new Legend(*this);
 		legend->SetFont(plot->GetAxisFont());
-		legend->SetAnchor(Legend::TopRight);
-		legend->SetPositionReference(Legend::RefTopRight);
+		legend->SetLegendReference(Legend::TopRight);
+		legend->SetWindowReference(Legend::TopRight);
 		legend->SetPosition(plot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
 			plot->GetTopAxis()->GetOffsetFromWindowEdge() + offset);
 		legend->SetVisibility(false);
@@ -1631,12 +1632,74 @@ void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 {
 	plot->SetPrettyCurves(true);
 
+	if (draggingLegend)
+	{
+		// TODO:  If legend is off screen, reset to default position and turn visibility off
+
+		UpdateLegendAnchor();
+	}
+
 	draggingLegend = false;
 	draggingLeftCursor = false;
 	draggingRightCursor = false;
 
 	SaveCurrentZoom();
 	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		UpdateLegendAnchor
+//
+// Description:		Updates the anchor depending on legend position.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::UpdateLegendAnchor()
+{
+	std::vector<std::pair<double, Legend::PositionReference> > distances;
+	double x, y;
+
+	legend->GetPosition(Legend::BottomLeft, Legend::BottomLeft, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::BottomLeft));
+
+	legend->GetPosition(Legend::BottomCenter, Legend::BottomCenter, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::BottomCenter));
+
+	legend->GetPosition(Legend::BottomRight, Legend::BottomRight, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::BottomRight));
+
+	legend->GetPosition(Legend::MiddleLeft, Legend::MiddleLeft, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::MiddleLeft));
+
+	legend->GetPosition(Legend::Center, Legend::Center, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::Center));
+
+	legend->GetPosition(Legend::MiddleRight, Legend::MiddleRight, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::MiddleRight));
+
+	legend->GetPosition(Legend::TopLeft, Legend::TopLeft, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::TopLeft));
+
+	legend->GetPosition(Legend::TopCenter, Legend::TopCenter, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::TopCenter));
+
+	legend->GetPosition(Legend::TopRight, Legend::TopRight, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::TopRight));
+
+	Legend::PositionReference bestRef = std::min_element(distances.begin(), distances.end())->second;
+	legend->GetPosition(bestRef, bestRef, x, y);
+	legend->SetWindowReference(bestRef);
+	legend->SetLegendReference(bestRef);
+	legend->SetPosition(x, y);
 }
 
 //==========================================================================
