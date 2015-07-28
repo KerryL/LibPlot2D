@@ -13,8 +13,8 @@
 // Description:  Computes root-mean-square of data.
 // History:
 
-#ifndef _RMS_H_
-#define _RMS_H_
+#ifndef RMS_H_
+#define RMS_H_
 
 // Local forward declarations
 class Dataset2D;
@@ -25,4 +25,4 @@ public:
 	static Dataset2D ComputeTimeHistory(const Dataset2D &data);
 };
 
-#endif// _RMS_H_
+#endif// RMS_H_

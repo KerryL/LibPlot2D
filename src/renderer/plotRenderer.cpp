@@ -2433,17 +2433,17 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::plotContextLeftYAxis;
+		context = PlotOwner::PlotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::plotContextRightYAxis;
+		context = PlotOwner::PlotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::plotContextXAxis;
+		context = PlotOwner::PlotContextXAxis;
 	else
-		context = PlotOwner::plotContextPlotArea;
+		context = PlotOwner::PlotContextPlotArea;
 
 	plotOwner.DisplayAxisRangeDialog(context);
 }
@@ -2473,17 +2473,17 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::plotContextLeftYAxis;
+		context = PlotOwner::PlotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::plotContextRightYAxis;
+		context = PlotOwner::PlotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::plotContextXAxis;
+		context = PlotOwner::PlotContextXAxis;
 	else
-		context = PlotOwner::plotContextPlotArea;
+		context = PlotOwner::PlotContextPlotArea;
 
 	// Display the context menu (further events handled by Parent)
 	plotOwner.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);

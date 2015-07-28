@@ -13,8 +13,8 @@
 // Description:  Handles user-specified mathematical operations on datasets.
 // History:
 
-#ifndef _EXPRESSION_TREE_H_
-#define _EXPRESSION_TREE_H_
+#ifndef EXPRESSION_TREE_H_
+#define EXPRESSION_TREE_H_
 
 // Standard C++ headers
 #include <queue>
@@ -31,7 +31,6 @@
 class ExpressionTree
 {
 public:
-	// Constructor
 	ExpressionTree(const ManagedList<const Dataset2D> *_list = NULL);
 
 	// Main solver method
@@ -142,4 +141,4 @@ private:
 	void AddToExpressionString(wxString &expression, const double &coefficient, const int &power) const;
 };
 
-#endif// _EXPRESSION_TREE_H_
+#endif// EXPRESSION_TREE_H_

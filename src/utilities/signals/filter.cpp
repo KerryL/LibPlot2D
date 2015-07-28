@@ -38,7 +38,7 @@
 //		None
 //
 //==========================================================================
-Filter::Filter(const double &_sampleRate) : sampleRate(_sampleRate)
+Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 {
 	a = NULL;
 	b = NULL;
@@ -70,8 +70,8 @@ Filter::Filter(const double &_sampleRate) : sampleRate(_sampleRate)
 //		None
 //
 //==========================================================================
-Filter::Filter(const double &_sampleRate, const std::vector<double> &numerator,
-	const std::vector<double> &denominator, const double &initialValue) : sampleRate(_sampleRate)
+Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
+	const std::vector<double> &denominator, const double &initialValue) : sampleRate(sampleRate)
 {
 	GenerateCoefficients(numerator, denominator);
 	Initialize(initialValue);
@@ -274,7 +274,7 @@ Filter& Filter::operator=(const Filter &f)
 //		None
 //
 //==========================================================================
-void Filter::DeleteArrays(void)
+void Filter::DeleteArrays()
 {
 	delete [] a;
 	delete [] b;
@@ -324,17 +324,17 @@ void Filter::Initialize(const double &initialValue)
 //		double containing the filtered value
 //
 //==========================================================================
-double Filter::Apply(const double &_u)
+double Filter::Apply(const double &u)
 {
-	ShiftArray(u, inSize);
-	u[0] = _u;
+	ShiftArray(this->u, inSize);
+	this->u[0] = u;
 
 	ShiftArray(y, outSize);
 
 	y[0] = 0.0;
 	unsigned int i;
 	for (i = 0; i < inSize; i++)
-		y[0] += a[i] * u[i];
+		y[0] += a[i] * this->u[i];
 	for (i = 1; i < outSize; i++)
 		y[0] -= b[i - 1] * y[i];
 
@@ -383,10 +383,10 @@ void Filter::ShiftArray(double *s, const unsigned int &size)
 //		None
 //
 //==========================================================================
-void Filter::AllocateArrays(const unsigned int &_inSize, const unsigned int &_outSize)
+void Filter::AllocateArrays(const unsigned int &inSize, const unsigned int &outSize)
 {
-	inSize = _inSize;
-	outSize = _outSize;
+	this->inSize = inSize;
+	this->outSize = outSize;
 
 	a = new double[inSize];
 	b = new double[outSize - 1];

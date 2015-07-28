@@ -16,7 +16,6 @@
 // Local headers
 #include "renderer/primitives/legend.h"
 #include "renderer/renderWindow.h"
-#include "utilities/math/plotMath.h"
 #include "renderer/line.h"
 
 // FTGL headers

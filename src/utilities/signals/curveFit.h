@@ -13,8 +13,8 @@
 // Description:  Contains methods for fitting curves to datasets.
 // History:
 
-#ifndef _CURVE_FIT_H_
-#define _CURVE_FIT_H_
+#ifndef CURVE_FIT_H_
+#define CURVE_FIT_H_
 
 // Local forward declarations
 class Dataset2D;
@@ -38,4 +38,4 @@ private:
 	//static void DoMatrixTest(void);
 };
 
-#endif// _CURVE_FIT_H_
+#endif// CURVE_FIT_H_

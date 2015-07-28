@@ -68,10 +68,10 @@ Matrix::Matrix()
 //		None
 //
 //==========================================================================
-Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns)
+Matrix::Matrix(const unsigned int &rows, const unsigned int &columns)
 {
-	rows = _rows;
-	columns = _columns;
+	this->rows = rows;
+	this->columns = columns;
 
 	AllocateElements();
 	Zero();
@@ -98,10 +98,10 @@ Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns)
 //		None
 //
 //==========================================================================
-Matrix::Matrix(const unsigned int &_rows, const unsigned int &_columns, double element1, ...)
+Matrix::Matrix(const unsigned int &rows, const unsigned int &columns, double element1, ...)
 {
-	rows = _rows;
-	columns = _columns;
+	this->rows = rows;
+	this->columns = columns;
 
 	AllocateElements();
 
@@ -248,8 +248,8 @@ void Matrix::Set(double element1, ...)
 // Description:		Returns the element at the specified location.
 //
 // Input Arguments:
-//		Row		= const int& specifying the row
-//		Column = const int& specifying the column
+//		row		= const int& specifying the row
+//		column = const int& specifying the column
 //
 // Output Arguments:
 //		None
@@ -279,7 +279,7 @@ double Matrix::GetElement(const int &row, const int &column) const
 //		MATRIX& reference to this
 //
 //==========================================================================
-Matrix& Matrix::MakeIdentity(void)
+Matrix& Matrix::MakeIdentity()
 {
 	Zero();
 
@@ -306,7 +306,7 @@ Matrix& Matrix::MakeIdentity(void)
 //		None
 //
 //==========================================================================
-void Matrix::Zero(void)
+void Matrix::Zero()
 {
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
@@ -324,10 +324,10 @@ void Matrix::Zero(void)
 //					this matrix.
 //
 // Input Arguments:
-//		StartRow	= const unsigned int& specifying the starting row
-//		StartColumn	= const unsigned int& specifying the starting column
-//		SubRows		= const unsigned int& specifying the number of rows
-//		SubColumns	= const unsigned int& specifying the number of columns
+//		startRow	= const unsigned int& specifying the starting row
+//		startColumn	= const unsigned int& specifying the starting column
+//		subRows		= const unsigned int& specifying the number of rows
+//		subColumns	= const unsigned int& specifying the number of columns
 //
 // Output Arguments:
 //		None
@@ -366,10 +366,10 @@ Matrix Matrix::GetSubMatrix(const unsigned int &startRow, const unsigned int &st
 //		None
 //
 // Return Value:
-//		Matrix, trasposed version of this
+//		Matrix, transposed version of this
 //
 //==========================================================================
-Matrix Matrix::GetTranspose(void) const
+Matrix Matrix::GetTranspose() const
 {
 	Matrix transpose(columns, rows);
 
@@ -396,29 +396,27 @@ Matrix Matrix::GetTranspose(void) const
 //		b	= const Matrix& vector to divide this into
 //
 // Output Arguments:
-//		None
+//		x	= Matrix& result of the division (x in the above example)
 //
 // Return Value:
-//		Matrix result of the division (x in the above example)
+//		bool, true for success, false otherwise
 //
 //==========================================================================
-Matrix Matrix::LeftDivide(const Matrix &b) const
+bool Matrix::LeftDivide(const Matrix& b, Matrix &x) const
 {
 	// Normal equations solution (not very robust?)
 	//return GetInverse() * b;
 
 	// Use singular value decomposition
-	Matrix U;
-	Matrix V;
-	Matrix W;
+	Matrix u;
+	Matrix v;
+	Matrix w;
 
-	if (!GetSingularValueDecomposition(U, V, W))
-	{
-		// TODO:  Generate an error?
-		return *this;
-	}
+	if (!GetSingularValueDecomposition(u, v, w))
+		return false;
 
-	return V * W.GetDiagonalInverse().GetTranspose() * U.GetTranspose() * b;
+	x = v * w.GetDiagonalInverse().GetTranspose() * u.GetTranspose() * b;
+	return true;
 }
 
 //==========================================================================
@@ -428,7 +426,7 @@ Matrix Matrix::LeftDivide(const Matrix &b) const
 // Description:		Multiplication operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const Vector& to multiply by
+//		v	= const Vector& to multiply by
 //
 // Output Arguments:
 //		None
@@ -437,16 +435,16 @@ Matrix Matrix::LeftDivide(const Matrix &b) const
 //		const Vector result of the matrix multiplication
 //
 //==========================================================================
-const Vector Matrix::operator * (const Vector &target) const
+const Vector Matrix::operator*(const Vector &v) const
 {
 	assert(rows == 3 && columns == 3);
 
 	Vector temp(0.0, 0.0, 0.0);
 
 	// Check to make sure we're a 3x3 matrix
-	temp.x = target.x * elements[0][0] + target.y * elements[0][1] + target.z * elements[0][2];
-	temp.y = target.x * elements[1][0] + target.y * elements[1][1] + target.z * elements[1][2];
-	temp.z = target.x * elements[2][0] + target.y * elements[2][1] + target.z * elements[2][2];
+	temp.x = v.x * elements[0][0] + v.y * elements[0][1] + v.z * elements[0][2];
+	temp.y = v.x * elements[1][0] + v.y * elements[1][1] + v.z * elements[1][2];
+	temp.z = v.x * elements[2][0] + v.y * elements[2][1] + v.z * elements[2][2];
 
 	return temp;
 }
@@ -458,20 +456,20 @@ const Vector Matrix::operator * (const Vector &target) const
 // Description:		Multiplication assignment operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const Matrix& to multiply
+//		m	= const Matrix& to multiply
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		MATRIX&
+//		Matrix&
 //
 //==========================================================================
-Matrix& Matrix::operator *= (const Matrix &target)
+Matrix& Matrix::operator*=(const Matrix &m)
 {
-	assert(columns == target.rows);
+	assert(columns == m.rows);
 
-	Matrix result(rows, target.columns);
+	Matrix result(rows, m.columns);
 
 	unsigned int counter, i, j;
 	for (i = 0; i < result.rows; i++)
@@ -480,7 +478,7 @@ Matrix& Matrix::operator *= (const Matrix &target)
 		{
 			result.elements[i][j] = 0.0;
 			for (counter = 0; counter < columns; counter++)
-				result.elements[i][j] += elements[i][counter] * target.elements[counter][j];
+				result.elements[i][j] += elements[i][counter] * m.elements[counter][j];
 		}
 	}
 
@@ -496,7 +494,7 @@ Matrix& Matrix::operator *= (const Matrix &target)
 // Description:		Assignment operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const Matrix& to assign to this
+//		m	= const Matrix& to assign to this
 //
 // Output Arguments:
 //		None
@@ -505,18 +503,19 @@ Matrix& Matrix::operator *= (const Matrix &target)
 //		Matrix& result of the assignment
 //
 //==========================================================================
-Matrix& Matrix::operator = (const Matrix &target)
+Matrix& Matrix::operator=(const Matrix &m)
 {
-	if (this == &target)
+	// Check for self assignment
+	if (this == &m)
 		return *this;
 
-	Resize(target.rows, target.columns);
+	Resize(m.rows, m.columns);
 
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
 		for (j = 0; j < columns; j++)
-			elements[i][j] = target.elements[i][j];
+			elements[i][j] = m.elements[i][j];
 	}
 
 	return *this;
@@ -529,7 +528,7 @@ Matrix& Matrix::operator = (const Matrix &target)
 // Description:		Addition assignment operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const Matrix& to add
+//		m	= const Matrix& to add
 //
 // Output Arguments:
 //		None
@@ -538,15 +537,15 @@ Matrix& Matrix::operator = (const Matrix &target)
 //		Matrix& result of the addition
 //
 //==========================================================================
-Matrix& Matrix::operator += (const Matrix &target)
+Matrix& Matrix::operator+=(const Matrix &m)
 {
-	assert(columns == target.columns && rows == target.rows);
+	assert(columns == m.columns && rows == m.rows);
 
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
 		for (j = 0; j < columns; j++)
-			elements[i][j] += target.elements[i][j];
+			elements[i][j] += m.elements[i][j];
 	}
 
 	return *this;
@@ -559,7 +558,7 @@ Matrix& Matrix::operator += (const Matrix &target)
 // Description:		Subrtaction assignment operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const Matrix& to subtract
+//		m	= const Matrix& to subtract
 //
 // Output Arguments:
 //		None
@@ -568,15 +567,15 @@ Matrix& Matrix::operator += (const Matrix &target)
 //		MATRIX& result of the subtraction
 //
 //==========================================================================
-Matrix& Matrix::operator -= (const Matrix &target)
+Matrix& Matrix::operator-=(const Matrix &m)
 {
-	assert(columns == target.columns && rows == target.rows);
+	assert(columns == m.columns && rows == m.rows);
 
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
 		for (j = 0; j < columns; j++)
-			elements[i][j] -= target.elements[i][j];
+			elements[i][j] -= m.elements[i][j];
 	}
 
 	return *this;
@@ -590,7 +589,7 @@ Matrix& Matrix::operator -= (const Matrix &target)
 //					Matrix class.
 //
 // Input Arguments:
-//		target	= const double& to multiply by
+//		n	= const double& to multiply by
 //
 // Output Arguments:
 //		None
@@ -599,13 +598,13 @@ Matrix& Matrix::operator -= (const Matrix &target)
 //		Matrix& result of the multiplication
 //
 //==========================================================================
-Matrix& Matrix::operator *=(const double &target)
+Matrix& Matrix::operator*=(const double &n)
 {
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
 		for (j = 0; j < columns; j++)
-			elements[i][j] *= target;
+			elements[i][j] *= n;
 	}
 
 	return *this;
@@ -619,7 +618,7 @@ Matrix& Matrix::operator *=(const double &target)
 //					Matrix class.
 //
 // Input Arguments:
-//		Double	= const double& to divide by
+//		n	= const double& to divide by
 //
 // Output Arguments:
 //		None
@@ -628,13 +627,13 @@ Matrix& Matrix::operator *=(const double &target)
 //		Matrix& result of the division
 //
 //==========================================================================
-Matrix& Matrix::operator /=(const double &target)
+Matrix& Matrix::operator/=(const double &n)
 {
 	unsigned int i, j;
 	for (i = 0; i < rows; i++)
 	{
 		for (j = 0; j < columns; j++)
-			elements[i][j] /= target;
+			elements[i][j] /= n;
 	}
 
 	return *this;
@@ -656,7 +655,7 @@ Matrix& Matrix::operator /=(const double &target)
 //		wxString containing the contents of this matrix
 //
 //==========================================================================
-wxString Matrix::Print(void) const
+wxString Matrix::Print() const
 {
 	wxString temp, intermediate;
 
@@ -798,7 +797,7 @@ void Matrix::ZeroRowByScalingAndAdding(const unsigned int &pivotRow,
 // Description:		Addition operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= Matrix to add
+//		m	= Matrix& to add
 //
 // Output Arguments:
 //		None
@@ -807,14 +806,11 @@ void Matrix::ZeroRowByScalingAndAdding(const unsigned int &pivotRow,
 //		Matrix contining the result of the addition
 //
 //==========================================================================
-const Matrix Matrix::operator+(const Matrix &target) const
+const Matrix Matrix::operator+(const Matrix &m) const
 {
-	// Create the return matrix
-	Matrix temp(target.rows, target.columns);
+	Matrix temp(m.rows, m.columns);
 	temp = *this;
-
-	// Do the addition
-	temp += target;
+	temp += m;
 
 	return temp;
 }
@@ -826,7 +822,7 @@ const Matrix Matrix::operator+(const Matrix &target) const
 // Description:		Subtraction operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const Matrix& to subtract
+//		m	= const Matrix& to subtract
 //
 // Output Arguments:
 //		None
@@ -835,14 +831,11 @@ const Matrix Matrix::operator+(const Matrix &target) const
 //		const Matrix contining the result of the subtraction
 //
 //==========================================================================
-const Matrix Matrix::operator-(const Matrix &target) const
+const Matrix Matrix::operator-(const Matrix &m) const
 {
-	// Create the return matrix
-	Matrix temp(target.rows, target.columns);
+	Matrix temp(m.rows, m.columns);
 	temp = *this;
-
-	// Do the subtraction
-	temp -= target;
+	temp -= m;
 
 	return temp;
 }
@@ -854,7 +847,7 @@ const Matrix Matrix::operator-(const Matrix &target) const
 // Description:		Multiplication operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const Matrix& to multiply by
+//		m	= const Matrix& to multiply by
 //
 // Output Arguments:
 //		None
@@ -863,14 +856,11 @@ const Matrix Matrix::operator-(const Matrix &target) const
 //		const Matrix contining the result of the multiplication
 //
 //==========================================================================
-const Matrix Matrix::operator*(const Matrix &target) const
+const Matrix Matrix::operator*(const Matrix &m) const
 {
-	// Create the return matrix
-	Matrix temp(target.rows, target.columns);
+	Matrix temp(m.rows, m.columns);
 	temp = *this;
-
-	// Do the multiplication
-	temp *= target;
+	temp *= m;
 
 	return temp;
 }
@@ -882,7 +872,7 @@ const Matrix Matrix::operator*(const Matrix &target) const
 // Description:		Element-wise multiplication operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const double& to multiply by
+//		n	= const double& to multiply by
 //
 // Output Arguments:
 //		None
@@ -891,14 +881,11 @@ const Matrix Matrix::operator*(const Matrix &target) const
 //		const Matrix contining the result of the multiplication
 //
 //==========================================================================
-const Matrix Matrix::operator * (const double &target) const
+const Matrix Matrix::operator*(const double &n) const
 {
-	// Create the return matrix
 	Matrix temp(rows, columns);
 	temp = *this;
-
-	// Do the multiplication
-	temp *= target;
+	temp *= n;
 
 	return temp;
 }
@@ -910,7 +897,7 @@ const Matrix Matrix::operator * (const double &target) const
 // Description:		Element-wise division operator for the Matrix class.
 //
 // Input Arguments:
-//		target	= const double& to divide by
+//		n	= const double& to divide by
 //
 // Output Arguments:
 //		None
@@ -919,21 +906,18 @@ const Matrix Matrix::operator * (const double &target) const
 //		const Matrix contining the result of the division
 //
 //==========================================================================
-const Matrix Matrix::operator / (const double &target) const
+const Matrix Matrix::operator/(const double &n) const
 {
-	// Create the return matrix
 	Matrix temp(rows, columns);
 	temp = *this;
-
-	// Do the division
-	temp /= target;
+	temp /= n;
 
 	return temp;
 }
 
 //==========================================================================
 // Class:			Matrix
-// Function:		operator ()
+// Function:		operator()
 //
 // Description:		Overload of the () operator for this object.  Permits accessing
 //					class data by using Matrix(row, column).  Non-const version.
@@ -949,18 +933,15 @@ const Matrix Matrix::operator / (const double &target) const
 //		double&, reference to the specified element
 //
 //==========================================================================
-double &Matrix::operator () (const unsigned int &row, const unsigned int &column)
+double &Matrix::operator()(const unsigned int &row, const unsigned int &column)
 {
-	// Make sure the indecies are valid
 	assert(row < rows && column < columns);
-
-	// Return the specified element
 	return elements[row][column];
 }
 
 //==========================================================================
 // Class:			Matrix
-// Function:		operator ()
+// Function:		operator()
 //
 // Description:		Overload of the () operator for this object.  Permits accessing
 //					class data by using Matrix(Row, Column).  Const version.
@@ -976,12 +957,9 @@ double &Matrix::operator () (const unsigned int &row, const unsigned int &column
 //		const double&, reference to the specified element
 //
 //==========================================================================
-const double &Matrix::operator () (const unsigned int &row, const unsigned int &column) const
+const double &Matrix::operator()(const unsigned int &row, const unsigned int &column) const
 {
-	// Make sure the indecies are valid
 	assert(row < rows && column < columns);
-
-	// Return the specified element
 	return elements[row][column];
 }
 
@@ -1002,7 +980,7 @@ const double &Matrix::operator () (const unsigned int &row, const unsigned int &
 //		Matrix, inverse of this
 //
 //==========================================================================
-Matrix Matrix::GetInverse(void) const
+Matrix Matrix::GetInverse() const
 {
 	if (!IsSquare() || GetRank() != rows)
 		return GetPsuedoInverse();
@@ -1027,21 +1005,21 @@ Matrix Matrix::GetInverse(void) const
 //		Matrix, inverse of this
 //
 //==========================================================================
-Matrix Matrix::GetPsuedoInverse(void) const
+Matrix Matrix::GetPsuedoInverse() const
 {
 	// Use singular value decomposition to compute the inverse
 	// SVD algorithm interpreted from Numerical Recipies in C
-	Matrix U;
-	Matrix W;
-	Matrix V;
+	Matrix u;
+	Matrix v;
+	Matrix w;
 
-	if (!GetSingularValueDecomposition(U, V, W))
+	if (!GetSingularValueDecomposition(u, v, w))
 	{
 		// TODO:  Generate an error?
 		return *this;
 	}
 
-	return V * W.GetDiagonalInverse() * U.GetTranspose();
+	return v * w.GetDiagonalInverse() * u.GetTranspose();
 }
 
 //==========================================================================
@@ -1063,7 +1041,7 @@ Matrix Matrix::GetPsuedoInverse(void) const
 //		Matrix, inverse of this (as long as this is a diagonal matrix)
 //
 //==========================================================================
-Matrix Matrix::GetDiagonalInverse(void) const
+Matrix Matrix::GetDiagonalInverse() const
 {
 	Matrix inverse(*this);
 
@@ -1126,7 +1104,7 @@ double Matrix::Pythag(const double& a, const double &b) const
 //		unsigned int indicating the rank of this matrix
 //
 //==========================================================================
-unsigned int Matrix::GetRank(void) const
+unsigned int Matrix::GetRank() const
 {
 	// TODO:  Is it better to use SVD for this?  Rank = # of non-zero singular values
 	Matrix reduced = GetRowReduced();
@@ -1165,7 +1143,7 @@ unsigned int Matrix::GetRank(void) const
 //		None
 //
 //==========================================================================
-void Matrix::FreeElements(void)
+void Matrix::FreeElements()
 {
 	unsigned int i;
 	for (i = 0; i < rows; i++)
@@ -1191,7 +1169,7 @@ void Matrix::FreeElements(void)
 //		None
 //
 //==========================================================================
-void Matrix::AllocateElements(void)
+void Matrix::AllocateElements()
 {
 	elements = new double*[rows];
 	unsigned int i;
@@ -1207,8 +1185,8 @@ void Matrix::AllocateElements(void)
 //					the specified size.
 //
 // Input Arguments:
-//		_rows		= const unsigned int& specifying new vertical dimension
-//		_columns	= const unsigned int& specifying new horizontal dimension
+//		rows	= const unsigned int& specifying new vertical dimension
+//		columns	= const unsigned int& specifying new horizontal dimension
 //
 // Output Arguments:
 //		None
@@ -1217,12 +1195,12 @@ void Matrix::AllocateElements(void)
 //		None
 //
 //==========================================================================
-void Matrix::Resize(const unsigned int &_rows, const unsigned int &_columns)
+void Matrix::Resize(const unsigned int &rows, const unsigned int &columns)
 {
 	FreeElements();
 
-	rows = _rows;
-	columns = _columns;
+	this->rows = rows;
+	this->columns = columns;
 
 	AllocateElements();
 }
@@ -1906,22 +1884,22 @@ Matrix& Matrix::RemoveColumn(const unsigned int &column)
 //		None
 //
 // Output Arguments:
-//		_rows	= const unsigned int& specifying the number of rows
-//		_column	= const unsigned int& specifying the number of columns; zero
-//				  is interpreted as square (set equal to _rows)
+//		rows	= const unsigned int& specifying the number of rows
+//		column	= const unsigned int& specifying the number of columns; zero
+//				  is interpreted as square (set equal to rows)
 //
 // Return Value:
 //		Matrix containing 1s along diagonal and zeros elsewhere
 //
 //==========================================================================
-Matrix Matrix::GetIdentity(const unsigned int &_rows, const unsigned int &_columns)
+Matrix Matrix::GetIdentity(const unsigned int &rows, const unsigned int &columns)
 {
 	Matrix identity;
 
-	if (_columns == 0)
-		identity.Resize(_rows, _rows);
+	if (columns == 0)
+		identity.Resize(rows, rows);
 	else
-		identity.Resize(_rows, _columns);
+		identity.Resize(rows, columns);
 
 	return identity.MakeIdentity();
 }

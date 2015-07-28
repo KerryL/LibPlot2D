@@ -13,8 +13,8 @@
 // Description:  Main frame for the application.
 // History:
 
-#ifndef _MAIN_FRAME_H_
-#define _MAIN_FRAME_H_
+#ifndef MAIN_FRAME_H_
+#define MAIN_FRAME_H_
 
 // Standard C++ headers
 #include <vector>
@@ -60,10 +60,10 @@ public:
 
 	enum PlotContext
 	{
-		plotContextXAxis,
-		plotContextLeftYAxis,
-		plotContextRightYAxis,
-		plotContextPlotArea
+		PlotContextXAxis,
+		PlotContextLeftYAxis,
+		PlotContextRightYAxis,
+		PlotContextPlotArea
 	};
 
 	bool GetXAxisScalingFactor(double &factor, wxString *label = NULL);
@@ -109,13 +109,13 @@ private:
 	// from the coordinates for this object!
 	void CreateGridContextMenu(const wxPoint &position, const unsigned int &row);
 
-	void ClearAllCurves(void);
+	void ClearAllCurves();
 	void AddCurve(wxString mathString);
 	void AddCurve(Dataset2D *data, wxString name);
 	void RemoveCurve(const unsigned int &i);
 
 	Color GetNextColor(const unsigned int &index) const;
-	void AddTimeRowToGrid(void);
+	void AddTimeRowToGrid();
 	unsigned int AddDataRowToGrid(const wxString &name);
 
 	void UpdateCurveProperties(const unsigned int &index, const Color &color,
@@ -195,7 +195,7 @@ private:
 	};
 
 	wxMenu *CreateAxisContextMenu(const unsigned int &baseEventId) const;
-	wxMenu *CreatePlotAreaContextMenu(void) const;
+	wxMenu *CreatePlotAreaContextMenu() const;
 
 	// Event handlers-----------------------------------------------------
 	// Buttons
@@ -266,10 +266,10 @@ private:
 
 	void SetMarkerSize(const unsigned int &curve, const int &size);
 
-	void ShowAppropriateXLabel(void);
+	void ShowAppropriateXLabel();
 
 	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);
-	FilterParameters DisplayFilterDialog(void);
+	FilterParameters DisplayFilterDialog();
 	void ApplyFilter(const FilterParameters &parameters, Dataset2D &data);
 
 	bool XScalingFactorIsKnown(double &factor, wxString *label) const;
@@ -322,8 +322,8 @@ private:
 
 	wxString GenerateTemporaryFileName(const unsigned int &length = 10) const;
 
-	void DoCopy(void);
-	void DoPaste(void);
+	void DoCopy();
+	void DoPaste();
 
 	DECLARE_EVENT_TABLE();
 
@@ -331,4 +331,4 @@ private:
 	//void TestSignalOperations(void);
 };
 
-#endif// _MAIN_FRAME_H_
+#endif// MAIN_FRAME_H_

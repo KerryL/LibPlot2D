@@ -13,8 +13,8 @@
 // Description:  Computes discrete-time integral of data.
 // History:
 
-#ifndef _INTEGRAL_H_
-#define _INTEGRAL_H_
+#ifndef INTEGRAL_H_
+#define INTEGRAL_H_
 
 // Local forward declarations
 class Dataset2D;
@@ -25,4 +25,4 @@ public:
 	static Dataset2D ComputeTimeHistory(const Dataset2D &data);
 };
 
-#endif// _INTEGRAL_H_
+#endif// INTEGRAL_H_

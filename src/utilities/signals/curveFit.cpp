@@ -70,7 +70,11 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 			A(i,j+1) = data.GetXData(i) * A(i,j) / maxX;
 	}
 
-	Matrix coefficients(A.LeftDivide(b));// we're solving the matrix equation Ax = b
+	Matrix coefficients;
+	if (!A.LeftDivide(b, coefficients))// we're solving the matrix equation Ax = b
+	{
+		// TODO:  generate error message?
+	}
 	for (i = 0; i <= order; i++)
 		fit.coefficients[i] = coefficients(i,0) / pow(maxX, (int)i);
 	ComputeRSquared(data, fit);

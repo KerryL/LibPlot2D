@@ -10,11 +10,11 @@
 // File:  fft.h
 // Created:  5/3/2011
 // Author:  K. Loux
-// Description:  Performs fast fourier transform on data.
+// Description:  Performs Fast Fourier Transform on data.
 // History:
 
-#ifndef _FFT_H_
-#define _FFT_H_
+#ifndef FFT_H_
+#define FFT_H_
 
 // Standard C++ headers
 #include <string>
@@ -330,4 +330,4 @@ private:
 		const unsigned int &windowSize, const unsigned int &averages);
 };
 
-#endif// _FFT_H_
+#endif// FFT_H_

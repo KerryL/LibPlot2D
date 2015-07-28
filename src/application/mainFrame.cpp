@@ -769,21 +769,21 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 
 	switch (context)
 	{
-	case plotContextXAxis:
+	case PlotContextXAxis:
 		contextMenu = CreateAxisContextMenu(idPlotContextBottomMajorGridlines);
 		contextMenu->Check(idPlotContextBottomLogarithmic, plotArea->GetXLogarithmic());
 		contextMenu->Check(idPlotContextBottomMajorGridlines, plotArea->GetBottomMajorGrid());
 		contextMenu->Check(idPlotContextBottomMinorGridlines, plotArea->GetBottomMinorGrid());
 		break;
 
-	case plotContextLeftYAxis:
+	case PlotContextLeftYAxis:
 		contextMenu = CreateAxisContextMenu(idPlotContextLeftMajorGridlines);
 		contextMenu->Check(idPlotContextLeftLogarithmic, plotArea->GetLeftLogarithmic());
 		contextMenu->Check(idPlotContextLeftMajorGridlines, plotArea->GetLeftMajorGrid());
 		contextMenu->Check(idPlotContextLeftMinorGridlines, plotArea->GetLeftMinorGrid());
 		break;
 
-	case plotContextRightYAxis:
+	case PlotContextRightYAxis:
 		contextMenu = CreateAxisContextMenu(idPlotContextRightMajorGridlines);
 		contextMenu->Check(idPlotContextRightLogarithmic, plotArea->GetRightLogarithmic());
 		contextMenu->Check(idPlotContextRightMajorGridlines, plotArea->GetRightMajorGrid());
@@ -791,7 +791,7 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 		break;
 
 	default:
-	case plotContextPlotArea:
+	case PlotContextPlotArea:
 		contextMenu = CreatePlotAreaContextMenu();
 		break;
 	}
@@ -907,7 +907,7 @@ wxMenu* MainFrame::CreateAxisContextMenu(const unsigned int &baseEventId) const
 //
 //==========================================================================
 wxArrayString MainFrame::GetFileNameFromUser(wxString dialogTitle, wxString defaultDirectory,
-										 wxString defaultFileName, wxString wildcard, long style)
+	wxString defaultFileName, wxString wildcard, long style)
 {
 	wxArrayString pathsAndFileNames;
 
@@ -1684,7 +1684,7 @@ void MainFrame::UpdateLegend()
 //		None
 //
 //==========================================================================
-void MainFrame::ShowAppropriateXLabel(void)
+void MainFrame::ShowAppropriateXLabel()
 {
 	// If the only visible curves are frequency plots, change the x-label
 	int i;
@@ -2962,7 +2962,7 @@ void MainFrame::DisplayMathChannelDialog(wxString defaultInput)
 	// Display input dialog in which user can specify the math desired
 	wxString message(_T("Enter the math you would like to perform:\n\n"));
 	message.Append(_T("    Use [x] notation to specify channels, where x = 0 is Time, x = 1 is the first data channel, etc.\n"));
-	message.Append(_T("    Valid operations are: +, -, *, /, %, ddt, int and fft.\n"));
+	message.Append(_T("    Valid operations are: +, -, *, /, %, ddt, int, fft and trigonometric functions.\n"));
 	message.Append(_T("    Use () to specify order of operations"));
 
 	AddCurve(::wxGetTextFromUser(message, _T("Specify Math Channel"), defaultInput, this));
@@ -3039,23 +3039,23 @@ bool MainFrame::GetCurrentAxisRange(const PlotContext &axis, double &min, double
 {
 	switch (axis)
 	{
-	case plotContextXAxis:
+	case PlotContextXAxis:
 		min = plotArea->GetXMin();
 		max = plotArea->GetXMax();
 		break;
 
-	case plotContextLeftYAxis:
+	case PlotContextLeftYAxis:
 		min = plotArea->GetLeftYMin();
 		max = plotArea->GetLeftYMax();
 		break;
 
-	case plotContextRightYAxis:
+	case PlotContextRightYAxis:
 		min = plotArea->GetRightYMin();
 		max = plotArea->GetRightYMax();
 		break;
 
 	default:
-	case plotContextPlotArea:
+	case PlotContextPlotArea:
 		// Plot area is not a valid context in which we can set axis limits
 		return false;
 	}
@@ -3085,16 +3085,16 @@ void MainFrame::SetNewAxisRange(const PlotContext &axis, const double &min, cons
 {
 	switch (axis)
 	{
-	case plotContextLeftYAxis:
+	case PlotContextLeftYAxis:
 		plotArea->SetLeftYLimits(min, max);
 		break;
 
-	case plotContextRightYAxis:
+	case PlotContextRightYAxis:
 		plotArea->SetRightYLimits(min, max);
 		break;
 
 	default:
-	case plotContextXAxis:
+	case PlotContextXAxis:
 		plotArea->SetXLimits(min, max);
 	}
 
@@ -3182,7 +3182,7 @@ void MainFrame::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 {
-	DisplayAxisRangeDialog(plotContextXAxis);
+	DisplayAxisRangeDialog(PlotContextXAxis);
 }
 
 //==========================================================================
@@ -3298,7 +3298,7 @@ void MainFrame::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 {
-	DisplayAxisRangeDialog(plotContextLeftYAxis);
+	DisplayAxisRangeDialog(PlotContextLeftYAxis);
 }
 
 //==========================================================================
@@ -3414,7 +3414,7 @@ void MainFrame::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 {
-	DisplayAxisRangeDialog(plotContextRightYAxis);
+	DisplayAxisRangeDialog(PlotContextRightYAxis);
 }
 
 //==========================================================================

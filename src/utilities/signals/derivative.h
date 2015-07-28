@@ -13,8 +13,8 @@
 // Description:  Computes discrete-time derivatives of data.
 // History:
 
-#ifndef _DERIVATIVE_H_
-#define _DERIVATIVE_H_
+#ifndef DERIVATIVE_H_
+#define DERIVATIVE_H_
 
 // Local forward declarations
 class Dataset2D;
@@ -25,4 +25,4 @@ public:
 	static Dataset2D ComputeTimeHistory(const Dataset2D &data);
 };
 
-#endif// _DERIVATIVE_H_
+#endif// DERIVATIVE_H_
