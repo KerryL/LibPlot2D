@@ -42,6 +42,7 @@
 //==========================================================================
 const unsigned int FilterDialog::defaultPrecision(2);
 const unsigned int FilterDialog::calculationPrecision(15);
+const unsigned int FilterDialog::maxFilterOrder(10000);
 
 //==========================================================================
 // Class:			FilterDialog
@@ -196,7 +197,7 @@ wxSizer* FilterDialog::CreateTextBoxes(void)
 	sizer->Add(widthBox, 0, wxEXPAND);
 
 	orderSpin = new wxSpinCtrl(this, SpinID, wxString::Format("%i", parameters.order));
-	orderSpin->SetRange(1, 10000);
+	orderSpin->SetRange(1, maxFilterOrder);
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Order")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(orderSpin);
 
@@ -414,9 +415,9 @@ void FilterDialog::OnRadioChange(wxCommandEvent& WXUNUSED(event))
 		return;
 
 	if (bandPassRadio->GetValue() || bandStopRadio->GetValue())
-		orderSpin->SetMin(2);
+		orderSpin->SetRange(2, maxFilterOrder);
 	else
-		orderSpin->SetMin(1);
+		orderSpin->SetRange(1, maxFilterOrder);
 
 	UpdateEnabledControls();
 	UpdateTransferFunction();

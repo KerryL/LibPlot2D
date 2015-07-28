@@ -13,8 +13,8 @@
 // Description:  Dialog box for defining filter parameters.
 // History:
 
-#ifndef _FILTER_DIALOG_H_
-#define _FILTER_DIALOG_H_
+#ifndef FILTER_DIALOG_H_
+#define FILTER_DIALOG_H_
 
 // Standard C++ headers
 #include <vector>
@@ -66,6 +66,8 @@ public:
 private:
 	static const unsigned int defaultPrecision;
 	static const unsigned int calculationPrecision;
+
+	static const unsigned int maxFilterOrder;
 
 	wxTextCtrl *cutoffFrequencyBox;
 	wxTextCtrl *dampingRatioBox;
@@ -168,4 +170,4 @@ private:
 	DECLARE_EVENT_TABLE();
 };
 
-#endif// _FILTER_DIALOG_H_
+#endif// FILTER_DIALOG_H_
