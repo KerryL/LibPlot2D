@@ -25,7 +25,7 @@
 // Description:		Constructor for ZoomBox class.
 //
 // Input Arguments:
-//		_renderWindow	= RenderWindow&
+//		renderWindow	= RenderWindow&
 //
 // Output Arguments:
 //		None
@@ -34,7 +34,7 @@
 //		None
 //
 //==========================================================================
-ZoomBox::ZoomBox(RenderWindow &_renderWindow) : Primitive(_renderWindow)
+ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 {
 	// Initially, we don't want to draw this
 	isVisible = false;
@@ -64,7 +64,7 @@ ZoomBox::ZoomBox(RenderWindow &_renderWindow) : Primitive(_renderWindow)
 //		None
 //
 //==========================================================================
-void ZoomBox::GenerateGeometry(void)
+void ZoomBox::GenerateGeometry()
 {
 	Line box;
 	std::vector<std::pair<double, double> > points;
@@ -92,7 +92,7 @@ void ZoomBox::GenerateGeometry(void)
 //		None
 //
 //==========================================================================
-bool ZoomBox::HasValidParameters(void)
+bool ZoomBox::HasValidParameters()
 {
 	// Just make sure the box actually exists
 	// It is up to the render window to ensure the coordinates are valid
@@ -109,8 +109,8 @@ bool ZoomBox::HasValidParameters(void)
 // Description:		Sets the location of the box's fixed corner.
 //
 // Input Arguments:
-//		_xAnchor	= const unsigned int& (pixels)
-//		_yAnchor	= const unsigned int& (pixels)
+//		xAnchor	= const unsigned int& (pixels)
+//		yAnchor	= const unsigned int& (pixels)
 //
 // Output Arguments:
 //		None
@@ -119,10 +119,10 @@ bool ZoomBox::HasValidParameters(void)
 //		None
 //
 //==========================================================================
-void ZoomBox::SetAnchorCorner(const unsigned int &_xAnchor, const unsigned int &_yAnchor)
+void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor)
 {
-	xAnchor = _xAnchor;
-	yAnchor = _yAnchor;
+	this->xAnchor = xAnchor;
+	this->yAnchor = yAnchor;
 
 	modified = true;
 }
@@ -134,8 +134,8 @@ void ZoomBox::SetAnchorCorner(const unsigned int &_xAnchor, const unsigned int &
 // Description:		Sets the location of the box's floating corner.
 //
 // Input Arguments:
-//		_xFloat	= const unsigned int& (pixels)
-//		_yFloat	= const unsigned int& (pixels)
+//		xFloat	= const unsigned int& (pixels)
+//		yFloat	= const unsigned int& (pixels)
 //
 // Output Arguments:
 //		None
@@ -144,10 +144,10 @@ void ZoomBox::SetAnchorCorner(const unsigned int &_xAnchor, const unsigned int &
 //		None
 //
 //==========================================================================
-void ZoomBox::SetFloatingCorner(const unsigned int &_xFloat, const unsigned int &_yFloat)
+void ZoomBox::SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat)
 {
-	xFloat = _xFloat;
-	yFloat = _yFloat;
+	this->xFloat = xFloat;
+	this->yFloat = yFloat;
 
 	modified = true;
 }

@@ -15,8 +15,8 @@
 //				 as well as OpenGL.
 // History:
 
-#ifndef _COLOR_H_
-#define _COLOR_H_
+#ifndef COLOR_H_
+#define COLOR_H_
 
 // wxWidgets forward declarations
 class wxString;
@@ -25,12 +25,10 @@ class wxColor;
 class Color
 {
 public:
-	// Constructors
 	Color();
 	Color(const double &red, const double &green, const double &blue, const double &alpha = 1.0);
 	Color(const wxColor &c);
 
-	// The color accessors
 	inline double GetRed() const { return red; }
 	inline double GetGreen() const { return green; }
 	inline double GetBlue() const { return blue; }
@@ -64,7 +62,6 @@ public:
 	void Set(const wxColor &color);
 	void SetAlpha(const double &alpha);
 
-	// Conversion to a wxColor
 	wxColor ToWxColor() const;
 
 	static Color GetColorHSL(const double &hue, const double &sat, const double &lum, const double &alpha = 1.0);
@@ -81,4 +78,4 @@ private:
 	void ValidateColor();
 };
 
-#endif// _COLOR_H_
+#endif// COLOR_H_

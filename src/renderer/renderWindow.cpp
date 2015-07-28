@@ -82,6 +82,11 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 	view3D = true;
 	viewOrthogonal = false;
 
+	// Make some assumptions to compute the horizontal viewing range
+	topMinusBottom = 100.0;
+	nearClip = 1.0;
+	farClip = 500.0;
+
 	AutoSetFrustum();
 
 	modelToView = new Matrix(3, 3);
@@ -90,8 +95,7 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
 	viewToModel = new Matrix(3, 3);
 	viewToModel->MakeIdentity();
 
-	cameraPosition.Set(0.0, 0.0, 0.0);
-	focalPoint.Set(0.0, 0.0, 0.0);
+	SetCameraView(Vector(1.0, 0.0, 0.0), Vector(0.0, 0.0, 0.0), Vector(0.0, 0.0, 1.0));
 	isInteracting = false;
 
 	SetBackgroundStyle(wxBG_STYLE_CUSTOM);// To avoid flashing under MSW
@@ -176,7 +180,7 @@ END_EVENT_TABLE()
 //		wxGLContext*
 //
 //==========================================================================
-wxGLContext* RenderWindow::GetContext(void)
+wxGLContext* RenderWindow::GetContext()
 {
 	if (!context)
 		context = new wxGLContext(this);
@@ -212,6 +216,9 @@ void RenderWindow::Render()
 	if (modified)
 		Initialize();
 
+	if (modelviewModified)
+		UpdateModelviewMatrix();
+
 	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
 		(float)backgroundColor.GetBlue(), (float)backgroundColor.GetAlpha());
 
@@ -223,9 +230,10 @@ void RenderWindow::Render()
 	glMatrixMode(GL_MODELVIEW);
 
 	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-	if (!view3D)// For 3D views, we need to render back-to-front
-		SortPrimitivesByAlpha();
+	SortPrimitivesByAlpha();
 
+	// Generally, all objects will have the same draw order and this won't do anything,
+	// but for some cases we do want to override the draw order just before rendering
 	SortPrimitivesByDrawOrder();
 
 	unsigned int i;
@@ -320,7 +328,7 @@ void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 //					is in the list.
 //
 // Input Arguments:
-//		toRemove	= PRIMITVE* pointing to the object to be removed
+//		toRemove	= Primitive* pointing to the object to be removed
 //
 // Output Arguments:
 //		None
@@ -486,6 +494,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent &event)
 {
 	SetCurrent(*GetContext());
+	glGetDoublev(GL_MODELVIEW_MATRIX, glModelviewMatrix);
 	UpdateTransformationMatricies();
 	glMatrixMode(GL_MODELVIEW);
 
@@ -528,7 +537,6 @@ void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent 
 //==========================================================================
 void RenderWindow::StoreMousePosition(wxMouseEvent &event)
 {
-	// Store the current position in the last position variables
 	lastMousePosition[0] = event.GetX();
 	lastMousePosition[1] = event.GetY();
 }
@@ -551,7 +559,6 @@ void RenderWindow::StoreMousePosition(wxMouseEvent &event)
 //==========================================================================
 void RenderWindow::OnMouseUpEvent(wxMouseEvent& WXUNUSED(event))
 {
-	// Reset the flag that indicates an interaction is in progress
 	isInteracting = false;
 }
 
@@ -629,20 +636,9 @@ void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 	// Handle 3D dollying differently than 2D dollying
 	if (view3D)
 	{
-		// Always dolly a constant distance
-		double dollyDistance = 0.05;
-
-		// TODO:  Adjust the dolly distance so it is slower closer to the focal point and slower farther away
-
-		// Get the normal direction (along which we will translate)
-		Vector normal(0.0, 0.0, 1.0);
-		normal = TransformToModel(normal);
-
-		// Apply the dolly distance and flip the distance depending on whether we're wheeling in or out
-		normal *= dollyDistance * event.GetWheelRotation();
-
-		// Apply the translation
-		glTranslated(normal.x, normal.y, normal.z);
+		const double dollyFactor(0.05);
+		const double nominalWheelRotation(120.0);
+		SetTopMinusBottom(topMinusBottom * (1.0 + event.GetWheelRotation() / nominalWheelRotation * dollyFactor));
 	}
 	else
 	{
@@ -670,27 +666,9 @@ void RenderWindow::DoDragDolly(wxMouseEvent &event)
 {
 	if (view3D)
 	{
-		double dollyDistance = 0.1;
-
-		// Convert up and normal vectors from openGL coordinates to model coordinates
-		Vector upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
-		upDirection = TransformToModel(upDirection);
-		normal = TransformToModel(normal);
-		leftDirection = normal.Cross(upDirection);
-
-		// Get a vector that represents the mouse position relative to the center of the screen
-		Vector mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
-			+ leftDirection * double(GetSize().GetWidth() / 2 - event.GetX());
-		Vector lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
-			+ leftDirection * double(GetSize().GetWidth() / 2 - lastMousePosition[0]);
-
-		// Get a vector that represents the mouse motion (projected onto a plane with the camera
-		// position as a normal)
-		Vector mouseMotion = mouseVector - lastMouseVector;
-
-		mouseMotion = TransformToView(mouseMotion);
-		normal *= dollyDistance * mouseMotion.y;
-		glTranslated(normal.x, normal.y, normal.z);
+		const double dollyFactor(0.05);
+		double deltaMouse = lastMousePosition[1] - event.GetY();
+		SetTopMinusBottom(topMinusBottom * (1.0 + deltaMouse * dollyFactor));
 	}
 	else
 	{
@@ -770,12 +748,10 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 //		None
 //
 //==========================================================================
-void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection)
+void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt,
+	const Vector &upDirection)
 {
-	SetCurrent(*GetContext());
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	modelviewModified = true;
 
 	// Compute the MODELVIEW matrix
 	// (Use calculations from gluLookAt documentation)
@@ -789,16 +765,41 @@ void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt, c
 									 u.x, u.y, u.z, 0.0,
 									 -f.x, -f.y, -f.z, 0.0,
 									 0.0, 0.0, 0.0, 1.0);
+		Matrix translation(4, 4, 1.0, 0.0, 0.0, -position.x,
+								 0.0, 1.0, 0.0, -position.y,
+								 0.0, 0.0, 1.0, -position.z,
+								 0.0, 0.0, 0.0, 1.0);
 
-		double glMatrix[16];
-		ConvertMatrixToGL(modelViewMatrix, glMatrix);
-		glLoadMatrixd(glMatrix);
+		ConvertMatrixToGL(modelViewMatrix * translation, glModelviewMatrix);
 	}
 
-	glTranslated(-position.x, -position.y, -position.z);
 	focalPoint = lookAt;
-
 	UpdateTransformationMatricies();
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		UpdateModelviewMatrix
+//
+// Description:		Makes the openGL calls to update the modelview matrix.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::UpdateModelviewMatrix()
+{
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadMatrixd(glModelviewMatrix);
+
+	modelviewModified = false;
 }
 
 //==========================================================================
@@ -863,12 +864,10 @@ Vector RenderWindow::TransformToModel(const Vector &viewVector) const
 //		None
 //
 //==========================================================================
-void RenderWindow::UpdateTransformationMatricies(void)
+void RenderWindow::UpdateTransformationMatricies()
 {
 	Matrix modelViewMatrix(4, 4);
-	double glMatrix[16];
-	glGetDoublev(GL_MODELVIEW_MATRIX, glMatrix);
-	ConvertGLToMatrix(modelViewMatrix, glMatrix);
+	ConvertGLToMatrix(modelViewMatrix, glModelviewMatrix);
 
 	// Extract the orientation matrices
 	(*modelToView) = modelViewMatrix.GetSubMatrix(0, 0, 3, 3);
@@ -880,7 +879,6 @@ void RenderWindow::UpdateTransformationMatricies(void)
 	cameraPosition.y = modelViewMatrix.GetElement(1, 3);
 	cameraPosition.z = modelViewMatrix.GetElement(2, 3);
 
-	// Transform the camera position into model coordinates
 	cameraPosition = TransformToModel(cameraPosition);
 }
 
@@ -900,31 +898,16 @@ void RenderWindow::UpdateTransformationMatricies(void)
 //		None
 //
 //==========================================================================
-void RenderWindow::AutoSetFrustum(void)
+void RenderWindow::AutoSetFrustum()
 {
+	modified = true;
+
 	// This method is really for 3D renderers - for 2D, we just re-initialize to handle change in aspect ratio/size
 	if (!view3D)
-	{
-		modified = true;
 		return;
-	}
 
-	// Get this window's size
-	wxSize WindowSize = GetSize();
-
-	// Set the aspect ratio to match this window's size
-	aspectRatio = (double)WindowSize.GetWidth() / (double)WindowSize.GetHeight();
-
-	// Set the vertical FOV
-	verticalFOV = 20.0 * PlotMath::pi / 180.0;
-
-	// Set the clipping plane distances to something reasonable
-	// TODO:  Make this be smarter, or user-adjustable (distance between camera and focal point)
-	nearClip = 5.0;
-	farClip = 500.0;
-
-	// Tell it that we're modified
-	modified = true;
+	wxSize windowSize = GetSize();
+	aspectRatio = (double)windowSize.GetWidth() / (double)windowSize.GetHeight();
 }
 
 //==========================================================================
@@ -943,7 +926,7 @@ void RenderWindow::AutoSetFrustum(void)
 //		wxString containing the error description
 //
 //==========================================================================
-wxString RenderWindow::GetGLError(void) const
+wxString RenderWindow::GetGLError() const
 {
 	int error = glGetError();
 
@@ -1032,7 +1015,7 @@ bool RenderWindow::WriteImageToFile(wxString pathAndFileName) const
 //		wxImage
 //
 //==========================================================================
-wxImage RenderWindow::GetImage(void) const
+wxImage RenderWindow::GetImage() const
 {
 	unsigned int height = GetSize().GetHeight();
 	unsigned int width = GetSize().GetWidth();
@@ -1099,14 +1082,14 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 //		None
 //
 //==========================================================================
-void RenderWindow::SortPrimitivesByAlpha(void)
+void RenderWindow::SortPrimitivesByAlpha()
 {
 	unsigned int i;
 	std::vector<ListItem> primitiveOrder;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 		primitiveOrder.push_back(ListItem(primitiveList[i]->GetColor().GetAlpha(), i));
 
-	std::stable_sort(primitiveOrder.begin(), primitiveOrder.end());
+	std::stable_sort(primitiveOrder.rbegin(), primitiveOrder.rend());
 
 	std::vector<unsigned int> order;
 	for (i = 0; i < primitiveOrder.size(); i++)
@@ -1218,7 +1201,7 @@ void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const double gl[])
 //		None
 //
 //==========================================================================
-void RenderWindow::Initialize2D(void) const
+void RenderWindow::Initialize2D() const
 {
 	// Disable Z-buffering, but allow testing
 	//glEnable(GL_DEPTH_TEST);// NOTE:  Can't uncomment this line or the app fails to paint on any target machine (don't know why)
@@ -1256,7 +1239,7 @@ void RenderWindow::Initialize2D(void) const
 //		None
 //
 //==========================================================================
-void RenderWindow::Initialize3D(void) const
+void RenderWindow::Initialize3D() const
 {
 	// Turn Z-buffering on
 	glEnable(GL_DEPTH_TEST);
@@ -1269,6 +1252,7 @@ void RenderWindow::Initialize3D(void) const
 	// Turn lighting on
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
 	// Smooth shading for nice-looking object
 	glShadeModel(GL_SMOOTH);
@@ -1301,7 +1285,7 @@ void RenderWindow::Initialize3D(void) const
 //		Matrix
 //
 //==========================================================================
-Matrix RenderWindow::Generate2DProjectionMatrix(void) const
+Matrix RenderWindow::Generate2DProjectionMatrix() const
 {
 	// Set up an orthogonal 2D projection matrix (this puts (0,0) at the lower left-hand corner of the window)
 	Matrix projectionMatrix(4, 4);
@@ -1332,31 +1316,75 @@ Matrix RenderWindow::Generate2DProjectionMatrix(void) const
 //		Matrix
 //
 //==========================================================================
-Matrix RenderWindow::Generate3DProjectionMatrix(void) const
+Matrix RenderWindow::Generate3DProjectionMatrix() const
 {
+	// For orthogonal projections, top - bottom and left - right give size in
+	// screen coordinates.  For perspective projections, these combined with
+	// the near clipping plane give FOV (top - bottom specifies screen height at
+	// the near clipping plane).
+	//  hFOV = atan(nearClip * 2.0 / leftMinusRight);// [rad]
+	//  vFOV = atan(nearClip * 2.0 / topMinusBottom);// [rad]
+	// The distance at which unity scaling occurs is the cotangent of (top - bottom) / 2.
+	// We can use the distance set in SetCameraView() to determine 
 	Matrix projectionMatrix(4, 4);
-	double halfHeight = tan(verticalFOV) * nearClip;
+	double rightMinusLeft(topMinusBottom * aspectRatio);
 	if (viewOrthogonal)
 	{
-		// Set up the elements for the orthogonal projection matrix (parallel projection)
-		projectionMatrix.SetElement(0, 0, 1.0 / (aspectRatio * halfHeight));
-		projectionMatrix.SetElement(1, 1, 1.0 / halfHeight);
+		projectionMatrix.SetElement(0, 0, 2.0 / rightMinusLeft);
+		projectionMatrix.SetElement(1, 1, 2.0 / topMinusBottom);
 		projectionMatrix.SetElement(2, 2, 2.0 / (nearClip - farClip));
-		projectionMatrix.SetElement(2, 3, (nearClip + farClip) / (nearClip - farClip));
-		//ProjectionMatrix.SetElement(3, 2, -1.0);// Removing this line does not give you a true orthographic projection, but it is necessary for dollying
 		projectionMatrix.SetElement(3, 3, 1.0);
+		// For symmetric frustums, elements (0,3) and (1,3) are zero
+		projectionMatrix.SetElement(2, 3, (nearClip + farClip) / (nearClip - farClip));
 	}
 	else
 	{
-		// Set up the elements for the perspective projection matrix
-		projectionMatrix.SetElement(0, 0, nearClip / (aspectRatio * halfHeight));
-		projectionMatrix.SetElement(1, 1, nearClip / halfHeight);
+		projectionMatrix.SetElement(0, 0, 2.0 * nearClip / rightMinusLeft);
+		projectionMatrix.SetElement(1, 1, 2.0 * nearClip / topMinusBottom);
 		projectionMatrix.SetElement(2, 2, (nearClip + farClip) / (nearClip - farClip));
 		projectionMatrix.SetElement(2, 3, 2.0 * farClip * nearClip / (nearClip - farClip));
 		projectionMatrix.SetElement(3, 2, -1.0);
 	}
 
 	return projectionMatrix;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		SetViewOrthogonal
+//
+// Description:		Switches between perspective and orthogonal projections
+//					while maintaining nominal scale.
+//
+// Input Arguments:
+//		viewOrthogonal	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::SetViewOrthogonal(const bool &viewOrthogonal)
+{
+	if (this->viewOrthogonal == viewOrthogonal)
+		return;
+
+	this->viewOrthogonal = viewOrthogonal;
+	modified = true;
+
+	// TODO:  Would be better to have some parameter that is common between the
+	// two modes and to just compute the projection matrix accordingly.
+	
+	// We can compute the distance at which we are focused (according to last call
+	// to SetCameraPosition()), and then determine the correct value of SetTopMinusBottom()
+	// in order to maintain unit scale at this distance.
+	double nominalDistance = cameraPosition.Distance(focalPoint);
+	if (viewOrthogonal)// was perspective
+		topMinusBottom *= nominalDistance / nearClip;
+	else// was orthogonal
+		topMinusBottom *= nearClip / nominalDistance;
 }
 
 //==========================================================================

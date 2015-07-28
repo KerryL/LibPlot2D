@@ -14,8 +14,8 @@
 // History:
 //	07/30/2012	- Added logarithmically-scalled plotting, K. Loux.
 
-#ifndef _AXIS_H_
-#define _AXIS_H_
+#ifndef AXIS_H_
+#define AXIS_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -31,16 +31,13 @@ class FTBBox;
 class Axis : public Primitive
 {
 public:
-	// Constructor
-	Axis(RenderWindow &_renderWindow);
-
-	// Destructor
+	Axis(RenderWindow &renderWindow);
 	~Axis();
 
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
-	void GenerateGeometry(void);
-	bool HasValidParameters(void);
+	void GenerateGeometry();
+	bool HasValidParameters();
 
 	// Enumeration for the axis orientations
 	enum AxisOrientation
@@ -61,44 +58,44 @@ public:
 	};
 
 	// Set option methods
-	void SetOrientation(const AxisOrientation &orientation) { this->orientation = orientation; modified = true; };
-	void SetMinimum(const double &minimum) { this->minimum = minimum; modified = true; };
-	void SetMaximum(const double &maximum) { this->maximum = maximum; modified = true; };
-	void SetMajorResolution(const double &majorResolution) { this->majorResolution = majorResolution; modified = true; };
-	void SetMinorResolution(const double &minorResolution) { this->minorResolution = minorResolution; modified = true; };
-	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; modified = true; };
-	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; modified = true; };
-	void SetLabel(wxString label) { this->label = label; modified = true; };
-	void SetFont(FTFont *font) { this->font = font; modified = true; };
-	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; modified = true; };
-	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; modified = true; };
-	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; modified = true; };
-	void SetOffsetFromWindowEdge(const unsigned int &offset) { offsetFromWindowEdge = offset; modified = true; };
+	void SetOrientation(const AxisOrientation &orientation) { this->orientation = orientation; modified = true; }
+	void SetMinimum(const double &minimum) { this->minimum = minimum; modified = true; }
+	void SetMaximum(const double &maximum) { this->maximum = maximum; modified = true; }
+	void SetMajorResolution(const double &majorResolution) { this->majorResolution = majorResolution; modified = true; }
+	void SetMinorResolution(const double &minorResolution) { this->minorResolution = minorResolution; modified = true; }
+	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; modified = true; }
+	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; modified = true; }
+	void SetLabel(wxString label) { this->label = label; modified = true; }
+	void SetFont(FTFont *font) { this->font = font; modified = true; }
+	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; modified = true; }
+	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; modified = true; }
+	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; modified = true; }
+	void SetOffsetFromWindowEdge(const unsigned int &offset) { offsetFromWindowEdge = offset; modified = true; }
 
-	void SetAxisAtMinEnd(const Axis *min) { minAxis = min; modified = true; };
-	void SetAxisAtMaxEnd(const Axis *max) { maxAxis = max; modified = true; };
-	void SetOppositeAxis(const Axis *opposite) { oppositeAxis = opposite; modified = true; };
+	void SetAxisAtMinEnd(const Axis *min) { minAxis = min; modified = true; }
+	void SetAxisAtMaxEnd(const Axis *max) { maxAxis = max; modified = true; }
+	void SetOppositeAxis(const Axis *opposite) { oppositeAxis = opposite; modified = true; }
 
-	void SetLogarithmicScale(const bool &log) { logarithmic = log; modified = true; };
+	void SetLogarithmicScale(const bool &log) { logarithmic = log; modified = true; }
 
 	// Get option methods
-	inline double GetMinimum(void) const { return minimum; };
-	inline double GetMaximum(void) const { return maximum; };
-	bool IsHorizontal(void) const;
-	inline unsigned int GetOffsetFromWindowEdge(void) const { return offsetFromWindowEdge; };
-	inline bool GetMajorGrid(void) const { return majorGrid; };
-	inline bool GetMinorGrid(void) const { return minorGrid; };
-	inline Color GetGridColor(void) const { return gridColor; };
+	inline double GetMinimum() const { return minimum; }
+	inline double GetMaximum() const { return maximum; }
+	bool IsHorizontal() const;
+	inline unsigned int GetOffsetFromWindowEdge() const { return offsetFromWindowEdge; }
+	inline bool GetMajorGrid() const { return majorGrid; }
+	inline bool GetMinorGrid() const { return minorGrid; }
+	inline Color GetGridColor() const { return gridColor; }
 
-	inline const Axis* GetAxisAtMinEnd(void) const { return minAxis; };
-	inline const Axis* GetAxisAtMaxEnd(void) const { return maxAxis; };
-	inline const Axis* GetOppositeAxis(void) const { return oppositeAxis; };
+	inline const Axis* GetAxisAtMinEnd() const { return minAxis; }
+	inline const Axis* GetAxisAtMaxEnd() const { return maxAxis; }
+	inline const Axis* GetOppositeAxis() const { return oppositeAxis; }
 
 	unsigned int GetAxisLength() const;
 
-	inline wxString GetLabel(void) const { return label; };
+	inline wxString GetLabel() const { return label; }
 
-	inline bool IsLogarithmic(void) const { return logarithmic; };
+	inline bool IsLogarithmic() const { return logarithmic; }
 
 	double ValueToPixel(const double &value) const;
 	double PixelToValue(const int &pixel) const;
@@ -123,12 +120,11 @@ private:
 	bool minorGrid;
 	int tickSize;
 
-	// Color of the grid
 	Color gridColor;
 
 	// Distance for edge of plot render window to the axis
-	unsigned int offsetFromWindowEdge;// [pixles]
-
+	unsigned int offsetFromWindowEdge;// [pixels]
+	
 	// Pointers to the axes at either end of this axis
 	const Axis *minAxis;
 	const Axis *maxAxis;
@@ -162,4 +158,4 @@ private:
 		const FTBBox &boundingBox, const double &offset) const;
 };
 
-#endif// _AXIS_H_
+#endif// AXIS_H_

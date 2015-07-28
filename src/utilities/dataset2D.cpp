@@ -16,7 +16,7 @@
 // Standard C++ headers
 #include <fstream>
 #include <utility>
-#include <assert.h>
+#include <cassert>
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -136,7 +136,7 @@ Dataset2D::~Dataset2D()
 //		None
 //
 //==========================================================================
-void Dataset2D::Reverse(void)
+void Dataset2D::Reverse()
 {
 	double *temp = new double[numberOfPoints];
 	unsigned int i;

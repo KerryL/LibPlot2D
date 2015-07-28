@@ -13,8 +13,8 @@
 // Description:  Derived from Primitive for creating plot curves objects.
 // History:
 
-#ifndef _PLOT_CURVE_H_
-#define _PLOT_CURVE_H_
+#ifndef PLOT_CURVE_H_
+#define PLOT_CURVE_H_
 
 // Local headers
 #include "renderer/primitives/primitive.h"
@@ -28,36 +28,34 @@ class Dataset2D;
 class PlotCurve : public Primitive
 {
 public:
-	// Constructor
-	PlotCurve(RenderWindow &_renderWindow);
+	PlotCurve(RenderWindow &renderWindow);
 	PlotCurve(const PlotCurve &plotCurve);
 
-	// Destructor
 	~PlotCurve();
 
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
-	void GenerateGeometry(void);
-	bool HasValidParameters(void);
+	void GenerateGeometry();
+	bool HasValidParameters();
 
-	void SetModified(void) { modified = true; }
+	void SetModified() { modified = true; }
 
 	void SetLineSize(const double &size) { lineSize = size; modified = true; }
 	void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
 	void SetPretty(const bool &pretty) { line.SetPretty(pretty); modified = true; }
 
 	// Remove all data from the plot
-	void SetData(const Dataset2D *_data);
-	void ClearData(void) { data = NULL; };
+	void SetData(const Dataset2D *data);
+	void ClearData() { data = NULL; }
 
 	// For setting up the plot
-	void BindToXAxis(Axis *_xAxis) { xAxis = _xAxis; modified = true; }
-	void BindToYAxis(Axis *_yAxis) { yAxis = _yAxis; modified = true; }
+	void BindToXAxis(Axis *xAxis) { this->xAxis = xAxis; modified = true; }
+	void BindToYAxis(Axis *yAxis) { this->yAxis = yAxis; modified = true; }
 
 	Axis *GetYAxis(void) { return yAxis; }
 
 	// Overloaded operators
-	PlotCurve& operator = (const PlotCurve &plotCurve);
+	PlotCurve& operator=(const PlotCurve &plotCurve);
 
 private:
 	// The axes with which this object is associated
@@ -110,4 +108,4 @@ private:
 	RangeSize SmallYRange(void) const;
 };
 
-#endif// _PLOT_CURVE_H_
+#endif// PLOT_CURVE_H_

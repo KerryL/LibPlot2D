@@ -14,8 +14,8 @@
 //				 the screen.
 // History:
 
-#ifndef _PLOT_RENDERER_H_
-#define _PLOT_RENDERER_H_
+#ifndef PLOT_RENDERER_H_
+#define PLOT_RENDERER_H_
 
 // Standard C++ headers
 #include <stack>
@@ -28,9 +28,11 @@
 // wxWidgets forward declarations
 class wxString;
 
+class MainFrame;
+typedef MainFrame Parent;
+
 // Local forward declarations
 class PlotObject;
-class MainFrame;
 class Dataset2D;
 class ZoomBox;
 class PlotCursor;
@@ -38,41 +40,38 @@ class PlotCursor;
 class PlotRenderer : public RenderWindow
 {
 public:
-	// Constructor
-	PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFrame &_mainFrame);
-
-	// Destructor
+	PlotRenderer(wxWindow &wxParent, Parent &parent, wxWindowID id, int args[]);
 	~PlotRenderer();
 
 	// Gets properties for actors
-	bool GetBottomMajorGrid(void) const;
-	bool GetLeftMajorGrid(void) const;
-	bool GetRightMajorGrid(void) const;
+	bool GetBottomMajorGrid() const;
+	bool GetLeftMajorGrid() const;
+	bool GetRightMajorGrid() const;
 
-	bool GetBottomMinorGrid(void) const;
-	bool GetLeftMinorGrid(void) const;
-	bool GetRightMinorGrid(void) const;
+	bool GetBottomMinorGrid() const;
+	bool GetLeftMinorGrid() const;
+	bool GetRightMinorGrid() const;
 
-	Color GetGridColor(void) const;
+	Color GetGridColor() const;
 
-	double GetXMin(void) const;
-	double GetXMax(void) const;
-	double GetLeftYMin(void) const;
-	double GetLeftYMax(void) const;
-	double GetRightYMin(void) const;
-	double GetRightYMax(void) const;
+	double GetXMin() const;
+	double GetXMax() const;
+	double GetLeftYMin() const;
+	double GetLeftYMax() const;
+	double GetRightYMin() const;
+	double GetRightYMax() const;
 
-	bool GetXLogarithmic(void) const;
-	bool GetLeftLogarithmic(void) const;
-	bool GetRightLogarithmic(void) const;
+	bool GetXLogarithmic() const;
+	bool GetLeftLogarithmic() const;
+	bool GetRightLogarithmic() const;
 
-	bool GetXAxisZoomed(void) const;
+	bool GetXAxisZoomed() const;
 
 	// Sets properties for actors
-	void SetMajorGridOn(void);
-	void SetMajorGridOff(void);
-	void SetMinorGridOn(void);
-	void SetMinorGridOff(void);
+	void SetMajorGridOn();
+	void SetMajorGridOff();
+	void SetMinorGridOn();
+	void SetMinorGridOff();
 
 	void SetBottomMajorGrid(const bool &grid);
 	void SetLeftMajorGrid(const bool &grid);
@@ -103,46 +102,46 @@ public:
 	void SetRightYLabel(wxString text);
 	void SetTitle(wxString text);
 
-	wxString GetXLabel(void) const;
-	wxString GetLeftYLabel(void) const;
-	wxString GetRightYLabel(void) const;
-	wxString GetTitle(void) const;
+	wxString GetXLabel() const;
+	wxString GetLeftYLabel() const;
+	wxString GetRightYLabel() const;
+	wxString GetTitle() const;
 
 	void AddCurve(const Dataset2D &data);
-	void RemoveAllCurves(void);
+	void RemoveAllCurves();
 	void RemoveCurve(const unsigned int &index);
 
-	void AutoScale(void);
-	void AutoScaleBottom(void);
-	void AutoScaleLeft(void);
-	void AutoScaleRight(void);
+	void AutoScale();
+	void AutoScaleBottom();
+	void AutoScaleLeft();
+	void AutoScaleRight();
 
 	void SetXLogarithmic(const bool &log);
 	void SetLeftLogarithmic(const bool &log);
 	void SetRightLogarithmic(const bool &log);
 
-	bool GetMajorGridOn(void);
-	bool GetMinorGridOn(void);
+	bool GetMajorGridOn();
+	bool GetMinorGridOn();
 	
-	bool LegendIsVisible(void);
-	void SetLegendOn(void);
-	void SetLegendOff(void);
+	bool LegendIsVisible();
+	void SetLegendOn();
+	void SetLegendOff();
 	void UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entries);
 
 	// Called to update the screen
-	void UpdateDisplay(void);
+	void UpdateDisplay();
 
-	bool GetLeftCursorVisible(void) const;
-	bool GetRightCursorVisible(void) const;
-	double GetLeftCursorValue(void) const;
-	double GetRightCursorValue(void) const;
+	bool GetLeftCursorVisible() const;
+	bool GetRightCursorVisible() const;
+	double GetLeftCursorValue() const;
+	double GetRightCursorValue() const;
 
-	void UpdateCursors(void);
+	void UpdateCursors();
 
-	MainFrame *GetMainFrame(void) { return &mainFrame; };
+	Parent *GetParent() { return &parent; }
 
-	void SaveCurrentZoom(void);
-	void ClearZoomStack(void);
+	void SaveCurrentZoom();
+	void ClearZoomStack();
 
 	static const unsigned int maxXTicks;
 	static const unsigned int maxYTicks;
@@ -150,13 +149,10 @@ public:
 
 private:
 	// Called from the PlotRenderer constructor only in order to initialize the display
-	void CreateActors(void);
+	void CreateActors();
 
-	// The actors necessary to create the plot
+	Parent &parent;
 	PlotObject *plot;
-
-	// Parent window
-	MainFrame &mainFrame;
 
 	// Overload of size event
 	void OnSize(wxSizeEvent &event);
@@ -217,8 +213,8 @@ protected:
 	};
 
 	std::stack<Zoom> zoom;
-	void UndoZoom(void);
-	bool ZoomChanged(void) const;
+	void UndoZoom();
+	bool ZoomChanged() const;
 
 	bool ignoreNextMouseMove;
 
@@ -226,4 +222,4 @@ protected:
 	DECLARE_EVENT_TABLE()
 };
 
-#endif// _PLOT_RENDERER_H_
+#endif// PLOT_RENDERER_H_

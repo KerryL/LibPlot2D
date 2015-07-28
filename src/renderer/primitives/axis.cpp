@@ -30,7 +30,7 @@
 // Description:		Constructor for the Axis class.
 //
 // Input Arguments:
-//		_renderWindow	= RenderWindow& reference to the object that owns this
+//		renderWindow	= RenderWindow& reference to the object that owns this
 //
 // Output Arguments:
 //		None
@@ -39,7 +39,7 @@
 //		None
 //
 //==========================================================================
-Axis::Axis(RenderWindow &_renderWindow) : Primitive(_renderWindow)
+Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow)
 {
 	color.Set(0.0, 0.0, 0.0, 1.0);
 
@@ -760,7 +760,7 @@ void Axis::ComputeTranslations(const double &value, int &xTranslation, int &yTra
 //		bool, true for horizontal, false for vertical
 //
 //==========================================================================
-bool Axis::IsHorizontal(void) const
+bool Axis::IsHorizontal() const
 {
 	if (orientation == OrientationBottom || orientation == OrientationTop)
 		return true;
@@ -785,7 +785,7 @@ bool Axis::IsHorizontal(void) const
 //		bool, true for OK to draw, false otherwise
 //
 //==========================================================================
-bool Axis::HasValidParameters(void)
+bool Axis::HasValidParameters()
 {
 	// Don't draw if any of the limits are not numbers
 	if (PlotMath::IsNaN(minimum) || PlotMath::IsNaN(maximum))

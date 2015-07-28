@@ -13,8 +13,8 @@
 // Description:  Derived from Primitive, this class is used to draw text.
 // History:
 
-#ifndef _TEXT_H_
-#define _TEXT_H_
+#ifndef TEXT_H_
+#define TEXT_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -28,43 +28,35 @@ class FTFont;
 class TextRendering : public Primitive
 {
 public:
-	// Constructor
-	TextRendering(RenderWindow &_renderWindow);
-
-	// Destructor
+	TextRendering(RenderWindow &renderWindow);
 	~TextRendering();
 
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
-	void GenerateGeometry(void);
-	bool HasValidParameters(void);
+	void GenerateGeometry();
+	bool HasValidParameters();
 
 	// Set option methods
-	void SetAngle(double _angle) { angle = _angle; modified = true; };
-	void SetFont(FTFont *_font) { font = _font; modified = true; };
-	void SetText(wxString _text) { text = _text; modified = true; };
-	void SetPosition(double _x, double _y) { x = _x; y = _y; modified = true; };
-	void SetCentered(bool _centered) { centered = _centered; modified = true; };
+	void SetAngle(const double& angle) { this->angle = angle; modified = true; }
+	void SetFont(FTFont *font) { this->font = font; modified = true; }
+	void SetText(const wxString& text) { this->text = text; modified = true; }
+	void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; modified = true; }
+	void SetCentered(const bool& centered) { this->centered = centered; modified = true; }
 
-	double GetTextHeight(void) const;
-	double GetTextWidth(void) const;
-
-	wxString GetText(void) const { return text; };
+	double GetTextHeight() const;
+	double GetTextWidth() const;
+	wxString GetText() const { return text; }
 
 private:
-	// The angle at which this text is inclined
 	double angle;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen
 
-	// The actual text content and font
 	wxString text;
 	FTFont *font;
 
 	// Flag indicating whether the text is centered at (X, Y) or if, if false,
-	// (X, Y) represents the lower left corner of the text bounding box
+	// (0, 0) represents the lower left corner of the text bounding box
 	bool centered;
-
-	// Position of this object in the render window
 	double x, y;
 };
 
-#endif// _TEXT_H_
+#endif// TEXT_H_

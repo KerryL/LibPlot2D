@@ -38,7 +38,7 @@
 // Description:		Returns true if a number is small enough to regard as zero.
 //
 // Input Arguments:
-//		toCheck	= const double& to be checked for being close to zero
+//		n	= const double& to be checked for being close to zero
 //
 // Output Arguments:
 //		None
@@ -47,9 +47,9 @@
 //		bool, true if the number is less than NEARLY_ZERO
 //
 //==========================================================================
-bool PlotMath::IsZero(const double &toCheck)
+bool PlotMath::IsZero(const double &n, const double &eps)
 {
-	if (fabs(toCheck) < NEARLY_ZERO)
+	if (fabs(n) < eps)
 		return true;
 	else
 		return false;
@@ -60,10 +60,10 @@ bool PlotMath::IsZero(const double &toCheck)
 // Function:		IsZero
 //
 // Description:		Returns true if a number is small enough to regard as zero.
-//					This function checks the magnitude of the VECTOR.
+//					This function checks the magnitude of the Vector.
 //
 // Input Arguments:
-//		toCheck	= const Vector& to be checked for being close to zero
+//		v	= const Vector& to be checked for being close to zero
 //
 // Output Arguments:
 //		None
@@ -72,10 +72,10 @@ bool PlotMath::IsZero(const double &toCheck)
 //		bool, true if the magnitude is less than NEARLY_ZERO
 //
 //==========================================================================
-bool PlotMath::IsZero(const Vector &toCheck)
+bool PlotMath::IsZero(const Vector &v, const double &eps)
 {
 	// Check each component of the vector
-	if (toCheck.Length() < NEARLY_ZERO)
+	if (v.Length() < eps)
 		return true;
 
 	return false;

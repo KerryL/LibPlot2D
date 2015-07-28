@@ -27,8 +27,8 @@
 // Description:		Constructor for the PlotCursor class.
 //
 // Input Arguments:
-//		_renderWindow	= RenderWindow&
-//		_axis			= Axis& with which we are associated
+//		renderWindow	= RenderWindow&
+//		axis			= Axis& with which we are associated
 //
 // Output Arguments:
 //		None
@@ -37,12 +37,10 @@
 //		None
 //
 //==========================================================================
-PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis)
-	: Primitive(_renderWindow), axis(_axis)
+PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
+	: Primitive(renderWindow), axis(axis)
 {
-	// Start out invisible
 	isVisible = false;
-
 	color = Color::ColorBlack;
 }
 
@@ -62,7 +60,7 @@ PlotCursor::PlotCursor(RenderWindow &_renderWindow, const Axis &_axis)
 //		None
 //
 //==========================================================================
-void PlotCursor::GenerateGeometry(void)
+void PlotCursor::GenerateGeometry()
 {
 	Line line;
 	if (axis.IsHorizontal())
@@ -98,7 +96,7 @@ void PlotCursor::GenerateGeometry(void)
 //		None
 //
 //==========================================================================
-bool PlotCursor::HasValidParameters(void)
+bool PlotCursor::HasValidParameters()
 {
 	// Make sure the value is within the axis limits
 	if (value >= axis.GetMinimum() && value <= axis.GetMaximum() &&
@@ -142,7 +140,7 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 
 //==========================================================================
 // Class:			PlotCursor
-// Function:		SetValue
+// Function:		SetLocation
 //
 // Description:		Sets the x position where the cursor should appear on the plot.
 //

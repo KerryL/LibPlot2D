@@ -10,6 +10,7 @@ DataPlotter/Release
 *.suo
 *.sdf
 *.opensdf
+*.bak
 
 # Ignore GKT directories
 bin/

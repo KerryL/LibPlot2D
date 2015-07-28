@@ -13,8 +13,8 @@
 // Description:  Base class for creating 3D objects.
 // History:
 
-#ifndef _PRIMITIVE_H_
-#define _PRIMITIVE_H_
+#ifndef PRIMITIVE_H_
+#define PRIMITIVE_H_
 
 // Local headers
 #include "renderer/color.h"
@@ -25,51 +25,45 @@ class RenderWindow;
 class Primitive
 {
 public:
-	// Constructor
-	Primitive(RenderWindow &_renderWindow);
+	Primitive(RenderWindow &renderWindow);
 	Primitive(const Primitive &primitive);
 
-	// Destructor
 	virtual ~Primitive();
 
 	// Performs the drawing operations
-	void Draw(void);
+	void Draw();
 
 	// Called when something is modified to re-create this object with
 	// all of the latest information
-	virtual void GenerateGeometry(void) = 0;
+	virtual void GenerateGeometry() = 0;
 
 	// Checks to see if this object's parameters are valid and allow drawing
-	virtual bool HasValidParameters(void) = 0;
+	virtual bool HasValidParameters() = 0;
 
 	// Private data accessors
-	void SetVisibility(const bool &_isVisible);
-	void SetColor(const Color &_color);
-	Color GetColor(void) { return color; };
-	void SetDrawOrder(const unsigned int &drawOrder) { this->drawOrder = drawOrder; };
-	void SetModified(void) { modified = true; };// Forces a re-draw
+	void SetVisibility(const bool &isVisible);
+	void SetColor(const Color &color);
+	Color GetColor() { return color; }
+	void SetDrawOrder(const unsigned int &drawOrder) { this->drawOrder = drawOrder; }
+	void SetModified() { modified = true; }// Forces a re-draw
 
-	bool GetIsVisible(void) const { return isVisible; };
+	bool GetIsVisible() const { return isVisible; }
 	unsigned int GetDrawOrder() const { return drawOrder; }
 
 	// Overloaded operators
-	Primitive& operator = (const Primitive &primitive);
+	Primitive& operator=(const Primitive &primitive);
 
 protected:
-	// Visibility flag
 	bool isVisible;
 
-	// The color variable
 	Color color;
 
-	// The "this has been modified" flag
 	bool modified;
 
-	// The render window that contains this object
 	RenderWindow &renderWindow;
 
-	void EnableAlphaBlending(void);
-	void DisableAlphaBlending(void);
+	void EnableAlphaBlending();
+	void DisableAlphaBlending();
 
 private:
 	// The openGL list index
@@ -77,4 +71,4 @@ private:
 	unsigned int drawOrder;
 };
 
-#endif// _PRIMITIVE_H_
+#endif// PRIMITIVE_H_

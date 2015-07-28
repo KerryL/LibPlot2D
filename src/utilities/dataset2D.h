@@ -13,12 +13,12 @@
 // Description:  Container for x and y-data series for plotting.
 // History:
 
-#ifndef _DATASET_H_
-#define _DATASET_H_
+#ifndef DATASET_H_
+#define DATASET_H_
 
 // Standard C++ headers
+#include <cassert>
 #include <cstdlib>
-#include <assert.h>
 
 // wxWidgets forward declarations
 class wxString;
@@ -26,12 +26,10 @@ class wxString;
 class Dataset2D
 {
 public:
-	// Constructors
 	Dataset2D();
 	Dataset2D(const Dataset2D& target);
 	Dataset2D(const unsigned int &numberOfPoints);
 
-	// Destructor
 	~Dataset2D();
 
 	// For exporting the data to a comma or tab delimited text file
@@ -40,17 +38,17 @@ public:
 	void Resize(const unsigned int &numberOfPoints);
 	void Reverse(void);
 
-	double ComputeYMean(void) const;
-	double GetAverageDeltaX(void) const;
+	double ComputeYMean() const;
+	double GetAverageDeltaX() const;
 
-	unsigned int GetNumberOfPoints(void) const { return numberOfPoints; };
+	unsigned int GetNumberOfPoints() const { return numberOfPoints; }
 	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;
-	double *GetXPointer(void) { return xData; };
-	double *GetYPointer(void) { return yData; };
-	const double *GetXPointer(void) const { return xData; };
-	const double *GetYPointer(void) const { return yData; };
-	double GetXData(const unsigned int &i) const { assert(i < numberOfPoints); return xData[i]; };
-	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; };
+	double *GetXPointer() { return xData; }
+	double *GetYPointer() { return yData; }
+	const double *GetXPointer() const { return xData; }
+	const double *GetYPointer() const { return yData; }
+	double GetXData(const unsigned int &i) const { assert(i < numberOfPoints); return xData[i]; }
+	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; }
 
 	Dataset2D& MultiplyXData(const double &target);
 	bool GetYAt(const double &x, double &y, bool *exactValue = NULL) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
@@ -123,4 +121,4 @@ private:
 		const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out);
 };
 
-#endif// _DATASET_H_
+#endif// DATASET_H_

@@ -15,8 +15,8 @@
 //				 collection of functions.
 // History:
 
-#ifndef _PLOT_MATH_H_
-#define _PLOT_MATH_H_
+#ifndef PLOT_MATH_H_
+#define PLOT_MATH_H_
 
 // Standard C++ headers
 #include <limits>// For QNaN
@@ -29,14 +29,14 @@ class wxString;
 namespace PlotMath
 {
 	// Constant declarations
-	const double NEARLY_ZERO = 1.0e-12;
+	const double NearlyZero = 1.0e-12;
 	//const double QNAN = std::numeric_limits<double>::quiet_NaN();// Not currently used
 	const double pi = 3.141592653589793238462643;
 
 	// Prototypes =====================================================
 	// For determining if a number is close enough to zero to regard as zero
-	bool IsZero(const double &toCheck);
-	bool IsZero(const Vector &toCheck);
+	bool IsZero(const double &n, const double &eps = NearlyZero);
+	bool IsZero(const Vector &v, const double &eps = NearlyZero);
 
 	template<typename T>
 	bool IsNaN(const T &value);
@@ -142,4 +142,4 @@ bool PlotMath::IsValid(const T &value)
 	return !IsNaN<T>(value) && !IsInf<T>(value);
 }
 
-#endif// _PLOT_MATH_H_
+#endif// PLOT_MATH_H_

@@ -28,7 +28,7 @@
 // Description:		Constructor for the TextRendering class.
 //
 // Input Arguments:
-//		_RenderWindow	= RENDER_WINDOW& reference to the object that owns this
+//		renderWindow	= RenderWindow& reference to the object that owns this
 //
 // Output Arguments:
 //		None
@@ -37,7 +37,7 @@
 //		None
 //
 //==========================================================================
-TextRendering::TextRendering(RenderWindow &_renderWindow) : Primitive(_renderWindow)
+TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindow)
 {
 	color.Set(0.0, 0.0, 0.0, 1.0);
 
@@ -47,7 +47,6 @@ TextRendering::TextRendering(RenderWindow &_renderWindow) : Primitive(_renderWin
 	text = wxEmptyString;
 
 	centered = false;
-
 	font = NULL;
 }
 
@@ -88,7 +87,7 @@ TextRendering::~TextRendering()
 //		None
 //
 //==========================================================================
-void TextRendering::GenerateGeometry(void)
+void TextRendering::GenerateGeometry()
 {
 	// Add the text
 	if (font && !text.IsEmpty())
@@ -129,7 +128,7 @@ void TextRendering::GenerateGeometry(void)
 //		bool, true for OK to draw, false otherwise
 //
 //==========================================================================
-bool TextRendering::HasValidParameters(void)
+bool TextRendering::HasValidParameters()
 {
 	// Don't draw if the angle is not a number
 	if (PlotMath::IsNaN(angle))
@@ -155,7 +154,7 @@ bool TextRendering::HasValidParameters(void)
 //		double, height in pixels of the current text
 //
 //==========================================================================
-double TextRendering::GetTextHeight(void) const
+double TextRendering::GetTextHeight() const
 {
 	if (!font)
 		return 0.0;
@@ -182,7 +181,7 @@ double TextRendering::GetTextHeight(void) const
 //		double, width in pixels of the current text
 //
 //==========================================================================
-double TextRendering::GetTextWidth(void) const
+double TextRendering::GetTextWidth() const
 {
 	if (!font)
 		return 0.0;

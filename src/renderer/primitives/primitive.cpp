@@ -24,7 +24,7 @@
 // Description:		Constructor for the Primitive class.
 //
 // Input Arguments:
-//		_renderWindow	= RenderWindow& pointing to the object that owns this
+//		renderWindow	= RenderWindow& pointing to the object that owns this
 //
 // Output Arguments:
 //		None
@@ -33,21 +33,16 @@
 //		None
 //
 //==========================================================================
-Primitive::Primitive(RenderWindow &_renderWindow) : renderWindow(_renderWindow)
+Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 {
-	// Initialize private data
 	isVisible = true;
 	modified = true;
 
-	// Initialize the color to black
 	color = Color::ColorBlack;
 
-	// Initialize the list index to zero
 	listIndex = 0;
-
 	drawOrder = 0;
 
-	// Add this object to the renderer
 	renderWindow.AddActor(this);
 }
 
@@ -116,7 +111,7 @@ Primitive::~Primitive()
 //		None
 //
 //==========================================================================
-void Primitive::Draw(void)
+void Primitive::Draw()
 {
 	if (modified || listIndex == 0)
 	{
@@ -158,7 +153,7 @@ void Primitive::Draw(void)
 // Description:		Sets the visibility flag for this object.
 //
 // Input Arguments:
-//		_isVisible	= const bool&
+//		isVisible	= const bool&
 //
 // Output Arguments:
 //		None
@@ -167,9 +162,9 @@ void Primitive::Draw(void)
 //		None
 //
 //==========================================================================
-void Primitive::SetVisibility(const bool &_isVisible)
+void Primitive::SetVisibility(const bool &isVisible)
 {
-	isVisible = _isVisible;
+	this->isVisible = isVisible;
 	modified = true;
 }
 
@@ -180,7 +175,7 @@ void Primitive::SetVisibility(const bool &_isVisible)
 // Description:		Sets the color of this object.
 //
 // Input Arguments:
-//		_Color	= const Color&
+//		color	= const Color&
 //
 // Output Arguments:
 //		None
@@ -189,15 +184,15 @@ void Primitive::SetVisibility(const bool &_isVisible)
 //		None
 //
 //==========================================================================
-void Primitive::SetColor(const Color &_color)
+void Primitive::SetColor(const Color &color)
 {
-	color = _color;
+	this->color = color;
 	modified = true;
 }
 
 //==========================================================================
 // Class:			Primitive
-// Function:		operator =
+// Function:		operator=
 //
 // Description:		Assignment operator for Primitive class.
 //
@@ -211,7 +206,7 @@ void Primitive::SetColor(const Color &_color)
 //		Primitive&, reference to this object
 //
 //==========================================================================
-Primitive& Primitive::operator = (const Primitive &primitive)
+Primitive& Primitive::operator=(const Primitive &primitive)
 {
 	// Check for self-assignment
 	if (this == &primitive)
@@ -244,7 +239,7 @@ Primitive& Primitive::operator = (const Primitive &primitive)
 //		Primitive&, reference to this object
 //
 //==========================================================================
-void Primitive::EnableAlphaBlending(void)
+void Primitive::EnableAlphaBlending()
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -269,7 +264,7 @@ void Primitive::EnableAlphaBlending(void)
 //		Primitive&, reference to this object
 //
 //==========================================================================
-void Primitive::DisableAlphaBlending(void)
+void Primitive::DisableAlphaBlending()
 {
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);

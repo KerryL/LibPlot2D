@@ -203,7 +203,7 @@ PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 {
 	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0};
 	//wxGLCanvas::IsDisplaySupported();// Added in wxWidgets 3.0
-	plotArea = new PlotRenderer(parent, wxID_ANY, args, *this);
+	plotArea = new PlotRenderer(*parent, *this, wxID_ANY, args);
 
 	plotArea->SetMinSize(wxSize(650, 320));
 	plotArea->SetMajorGridOn();

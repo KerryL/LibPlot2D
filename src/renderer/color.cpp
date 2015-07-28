@@ -56,7 +56,7 @@ Color::Color()
 //					as specified by the arguments.
 //
 // Input Arguments:
-//		red	= const double& specifying the amount of red in this color (0.0 - 1.0)
+//		red		= const double& specifying the amount of red in this color (0.0 - 1.0)
 //		green	= const double& specifying the amount of green in this color (0.0 - 1.0)
 //		blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
 //		alpha	= const double& specifying the opacity of this color (0.0 - 1.0)
@@ -116,10 +116,8 @@ Color::Color(const wxColor &c)
 const Color Color::ColorRed(1.0, 0.0, 0.0);
 const Color Color::ColorGreen(0.0, 1.0, 0.0);
 const Color Color::ColorBlue(0.0, 0.0, 1.0);
-
 const Color Color::ColorWhite(1.0, 1.0, 1.0);
 const Color Color::ColorBlack(0.0, 0.0, 0.0);
-
 const Color Color::ColorYellow(1.0, 1.0, 0.0);
 const Color Color::ColorCyan(0.0, 1.0, 1.0);
 const Color Color::ColorMagenta(1.0, 0.0, 1.0);
@@ -314,7 +312,7 @@ void Color::SetHSL(const double &hue, const double &sat, const double &lum, cons
 //		red		= const double& specifying the amount of red in this color (0.0 - 1.0)
 //		green	= const double& specifying the amount of green in this color (0.0 - 1.0)
 //		blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
-//		alpha	= double specifying the opacity of this color (0.0 - 1.0)
+//		alpha	= const double& specifying the opacity of this color (0.0 - 1.0)
 //
 // Output Arguments:
 //		None
@@ -368,7 +366,7 @@ void Color::Set(const wxColor &color)
 // Description:		Sets the alpha value for this object.
 //
 // Input Arguments:
-//		_alpha = const double&
+//		alpha = const double&
 //
 // Output Arguments:
 //		None
@@ -377,9 +375,9 @@ void Color::Set(const wxColor &color)
 //		None
 //
 //==========================================================================
-void Color::SetAlpha(const double &_alpha)
+void Color::SetAlpha(const double &alpha)
 {
-	alpha = _alpha;
+	this->alpha = alpha;
 	ValidateColor();
 }
 

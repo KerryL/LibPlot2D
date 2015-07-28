@@ -13,8 +13,8 @@
 // Description:  Intermediate class for creating plots from arrays of data.
 // History:
 
-#ifndef _PLOT_OBJECT_H_
-#define _PLOT_OBJECT_H_
+#ifndef PLOT_OBJECT_H_
+#define PLOT_OBJECT_H_
 
 // Standard C++ headers
 #include <vector>
@@ -38,40 +38,36 @@ class FTFont;
 class PlotObject
 {
 public:
-	// Constructor
-	PlotObject(PlotRenderer &_renderer);
-
-	// Destructor
+	PlotObject(PlotRenderer &renderer);
 	~PlotObject();
 
-	// Updates the actors on the screen
-	void Update(void);
+	void Update();
 
-	void RemoveExistingPlots(void);
+	void RemoveExistingPlots();
 	void RemovePlot(const unsigned int &index);
 	void AddCurve(const Dataset2D &data);
 
 	// Accessors for the axes limits
-	inline double GetXMin(void) const { return xMin; };
-	inline double GetXMax(void) const { return xMax; };
-	inline double GetLeftYMin(void) const { return yLeftMin; };
-	inline double GetLeftYMax(void) const { return yLeftMax; };
-	inline double GetRightYMin(void) const { return yRightMin; };
-	inline double GetRightYMax(void) const { return yRightMax; };
+	inline double GetXMin() const { return xMin; }
+	inline double GetXMax() const { return xMax; }
+	inline double GetLeftYMin() const { return yLeftMin; }
+	inline double GetLeftYMax() const { return yLeftMax; }
+	inline double GetRightYMin() const { return yRightMin; }
+	inline double GetRightYMax() const { return yRightMax; }
 
-	inline double GetXMinOriginal(void) const { return xMinOriginal; };
-	inline double GetXMaxOriginal(void) const { return xMaxOriginal; };
-	inline double GetLeftYMinOriginal(void) const { return yLeftMinOriginal; };
-	inline double GetLeftYMaxOriginal(void) const { return yLeftMaxOriginal; };
-	inline double GetRightYMinOriginal(void) const { return yRightMinOriginal; };
-	inline double GetRightYMaxOriginal(void) const { return yRightMaxOriginal; };
+	inline double GetXMinOriginal() const { return xMinOriginal; }
+	inline double GetXMaxOriginal() const { return xMaxOriginal; }
+	inline double GetLeftYMinOriginal() const { return yLeftMinOriginal; }
+	inline double GetLeftYMaxOriginal() const { return yLeftMaxOriginal; }
+	inline double GetRightYMinOriginal() const { return yRightMinOriginal; }
+	inline double GetRightYMaxOriginal() const { return yRightMaxOriginal; }
 
-	void SetXMin(const double &_xMin);
-	void SetXMax(const double &_xMax);
-	void SetLeftYMin(const double &_yMin);
-	void SetLeftYMax(const double &_yMax);
-	void SetRightYMin(const double &_yMin);
-	void SetRightYMax(const double &_yMax);
+	void SetXMin(const double &xMin);
+	void SetXMax(const double &xMax);
+	void SetLeftYMin(const double &yMin);
+	void SetLeftYMax(const double &yMax);
+	void SetRightYMin(const double &yMin);
+	void SetRightYMax(const double &yMax);
 
 	void SetCurveProperties(const unsigned int &index, const Color &color,
 		const bool &visible, const bool &rightAxis, const double &lineSize,
@@ -101,38 +97,37 @@ public:
 	void SetRightYLabel(wxString text);
 	void SetTitle(wxString text);
 
-	wxString GetXLabel(void) const;
-	wxString GetLeftYLabel(void) const;
-	wxString GetRightYLabel(void) const;
-	wxString GetTitle(void) const;
+	wxString GetXLabel() const;
+	wxString GetLeftYLabel() const;
+	wxString GetRightYLabel() const;
+	wxString GetTitle() const;
 
 	void SetGridColor(const Color &color);
-	Color GetGridColor(void) const;
+	Color GetGridColor() const;
 
-	void ResetAutoScaling(void);
-	void SetAutoScaleBottom(void) { autoScaleX = true; };
-	void SetAutoScaleLeft(void) { autoScaleLeftY = true; };
-	void SetAutoScaleRight(void) { autoScaleRightY = true; };
+	void ResetAutoScaling();
+	void SetAutoScaleBottom() { autoScaleX = true; }
+	void SetAutoScaleLeft() { autoScaleLeftY = true; }
+	void SetAutoScaleRight() { autoScaleRightY = true; }
 
-	const Axis* GetBottomAxis(void) const { return axisBottom; };
-	const Axis* GetTopAxis(void) const { return axisTop; };
-	const Axis* GetLeftYAxis(void) const { return axisLeft; };
-	const Axis* GetRightYAxis(void) const { return axisRight; };
-	bool GetMajorGrid(void);
-	bool GetMinorGrid(void);
+	const Axis* GetBottomAxis() const { return axisBottom; }
+	const Axis* GetTopAxis() const { return axisTop; }
+	const Axis* GetLeftYAxis() const { return axisLeft; }
+	const Axis* GetRightYAxis() const { return axisRight; }
+	bool GetMajorGrid();
+	bool GetMinorGrid();
 
 	void SetXLogarithmic(const bool &log);
 	void SetLeftLogarithmic(const bool &log);
 	void SetRightLogarithmic(const bool &log);
 
-	bool GetXAxisAutoScaled(void) const { return autoScaleX; };
+	bool GetXAxisAutoScaled() const { return autoScaleX; }
 
-	unsigned int GetCurveCount(void) const { return plotList.size(); };
+	unsigned int GetCurveCount() const { return plotList.size(); }
 
 	FTFont* GetAxisFont() const { return axisFont; }
 
 private:
-	// The renderer object
 	PlotRenderer &renderer;
 
 	static const unsigned int horizontalOffsetWithLabel;
@@ -148,7 +143,6 @@ private:
 
 	TextRendering *titleObject;
 
-	// The font objects
 	FTFont *axisFont;
 	FTFont *titleFont;
 
@@ -157,7 +151,6 @@ private:
 	double xMinOriginal, xMaxOriginal, yLeftMinOriginal, yLeftMaxOriginal,
 		yRightMinOriginal, yRightMaxOriginal;
 
-	// Flag to indicate how the limits are set
 	bool autoScaleX;
 	bool autoScaleLeftY;
 	bool autoScaleRightY;
@@ -175,12 +168,12 @@ private:
 	std::vector<PlotCurve*> plotList;
 	std::vector<const Dataset2D*> dataList;
 
-	void CreateAxisObjects(void);
-	void InitializeFonts(void);
+	void CreateAxisObjects();
+	void InitializeFonts();
 	void CreateFontObjects(const wxString &fontFile);
 
 	// Handles all of the formatting for the plot
-	void FormatPlot(void);
+	void FormatPlot();
 
 	// Handles the spacing of the axis ticks
 	void AutoScaleAxis(double &min, double &max, double &majorRes, const int &maxTicks, const bool &logarithmic,
@@ -192,31 +185,31 @@ private:
 	double ComputeMinorResolution(const double &min, const double &max,
 		const double &majorResolution, const double &axisLength) const;
 
-	void FormatAxesBasics(void);
+	void FormatAxesBasics();
 	void FormatBottomBasics(const Axis::TickStyle &tickStyle);
 	void FormatTopBasics(const Axis::TickStyle &tickStyle);
 	void FormatLeftBasics(const Axis::TickStyle &tickStyle);
 	void FormatRightBasics(const Axis::TickStyle &tickStyle);
-	void UpdateAxesOffsets(void);
+	void UpdateAxesOffsets();
 	void SetAxesColor(const Color &color);
-	void FormatTitle(void);
+	void FormatTitle();
 
-	void FormatCurves(void);
+	void FormatCurves();
 
-	void CheckForZeroRange(void);
+	void CheckForZeroRange();
 	void HandleZeroRangeAxis(double &min, double &max) const;
 
 	void ApplyRangeLimits(const double &xMinor, const double &xMajor, const double &yLeftMinor,
 		const double &yLeftMajor, const double &yRightMinor, const double &yRightMajor);
-	void CheckAutoScaling(void);
-	void UpdateLimitValues(void);
+	void CheckAutoScaling();
+	void UpdateLimitValues();
 	void ValidateRangeLimits(double &min, double &max, const bool &autoScale, double &major, double &minor) const;
 	void ValidateLogarithmicLimits(Axis &axis, const double &min);
-	void SetOriginalAxisLimits(void);
+	void SetOriginalAxisLimits();
 	void GetAxisExtremes(const Dataset2D &data, Axis *yAxis);
-	void ResetOriginalLimits(void);
-	void MatchYAxes(void);
+	void ResetOriginalLimits();
+	void MatchYAxes();
 	double GetFirstValidValue(const double* data, const unsigned int &size) const;
 };
 
-#endif// _PLOT_OBJECT_H_
+#endif// PLOT_OBJECT_H_

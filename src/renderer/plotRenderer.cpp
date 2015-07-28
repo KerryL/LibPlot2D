@@ -57,10 +57,10 @@ const unsigned int PlotRenderer::maxYTicks(10);
 // Description:		Constructor for PlotRenderer class.
 //
 // Input Arguments:
-//		parent		= wxWindow* pointing to this object's parent window
+//		wxParent	= wxWindow&
+//		parent		= Parent& reference to this applications's main window
 //		id			= wxWindowID
 //		args		= int[] NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
-//		_mainFrame	= MainFrame& reference to this applications's main window
 //
 // Output Arguments:
 //		None
@@ -69,9 +69,9 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //		None
 //
 //==========================================================================
-PlotRenderer::PlotRenderer(wxWindow *parent, wxWindowID id, int args[], MainFrame &_mainFrame)
-							 : RenderWindow(*parent, id, args, wxDefaultPosition,
-							 wxDefaultSize), mainFrame(_mainFrame)
+PlotRenderer::PlotRenderer(wxWindow &wxParent, Parent &parent, wxWindowID id, int args[])
+	: RenderWindow(wxParent, id, args, wxDefaultPosition, wxDefaultSize),
+	parent(parent)
 {
 	CreateActors();
 
@@ -155,7 +155,7 @@ END_EVENT_TABLE()
 //		None
 //
 //==========================================================================
-void PlotRenderer::UpdateDisplay(void)
+void PlotRenderer::UpdateDisplay()
 {
 	plot->Update();
 	Refresh();
@@ -177,7 +177,7 @@ void PlotRenderer::UpdateDisplay(void)
 //		None
 //
 //==========================================================================
-void PlotRenderer::CreateActors(void)
+void PlotRenderer::CreateActors()
 {
 	plot = new PlotObject(*this);
 
@@ -416,7 +416,7 @@ void PlotRenderer::OnMiddleButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 //		bool
 //
 //==========================================================================
-bool PlotRenderer::ZoomChanged(void) const
+bool PlotRenderer::ZoomChanged() const
 {
 	if (zoom.size() == 0)
 		return true;
@@ -453,7 +453,7 @@ bool PlotRenderer::ZoomChanged(void) const
 //		None
 //
 //==========================================================================
-void PlotRenderer::SaveCurrentZoom(void)
+void PlotRenderer::SaveCurrentZoom()
 {
 	if (!ZoomChanged())
 		return;
@@ -489,7 +489,7 @@ void PlotRenderer::SaveCurrentZoom(void)
 //		None
 //
 //==========================================================================
-void PlotRenderer::UndoZoom(void)
+void PlotRenderer::UndoZoom()
 {
 	if (zoom.size() < 2)
 		return;
@@ -526,7 +526,7 @@ void PlotRenderer::UndoZoom(void)
 //		None
 //
 //==========================================================================
-void PlotRenderer::ClearZoomStack(void)
+void PlotRenderer::ClearZoomStack()
 {
 	while (zoom.size() > 0)
 		zoom.pop();
@@ -548,7 +548,7 @@ void PlotRenderer::ClearZoomStack(void)
 //		bool, true for visible, false for hidden
 //
 //==========================================================================
-bool PlotRenderer::GetMajorGridOn(void)
+bool PlotRenderer::GetMajorGridOn()
 {
 	return plot->GetMajorGrid();
 }
@@ -569,7 +569,7 @@ bool PlotRenderer::GetMajorGridOn(void)
 //		bool, true for visible, false for hidden
 //
 //==========================================================================
-bool PlotRenderer::GetMinorGridOn(void)
+bool PlotRenderer::GetMinorGridOn()
 {
 	return plot->GetMinorGrid();
 }
@@ -1718,7 +1718,7 @@ void PlotRenderer::UpdateLegendAnchor()
 //		bool indicating status of left cursor visibility flag
 //
 //==========================================================================
-bool PlotRenderer::GetLeftCursorVisible(void) const
+bool PlotRenderer::GetLeftCursorVisible() const
 {
 	return leftCursor->GetIsVisible();
 }
@@ -1739,7 +1739,7 @@ bool PlotRenderer::GetLeftCursorVisible(void) const
 //		bool indicating status of right cursor visibility flag
 //
 //==========================================================================
-bool PlotRenderer::GetRightCursorVisible(void) const
+bool PlotRenderer::GetRightCursorVisible() const
 {
 	return rightCursor->GetIsVisible();
 }
@@ -1781,7 +1781,7 @@ double PlotRenderer::GetLeftCursorValue(void) const
 //		double
 //
 //==========================================================================
-double PlotRenderer::GetRightCursorValue(void) const
+double PlotRenderer::GetRightCursorValue() const
 {
 	return rightCursor->GetValue();
 }
@@ -1802,7 +1802,7 @@ double PlotRenderer::GetRightCursorValue(void) const
 //		None
 //
 //==========================================================================
-void PlotRenderer::UpdateCursors(void)
+void PlotRenderer::UpdateCursors()
 {
 	// Tell the cursors they need to recalculate
 	leftCursor->SetModified();
@@ -1831,7 +1831,7 @@ void PlotRenderer::UpdateCursors(void)
 //		double indicating the minimum value of the X-axis
 //
 //==========================================================================
-double PlotRenderer::GetXMin(void) const
+double PlotRenderer::GetXMin() const
 {
 	return plot->GetBottomAxis()->GetMinimum();
 }
@@ -1852,7 +1852,7 @@ double PlotRenderer::GetXMin(void) const
 //		double indicating the minimum value of the X-axis
 //
 //==========================================================================
-double PlotRenderer::GetXMax(void) const
+double PlotRenderer::GetXMax() const
 {
 	return plot->GetBottomAxis()->GetMaximum();
 }
@@ -1873,7 +1873,7 @@ double PlotRenderer::GetXMax(void) const
 //		double indicating the minimum value of the X-axis
 //
 //==========================================================================
-double PlotRenderer::GetLeftYMin(void) const
+double PlotRenderer::GetLeftYMin() const
 {
 	return plot->GetLeftYAxis()->GetMinimum();
 }
@@ -1894,7 +1894,7 @@ double PlotRenderer::GetLeftYMin(void) const
 //		double indicating the minimum value of the X-axis
 //
 //==========================================================================
-double PlotRenderer::GetLeftYMax(void) const
+double PlotRenderer::GetLeftYMax() const
 {
 	return plot->GetLeftYAxis()->GetMaximum();
 }
@@ -1915,7 +1915,7 @@ double PlotRenderer::GetLeftYMax(void) const
 //		double indicating the minimum value of the X-axis
 //
 //==========================================================================
-double PlotRenderer::GetRightYMin(void) const
+double PlotRenderer::GetRightYMin() const
 {
 	return plot->GetRightYAxis()->GetMinimum();
 }
@@ -1936,7 +1936,7 @@ double PlotRenderer::GetRightYMin(void) const
 //		double indicating the minimum value of the X-axis
 //
 //==========================================================================
-double PlotRenderer::GetRightYMax(void) const
+double PlotRenderer::GetRightYMax() const
 {
 	return plot->GetRightYAxis()->GetMaximum();
 }
@@ -1957,7 +1957,7 @@ double PlotRenderer::GetRightYMax(void) const
 //		Color
 //
 //==========================================================================
-Color PlotRenderer::GetGridColor(void) const
+Color PlotRenderer::GetGridColor() const
 {
 	return plot->GetGridColor();
 }
@@ -2000,7 +2000,7 @@ void PlotRenderer::SetGridColor(const Color &color)
 //		bool, indicating whether or not the X axis has a logarithmic scale
 //
 //==========================================================================
-bool PlotRenderer::GetXLogarithmic(void) const
+bool PlotRenderer::GetXLogarithmic() const
 {
 	if (plot->GetBottomAxis())
 		return plot->GetBottomAxis()->IsLogarithmic();
@@ -2025,7 +2025,7 @@ bool PlotRenderer::GetXLogarithmic(void) const
 //		bool, indicating whether or not the left Y axis has a logarithmic scale
 //
 //==========================================================================
-bool PlotRenderer::GetLeftLogarithmic(void) const
+bool PlotRenderer::GetLeftLogarithmic() const
 {
 	if (plot->GetLeftYAxis())
 		return plot->GetLeftYAxis()->IsLogarithmic();
@@ -2050,7 +2050,7 @@ bool PlotRenderer::GetLeftLogarithmic(void) const
 //		bool, indicating whether or not the right Y axis has a logarithmic scale
 //
 //==========================================================================
-bool PlotRenderer::GetRightLogarithmic(void) const
+bool PlotRenderer::GetRightLogarithmic() const
 {
 	if (plot->GetRightYAxis())
 		return plot->GetRightYAxis()->IsLogarithmic();
@@ -2144,7 +2144,7 @@ void PlotRenderer::SetRightLogarithmic(const bool &log)
 //		bool, true if the user zoomed in (or panned) along the x-axis
 //
 //==========================================================================
-bool PlotRenderer::GetXAxisZoomed(void) const
+bool PlotRenderer::GetXAxisZoomed() const
 {
 	if (!plot->GetBottomAxis())
 		return false;
@@ -2429,24 +2429,23 @@ void PlotRenderer::ProcessPlotAreaDoubleClick(const unsigned int &x)
 void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y)
 {
 	// Determine the context
-	MainFrame::PlotContext context;
+	Parent::PlotContext context;
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = MainFrame::plotContextLeftYAxis;
+		context = Parent::plotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = MainFrame::plotContextRightYAxis;
+		context = Parent::plotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = MainFrame::plotContextXAxis;
+		context = Parent::plotContextXAxis;
 	else
-		context = MainFrame::plotContextPlotArea;
+		context = Parent::plotContextPlotArea;
 
-	// Display the dialog
-	mainFrame.DisplayAxisRangeDialog(context);
+	parent.DisplayAxisRangeDialog(context);
 }
 
 //==========================================================================
@@ -2468,26 +2467,26 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 {
 	// Determine the context
-	MainFrame::PlotContext context;
+	Parent::PlotContext context;
 	unsigned int x = event.GetX();
 	unsigned int y = event.GetY();
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = MainFrame::plotContextLeftYAxis;
+		context = Parent::plotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = MainFrame::plotContextRightYAxis;
+		context = Parent::plotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = MainFrame::plotContextXAxis;
+		context = Parent::plotContextXAxis;
 	else
-		context = MainFrame::plotContextPlotArea;
+		context = Parent::plotContextPlotArea;
 
-	// Display the context menu (further events handled by MainFrame)
-	mainFrame.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
+	// Display the context menu (further events handled by Parent)
+	parent.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
 }
 
 //==========================================================================
@@ -2506,7 +2505,7 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 //		None
 //
 //==========================================================================
-void PlotRenderer::ProcessZoomBoxEnd(void)
+void PlotRenderer::ProcessZoomBoxEnd()
 {
 	zoomBox->SetVisibility(false);
 
@@ -2622,7 +2621,7 @@ void PlotRenderer::ForcePointWithinPlotArea(unsigned int &x, unsigned int &y)
 //		wxString
 //
 //==========================================================================
-wxString PlotRenderer::GetXLabel(void) const
+wxString PlotRenderer::GetXLabel() const
 {
 	return plot->GetXLabel();
 }
@@ -2643,7 +2642,7 @@ wxString PlotRenderer::GetXLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotRenderer::GetLeftYLabel(void) const
+wxString PlotRenderer::GetLeftYLabel() const
 {
 	return plot->GetLeftYLabel();
 }
@@ -2664,7 +2663,7 @@ wxString PlotRenderer::GetLeftYLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotRenderer::GetRightYLabel(void) const
+wxString PlotRenderer::GetRightYLabel() const
 {
 	return plot->GetRightYLabel();
 }
@@ -2685,7 +2684,7 @@ wxString PlotRenderer::GetRightYLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotRenderer::GetTitle(void) const
+wxString PlotRenderer::GetTitle() const
 {
 	return plot->GetTitle();
 }
