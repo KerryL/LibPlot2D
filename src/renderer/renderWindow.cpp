@@ -213,11 +213,11 @@ void RenderWindow::Render()
 	SetCurrent(*context);
 	wxPaintDC(this);
 
-	if (modified)
-		Initialize();
-
 	if (modelviewModified)
 		UpdateModelviewMatrix();
+
+	if (modified)
+		Initialize();
 
 	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
 		(float)backgroundColor.GetBlue(), (float)backgroundColor.GetAlpha());
