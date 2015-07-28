@@ -259,7 +259,7 @@ void PlotObject::Update(void)
 	FormatPlot();
 
 	renderer.UpdateCursors();
-	dynamic_cast<MainFrame*>(renderer.GetParent())->UpdateCursorValues(
+	renderer.GetPlotOwner()->UpdateCursorValues(
 		renderer.GetLeftCursorVisible(), renderer.GetRightCursorVisible(),
 		renderer.GetLeftCursorValue(), renderer.GetRightCursorValue());
 }

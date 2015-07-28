@@ -58,7 +58,7 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //
 // Input Arguments:
 //		wxParent	= wxWindow&
-//		parent		= Parent& reference to this applications's main window
+//		plotOwner	= PlotOwner& reference to this applications's main window
 //		id			= wxWindowID
 //		args		= int[] NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
 //
@@ -69,9 +69,9 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //		None
 //
 //==========================================================================
-PlotRenderer::PlotRenderer(wxWindow &wxParent, Parent &parent, wxWindowID id, int args[])
+PlotRenderer::PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID id, int args[])
 	: RenderWindow(wxParent, id, args, wxDefaultPosition, wxDefaultSize),
-	parent(parent)
+	plotOwner(plotOwner)
 {
 	CreateActors();
 
@@ -2429,23 +2429,23 @@ void PlotRenderer::ProcessPlotAreaDoubleClick(const unsigned int &x)
 void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y)
 {
 	// Determine the context
-	Parent::PlotContext context;
+	PlotOwner::PlotContext context;
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = Parent::plotContextLeftYAxis;
+		context = PlotOwner::plotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = Parent::plotContextRightYAxis;
+		context = PlotOwner::plotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = Parent::plotContextXAxis;
+		context = PlotOwner::plotContextXAxis;
 	else
-		context = Parent::plotContextPlotArea;
+		context = PlotOwner::plotContextPlotArea;
 
-	parent.DisplayAxisRangeDialog(context);
+	plotOwner.DisplayAxisRangeDialog(context);
 }
 
 //==========================================================================
@@ -2467,26 +2467,26 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 {
 	// Determine the context
-	Parent::PlotContext context;
+	PlotOwner::PlotContext context;
 	unsigned int x = event.GetX();
 	unsigned int y = event.GetY();
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = Parent::plotContextLeftYAxis;
+		context = PlotOwner::plotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = Parent::plotContextRightYAxis;
+		context = PlotOwner::plotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = Parent::plotContextXAxis;
+		context = PlotOwner::plotContextXAxis;
 	else
-		context = Parent::plotContextPlotArea;
+		context = PlotOwner::plotContextPlotArea;
 
 	// Display the context menu (further events handled by Parent)
-	parent.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
+	plotOwner.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
 }
 
 //==========================================================================

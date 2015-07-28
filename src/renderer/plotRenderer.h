@@ -29,7 +29,7 @@
 class wxString;
 
 class MainFrame;
-typedef MainFrame Parent;
+typedef MainFrame PlotOwner;
 
 // Local forward declarations
 class PlotObject;
@@ -40,7 +40,7 @@ class PlotCursor;
 class PlotRenderer : public RenderWindow
 {
 public:
-	PlotRenderer(wxWindow &wxParent, Parent &parent, wxWindowID id, int args[]);
+	PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID id, int args[]);
 	~PlotRenderer();
 
 	// Gets properties for actors
@@ -138,7 +138,7 @@ public:
 
 	void UpdateCursors();
 
-	Parent *GetParent() { return &parent; }
+	PlotOwner *GetPlotOwner() { return &plotOwner; }
 
 	void SaveCurrentZoom();
 	void ClearZoomStack();
@@ -151,7 +151,7 @@ private:
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();
 
-	Parent &parent;
+	PlotOwner &plotOwner;
 	PlotObject *plot;
 
 	// Overload of size event
