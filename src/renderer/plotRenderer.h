@@ -209,7 +209,7 @@ protected:
 	void ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y);
 
 	void ProcessRightClick(wxMouseEvent &event);
-	void ProcessZoomBoxEnd(void);
+	void ProcessZoomBoxEnd();
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
 
