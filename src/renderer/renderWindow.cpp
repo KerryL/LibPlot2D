@@ -968,33 +968,8 @@ wxString RenderWindow::GetGLError() const
 //==========================================================================
 bool RenderWindow::WriteImageToFile(wxString pathAndFileName) const
 {
-	unsigned int height = GetSize().GetHeight();
-	unsigned int width = GetSize().GetWidth();
-
-	// Create a buffer in which we will store the raw image data
-	GLubyte *imageBuffer = (GLubyte*)malloc(width * height * sizeof(GLubyte) * 3);
-
-	// Tell OpenGL to tight-pack the data - don't pad the bytes at the end of a row
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-	// Read the image into the buffer
-	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, imageBuffer);
-
-	// Move the image data from a raw buffer into a wxImage
-	// We set the static data flag to true, so we're still responsible for deleting the buffer
-	// Not sure why we need to do it this way, but it crashes every time if we don't
-	wxImage newImage(width, height, imageBuffer, true);
-
-	// If written as-is, the image will be upside down, so we flip it
-	newImage = newImage.Mirror(false);
-
-	// After the mirror, we can free the original buffer
-	free(imageBuffer);
-
-	// Set up the image handlers for all of the image types we anticipate
+	wxImage newImage(GetImage());
 	wxInitAllImageHandlers();
-
-	// Save the image to file
 	return newImage.SaveFile(pathAndFileName);
 }
 

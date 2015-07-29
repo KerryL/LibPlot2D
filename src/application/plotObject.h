@@ -124,6 +124,7 @@ public:
 	bool GetXAxisAutoScaled() const { return autoScaleX; }
 
 	unsigned int GetCurveCount() const { return plotList.size(); }
+	unsigned long long GetTotalPointCount() const;
 
 	FTFont* GetAxisFont() const { return axisFont; }
 

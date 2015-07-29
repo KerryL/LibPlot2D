@@ -69,6 +69,24 @@
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		Constant declarations
+//
+// Description:		Constant declarations for MainFrame class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const unsigned long long MainFrame::highQualityCurvePointLimit(10000);
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		MainFrame
 //
 // Description:		Constructor for MainFrame class.  Initializes the form
@@ -207,6 +225,7 @@ PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 
 	plotArea->SetMinSize(wxSize(650, 320));
 	plotArea->SetMajorGridOn();
+	plotArea->SetCurveQuality(PlotRenderer::QualityHighWrite);
 
 	return plotArea;
 }
@@ -1301,6 +1320,8 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 
 	plotArea->AddCurve(*data);
 	UpdateCurveProperties(index - 1, GetNextColor(index), true, false);
+
+	UpdateCurveQuality();
 	plotArea->UpdateDisplay();
 }
 
@@ -1459,7 +1480,34 @@ void MainFrame::RemoveCurve(const unsigned int &i)
 	plotArea->RemoveCurve(i);
 	plotList.Remove(i);
 
+	UpdateCurveQuality();
 	UpdateLegend();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		UpdateCurveQuality
+//
+// Description:		Sets curve quality according to how many lines need to
+//					be rendered.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::UpdateCurveQuality()
+{
+	if (plotArea->GetTotalPointCount() > highQualityCurvePointLimit)
+		plotArea->SetCurveQuality(PlotRenderer::QualityHighWrite);
+	else
+		plotArea->SetCurveQuality(static_cast<PlotRenderer::CurveQuality>(
+		PlotRenderer::QualityHighStatic | PlotRenderer::QualityHighWrite));
 }
 
 //==========================================================================
