@@ -13,6 +13,9 @@
 // Description:  Base class for data file classes.
 // History:
 
+// Standard C++ headers
+#include <locale>
+
 // Local headers
 #include "application/dataFiles/dataFile.h"
 #include "application/multiChoiceDialog.h"
@@ -320,11 +323,18 @@ wxString DataFile::DetermineBestDelimiter(void) const
 //==========================================================================
 wxArrayString DataFile::CreateDelimiterList(void) const
 {
-	// Don't use periods ('.') because we're going to have those in regular
-	// numbers (switch this for other languages?)
+	// Don't use decimals because we're going to have those in regular numbers
+	std::locale usersLocale = std::locale("");// get user's preferred locale settings
+	wxChar point = std::use_facet< std::numpunct<wxChar> >(usersLocale).decimal_point();
+
 	wxArrayString delimiterList;
+	if (point != ',')
+		delimiterList.Add(_T(","));
+
+	if (point != '.')
+		delimiterList.Add(_T("."));
+
 	delimiterList.Add(_T(" "));
-	delimiterList.Add(_T(","));
 	delimiterList.Add(_T("\t"));
 	delimiterList.Add(_T(";"));
 
