@@ -316,7 +316,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	if (!event.Dragging() || ignoreNextMouseMove)// ignoreNextMouseMove prevents panning on maximize by double clicking title bar
+	if (!event.Dragging() || ignoreNextMouseMove)// ignoreNextMouseMove prevents panning on maximize by double clicking title bar or after creating a context menu
 	{
 		plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
 		ignoreNextMouseMove = false;
@@ -2511,6 +2511,7 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 
 	// Display the context menu (further events handled by Parent)
 	plotOwner.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
+	ignoreNextMouseMove = true;
 }
 
 //==========================================================================
