@@ -76,6 +76,8 @@ public:
 	inline bool GetViewOrthogonal() const { return viewOrthogonal; }
 	inline bool GetView3D() const { return view3D; }
 
+	inline double GetAspectRatio() const { return aspectRatio; }
+
 	// Returns a string containing any OpenGL errors
 	wxString GetGLError() const;
 
@@ -171,12 +173,14 @@ private:
 	// Method for re-organizing the PrimitiveList so opaque objects are at the beginning and
 	// transparent objects are at the end
 	void SortPrimitivesByAlpha();
-
 	void SortPrimitivesByDrawOrder();
+
+	void DoResize();
 
 protected:
 	bool view3D;
 	bool modified;
+	bool sizeUpdateRequired;
 
 	ManagedList<Primitive> primitiveList;
 

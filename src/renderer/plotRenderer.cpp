@@ -161,10 +161,11 @@ void PlotRenderer::UpdateDisplay()
 {
 	plot->Update();
 	Refresh();
+	Update();
 }
 
 //==========================================================================
-// Class:			PLOT_RENDERER
+// Class:			PlotRenderer
 // Function:		CreateActors
 //
 // Description:		Creates the actors for this plot.
