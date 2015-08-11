@@ -15,6 +15,9 @@
 //				 as well as OpenGL.
 // History:
 
+// Standard C++ headers
+#include <algorithm>
+
 // wxWidgets headers
 #include <wx/wx.h>
 #include <wx/colour.h>

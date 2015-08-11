@@ -18,12 +18,12 @@
 // Local headers
 #include "arrayStringCompare.h"
 
-bool ArrayStringCompare::operator()(const wxArrayString &a1, const wxArrayString &a2)
+bool ArrayStringCompare::operator()(const wxArrayString &a1, const wxArrayString &a2) const
 {
 	return GenerateSingleString(a1) < GenerateSingleString(a2);
 }
 
-wxString ArrayStringCompare::GenerateSingleString(const wxArrayString &a)
+wxString ArrayStringCompare::GenerateSingleString(const wxArrayString &a) const
 {
 	wxString s;
 	unsigned int i;

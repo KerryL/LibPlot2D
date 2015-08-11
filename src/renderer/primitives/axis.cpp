@@ -15,6 +15,9 @@
 //	11/17/2010	- Fixed some bugs related to rendering of ticks and grid lines, K. Loux.
 //	07/30/2012	- Added logarithmically-scalled plotting, K. Loux.
 
+// Standard C++ headers
+#include <algorithm>
+
 // Local headers
 #include "renderer/primitives/axis.h"
 #include "renderer/renderWindow.h"
