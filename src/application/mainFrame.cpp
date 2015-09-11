@@ -69,6 +69,24 @@
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		Constant declarations
+//
+// Description:		Constant declarations for MainFrame class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const unsigned long long MainFrame::highQualityCurvePointLimit(10000);
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		MainFrame
 //
 // Description:		Constructor for MainFrame class.  Initializes the form
@@ -96,7 +114,6 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, wxEmptyString, wxDefaultPositio
 
 	currentFileFormat = FormatGeneric;
 
-	// Also initialize the random number generator
 	srand(time(NULL));
 
 	//TestSignalOperations();
@@ -207,6 +224,7 @@ PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 
 	plotArea->SetMinSize(wxSize(650, 320));
 	plotArea->SetMajorGridOn();
+	plotArea->SetCurveQuality(PlotRenderer::QualityHighWrite);
 
 	return plotArea;
 }
@@ -1301,6 +1319,8 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 
 	plotArea->AddCurve(*data);
 	UpdateCurveProperties(index - 1, GetNextColor(index), true, false);
+
+	UpdateCurveQuality();
 	plotArea->UpdateDisplay();
 }
 
@@ -1459,7 +1479,34 @@ void MainFrame::RemoveCurve(const unsigned int &i)
 	plotArea->RemoveCurve(i);
 	plotList.Remove(i);
 
+	UpdateCurveQuality();
 	UpdateLegend();
+}
+
+//==========================================================================
+// Class:			MainFrame
+// Function:		UpdateCurveQuality
+//
+// Description:		Sets curve quality according to how many lines need to
+//					be rendered.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void MainFrame::UpdateCurveQuality()
+{
+	if (plotArea->GetTotalPointCount() > highQualityCurvePointLimit)
+		plotArea->SetCurveQuality(PlotRenderer::QualityHighWrite);
+	else
+		plotArea->SetCurveQuality(static_cast<PlotRenderer::CurveQuality>(
+		PlotRenderer::QualityHighStatic | PlotRenderer::QualityHighWrite));
 }
 
 //==========================================================================
@@ -1621,12 +1668,11 @@ void MainFrame::UpdateCurveProperties(const unsigned int &index, const Color &co
 {
 	double lineSize;
 	long markerSize;
+	UpdateLegend();// Must come first in order to be updated simultaneously with line
 	optionsGrid->GetCellValue(index + 1, colLineSize).ToDouble(&lineSize);
 	optionsGrid->GetCellValue(index + 1, colMarkerSize).ToLong(&markerSize);
 	plotArea->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
 	plotArea->SaveCurrentZoom();
-	
-	UpdateLegend();
 }
 
 //==========================================================================
@@ -1647,7 +1693,7 @@ void MainFrame::UpdateCurveProperties(const unsigned int &index, const Color &co
 //==========================================================================
 void MainFrame::UpdateLegend()
 {
-	unsigned long lineSize;
+	double lineSize;
 	long markerSize;
 	std::vector<Legend::LegendEntryInfo> entries;
 	Legend::LegendEntryInfo info;
@@ -1657,7 +1703,7 @@ void MainFrame::UpdateLegend()
 		if (optionsGrid->GetCellValue(i, colVisible).IsEmpty())
 			continue;
 			
-		optionsGrid->GetCellValue(i, colLineSize).ToULong(&lineSize);
+		optionsGrid->GetCellValue(i, colLineSize).ToDouble(&lineSize);
 		optionsGrid->GetCellValue(i, colMarkerSize).ToLong(&markerSize);
 		info.color = Color(optionsGrid->GetCellBackgroundColour(i, colColor));
 		info.lineSize = lineSize;

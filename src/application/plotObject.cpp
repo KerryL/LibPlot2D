@@ -254,7 +254,7 @@ void PlotObject::CreateFontObjects(const wxString &fontFile)
 //		None
 //
 //==========================================================================
-void PlotObject::Update(void)
+void PlotObject::Update()
 {
 	FormatPlot();
 
@@ -2062,4 +2062,30 @@ wxString PlotObject::GetRightYLabel(void) const
 wxString PlotObject::GetTitle(void) const
 {
 	return titleObject->GetText();
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetTotalPointCount
+//
+// Description:		Returns the total number of points contained in the curves.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned long long
+//
+//==========================================================================
+unsigned long long PlotObject::GetTotalPointCount() const
+{
+	unsigned long long count(0);
+	unsigned int i;
+	for (i = 0; i < dataList.size(); i++)
+		count += dataList[i]->GetNumberOfPoints();
+
+	return count;
 }

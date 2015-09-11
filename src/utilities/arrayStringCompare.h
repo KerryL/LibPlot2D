@@ -21,10 +21,10 @@ class wxArrayString;
 class ArrayStringCompare
 {
 public:
-	bool operator()(const wxArrayString &a1, const wxArrayString &a2);
+	bool operator()(const wxArrayString &a1, const wxArrayString &a2) const;
 
 private:
-	wxString GenerateSingleString(const wxArrayString &a);
+	wxString GenerateSingleString(const wxArrayString &a) const;
 };
 
 #endif// ARRAY_STRING_COMPARE_H_

@@ -90,7 +90,7 @@ public:
 	{
 		wxString text;
 		Color color;
-		unsigned int lineSize;
+		double lineSize;
 		int markerSize;
 	};
 

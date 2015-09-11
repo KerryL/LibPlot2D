@@ -147,6 +147,22 @@ public:
 	static const unsigned int maxYTicks;
 	static double ComputeTickSpacing(const double &min, const double &max, const int &maxTicks);
 
+	enum CurveQuality
+	{
+		QualityAlwaysLow = 0,
+		QualityHighWrite = 1 << 0,
+		QualityHighDrag = 1 << 1,
+		QualityHighStatic = 1 << 2,
+		QualityAlwaysHigh = QualityHighWrite | QualityHighDrag | QualityHighStatic
+	};
+
+	void SetCurveQuality(const CurveQuality& curveQuality);
+	CurveQuality GetCurveQuality() const { return curveQuality; }
+
+	unsigned long long GetTotalPointCount() const;
+
+	wxImage GetImage() const;
+
 private:
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();
@@ -193,7 +209,7 @@ protected:
 	void ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y);
 
 	void ProcessRightClick(wxMouseEvent &event);
-	void ProcessZoomBoxEnd(void);
+	void ProcessZoomBoxEnd();
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
 
@@ -217,6 +233,7 @@ protected:
 	bool ZoomChanged() const;
 
 	bool ignoreNextMouseMove;
+	CurveQuality curveQuality;
 
 	// For the event table
 	DECLARE_EVENT_TABLE()

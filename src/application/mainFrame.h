@@ -44,10 +44,7 @@ class DataFile;
 class MainFrame : public wxFrame
 {
 public:
-	// Constructor
 	MainFrame();
-
-	// Destructor
 	~MainFrame();
 
 	// For getting a open/save file name from the user
@@ -76,6 +73,8 @@ public:
 		const double &leftValue, const double &rightValue);
 
 private:
+	static const unsigned long long highQualityCurvePointLimit;
+
 	// Functions that do some of the frame initialization and control positioning
 	void CreateControls(void);
 	void SetProperties(void);
@@ -324,6 +323,8 @@ private:
 
 	void DoCopy();
 	void DoPaste();
+
+	void UpdateCurveQuality();
 
 	DECLARE_EVENT_TABLE();
 

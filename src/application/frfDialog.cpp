@@ -13,6 +13,9 @@
 // Description:  Dialog for selection of frequency response function data.
 // History:
 
+// Standard C++ headers
+#include <algorithm>
+
 // Local headers
 #include "application/frfDialog.h"
 
