@@ -2708,6 +2708,7 @@ wxString PlotRenderer::GetTitle() const
 double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
 	const int &maxTicks)
 {
+	assert(max > min);
 	double range = max - min;
 	int orderOfMagnitude = (int)log10(range);
 

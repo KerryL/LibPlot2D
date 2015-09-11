@@ -1140,8 +1140,8 @@ void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
 	}
 	else
 	{
-		min -= min * 0.1;
-		max += max * 0.1;
+		min -= fabs(min) * 0.1;
+		max += fabs(max) * 0.1;
 	}
 }
 
