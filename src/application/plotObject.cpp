@@ -173,6 +173,8 @@ void PlotObject::InitializeFonts(void)
 
 	if (!foundFont)
 	{
+		axisFont = NULL;
+		titleFont = NULL;
 		if (!fontFile.IsEmpty())
 		{
 			wxString fontName;
@@ -184,6 +186,7 @@ void PlotObject::InitializeFonts(void)
 		}
 		else
 			wxMessageBox(_T("Could not find any *.ttf files - cannot generate plot fonts"));
+		return;
 	}
 
 	CreateFontObjects(fontFile);

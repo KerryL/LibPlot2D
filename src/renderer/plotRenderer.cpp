@@ -324,7 +324,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	if (draggingLegend)
+	if (draggingLegend && legend)
 		legend->SetDeltaPosition(event.GetX() - lastMousePosition[0], lastMousePosition[1] - event.GetY());
 	else if (draggingLeftCursor)
 		leftCursor->SetLocation(event.GetX());
@@ -1628,7 +1628,7 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 {
 	// Check to see if we're on a cursor or the legend
-	if (legend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
+	if (legend && legend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
 		draggingLegend = true;
 	else if (leftCursor->IsUnder(event.GetX()))
 		draggingLeftCursor = true;
@@ -1689,6 +1689,9 @@ void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 //==========================================================================
 void PlotRenderer::UpdateLegendAnchor()
 {
+	if (!legend)
+		return;
+
 	std::vector<std::pair<double, Legend::PositionReference> > distances;
 	double x, y;
 

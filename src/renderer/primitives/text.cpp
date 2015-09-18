@@ -89,26 +89,22 @@ TextRendering::~TextRendering()
 //==========================================================================
 void TextRendering::GenerateGeometry()
 {
-	// Add the text
-	if (font && !text.IsEmpty())
-	{
-		glPushMatrix();
-			glLoadIdentity();
+	glPushMatrix();
+		glLoadIdentity();
 
-			// Position the text
-			if (centered)
-				glTranslated(x - GetTextWidth() / 2.0 * cos(angle * PlotMath::pi / 180.0)
-					+ GetTextHeight() / 2.0 * sin(angle * PlotMath::pi / 180.0),
-					y - GetTextWidth() / 2.0 * sin(angle * PlotMath::pi / 180.0)
-					- GetTextHeight() / 2.0 * cos(angle * PlotMath::pi / 180.0), 0.0);
-			else
-				glTranslated(x, y, 0.0);
-			glRotated(angle, 0.0, 0.0, 1.0);
+		// Position the text
+		if (centered)
+			glTranslated(x - GetTextWidth() / 2.0 * cos(angle * PlotMath::pi / 180.0)
+				+ GetTextHeight() / 2.0 * sin(angle * PlotMath::pi / 180.0),
+				y - GetTextWidth() / 2.0 * sin(angle * PlotMath::pi / 180.0)
+				- GetTextHeight() / 2.0 * cos(angle * PlotMath::pi / 180.0), 0.0);
+		else
+			glTranslated(x, y, 0.0);
+		glRotated(angle, 0.0, 0.0, 1.0);
 
-			// Render the text
-			font->Render(text.mb_str());
-		glPopMatrix();
-	}
+		// Render the text
+		font->Render(text.mb_str());
+	glPopMatrix();
 }
 
 //==========================================================================
@@ -132,6 +128,9 @@ bool TextRendering::HasValidParameters()
 {
 	// Don't draw if the angle is not a number
 	if (PlotMath::IsNaN(angle))
+		return false;
+
+	if (!font || !text.IsEmpty())
 		return false;
 
 	return true;
