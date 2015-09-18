@@ -42,14 +42,19 @@ AR = ar rcs
 RANLIB = ranlib
 
 # Compiler flags
-#CFLAGS = -g -Wall -Wextra -Werror $(INCDIRS) `wx-config --cppflags` `pkg-config --cflags ftgl` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_
-CFLAGS = -g -Wall -Wextra $(INCDIRS) `wx-config --version=3.0 --cppflags` `pkg-config --cflags ftgl` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -Wno-unused-local-typedefs -std=c++0x
+CFLAGS = -Wall -Wextra $(INCDIRS) `pkg-config --cflags ftgl` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -Wno-unused-local-typedefs -std=c++0x
+CFLAGS_RELEASE = $(CFLAGS) -O2 `wx-config --version=3.0 --debug=no --cppflags`
+CFLAGS_DEBUG = $(CFLAGS) -g `wx-config --version=3.0 --debug=yes --cppflags`
 
 # Linker flags
-LDFLAGS = $(LIBDIRS) $(LIBS) `wx-config --version=3.0 --libs all` `pkg-config --libs ftgl,gl`
+LDFLAGS = $(LIBDIRS) $(LIBS) `pkg-config --libs ftgl,gl`
+LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --version=3.0 --debug=yes --libs all`
+LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --version=3.0 --debug=no --libs all`
 
 # Object file output directory
 OBJDIR = $(CURDIR)/.obj/
+OBJDIR_DEBUG = $(OBJDIR)debug/
+OBJDIR_RELEASE = $(OBJDIR)release/
 
 # Binary file output directory
 BINDIR = $(CURDIR)/bin/
