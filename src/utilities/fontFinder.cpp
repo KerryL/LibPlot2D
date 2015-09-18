@@ -196,8 +196,11 @@ bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &p
 //==========================================================================
 bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 {
+	if (fontFile.IsEmpty())
+		return false;
+
 	std::ifstream fontStream(fontFile.mb_str(), std::ios::in | std::ios::binary);
-	if (!fontStream.good())
+	if (!fontStream.good() || !fontStream.is_open())
 		return false;
 
 	TT_OFFSET_TABLE ttOffsetTable = ReadOffsetTable(fontStream);
