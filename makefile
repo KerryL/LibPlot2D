@@ -5,6 +5,7 @@ include makefile.inc
 
 # Name of the executable to compile and link
 TARGET = DataPlotter
+TARGET_DEBUG = DataPlotterd
 
 # Directories in which to search for source files
 DIRS = \
@@ -20,19 +21,29 @@ DIRS = \
 SRC = $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
 
 # Object files
-OBJS = $(addprefix $(OBJDIR),$(SRC:.cpp=.o))
+OBJS_DEBUG = $(addprefix $(OBJDIR_DEBUG),$(SRC:.cpp=.o))
+OBJS_RELEASE = $(addprefix $(OBJDIR_RELEASE),$(SRC:.cpp=.o))
 
-.PHONY: all clean
+.PHONY: all debug clean
 
 all: $(TARGET)
+debug: $(TARGET_DEBUG)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS_RELEASE)
 	$(MKDIR) $(BINDIR)
-	$(CC) $(OBJS) $(LDFLAGS) -L$(LIBOUTDIR) $(addprefix -l,$(PSLIB)) -o $(BINDIR)$@
+	$(CC) $(OBJS_RELEASE) $(LDFLAGS_RELEASE) -L$(LIBOUTDIR) $(addprefix -l,$(PSLIB)) -o $(BINDIR)$@
 
-$(OBJDIR)%.o: %.cpp
+$(TARGET_DEBUG): $(OBJS_DEBUG)
+	$(MKDIR) $(BINDIR)
+	$(CC) $(OBJS_DEBUG) $(LDFLAGS_DEBUG) -L$(LIBOUTDIR) $(addprefix -l,$(PSLIB)) -o $(BINDIR)$@
+
+$(OBJDIR_RELEASE)%.o: %.cpp
 	$(MKDIR) $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
+
+$(OBJDIR_DEBUG)%.o: %.cpp
+	$(MKDIR) $(dir $@)
+	$(CC) $(CFLAGS_DEBUG) -c $< -o $@
 
 clean:
 	$(RM) -r $(OBJDIR)
