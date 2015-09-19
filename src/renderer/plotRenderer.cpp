@@ -684,6 +684,7 @@ void PlotRenderer::SetMinorGridOff()
 void PlotRenderer::SetCurveQuality(const CurveQuality& curveQuality)
 {
 	this->curveQuality = curveQuality;
+	plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
 }
 
 //==========================================================================
@@ -2802,7 +2803,7 @@ wxImage PlotRenderer::GetImage() const
 {
 	plot->SetPrettyCurves((curveQuality & QualityHighWrite) != 0);
 	if (((curveQuality & QualityHighStatic) != 0) != ((curveQuality & QualityHighWrite) != 0))
-		{/*UpdateDisplay();*/}// TODO:  Can't call from const method, so HighQualityWrite flag current doesn't work
+		{/*UpdateDisplay();*/}// TODO:  Can't call from const method, so HighQualityWrite flag currently doesn't work
 
 	wxImage newImage(RenderWindow::GetImage());
 	plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
