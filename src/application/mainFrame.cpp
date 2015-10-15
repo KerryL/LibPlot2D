@@ -1115,6 +1115,21 @@ wxString MainFrame::GenerateTemporaryFileName(const unsigned int &length) const
 	for (i = 0; i < length; i++)
 		name.Append((char)((rand() % 52) + 65));
 
+	// Remove illegal characters
+#ifdef __WXMSW__
+	name.Replace(_T("?"), _T(""));
+	name.Replace(_T("\""), _T(""));
+	name.Replace(_T("\\"), _T(""));
+	name.Replace(_T("/"), _T(""));
+	name.Replace(_T(":"), _T(""));
+	name.Replace(_T("*"), _T(""));
+	name.Replace(_T("|"), _T(""));
+	name.Replace(_T("<"), _T(""));
+	name.Replace(_T(">"), _T(""));
+#else
+	name.Replace(_T("/"), _T(""));
+#endif
+
 	name.Append(_T(".tmp"));
 
 	return name;
