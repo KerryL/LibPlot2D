@@ -24,6 +24,8 @@
       <File Name="src/renderer/renderWindow.cpp"/>
       <File Name="src/renderer/renderWindow.h"/>
       <File Name="src/renderer/plotRenderer.cpp"/>
+      <File Name="src/renderer/line.cpp"/>
+      <File Name="src/renderer/line.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="utilities">
       <VirtualDirectory Name="signals">
