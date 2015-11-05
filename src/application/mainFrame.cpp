@@ -983,14 +983,26 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 				selectionInfo = lastSelectionInfo;
 			else
 				selectionInfo.selections.Clear();
-			files[i]->GetSelectionsFromUser(selectionInfo, this);
-			if (selectionInfo.selections.Count() < 1)
+
+			if (plotList.GetCount() == 0 && files[i]->GetAllDescriptions().Count() == 2)// 2 descriptions because X column counts as one
 			{
-				for (j = 0; j <= i; j++)
-					delete files[j];
-				return false;
+				// No existing data (no need for "Remove Existing Curves?") and
+				// only one curve in file - no need to ask anything of user.
+				selectionInfo.selections.Clear();// In case lastSelectionInfo was used to initialize selectionInfo
+				selectionInfo.selections.Add(0);
+				selectionInfoMap[files[i]->GetAllDescriptions()] = selectionInfo;
 			}
-			selectionInfoMap[files[i]->GetAllDescriptions()] = selectionInfo;
+			else
+			{
+				files[i]->GetSelectionsFromUser(selectionInfo, this);
+				if (selectionInfo.selections.Count() < 1)
+				{
+					for (j = 0; j <= i; j++)
+						delete files[j];
+					return false;
+				}
+				selectionInfoMap[files[i]->GetAllDescriptions()] = selectionInfo;
+			}
 		}
 		else
 			selectionInfo = it->second;
