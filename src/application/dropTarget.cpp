@@ -22,7 +22,7 @@
 // Class:			DropTarget
 // Function:		DropTarget
 //
-// Description:		Constructor for DROP_TARGET class.
+// Description:		Constructor for DropTarget class.
 //
 // Input Arguments:
 //		_mainFrame	= &MainFrame, reference to main application window
@@ -178,7 +178,7 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 //		None
 //
 //==========================================================================
-void DropTarget::ClearBuffer(void)
+void DropTarget::ClearBuffer()
 {
 	if (buffer)
 		delete [] buffer;

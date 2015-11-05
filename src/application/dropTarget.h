@@ -44,7 +44,7 @@ private:
 
 	char *buffer;
 
-	void ClearBuffer(void);
+	void ClearBuffer();
 };
 
 #endif//  _DROP_TARGET_H_
