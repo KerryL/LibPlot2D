@@ -312,7 +312,8 @@ wxBoxSizer* MainFrame::CreateButtons(wxWindow *parent)
 	topSizer->Add(new wxButton(parent, idButtonReloadData, _T("Reload &Data")), 1, wxGROW);
 
 	buttonSizer->AddStretchSpacer(1);
-	buttonSizer->Add(new wxStaticText(parent, wxID_ANY, DataPlotterApp::versionString));
+	buttonSizer->Add(new wxStaticText(parent, wxID_ANY, DataPlotterApp::versionString
+		+ _T(" (") + DataPlotterApp::gitHash + _T(")")));
 
 	return buttonSizer;
 }

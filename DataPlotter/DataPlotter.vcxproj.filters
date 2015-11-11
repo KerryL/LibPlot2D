@@ -323,6 +323,9 @@
     <ClCompile Include="..\src\renderer\line.cpp">
       <Filter>Source Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\application\gitHash.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="../res\DataPlotter.rc">

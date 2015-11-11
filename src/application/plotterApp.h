@@ -34,6 +34,7 @@ public:
 	static const wxString dataPlotterName;// Internal
 	static const wxString creator;
 	static const wxString versionString;
+	static const wxString gitHash;
 
 private:
 	// The main class for the application - this object is the parent for all other objects

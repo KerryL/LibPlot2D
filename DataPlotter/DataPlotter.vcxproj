@@ -103,6 +103,10 @@
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PreBuildEvent>
+      <Command>getGitHash</Command>
+      <Message>Updating git hash information</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug wx2.8|Win32'">
     <ClCompile>
@@ -148,6 +152,12 @@
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PreBuildEvent>
+      <Command>../getGitHash ../</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Updating git hash information</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release wx2.8|Win32'">
     <ClCompile>
@@ -285,6 +295,7 @@
     <ClCompile Include="../src\utilities\signals\filter.cpp" />
     <ClCompile Include="../src\utilities\signals\integral.cpp" />
     <ClCompile Include="../src\utilities\signals\rms.cpp" />
+    <ClCompile Include="..\src\application\gitHash.cpp" />
     <ClCompile Include="..\src\renderer\line.cpp" />
     <ClCompile Include="..\src\renderer\primitives\legend.cpp" />
     <ClCompile Include="..\src\utilities\arrayStringCompare.cpp" />

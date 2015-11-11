@@ -16,3 +16,6 @@ DataPlotter/Release
 bin/
 .obj/
 /DataPlotter/nbproject/private/
+
+# Ignore automatically generated files
+gitHash.cpp
