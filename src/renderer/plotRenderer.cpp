@@ -1477,6 +1477,24 @@ void PlotRenderer::AutoScaleRight()
 //==========================================================================
 void PlotRenderer::SetXLabel(wxString text)
 {
+	/*const int oldOffset(plot->GetVerticalAxisOffset(!plot->GetXLabel().IsEmpty()));
+	const int newOffset(plot->GetVerticalAxisOffset(!text.IsEmpty()));
+
+	if (oldOffset != newOffset)
+	{
+		if (legend->GetWindowReference() == Legend::BottomLeft ||
+			legend->GetWindowReference() == Legend::BottomCenter ||
+			legend->GetWindowReference() == Legend::BottomRight)
+			legend->SetDeltaPosition(0, newOffset - oldOffset);
+		else if (legend->GetWindowReference() == Legend::MiddleLeft ||
+			legend->GetWindowReference() == Legend::Center ||
+			legend->GetWindowReference() == Legend::MiddleRight)
+			legend->SetDeltaPosition(0, (newOffset - oldOffset) / 2);
+	}*/ // Adjust legend position as plot area size changes
+	// Not implemented due to possiblity that legend would be moved off-screen
+	// Also, when moved to bottom corners of the plot area, depending on window size, best anchor is reported as left/right middle instead of bottom
+	// Better solution would anchor legend to corner of plot area if placed within plot area, or corner of window if placed outside of plot area
+
 	plot->SetXLabel(text);
 	UpdateDisplay();
 }
@@ -1499,6 +1517,21 @@ void PlotRenderer::SetXLabel(wxString text)
 //==========================================================================
 void PlotRenderer::SetLeftYLabel(wxString text)
 {
+	const int oldOffset(plot->GetHorizontalAxisOffset(!plot->GetLeftYLabel().IsEmpty()));
+	const int newOffset(plot->GetHorizontalAxisOffset(!text.IsEmpty()));
+
+	if (oldOffset != newOffset)
+	{
+		if (legend->GetWindowReference() == Legend::BottomCenter ||
+			legend->GetWindowReference() == Legend::Center ||
+			legend->GetWindowReference() == Legend::TopCenter)
+			legend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
+		else if (legend->GetWindowReference() == Legend::BottomLeft ||
+			legend->GetWindowReference() == Legend::MiddleLeft ||
+			legend->GetWindowReference() == Legend::TopLeft)
+			legend->SetDeltaPosition(newOffset - oldOffset, 0);
+	}
+
 	plot->SetLeftYLabel(text);
 	UpdateDisplay();
 }
@@ -1521,6 +1554,21 @@ void PlotRenderer::SetLeftYLabel(wxString text)
 //==========================================================================
 void PlotRenderer::SetRightYLabel(wxString text)
 {
+	const int oldOffset(plot->GetHorizontalAxisOffset(!plot->GetRightYLabel().IsEmpty()));
+	const int newOffset(plot->GetHorizontalAxisOffset(!text.IsEmpty()));
+
+	if (oldOffset != newOffset)
+	{
+		if (legend->GetWindowReference() == Legend::BottomCenter ||
+			legend->GetWindowReference() == Legend::Center ||
+			legend->GetWindowReference() == Legend::TopCenter)
+			legend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
+		else if (legend->GetWindowReference() == Legend::BottomRight ||
+			legend->GetWindowReference() == Legend::MiddleRight ||
+			legend->GetWindowReference() == Legend::TopRight)
+			legend->SetDeltaPosition(oldOffset - newOffset, 0);
+	}
+
 	plot->SetRightYLabel(text);
 	UpdateDisplay();
 }
@@ -1543,6 +1591,24 @@ void PlotRenderer::SetRightYLabel(wxString text)
 //==========================================================================
 void PlotRenderer::SetTitle(wxString text)
 {
+	/*const int oldOffset(plot->GetVerticalAxisOffset(!plot->GetTitle().IsEmpty()));
+	const int newOffset(plot->GetVerticalAxisOffset(!text.IsEmpty()));
+
+	if (oldOffset != newOffset)
+	{
+		if (legend->GetWindowReference() == Legend::TopLeft ||
+			legend->GetWindowReference() == Legend::TopCenter ||
+			legend->GetWindowReference() == Legend::TopRight)
+			legend->SetDeltaPosition(0, newOffset - oldOffset);
+		else if (legend->GetWindowReference() == Legend::MiddleLeft ||
+			legend->GetWindowReference() == Legend::Center ||
+			legend->GetWindowReference() == Legend::MiddleRight)
+			legend->SetDeltaPosition(0, (newOffset - oldOffset) / 2);
+	}*/ // Adjust legend position as plot area size changes
+	// Not implemented due to possiblity that legend would be moved off-screen
+	// Also, when moved to bottom corners of the plot area, depending on window size, best anchor is reported as left/right middle instead of bottom
+	// Better solution would anchor legend to corner of plot area if placed within plot area, or corner of window if placed outside of plot area
+
 	plot->SetTitle(text);
 	UpdateDisplay();
 }

@@ -620,6 +620,56 @@ void PlotObject::FormatAxesBasics(void)
 
 //==========================================================================
 // Class:			PlotObject
+// Function:		GetHorizontalAxisOffset
+//
+// Description:		Returns the number of pixels that a horizontal axis is
+//					to be offset from the edge of the plot area.
+//
+// Input Arguments:
+//		withLabel	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int PlotObject::GetHorizontalAxisOffset(const bool &withLabel) const
+{
+	if (withLabel)
+		return horizontalOffsetWithLabel;
+
+	return horizontalOffsetWithoutLabel;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		GetVerticalAxisOffset
+//
+// Description:		Returns the number of pixels that a vertical axis is
+//					to be offset from the edge of the plot area.
+//
+// Input Arguments:
+//		withLabel	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//==========================================================================
+unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
+{
+	if (withLabel)
+		return verticalOffsetWithLabel;
+
+	return verticalOffsetWithoutLabel;
+}
+
+//==========================================================================
+// Class:			PlotObject
 // Function:		UpdateAxesOffsets
 //
 // Description:		Updates the offsets for each axis from the edge of the viewable area.

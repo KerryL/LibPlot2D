@@ -128,6 +128,9 @@ public:
 
 	FTFont* GetAxisFont() const { return axisFont; }
 
+	unsigned int GetHorizontalAxisOffset(const bool &withLabel) const;
+	unsigned int GetVerticalAxisOffset(const bool &withLabel) const;
+
 private:
 	PlotRenderer &renderer;
 
