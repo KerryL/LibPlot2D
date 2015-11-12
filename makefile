@@ -24,7 +24,7 @@ SRC = $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
 OBJS_DEBUG = $(addprefix $(OBJDIR_DEBUG),$(SRC:.cpp=.o))
 OBJS_RELEASE = $(addprefix $(OBJDIR_RELEASE),$(SRC:.cpp=.o))
 
-.PHONY: all debug clean
+.PHONY: all debug clean version
 
 all: $(TARGET)
 debug: $(TARGET_DEBUG)
@@ -37,13 +37,16 @@ $(TARGET_DEBUG): $(OBJS_DEBUG)
 	$(MKDIR) $(BINDIR)
 	$(CC) $(OBJS_DEBUG) $(LDFLAGS_DEBUG) -L$(LIBOUTDIR) $(addprefix -l,$(PSLIB)) -o $(BINDIR)$@
 
-$(OBJDIR_RELEASE)%.o: %.cpp
+$(OBJDIR_RELEASE)%.o: %.cpp version
 	$(MKDIR) $(dir $@)
 	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
 
-$(OBJDIR_DEBUG)%.o: %.cpp
+$(OBJDIR_DEBUG)%.o: %.cpp version
 	$(MKDIR) $(dir $@)
 	$(CC) $(CFLAGS_DEBUG) -c $< -o $@
+
+version:
+	./getGitHash.sh
 
 clean:
 	$(RM) -r $(OBJDIR)

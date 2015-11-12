@@ -1,36 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Session Name="/home/kerry/Projects/DataPlotter/DataPlotter.workspace">
-  <int Value="3" Name="m_selectedTab"/>
+  <int Value="6" Name="m_selectedTab"/>
   <wxString Value="/home/kerry/Projects/DataPlotter/DataPlotter.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
+      <wxString Value="/home/kerry/Projects/DataPlotter/src/renderer/line.h" Name="FileName"/>
+      <int Value="31" Name="FirstVisibleLine"/>
+      <int Value="33" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
       <wxString Value="/home/kerry/Projects/DataPlotter/src/application/mainFrame.cpp" Name="FileName"/>
-      <int Value="190" Name="FirstVisibleLine"/>
-      <int Value="207" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/kerry/Projects/DataPlotter/src/renderer/renderWindow.cpp" Name="FileName"/>
-      <int Value="1222" Name="FirstVisibleLine"/>
-      <int Value="1239" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/kerry/Projects/DataPlotter/src/renderer/primitives/axis.cpp" Name="FileName"/>
-      <int Value="1" Name="FirstVisibleLine"/>
-      <int Value="18" Name="CurrentLine"/>
+      <int Value="1498" Name="FirstVisibleLine"/>
+      <int Value="1507" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/kerry/Projects/DataPlotter/src/application/plotObject.cpp" Name="FileName"/>
-      <int Value="1126" Name="FirstVisibleLine"/>
-      <int Value="1143" Name="CurrentLine"/>
+      <int Value="15" Name="FirstVisibleLine"/>
+      <int Value="16" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/kerry/Projects/DataPlotter/src/application/plotObject.h" Name="FileName"/>
+      <int Value="14" Name="FirstVisibleLine"/>
+      <int Value="15" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/kerry/Projects/DataPlotter/src/renderer/plotRenderer.h" Name="FileName"/>
+      <int Value="147" Name="FirstVisibleLine"/>
+      <int Value="158" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/kerry/Projects/DataPlotter/src/renderer/plotRenderer.cpp" Name="FileName"/>
-      <int Value="2693" Name="FirstVisibleLine"/>
-      <int Value="2710" Name="CurrentLine"/>
+      <int Value="671" Name="FirstVisibleLine"/>
+      <int Value="678" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/kerry/Projects/massPropFitter/src/main.cpp" Name="FileName"/>
+      <int Value="375" Name="FirstVisibleLine"/>
+      <int Value="396" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
   </TabInfoArray>

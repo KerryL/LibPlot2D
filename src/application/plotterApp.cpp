@@ -42,8 +42,7 @@ IMPLEMENT_APP(DataPlotterApp);
 const wxString DataPlotterApp::dataPlotterTitle = _T("Data Plotter");
 const wxString DataPlotterApp::dataPlotterName = _T("DataPlotterApplication");
 const wxString DataPlotterApp::creator = _T("Kerry Loux");
-const wxString DataPlotterApp::versionString = _T("v3.18");
-// gitHash is defined in gitHash.cpp, which is automatically generated during the build
+// gitHash and versionString are defined in gitHash.cpp, which is automatically generated during the build
 
 //==========================================================================
 // Class:			DataPlotterApp
