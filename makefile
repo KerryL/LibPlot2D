@@ -19,12 +19,15 @@ DIRS = \
 
 # Source files
 SRC = $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
+VERSION_FILE = src/application/gitHash.cpp
+SRC += $(VERSION_FILE)
 
 # Object files
 OBJS_DEBUG = $(addprefix $(OBJDIR_DEBUG),$(SRC:.cpp=.o))
 OBJS_RELEASE = $(addprefix $(OBJDIR_RELEASE),$(SRC:.cpp=.o))
 
 .PHONY: all debug clean version
+#.NOTPARALLEL:
 
 all: $(TARGET)
 debug: $(TARGET_DEBUG)
@@ -51,3 +54,4 @@ version:
 clean:
 	$(RM) -r $(OBJDIR)
 	$(RM) $(BINDIR)$(TARGET)
+	$(RM) $(VERSION_FILE)
