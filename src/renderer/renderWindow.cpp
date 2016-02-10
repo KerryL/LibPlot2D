@@ -289,6 +289,7 @@ void RenderWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
 void RenderWindow::OnSize(wxSizeEvent& WXUNUSED(event))
 {
     sizeUpdateRequired = true;
+	Refresh();
 }
 
 //==========================================================================
@@ -312,16 +313,9 @@ void RenderWindow::DoResize()
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 	int w, h;
 	GetClientSize(&w, &h);
+	glViewport(0, 0, (GLint) w, (GLint) h);
 
-	if (GetContext() && IsShownOnScreen())
-	{
-		SetCurrent(*GetContext());
-		glViewport(0, 0, (GLint) w, (GLint) h);
-	}
-	Refresh();
-
-	// This takes care of any change in aspect ratio
-	AutoSetFrustum();
+	AutoSetFrustum();// This takes care of any change in aspect ratio
 
 	sizeUpdateRequired = false;
 	modelviewModified = true;

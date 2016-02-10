@@ -104,7 +104,7 @@
       <AdditionalIncludeDirectories>$(WXWIN)\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PreBuildEvent>
-      <Command>getGitHash</Command>
+      <Command>../getGitHash ../</Command>
       <Message>Updating git hash information</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>

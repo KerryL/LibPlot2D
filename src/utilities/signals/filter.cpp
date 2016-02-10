@@ -499,19 +499,19 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 	while (expectedPower < -1)
 	{
 		expectedPower++;
-		terms.insert(terms.begin(), std::pair<int, double>(expectedPower + 1, 0.0));
+		terms.insert(terms.begin(), std::make_pair(expectedPower + 1, 0.0));
 	}
 
 	for (i = 1; i < (int)terms.size(); i++)
 	{
 		if (terms[i].first != expectedPower)
-			terms.insert(terms.begin() + i, std::pair<int, double>(expectedPower, 0.0));
+			terms.insert(terms.begin() + i, std::make_pair(expectedPower, 0.0));
 		expectedPower--;
 	}
 
 	while (expectedPower >= 0)
 	{
-		terms.insert(terms.end(), std::pair<int, double>(expectedPower, 0.0));
+		terms.insert(terms.end(), std::make_pair(expectedPower, 0.0));
 		expectedPower--;
 	}
 
