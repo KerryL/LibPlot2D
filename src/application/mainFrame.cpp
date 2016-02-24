@@ -3906,6 +3906,7 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName)
 //==========================================================================
 void MainFrame::DoCopy(void)
 {
+	wxInitAllImageHandlers();
 	if (wxTheClipboard->Open())
 	{
 		wxTheClipboard->SetData(new wxBitmapDataObject(plotArea->GetImage()));
