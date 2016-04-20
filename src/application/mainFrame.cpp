@@ -696,10 +696,10 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ButtonReloadDataClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
-	if (lastFileLoaded.IsEmpty())
+	if (lastFilesLoaded.IsEmpty())
 		return;
 
-	LoadFiles(wxArrayString(1, &lastFileLoaded));
+	LoadFiles(lastFilesLoaded);
 }
 
 //==========================================================================
@@ -1046,7 +1046,7 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 	SetXDataLabel(genericXAxisLabel);
 	plotArea->SaveCurrentZoom();
 
-	lastFileLoaded = fileList[fileList.Count() - 1];
+	lastFilesLoaded = fileList;
 	lastSelectionInfo = selectionInfo;
 	lastDescriptions = files[files.size() - 1]->GetAllDescriptions();
 

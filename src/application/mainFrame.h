@@ -313,7 +313,7 @@ private:
 
 	wxString ExtractFileNameFromPath(const wxString &pathAndFileName) const;
 
-	wxString lastFileLoaded;
+	wxArrayString lastFilesLoaded;
 	DataFile::SelectionData lastSelectionInfo;
 	wxArrayString lastDescriptions;
 
