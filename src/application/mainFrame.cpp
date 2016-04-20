@@ -1268,6 +1268,8 @@ void MainFrame::SetXDataLabel(const FileFormat &format)
 
 	default:
 	case FormatGeneric:
+	case FormatKollmorgen:
+	case FormatBaumuller:
 		SetXDataLabel(genericXAxisLabel);
 	}
 }
@@ -3236,6 +3238,9 @@ void MainFrame::SetNewAxisRange(const PlotContext &axis, const double &min, cons
 	default:
 	case PlotContextXAxis:
 		plotArea->SetXLimits(min, max);
+
+	case PlotContextPlotArea:
+		assert(false);
 	}
 
 	plotArea->UpdateDisplay();

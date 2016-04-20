@@ -36,7 +36,8 @@ protected:
 
 	virtual wxArrayString CreateDelimiterList(void) const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors) const;
+		std::vector<double> *rawData, std::vector<double> &factors,
+		wxString &errorString) const;
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
 
@@ -44,11 +45,13 @@ protected:
 	wxXmlNode* FollowNodePath(const wxXmlDocument &document, const wxString &path) const;
 	wxXmlNode* FollowNodePath(wxXmlNode *node, const wxString &path) const;
 
-	bool DataStringToVector(const wxString &data, std::vector<double> &dataVector, const double &factor) const;
+	bool DataStringToVector(const wxString &data, std::vector<double> &dataVector,
+		const double &factor, wxString& errorString) const;
 
-	bool ExtractXData(std::vector<double> *rawData, std::vector<double> &factors) const;
+	bool ExtractXData(std::vector<double> *rawData, std::vector<double> &factors,
+		wxString& errorString) const;
 	bool ExtractYData(wxXmlNode *channel, std::vector<double> *rawData,
-		std::vector<double> &factors, const unsigned int &set) const;
+		std::vector<double> &factors, const unsigned int &set, wxString& errorString) const;
 };
 
 #endif//_CUSTOM_XML_FILE_H_

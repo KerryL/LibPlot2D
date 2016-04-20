@@ -33,7 +33,8 @@ protected:
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
 	virtual void DoTypeSpecificLoadTasks(void);
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors) const;
+		std::vector<double> *rawData, std::vector<double> &factors,
+		wxString &errorString) const;
 
 private:
 	double timeStep;// [sec]

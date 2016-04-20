@@ -140,10 +140,11 @@
       <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FTGL)\src;../src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4458;4456</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_lib;$(FREETYPE)\objs\win32\vc2010;$(FTGL)\msvc\Build</AdditionalLibraryDirectories>

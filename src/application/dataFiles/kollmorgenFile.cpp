@@ -157,21 +157,24 @@ void KollmorgenFile::DoTypeSpecificLoadTasks(void)
 //
 // Output Arguments:
 //		rawData	= std::vector<double>* containing the data
+//		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //==========================================================================
 bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
-	std::vector<double> *rawData, std::vector<double> &factors) const
+	std::vector<double> *rawData, std::vector<double> &factors, wxString& errorString) const
 {
 	std::string nextLine;
 	wxArrayString parsed;
 	unsigned int i, set, curveCount(choices.size() + 1);
+	unsigned int lineNumber(headerLines);
 	double tempDouble, time(0.0);
 
 	while (!file.eof())
 	{
+		lineNumber++;
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		parsed.Insert(wxString::Format("%f", time), 0);
@@ -187,7 +190,11 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		for (i = 0; i < parsed.size(); i++)
 		{
 			if (!parsed[i].ToDouble(&tempDouble))
+			{
+				errorString.Printf("Failed to convert entry at row %i, column %i, to a number.",
+						lineNumber, i + 1);
 				return false;
+			}
 			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
 			{
 				rawData[set].push_back(tempDouble);

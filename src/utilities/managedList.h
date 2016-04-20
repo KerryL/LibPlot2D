@@ -35,8 +35,7 @@ template <class T>
 class ManagedList
 {
 public:
-	// Destructor
-	~ManagedList();
+	virtual ~ManagedList();
 
 	// Private data accessors
 	unsigned int Add(T *toAdd);
@@ -49,7 +48,6 @@ public:
 	// Re-organizes the data in the list
 	void ReorderObjects(const std::vector<unsigned int> &order);
 
-	// Operators
 	T *operator [](const unsigned int &index) const;
 
 private:
