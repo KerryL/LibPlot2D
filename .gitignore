@@ -6,6 +6,7 @@ Release wx2.8/
 ipch/
 DataPlotter/Debug
 DataPlotter/Release
+*.opendb
 
 *.suo
 *.sdf

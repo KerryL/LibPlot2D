@@ -326,6 +326,8 @@ private:
 
 	void UpdateCurveQuality();
 
+	static bool ItemIsInArray(const wxArrayInt& a, const int& item);
+
 	DECLARE_EVENT_TABLE();
 
 	// Testing methods

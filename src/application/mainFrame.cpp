@@ -1539,6 +1539,36 @@ void MainFrame::UpdateCurveQuality()
 
 //==========================================================================
 // Class:			MainFrame
+// Function:		ItemIsInArray
+//
+// Description:		Checks to see if the specified value is contained in the
+//					referenced array.
+//
+// Input Arguments:
+//		a		= const wxArrayInt&
+//		item	= const int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true if item is in the array, false otherwise
+//
+//==========================================================================
+bool MainFrame::ItemIsInArray(const wxArrayInt& a, const int& item)
+{
+	unsigned int i;
+	for (i = 0; i < a.Count(); i++)
+	{
+		if (a[i] == item)
+			return true;
+	}
+
+	return false;
+}
+
+//==========================================================================
+// Class:			MainFrame
 // Function:		GridRightClickEvent
 //
 // Description:		Handles right-click events on the grid control.  Displays
@@ -1556,7 +1586,10 @@ void MainFrame::UpdateCurveQuality()
 //==========================================================================
 void MainFrame::GridRightClickEvent(wxGridEvent &event)
 {
-	optionsGrid->SelectRow(event.GetRow());
+	if (optionsGrid->GetSelectedRows().Count() == 0 ||
+		!ItemIsInArray(optionsGrid->GetSelectedRows(), event.GetRow()))
+		optionsGrid->SelectRow(event.GetRow());
+
 	CreateGridContextMenu(event.GetPosition() + optionsGrid->GetPosition()
 		+ optionsGrid->GetParent()->GetPosition(), event.GetRow());
 }
@@ -2356,11 +2389,15 @@ void MainFrame::ContextScaleXDataEvent(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	// Create new dataset containing the derivative of dataset and add it to the plot
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = new Dataset2D(DiscreteDerivative::ComputeTimeHistory(*plotList[row - 1]));
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		Dataset2D *newData = new Dataset2D(DiscreteDerivative::ComputeTimeHistory(*plotList[row - 1]));
 
-	wxString name = _T("d/dt(") + optionsGrid->GetCellValue(row, colName) + _T(")");
-	AddCurve(newData, name);
+		wxString name = _T("d/dt(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+		AddCurve(newData, name);
+	}
 }
 
 //==========================================================================
@@ -2383,11 +2420,15 @@ void MainFrame::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 {
 	// Create new dataset containing the integral of dataset and add it to the plot
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = new Dataset2D(DiscreteIntegral::ComputeTimeHistory(*plotList[row - 1]));
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		Dataset2D *newData = new Dataset2D(DiscreteIntegral::ComputeTimeHistory(*plotList[row - 1]));
 
-	wxString name = _T("integral(") + optionsGrid->GetCellValue(row, colName) + _T(")");
-	AddCurve(newData, name);
+		wxString name = _T("integral(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+		AddCurve(newData, name);
+	}
 }
 
 //==========================================================================
@@ -2410,11 +2451,15 @@ void MainFrame::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 void MainFrame::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 {
 	// Create new dataset containing the RMS of dataset and add it to the plot
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = new Dataset2D(RootMeanSquare::ComputeTimeHistory(*plotList[row - 1]));
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		Dataset2D *newData = new Dataset2D(RootMeanSquare::ComputeTimeHistory(*plotList[row - 1]));
 
-	wxString name = _T("RMS(") + optionsGrid->GetCellValue(row, colName) + _T(")");
-	AddCurve(newData, name);
+		wxString name = _T("RMS(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+		AddCurve(newData, name);
+	}
 }
 
 //==========================================================================
@@ -2436,14 +2481,18 @@ void MainFrame::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 {
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = GetFFTData(plotList[row - 1]);
-	if (!newData)
-		return;
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		Dataset2D *newData = GetFFTData(plotList[row - 1]);
+		if (!newData)
+			continue;
 
-	wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
-	AddCurve(newData, name);
-	SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+		wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
+		AddCurve(newData, name);
+		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+	}
 }
 
 //==========================================================================
@@ -2474,11 +2523,15 @@ void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 		return;
 	}
 
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = new Dataset2D(PlotMath::ApplyBitMask(*plotList[row - 1], bit));
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		Dataset2D *newData = new Dataset2D(PlotMath::ApplyBitMask(*plotList[row - 1], bit));
 
-	wxString name = optionsGrid->GetCellValue(row, colName) + _T(", Bit ") + wxString::Format("%lu", bit);
-	AddCurve(newData, name);
+		wxString name = optionsGrid->GetCellValue(row, colName) + _T(", Bit ") + wxString::Format("%lu", bit);
+		AddCurve(newData, name);
+	}
 }
 
 //==========================================================================
@@ -2488,7 +2541,7 @@ void MainFrame::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 // Description:		Returns a dataset containing an FFT of the specified data.
 //
 // Input Arguments:
-//		data				= const Dataset2D&
+//		data	= const Dataset2D&
 //
 // Output Arguments:
 //		None
@@ -2599,14 +2652,18 @@ void MainFrame::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
 		return;
 
 	// Create new dataset containing the RMS of dataset and add it to the plot
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	Dataset2D *newData = new Dataset2D(*plotList[row - 1]);
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		Dataset2D *newData = new Dataset2D(*plotList[row - 1]);
 
-	newData->XShift(shift);
+		newData->XShift(shift);
 
-	wxString name = optionsGrid->GetCellValue(row, colName) + _T(", t = t0 + ");
-	name += shiftText;
-	AddCurve(newData, name);
+		wxString name = optionsGrid->GetCellValue(row, colName) + _T(", t = t0 + ");
+		name += shiftText;
+		AddCurve(newData, name);
+	}
 }
 
 //==========================================================================
@@ -2634,14 +2691,18 @@ void MainFrame::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 		return;
 
 	// Create new dataset containing the FFT of dataset and add it to the plot
-	unsigned int row = optionsGrid->GetSelectedRows()[0];
-	const Dataset2D *currentData = plotList[row - 1];
-	Dataset2D *newData = new Dataset2D(*currentData);
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		const Dataset2D *currentData = plotList[row - 1];
+		Dataset2D *newData = new Dataset2D(*currentData);
 
-	ApplyFilter(filterParameters, *newData);
+		ApplyFilter(filterParameters, *newData);
 
-	wxString name = FilterDialog::GetFilterNamePrefix(filterParameters) + _T(" (") + optionsGrid->GetCellValue(row, colName) + _T(")");
-	AddCurve(newData, name);
+		wxString name = FilterDialog::GetFilterNamePrefix(filterParameters) + _T(" (") + optionsGrid->GetCellValue(row, colName) + _T(")");
+		AddCurve(newData, name);
+	}
 }
 
 //==========================================================================
@@ -2679,10 +2740,15 @@ void MainFrame::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 		return;
 	}
 
-	wxString name;
-	Dataset2D* newData = GetCurveFitData(order, plotList[optionsGrid->GetSelectedRows()[0] - 1], name);
+	unsigned int i, row;
+	for (i = 0; i < optionsGrid->GetSelectedRows().Count(); i++)
+	{
+		row = optionsGrid->GetSelectedRows()[i];
+		wxString name;
+		Dataset2D* newData = GetCurveFitData(order, plotList[row - 1], name);
 
-	AddCurve(newData, name);
+		AddCurve(newData, name);
+	}
 }
 
 //==========================================================================
