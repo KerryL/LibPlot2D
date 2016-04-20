@@ -122,7 +122,7 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 	{
 		fontFile = GetFontFileName(fontList[i]);
 		if (!fontFile.IsEmpty())
-			return false;
+			return true;
 	}
 
 	// Nothing found - return false with empty fontFile
