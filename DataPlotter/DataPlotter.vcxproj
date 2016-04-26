@@ -90,7 +90,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;FTGL_LIBRARY_STATIC;_DATAPLOTTER_64_BIT_;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../src/;$(FREETYPE)\include;$(WXWIN)\lib\vc_dll\mswud;$(WXWIN)\include;$(FTGL)\src;./src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/;$(FREETYPE)\include;$(WXWIN)\lib\vc_dll\mswud;$(WXWIN)\include;$(OPENGL);$(FTGL)\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4458;4456</DisableSpecificWarnings>
     </ClCompile>
@@ -137,7 +137,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;FTGL_LIBRARY_STATIC;_DATAPLOTTER_64_BIT_;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FTGL)\src;../src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(OPENGL);$(FTGL)\src;../src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4458;4456</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

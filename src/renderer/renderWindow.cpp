@@ -26,6 +26,12 @@
 #include <wx/dcclient.h>
 #include <wx/image.h>
 
+// OpenGL headers
+#include <gl/glcorearb.h>
+#ifdef _MSC_VER
+#undef Yield// Added to fix compiler error in wxThread caused by including windows.h (within glcorearb.h)
+#endif
+
 // Local headers
 #include "renderer/renderWindow.h"
 #include "utilities/math/matrix.h"
@@ -1215,18 +1221,8 @@ void RenderWindow::Initialize2D() const
 
 	ShiftForExactPixelization();
 
-	// Enable the parameters required for anti-aliasing of lines
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-	glEnable(GL_POLYGON_SMOOTH);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-
-	glEnable(GL_POINT_SMOOTH);
-	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Enable antialiasing
+	glEnable(GL_MULTISAMPLE);
 }
 
 //==========================================================================
@@ -1263,16 +1259,8 @@ void RenderWindow::Initialize3D() const
 	// Smooth shading for nice-looking object
 	glShadeModel(GL_SMOOTH);
 
-	// Don't disable this:  required for anti-aliasing
-	// Disable alpha blending (this is enabled as-needed when rendering objects)
-	//glDisable(GL_BLEND);
-
-	// Enable anti-aliasing for polygons
-	glEnable(GL_POLYGON_SMOOTH);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Enable antialiasing
+	glEnable(GL_MULTISAMPLE);
 }
 
 //==========================================================================
