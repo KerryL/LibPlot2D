@@ -726,7 +726,7 @@ bool PlotRenderer::LegendIsVisible()
 //		None
 //
 //==========================================================================
-void PlotRenderer::SetLegendOn(void)
+void PlotRenderer::SetLegendOn()
 {
 	if (!legend)
 		return;
@@ -749,7 +749,7 @@ void PlotRenderer::SetLegendOn(void)
 //		None
 //
 //==========================================================================
-void PlotRenderer::SetLegendOff(void)
+void PlotRenderer::SetLegendOff()
 {
 	if (!legend)
 		return;
@@ -794,7 +794,7 @@ void PlotRenderer::UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entr
 //		bool indicating status of bottom grid
 //
 //==========================================================================
-bool PlotRenderer::GetBottomMajorGrid(void) const
+bool PlotRenderer::GetBottomMajorGrid() const
 {
 	return plot->GetBottomAxis()->GetMajorGrid();
 }
@@ -815,7 +815,7 @@ bool PlotRenderer::GetBottomMajorGrid(void) const
 //		bool indicating status of bottom grid
 //
 //==========================================================================
-bool PlotRenderer::GetBottomMinorGrid(void) const
+bool PlotRenderer::GetBottomMinorGrid() const
 {
 	return plot->GetBottomAxis()->GetMinorGrid();
 }
@@ -836,7 +836,7 @@ bool PlotRenderer::GetBottomMinorGrid(void) const
 //		bool indicating status of left grid
 //
 //==========================================================================
-bool PlotRenderer::GetLeftMajorGrid(void) const
+bool PlotRenderer::GetLeftMajorGrid() const
 {
 	return plot->GetLeftYAxis()->GetMajorGrid();
 }
@@ -857,7 +857,7 @@ bool PlotRenderer::GetLeftMajorGrid(void) const
 //		bool indicating status of left grid
 //
 //==========================================================================
-bool PlotRenderer::GetLeftMinorGrid(void) const
+bool PlotRenderer::GetLeftMinorGrid() const
 {
 	return plot->GetLeftYAxis()->GetMinorGrid();
 }
@@ -878,7 +878,7 @@ bool PlotRenderer::GetLeftMinorGrid(void) const
 //		bool indicating status of right grid
 //
 //==========================================================================
-bool PlotRenderer::GetRightMajorGrid(void) const
+bool PlotRenderer::GetRightMajorGrid() const
 {
 	return plot->GetRightYAxis()->GetMajorGrid();
 }
@@ -899,7 +899,7 @@ bool PlotRenderer::GetRightMajorGrid(void) const
 //		bool indicating status of right grid
 //
 //==========================================================================
-bool PlotRenderer::GetRightMinorGrid(void) const
+bool PlotRenderer::GetRightMinorGrid() const
 {
 	return plot->GetRightYAxis()->GetMinorGrid();
 }
@@ -1854,7 +1854,7 @@ bool PlotRenderer::GetRightCursorVisible() const
 //		double
 //
 //==========================================================================
-double PlotRenderer::GetLeftCursorValue(void) const
+double PlotRenderer::GetLeftCursorValue() const
 {
 	return leftCursor->GetValue();
 }

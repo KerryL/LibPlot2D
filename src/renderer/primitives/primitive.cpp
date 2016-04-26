@@ -97,8 +97,6 @@ Primitive::~Primitive()
 // Description:		Calls two mandatory overloads that 1) check to see if the
 //					information describing this object is valid, and if so, 2)
 //					calls the GenerateGeometry() method to create the object.
-//					Uses glLists if geometry has already been created and all
-//					information is up-to-date.
 //
 // Input Arguments:
 //		None

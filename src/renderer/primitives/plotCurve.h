@@ -38,21 +38,18 @@ public:
 	void GenerateGeometry();
 	bool HasValidParameters();
 
-	void SetModified() { modified = true; }
+	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
+	inline void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
+	inline void SetPretty(const bool &pretty) { line.SetPretty(pretty); modified = true; }
 
-	void SetLineSize(const double &size) { lineSize = size; modified = true; }
-	void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
-	void SetPretty(const bool &pretty) { line.SetPretty(pretty); modified = true; }
-
-	// Remove all data from the plot
 	void SetData(const Dataset2D *data);
-	void ClearData() { data = NULL; }
+	inline void ClearData() { data = NULL; }
 
 	// For setting up the plot
-	void BindToXAxis(Axis *xAxis) { this->xAxis = xAxis; modified = true; }
-	void BindToYAxis(Axis *yAxis) { this->yAxis = yAxis; modified = true; }
+	inline void BindToXAxis(Axis *xAxis) { this->xAxis = xAxis; modified = true; }
+	inline void BindToYAxis(Axis *yAxis) { this->yAxis = yAxis; modified = true; }
 
-	Axis *GetYAxis(void) { return yAxis; }
+	inline Axis *GetYAxis() { return yAxis; }
 
 	// Overloaded operators
 	PlotCurve& operator=(const PlotCurve &plotCurve);
@@ -93,7 +90,7 @@ private:
 	double GetInterpolatedXOrdinate(const unsigned int &first, const unsigned int &second, const double &yValue) const;
 	double GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const;
 
-	void PlotMarkers(void) const;
+	void PlotMarkers() const;
 	void DrawMarker(const double &x, const double &y) const;
 
 	enum RangeSize
@@ -103,9 +100,9 @@ private:
 		RangeSizeUndetermined
 	};
 
-	bool SmallRange(void) const;
-	RangeSize SmallXRange(void) const;
-	RangeSize SmallYRange(void) const;
+	bool SmallRange() const;
+	RangeSize SmallXRange() const;
+	RangeSize SmallYRange() const;
 };
 
 #endif// PLOT_CURVE_H_

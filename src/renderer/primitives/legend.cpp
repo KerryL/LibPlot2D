@@ -91,7 +91,7 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 //		None
 //
 //==========================================================================
-void Legend::GenerateGeometry(void)
+void Legend::GenerateGeometry()
 {
 	UpdateBoundingBox();
 

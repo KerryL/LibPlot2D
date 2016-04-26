@@ -136,8 +136,8 @@ private:
 
 	Line line;
 
-	void DrawFullAxis(void);
-	int ComputeMainAxisLocation(void) const;
+	void DrawFullAxis();
+	int ComputeMainAxisLocation() const;
 	void ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount = NULL);
 	void DrawMainAxis(const int &mainAxisLocation) const;
 	void DrawHorizontalGrid(const unsigned int &count) const;
@@ -149,11 +149,11 @@ private:
 	double GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const;
 	double GetNextGridValue(const unsigned int &tick) const;
 
-	void DrawAxisLabel(void) const;
-	void DrawTickLabels(void);
+	void DrawAxisLabel() const;
+	void DrawTickLabels();
 
 	double GetAxisLabelTranslation(const double &offset, const double &fontHeight) const;
-	unsigned int GetPrecision(void) const;
+	unsigned int GetPrecision() const;
 	void ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
 		const FTBBox &boundingBox, const double &offset) const;
 };

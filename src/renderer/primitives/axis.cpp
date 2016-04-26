@@ -109,7 +109,7 @@ Axis::~Axis()
 //		None
 //
 //==========================================================================
-void Axis::GenerateGeometry(void)
+void Axis::GenerateGeometry()
 {
 	DrawFullAxis();
 
@@ -140,7 +140,7 @@ void Axis::GenerateGeometry(void)
 //		None
 //
 //==========================================================================
-void Axis::DrawFullAxis(void)
+void Axis::DrawFullAxis()
 {
 	unsigned int numberOfTicks, numberOfGridLines;
 	int mainAxisLocation = ComputeMainAxisLocation();
@@ -187,7 +187,7 @@ void Axis::DrawFullAxis(void)
 //		int, indicating the location of the main axis
 //
 //==========================================================================
-int Axis::ComputeMainAxisLocation(void) const
+int Axis::ComputeMainAxisLocation() const
 {
 	// Compute the mainAxisLocation (X for vertical axis, Y for horizontal axis)
 	if (orientation == OrientationBottom || orientation == OrientationLeft)
@@ -523,7 +523,7 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //		None
 //
 //==========================================================================
-void Axis::DrawAxisLabel(void) const
+void Axis::DrawAxisLabel() const
 {
 	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
@@ -613,7 +613,7 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 //		None
 //
 //==========================================================================
-void Axis::DrawTickLabels(void)
+void Axis::DrawTickLabels()
 {
 	FTBBox boundingBox;
 	int xTranslation, yTranslation;
@@ -662,7 +662,7 @@ void Axis::DrawTickLabels(void)
 //		unsigned int
 //
 //==========================================================================
-unsigned int Axis::GetPrecision(void) const
+unsigned int Axis::GetPrecision() const
 {
 	// It does look nicer to use the raw return value of GetPrecision(), but it affects the function
 	// of dragging the plot around.  Because we always force the limits to actually

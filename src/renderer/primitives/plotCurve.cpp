@@ -732,7 +732,7 @@ double PlotCurve::GetInterpolatedYOrdinate(const unsigned int &first, const unsi
 //		None
 //
 //==========================================================================
-void PlotCurve::PlotMarkers(void) const
+void PlotCurve::PlotMarkers() const
 {
 	unsigned int i;
 	for (i = 0; i < data->GetNumberOfPoints(); i++)
@@ -790,7 +790,7 @@ void PlotCurve::DrawMarker(const double &x, const double &y) const
 //		bool
 //
 //==========================================================================
-bool PlotCurve::SmallRange(void) const
+bool PlotCurve::SmallRange() const
 {
 	if (data->GetNumberOfPoints() < 2)
 		return false;
@@ -830,7 +830,7 @@ bool PlotCurve::SmallRange(void) const
 //		PlotCurve::RangeSize
 //
 //==========================================================================
-PlotCurve::RangeSize PlotCurve::SmallXRange(void) const
+PlotCurve::RangeSize PlotCurve::SmallXRange() const
 {
 	double period = data->GetXData(1) - data->GetXData(0);
 	if (period == 0.0)
@@ -869,7 +869,7 @@ PlotCurve::RangeSize PlotCurve::SmallXRange(void) const
 //		PlotCurve::RangeSize
 //
 //==========================================================================
-PlotCurve::RangeSize PlotCurve::SmallYRange(void) const
+PlotCurve::RangeSize PlotCurve::SmallYRange() const
 {
 	double period = data->GetYData(1) - data->GetYData(0);
 	if (period == 0.0)

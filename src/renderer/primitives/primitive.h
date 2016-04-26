@@ -43,12 +43,12 @@ public:
 	// Private data accessors
 	void SetVisibility(const bool &isVisible);
 	void SetColor(const Color &color);
-	Color GetColor() { return color; }
-	void SetDrawOrder(const unsigned int &drawOrder) { this->drawOrder = drawOrder; }
-	void SetModified() { modified = true; }// Forces a re-draw
+	inline Color GetColor() { return color; }
+	inline void SetDrawOrder(const unsigned int &drawOrder) { this->drawOrder = drawOrder; }
+	inline void SetModified() { modified = true; }// Forces a re-draw
 
-	bool GetIsVisible() const { return isVisible; }
-	unsigned int GetDrawOrder() const { return drawOrder; }
+	inline bool GetIsVisible() const { return isVisible; }
+	inline unsigned int GetDrawOrder() const { return drawOrder; }
 
 	// Overloaded operators
 	Primitive& operator=(const Primitive &primitive);
