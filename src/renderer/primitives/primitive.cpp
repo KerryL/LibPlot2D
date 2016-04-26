@@ -64,7 +64,6 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 //==========================================================================
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
-	// Do the copy
 	*this = primitive;
 }
 

@@ -60,7 +60,7 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //		wxParent	= wxWindow&
 //		plotOwner	= PlotOwner& reference to this applications's main window
 //		id			= wxWindowID
-//		args		= int[] NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
+//		attr		= const wxGLAttributes& NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
 //
 // Output Arguments:
 //		None
@@ -69,8 +69,8 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //		None
 //
 //==========================================================================
-PlotRenderer::PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID id, int args[])
-	: RenderWindow(wxParent, id, args, wxDefaultPosition, wxDefaultSize),
+PlotRenderer::PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID id, const wxGLAttributes& attr)
+	: RenderWindow(wxParent, id, attr, wxDefaultPosition, wxDefaultSize),
 	plotOwner(plotOwner)
 {
 	CreateActors();

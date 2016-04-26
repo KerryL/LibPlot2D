@@ -60,7 +60,7 @@ const double RenderWindow::exactPixelShift(0.375);
 // Input Arguments:
 //		parent		= wxWindow& reference to the owner of this object
 //		id			= wxWindowID to identify this window
-//		args		= int[] NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
+//		attr		= const wxGLAttributes& NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
 //		position	= const wxPoint& specifying this object's position
 //		size		= const wxSize& specifying this object's size
 //		style		= long specifying this object's style flags
@@ -72,9 +72,9 @@ const double RenderWindow::exactPixelShift(0.375);
 //		None
 //
 //==========================================================================
-RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, int args[],
+RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, id, args, position, size, style | wxFULL_REPAINT_ON_RESIZE)
+	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
 {
 	context = NULL;
 

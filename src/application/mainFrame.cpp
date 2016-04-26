@@ -218,9 +218,10 @@ void MainFrame::CreateControls(void)
 //==========================================================================
 PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 {
-	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0};
-	//wxGLCanvas::IsDisplaySupported();// Added in wxWidgets 3.0
-	plotArea = new PlotRenderer(*parent, *this, wxID_ANY, args);
+	wxGLAttributes displayAttributes;
+	displayAttributes.PlatformDefaults().RGBA().DoubleBuffer().SampleBuffers(1).Samplers(4).EndList();
+	assert(wxGLCanvas::IsDisplaySupported(displayAttributes));
+	plotArea = new PlotRenderer(*parent, *this, wxID_ANY, displayAttributes);
 
 	plotArea->SetMinSize(wxSize(650, 320));
 	plotArea->SetMajorGridOn();
@@ -392,7 +393,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_GRID_CELL_RIGHT_CLICK(MainFrame::GridRightClickEvent)
 	EVT_GRID_CELL_LEFT_DCLICK(MainFrame::GridDoubleClickEvent)
 	EVT_GRID_CELL_LEFT_CLICK(MainFrame::GridLeftClickEvent)
-	EVT_GRID_CELL_CHANGE(MainFrame::GridCellChangeEvent)
+	EVT_GRID_CELL_CHANGED(MainFrame::GridCellChangeEvent)
 	EVT_GRID_LABEL_RIGHT_CLICK(MainFrame::GridLabelRightClickEvent)
 
 	// Context menu
@@ -669,7 +670,7 @@ void MainFrame::ButtonRemoveCurveClickedEvent(wxCommandEvent& WXUNUSED(event))
 {
 	// Workaround for now
 	int i;
-	for (i = optionsGrid->GetRows() - 1; i > 0; i--)
+	for (i = optionsGrid->GetNumberRows() - 1; i > 0; i--)
 	{
 		if (optionsGrid->IsInSelection(i, 0))
 			RemoveCurve(i - 1);
@@ -1423,10 +1424,10 @@ unsigned int MainFrame::AddDataRowToGrid(const wxString &name)
 	optionsGrid->SetCellValue(index, colMarkerSize, _T("-1"));
 	optionsGrid->SetCellValue(index, colVisible, _T("1"));
 
-	int width = optionsGrid->GetColumnWidth(colName);
+	int width = optionsGrid->GetColSize(colName);
 	optionsGrid->AutoSizeColumn(colName, false);
-	if (optionsGrid->GetColumnWidth(colName) < width)
-		optionsGrid->SetColumnWidth(colName, width);
+	if (optionsGrid->GetColSize(colName) < width)
+		optionsGrid->SetColSize(colName, width);
 
 	return index;
 }
@@ -1798,7 +1799,7 @@ void MainFrame::ShowAppropriateXLabel()
 	// If the only visible curves are frequency plots, change the x-label
 	int i;
 	bool showFrequencyLabel(false);
-	for (i = 1; i < optionsGrid->GetRows(); i++)
+	for (i = 1; i < optionsGrid->GetNumberRows(); i++)
 	{
 		if (optionsGrid->GetCellValue(i, colVisible).Cmp(_T("1")) == 0)
 		{
@@ -2231,18 +2232,18 @@ void MainFrame::AddFFTCurves(const double& xFactor, Dataset2D *amplitude, Datase
 	Dataset2D *coherence, const wxString &namePortion)
 {
 	AddCurve(&(amplitude->MultiplyXData(xFactor)), _T("FRF Amplitude, ") + namePortion + _T(", [dB]"));
-	SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+	SetMarkerSize(optionsGrid->GetNumberRows() - 2, 0);
 
 	if (phase)
 	{
 		AddCurve(&(phase->MultiplyXData(xFactor)), _T("FRF Phase, ") + namePortion + _T(", [deg]"));
-		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+		SetMarkerSize(optionsGrid->GetNumberRows() - 2, 0);
 	}
 
 	if (coherence)
 	{
 		AddCurve(&(coherence->MultiplyXData(xFactor)), _T("FRF Coherence, ") + namePortion + _T(", [-]"));
-		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+		SetMarkerSize(optionsGrid->GetNumberRows() - 2, 0);
 	}
 }
 
@@ -2340,17 +2341,16 @@ void MainFrame::ContextScaleXDataEvent(wxCommandEvent& WXUNUSED(event))
 			scaledData->MultiplyXData(factor);
 			AddCurve(scaledData, optionsGrid->GetCellValue(i + 1, colName));
 
-			optionsGrid->SetCellBackgroundColour(
-				optionsGrid->GetCellBackgroundColour(i + 1, colColor),
-				i + stopIndex + 1, colColor);
-			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colLineSize),
-				i + stopIndex + 1, colLineSize);
-			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colMarkerSize),
-				i + stopIndex + 1, colMarkerSize);
-			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colVisible),
-				i + stopIndex + 1, colVisible);
-			optionsGrid->SetCellValue(optionsGrid->GetCellValue(i + 1, colRightAxis),
-				i + stopIndex + 1, colRightAxis);
+			optionsGrid->SetCellBackgroundColour(i + stopIndex + 1, colColor,
+				optionsGrid->GetCellBackgroundColour(i + 1, colColor));
+			optionsGrid->SetCellValue(i + stopIndex + 1, colLineSize,
+				optionsGrid->GetCellValue(i + 1, colLineSize));
+			optionsGrid->SetCellValue(i + stopIndex + 1, colMarkerSize,
+				optionsGrid->GetCellValue(i + 1, colMarkerSize));
+			optionsGrid->SetCellValue(i + stopIndex + 1, colVisible,
+				optionsGrid->GetCellValue(i + 1, colVisible));
+			optionsGrid->SetCellValue(i + stopIndex + 1, colRightAxis,
+				optionsGrid->GetCellValue(i + 1, colRightAxis));
 
 			UpdateCurveProperties(i + stopIndex);
 		}
@@ -2493,7 +2493,7 @@ void MainFrame::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 
 		wxString name = _T("FFT(") + optionsGrid->GetCellValue(row, colName) + _T(")");
 		AddCurve(newData, name);
-		SetMarkerSize(optionsGrid->GetRows() - 2, 0);
+		SetMarkerSize(optionsGrid->GetNumberRows() - 2, 0);
 	}
 }
 
@@ -3010,7 +3010,7 @@ void MainFrame::UpdateCursorValues(const bool &leftVisible, const bool &rightVis
 	// For each curve, update the cursor values
 	int i;
 	bool showXDifference(false);
-	for (i = 1; i < optionsGrid->GetRows(); i++)
+	for (i = 1; i < optionsGrid->GetNumberRows(); i++)
 	{
 		UpdateSingleCursorValue(i, leftValue, colLeftCursor, leftVisible);
 		UpdateSingleCursorValue(i, rightValue, colRightCursor, rightVisible);
