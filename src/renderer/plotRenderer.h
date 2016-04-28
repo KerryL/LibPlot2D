@@ -163,6 +163,8 @@ public:
 
 	wxImage GetImage() const;
 
+	virtual void SetBackgroundColor(const Color& backgroundColor);
+
 private:
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();

@@ -183,6 +183,7 @@ void PlotRenderer::UpdateDisplay()
 void PlotRenderer::CreateActors()
 {
 	plot = new PlotObject(*this);
+	SetBackgroundColor(Color::ColorWhite);
 
 	// Also create the zoom box and cursors, even though they aren't drawn yet
 	zoomBox = new ZoomBox(*this);
@@ -2895,4 +2896,26 @@ wxImage PlotRenderer::GetImage() const
 unsigned long long PlotRenderer::GetTotalPointCount() const
 {
 	return plot->GetTotalPointCount();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetBackgroundColor
+//
+// Description:		Sets the background color for the plot area.
+//
+// Input Arguments:
+//		backgroundColor	= const Color&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetBackgroundColor(const Color& backgroundColor)
+{
+	RenderWindow::SetBackgroundColor(backgroundColor);
+	plot->SetBackgroundColor(backgroundColor);
 }

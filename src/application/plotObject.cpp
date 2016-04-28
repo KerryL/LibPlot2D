@@ -24,6 +24,7 @@
 #include "renderer/primitives/plotCurve.h"
 #include "renderer/primitives/text.h"
 #include "renderer/primitives/legend.h"
+#include "renderer/primitives/plotFrame.h"
 #include "utilities/math/plotMath.h"
 #include "utilities/dataset2D.h"
 #include "utilities/fontFinder.h"
@@ -70,9 +71,9 @@ PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 {
 	InitializeFonts();
 	CreateAxisObjects();
+	frame = new PlotFrame(renderer, *axisTop, *axisBottom, *axisLeft, *axisRight);
 
 	ResetAutoScaling();
-	renderer.SetBackgroundColor(Color::ColorWhite);
 }
 
 //==========================================================================
@@ -115,7 +116,7 @@ PlotObject::~PlotObject()
 //		None
 //
 //==========================================================================
-void PlotObject::CreateAxisObjects(void)
+void PlotObject::CreateAxisObjects()
 {
 	axisTop = new Axis(renderer);
 	axisBottom = new Axis(renderer);
@@ -159,7 +160,7 @@ void PlotObject::CreateAxisObjects(void)
 //		None
 //
 //==========================================================================
-void PlotObject::InitializeFonts(void)
+void PlotObject::InitializeFonts()
 {
 	// Find the name of the font that we want to use
 	wxString fontFile;
@@ -472,7 +473,7 @@ void PlotObject::SetRightYMajorResolution(const double &resolution)
 //		None
 //
 //==========================================================================
-void PlotObject::RemoveExistingPlots(void)
+void PlotObject::RemoveExistingPlots()
 {
 	while (plotList.size() > 0)
 		RemovePlot(0);
@@ -545,7 +546,7 @@ void PlotObject::AddCurve(const Dataset2D &data)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatPlot(void)
+void PlotObject::FormatPlot()
 {
 	UpdateAxesOffsets();
 	FormatTitle();
@@ -606,7 +607,7 @@ void PlotObject::FormatPlot(void)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatAxesBasics(void)
+void PlotObject::FormatAxesBasics()
 {
 	Axis::TickStyle tickStyle = Axis::TickStyleInside;
 
@@ -684,7 +685,7 @@ unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
 //		None
 //
 //==========================================================================
-void PlotObject::UpdateAxesOffsets(void)
+void PlotObject::UpdateAxesOffsets()
 {
 	if (axisBottom->GetLabel().IsEmpty())
 		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
@@ -841,7 +842,7 @@ void PlotObject::SetAxesColor(const Color &color)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatTitle(void)
+void PlotObject::FormatTitle()
 {
 	titleObject->SetFont(titleFont);
 	titleObject->SetCentered(true);
@@ -866,7 +867,7 @@ void PlotObject::FormatTitle(void)
 //		None
 //
 //==========================================================================
-void PlotObject::SetOriginalAxisLimits(void)
+void PlotObject::SetOriginalAxisLimits()
 {
 	leftUsed = false;
 	rightUsed = false;
@@ -950,7 +951,7 @@ double PlotObject::GetFirstValidValue(const double* data, const unsigned int &si
 //		None
 //
 //==========================================================================
-void PlotObject::MatchYAxes(void)
+void PlotObject::MatchYAxes()
 {
 	// If one axis is unused, make it match the other
 	if (leftUsed && !rightUsed)
@@ -1118,7 +1119,7 @@ void PlotObject::ValidateRangeLimits(double &min, double &max,
 //		None
 //
 //==========================================================================
-void PlotObject::ResetOriginalLimits(void)
+void PlotObject::ResetOriginalLimits()
 {
 	if (autoScaleX)
 	{
@@ -1215,7 +1216,7 @@ void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
 //		None
 //
 //==========================================================================
-void PlotObject::CheckForZeroRange(void)
+void PlotObject::CheckForZeroRange()
 {
 	if (PlotMath::IsZero(xMaxOriginal - xMinOriginal))
 		HandleZeroRangeAxis(xMinOriginal, xMaxOriginal);
@@ -1285,7 +1286,7 @@ void PlotObject::CheckAutoScaling()
 //		None
 //
 //==========================================================================
-void PlotObject::UpdateLimitValues(void)
+void PlotObject::UpdateLimitValues()
 {
 	axisBottom->Draw();
 	xMin = axisBottom->GetMinimum();
@@ -1774,7 +1775,7 @@ void PlotObject::SetMinorGrid(const bool &gridOn)
 //		None
 //
 //==========================================================================
-bool PlotObject::GetMajorGrid(void)
+bool PlotObject::GetMajorGrid()
 {
 	if (axisBottom == NULL)
 		return false;
@@ -1798,7 +1799,7 @@ bool PlotObject::GetMajorGrid(void)
 //		None
 //
 //==========================================================================
-bool PlotObject::GetMinorGrid(void)
+bool PlotObject::GetMinorGrid()
 {
 	if (axisBottom == NULL)
 		return false;
@@ -2023,7 +2024,7 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatCurves(void)
+void PlotObject::FormatCurves()
 {
 	unsigned int i;
 	for (i = 0; i < (unsigned int)plotList.size(); i++)
@@ -2049,7 +2050,7 @@ void PlotObject::FormatCurves(void)
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetXLabel(void) const
+wxString PlotObject::GetXLabel() const
 {
 	return axisBottom->GetLabel();
 }
@@ -2070,7 +2071,7 @@ wxString PlotObject::GetXLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetLeftYLabel(void) const
+wxString PlotObject::GetLeftYLabel() const
 {
 	return axisLeft->GetLabel();
 }
@@ -2091,7 +2092,7 @@ wxString PlotObject::GetLeftYLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetRightYLabel(void) const
+wxString PlotObject::GetRightYLabel() const
 {
 	return axisRight->GetLabel();
 }
@@ -2112,7 +2113,7 @@ wxString PlotObject::GetRightYLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetTitle(void) const
+wxString PlotObject::GetTitle() const
 {
 	return titleObject->GetText();
 }
@@ -2141,4 +2142,25 @@ unsigned long long PlotObject::GetTotalPointCount() const
 		count += dataList[i]->GetNumberOfPoints();
 
 	return count;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		SetBackgroundColor
+//
+// Description:		Sets the plot background color.
+//
+// Input Arguments:
+//		color	= const Color&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::SetBackgroundColor(const Color& color)
+{
+	frame->SetColor(color);
 }
