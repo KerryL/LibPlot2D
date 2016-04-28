@@ -97,7 +97,6 @@ void Legend::GenerateGeometry()
 
 	glPushMatrix();
 		glLoadIdentity();
-		renderWindow.ShiftForExactPixelization();
 
 		DrawBackground();
 		DrawBorder();
@@ -176,7 +175,6 @@ void Legend::DrawNextEntry(const double &index) const
 	glPushMatrix();
 		glColor4d(0.0, 0.0, 0.0, 1.0);
 		glLoadIdentity();
-		renderWindow.ShiftForExactPixelization();
 		glTranslated(x + 2 * entrySpacing + sampleLength, y, 0.0);
 		font->Render(entries[index].text.mb_str());
 	glPopMatrix();

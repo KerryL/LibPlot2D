@@ -87,14 +87,16 @@ public:
 
 	// Determines if a particular primitive is in the scene owned by this object
 	bool IsThisRendererSelected(const Primitive *pickedObject) const;
-	
-	void ShiftForExactPixelization() const;
+
+	void SetNeedAlphaSort() { needAlphaSort = true; }
+	void SetNeedOrderSort() { needOrderSort = true; }
+
+	static GLint CreateShader(const GLint& type, const std::string& shaderFile);
+	static GLint CreateProgram(const std::vector<GLint>& shaderList);
 
 private:
 	wxGLContext *context;
 	wxGLContext* GetContext();
-	
-	static const double exactPixelShift;
 
 	// Flags describing the options for this object's functionality
 	bool wireFrame;
@@ -108,23 +110,11 @@ private:
 
 	Color backgroundColor;
 
-	// List of item indexes and alphas for sorting by alpha
-	struct ListItem
-	{
-		ListItem(const double& alpha, const int& i)
-		{
-			this->alpha = alpha;
-			this->i = i;
-		};
+	static bool AlphaSortPredicate(const Primitive* p1, const Primitive* p2);
+	static bool OrderSortPredicate(const Primitive* p1, const Primitive* p2);
 
-		double alpha;
-		int i;
-
-		bool operator< (const ListItem &right) const
-		{
-			return alpha < right.alpha;
-		};
-	};
+	bool needAlphaSort;
+	bool needOrderSort;
 
 	// Event handlers-----------------------------------------------------
 	// Interactor events
@@ -162,7 +152,21 @@ private:
 	void UpdateModelviewMatrix();
 
 	bool modelviewModified;
-	double glModelviewMatrix[16];
+	float glModelviewMatrix[16];
+	float glProjectionMatrix[16];
+
+	GLint modelviewLocation;
+	GLint projectionLocation;
+
+	static const std::string modelviewName;
+	static const std::string projectionName;
+
+	const GLint defaultVertexShader;
+	const GLint defaultFragmentShader;
+	const std::vector<GLint> shaderList;
+
+	static GLint CreateDefaultVertexShader();
+	static GLint CreateDefaultFragmentShader();
 
 	Matrix *modelToView;
 	Matrix *viewToModel;
@@ -170,16 +174,9 @@ private:
 	Vector cameraPosition;
 	Vector focalPoint;
 
-	// Method for re-organizing the PrimitiveList so opaque objects are at the beginning and
-	// transparent objects are at the end
-	void SortPrimitivesByAlpha();
-	void SortPrimitivesByDrawOrder();
-
 	void DoResize();
 
-	/*std::vector<GLuint> shaderList;
-	static GLuint CreateDefaultVertexShader();
-	static GLuint CreateDefaultFragmentShader();*/
+	bool glewInitialized;
 
 protected:
 	bool view3D;
@@ -197,18 +194,14 @@ protected:
 	// Flag indicating whether or not we should select a new focal point for the interactions
 	bool isInteracting;
 
-	static void ConvertMatrixToGL(const Matrix& matrix, double gl[]);
-	static void ConvertGLToMatrix(Matrix& matrix, const double gl[]);
+	static void ConvertMatrixToGL(const Matrix& matrix, float gl[]);
+	static void ConvertGLToMatrix(Matrix& matrix, const float gl[]);
 
-	void Initialize2D() const;
-	void Initialize3D() const;
+	void Initialize2D();
+	void Initialize3D();
 
 	Matrix Generate2DProjectionMatrix() const;
 	Matrix Generate3DProjectionMatrix() const;
-
-	/*GLuint AddShader(const GLuint& shaderID);
-	const GLuint defaultVertexShader;
-	const GLuint defaultFragmentShader;*/
 
 	DECLARE_EVENT_TABLE()
 };

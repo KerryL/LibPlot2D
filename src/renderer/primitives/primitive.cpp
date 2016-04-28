@@ -43,6 +43,8 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	drawOrder = 1000;
 
 	renderWindow.AddActor(this);
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
 }
 
 //==========================================================================
@@ -64,6 +66,8 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
 	*this = primitive;
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
 }
 
 //==========================================================================
@@ -84,6 +88,8 @@ Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.render
 //==========================================================================
 Primitive::~Primitive()
 {
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
 }
 
 //==========================================================================
@@ -113,6 +119,11 @@ void Primitive::Draw()
 		if (!HasValidParameters() || !isVisible)
 			return;
 
+		// Shaders need to:
+		// 1.  Apply rotation transformation
+		// 2.  Apply position transformation
+		// 2.  Set color
+		// 3.  Do shading (smoothing for lines) (or not!)
 		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 
 		// If the object is transparent, enable alpha blending
@@ -170,6 +181,29 @@ void Primitive::SetColor(const Color &color)
 {
 	this->color = color;
 	modified = true;
+	renderWindow.SetNeedAlphaSort();
+}
+
+//==========================================================================
+// Class:			Primitive
+// Function:		SetDrawOrder
+//
+// Description:		Sets the draw order for the object.
+//
+// Input Arguments:
+//		drawOrder	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::SetDrawOrder(const unsigned int& drawOrder)
+{
+	this->drawOrder = drawOrder;
+	renderWindow.SetNeedOrderSort();
 }
 
 //==========================================================================
@@ -198,6 +232,7 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	isVisible	= primitive.isVisible;
 	color		= primitive.color;
 	modified	= primitive.modified;
+	drawOrder	= primitive.drawOrder;
 
 	return *this;
 }

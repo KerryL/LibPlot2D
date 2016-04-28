@@ -171,10 +171,7 @@ void PlotCurve::PlotPoint(const unsigned int &i)
 //==========================================================================
 void PlotCurve::PlotPoint(const double &x, const double &y)
 {
-	double doublePoint[2] = {x, y};
-	double point[2];
-
-	RescalePoint(doublePoint, point);
+	double point[2] = {x, y};
 	points.push_back(std::make_pair(point[0], point[1]));
 }
 
@@ -280,33 +277,6 @@ void PlotCurve::SetData(const Dataset2D *data)
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		RescalePoint
-//
-// Description:		Rescales the onscreen position of the point according to
-//					the size of the axis with which this object is associated.
-//
-// Input Arguments:
-//		value	= const double* containing the location of the point in plot
-//				  coordinates
-//
-// Output Arguments:
-//		coordinate	= double* specifying the location of the object in screen coordinates
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::RescalePoint(const double *value, double *coordinate) const
-{
-	if (!value || !coordinate)
-		return;
-
-	coordinate[0] = xAxis->ValueToPixel(value[0]);
-	coordinate[1] = yAxis->ValueToPixel(value[1]);
-}
-
-//==========================================================================
-// Class:			PlotCurve
 // Function:		PlotMarkers
 //
 // Description:		Plots markers at all un-interpolated points.
@@ -347,9 +317,7 @@ void PlotCurve::PlotMarkers() const
 //==========================================================================
 void PlotCurve::DrawMarker(const double &x, const double &y) const
 {
-	double doublePoint[2] = {x, y};
-	double point[2];
-	RescalePoint(doublePoint, point);
+	double point[2] = {x, y};
 
 	int halfMarkerSize = 2 * markerSize;
 

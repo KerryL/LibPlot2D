@@ -67,8 +67,6 @@ private:
 	double lineSize;
 	int markerSize;
 
-	void RescalePoint(const double *value, double *coordinate) const;
-
 	//bool PointIsWithinPlotArea(const unsigned int &i) const;
 	void PlotPoint(const unsigned int &i);
 	void PlotPoint(const double &x, const double &y);

@@ -43,8 +43,8 @@ public:
 	// Private data accessors
 	void SetVisibility(const bool &isVisible);
 	void SetColor(const Color &color);
-	inline Color GetColor() { return color; }
-	inline void SetDrawOrder(const unsigned int &drawOrder) { this->drawOrder = drawOrder; }
+	inline Color GetColor() const { return color; }
+	void SetDrawOrder(const unsigned int &drawOrder);
 	inline void SetModified() { modified = true; }// Forces a re-draw
 
 	inline bool GetIsVisible() const { return isVisible; }

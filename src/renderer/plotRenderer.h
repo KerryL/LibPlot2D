@@ -215,6 +215,10 @@ protected:
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
 
+	// Use RenderWindow::glModelViewMatrix for window-fixed things like axes and gridlines
+	float glModelViewMatrixLeftAxis[16];
+	float glModelViewMatrixRightAxis[16];
+
 	struct Zoom
 	{
 		double xMin;

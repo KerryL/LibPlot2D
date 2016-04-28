@@ -26,11 +26,8 @@
 #include <wx/dcclient.h>
 #include <wx/image.h>
 
-// OpenGL headers
-#include <gl/glcorearb.h>
-#ifdef _MSC_VER
-#undef Yield// Added to fix compiler error in wxThread caused by including windows.h (within glcorearb.h)
-#endif
+// GLEW headers
+#include <GL\glew.h>
 
 // Local headers
 #include "renderer/renderWindow.h"
@@ -54,7 +51,8 @@
 //		None
 //
 //==========================================================================
-const double RenderWindow::exactPixelShift(0.375);
+const std::string RenderWindow::modelviewName("modelviewMatrix");
+const std::string RenderWindow::projectionName("projectionMatrix");
 
 //==========================================================================
 // Class:			RenderWindow
@@ -80,11 +78,12 @@ const double RenderWindow::exactPixelShift(0.375);
 //==========================================================================
 RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)/*,
+	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE),
 	defaultVertexShader(CreateDefaultVertexShader()),
-	defaultFragmentShader(CreateDefaultFragmentShader())*/
+	defaultFragmentShader(CreateDefaultFragmentShader())
 {
 	context = NULL;
+	glewInitialized = false;
 
 	wireFrame = false;
 	view3D = true;
@@ -111,9 +110,13 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 	modified = true;
 	sizeUpdateRequired = true;
 	modelviewModified = true;
+	needAlphaSort = true;
+	needOrderSort = true;
 
-	/*shaderList.push_back(defaultVertexShader);
-	shaderList.push_back(defaultFragmentShader);*/
+	// TODO:  Build/link/compile shaders
+
+	modelviewLocation = glGetUniformLocation(, modelviewName.c_str());
+	projectionLocation = glGetUniformLocation(, projectionName.c_str());
 }
 
 //==========================================================================
@@ -226,6 +229,13 @@ void RenderWindow::Render()
 	SetCurrent(*context);
 	wxPaintDC(this);
 
+	if (!glewInitialized)
+	{
+		if (glewInit() != GLEW_OK)
+			return;
+		glewInitialized = true;
+	}
+
 	if (sizeUpdateRequired)
 		DoResize();
 
@@ -243,14 +253,24 @@ void RenderWindow::Render()
 	else
 		glClear(GL_COLOR_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-
 	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-	SortPrimitivesByAlpha();
+	if (needAlphaSort)
+	{
+		std::sort(primitiveList.begin(), primitiveList.end(), AlphaSortPredicate);
+		needAlphaSort = false;
+	}
 
 	// Generally, all objects will have the same draw order and this won't do anything,
 	// but for some cases we do want to override the draw order just before rendering
-	SortPrimitivesByDrawOrder();
+	if (needOrderSort)
+	{
+		std::stable_sort(primitiveList.begin(), primitiveList.end(), OrderSortPredicate);
+		needOrderSort = false;
+	}
+
+	// TODO:  How many glPrograms will we have?  If more than one, do an additional sort to group by program?
+	// Do we call glUseProgram here or in each primitive?  Who owns the programs?
+	// If we do that in each primitive, it permits the use of legacy openGL...
 
 	unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
@@ -421,19 +441,13 @@ void RenderWindow::Initialize()
 		projectionMatrix = Generate2DProjectionMatrix();
 	}
 
-	glEnable(GL_COLOR_MATERIAL);
-
 	if (wireFrame)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	glMatrixMode(GL_PROJECTION);
-
-	// Convert from double** to double* where rows are appended to create the single vector representing the matrix
-	double glMatrix[16];
-	ConvertMatrixToGL(projectionMatrix, glMatrix);
-	glLoadMatrixd(glMatrix);
+	ConvertMatrixToGL(projectionMatrix, glProjectionMatrix);
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glProjectionMatrix);
 
 	modified = false;
 }
@@ -528,10 +542,9 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 //==========================================================================
 void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent &event)
 {
+	// TODO:  Needs work!
 	SetCurrent(*GetContext());
-	glGetDoublev(GL_MODELVIEW_MATRIX, glModelviewMatrix);
 	UpdateTransformationMatricies();
-	glMatrixMode(GL_MODELVIEW);
 
 	if (!isInteracting)
 	{
@@ -645,6 +658,7 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 	double angle = sqrt(fabs(double((xDistance - lastXDistance) * (xDistance - lastXDistance))
 		+ double((yDistance - lastYDistance) * (yDistance - lastYDistance)))) / 800.0 * 360.0;// [deg]
 
+	// TODO:  Needs work!
 	glTranslated(focalPoint.x, focalPoint.y, focalPoint.z);
 	glRotated(angle, axisOfRotation.x, axisOfRotation.y, axisOfRotation.z);
 	glTranslated(-focalPoint.x, -focalPoint.y, -focalPoint.z);
@@ -753,7 +767,7 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 		mouseMotion *= motionFactor;
 
 		// Apply the translation
-		glTranslated(mouseMotion.x, mouseMotion.y, mouseMotion.z);
+		glTranslated(mouseMotion.x, mouseMotion.y, mouseMotion.z);// TODO:  Remove
 
 		// Update the focal point
 		focalPoint -= mouseMotion;
@@ -830,10 +844,7 @@ void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt,
 //==========================================================================
 void RenderWindow::UpdateModelviewMatrix()
 {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glLoadMatrixd(glModelviewMatrix);
-
+	glUniformMatrix4fv(modelviewLocation, 1, GL_FALSE, glModelviewMatrix);
 	modelviewModified = false;
 }
 
@@ -1077,67 +1088,46 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 
 //==========================================================================
 // Class:			RenderWindow
-// Function:		SortPrimitivesByAlpha
+// Function:		AlphaSortPredicate
 //
-// Description:		Sorts the PrimitiveList by Color.Alpha to ensure that
-//					opaque objects are rendered prior to transparent objects.
+// Description:		Predicate for sorting by alpha.
 //
 // Input Arguments:
-//		None
+//		p1	= const Primitive*
+//		p2	= const Primitive*
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		None
+//		bool, true if ???
 //
 //==========================================================================
-void RenderWindow::SortPrimitivesByAlpha()
+bool RenderWindow::AlphaSortPredicate(const Primitive* p1, const Primitive* p2)
 {
-	unsigned int i;
-	std::vector<ListItem> primitiveOrder;
-	for (i = 0; i < primitiveList.GetCount(); i++)
-		primitiveOrder.push_back(ListItem(primitiveList[i]->GetColor().GetAlpha(), i));
-
-	std::stable_sort(primitiveOrder.rbegin(), primitiveOrder.rend());
-
-	std::vector<unsigned int> order;
-	for (i = 0; i < primitiveOrder.size(); i++)
-		order.push_back(primitiveOrder[i].i);
-
-	primitiveList.ReorderObjects(order);
+	return p1->GetColor().GetAlpha() > p2->GetColor().GetAlpha();
 }
 
 //==========================================================================
 // Class:			RenderWindow
-// Function:		SortPrimitivesByDrawOrder
+// Function:		OrderSortPredicate
 //
-// Description:		Sorts the PrimitiveList by draw order.
+// Description:		Predicate for sorting by draw order.
 //
 // Input Arguments:
-//		None
+//		p1	= const Primitive*
+//		p2	= const Primitive*
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		None
+//		bool, true if ???
 //
 //==========================================================================
-void RenderWindow::SortPrimitivesByDrawOrder()
+bool RenderWindow::OrderSortPredicate(const Primitive* p1, const Primitive* p2)
 {
-	unsigned int i;
-	std::vector<ListItem> primitiveOrder;
-	for (i = 0; i < primitiveList.GetCount(); i++)
-		primitiveOrder.push_back(ListItem(primitiveList[i]->GetDrawOrder(), i));
-
-	std::stable_sort(primitiveOrder.begin(), primitiveOrder.end());
-
-	std::vector<unsigned int> order;
-	for (i = 0; i < primitiveOrder.size(); i++)
-		order.push_back(primitiveOrder[i].i);
-
-	primitiveList.ReorderObjects(order);
+	return p1->GetDrawOrder() < p2->GetDrawOrder();
 }
 
 //==========================================================================
@@ -1152,13 +1142,13 @@ void RenderWindow::SortPrimitivesByDrawOrder()
 //		matrix	= const Matrix& containing the original data
 //
 // Output Arguments:
-//		gl		= double[] in the form expected by OpenGL
+//		gl		= float[] in the form expected by OpenGL
 //
 // Return Value:
 //		None
 //
 //==========================================================================
-void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, double gl[])
+void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, float gl[])
 {
 	unsigned int i, j;
 	for (i = 0; i < matrix.GetNumberOfRows(); i++)
@@ -1176,7 +1166,7 @@ void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, double gl[])
 //					must be set before this call.
 //
 // Input Arguments:
-//		gl		= double[] in the form expected by OpenGL
+//		gl		= float[] in the form expected by OpenGL
 //
 // Output Arguments:
 //		matrix	= const Matrix& containing the original data
@@ -1185,7 +1175,7 @@ void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, double gl[])
 //		None
 //
 //==========================================================================
-void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const double gl[])
+void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const float gl[])
 {
 	unsigned int i, j;
 	for (i = 0; i < matrix.GetNumberOfRows(); i++)
@@ -1211,31 +1201,22 @@ void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const double gl[])
 //		None
 //
 //==========================================================================
-void RenderWindow::Initialize2D() const
+void RenderWindow::Initialize2D()
 {
-	// Disable Z-buffering, but allow testing
-	//glEnable(GL_DEPTH_TEST);// NOTE:  Can't uncomment this line or the app fails to paint on any target machine (don't know why)
+	// Disable unused options to speed-up 2D rendering
 	glDepthMask(GL_FALSE);
 
-	/* Read that disabling all of this stuff can make 2D rendering faster?
-	glDisable(GL_DITHER);
+glDisable(GL_DITHER);
 glDisable(GL_ALPHA_TEST);
 glDisable(GL_BLEND);
 glDisable(GL_STENCIL_TEST);
 glDisable(GL_FOG);
 glDisable(GL_TEXTURE_2D);
 glDisable(GL_DEPTH_TEST);
-glPixelZoom(1.0,1.0);
-	*/
+glPixelZoom(1.0, 1.0);
 
-	// Turn lighting off
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	ShiftForExactPixelization();
+	ConvertMatrixToGL(Matrix::GetIdentity(4, 4), glModelviewMatrix);
+	// TODO:  Send to openGL?
 
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
@@ -1257,7 +1238,7 @@ glPixelZoom(1.0,1.0);
 //		None
 //
 //==========================================================================
-void RenderWindow::Initialize3D() const
+void RenderWindow::Initialize3D()
 {
 	// Turn Z-buffering on
 	glEnable(GL_DEPTH_TEST);
@@ -1266,14 +1247,6 @@ void RenderWindow::Initialize3D() const
 	// Z-buffer settings
 	glClearDepth(1.0);
 	glDepthFunc(GL_LEQUAL);
-
-	// Turn lighting on
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-
-	// Smooth shading for nice-looking object
-	glShadeModel(GL_SMOOTH);
 
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
@@ -1464,25 +1437,4 @@ bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, Interaction
 		return false;
 
 	return true;
-}
-
-//==========================================================================
-// Class:			RenderWindow
-// Function:		ShiftForExactPixelization
-//
-// Description:		Applies shift trick to enabled exact pixelization.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void RenderWindow::ShiftForExactPixelization() const
-{
-	glTranslated(exactPixelShift, exactPixelShift, 0.0);
 }

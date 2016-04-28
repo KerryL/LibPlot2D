@@ -50,6 +50,18 @@ public:
 
 	T *operator [](const unsigned int &index) const;
 
+	typename std::vector<T*>::iterator begin() { return list.begin(); }
+	typename std::vector<T*>::const_iterator begin() const { return list.begin(); }
+
+	typename std::vector<T*>::iterator end() { return list.end(); }
+	typename std::vector<T*>::const_iterator end() const { return list.end(); }
+
+	typename std::vector<T*>::reverse_iterator rbegin() { return list.rbegin(); }
+	typename std::vector<T*>::const_reverse_iterator rbegin() const { return list.rbegin(); }
+
+	typename std::vector<T*>::reverse_iterator rend() { return list.rend(); }
+	typename std::vector<T*>::const_reverse_iterator rend() const { return list.rend(); }
+
 private:
 	std::vector<T*> list;
 };
