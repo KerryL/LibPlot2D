@@ -71,7 +71,7 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 
 	font = NULL;
 
-	SetDrawOrder(1000);// Draw this last
+	SetDrawOrder(3000);// Draw this last
 }
 
 //==========================================================================

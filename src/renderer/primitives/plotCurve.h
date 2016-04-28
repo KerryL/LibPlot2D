@@ -31,12 +31,12 @@ public:
 	PlotCurve(RenderWindow &renderWindow);
 	PlotCurve(const PlotCurve &plotCurve);
 
-	~PlotCurve();
+	virtual ~PlotCurve();
 
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
+	virtual void GenerateGeometry();
+	virtual bool HasValidParameters();
 
 	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
 	inline void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
@@ -69,26 +69,11 @@ private:
 
 	void RescalePoint(const double *value, double *coordinate) const;
 
-	bool PointIsWithinPlotArea(const unsigned int &i) const;
+	//bool PointIsWithinPlotArea(const unsigned int &i) const;
 	void PlotPoint(const unsigned int &i);
 	void PlotPoint(const double &x, const double &y);
-	void PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint);
-	void PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second);
-
-	bool PointsCrossBottomAxis(const unsigned int &first, const unsigned int &second) const;
-	bool PointsCrossTopAxis(const unsigned int &first, const unsigned int &second) const;
-	bool PointsCrossLeftAxis(const unsigned int &first, const unsigned int &second) const;
-	bool PointsCrossRightAxis(const unsigned int &first, const unsigned int &second) const;
-
-	bool PointsCrossXOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const;
-	bool PointsCrossYOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const;
-
-	bool PointsJumpPlotArea(const unsigned int &first, const unsigned int &second) const;
 
 	bool PointIsValid(const unsigned int &i) const;
-
-	double GetInterpolatedXOrdinate(const unsigned int &first, const unsigned int &second, const double &yValue) const;
-	double GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const;
 
 	void PlotMarkers() const;
 	void DrawMarker(const double &x, const double &y) const;

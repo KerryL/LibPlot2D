@@ -69,7 +69,7 @@ public:
 	inline void SetFarClip(const double& farClip) { this->farClip = farClip; modified = true; }
 	inline void SetView3D(const bool& view3D) { this->view3D = view3D; modified = true; }
 
-	inline void SetBackgroundColor(const Color& backgroundColor) { this->backgroundColor = backgroundColor; modified = true; }
+	virtual void SetBackgroundColor(const Color& backgroundColor) { this->backgroundColor = backgroundColor; modified = true; }
 	inline Color GetBackgroundColor() { return backgroundColor; }
 
 	inline bool GetWireFrame() const { return wireFrame; };
@@ -177,6 +177,10 @@ private:
 
 	void DoResize();
 
+	/*std::vector<GLuint> shaderList;
+	static GLuint CreateDefaultVertexShader();
+	static GLuint CreateDefaultFragmentShader();*/
+
 protected:
 	bool view3D;
 	bool modified;
@@ -201,6 +205,10 @@ protected:
 
 	Matrix Generate2DProjectionMatrix() const;
 	Matrix Generate3DProjectionMatrix() const;
+
+	/*GLuint AddShader(const GLuint& shaderID);
+	const GLuint defaultVertexShader;
+	const GLuint defaultFragmentShader;*/
 
 	DECLARE_EVENT_TABLE()
 };

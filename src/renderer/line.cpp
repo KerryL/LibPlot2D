@@ -91,8 +91,8 @@ Line::Line()
 //		None
 //
 //==========================================================================
-void Line::Draw(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
-		const unsigned int &y2) const
+void Line::Draw(const unsigned int &x1, const unsigned int &y1,
+	const unsigned int &x2, const unsigned int &y2) const
 {
 	Draw(static_cast<double>(x1), static_cast<double>(y1),
 		static_cast<double>(x2), static_cast<double>(y2));
@@ -117,7 +117,8 @@ void Line::Draw(const unsigned int &x1, const unsigned int &y1, const unsigned i
 //		None
 //
 //==========================================================================
-void Line::Draw(const double &x1, const double &y1, const double &x2, const double &y2) const
+void Line::Draw(const double &x1, const double &y1,
+	const double &x2, const double &y2) const
 {
 	if (pretty)
 		DoPrettyDraw(x1, y1, x2, y2);

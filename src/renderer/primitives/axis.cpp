@@ -70,6 +70,7 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow)
 	oppositeAxis = NULL;
 
 	gridColor.Set(0.8, 0.8, 0.8, 1.0);
+	SetDrawOrder(2500);
 }
 
 //==========================================================================

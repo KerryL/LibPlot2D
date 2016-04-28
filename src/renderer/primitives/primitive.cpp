@@ -40,8 +40,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 
 	color = Color::ColorBlack;
 
-	listIndex = 0;
-	drawOrder = 0;
+	drawOrder = 1000;
 
 	renderWindow.AddActor(this);
 }
@@ -85,9 +84,6 @@ Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.render
 //==========================================================================
 Primitive::~Primitive()
 {
-	// Release the glList for this object (if the list exists)
-	if (listIndex != 0)
-		glDeleteLists(listIndex, 1);
 }
 
 //==========================================================================
@@ -110,20 +106,12 @@ Primitive::~Primitive()
 //==========================================================================
 void Primitive::Draw()
 {
-	if (modified || listIndex == 0)
+	if (modified || true)// TODO:  Fix this
 	{
 		modified = false;
 
-		if (listIndex == 0)
-			listIndex = glGenLists(1);
-
-		glNewList(listIndex, GL_COMPILE);
-
 		if (!HasValidParameters() || !isVisible)
-		{
-			glEndList();
 			return;
-		}
 
 		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 
@@ -135,12 +123,9 @@ void Primitive::Draw()
 
 		/*if (color.GetAlpha() != 1.0)
 			DisableAlphaBlending();*/
-
-		glEndList();
 	}
 
-	if (listIndex != 0)
-		glCallList(listIndex);
+	// TODO:  Tell it to render?
 }
 
 //==========================================================================
@@ -213,9 +198,6 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	isVisible	= primitive.isVisible;
 	color		= primitive.color;
 	modified	= primitive.modified;
-
-	// The list index just gets zeroed out
-	listIndex = 0;
 
 	return *this;
 }

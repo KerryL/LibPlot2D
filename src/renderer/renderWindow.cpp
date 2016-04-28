@@ -80,7 +80,9 @@ const double RenderWindow::exactPixelShift(0.375);
 //==========================================================================
 RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
+	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)/*,
+	defaultVertexShader(CreateDefaultVertexShader()),
+	defaultFragmentShader(CreateDefaultFragmentShader())*/
 {
 	context = NULL;
 
@@ -109,6 +111,9 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 	modified = true;
 	sizeUpdateRequired = true;
 	modelviewModified = true;
+
+	/*shaderList.push_back(defaultVertexShader);
+	shaderList.push_back(defaultFragmentShader);*/
 }
 
 //==========================================================================
@@ -1211,6 +1216,17 @@ void RenderWindow::Initialize2D() const
 	// Disable Z-buffering, but allow testing
 	//glEnable(GL_DEPTH_TEST);// NOTE:  Can't uncomment this line or the app fails to paint on any target machine (don't know why)
 	glDepthMask(GL_FALSE);
+
+	/* Read that disabling all of this stuff can make 2D rendering faster?
+	glDisable(GL_DITHER);
+glDisable(GL_ALPHA_TEST);
+glDisable(GL_BLEND);
+glDisable(GL_STENCIL_TEST);
+glDisable(GL_FOG);
+glDisable(GL_TEXTURE_2D);
+glDisable(GL_DEPTH_TEST);
+glPixelZoom(1.0,1.0);
+	*/
 
 	// Turn lighting off
 	glDisable(GL_LIGHTING);

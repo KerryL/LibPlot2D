@@ -23,7 +23,7 @@ PlotFrame::PlotFrame(RenderWindow &renderWindow, const Axis& top, const Axis& bo
 	top(&top), bottom(&bottom), left(&left), right(&right)
 {
 	// Draw AFTER plot curves but BEFORE axis labels
-	SetDrawOrder(0);
+	SetDrawOrder(2000);
 }
 
 PlotFrame::~PlotFrame()
@@ -37,26 +37,30 @@ void PlotFrame::GenerateGeometry()
 	renderWindow.GetSize(&width, &height);
 
 	glBegin(GL_QUADS);
-		
+
+	// Left
 	glVertex2i(0, 0);
 	glVertex2i(left->GetOffsetFromWindowEdge(), 0);
 	glVertex2i(left->GetOffsetFromWindowEdge(), height);
 	glVertex2i(0, height);
 
-	/*glVertex2i(point[0] + halfMarkerSize, point[1] + halfMarkerSize);
-	glVertex2i(point[0] + halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] + halfMarkerSize);
+	// Bottom
+	glVertex2i(left->GetOffsetFromWindowEdge(), 0);
+	glVertex2i(width - right->GetOffsetFromWindowEdge(), 0);
+	glVertex2i(width - right->GetOffsetFromWindowEdge(), bottom->GetOffsetFromWindowEdge());
+	glVertex2i(left->GetOffsetFromWindowEdge(), bottom->GetOffsetFromWindowEdge());
 
-	glVertex2i(point[0] + halfMarkerSize, point[1] + halfMarkerSize);
-	glVertex2i(point[0] + halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] + halfMarkerSize);
+	// Right
+	glVertex2i(width - right->GetOffsetFromWindowEdge(), 0);
+	glVertex2i(width, 0);
+	glVertex2i(width, height);
+	glVertex2i(width - right->GetOffsetFromWindowEdge(), height);
 
-	glVertex2i(point[0] + halfMarkerSize, point[1] + halfMarkerSize);
-	glVertex2i(point[0] + halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] + halfMarkerSize);*/
+	// Top
+	glVertex2i(left->GetOffsetFromWindowEdge(), height - top->GetOffsetFromWindowEdge());
+	glVertex2i(width - right->GetOffsetFromWindowEdge(), height - top->GetOffsetFromWindowEdge());
+	glVertex2i(width - right->GetOffsetFromWindowEdge(), height);
+	glVertex2i(left->GetOffsetFromWindowEdge(), height);
 
 	glEnd();
 }

@@ -65,10 +65,13 @@ protected:
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
 
+	unsigned int vertexShaderIndex;
+	unsigned int fragmentShaderIndex;
+
 private:
-	// The openGL list index
-	unsigned int listIndex;
 	unsigned int drawOrder;
+
+	// TODO:  Store GL object handles here
 };
 
 #endif// PRIMITIVE_H_
