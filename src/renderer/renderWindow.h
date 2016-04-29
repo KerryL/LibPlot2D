@@ -91,8 +91,8 @@ public:
 	void SetNeedAlphaSort() { needAlphaSort = true; }
 	void SetNeedOrderSort() { needOrderSort = true; }
 
-	static GLint CreateShader(const GLint& type, const std::string& shaderFile);
-	static GLint CreateProgram(const std::vector<GLint>& shaderList);
+	static GLuint CreateShader(const GLenum& type, const std::string& shaderContents);
+	static GLuint CreateProgram(const std::vector<GLuint>& shaderList);
 
 private:
 	wxGLContext *context;
@@ -161,12 +161,16 @@ private:
 	static const std::string modelviewName;
 	static const std::string projectionName;
 
-	const GLint defaultVertexShader;
-	const GLint defaultFragmentShader;
-	const std::vector<GLint> shaderList;
+	static const std::string defaultVertexShader;
+	static const std::string defaultFragmentShader;
+	GLuint defaultVertexShaderIndex;
+	GLuint defaultFragmentShaderIndex;
+	static std::vector<GLuint> shaderList;
+	GLuint defaultProgram;
+	void BuildShaders();
 
-	static GLint CreateDefaultVertexShader();
-	static GLint CreateDefaultFragmentShader();
+	static GLuint CreateDefaultVertexShader();
+	static GLuint CreateDefaultFragmentShader();
 
 	Matrix *modelToView;
 	Matrix *viewToModel;

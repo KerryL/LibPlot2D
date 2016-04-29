@@ -54,6 +54,64 @@
 const std::string RenderWindow::modelviewName("modelviewMatrix");
 const std::string RenderWindow::projectionName("projectionMatrix");
 
+std::vector<GLuint> RenderWindow::shaderList;
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		defaultVertexShader
+//
+// Description:		Default vertex shader.
+//
+// Input Arguments:
+//		0	= position
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const std::string RenderWindow::defaultVertexShader(
+	"#version 330\n"
+	"\n"
+	"uniform mat4 modelviewMatrix;\n"
+	"uniform mat4 projectionMatrix;\n"
+	"\n"
+	"layout(location = 0) in vec4 position;\n"
+	"void main()\n"
+	"{\n"
+	"    gl_Position = projectionMatrix * modelviewMatrix * position;\n"
+	"}\n"
+	"");
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		defaultFragmentShader
+//
+// Description:		Default fragment shader.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const std::string RenderWindow::defaultFragmentShader(
+	"#version 330\n"
+	"\n"
+	"layout(location = 0) in vec4 inputColor;\n"
+	"out vec4 outputColor;\n"// TODO:  Allow color specification
+	"void main()\n"
+	"{\n"
+	"    outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+	"}\n"
+	"");
+
 //==========================================================================
 // Class:			RenderWindow
 // Function:		RenderWindow
@@ -78,9 +136,7 @@ const std::string RenderWindow::projectionName("projectionMatrix");
 //==========================================================================
 RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE),
-	defaultVertexShader(CreateDefaultVertexShader()),
-	defaultFragmentShader(CreateDefaultFragmentShader())
+	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
 {
 	context = NULL;
 	glewInitialized = false;
@@ -112,11 +168,6 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 	modelviewModified = true;
 	needAlphaSort = true;
 	needOrderSort = true;
-
-	// TODO:  Build/link/compile shaders
-
-	modelviewLocation = glGetUniformLocation(, modelviewName.c_str());
-	projectionLocation = glGetUniformLocation(, projectionName.c_str());
 }
 
 //==========================================================================
@@ -233,11 +284,14 @@ void RenderWindow::Render()
 	{
 		if (glewInit() != GLEW_OK)
 			return;
+		BuildShaders();
 		glewInitialized = true;
 	}
 
 	if (sizeUpdateRequired)
 		DoResize();
+
+	glUseProgram(defaultProgram);
 
 	if (modelviewModified)
 		UpdateModelviewMatrix();
@@ -1437,4 +1491,163 @@ bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, Interaction
 		return false;
 
 	return true;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		CreateDefaultVertexShader
+//
+// Description:		Builds the default vertex shader and returns its index.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint specifying the index of the shader
+//
+//==========================================================================
+GLuint RenderWindow::CreateDefaultVertexShader()
+{
+	return CreateShader(GL_VERTEX_SHADER, defaultVertexShader);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		CreateDefaultFragmentShader
+//
+// Description:		Builds the default fragment shader and returns its index.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint specifying the index of the shader
+//
+//==========================================================================
+GLuint RenderWindow::CreateDefaultFragmentShader()
+{
+	return CreateShader(GL_FRAGMENT_SHADER, defaultFragmentShader);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		CreateShader
+//
+// Description:		Compiles the specified shader.
+//
+// Input Arguments:
+//		type			= const GLenum&
+//		shaderContents	= const std::string& containing the actual string
+//						  contents of the shader
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint specifying the index of the shader
+//
+//==========================================================================
+GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderContents)
+{
+	GLuint shader = glCreateShader(type);
+	shaderList.push_back(shader);
+	const char* shaderString = shaderContents.c_str();
+	glShaderSource(shader, 1, &shaderString, NULL);
+
+	glCompileShader(shader);
+
+	GLint status;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+	if (status == GL_FALSE)
+	{
+		GLint infoLogLength;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+        
+		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+		assert(false && strInfoLog);
+		delete[] strInfoLog;
+	}
+
+	return shader;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		CreateProgram
+//
+// Description:		Builds the default program.
+//
+// Input Arguments:
+//		shaderList	= const std::vector<GLuint>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint specifying the index of the program
+//
+//==========================================================================
+GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
+{
+	GLuint program = glCreateProgram();
+	size_t i;
+	for (i = 0; i < shaderList.size(); i++)
+		glAttachShader(program, shaderList[i]);
+
+	glLinkProgram(program);
+	GLint status;
+	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	if (status == GL_FALSE)
+	{
+		GLint infoLogLength;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+        
+		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+		assert(false && strInfoLog);
+		delete[] strInfoLog;
+	}
+
+	for (i = 0; i < shaderList.size(); i++)
+	{
+		glDetachShader(program, shaderList[i]);
+		glDeleteShader(shaderList[i]);
+	}
+
+	return program;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		BuildShaders
+//
+// Description:		Builds the default shaders and sets the indices to the
+//					matrices we need to track.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::BuildShaders()
+{
+	defaultVertexShaderIndex = CreateDefaultVertexShader();
+	defaultFragmentShaderIndex = CreateDefaultFragmentShader();
+
+	defaultProgram = CreateProgram(shaderList);
+
+	modelviewLocation = glGetUniformLocation(defaultProgram, modelviewName.c_str());
+	projectionLocation = glGetUniformLocation(defaultProgram, projectionName.c_str());
 }

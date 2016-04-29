@@ -35,6 +35,8 @@ public:
 
 	// Called when something is modified to re-create this object with
 	// all of the latest information
+	virtual void UpdateColor();
+	virtual void Update() = 0;
 	virtual void GenerateGeometry() = 0;
 
 	// Checks to see if this object's parameters are valid and allow drawing
@@ -68,10 +70,17 @@ protected:
 	unsigned int vertexShaderIndex;
 	unsigned int fragmentShaderIndex;
 
+	virtual void InitializeColorBuffer();
+	virtual void InitializeVertexBuffer() = 0;
+
+	GLfloat *vertices;
+
 private:
 	unsigned int drawOrder;
 
-	// TODO:  Store GL object handles here
+	GLuint positionBufferIndex;
+	GLuint colorBufferIndex;
+	GLfloat colorBuffer[4];
 };
 
 #endif// PRIMITIVE_H_

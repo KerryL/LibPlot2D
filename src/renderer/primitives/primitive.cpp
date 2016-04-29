@@ -13,6 +13,9 @@
 // Description:  Abstract base class for creating 3D objects.
 // History:
 
+// GLEW headers
+#include <GL\glew.h>
+
 // Local headers
 #include "renderer/primitives/primitive.h"
 #include "renderer/renderWindow.h"
@@ -45,6 +48,11 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	renderWindow.AddActor(this);
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
+
+	InitializeColorBuffer();
+	InitializeVertexBuffer();
+
+	vertices = NULL;
 }
 
 //==========================================================================
@@ -66,8 +74,13 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
 	*this = primitive;
+	modified = true;
+
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
+
+	InitializeColorBuffer();
+	InitializeVertexBuffer();
 }
 
 //==========================================================================
@@ -90,6 +103,8 @@ Primitive::~Primitive()
 {
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
+
+	delete[] vertices;
 }
 
 //==========================================================================
@@ -112,31 +127,17 @@ Primitive::~Primitive()
 //==========================================================================
 void Primitive::Draw()
 {
-	if (modified || true)// TODO:  Fix this
+	if (modified)
 	{
 		modified = false;
 
 		if (!HasValidParameters() || !isVisible)
 			return;
 
-		// Shaders need to:
-		// 1.  Apply rotation transformation
-		// 2.  Apply position transformation
-		// 2.  Set color
-		// 3.  Do shading (smoothing for lines) (or not!)
-		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-
-		// If the object is transparent, enable alpha blending
-		/*if (color.GetAlpha() != 1.0)
-			EnableAlphaBlending();*/
-
-		GenerateGeometry();
-
-		/*if (color.GetAlpha() != 1.0)
-			DisableAlphaBlending();*/
+		Update();
 	}
 
-	// TODO:  Tell it to render?
+	GenerateGeometry();
 }
 
 //==========================================================================
@@ -234,6 +235,9 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	modified	= primitive.modified;
 	drawOrder	= primitive.drawOrder;
 
+	// TODO:  Need to go over handling of openGL stuff here
+	assert(false);
+
 	return *this;
 }
 
@@ -282,4 +286,53 @@ void Primitive::DisableAlphaBlending()
 {
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
+}
+
+//==========================================================================
+// Class:			Primitive
+// Function:		UpdateColor
+//
+// Description:		Updates the color of the primitive (when the default
+//					shaders are used).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::UpdateColor()
+{
+	colorBuffer[0] = (float)color.GetRed();
+	colorBuffer[1] = (float)color.GetGreen();
+	colorBuffer[2] = (float)color.GetBlue();
+	colorBuffer[3] = (float)color.GetAlpha();
+}
+
+//==========================================================================
+// Class:			Primitive
+// Function:		InitializeColorBuffer
+//
+// Description:		Initializes the color buffer for use with the default shaderss.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::InitializeColorBuffer()
+{
+	glGenBuffers(1, &colorBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, colorBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colorBuffer), colorBuffer, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
