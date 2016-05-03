@@ -28,19 +28,14 @@ class Dataset2D;
 class PlotCurve : public Primitive
 {
 public:
-	PlotCurve(RenderWindow &renderWindow);
+	PlotCurve(RenderWindow &renderWindow, const Dataset2D& data);
 	PlotCurve(const PlotCurve &plotCurve);
 
 	virtual ~PlotCurve();
 
-	
-
 	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
 	inline void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
 	inline void SetPretty(const bool &pretty) { line.SetPretty(pretty); modified = true; }
-
-	void SetData(const Dataset2D *data);
-	inline void ClearData() { data = NULL; }
 
 	// For setting up the plot
 	inline void BindToXAxis(Axis *xAxis) { this->xAxis = xAxis; modified = true; }
@@ -64,17 +59,12 @@ private:
 	Axis *xAxis;
 	Axis *yAxis;
 
-	const Dataset2D *data;
+	const Dataset2D& data;
 
 	Line line;
-	std::vector<std::pair<double, double> > points;
 
 	double lineSize;
 	int markerSize;
-
-	//bool PointIsWithinPlotArea(const unsigned int &i) const;
-	void PlotPoint(const unsigned int &i);
-	void PlotPoint(const double &x, const double &y);
 
 	bool PointIsValid(const unsigned int &i) const;
 

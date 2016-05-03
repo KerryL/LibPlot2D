@@ -18,6 +18,7 @@
 
 // Local headers
 #include "renderer/primitives/primitive.h"
+#include "renderer/line.h"
 
 class ZoomBox : public Primitive
 {
@@ -42,6 +43,8 @@ protected:
 
 private:
 	unsigned int xAnchor, yAnchor, xFloat, yFloat;
+
+	Line box;
 };
 
 #endif// ZOOM_BOX_H_

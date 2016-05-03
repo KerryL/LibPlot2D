@@ -111,6 +111,7 @@ Axis::~Axis()
 //==========================================================================
 void Axis::InitializeVertexBuffer()
 {
+	delete[] vertexBuffer;
 }
 
 //==========================================================================
@@ -304,14 +305,15 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 //==========================================================================
 void Axis::DrawMainAxis(const int &mainAxisLocation) const
 {
-	if (IsHorizontal())
+	// TODO:  Update for OGL4
+	/*if (IsHorizontal())
 		line.Draw(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation,
 			renderWindow.GetSize().GetWidth()
 			- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
 	else
 		line.Draw(mainAxisLocation, minAxis->GetOffsetFromWindowEdge(),
 			mainAxisLocation, renderWindow.GetSize().GetHeight() -
-			maxAxis->GetOffsetFromWindowEdge());
+			maxAxis->GetOffsetFromWindowEdge());*/
 }
 
 //==========================================================================
@@ -370,7 +372,8 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 //==========================================================================
 void Axis::DrawHorizontalGrid(const unsigned int &count) const
 {
-	Line gridLine;
+	// TODO:  Update for OGL4
+	/*Line gridLine;
 	gridLine.SetLineColor(gridColor);
 	gridLine.SetBackgroundColorForAlphaFade();
 
@@ -390,7 +393,7 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 
 		gridLine.Draw(location, static_cast<double>(offsetFromWindowEdge), location,
 			static_cast<double>(renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge()));
-	}
+	}*/
 }
 
 //==========================================================================
@@ -412,7 +415,8 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 //==========================================================================
 void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation) const
 {
-	int insideTick, outsideTick, sign;
+	// TODO:  Update for OGL4
+	/*int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
@@ -427,7 +431,7 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 
 		line.Draw(location, static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign),
 			location, static_cast<double>(mainAxisLocation + tickSize * insideTick * sign));
-	}
+	}*/
 }
 
 //==========================================================================
@@ -448,7 +452,8 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 //==========================================================================
 void Axis::DrawVerticalGrid(const unsigned int &count) const
 {
-	Line gridLine;
+	// TODO:  Update for OGL4
+	/*Line gridLine;
 	gridLine.SetLineColor(gridColor);
 	gridLine.SetBackgroundColorForAlphaFade();
 
@@ -468,7 +473,7 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 
 		gridLine.Draw(static_cast<double>(offsetFromWindowEdge), location,
 			static_cast<double>(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge()), location);
-	}
+	}*/
 }
 
 //==========================================================================
@@ -490,6 +495,8 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 //==========================================================================
 void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation) const
 {
+	// TODO:  Update for OGL4
+	/*
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
@@ -506,7 +513,7 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 
 		line.Draw(static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign), location,
 			static_cast<double>(mainAxisLocation + tickSize * insideTick * sign), location);
-	}
+	}*/
 }
 
 //==========================================================================
@@ -566,6 +573,8 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //==========================================================================
 void Axis::DrawAxisLabel() const
 {
+	// TODO:  Update for OGL4
+	/*
 	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
@@ -590,7 +599,7 @@ void Axis::DrawAxisLabel() const
 		}
 
 		font->Render(label.mb_str());
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
 //==========================================================================
@@ -672,13 +681,14 @@ void Axis::DrawTickLabels()
 		value = std::min(GetNextTickValue(tick == 0, tick == numberOfTicks + 1, tick), maximum);
 		valueLabel.Printf("%0.*f", precision, value);
 
+		// TODO:  Update for OGL4
 		// TODO:  Don't draw it if it's too close to the maximum (based on text size)
-		glPushMatrix();
+		/*glPushMatrix();
 			glLoadIdentity();
 			ComputeTranslations(value, xTranslation, yTranslation, font->BBox(valueLabel.mb_str()), valueOffsetFromEdge);
 			glTranslated(xTranslation, yTranslation, 0.0);
 			font->Render(valueLabel.mb_str());
-		glPopMatrix();
+		glPopMatrix();*/
 	}
 
 	valueLabel.Printf("%0.*f", precision, maximum);

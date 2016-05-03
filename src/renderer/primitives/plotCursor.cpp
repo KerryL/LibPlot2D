@@ -14,11 +14,13 @@
 // History:
 //  5/12/2011 - Renamed to PlotCursor from Cursor due to conflict in X.h, K. Loux
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/plotCursor.h"
 #include "renderer/primitives/axis.h"
 #include "renderer/renderWindow.h"
-#include "renderer/line.h"
 
 //==========================================================================
 // Class:			PlotCursor
@@ -62,6 +64,13 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 //==========================================================================
 void PlotCursor::InitializeVertexBuffer()
 {
+	delete[] vertexBuffer;
+
+	vertexCount = 2;
+	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
+
+	glGenVertexArrays(1, &vertexArrayIndex);
+	glGenBuffers(1, &vertexBufferIndex);
 }
 
 //==========================================================================
@@ -82,6 +91,21 @@ void PlotCursor::InitializeVertexBuffer()
 //==========================================================================
 void PlotCursor::Update()
 {
+	if (axis.IsHorizontal())
+	{
+		line.Update(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
+			locationAlongAxis, renderWindow.GetSize().GetHeight()
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
+	}
+	else
+	{
+		line.Update(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
+			renderWindow.GetSize().GetWidth()
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
+	}
+
+	// Update the value of the cursor (required for accuracy when zoom changes, for example)
+	value = axis.PixelToValue(locationAlongAxis);
 }
 
 //==========================================================================
@@ -102,22 +126,7 @@ void PlotCursor::Update()
 //==========================================================================
 void PlotCursor::GenerateGeometry()
 {
-	/*Line line;
-	if (axis.IsHorizontal())
-	{
-		line.Draw(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
-			locationAlongAxis, renderWindow.GetSize().GetHeight()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
-	}
-	else
-	{
-		line.Draw(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
-			renderWindow.GetSize().GetWidth()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
-	}
-
-	// Update the value of the cursor (required for accuracy when zoom changes, for example)
-	value = axis.PixelToValue(locationAlongAxis);*/
+	line.Draw();
 }
 
 //==========================================================================

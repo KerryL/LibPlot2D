@@ -13,10 +13,12 @@
 // Description:  Logic for drawing the zoom box as the user moves the mouse.
 // History:
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/zoomBox.h"
 #include "renderer/renderWindow.h"
-#include "renderer/line.h"
 
 //==========================================================================
 // Class:			ZoomBox
@@ -66,6 +68,13 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 //==========================================================================
 void ZoomBox::InitializeVertexBuffer()
 {
+	delete[] vertexBuffer;
+
+	vertexCount = 4;
+	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
+
+	glGenVertexArrays(1, &vertexArrayIndex);
+	glGenBuffers(1, &vertexBufferIndex);
 }
 
 //==========================================================================
@@ -86,6 +95,13 @@ void ZoomBox::InitializeVertexBuffer()
 //==========================================================================
 void ZoomBox::Update()
 {
+	std::vector<std::pair<double, double> > points;
+	points.push_back(std::make_pair(xAnchor, yAnchor));
+	points.push_back(std::make_pair(xFloat, yAnchor));
+	points.push_back(std::make_pair(xFloat, yFloat));
+	points.push_back(std::make_pair(xAnchor, yFloat));
+	points.push_back(std::make_pair(xAnchor, yAnchor));
+	box.Update(points);
 }
 
 //==========================================================================
@@ -106,14 +122,7 @@ void ZoomBox::Update()
 //==========================================================================
 void ZoomBox::GenerateGeometry()
 {
-	/*Line box;
-	std::vector<std::pair<double, double> > points;
-	points.push_back(std::make_pair(xAnchor, yAnchor));
-	points.push_back(std::make_pair(xFloat, yAnchor));
-	points.push_back(std::make_pair(xFloat, yFloat));
-	points.push_back(std::make_pair(xAnchor, yFloat));
-	points.push_back(std::make_pair(xAnchor, yAnchor));
-	box.Draw(points);*/
+	box.Draw();
 }
 
 //==========================================================================

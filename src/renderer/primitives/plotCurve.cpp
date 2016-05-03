@@ -14,6 +14,9 @@
 // History:
 //	11/9/2010	- Modified to accomodate 3D plots, K. Loux.
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/plotCurve.h"
 #include "renderer/renderWindow.h"
@@ -29,6 +32,7 @@
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow* pointing to the object that owns this
+//		data			= const Dataset2D&
 //
 // Output Arguments:
 //		None
@@ -37,7 +41,8 @@
 //		None
 //
 //==========================================================================
-PlotCurve::PlotCurve(RenderWindow &renderWindow) : Primitive(renderWindow)
+PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
+	: Primitive(renderWindow), data(data)
 {
 	xAxis = NULL;
 	yAxis = NULL;
@@ -62,7 +67,8 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow) : Primitive(renderWindow)
 //		None
 //
 //==========================================================================
-PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve)
+PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
+	data(plotCurve.data)
 {
 	*this = plotCurve;
 }
@@ -105,6 +111,13 @@ PlotCurve::~PlotCurve()
 //==========================================================================
 void PlotCurve::InitializeVertexBuffer()
 {
+	delete[] vertexBuffer;
+
+	vertexCount = 4 * data.GetNumberOfPoints();
+	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
+
+	glGenVertexArrays(1, &vertexArrayIndex);
+	glGenBuffers(1, &vertexBufferIndex);
 }
 
 //==========================================================================
@@ -125,6 +138,26 @@ void PlotCurve::InitializeVertexBuffer()
 //==========================================================================
 void PlotCurve::Update()
 {
+	if (lineSize > 0)
+	{
+		const double lineSizeScale(1.2);
+
+		line.SetLineColor(color);
+		line.SetBackgroundColorForAlphaFade();
+		line.SetWidth(lineSize * lineSizeScale);
+		line.Update(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
+	}
+	else
+		line.SetWidth(0.0);
+
+	// TODO:  Need markers
+	/*if (markerSize > 0 || (markerSize < 0 && SmallRange()))
+	{
+		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
+		glBegin(GL_QUADS);
+		PlotMarkers();
+		glEnd();
+	}*/
 }
 
 //==========================================================================
@@ -146,73 +179,8 @@ void PlotCurve::Update()
 //==========================================================================
 void PlotCurve::GenerateGeometry()
 {
-	/*if (lineSize > 0)
-	{
-		const double lineSizeScale(1.2);
-
-		line.SetLineColor(color);
-		line.SetBackgroundColorForAlphaFade();
-		line.SetWidth(lineSize * lineSizeScale);
-		points.clear();
-
-		unsigned int i;
-		for (i = 0; i < data->GetNumberOfPoints(); i++)
-				PlotPoint(i);
-
-		line.Draw(points);
-	}
-
-	if (markerSize > 0 || (markerSize < 0 && SmallRange()))
-	{
-		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-		glBegin(GL_QUADS);
-		PlotMarkers();
-		glEnd();
-	}*/
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PlotPoint
-//
-// Description:		Plots the coordinate with the specified data index.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::PlotPoint(const unsigned int &i)
-{
-	PlotPoint(data->GetXData(i), data->GetYData(i));
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PlotPoint
-//
-// Description:		Plots the coordinate with the specified coordinates.
-//
-// Input Arguments:
-//		x	= const double&
-//		y	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::PlotPoint(const double &x, const double &y)
-{
-	double point[2] = {x, y};
-	points.push_back(std::make_pair(point[0], point[1]));
+	line.Draw();
+	// TODO:  markers?
 }
 
 //==========================================================================
@@ -233,10 +201,10 @@ void PlotCurve::PlotPoint(const double &x, const double &y)
 //==========================================================================
 bool PlotCurve::PointIsValid(const unsigned int &i) const
 {
-	assert(i < data->GetNumberOfPoints());
+	assert(i < data.GetNumberOfPoints());
 
-	return PlotMath::IsValid<double>(data->GetXData(i)) &&
-		PlotMath::IsValid<double>(data->GetYData(i));
+	return PlotMath::IsValid<double>(data.GetXData(i)) &&
+		PlotMath::IsValid<double>(data.GetYData(i));
 }
 
 //==========================================================================
@@ -258,7 +226,7 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 //==========================================================================
 bool PlotCurve::HasValidParameters()
 {
-	if (xAxis != NULL && yAxis != NULL && data->GetNumberOfPoints() > 1)
+	if (xAxis != NULL && yAxis != NULL && data.GetNumberOfPoints() > 1)
 	{
 		if (xAxis->IsHorizontal() && !yAxis->IsHorizontal())
 			return true;
@@ -295,28 +263,6 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		SetData
-//
-// Description:		Assigns data to the curve.
-//
-// Input Arguments:
-//		data	= const Dataset2D* to plot
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::SetData(const Dataset2D *data)
-{
-	this->data = data;
-	modified = true;
-}
-
-//==========================================================================
-// Class:			PlotCurve
 // Function:		PlotMarkers
 //
 // Description:		Plots markers at all un-interpolated points.
@@ -334,8 +280,8 @@ void PlotCurve::SetData(const Dataset2D *data)
 void PlotCurve::PlotMarkers() const
 {
 	unsigned int i;
-	for (i = 0; i < data->GetNumberOfPoints(); i++)
-			DrawMarker(data->GetXData(i), data->GetYData(i));
+	for (i = 0; i < data.GetNumberOfPoints(); i++)
+			DrawMarker(data.GetXData(i), data.GetYData(i));
 }
 
 //==========================================================================
@@ -386,7 +332,7 @@ void PlotCurve::DrawMarker(const double &x, const double &y) const
 //==========================================================================
 bool PlotCurve::SmallRange() const
 {
-	if (data->GetNumberOfPoints() < 2)
+	if (data.GetNumberOfPoints() < 2)
 		return false;
 
 	switch (SmallXRange())
@@ -426,7 +372,7 @@ bool PlotCurve::SmallRange() const
 //==========================================================================
 PlotCurve::RangeSize PlotCurve::SmallXRange() const
 {
-	double period = data->GetXData(1) - data->GetXData(0);
+	double period = data.GetXData(1) - data.GetXData(0);
 	if (period == 0.0)
 		return RangeSizeUndetermined;
 
@@ -465,7 +411,7 @@ PlotCurve::RangeSize PlotCurve::SmallXRange() const
 //==========================================================================
 PlotCurve::RangeSize PlotCurve::SmallYRange() const
 {
-	double period = data->GetYData(1) - data->GetYData(0);
+	double period = data.GetYData(1) - data.GetYData(0);
 	if (period == 0.0)
 		return RangeSizeUndetermined;
 

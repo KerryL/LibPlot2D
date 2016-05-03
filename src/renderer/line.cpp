@@ -74,9 +74,9 @@ Line::Line()
 
 //==========================================================================
 // Class:			Line
-// Function:		Draw
+// Function:		Update
 //
-// Description:		Draws the specified line segment.
+// Description:		Updates the specified line segment.
 //
 // Input Arguments:
 //		x1	= const unsigned int&
@@ -91,18 +91,18 @@ Line::Line()
 //		None
 //
 //==========================================================================
-void Line::Draw(const unsigned int &x1, const unsigned int &y1,
+void Line::Update(const unsigned int &x1, const unsigned int &y1,
 	const unsigned int &x2, const unsigned int &y2) const
 {
-	Draw(static_cast<double>(x1), static_cast<double>(y1),
+	Update(static_cast<double>(x1), static_cast<double>(y1),
 		static_cast<double>(x2), static_cast<double>(y2));
 }
 
 //==========================================================================
 // Class:			Line
-// Function:		Draw
+// Function:		Update
 //
-// Description:		Draws the specified line segment.
+// Description:		Updates the specified line segment.
 //
 // Input Arguments:
 //		x1	= const double&
@@ -117,7 +117,7 @@ void Line::Draw(const unsigned int &x1, const unsigned int &y1,
 //		None
 //
 //==========================================================================
-void Line::Draw(const double &x1, const double &y1,
+void Line::Update(const double &x1, const double &y1,
 	const double &x2, const double &y2) const
 {
 	if (pretty)
@@ -128,12 +128,12 @@ void Line::Draw(const double &x1, const double &y1,
 
 //==========================================================================
 // Class:			Line
-// Function:		Draw
+// Function:		Update
 //
-// Description:		Draws the specified line segments.
+// Description:		Updates the specified line segments.
 //
 // Input Arguments:
-//		points	= cosnt std::vector<std::pair<unsigned int, unsigned int> >&
+//		points	= const std::vector<std::pair<unsigned int, unsigned int> >&
 //
 // Output Arguments:
 //		None
@@ -142,7 +142,7 @@ void Line::Draw(const double &x1, const double &y1,
 //		None
 //
 //==========================================================================
-void Line::Draw(const std::vector<std::pair<unsigned int, unsigned int> > &points) const
+void Line::Update(const std::vector<std::pair<unsigned int, unsigned int> > &points) const
 {
 	std::vector<std::pair<double, double> > dPoints(points.size());
 	unsigned int i;
@@ -151,14 +151,14 @@ void Line::Draw(const std::vector<std::pair<unsigned int, unsigned int> > &point
 		dPoints[i].first = static_cast<double>(points[i].first);
 		dPoints[i].second = static_cast<double>(points[i].second);
 	}
-	Draw(dPoints);
+	Update(dPoints);
 }
 
 //==========================================================================
 // Class:			Line
-// Function:		Draw
+// Function:		Update
 //
-// Description:		Draws the specified line segments.
+// Description:		Updates the specified line segments.
 //
 // Input Arguments:
 //		points	= cosnt std::vector<std::pair<double, double> >&
@@ -170,7 +170,7 @@ void Line::Draw(const std::vector<std::pair<unsigned int, unsigned int> > &point
 //		None
 //
 //==========================================================================
-void Line::Draw(const std::vector<std::pair<double, double> > &points) const
+void Line::Update(const std::vector<std::pair<double, double> > &points) const
 {
 	if (points.size() < 2)
 		return;
@@ -179,6 +179,52 @@ void Line::Draw(const std::vector<std::pair<double, double> > &points) const
 		DoPrettyDraw(points);
 	else
 		DoUglyDraw(points);
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		Update
+//
+// Description:		Updates the specified line segments.
+//
+// Input Arguments:
+//		x		= const double* const
+//		y		= const double* const
+//		count	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::Update(const double* const x, const double* const y, const unsigned int& count)
+{
+	// TODO:  Implement
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		Draw
+//
+// Description:		Draw the contained line segments.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::Draw()
+{
+	if (halfWidth == 0.0)
+		return;
+	// TODO:  Implement
 }
 
 //==========================================================================
@@ -258,6 +304,7 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 //==========================================================================
 void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const
 {
+	// TODO:  Update to OGL4
 	glLineWidth(2.0 * halfWidth);
 	glBegin(GL_LINES);
 
@@ -308,7 +355,7 @@ void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, co
 
 	where the line (x1, y1) to (x2, y2) passes halfway between points (3 and 5) and (4 and 6)
 	*/
-
+	// TODO:  Update to OGL4
 	glBegin(GL_TRIANGLE_STRIP);
 
 	glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
@@ -346,6 +393,7 @@ void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, co
 //==========================================================================
 void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points) const
 {
+	// TODO:  Update to OGL4
 	glLineWidth(2.0 * halfWidth);
 	glBegin(GL_LINE_STRIP);
 
@@ -401,6 +449,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points) c
 	+----+
 	1    3
 	*/
+	// TODO:  Update to OGL4
 	glBegin(GL_TRIANGLE_STRIP);
 
 	unsigned int i;

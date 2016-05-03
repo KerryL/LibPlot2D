@@ -87,6 +87,8 @@ PlotFrame::~PlotFrame()
 //==========================================================================
 void PlotFrame::InitializeVertexBuffer()
 {
+	delete[] vertexBuffer;
+
 	vertexCount = 24;
 	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
 

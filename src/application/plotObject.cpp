@@ -521,13 +521,12 @@ void PlotObject::RemovePlot(const unsigned int &index)
 //==========================================================================
 void PlotObject::AddCurve(const Dataset2D &data)
 {
-	PlotCurve *newPlot = new PlotCurve(renderer);
+	PlotCurve *newPlot = new PlotCurve(renderer, data);
 	plotList.push_back(newPlot);
 	dataList.push_back(&data);
 
 	newPlot->BindToXAxis(axisBottom);
 	newPlot->BindToYAxis(axisLeft);
-	newPlot->SetData(&data);
 }
 
 //==========================================================================

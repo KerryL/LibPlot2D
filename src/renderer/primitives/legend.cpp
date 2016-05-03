@@ -13,13 +13,16 @@
 // Description:  Derived from Primitive, this class is used to draw plot legends.
 // History:
 
+// GLEW headers
+#include <GL/glew.h>
+
+// FTGL headers
+#include <FTGL/ftgl.h>
+
 // Local headers
 #include "renderer/primitives/legend.h"
 #include "renderer/renderWindow.h"
 #include "renderer/line.h"
-
-// FTGL headers
-#include <FTGL/ftgl.h>
 
 //==========================================================================
 // Class:			Legend
@@ -92,6 +95,16 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 //==========================================================================
 void Legend::InitializeVertexBuffer()
 {
+	delete[] vertexBuffer;
+
+	vertexCount = 4 + 2 * entries.size();
+	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
+
+	glGenVertexArrays(1, &vertexArrayIndex);
+	glGenBuffers(1, &vertexBufferIndex);
+
+	// TODO:  Text?
+	// TODO:  quads for markers?
 }
 
 //==========================================================================
@@ -194,7 +207,8 @@ bool Legend::HasValidParameters()
 //==========================================================================
 void Legend::DrawNextEntry(const double &index) const
 {
-	double x, y;
+	// TODO:  Update for OGL4
+	/*double x, y;
 	GetAdjustedPosition(x, y);
 	y += height;
 	
@@ -219,7 +233,7 @@ void Legend::DrawNextEntry(const double &index) const
 		renderWindow.ShiftForExactPixelization();
 		glTranslated(x + 2 * entrySpacing + sampleLength, y, 0.0);
 		font->Render(entries[index].text.mb_str());
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
 //==========================================================================
@@ -243,13 +257,14 @@ void Legend::DrawNextEntry(const double &index) const
 void Legend::DrawMarker(const unsigned int &x, const unsigned int &y,
 	const unsigned int &size) const
 {
-	const unsigned int halfSize(size * 2);
+	// TODO:  Update for OGL4
+	/*const unsigned int halfSize(size * 2);
 	glBegin(GL_QUADS);
 	glVertex2i(x - halfSize, y - halfSize);
 	glVertex2i(x + halfSize, y - halfSize);
 	glVertex2i(x + halfSize, y + halfSize);
 	glVertex2i(x - halfSize, y + halfSize);
-	glEnd();
+	glEnd();*/
 }
 
 //==========================================================================
@@ -270,7 +285,8 @@ void Legend::DrawMarker(const unsigned int &x, const unsigned int &y,
 //==========================================================================
 void Legend::DrawBackground() const
 {
-	glBegin(GL_QUADS);
+	// TODO:  Update for OGL4
+	/*glBegin(GL_QUADS);
 	glColor4d(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
 	
 	double x, y;
@@ -281,7 +297,7 @@ void Legend::DrawBackground() const
 	glVertex2i(x + width, y + height);
 	glVertex2i(x, y + height);
 
-	glEnd();
+	glEnd();*/
 }
 
 //==========================================================================
@@ -302,11 +318,12 @@ void Legend::DrawBackground() const
 //==========================================================================
 void Legend::DrawBorder() const
 {
-	Line border;
+	// TODO:  Update for OGL4
+	/*Line border;
 	border.SetWidth(borderSize);
 	border.SetLineColor(borderColor);
 	border.SetBackgroundColorForAlphaFade();
-	border.Draw(GetCornerVertices());
+	border.Draw(GetCornerVertices());*/
 }
 
 //==========================================================================

@@ -33,16 +33,19 @@ public:
 	Line();
 
 	inline void SetPretty(const bool &pretty) { this->pretty = pretty; }
-	inline void SetWidth(const double &width) { assert(width > 0.0); halfWidth = 0.5 * width; }
+	inline void SetWidth(const double &width) { assert(width >= 0.0); halfWidth = 0.5 * width; }
 	inline void SetLineColor(const Color &color) { lineColor = color; }
 	inline void SetBackgroundColor(const Color &color) { backgroundColor = color; }
 	inline void SetBackgroundColorForAlphaFade() { backgroundColor = lineColor; backgroundColor.SetAlpha(0.0); }
 
-	void Draw(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
+	void Update(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
 		const unsigned int &y2) const;
-	void Draw(const double &x1, const double &y1, const double &x2, const double &y2) const;
-	void Draw(const std::vector<std::pair<unsigned int, unsigned int> > &points) const;
-	void Draw(const std::vector<std::pair<double, double> > &points) const;
+	void Update(const double &x1, const double &y1, const double &x2, const double &y2) const;
+	void Update(const std::vector<std::pair<unsigned int, unsigned int> > &points) const;
+	void Update(const std::vector<std::pair<double, double> > &points) const;
+	void Update(const double* const x, const double* const y, const unsigned int& count);
+
+	void Draw();
 
 private:
 	static const double fadeDistance;

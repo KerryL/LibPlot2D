@@ -88,6 +88,7 @@ TextRendering::~TextRendering()
 //==========================================================================
 void TextRendering::InitializeVertexBuffer()
 {
+	delete[] vertexBuffer;
 }
 
 //==========================================================================

@@ -19,6 +19,7 @@
 
 // Local headers
 #include "renderer/primitives/primitive.h"
+#include "renderer/line.h"
 
 // Local forward declarations
 class Axis;
@@ -47,6 +48,8 @@ protected:
 private:
 	// The axis we are associated with (perpendicular to)
 	const Axis &axis;
+
+	Line line;
 
 	// Current value where this object meets the axis
 	double value;
