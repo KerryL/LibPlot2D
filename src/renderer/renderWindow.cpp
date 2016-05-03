@@ -79,16 +79,16 @@ const std::string RenderWindow::defaultVertexShader(
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec4 position;\n"
-	//"layout(location = 1) in vec4 color;\n"// TODO:  Fix
+	"layout(location = 1) in vec4 color;\n"
 	"\n"
 	"out vec4 vertexColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	//"    vertexColor = color;\n"// TODO:  Fix
+	"    vertexColor = color;\n"
 	"    gl_Position = projectionMatrix * modelviewMatrix * position;\n"
 	"}\n"
-	"");
+);
 
 //==========================================================================
 // Class:			RenderWindow
@@ -117,7 +117,7 @@ const std::string RenderWindow::defaultFragmentShader(
 	"{\n"
 	"    outputColor = vertexColor;\n"
 	"}\n"
-	"");
+);
 
 //==========================================================================
 // Class:			RenderWindow

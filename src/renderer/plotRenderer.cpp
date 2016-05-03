@@ -73,17 +73,16 @@ const std::string PlotRenderer::defaultVertexShader(// TODO:  shader version w/ 
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec2 position;\n"
-	//"layout(location = 1) in vec4 color;\n"// TODO:  Fix
+	"layout(location = 1) in vec4 color;\n"
 	"\n"
 	"out vec4 vertexColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	//"    vertexColor = color;\n"
-	"    vertexColor = vec4(1.0, 0.0, 1.0, 1.0);\n"// TODO:  Fix
+	"    vertexColor = color;\n"
 	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(position, 0.0, 1.0);\n"
 	"}\n"
-	"");
+);
 
 //==========================================================================
 // Class:			PlotRenderer

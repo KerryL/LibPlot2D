@@ -47,7 +47,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
-	vertices = NULL;
+	vertexBuffer = NULL;
 	vertexCount = 0;
 
 	vertexCountModified = true;
@@ -72,7 +72,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 //==========================================================================
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
-	vertices = NULL;
+	vertexBuffer = NULL;
 	vertexCount = 0;
 
 	*this = primitive;
@@ -105,8 +105,11 @@ Primitive::~Primitive()
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
-	delete[] vertices;
-	vertices = NULL;
+	glDeleteBuffers(1, &vertexBufferIndex);
+	glDeleteVertexArrays(1, &vertexArrayIndex);
+
+	delete[] vertexBuffer;
+	vertexBuffer = NULL;
 }
 
 //==========================================================================
@@ -143,20 +146,6 @@ void Primitive::Draw()
 		Update();
 		modified = false;
 	}
-
-	/*if (colorModified)
-	{
-		if (!colorBufferInitialized)
-		{
-			glGenBuffers(1, &colorBufferIndex);
-			colorBufferInitialized = true;
-		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, colorBufferIndex);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colorBuffer), colorBuffer, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		colorModified = false;
-	}*/
 
 	GenerateGeometry();
 }

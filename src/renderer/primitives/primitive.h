@@ -69,8 +69,9 @@ protected:
 	virtual void InitializeVertexBuffer() = 0;
 	unsigned int vertexCount;
 
-	float *vertices;
+	float *vertexBuffer;
 	unsigned int vertexBufferIndex;
+	unsigned int vertexArrayIndex;
 
 private:
 	unsigned int drawOrder;
