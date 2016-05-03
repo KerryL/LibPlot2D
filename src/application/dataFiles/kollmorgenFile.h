@@ -31,7 +31,7 @@ public:
 protected:
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks(void);
+	virtual void DoTypeSpecificLoadTasks();
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors,
 		wxString &errorString) const;

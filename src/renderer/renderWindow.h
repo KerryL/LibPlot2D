@@ -27,10 +27,8 @@
 // Local headers
 #include "utilities/managedList.h"
 #include "utilities/math/vector.h"
+#include "utilities/math/matrix.h"
 #include "renderer/primitives/primitive.h"
-
-// Local forward declarations
-class Matrix;
 
 class RenderWindow : public wxGLCanvas
 {
@@ -39,10 +37,7 @@ public:
 		const wxPoint& position, const wxSize& size, long style = 0);
 	virtual ~RenderWindow();
 
-	// Sets up all of the open GL parameters
 	void Initialize();
-
-	// Sets up the camera
 	void SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection);
 
 	// Transforms between the model coordinate system and the view (openGL) coordinate system
@@ -94,9 +89,14 @@ public:
 	static GLuint CreateShader(const GLenum& type, const std::string& shaderContents);
 	static GLuint CreateProgram(const std::vector<GLuint>& shaderList);
 
+	void ShiftForExactPixelization();
+	void UseDefaultProgram() const;
+
 private:
 	wxGLContext *context;
 	wxGLContext* GetContext();
+
+	static const double exactPixelShift;
 
 	// Flags describing the options for this object's functionality
 	bool wireFrame;
@@ -148,12 +148,12 @@ private:
 	void DoPan(wxMouseEvent &event);
 
 	// Updates the transformation matrices according to the current modelview matrix
-	void UpdateTransformationMatricies();
+	//void UpdateTransformationMatricies();
 	void UpdateModelviewMatrix();
 
 	bool modelviewModified;
-	float glModelviewMatrix[16];
-	float glProjectionMatrix[16];
+	Matrix modelviewMatrix;
+	Matrix projectionMatrix;
 
 	GLint modelviewLocation;
 	GLint projectionLocation;
@@ -163,6 +163,7 @@ private:
 
 	static const std::string defaultVertexShader;
 	static const std::string defaultFragmentShader;
+
 	GLuint defaultVertexShaderIndex;
 	GLuint defaultFragmentShaderIndex;
 	static std::vector<GLuint> shaderList;
@@ -172,10 +173,6 @@ private:
 	static GLuint CreateDefaultVertexShader();
 	static GLuint CreateDefaultFragmentShader();
 
-	Matrix *modelToView;
-	Matrix *viewToModel;
-
-	Vector cameraPosition;
 	Vector focalPoint;
 
 	void DoResize();
@@ -208,6 +205,9 @@ protected:
 	Matrix Generate3DProjectionMatrix() const;
 
 	DECLARE_EVENT_TABLE()
+
+	static void Translate(Matrix& m, const double& x, const double& y, const double& z);
+	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);
 };
 
 #endif// RENDER_WINDOW_H_

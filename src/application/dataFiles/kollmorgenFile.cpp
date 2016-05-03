@@ -119,7 +119,7 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 //		None
 //
 //==========================================================================
-void KollmorgenFile::DoTypeSpecificLoadTasks(void)
+void KollmorgenFile::DoTypeSpecificLoadTasks()
 {
 	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())

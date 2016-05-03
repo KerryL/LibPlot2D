@@ -46,6 +46,46 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 
 //==========================================================================
 // Class:			PlotCursor
+// Function:		InitializeVertexBuffer
+//
+// Description:		Initializes the vertex buffer containing this object's vertices.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCursor::InitializeVertexBuffer()
+{
+}
+
+//==========================================================================
+// Class:			PlotCursor
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCursor::Update()
+{
+}
+
+//==========================================================================
+// Class:			PlotCursor
 // Function:		GenerateGeometry
 //
 // Description:		Generates OpenGL commands to draw the cursor.
@@ -62,7 +102,7 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 //==========================================================================
 void PlotCursor::GenerateGeometry()
 {
-	Line line;
+	/*Line line;
 	if (axis.IsHorizontal())
 	{
 		line.Draw(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
@@ -77,7 +117,7 @@ void PlotCursor::GenerateGeometry()
 	}
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
-	value = axis.PixelToValue(locationAlongAxis);
+	value = axis.PixelToValue(locationAlongAxis);*/
 }
 
 //==========================================================================

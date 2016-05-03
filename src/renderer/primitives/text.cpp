@@ -72,6 +72,46 @@ TextRendering::~TextRendering()
 
 //==========================================================================
 // Class:			TextRendering
+// Function:		InitializeVertexBuffer
+//
+// Description:		Initializes the vertex buffer containing this object's vertices.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void TextRendering::InitializeVertexBuffer()
+{
+}
+
+//==========================================================================
+// Class:			TextRendering
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void TextRendering::Update()
+{
+}
+
+//==========================================================================
+// Class:			TextRendering
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
@@ -89,7 +129,7 @@ TextRendering::~TextRendering()
 //==========================================================================
 void TextRendering::GenerateGeometry()
 {
-	glPushMatrix();
+	/*glPushMatrix();
 		glLoadIdentity();
 
 		// Position the text
@@ -104,7 +144,7 @@ void TextRendering::GenerateGeometry()
 
 		// Render the text
 		font->Render(text.mb_str());
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
 //==========================================================================

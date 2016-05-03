@@ -58,7 +58,7 @@ bool CustomXMLFile::IsType(const wxString &fileName)
 //		wxArrayString
 //
 //==========================================================================
-wxArrayString CustomXMLFile::CreateDelimiterList(void) const
+wxArrayString CustomXMLFile::CreateDelimiterList() const
 {
 	if (fileFormat.GetDelimiter().IsEmpty())
 		return DataFile::CreateDelimiterList();

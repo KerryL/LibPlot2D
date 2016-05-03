@@ -89,6 +89,46 @@ PlotCurve::~PlotCurve()
 
 //==========================================================================
 // Class:			PlotCurve
+// Function:		InitializeVertexBuffer
+//
+// Description:		Initializes the vertex buffer containing this object's vertices.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::InitializeVertexBuffer()
+{
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::Update()
+{
+}
+
+//==========================================================================
+// Class:			PlotCurve
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
@@ -106,7 +146,7 @@ PlotCurve::~PlotCurve()
 //==========================================================================
 void PlotCurve::GenerateGeometry()
 {
-	if (lineSize > 0)
+	/*if (lineSize > 0)
 	{
 		const double lineSizeScale(1.2);
 
@@ -128,7 +168,7 @@ void PlotCurve::GenerateGeometry()
 		glBegin(GL_QUADS);
 		PlotMarkers();
 		glEnd();
-	}
+	}*/
 }
 
 //==========================================================================

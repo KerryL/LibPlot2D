@@ -51,7 +51,7 @@ public:
 	Dataset2D* GetDataset(const unsigned int &i) const { return data[i]; }
 	wxString GetDescription(const unsigned int &i) const { return selectedDescriptions[i]; }
 	wxArrayString GetAllDescriptions() const { return descriptions; }
-	unsigned int GetDataCount(void) { return data.size(); }
+	unsigned int GetDataCount() { return data.size(); }
 
 	bool DescriptionsMatch(const DataFile &file) const;
 	bool DescriptionsMatch(const wxArrayString &descriptions) const;
@@ -72,9 +72,9 @@ protected:
 	bool ignoreConsecutiveDelimiters;
 	bool timeIsFormatted;
 
-	wxString DetermineBestDelimiter(void) const;
+	wxString DetermineBestDelimiter() const;
 
-	virtual wxArrayString CreateDelimiterList(void) const;
+	virtual wxArrayString CreateDelimiterList() const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors,
 		wxString &errorString) const;
@@ -82,8 +82,8 @@ protected:
 		const unsigned int &dataSize);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks(void) {};
-	virtual void DoTypeSpecificProcessTasks(void) {};
+	virtual void DoTypeSpecificLoadTasks() {};
+	virtual void DoTypeSpecificProcessTasks() {};
 	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
 
 	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter) const;

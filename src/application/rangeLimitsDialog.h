@@ -25,8 +25,8 @@ public:
 	// Constructor
 	RangeLimitsDialog(wxWindow *parent, const double &min, const double &max);
 
-	double GetMinimum(void) const;
-	double GetMaximum(void) const;
+	double GetMinimum() const;
+	double GetMaximum() const;
 
 private:
 	wxTextCtrl *minBox;

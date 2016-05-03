@@ -29,13 +29,17 @@ public:
 		const Axis& left, const Axis& right);
 	virtual ~PlotFrame();
 
+protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
-	virtual void GenerateGeometry();
 	virtual bool HasValidParameters();
+	virtual void Update();
+	virtual void GenerateGeometry();
+	virtual void InitializeVertexBuffer();
 
 private:
 	const Axis *top, *bottom, *left, *right;
+	unsigned int *uiVertices;
 };
 
 #endif// PLOT_FRAME_H_

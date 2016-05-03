@@ -28,11 +28,6 @@ class PlotCursor : public Primitive
 public:
 	PlotCursor(RenderWindow &renderWindow, const Axis &axis);
 
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
-
 	void SetLocation(const int& location);
 	double GetValue() const { return value; }
 
@@ -40,6 +35,14 @@ public:
 
 	// Assignment operator (to avoid Warning C4512 due to const reference member)
 	PlotCursor& operator=(const PlotCursor &target);
+
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update();
+	virtual void GenerateGeometry();
+	virtual void InitializeVertexBuffer();
 
 private:
 	// The axis we are associated with (perpendicular to)

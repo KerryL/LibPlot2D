@@ -76,8 +76,8 @@ private:
 	static const unsigned long long highQualityCurvePointLimit;
 
 	// Functions that do some of the frame initialization and control positioning
-	void CreateControls(void);
-	void SetProperties(void);
+	void CreateControls();
+	void SetProperties();
 
 	PlotRenderer* CreatePlotArea(wxWindow *parent);
 	wxGrid* CreateOptionsGrid(wxWindow *parent);
@@ -331,7 +331,7 @@ private:
 	DECLARE_EVENT_TABLE();
 
 	// Testing methods
-	//void TestSignalOperations(void);
+	//void TestSignalOperations();
 };
 
 #endif// MAIN_FRAME_H_

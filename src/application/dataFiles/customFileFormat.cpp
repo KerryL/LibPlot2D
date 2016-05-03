@@ -416,7 +416,7 @@ bool CustomFileFormat::MatchNextLine(std::ifstream &inFile, const wxString &text
 //		None
 //
 //==========================================================================
-void CustomFileFormat::ClearData(void)
+void CustomFileFormat::ClearData()
 {
 	formatName.Empty();
 	delimiter.Empty();

@@ -95,6 +95,46 @@ Axis::~Axis()
 
 //==========================================================================
 // Class:			Axis
+// Function:		InitializeVertexBuffer
+//
+// Description:		Initializes the vertex buffer containing this object's vertices.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Axis::InitializeVertexBuffer()
+{
+}
+
+//==========================================================================
+// Class:			Axis
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Axis::Update()
+{
+}
+
+//==========================================================================
+// Class:			Axis
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
@@ -112,7 +152,7 @@ Axis::~Axis()
 //==========================================================================
 void Axis::GenerateGeometry()
 {
-	DrawFullAxis();
+	/*DrawFullAxis();
 
 	glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 
@@ -122,7 +162,7 @@ void Axis::GenerateGeometry()
 			DrawAxisLabel();
 
 		DrawTickLabels();
-	}
+	}*/
 }
 
 //==========================================================================

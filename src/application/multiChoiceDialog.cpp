@@ -174,7 +174,7 @@ int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* MultiChoiceDialog::CreateButtons(void)
+wxSizer* MultiChoiceDialog::CreateButtons()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -377,7 +377,7 @@ void MultiChoiceDialog::SetAllChoices(const bool &selected)
 //		bool
 //
 //==========================================================================
-bool MultiChoiceDialog::RemoveExistingCurves(void) const
+bool MultiChoiceDialog::RemoveExistingCurves() const
 {
 	return removeCheckBox->GetValue();
 }

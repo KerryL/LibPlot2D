@@ -129,7 +129,7 @@ wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* FRFDialog::CreateTextBox(void)
+wxSizer* FRFDialog::CreateTextBox()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -157,7 +157,7 @@ wxSizer* FRFDialog::CreateTextBox(void)
 //		wxSizer*
 //
 //==========================================================================
-wxSizer *FRFDialog::CreateCheckBoxes(void)
+wxSizer *FRFDialog::CreateCheckBoxes()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -194,7 +194,7 @@ wxSizer *FRFDialog::CreateCheckBoxes(void)
 //		bool, true if transfer is valid, false otherwise
 //
 //==========================================================================
-bool FRFDialog::TransferDataFromWindow(void)
+bool FRFDialog::TransferDataFromWindow()
 {
 	if (inputList->GetSelection() == wxNOT_FOUND || outputList->GetSelection() == wxNOT_FOUND)
 	{
@@ -230,7 +230,7 @@ bool FRFDialog::TransferDataFromWindow(void)
 //		unsigned int
 //
 //==========================================================================
-unsigned int FRFDialog::GetInputIndex(void) const
+unsigned int FRFDialog::GetInputIndex() const
 {
 	return inputList->GetSelection();
 }
@@ -251,7 +251,7 @@ unsigned int FRFDialog::GetInputIndex(void) const
 //		unsigned int
 //
 //==========================================================================
-unsigned int FRFDialog::GetOutputIndex(void) const
+unsigned int FRFDialog::GetOutputIndex() const
 {
 	return outputList->GetSelection();
 }
@@ -272,7 +272,7 @@ unsigned int FRFDialog::GetOutputIndex(void) const
 //		unsigned int
 //
 //==========================================================================
-unsigned int FRFDialog::GetNumberOfAverages(void) const
+unsigned int FRFDialog::GetNumberOfAverages() const
 {
 	unsigned long value;
 	averagesTextBox->GetValue().ToULong(&value);
@@ -295,7 +295,7 @@ unsigned int FRFDialog::GetNumberOfAverages(void) const
 //		bool
 //
 //==========================================================================
-bool FRFDialog::GetComputePhase(void) const
+bool FRFDialog::GetComputePhase() const
 {
 	return phaseCheckBox->GetValue();
 }
@@ -316,7 +316,7 @@ bool FRFDialog::GetComputePhase(void) const
 //		bool
 //
 //==========================================================================
-bool FRFDialog::GetComputeCoherence(void) const
+bool FRFDialog::GetComputeCoherence() const
 {
 	return coherenceCheckBox->GetValue();
 }
@@ -337,7 +337,7 @@ bool FRFDialog::GetComputeCoherence(void) const
 //		bool
 //
 //==========================================================================
-bool FRFDialog::GetModuloPhase(void) const
+bool FRFDialog::GetModuloPhase() const
 {
 	return moduloPhaseCheckBox->GetValue();
 }

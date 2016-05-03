@@ -90,6 +90,8 @@ public:
 	Matrix GetPsuedoInverse() const;
 	Matrix GetDiagonalInverse() const;
 
+	Matrix& Transpose();
+
 	bool LeftDivide(const Matrix& b, Matrix &x) const;// x = A \ b
 	Matrix GetRowReduced() const;
 	unsigned int GetRank() const;

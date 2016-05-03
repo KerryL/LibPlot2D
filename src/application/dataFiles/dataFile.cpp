@@ -266,7 +266,7 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 //		wxString indicating the delimiter to use; wxEmptyString on failure
 //
 //==========================================================================
-wxString DataFile::DetermineBestDelimiter(void) const
+wxString DataFile::DetermineBestDelimiter() const
 {
 	std::string nextLine;
 	wxArrayString delimitedLine, delimiterList(CreateDelimiterList());
@@ -321,7 +321,7 @@ wxString DataFile::DetermineBestDelimiter(void) const
 //		wxArrayString containing the list
 //
 //==========================================================================
-wxArrayString DataFile::CreateDelimiterList(void) const
+wxArrayString DataFile::CreateDelimiterList() const
 {
 	// Don't use decimals because we're going to have those in regular numbers
 	std::locale usersLocale = std::locale("");// get user's preferred locale settings

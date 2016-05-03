@@ -24,11 +24,6 @@ class ZoomBox : public Primitive
 public:
 	ZoomBox(RenderWindow &renderWindow);
 
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
-
 	void SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor);
 	void SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat);
 
@@ -36,6 +31,14 @@ public:
 	unsigned int GetYAnchor() { return yAnchor; }
 	unsigned int GetXFloat() { return xFloat; }
 	unsigned int GetYFloat() { return yFloat; }
+
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update();
+	virtual void GenerateGeometry();
+	virtual void InitializeVertexBuffer();
 
 private:
 	unsigned int xAnchor, yAnchor, xFloat, yFloat;

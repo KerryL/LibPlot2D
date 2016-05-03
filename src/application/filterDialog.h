@@ -60,7 +60,7 @@ public:
 	// Constructor
 	FilterDialog(wxWindow *parent, const FilterParameters* _parameters = NULL);
 
-	const FilterParameters& GetFilterParameters(void) const { return parameters; };
+	const FilterParameters& GetFilterParameters() const { return parameters; };
 	static wxString GetFilterNamePrefix(const FilterParameters &parameters);
 
 private:
@@ -91,7 +91,7 @@ private:
 	FilterParameters parameters;
 
 	// Overload from wxDialog
-	virtual bool TransferDataFromWindow(void);
+	virtual bool TransferDataFromWindow();
 
 	// Event handlers
 	void OnSpinChange(wxSpinEvent &event);
@@ -101,15 +101,15 @@ private:
 	void OnTransferFunctionChange(wxCommandEvent &event);
 	void OnInputTextChange(wxCommandEvent &event);
 
-	void HandleSpin(void);
-	void UpdateTransferFunction(void);
-	void UpdateEnabledControls(void);
+	void HandleSpin();
+	void UpdateTransferFunction();
+	void UpdateEnabledControls();
 
-	FilterParameters::Type GetType(void) const;
+	FilterParameters::Type GetType() const;
 
 	bool automaticStringPrecision;
 	unsigned int stringPrecision;
-	unsigned int DetermineStringPrecision(void) const;
+	unsigned int DetermineStringPrecision() const;
 
 	void GetLowPassTF(wxString &numerator, wxString &denominator) const;
 	void GetHighPassTF(wxString &numerator, wxString &denominator) const;
@@ -136,18 +136,18 @@ private:
 		InputTextID
 	};
 
-	void CreateControls(void);
-	wxSizer* CreateTextBoxes(void);
-	wxSizer* CreateCheckBoxes(void);
-	wxSizer* CreateRadioButtons(void);
-	wxSizer* CreateTransferFunctionControls(void);
+	void CreateControls();
+	wxSizer* CreateTextBoxes();
+	wxSizer* CreateCheckBoxes();
+	wxSizer* CreateRadioButtons();
+	wxSizer* CreateTransferFunctionControls();
 
-	bool CutoffFrequencyIsValid(void);
-	bool DampingRatioIsValid(void);
-	bool WidthIsValid(void);
+	bool CutoffFrequencyIsValid();
+	bool DampingRatioIsValid();
+	bool WidthIsValid();
 	bool ExpressionIsValid(const wxString& expression);
 
-	bool DampingRatioInputRequired(void);
+	bool DampingRatioInputRequired();
 
 	static wxString GetOrderString(const unsigned int &order);
 	static wxString GetPrimaryName(const wxString& name, const FilterParameters &parameters);

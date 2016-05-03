@@ -167,7 +167,7 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 //		None
 //
 //==========================================================================
-void BaumullerFile::DoTypeSpecificLoadTasks(void)
+void BaumullerFile::DoTypeSpecificLoadTasks()
 {
 	ignoreConsecutiveDelimiters = false;
 }
@@ -188,7 +188,7 @@ void BaumullerFile::DoTypeSpecificLoadTasks(void)
 //		None
 //
 //==========================================================================
-void BaumullerFile::DoTypeSpecificProcessTasks(void)
+void BaumullerFile::DoTypeSpecificProcessTasks()
 {
 	ignoreConsecutiveDelimiters = true;
 }

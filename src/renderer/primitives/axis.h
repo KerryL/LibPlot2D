@@ -34,11 +34,6 @@ public:
 	Axis(RenderWindow &renderWindow);
 	~Axis();
 
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
-
 	// Enumeration for the axis orientations
 	enum AxisOrientation
 	{
@@ -99,6 +94,14 @@ public:
 
 	double ValueToPixel(const double &value) const;
 	double PixelToValue(const int &pixel) const;
+
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update();
+	virtual void GenerateGeometry();
+	virtual void InitializeVertexBuffer();
 
 private:
 	// This object's orientation

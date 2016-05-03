@@ -39,20 +39,19 @@
 Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 {
 	isVisible = true;
-	modified = true;
 
-	color = Color::ColorBlack;
-
+	SetColor(Color::ColorBlack);
 	drawOrder = 1000;
 
 	renderWindow.AddActor(this);
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
-	InitializeColorBuffer();
-	InitializeVertexBuffer();
-
 	vertices = NULL;
+	vertexCount = 0;
+
+	vertexCountModified = true;
+	modified = true;
 }
 
 //==========================================================================
@@ -73,14 +72,16 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 //==========================================================================
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
+	vertices = NULL;
+	vertexCount = 0;
+
 	*this = primitive;
+
+	vertexCountModified = true;
 	modified = true;
 
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
-
-	InitializeColorBuffer();
-	InitializeVertexBuffer();
 }
 
 //==========================================================================
@@ -105,6 +106,7 @@ Primitive::~Primitive()
 	renderWindow.SetNeedOrderSort();
 
 	delete[] vertices;
+	vertices = NULL;
 }
 
 //==========================================================================
@@ -127,15 +129,34 @@ Primitive::~Primitive()
 //==========================================================================
 void Primitive::Draw()
 {
-	if (modified)
-	{
-		modified = false;
+	if (!HasValidParameters() || !isVisible)
+		return;
 
-		if (!HasValidParameters() || !isVisible)
-			return;
+	if (vertexCountModified || modified)
+	{
+		if (vertexCountModified)
+		{
+			InitializeVertexBuffer();
+			vertexCountModified = false;
+		}
 
 		Update();
+		modified = false;
 	}
+
+	/*if (colorModified)
+	{
+		if (!colorBufferInitialized)
+		{
+			glGenBuffers(1, &colorBufferIndex);
+			colorBufferInitialized = true;
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, colorBufferIndex);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(colorBuffer), colorBuffer, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		colorModified = false;
+	}*/
 
 	GenerateGeometry();
 }
@@ -181,7 +202,6 @@ void Primitive::SetVisibility(const bool &isVisible)
 void Primitive::SetColor(const Color &color)
 {
 	this->color = color;
-	modified = true;
 	renderWindow.SetNeedAlphaSort();
 }
 
@@ -286,53 +306,4 @@ void Primitive::DisableAlphaBlending()
 {
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
-}
-
-//==========================================================================
-// Class:			Primitive
-// Function:		UpdateColor
-//
-// Description:		Updates the color of the primitive (when the default
-//					shaders are used).
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Primitive::UpdateColor()
-{
-	colorBuffer[0] = (float)color.GetRed();
-	colorBuffer[1] = (float)color.GetGreen();
-	colorBuffer[2] = (float)color.GetBlue();
-	colorBuffer[3] = (float)color.GetAlpha();
-}
-
-//==========================================================================
-// Class:			Primitive
-// Function:		InitializeColorBuffer
-//
-// Description:		Initializes the color buffer for use with the default shaderss.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Primitive::InitializeColorBuffer()
-{
-	glGenBuffers(1, &colorBufferIndex);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBufferIndex);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colorBuffer), colorBuffer, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

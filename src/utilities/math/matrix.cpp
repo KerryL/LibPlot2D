@@ -357,7 +357,7 @@ Matrix Matrix::GetSubMatrix(const unsigned int &startRow, const unsigned int &st
 // Class:			Matrix
 // Function:		GetTranspose
 //
-// Description:		Transposes this matrix.
+// Description:		Returns the transposes of this matrix.
 //
 // Input Arguments:
 //		None
@@ -382,6 +382,28 @@ Matrix Matrix::GetTranspose() const
 	}
 
 	return transpose;
+}
+
+//==========================================================================
+// Class:			Matrix
+// Function:		Transpose
+//
+// Description:		Transposes this matrix in-place.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Matrix, reference to this
+//
+//==========================================================================
+Matrix& Matrix::Transpose()
+{
+	*this = GetTranspose();
+	return *this;
 }
 
 //==========================================================================
@@ -692,7 +714,7 @@ wxString Matrix::Print() const
 //		Matrix& reference to this
 //
 //==========================================================================
-Matrix Matrix::GetRowReduced(void) const
+Matrix Matrix::GetRowReduced() const
 {
 	unsigned int curRow, pivotCol(0), pivotRow;
 	Matrix reduced(*this);

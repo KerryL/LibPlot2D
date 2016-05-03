@@ -99,7 +99,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 //		None
 //
 //==========================================================================
-/*void CurveFit::DoMatrixTest(void)
+/*void CurveFit::DoMatrixTest()
 {
 	Matrix M(4,5);
 	M(0,0) = 1.0;

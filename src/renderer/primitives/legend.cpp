@@ -76,6 +76,46 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 
 //==========================================================================
 // Class:			Legend
+// Function:		InitializeVertexBuffer
+//
+// Description:		Initializes the vertex buffer containing this object's vertices.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::InitializeVertexBuffer()
+{
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::Update()
+{
+}
+
+//==========================================================================
+// Class:			Legend
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
@@ -93,7 +133,7 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 //==========================================================================
 void Legend::GenerateGeometry()
 {
-	UpdateBoundingBox();
+	/*UpdateBoundingBox();
 
 	glPushMatrix();
 		glLoadIdentity();
@@ -105,7 +145,7 @@ void Legend::GenerateGeometry()
 		for (i = 0; i < entries.size(); i++)
 			DrawNextEntry(i);
 
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
 //==========================================================================
@@ -125,7 +165,7 @@ void Legend::GenerateGeometry()
 //		bool, true for OK to draw, false otherwise
 //
 //==========================================================================
-bool Legend::HasValidParameters(void)
+bool Legend::HasValidParameters()
 {
 	if (!font)
 		return false;

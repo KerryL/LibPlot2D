@@ -33,15 +33,6 @@ public:
 	// Performs the drawing operations
 	void Draw();
 
-	// Called when something is modified to re-create this object with
-	// all of the latest information
-	virtual void UpdateColor();
-	virtual void Update() = 0;
-	virtual void GenerateGeometry() = 0;
-
-	// Checks to see if this object's parameters are valid and allow drawing
-	virtual bool HasValidParameters() = 0;
-
 	// Private data accessors
 	void SetVisibility(const bool &isVisible);
 	void SetColor(const Color &color);
@@ -60,9 +51,14 @@ protected:
 
 	Color color;
 
+	bool vertexCountModified;
 	bool modified;
 
 	RenderWindow &renderWindow;
+
+	virtual bool HasValidParameters() = 0;
+	virtual void Update() = 0;
+	virtual void GenerateGeometry() = 0;
 
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
@@ -70,17 +66,14 @@ protected:
 	unsigned int vertexShaderIndex;
 	unsigned int fragmentShaderIndex;
 
-	virtual void InitializeColorBuffer();
 	virtual void InitializeVertexBuffer() = 0;
+	unsigned int vertexCount;
 
-	GLfloat *vertices;
+	float *vertices;
+	unsigned int vertexBufferIndex;
 
 private:
 	unsigned int drawOrder;
-
-	GLuint positionBufferIndex;
-	GLuint colorBufferIndex;
-	GLfloat colorBuffer[4];
 };
 
 #endif// PRIMITIVE_H_

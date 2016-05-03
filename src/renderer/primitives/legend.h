@@ -38,11 +38,6 @@ public:
 	// Destructor
 	virtual ~Legend() {}
 
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry(void);
-	bool HasValidParameters(void);
-
 	// Set option methods
 	void SetFont(FTFont *font) { this->font = font; modified = true; }
 	void SetFontColor(const Color &color) { fontColor = color; modified = true; }
@@ -94,9 +89,17 @@ public:
 		int markerSize;
 	};
 
-	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; };
+	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; vertexCountModified = true;  }
 
 	bool IsUnder(const unsigned int &x, const unsigned int &y) const;
+
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update();
+	virtual void GenerateGeometry();
+	virtual void InitializeVertexBuffer();
 
 private:
 	static const unsigned int entrySpacing;// [pixels]

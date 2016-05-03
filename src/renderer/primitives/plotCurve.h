@@ -33,10 +33,7 @@ public:
 
 	virtual ~PlotCurve();
 
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	virtual void GenerateGeometry();
-	virtual bool HasValidParameters();
+	
 
 	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
 	inline void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
@@ -53,6 +50,14 @@ public:
 
 	// Overloaded operators
 	PlotCurve& operator=(const PlotCurve &plotCurve);
+
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update();
+	virtual void GenerateGeometry();
+	virtual void InitializeVertexBuffer();
 
 private:
 	// The axes with which this object is associated

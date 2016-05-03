@@ -30,8 +30,8 @@ public:
 protected:
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks(void);
-	virtual void DoTypeSpecificProcessTasks(void);
+	virtual void DoTypeSpecificLoadTasks();
+	virtual void DoTypeSpecificProcessTasks();
 
 	bool ConstructNames(std::string &nextLine, std::ifstream &file,
 		wxArrayString &names, wxArrayString &previousLines) const;

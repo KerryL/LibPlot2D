@@ -26,7 +26,7 @@ public:
 	TextInputDialog(const wxString &message, const wxString &title, const wxString &defaultText, wxWindow *parent);
 	virtual ~TextInputDialog();
 
-	wxString GetText(void) const { return text->GetValue(); };
+	wxString GetText() const { return text->GetValue(); };
 
 private:
 	wxTextCtrl *text;

@@ -50,6 +50,46 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 
 //==========================================================================
 // Class:			ZoomBox
+// Function:		InitializeVertexBuffer
+//
+// Description:		Initializes the vertex buffer containing this object's vertices.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ZoomBox::InitializeVertexBuffer()
+{
+}
+
+//==========================================================================
+// Class:			ZoomBox
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ZoomBox::Update()
+{
+}
+
+//==========================================================================
+// Class:			ZoomBox
 // Function:		GenerateGeometry
 //
 // Description:		Generates OpenGL commands to draw the box.
@@ -66,14 +106,14 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 //==========================================================================
 void ZoomBox::GenerateGeometry()
 {
-	Line box;
+	/*Line box;
 	std::vector<std::pair<double, double> > points;
 	points.push_back(std::make_pair(xAnchor, yAnchor));
 	points.push_back(std::make_pair(xFloat, yAnchor));
 	points.push_back(std::make_pair(xFloat, yFloat));
 	points.push_back(std::make_pair(xAnchor, yFloat));
 	points.push_back(std::make_pair(xAnchor, yAnchor));
-	box.Draw(points);
+	box.Draw(points);*/
 }
 
 //==========================================================================

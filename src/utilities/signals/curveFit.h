@@ -35,7 +35,7 @@ public:
 
 private:
 	static void ComputeRSquared(const Dataset2D &data, PolynomialFit& fit);
-	//static void DoMatrixTest(void);
+	//static void DoMatrixTest();
 };
 
 #endif// CURVE_FIT_H_

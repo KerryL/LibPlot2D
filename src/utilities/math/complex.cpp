@@ -146,7 +146,7 @@ ostream &operator << (ostream &writeOut, const Complex &complex)
 //		wxString containing the formatted value of this object
 //
 //==========================================================================
-wxString Complex::Print(void) const
+wxString Complex::Print() const
 {
 	wxString temp;
 
@@ -557,7 +557,7 @@ bool Complex::operator != (const Complex &complex) const
 //		with opposite magnitude as this
 //
 //==========================================================================
-const Complex Complex::GetConjugate(void) const
+const Complex Complex::GetConjugate() const
 {
 	Complex temp;
 
@@ -586,7 +586,7 @@ const Complex Complex::GetConjugate(void) const
 //		double
 //
 //==========================================================================
-double Complex::GetPolarLength(void) const
+double Complex::GetPolarLength() const
 {
 	return sqrt(real * real + imaginary * imaginary);
 }
@@ -607,7 +607,7 @@ double Complex::GetPolarLength(void) const
 //		double
 //
 //==========================================================================
-double Complex::GetPolarAngle(void) const
+double Complex::GetPolarAngle() const
 {
 	return atan2(imaginary, real);
 }

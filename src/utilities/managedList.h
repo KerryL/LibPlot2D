@@ -40,10 +40,10 @@ public:
 	// Private data accessors
 	unsigned int Add(T *toAdd);
 	virtual void Remove(const unsigned int &index);
-	inline unsigned int GetCount(void) const { return list.size(); };
+	inline unsigned int GetCount() const { return list.size(); };
 
 	// Removes all objects from the list
-	virtual void Clear(void);
+	virtual void Clear();
 
 	// Re-organizes the data in the list
 	void ReorderObjects(const std::vector<unsigned int> &order);
@@ -211,7 +211,7 @@ void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 //
 //==========================================================================
 template <class T>
-void ManagedList<T>::Clear(void)
+void ManagedList<T>::Clear()
 {
 	unsigned int i;
 	for (i = 0; i < list.size(); i++)

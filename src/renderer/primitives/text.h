@@ -31,11 +31,6 @@ public:
 	TextRendering(RenderWindow &renderWindow);
 	~TextRendering();
 
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
-
 	// Set option methods
 	void SetAngle(const double& angle) { this->angle = angle; modified = true; }
 	void SetFont(FTFont *font) { this->font = font; modified = true; }
@@ -46,6 +41,14 @@ public:
 	double GetTextHeight() const;
 	double GetTextWidth() const;
 	wxString GetText() const { return text; }
+
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update();
+	virtual void GenerateGeometry();
+	virtual void InitializeVertexBuffer();
 
 private:
 	double angle;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen

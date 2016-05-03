@@ -133,7 +133,7 @@ END_EVENT_TABLE()
 //		None
 //
 //==========================================================================
-void FilterDialog::CreateControls(void)
+void FilterDialog::CreateControls()
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -176,7 +176,7 @@ void FilterDialog::CreateControls(void)
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* FilterDialog::CreateTextBoxes(void)
+wxSizer* FilterDialog::CreateTextBoxes()
 {
 	wxFlexGridSizer *sizer = new wxFlexGridSizer(2, 5, 5);
 	sizer->AddGrowableCol(1);
@@ -220,7 +220,7 @@ wxSizer* FilterDialog::CreateTextBoxes(void)
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* FilterDialog::CreateCheckBoxes(void)
+wxSizer* FilterDialog::CreateCheckBoxes()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -254,7 +254,7 @@ wxSizer* FilterDialog::CreateCheckBoxes(void)
 //		wxSizer* containing the radio buttons
 //
 //==========================================================================
-wxSizer* FilterDialog::CreateRadioButtons(void)
+wxSizer* FilterDialog::CreateRadioButtons()
 {
 	wxBoxSizer *typeSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -307,7 +307,7 @@ wxSizer* FilterDialog::CreateRadioButtons(void)
 //		wxSizer* containing the buttons
 //
 //==========================================================================
-wxSizer* FilterDialog::CreateTransferFunctionControls(void)
+wxSizer* FilterDialog::CreateTransferFunctionControls()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -387,7 +387,7 @@ void FilterDialog::OnSpin(wxSpinEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void FilterDialog::HandleSpin(void)
+void FilterDialog::HandleSpin()
 {
 	UpdateEnabledControls();
 	UpdateTransferFunction();
@@ -483,7 +483,7 @@ void FilterDialog::OnInputTextChange(wxCommandEvent& WXUNUSED(event))
 //		FilterParameters::Type
 //
 //==========================================================================
-FilterParameters::Type FilterDialog::GetType(void) const
+FilterParameters::Type FilterDialog::GetType() const
 {
 	if (!initialized)
 		return FilterParameters::TypeLowPass;
@@ -521,7 +521,7 @@ FilterParameters::Type FilterDialog::GetType(void) const
 //		bool, true if dialog contents are valid
 //
 //==========================================================================
-bool FilterDialog::TransferDataFromWindow(void)
+bool FilterDialog::TransferDataFromWindow()
 {
 	wxString originalNumerator = numeratorBox->GetValue();
 	wxString originalDenominator = denominatorBox->GetValue();
@@ -591,7 +591,7 @@ bool FilterDialog::TransferDataFromWindow(void)
 //		bool, true if dialog contents are valid
 //
 //==========================================================================
-bool FilterDialog::CutoffFrequencyIsValid(void)
+bool FilterDialog::CutoffFrequencyIsValid()
 {
 	if (!cutoffFrequencyBox->GetValue().ToDouble(&parameters.cutoffFrequency))
 	{
@@ -623,7 +623,7 @@ bool FilterDialog::CutoffFrequencyIsValid(void)
 //		bool, true if dialog contents are valid
 //
 //==========================================================================
-bool FilterDialog::DampingRatioIsValid(void)
+bool FilterDialog::DampingRatioIsValid()
 {
 	if (DampingRatioInputRequired())
 	{
@@ -658,7 +658,7 @@ bool FilterDialog::DampingRatioIsValid(void)
 //		bool, true if dialog contents are valid
 //
 //==========================================================================
-bool FilterDialog::WidthIsValid(void)
+bool FilterDialog::WidthIsValid()
 {
 	if (parameters.type == FilterParameters::TypeBandStop ||
 		parameters.type == FilterParameters::TypeBandPass ||
@@ -728,7 +728,7 @@ bool FilterDialog::ExpressionIsValid(const wxString &expression)
 //		None
 //
 //==========================================================================
-void FilterDialog::UpdateTransferFunction(void)
+void FilterDialog::UpdateTransferFunction()
 {
 	if (!initialized || customRadio->GetValue())
 		return;
@@ -771,7 +771,7 @@ void FilterDialog::UpdateTransferFunction(void)
 //		unsigned int
 //
 //==========================================================================
-unsigned int FilterDialog::DetermineStringPrecision(void) const
+unsigned int FilterDialog::DetermineStringPrecision() const
 {
 	if (!automaticStringPrecision)
 		return stringPrecision;
@@ -1205,7 +1205,7 @@ void FilterDialog::OnTransferFunctionChange(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void FilterDialog::UpdateEnabledControls(void)
+void FilterDialog::UpdateEnabledControls()
 {
 	if (!initialized)
 		return;
@@ -1562,7 +1562,7 @@ void FilterDialog::ComputeLogCutoffs(const double &center, const double &width,
 //		bool
 //
 //==========================================================================
-bool FilterDialog::DampingRatioInputRequired(void)
+bool FilterDialog::DampingRatioInputRequired()
 {
 	if ((butterworthCheckBox->IsEnabled() && butterworthCheckBox->GetValue()) ||
 		customRadio->GetValue() ||
@@ -1597,7 +1597,7 @@ bool FilterDialog::DampingRatioInputRequired(void)
 //		bool
 //
 //==========================================================================
-/*bool FilterDialog::OrderIsValid(void)
+/*bool FilterDialog::OrderIsValid()
 {
 	if (customRadio->GetValue() ||
 		notchRadio->GetValue())
