@@ -90,7 +90,12 @@ public:
 	static GLuint CreateProgram(const std::vector<GLuint>& shaderList);
 
 	void ShiftForExactPixelization();
-	void UseDefaultProgram() const;
+	void UseDefaultProgram();
+
+	GLuint GetPositionLocation() const { return positionAttributeLocation; }
+	GLuint GetColorLocation() const { return colorAttributeLocation; }
+
+	virtual unsigned int GetVertexDimension() const { return 4; }
 
 private:
 	wxGLContext *context;
@@ -160,18 +165,20 @@ private:
 
 	static const std::string modelviewName;
 	static const std::string projectionName;
+	static const std::string positionName;
+	static const std::string colorName;
 
 	static const std::string defaultVertexShader;
 	static const std::string defaultFragmentShader;
 
-	GLuint defaultVertexShaderIndex;
-	GLuint defaultFragmentShaderIndex;
-	static std::vector<GLuint> shaderList;
 	GLuint defaultProgram;
 	void BuildShaders();
 
-	static GLuint CreateDefaultVertexShader();
-	static GLuint CreateDefaultFragmentShader();
+	GLuint CreateDefaultVertexShader();
+	GLuint CreateDefaultFragmentShader();
+
+	GLuint positionAttributeLocation;
+	GLuint colorAttributeLocation;
 
 	Vector focalPoint;
 
@@ -205,6 +212,9 @@ protected:
 	Matrix Generate3DProjectionMatrix() const;
 
 	DECLARE_EVENT_TABLE()
+
+	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
+	virtual std::string GetDefaultFragmentShader() const { return defaultFragmentShader; }
 
 	static void Translate(Matrix& m, const double& x, const double& y, const double& z);
 	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);

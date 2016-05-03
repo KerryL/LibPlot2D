@@ -52,6 +52,41 @@ const unsigned int PlotRenderer::maxYTicks(10);
 
 //==========================================================================
 // Class:			PlotRenderer
+// Function:		defaultVertexShader
+//
+// Description:		Default vertex shader.
+//
+// Input Arguments:
+//		0	= position
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const std::string PlotRenderer::defaultVertexShader(// TODO:  shader version w/ and w/o matrix multiplication?
+	"#version 330\n"
+	"\n"
+	"uniform mat4 modelviewMatrix;\n"
+	"uniform mat4 projectionMatrix;\n"
+	"\n"
+	"layout(location = 0) in vec2 position;\n"
+	//"layout(location = 1) in vec4 color;\n"// TODO:  Fix
+	"\n"
+	"out vec4 vertexColor;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	//"    vertexColor = color;\n"
+	"    vertexColor = vec4(1.0, 0.0, 1.0, 1.0);\n"// TODO:  Fix
+	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(position, 0.0, 1.0);\n"
+	"}\n"
+	"");
+
+//==========================================================================
+// Class:			PlotRenderer
 // Function:		PlotRenderer
 //
 // Description:		Constructor for PlotRenderer class.

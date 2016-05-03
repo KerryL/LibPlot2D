@@ -165,7 +165,11 @@ public:
 
 	virtual void SetBackgroundColor(const Color& backgroundColor);
 
+	virtual unsigned int GetVertexDimension() const { return 2; }
+
 private:
+	static const std::string defaultVertexShader;
+
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();
 
@@ -214,6 +218,8 @@ protected:
 	void ProcessZoomBoxEnd();
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
+
+	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
 
 	// Use RenderWindow::glModelViewMatrix for window-fixed things like axes and gridlines
 	float glModelViewMatrixLeftAxis[16];

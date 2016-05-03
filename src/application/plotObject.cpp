@@ -24,7 +24,7 @@
 #include "renderer/primitives/plotCurve.h"
 #include "renderer/primitives/text.h"
 #include "renderer/primitives/legend.h"
-#include "renderer/primitives/plotFrame.h"
+#include "renderer/primitives/plotFrame.h"// TODO:  See if this can be replaced with stencil buffer
 #include "utilities/math/plotMath.h"
 #include "utilities/dataset2D.h"
 #include "utilities/fontFinder.h"

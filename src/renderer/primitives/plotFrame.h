@@ -39,7 +39,8 @@ protected:
 
 private:
 	const Axis *top, *bottom, *left, *right;
-	unsigned int *uiVertices;
+
+	void FillColorBuffer();
 };
 
 #endif// PLOT_FRAME_H_

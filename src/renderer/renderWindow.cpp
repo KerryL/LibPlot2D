@@ -51,10 +51,10 @@
 //==========================================================================
 const std::string RenderWindow::modelviewName("modelviewMatrix");
 const std::string RenderWindow::projectionName("projectionMatrix");
+const std::string RenderWindow::positionName("position");
+const std::string RenderWindow::colorName("color");
 
 const double RenderWindow::exactPixelShift(0.375);
-
-std::vector<GLuint> RenderWindow::shaderList;
 
 //==========================================================================
 // Class:			RenderWindow
@@ -79,13 +79,13 @@ const std::string RenderWindow::defaultVertexShader(
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec4 position;\n"
-	"layout(location = 4) in vec4 color;\n"
+	//"layout(location = 1) in vec4 color;\n"// TODO:  Fix
 	"\n"
 	"out vec4 vertexColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"    vertexColor = color;\n"
+	//"    vertexColor = color;\n"// TODO:  Fix
 	"    gl_Position = projectionMatrix * modelviewMatrix * position;\n"
 	"}\n"
 	"");
@@ -291,11 +291,11 @@ void RenderWindow::Render()
 
 	UseDefaultProgram();
 
-	if (modelviewModified)
-		UpdateModelviewMatrix();
-
 	if (modified)
 		Initialize();
+
+	if (modelviewModified)
+		UpdateModelviewMatrix();
 
 	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
 		(float)backgroundColor.GetBlue(), (float)backgroundColor.GetAlpha());
@@ -326,6 +326,7 @@ void RenderWindow::Render()
 	for (i = 0; i < primitiveList.GetCount(); i++)
 		primitiveList[i]->Draw();
 
+	glFlush();
 	SwapBuffers();
 }
 
@@ -811,15 +812,12 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 		// position as a normal)
 		Vector mouseMotion = mouseVector - lastMouseVector;
 
-		// Determine and apply the motion factor
 		double motionFactor = 0.15;
 		mouseMotion *= motionFactor;
 
-		// Apply the translation
 		Translate(modelviewMatrix, mouseMotion.x, mouseMotion.y, mouseMotion.z);
 		modelviewModified = true;
 
-		// Update the focal point
 		focalPoint -= mouseMotion;
 	}
 	else
@@ -1487,12 +1485,12 @@ bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, Interaction
 //		None
 //
 // Return Value:
-//		GLuint specifying the index of the shader
+//		GLuint
 //
 //==========================================================================
 GLuint RenderWindow::CreateDefaultVertexShader()
 {
-	return CreateShader(GL_VERTEX_SHADER, defaultVertexShader);
+	return CreateShader(GL_VERTEX_SHADER, GetDefaultVertexShader());
 }
 
 //==========================================================================
@@ -1508,12 +1506,12 @@ GLuint RenderWindow::CreateDefaultVertexShader()
 //		None
 //
 // Return Value:
-//		GLuint specifying the index of the shader
+//		GLuint
 //
 //==========================================================================
 GLuint RenderWindow::CreateDefaultFragmentShader()
 {
-	return CreateShader(GL_FRAGMENT_SHADER, defaultFragmentShader);
+	return CreateShader(GL_FRAGMENT_SHADER, GetDefaultFragmentShader());
 }
 
 //==========================================================================
@@ -1537,7 +1535,6 @@ GLuint RenderWindow::CreateDefaultFragmentShader()
 GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderContents)
 {
 	GLuint shader = glCreateShader(type);
-	shaderList.push_back(shader);
 	const char* shaderString = shaderContents.c_str();
 	glShaderSource(shader, 1, &shaderString, NULL);
 
@@ -1624,13 +1621,17 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 //==========================================================================
 void RenderWindow::BuildShaders()
 {
-	defaultVertexShaderIndex = CreateDefaultVertexShader();
-	defaultFragmentShaderIndex = CreateDefaultFragmentShader();
+	std::vector<GLuint> shaderList;
+	shaderList.push_back(CreateDefaultVertexShader());
+	shaderList.push_back(CreateDefaultFragmentShader());
 
 	defaultProgram = CreateProgram(shaderList);
 
 	modelviewLocation = glGetUniformLocation(defaultProgram, modelviewName.c_str());
 	projectionLocation = glGetUniformLocation(defaultProgram, projectionName.c_str());
+
+	positionAttributeLocation = glGetAttribLocation(defaultProgram, positionName.c_str());
+	colorAttributeLocation = glGetAttribLocation(defaultProgram, colorName.c_str());
 }
 
 //==========================================================================
@@ -1715,7 +1716,7 @@ void RenderWindow::Rotate(Matrix& m, const double& angle,
 //		None
 //
 //==========================================================================
-void RenderWindow::UseDefaultProgram() const
+void RenderWindow::UseDefaultProgram()
 {
 	glUseProgram(defaultProgram);
 }

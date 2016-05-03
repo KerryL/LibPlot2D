@@ -68,8 +68,6 @@ PlotFrame::PlotFrame(RenderWindow &renderWindow, const Axis& top, const Axis& bo
 //==========================================================================
 PlotFrame::~PlotFrame()
 {
-	delete [] uiVertices;
-	uiVertices = NULL;
 }
 
 //==========================================================================
@@ -90,8 +88,8 @@ PlotFrame::~PlotFrame()
 //==========================================================================
 void PlotFrame::InitializeVertexBuffer()
 {
-	vertexCount = 48;
-	uiVertices = new unsigned int[vertexCount];
+	vertexCount = 24;
+	vertices = new float[vertexCount * renderWindow.GetVertexDimension()];
 
 	glGenBuffers(1, &vertexBufferIndex);
 }
@@ -118,45 +116,122 @@ void PlotFrame::Update()
 	int width, height;
 	renderWindow.GetSize(&width, &height);
 
-	// Left
-	uiVertices[0] = 0;											uiVertices[1] = 0;
-	uiVertices[2] = left->GetOffsetFromWindowEdge();			uiVertices[3] = 0;
-	uiVertices[4] = left->GetOffsetFromWindowEdge();			uiVertices[5] = height;
+	//FillColorBuffer();
 
-	uiVertices[6] = left->GetOffsetFromWindowEdge();			uiVertices[7] = height;
-	uiVertices[8] = 0;											uiVertices[9] = height;
-	uiVertices[10] = 0;											uiVertices[11] = 0;
+	// Left
+	vertices[0] = 0.0f;
+	vertices[1] = 0.0f;
+
+	vertices[2] = left->GetOffsetFromWindowEdge();
+	vertices[3] = 0.0f;
+
+	vertices[4] = left->GetOffsetFromWindowEdge();
+	vertices[5] = height;
+
+	vertices[6] = left->GetOffsetFromWindowEdge();
+	vertices[7] = height;
+
+	vertices[8] = 0.0f;
+	vertices[9] = height;
+
+	vertices[10] = 0.0f;
+	vertices[11] = 0.0f;
 
 	// Bottom
-	uiVertices[12] = left->GetOffsetFromWindowEdge();			uiVertices[13] = 0;
-	uiVertices[14] = width - right->GetOffsetFromWindowEdge();	uiVertices[15] = 0;
-	uiVertices[16] = width - right->GetOffsetFromWindowEdge();	uiVertices[17] = bottom->GetOffsetFromWindowEdge();
+	vertices[12] = left->GetOffsetFromWindowEdge();
+	vertices[13] = 0.0f;
 
-	uiVertices[18] = width - right->GetOffsetFromWindowEdge();	uiVertices[19] = bottom->GetOffsetFromWindowEdge();
-	uiVertices[20] = left->GetOffsetFromWindowEdge();			uiVertices[21] = bottom->GetOffsetFromWindowEdge();
-	uiVertices[22] = left->GetOffsetFromWindowEdge();			uiVertices[23] = 0;
+	vertices[14] = width - right->GetOffsetFromWindowEdge();
+	vertices[15] = 0.0f;
+
+	vertices[16] = width - right->GetOffsetFromWindowEdge();
+	vertices[17] = bottom->GetOffsetFromWindowEdge();
+
+	vertices[18] = width - right->GetOffsetFromWindowEdge();
+	vertices[19] = bottom->GetOffsetFromWindowEdge();
+
+	vertices[20] = left->GetOffsetFromWindowEdge();
+	vertices[21] = bottom->GetOffsetFromWindowEdge();
+
+	vertices[22] = left->GetOffsetFromWindowEdge();
+	vertices[23] = 0.0f;
 
 	// Right
-	uiVertices[24] = width - right->GetOffsetFromWindowEdge();	uiVertices[25] = 0;
-	uiVertices[26] = width;										uiVertices[27] = 0;
-	uiVertices[28] = width;										uiVertices[29] = height;
+	vertices[24] = width - right->GetOffsetFromWindowEdge();
+	vertices[25] = 0.0f;
 
-	uiVertices[30] = width;										uiVertices[31] = height;
-	uiVertices[32] = width - right->GetOffsetFromWindowEdge();	uiVertices[33] = height;
-	uiVertices[34] = width - right->GetOffsetFromWindowEdge();	uiVertices[35] = 0;
+	vertices[26] = width;
+	vertices[27] = 0.0f;
+
+	vertices[28] = width;
+	vertices[29] = height;
+
+	vertices[30] = width;
+	vertices[31] = height;
+
+	vertices[32] = width - right->GetOffsetFromWindowEdge();
+	vertices[33] = height;
+
+	vertices[34] = width - right->GetOffsetFromWindowEdge();
+	vertices[35] = 0.0f;
 
 	// Top
-	uiVertices[36] = left->GetOffsetFromWindowEdge();			uiVertices[37] = height - top->GetOffsetFromWindowEdge();
-	uiVertices[38] = width - right->GetOffsetFromWindowEdge();	uiVertices[39] = height - top->GetOffsetFromWindowEdge();
-	uiVertices[40] = width - right->GetOffsetFromWindowEdge();	uiVertices[41] = height;
+	vertices[36] = left->GetOffsetFromWindowEdge();
+	vertices[37] = height - top->GetOffsetFromWindowEdge();
 
-	uiVertices[42] = width - right->GetOffsetFromWindowEdge();	uiVertices[43] = height;
-	uiVertices[44] = left->GetOffsetFromWindowEdge();			uiVertices[45] = height;
-	uiVertices[46] = left->GetOffsetFromWindowEdge();			uiVertices[47] = height - top->GetOffsetFromWindowEdge();
+	vertices[38] = width - right->GetOffsetFromWindowEdge();
+	vertices[39] = height - top->GetOffsetFromWindowEdge();
+
+	vertices[40] = width - right->GetOffsetFromWindowEdge();
+	vertices[41] = height;
+
+	vertices[42] = width - right->GetOffsetFromWindowEdge();
+	vertices[43] = height;
+
+	vertices[44] = left->GetOffsetFromWindowEdge();
+	vertices[45] = height;
+
+	vertices[46] = left->GetOffsetFromWindowEdge();
+	vertices[47] = height - top->GetOffsetFromWindowEdge();
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferIndex);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * vertexCount, uiVertices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * vertexCount * renderWindow.GetVertexDimension(),
+		vertices, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT,
+		GL_FALSE, /*sizeof(GLfloat) * renderWindow.GetVertexDimension()*/0, 0);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+//==========================================================================
+// Class:			PlotFrame
+// Function:		FillColorBuffer
+//
+// Description:		Writes to the color buffer.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotFrame::FillColorBuffer()
+{
+	unsigned int i;
+	for (i = 0; i < vertexCount; i++)
+	{
+		vertices[i * 8 + 4] = (float)color.GetRed();
+		vertices[i * 8 + 5] = (float)color.GetGreen();
+		vertices[i * 8 + 6] = (float)color.GetBlue();
+		vertices[i * 8 + 7] = (float)color.GetAlpha();
+	}
 }
 
 //==========================================================================
@@ -178,10 +253,10 @@ void PlotFrame::Update()
 void PlotFrame::GenerateGeometry()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferIndex);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
-
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
 	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+	glDisableVertexAttribArray(renderWindow.GetPositionLocation());
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 //==========================================================================

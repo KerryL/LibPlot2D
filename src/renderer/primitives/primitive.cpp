@@ -203,6 +203,7 @@ void Primitive::SetColor(const Color &color)
 {
 	this->color = color;
 	renderWindow.SetNeedAlphaSort();
+	modified = true;
 }
 
 //==========================================================================
