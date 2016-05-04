@@ -40,7 +40,7 @@
 //
 //==========================================================================
 PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
-	: Primitive(renderWindow), axis(axis)
+	: Primitive(renderWindow), axis(axis), line(renderWindow)
 {
 	isVisible = false;
 	color = Color::ColorBlack;
@@ -53,7 +53,7 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 // Description:		Initializes the vertex buffer containing this object's vertices.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -62,15 +62,10 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 //		None
 //
 //==========================================================================
-void PlotCursor::InitializeVertexBuffer()
+void PlotCursor::InitializeVertexBuffer(const unsigned int& i)
 {
-	delete[] vertexBuffer;
-
-	vertexCount = 2;
-	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
-
-	glGenVertexArrays(1, &vertexArrayIndex);
-	glGenBuffers(1, &vertexBufferIndex);
+	bufferInfo[i].vertexCount = 2;
+	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
 }
 
 //==========================================================================
@@ -80,7 +75,7 @@ void PlotCursor::InitializeVertexBuffer()
 // Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -89,20 +84,24 @@ void PlotCursor::InitializeVertexBuffer()
 //		None
 //
 //==========================================================================
-void PlotCursor::Update()
+void PlotCursor::Update(const unsigned int& /*i*/)
 {
 	if (axis.IsHorizontal())
 	{
-		line.Update(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
+		line.Build(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
 			locationAlongAxis, renderWindow.GetSize().GetHeight()
 			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
 	}
 	else
 	{
-		line.Update(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
+		line.Build(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
 			renderWindow.GetSize().GetWidth()
 			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
 	}
+
+	// TODO:  Need to delete openGL objects?
+	bufferInfo.clear();
+	bufferInfo.push_back(line.GetBufferInfo());
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
 	value = axis.PixelToValue(locationAlongAxis);
@@ -126,7 +125,12 @@ void PlotCursor::Update()
 //==========================================================================
 void PlotCursor::GenerateGeometry()
 {
-	line.Draw();
+	if (bufferInfo.size() == 0)
+		return;
+
+	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+	Line::DoPrettyDraw(bufferInfo[0].vertexCount);
+	glBindVertexArray(0);
 }
 
 //==========================================================================

@@ -36,7 +36,7 @@
 //		None
 //
 //==========================================================================
-ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
+ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(renderWindow)
 {
 	// Initially, we don't want to draw this
 	isVisible = false;
@@ -57,7 +57,7 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 // Description:		Initializes the vertex buffer containing this object's vertices.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -66,15 +66,15 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 //		None
 //
 //==========================================================================
-void ZoomBox::InitializeVertexBuffer()
+void ZoomBox::InitializeVertexBuffer(const unsigned int& i)
 {
-	delete[] vertexBuffer;
+	delete[] bufferInfo[i].vertexBuffer;
 
-	vertexCount = 4;
-	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	bufferInfo[i].vertexCount = 4;
+	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
 
-	glGenVertexArrays(1, &vertexArrayIndex);
-	glGenBuffers(1, &vertexBufferIndex);
+	glGenVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
+	glGenBuffers(1, &bufferInfo[i].vertexBufferIndex);
 }
 
 //==========================================================================
@@ -84,7 +84,7 @@ void ZoomBox::InitializeVertexBuffer()
 // Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -93,7 +93,7 @@ void ZoomBox::InitializeVertexBuffer()
 //		None
 //
 //==========================================================================
-void ZoomBox::Update()
+void ZoomBox::Update(const unsigned int& i)
 {
 	std::vector<std::pair<double, double> > points;
 	points.push_back(std::make_pair(xAnchor, yAnchor));
@@ -101,7 +101,11 @@ void ZoomBox::Update()
 	points.push_back(std::make_pair(xFloat, yFloat));
 	points.push_back(std::make_pair(xAnchor, yFloat));
 	points.push_back(std::make_pair(xAnchor, yAnchor));
-	box.Update(points);
+	box.Build(points);
+
+	// TODO:  Need to delete openGL objects?
+	bufferInfo.clear();
+	bufferInfo.push_back(box.GetBufferInfo());
 }
 
 //==========================================================================
@@ -122,7 +126,9 @@ void ZoomBox::Update()
 //==========================================================================
 void ZoomBox::GenerateGeometry()
 {
-	box.Draw();
+	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+	Line::DoPrettyDraw(bufferInfo[0].vertexCount);
+	glBindVertexArray(0);
 }
 
 //==========================================================================

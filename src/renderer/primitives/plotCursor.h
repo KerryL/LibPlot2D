@@ -41,9 +41,9 @@ protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
 	virtual bool HasValidParameters();
-	virtual void Update();
+	virtual void Update(const unsigned int& i);
 	virtual void GenerateGeometry();
-	virtual void InitializeVertexBuffer();
+	virtual void InitializeVertexBuffer(const unsigned int& i);
 
 private:
 	// The axis we are associated with (perpendicular to)

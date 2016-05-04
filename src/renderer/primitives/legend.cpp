@@ -84,7 +84,7 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 // Description:		Initializes the vertex buffer containing this object's vertices.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -93,15 +93,10 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 //		None
 //
 //==========================================================================
-void Legend::InitializeVertexBuffer()
+void Legend::InitializeVertexBuffer(const unsigned int& i)
 {
-	delete[] vertexBuffer;
-
-	vertexCount = 4 + 2 * entries.size();
-	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
-
-	glGenVertexArrays(1, &vertexArrayIndex);
-	glGenBuffers(1, &vertexBufferIndex);
+	bufferInfo[i].vertexCount = 4 + 2 * entries.size();
+	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
 
 	// TODO:  Text?
 	// TODO:  quads for markers?
@@ -114,7 +109,7 @@ void Legend::InitializeVertexBuffer()
 // Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -123,7 +118,7 @@ void Legend::InitializeVertexBuffer()
 //		None
 //
 //==========================================================================
-void Legend::Update()
+void Legend::Update(const unsigned int& i)
 {
 }
 

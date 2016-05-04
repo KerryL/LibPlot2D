@@ -1702,6 +1702,36 @@ void RenderWindow::Rotate(Matrix& m, const double& angle,
 
 //==========================================================================
 // Class:			RenderWindow
+// Function:		Scale
+//
+// Description:		Applies the specified scaling to the specified matrix.
+//
+// Input Arguments:
+//		m		= Matrix&
+//		x		= const double&
+//		y		= const double&
+//		z		= const double&
+//
+// Output Arguments:
+//		m	= Matrix&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::Scale(Matrix& m, const double& x, const double& y, const double& z)
+{
+	Matrix scale(4, 4);
+	scale.MakeIdentity();
+	scale(0,0) = x;
+	scale(1,1) = y;
+	scale(2,2) = z;
+
+	m *= scale;
+}
+
+//==========================================================================
+// Class:			RenderWindow
 // Function:		UseDefaultProgram
 //
 // Description:		Loads the default OpenGL program.

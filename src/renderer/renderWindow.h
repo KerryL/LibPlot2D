@@ -218,6 +218,7 @@ protected:
 
 	static void Translate(Matrix& m, const double& x, const double& y, const double& z);
 	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);
+	static void Scale(Matrix& m, const double& x, const double& y, const double& z);
 };
 
 #endif// RENDER_WINDOW_H_

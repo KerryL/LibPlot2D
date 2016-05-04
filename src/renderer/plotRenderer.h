@@ -247,6 +247,9 @@ protected:
 	bool ignoreNextMouseMove;
 	CurveQuality curveQuality;
 
+	Matrix leftModelview;
+	Matrix rightModelview;
+
 	// For the event table
 	DECLARE_EVENT_TABLE()
 };

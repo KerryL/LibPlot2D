@@ -16,12 +16,13 @@
 //               widths.
 // History:
 
-// wxWidgets headers
-#include <wx/glcanvas.h>
+// GLEW headers
+#include <GL/glew.h>
 
 // Local headers
 #include "renderer/line.h"
 #include "utilities/math/plotMath.h"
+#include "renderer/renderWindow.h"
 
 //==========================================================================
 // Class:			Line
@@ -55,7 +56,7 @@ const double Line::fadeDistance(0.6);
 // Description:		Constructor for Line class.
 //
 // Input Arguments:
-//		None
+//		renderWindow	= const RenderWindow&
 //
 // Output Arguments:
 //		None
@@ -64,19 +65,22 @@ const double Line::fadeDistance(0.6);
 //		None
 //
 //==========================================================================
-Line::Line()
+Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 {
 	pretty = true;
 	SetWidth(1.0);
 	lineColor = Color::ColorBlack;
 	SetBackgroundColorForAlphaFade();
+
+	bufferInfo.vertexBuffer = NULL;
+	bufferInfo.vertexCountModified = false;
 }
 
 //==========================================================================
 // Class:			Line
-// Function:		Update
+// Function:		Build
 //
-// Description:		Updates the specified line segment.
+// Description:		Builds the specified line segment.
 //
 // Input Arguments:
 //		x1	= const unsigned int&
@@ -91,18 +95,18 @@ Line::Line()
 //		None
 //
 //==========================================================================
-void Line::Update(const unsigned int &x1, const unsigned int &y1,
-	const unsigned int &x2, const unsigned int &y2) const
+void Line::Build(const unsigned int &x1, const unsigned int &y1,
+	const unsigned int &x2, const unsigned int &y2)
 {
-	Update(static_cast<double>(x1), static_cast<double>(y1),
+	Build(static_cast<double>(x1), static_cast<double>(y1),
 		static_cast<double>(x2), static_cast<double>(y2));
 }
 
 //==========================================================================
 // Class:			Line
-// Function:		Update
+// Function:		Build
 //
-// Description:		Updates the specified line segment.
+// Description:		Builds the specified line segment.
 //
 // Input Arguments:
 //		x1	= const double&
@@ -117,8 +121,8 @@ void Line::Update(const unsigned int &x1, const unsigned int &y1,
 //		None
 //
 //==========================================================================
-void Line::Update(const double &x1, const double &y1,
-	const double &x2, const double &y2) const
+void Line::Build(const double &x1, const double &y1,
+	const double &x2, const double &y2)
 {
 	if (pretty)
 		DoPrettyDraw(x1, y1, x2, y2);
@@ -128,9 +132,9 @@ void Line::Update(const double &x1, const double &y1,
 
 //==========================================================================
 // Class:			Line
-// Function:		Update
+// Function:		Build
 //
-// Description:		Updates the specified line segments.
+// Description:		Builds the specified line segments.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<unsigned int, unsigned int> >&
@@ -142,7 +146,7 @@ void Line::Update(const double &x1, const double &y1,
 //		None
 //
 //==========================================================================
-void Line::Update(const std::vector<std::pair<unsigned int, unsigned int> > &points) const
+void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &points)
 {
 	std::vector<std::pair<double, double> > dPoints(points.size());
 	unsigned int i;
@@ -151,14 +155,14 @@ void Line::Update(const std::vector<std::pair<unsigned int, unsigned int> > &poi
 		dPoints[i].first = static_cast<double>(points[i].first);
 		dPoints[i].second = static_cast<double>(points[i].second);
 	}
-	Update(dPoints);
+	Build(dPoints);
 }
 
 //==========================================================================
 // Class:			Line
-// Function:		Update
+// Function:		Build
 //
-// Description:		Updates the specified line segments.
+// Description:		Builds the specified line segments.
 //
 // Input Arguments:
 //		points	= cosnt std::vector<std::pair<double, double> >&
@@ -170,7 +174,7 @@ void Line::Update(const std::vector<std::pair<unsigned int, unsigned int> > &poi
 //		None
 //
 //==========================================================================
-void Line::Update(const std::vector<std::pair<double, double> > &points) const
+void Line::Build(const std::vector<std::pair<double, double> > &points)
 {
 	if (points.size() < 2)
 		return;
@@ -183,9 +187,9 @@ void Line::Update(const std::vector<std::pair<double, double> > &points) const
 
 //==========================================================================
 // Class:			Line
-// Function:		Update
+// Function:		Build
 //
-// Description:		Updates the specified line segments.
+// Description:		Builds the specified line segments.
 //
 // Input Arguments:
 //		x		= const double* const
@@ -199,32 +203,16 @@ void Line::Update(const std::vector<std::pair<double, double> > &points) const
 //		None
 //
 //==========================================================================
-void Line::Update(const double* const x, const double* const y, const unsigned int& count)
+void Line::Build(const double* const x, const double* const y, const unsigned int& count)
 {
-	// TODO:  Implement
-}
-
-//==========================================================================
-// Class:			Line
-// Function:		Draw
-//
-// Description:		Draw the contained line segments.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Line::Draw()
-{
-	if (halfWidth == 0.0)
-		return;
-	// TODO:  Implement
+	std::vector<std::pair<double, double> > dPoints(count);
+	unsigned int i;
+	for (i = 0; i < dPoints.size(); i++)
+	{
+		dPoints[i].first = static_cast<double>(x[i]);
+		dPoints[i].second = static_cast<double>(y[i]);
+	}
+	Build(dPoints);
 }
 
 //==========================================================================
@@ -285,6 +273,33 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 
 //==========================================================================
 // Class:			Line
+// Function:		AllocateBuffer
+//
+// Description:		Allocated local vertex buffer;
+//
+// Input Arguments:
+//		vertexCount	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::AllocateBuffer(const unsigned int& vertexCount)
+{
+	// TODO:  Do we leak these gl objects?
+	glGenVertexArrays(1, &bufferInfo.vertexArrayIndex);
+	glGenBuffers(1, &bufferInfo.vertexBufferIndex);
+
+	bufferInfo.vertexCount = vertexCount;
+	bufferInfo.vertexBuffer = new float[bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	assert(renderWindow.GetVertexDimension() == 2);
+}
+
+//==========================================================================
+// Class:			Line
 // Function:		DoUglyDraw
 //
 // Description:		Draws a line using OpenGL lines.
@@ -302,17 +317,45 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 //		None
 //
 //==========================================================================
-void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const
+void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2)
 {
-	// TODO:  Update to OGL4
+	AllocateBuffer(2);
+
+	bufferInfo.vertexBuffer[0] = (float)x1;
+	bufferInfo.vertexBuffer[1] = (float)y1;
+	bufferInfo.vertexBuffer[2] = (float)x2;
+	bufferInfo.vertexBuffer[3] = (float)y2;
+
+	bufferInfo.vertexBuffer[4] = (float)lineColor.GetRed();
+	bufferInfo.vertexBuffer[5] = (float)lineColor.GetGreen();
+	bufferInfo.vertexBuffer[6] = (float)lineColor.GetBlue();
+	bufferInfo.vertexBuffer[7] = (float)lineColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[8] = (float)lineColor.GetRed();
+	bufferInfo.vertexBuffer[9] = (float)lineColor.GetGreen();
+	bufferInfo.vertexBuffer[10] = (float)lineColor.GetBlue();
+	bufferInfo.vertexBuffer[11] = (float)lineColor.GetAlpha();
+
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(renderWindow.GetColorLocation());
+	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo.vertexCount));
+
 	glLineWidth(2.0 * halfWidth);
-	glBegin(GL_LINES);
 
-	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-	glVertex2f(x1, y1);
-	glVertex2f(x2, y2);
+	glBindVertexArray(0);
 
-	glEnd();
+	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	bufferInfo.vertexBuffer = NULL;
 }
 
 //==========================================================================
@@ -334,7 +377,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 //		None
 //
 //==========================================================================
-void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const
+void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2)
 {
 	double dxLine, dyLine, dxEdge, dyEdge;
 	ComputeOffsets(x1, y1, x2, y2, dxLine, dyLine, dxEdge, dyEdge);
@@ -355,24 +398,91 @@ void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, co
 
 	where the line (x1, y1) to (x2, y2) passes halfway between points (3 and 5) and (4 and 6)
 	*/
-	// TODO:  Update to OGL4
-	glBegin(GL_TRIANGLE_STRIP);
 
-	glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-	glVertex2f(x1 - dxEdge, y1 - dyEdge);
-	glVertex2f(x2 - dxEdge, y2 - dyEdge);
+	AllocateBuffer(8);
 
-	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-	glVertex2f(x1 - dxLine, y1 - dyLine);
-	glVertex2f(x2 - dxLine, y2 - dyLine);
-	glVertex2f(x1 + dxLine, y1 + dyLine);
-	glVertex2f(x2 + dxLine, y2 + dyLine);
+	bufferInfo.vertexBuffer[0] = (float)(x1 - dxEdge);
+	bufferInfo.vertexBuffer[1] = (float)(y1 - dyEdge);
 
-	glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-	glVertex2f(x1 + dxEdge, y1 + dyEdge);
-	glVertex2f(x2 + dxEdge, y2 + dyEdge);
+	bufferInfo.vertexBuffer[2] = (float)(x2 - dxEdge);
+	bufferInfo.vertexBuffer[3] = (float)(y2 - dyEdge);
 
-	glEnd();
+	bufferInfo.vertexBuffer[4] = (float)(x1 - dxLine);
+	bufferInfo.vertexBuffer[5] = (float)(y1 - dyLine);
+
+	bufferInfo.vertexBuffer[6] = (float)(x2 - dxLine);
+	bufferInfo.vertexBuffer[7] = (float)(y2 - dyLine);
+
+	bufferInfo.vertexBuffer[8] = (float)(x1 + dxLine);
+	bufferInfo.vertexBuffer[9] = (float)(y1 + dyLine);
+
+	bufferInfo.vertexBuffer[10] = (float)(x2 + dxLine);
+	bufferInfo.vertexBuffer[11] = (float)(y2 + dyLine);
+
+	bufferInfo.vertexBuffer[12] = (float)(x1 + dxEdge);
+	bufferInfo.vertexBuffer[13] = (float)(y1 + dyEdge);
+
+	bufferInfo.vertexBuffer[14] = (float)(x2 + dxEdge);
+	bufferInfo.vertexBuffer[15] = (float)(y2 + dyEdge);
+
+	bufferInfo.vertexBuffer[16] = (float)backgroundColor.GetRed();
+	bufferInfo.vertexBuffer[17] = (float)backgroundColor.GetGreen();
+	bufferInfo.vertexBuffer[18] = (float)backgroundColor.GetBlue();
+	bufferInfo.vertexBuffer[19] = (float)backgroundColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[20] = (float)backgroundColor.GetRed();
+	bufferInfo.vertexBuffer[21] = (float)backgroundColor.GetGreen();
+	bufferInfo.vertexBuffer[22] = (float)backgroundColor.GetBlue();
+	bufferInfo.vertexBuffer[23] = (float)backgroundColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[24] = (float)lineColor.GetRed();
+	bufferInfo.vertexBuffer[25] = (float)lineColor.GetGreen();
+	bufferInfo.vertexBuffer[26] = (float)lineColor.GetBlue();
+	bufferInfo.vertexBuffer[27] = (float)lineColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[28] = (float)lineColor.GetRed();
+	bufferInfo.vertexBuffer[29] = (float)lineColor.GetGreen();
+	bufferInfo.vertexBuffer[30] = (float)lineColor.GetBlue();
+	bufferInfo.vertexBuffer[31] = (float)lineColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[32] = (float)lineColor.GetRed();
+	bufferInfo.vertexBuffer[33] = (float)lineColor.GetGreen();
+	bufferInfo.vertexBuffer[34] = (float)lineColor.GetBlue();
+	bufferInfo.vertexBuffer[35] = (float)lineColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[36] = (float)lineColor.GetRed();
+	bufferInfo.vertexBuffer[37] = (float)lineColor.GetGreen();
+	bufferInfo.vertexBuffer[38] = (float)lineColor.GetBlue();
+	bufferInfo.vertexBuffer[39] = (float)lineColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[40] = (float)backgroundColor.GetRed();
+	bufferInfo.vertexBuffer[41] = (float)backgroundColor.GetGreen();
+	bufferInfo.vertexBuffer[42] = (float)backgroundColor.GetBlue();
+	bufferInfo.vertexBuffer[43] = (float)backgroundColor.GetAlpha();
+
+	bufferInfo.vertexBuffer[44] = (float)backgroundColor.GetRed();
+	bufferInfo.vertexBuffer[45] = (float)backgroundColor.GetGreen();
+	bufferInfo.vertexBuffer[46] = (float)backgroundColor.GetBlue();
+	bufferInfo.vertexBuffer[47] = (float)backgroundColor.GetAlpha();
+
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(renderWindow.GetColorLocation());
+	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo.vertexCount));
+
+	glBindVertexArray(0);
+
+	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	bufferInfo.vertexBuffer = NULL;
 }
 
 //==========================================================================
@@ -391,19 +501,44 @@ void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, co
 //		None
 //
 //==========================================================================
-void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points) const
+void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 {
-	// TODO:  Update to OGL4
-	glLineWidth(2.0 * halfWidth);
-	glBegin(GL_LINE_STRIP);
+	AllocateBuffer(points.size());
 
-	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-
+	const unsigned int dimension(renderWindow.GetVertexDimension());
+	const unsigned int start(points.size() * dimension);
 	unsigned int i;
 	for (i = 0; i < points.size(); i++)
-		glVertex2f(points[i].first, points[i].second);
+	{
+		bufferInfo.vertexBuffer[i * dimension] = (float)points[i].first;
+		bufferInfo.vertexBuffer[i * dimension + 1] = (float)points[i].second;
 
-	glEnd();
+		bufferInfo.vertexBuffer[start + i * 4] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[start + i * 4 + 1] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[start + i * 4 + 2] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[start + i * 4 + 3] = (float)lineColor.GetAlpha();
+	}
+
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(renderWindow.GetColorLocation());
+	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo.vertexCount));
+
+	glLineWidth(2.0 * halfWidth);
+
+	glBindVertexArray(0);
+
+	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	bufferInfo.vertexBuffer = NULL;
 }
 
 //==========================================================================
@@ -422,7 +557,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points) con
 //		None
 //
 //==========================================================================
-void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points) const
+void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 {
 	struct Offsets
 	{
@@ -449,11 +584,12 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points) c
 	+----+
 	1    3
 	*/
-	// TODO:  Update to OGL4
-	glBegin(GL_TRIANGLE_STRIP);
 
+	AllocateBuffer(points.size() * 6);
+
+	const unsigned int dimension(renderWindow.GetVertexDimension());
+	const unsigned int startColorLeft(bufferInfo.vertexCount * dimension);
 	unsigned int i;
-	// Left side blend
 	for (i = 1; i < points.size(); i++)
 	{
 		ComputeOffsets(points[i - 1].first, points[i - 1].second, points[i].first, points[i].second,
@@ -463,50 +599,176 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points) c
 		offsets[i - 1].dxEdge = dxEdge;
 		offsets[i - 1].dyEdge = dyEdge;
 
-		glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-		glVertex2f(points[i - 1].first - offsets[i - 1].dxLine, points[i - 1].second - offsets[i - 1].dyLine);
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4)] = (float)(points[i - 1].first - offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4) + 1] = (float)(points[i - 1].second - offsets[i - 1].dyLine);
 
-		glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-		glVertex2f(points[i - 1].first - offsets[i - 1].dxEdge, points[i - 1].second - offsets[i - 1].dyEdge);
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4) + 2] = (float)(points[i - 1].first - offsets[i - 1].dxEdge);
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4) + 3] = (float)(points[i - 1].second - offsets[i - 1].dyEdge);
 
-		glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-		glVertex2f(points[i].first - offsets[i - 1].dxLine, points[i].second - offsets[i - 1].dyLine);
-		
-		glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-		glVertex2f(points[i].first - offsets[i - 1].dxEdge, points[i].second - offsets[i - 1].dyEdge);
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4) + 4] = (float)(points[i].first - offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4) + 5] = (float)(points[i].second - offsets[i - 1].dyLine);
+
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4) + 6] = (float)(points[i].first - offsets[i - 1].dxEdge);
+		bufferInfo.vertexBuffer[(i - 1) * (dimension * 4) + 7] = (float)(points[i].second - offsets[i - 1].dyEdge);
+
+		bufferInfo.vertexBuffer[startColorLeft + i * 16] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 1] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 2] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 3] = (float)lineColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 4] = (float)backgroundColor.GetRed();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 5] = (float)backgroundColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 6] = (float)backgroundColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 7] = (float)backgroundColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 8] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 9] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 10] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 11] = (float)lineColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 12] = (float)backgroundColor.GetRed();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 13] = (float)backgroundColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 14] = (float)backgroundColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorLeft + i * 16 + 15] = (float)backgroundColor.GetAlpha();
 	}
 
-	glEnd();
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-
-	// Core line
+	const unsigned int startVertexCenter(points.size() * dimension * 4);
+	const unsigned int startColorCenter(bufferInfo.vertexCount * (dimension + 4));
 	for (i = 1; i < points.size(); i++)
 	{
-		glVertex2f(points[i - 1].first - offsets[i - 1].dxLine, points[i - 1].second - offsets[i - 1].dyLine);
-		glVertex2f(points[i - 1].first + offsets[i - 1].dxLine, points[i - 1].second + offsets[i - 1].dyLine);
-		glVertex2f(points[i].first - offsets[i - 1].dxLine, points[i].second - offsets[i - 1].dyLine);
-		glVertex2f(points[i].first + offsets[i - 1].dxLine, points[i].second + offsets[i - 1].dyLine);
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4)] = (float)(points[i - 1].first - offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4) + 1] = (float)(points[i - 1].second - offsets[i - 1].dyLine);
+
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4) + 2] = (float)(points[i - 1].first + offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4) + 3] = (float)(points[i - 1].second + offsets[i - 1].dyLine);
+
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4) + 4] = (float)(points[i].first - offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4) + 5] = (float)(points[i].second - offsets[i - 1].dyLine);
+
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4) + 6] = (float)(points[i].first + offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[startVertexCenter + (i - 1) * (dimension * 4) + 7] = (float)(points[i].second + offsets[i - 1].dyLine);
+
+		bufferInfo.vertexBuffer[startColorCenter + i * 16] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 1] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 2] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 3] = (float)lineColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 4] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 5] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 6] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 7] = (float)lineColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 8] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 9] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 10] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 11] = (float)lineColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 12] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 13] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 14] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorCenter + i * 16 + 15] = (float)lineColor.GetAlpha();
 	}
 
-	glEnd();
-	glBegin(GL_TRIANGLE_STRIP);
-
-	// Right side blend
+	const unsigned int startVertexRight(points.size() * dimension * 8);
+	const unsigned int startColorRight(bufferInfo.vertexCount * (dimension + 8));
 	for (i = 1; i < points.size(); i++)
 	{
-		glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-		glVertex2f(points[i - 1].first + offsets[i - 1].dxEdge, points[i - 1].second + offsets[i - 1].dyEdge);
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4)] = (float)(points[i - 1].first + offsets[i - 1].dxEdge);
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4) + 1] = (float)(points[i - 1].second + offsets[i - 1].dyEdge);
 
-		glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-		glVertex2f(points[i - 1].first + offsets[i - 1].dxLine, points[i - 1].second + offsets[i - 1].dyLine);
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4) + 2] = (float)(points[i - 1].first + offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4) + 3] = (float)(points[i - 1].second + offsets[i - 1].dyLine);
 
-		glColor4f(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-		glVertex2f(points[i].first + offsets[i - 1].dxEdge, points[i].second + offsets[i - 1].dyEdge);
-		
-		glColor4f(lineColor.GetRed(), lineColor.GetGreen(), lineColor.GetBlue(), lineColor.GetAlpha());
-		glVertex2f(points[i].first + offsets[i - 1].dxLine, points[i].second + offsets[i - 1].dyLine);
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4) + 4] = (float)(points[i].first + offsets[i - 1].dxEdge);
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4) + 5] = (float)(points[i].second + offsets[i - 1].dyEdge);
+
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4) + 6] = (float)(points[i].first + offsets[i - 1].dxLine);
+		bufferInfo.vertexBuffer[startVertexRight + (i - 1) * (dimension * 4) + 7] = (float)(points[i].second + offsets[i - 1].dyLine);
+
+		bufferInfo.vertexBuffer[startColorRight + i * 16] = (float)backgroundColor.GetRed();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 1] = (float)backgroundColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 2] = (float)backgroundColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 3] = (float)backgroundColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 4] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 5] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 6] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 7] = (float)lineColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 8] = (float)backgroundColor.GetRed();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 9] = (float)backgroundColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 10] = (float)backgroundColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 11] = (float)backgroundColor.GetAlpha();
+
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 12] = (float)lineColor.GetRed();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 13] = (float)lineColor.GetGreen();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 14] = (float)lineColor.GetBlue();
+		bufferInfo.vertexBuffer[startColorRight + i * 16 + 15] = (float)lineColor.GetAlpha();
 	}
 
-	glEnd();
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(renderWindow.GetColorLocation());
+	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo.vertexCount));
+
+	glLineWidth(2.0 * halfWidth);
+
+	glBindVertexArray(0);
+
+	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	bufferInfo.vertexBuffer = NULL;
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoUglyDraw
+//
+// Description:		Draws a line strip using OpenGL lines.
+//
+// Input Arguments:
+//		vertexCount	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoUglyDraw(const unsigned int& vertexCount)
+{
+	glDrawArrays(GL_LINE_STRIP, 0, vertexCount);
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoPrettyDraw
+//
+// Description:		Draws a line strip using OpenGL triangles.
+//
+// Input Arguments:
+//		vertexCount	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoPrettyDraw(const unsigned int& vertexCount)
+{
+	assert(vertexCount % 3 == 0);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount / 3);
+	glDrawArrays(GL_TRIANGLE_STRIP, vertexCount / 3, vertexCount / 3);
+	glDrawArrays(GL_TRIANGLE_STRIP, 2 * vertexCount / 3, vertexCount / 3);
 }

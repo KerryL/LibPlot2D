@@ -16,6 +16,9 @@
 #ifndef PRIMITIVE_H_
 #define PRIMITIVE_H_
 
+// Standard C++ headers
+#include <vector>
+
 // Local headers
 #include "renderer/color.h"
 
@@ -46,35 +49,39 @@ public:
 	// Overloaded operators
 	Primitive& operator=(const Primitive &primitive);
 
+	struct BufferInfo
+	{
+		unsigned int vertexCount;
+		float *vertexBuffer;
+		unsigned int vertexBufferIndex;
+		unsigned int vertexArrayIndex;
+		bool vertexCountModified;
+	};
+
 protected:
 	bool isVisible;
 
 	Color color;
 
-	bool vertexCountModified;
 	bool modified;
 
 	RenderWindow &renderWindow;
 
 	virtual bool HasValidParameters() = 0;
-	virtual void Update() = 0;
+	virtual void Update(const unsigned int& i) = 0;
 	virtual void GenerateGeometry() = 0;
 
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
 
-	unsigned int vertexShaderIndex;
-	unsigned int fragmentShaderIndex;
+	virtual void InitializeVertexBuffer(const unsigned int& i) = 0;
 
-	virtual void InitializeVertexBuffer() = 0;
-	unsigned int vertexCount;
-
-	float *vertexBuffer;
-	unsigned int vertexBufferIndex;
-	unsigned int vertexArrayIndex;
+	std::vector<BufferInfo> bufferInfo;
 
 private:
 	unsigned int drawOrder;
+
+	void HandleVertexBufferModification(const unsigned int& i);
 };
 
 #endif// PRIMITIVE_H_

@@ -89,7 +89,7 @@ public:
 		int markerSize;
 	};
 
-	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; vertexCountModified = true;  }
+	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; }// TODO:  This will need to change size of bufferInfo
 
 	bool IsUnder(const unsigned int &x, const unsigned int &y) const;
 
@@ -97,9 +97,9 @@ protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
 	virtual bool HasValidParameters();
-	virtual void Update();
+	virtual void Update(const unsigned int& i);
 	virtual void GenerateGeometry();
-	virtual void InitializeVertexBuffer();
+	virtual void InitializeVertexBuffer(const unsigned int& i);
 
 private:
 	static const unsigned int entrySpacing;// [pixels]

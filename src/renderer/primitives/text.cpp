@@ -77,7 +77,7 @@ TextRendering::~TextRendering()
 // Description:		Initializes the vertex buffer containing this object's vertices.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -86,9 +86,9 @@ TextRendering::~TextRendering()
 //		None
 //
 //==========================================================================
-void TextRendering::InitializeVertexBuffer()
+void TextRendering::InitializeVertexBuffer(const unsigned int& i)
 {
-	delete[] vertexBuffer;
+	delete[] bufferInfo[i].vertexBuffer;
 }
 
 //==========================================================================
@@ -98,7 +98,7 @@ void TextRendering::InitializeVertexBuffer()
 // Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -107,7 +107,7 @@ void TextRendering::InitializeVertexBuffer()
 //		None
 //
 //==========================================================================
-void TextRendering::Update()
+void TextRendering::Update(const unsigned int& i)
 {
 }
 

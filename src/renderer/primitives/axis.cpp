@@ -42,7 +42,7 @@
 //		None
 //
 //==========================================================================
-Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow)
+Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), line(renderWindow)
 {
 	color.Set(0.0, 0.0, 0.0, 1.0);
 
@@ -100,7 +100,7 @@ Axis::~Axis()
 // Description:		Initializes the vertex buffer containing this object's vertices.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -109,9 +109,8 @@ Axis::~Axis()
 //		None
 //
 //==========================================================================
-void Axis::InitializeVertexBuffer()
+void Axis::InitializeVertexBuffer(const unsigned int& i)
 {
-	delete[] vertexBuffer;
 }
 
 //==========================================================================
@@ -121,7 +120,7 @@ void Axis::InitializeVertexBuffer()
 // Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -130,7 +129,7 @@ void Axis::InitializeVertexBuffer()
 //		None
 //
 //==========================================================================
-void Axis::Update()
+void Axis::Update(const unsigned int& i)
 {
 }
 

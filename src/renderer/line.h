@@ -26,11 +26,15 @@
 
 // Local headers
 #include "renderer/color.h"
+#include "renderer/primitives/primitive.h"
+
+// Local forward declarations
+class RenderWindow;
 
 class Line
 {
 public:
-	Line();
+	Line(const RenderWindow& renderWindow);
 
 	inline void SetPretty(const bool &pretty) { this->pretty = pretty; }
 	inline void SetWidth(const double &width) { assert(width >= 0.0); halfWidth = 0.5 * width; }
@@ -38,21 +42,18 @@ public:
 	inline void SetBackgroundColor(const Color &color) { backgroundColor = color; }
 	inline void SetBackgroundColorForAlphaFade() { backgroundColor = lineColor; backgroundColor.SetAlpha(0.0); }
 
-	// Maybe instead of Update/Draw, we should have a Build() method that:
-	// 1.  Creates openGL objects
-	// 2.  Loads data to openGL
-	// 3.  Deletes CPU-side memory
-	// 4.  Returns openGL handls
-	// So this object can be a temporary and as long as owner maintains object hangles, everything is OK?
+	// Geometry is constructed in Build() call, so all options need to be set prior
+	void Build(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
+		const unsigned int &y2);
+	void Build(const double &x1, const double &y1, const double &x2, const double &y2);
+	void Build(const std::vector<std::pair<unsigned int, unsigned int> > &points);
+	void Build(const std::vector<std::pair<double, double> > &points);
+	void Build(const double* const x, const double* const y, const unsigned int& count);
 
-	void Update(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
-		const unsigned int &y2) const;
-	void Update(const double &x1, const double &y1, const double &x2, const double &y2) const;
-	void Update(const std::vector<std::pair<unsigned int, unsigned int> > &points) const;
-	void Update(const std::vector<std::pair<double, double> > &points) const;
-	void Update(const double* const x, const double* const y, const unsigned int& count);
+	Primitive::BufferInfo GetBufferInfo() const { return bufferInfo; }
 
-	void Draw();
+	static void DoUglyDraw(const unsigned int& vertexCount);
+	static void DoPrettyDraw(const unsigned int& vertexCount);
 
 private:
 	static const double fadeDistance;
@@ -60,6 +61,9 @@ private:
 	Color lineColor;
 	Color backgroundColor;
 	bool pretty;
+
+	const RenderWindow& renderWindow;
+	Primitive::BufferInfo bufferInfo;
 
 	void ComputeOffsets(const double &x1, const double &y1, const double &x2,
 		const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const;
@@ -72,10 +76,12 @@ private:
 		double dyEdge;
 	};
 
-	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const;
-	void DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2) const;
-	void DoUglyDraw(const std::vector<std::pair<double, double> > &points) const;
-	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points) const;
+	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2);
+	void DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2);
+	void DoUglyDraw(const std::vector<std::pair<double, double> > &points);
+	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points);
+
+	void AllocateBuffer(const unsigned int& vertexCount);
 };
 
 #endif// LINE_H_

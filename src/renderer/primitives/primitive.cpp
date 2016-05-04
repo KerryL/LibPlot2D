@@ -47,10 +47,6 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
-	vertexBuffer = NULL;
-	vertexCount = 0;
-
-	vertexCountModified = true;
 	modified = true;
 }
 
@@ -72,12 +68,8 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 //==========================================================================
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
-	vertexBuffer = NULL;
-	vertexCount = 0;
-
 	*this = primitive;
 
-	vertexCountModified = true;
 	modified = true;
 
 	renderWindow.SetNeedAlphaSort();
@@ -105,11 +97,15 @@ Primitive::~Primitive()
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
-	glDeleteBuffers(1, &vertexBufferIndex);
-	glDeleteVertexArrays(1, &vertexArrayIndex);
+	unsigned int i;
+	for (i = 0; i < bufferInfo.size(); i++)
+	{
+		glDeleteBuffers(1, &bufferInfo[i].vertexBufferIndex);
+		glDeleteVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
 
-	delete[] vertexBuffer;
-	vertexBuffer = NULL;
+		delete[] bufferInfo[i].vertexBuffer;
+		bufferInfo[i].vertexBuffer = NULL;
+	}
 }
 
 //==========================================================================
@@ -135,19 +131,53 @@ void Primitive::Draw()
 	if (!HasValidParameters() || !isVisible)
 		return;
 
-	if (vertexCountModified || modified)
+	unsigned int i;
+	for (i = 0; i < bufferInfo.size(); i++)
 	{
-		if (vertexCountModified)
+		if (bufferInfo[i].vertexCountModified || modified)
 		{
-			InitializeVertexBuffer();
-			vertexCountModified = false;
-		}
+			if (bufferInfo[i].vertexCountModified)
+				HandleVertexBufferModification(i);
 
-		Update();
-		modified = false;
+			Update(i);
+		}
 	}
 
+	modified = false;
 	GenerateGeometry();
+}
+
+//==========================================================================
+// Class:			Primitive
+// Function:		HandleVertexBufferModification
+//
+// Description:		Handles clean-up of existing buffer objects and creats
+//					new ones.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::HandleVertexBufferModification(const unsigned int& i)
+{
+	if (bufferInfo[i].vertexBuffer)
+	{
+		delete[] bufferInfo[i].vertexBuffer;
+		glDeleteBuffers(1, &bufferInfo[i].vertexBufferIndex);
+		glDeleteVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
+	}
+
+	InitializeVertexBuffer(i);
+	bufferInfo[i].vertexCountModified = false;
+
+	glGenVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
+	glGenBuffers(1, &bufferInfo[i].vertexBufferIndex);
 }
 
 //==========================================================================

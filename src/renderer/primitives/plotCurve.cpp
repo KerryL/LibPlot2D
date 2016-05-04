@@ -42,13 +42,14 @@
 //
 //==========================================================================
 PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
-	: Primitive(renderWindow), data(data)
+	: Primitive(renderWindow), data(data), line(renderWindow)
 {
 	xAxis = NULL;
 	yAxis = NULL;
 
 	lineSize = 1;
 	markerSize = -1;
+	pretty = true;
 }
 
 //==========================================================================
@@ -68,7 +69,7 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 //
 //==========================================================================
 PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
-	data(plotCurve.data)
+	data(plotCurve.data), line(renderWindow)
 {
 	*this = plotCurve;
 }
@@ -100,7 +101,7 @@ PlotCurve::~PlotCurve()
 // Description:		Initializes the vertex buffer containing this object's vertices.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -109,15 +110,10 @@ PlotCurve::~PlotCurve()
 //		None
 //
 //==========================================================================
-void PlotCurve::InitializeVertexBuffer()
+void PlotCurve::InitializeVertexBuffer(const unsigned int& i)
 {
-	delete[] vertexBuffer;
-
-	vertexCount = 4 * data.GetNumberOfPoints();
-	vertexBuffer = new float[vertexCount * (renderWindow.GetVertexDimension() + 4)];
-
-	glGenVertexArrays(1, &vertexArrayIndex);
-	glGenBuffers(1, &vertexBufferIndex);
+	bufferInfo[i].vertexCount = 4 * data.GetNumberOfPoints();
+	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
 }
 
 //==========================================================================
@@ -127,7 +123,7 @@ void PlotCurve::InitializeVertexBuffer()
 // Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
-//		None
+//		i	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -136,7 +132,7 @@ void PlotCurve::InitializeVertexBuffer()
 //		None
 //
 //==========================================================================
-void PlotCurve::Update()
+void PlotCurve::Update(const unsigned int& i)
 {
 	if (lineSize > 0)
 	{
@@ -145,10 +141,14 @@ void PlotCurve::Update()
 		line.SetLineColor(color);
 		line.SetBackgroundColorForAlphaFade();
 		line.SetWidth(lineSize * lineSizeScale);
-		line.Update(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
+		line.Build(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
 	}
 	else
 		line.SetWidth(0.0);
+
+	// TODO:  Need to delete openGL objects?
+	bufferInfo.clear();
+	bufferInfo.push_back(line.GetBufferInfo());
 
 	// TODO:  Need markers
 	/*if (markerSize > 0 || (markerSize < 0 && SmallRange()))
@@ -179,7 +179,18 @@ void PlotCurve::Update()
 //==========================================================================
 void PlotCurve::GenerateGeometry()
 {
-	line.Draw();
+	if (bufferInfo.size() == 0)
+		return;
+
+	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+
+	if (pretty)
+		Line::DoPrettyDraw(bufferInfo[0].vertexCount);
+	else
+		Line::DoUglyDraw(bufferInfo[0].vertexCount);
+
+	glBindVertexArray(0);
+
 	// TODO:  markers?
 }
 
