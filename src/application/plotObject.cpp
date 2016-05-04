@@ -261,6 +261,7 @@ void PlotObject::CreateFontObjects(const wxString &fontFile)
 void PlotObject::Update()
 {
 	FormatPlot();
+	ComputeTransformationMatrices();
 
 	renderer.UpdateCursors();
 	renderer.GetPlotOwner()->UpdateCursorValues(
@@ -2162,4 +2163,53 @@ unsigned long long PlotObject::GetTotalPointCount() const
 void PlotObject::SetBackgroundColor(const Color& color)
 {
 	frame->SetColor(color);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		ComputeTransformationMatrices
+//
+// Description:		Calculates the transformation matrices for plot curves
+//					associated with the right and left y-axes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::ComputeTransformationMatrices()
+{
+	Matrix left(4,4), right(4,4);
+	left.MakeIdentity();
+	right.MakeIdentity();
+
+	int width, height;
+	renderer.GetSize(&width, &height);
+
+	double plotAreaWidth = width - axisLeft->GetOffsetFromWindowEdge() - axisRight->GetOffsetFromWindowEdge();
+	double plotAreaHeight = height - axisBottom->GetOffsetFromWindowEdge() - axisTop->GetOffsetFromWindowEdge();
+
+	double xScale = plotAreaWidth / (axisBottom->GetMaximum() - axisBottom->GetMinimum());
+	double leftYScale = plotAreaHeight / (axisLeft->GetMaximum() - axisLeft->GetMinimum());
+	double rightYScale = plotAreaHeight / (axisRight->GetMaximum() - axisRight->GetMinimum());
+
+	double xCenter = axisBottom->GetMinimum() + 0.5 * (axisBottom->GetMaximum() - axisBottom->GetMinimum());
+	double leftYCenter = axisLeft->GetMinimum() + 0.5 * (axisLeft->GetMaximum() - axisLeft->GetMinimum());
+	double rightYCenter = axisRight->GetMinimum() + 0.5 * (axisRight->GetMaximum() - axisRight->GetMinimum());
+
+	RenderWindow::Scale(left, xScale, leftYScale, 1.0);
+	RenderWindow::Scale(right, xScale, rightYScale, 1.0);
+
+	RenderWindow::Translate(left, xCenter + axisLeft->GetOffsetFromWindowEdge() / xScale,
+		leftYCenter - axisBottom->GetOffsetFromWindowEdge() / leftYScale, 0.0);
+	RenderWindow::Translate(right, xCenter + axisLeft->GetOffsetFromWindowEdge() / xScale,
+		rightYCenter - axisBottom->GetOffsetFromWindowEdge() / rightYScale, 0.0);
+
+	renderer.SetLeftModelview(left);
+	renderer.SetLeftModelview(right);
 }

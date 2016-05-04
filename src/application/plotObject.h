@@ -183,6 +183,7 @@ private:
 
 	// Handles all of the formatting for the plot
 	void FormatPlot();
+	void ComputeTransformationMatrices();
 
 	// Handles the spacing of the axis ticks
 	void AutoScaleAxis(double &min, double &max, double &majorRes, const int &maxTicks, const bool &logarithmic,

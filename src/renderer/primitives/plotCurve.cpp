@@ -20,6 +20,7 @@
 // Local headers
 #include "renderer/primitives/plotCurve.h"
 #include "renderer/renderWindow.h"
+#include "renderer/plotRenderer.h"
 #include "renderer/primitives/axis.h"
 #include "utilities/dataset2D.h"
 #include "utilities/math/plotMath.h"
@@ -182,6 +183,11 @@ void PlotCurve::GenerateGeometry()
 	if (bufferInfo.size() == 0)
 		return;
 
+	if (yAxis->GetOrientation() == Axis::OrientationLeft)
+		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewLeft);
+	else
+		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewRight);
+
 	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 
 	if (pretty)
@@ -192,6 +198,8 @@ void PlotCurve::GenerateGeometry()
 	glBindVertexArray(0);
 
 	// TODO:  markers?
+
+	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewFixed);
 }
 
 //==========================================================================

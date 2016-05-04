@@ -97,6 +97,10 @@ public:
 
 	virtual unsigned int GetVertexDimension() const { return 4; }
 
+	static void Translate(Matrix& m, const double& x, const double& y, const double& z);
+	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);
+	static void Scale(Matrix& m, const double& x, const double& y, const double& z);
+
 private:
 	wxGLContext *context;
 	wxGLContext* GetContext();
@@ -156,13 +160,6 @@ private:
 	//void UpdateTransformationMatricies();
 	void UpdateModelviewMatrix();
 
-	bool modelviewModified;
-	Matrix modelviewMatrix;
-	Matrix projectionMatrix;
-
-	GLint modelviewLocation;
-	GLint projectionLocation;
-
 	static const std::string modelviewName;
 	static const std::string projectionName;
 	static const std::string positionName;
@@ -211,14 +208,17 @@ protected:
 	Matrix Generate2DProjectionMatrix() const;
 	Matrix Generate3DProjectionMatrix() const;
 
+	bool modelviewModified;
+	Matrix modelviewMatrix;
+	Matrix projectionMatrix;
+
+	GLint modelviewLocation;
+	GLint projectionLocation;
+
 	DECLARE_EVENT_TABLE()
 
 	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
 	virtual std::string GetDefaultFragmentShader() const { return defaultFragmentShader; }
-
-	static void Translate(Matrix& m, const double& x, const double& y, const double& z);
-	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);
-	static void Scale(Matrix& m, const double& x, const double& y, const double& z);
 };
 
 #endif// RENDER_WINDOW_H_

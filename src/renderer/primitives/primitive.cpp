@@ -47,6 +47,10 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
+	bufferInfo.push_back(BufferInfo());
+	bufferInfo.back().vertexBuffer = NULL;
+	bufferInfo.back().vertexCountModified = true;
+
 	modified = true;
 }
 

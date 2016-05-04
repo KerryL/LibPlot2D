@@ -85,6 +85,7 @@ public:
 	inline const Axis* GetAxisAtMinEnd() const { return minAxis; }
 	inline const Axis* GetAxisAtMaxEnd() const { return maxAxis; }
 	inline const Axis* GetOppositeAxis() const { return oppositeAxis; }
+	inline AxisOrientation GetOrientation() const { return orientation; }
 
 	unsigned int GetAxisLength() const;
 

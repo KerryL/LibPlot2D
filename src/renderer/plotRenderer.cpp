@@ -18,6 +18,9 @@
 #include <cassert>
 #include <algorithm>
 
+// GLEW headers
+#include <GL/glew.h>
+
 // wxWidgets headers
 #include <wx/wx.h>
 
@@ -2952,4 +2955,42 @@ void PlotRenderer::SetBackgroundColor(const Color& backgroundColor)
 {
 	RenderWindow::SetBackgroundColor(backgroundColor);
 	plot->SetBackgroundColor(backgroundColor);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		LoadModelviewUniform
+//
+// Description:		Loads the specified modelview matrix to the openGL uniform.
+//
+// Input Arguments:
+//		mv	= const Modelview&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
+{
+	float glModelviewMatrix[16];
+
+	switch(mv)
+	{
+	case ModelviewLeft:
+		ConvertMatrixToGL(leftModelview, glModelviewMatrix);
+		break;
+
+	case ModelviewRight:
+		ConvertMatrixToGL(rightModelview, glModelviewMatrix);
+		break;
+
+	default:
+	case ModelviewFixed:
+		ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
+	}
+
+	glUniformMatrix4fv(modelviewLocation, 1, GL_FALSE, glModelviewMatrix);
 }

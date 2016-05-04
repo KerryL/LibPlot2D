@@ -167,6 +167,18 @@ public:
 
 	virtual unsigned int GetVertexDimension() const { return 2; }
 
+	enum Modelview
+	{
+		ModelviewFixed,
+		ModelviewLeft,
+		ModelviewRight
+	};
+
+	void LoadModelviewUniform(const Modelview& mv);
+
+	void SetLeftModelview(const Matrix& m) { leftModelview = m; }
+	void SetRightModelview(const Matrix& m) { rightModelview = m; }
+
 private:
 	static const std::string defaultVertexShader;
 
