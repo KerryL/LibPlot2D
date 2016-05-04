@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -66,7 +66,7 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //		None
 //
 //==========================================================================
-const std::string PlotRenderer::defaultVertexShader(// TODO:  shader version w/ and w/o matrix multiplication?
+const std::string PlotRenderer::defaultVertexShader(
 	"#version 330\n"
 	"\n"
 	"uniform mat4 modelviewMatrix;\n"

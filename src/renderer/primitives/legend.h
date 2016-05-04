@@ -128,6 +128,8 @@ private:
 	PositionReference windowRef;
 	PositionReference legendRef;
 	void GetAdjustedPosition(double &x, double &y) const;
+
+	// TODO:  This object should have its own modelview matrix
 };
 
-#endif// _TEXT_H_
+#endif// LEGEND_H_

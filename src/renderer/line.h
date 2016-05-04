@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -38,6 +38,13 @@ public:
 	inline void SetBackgroundColor(const Color &color) { backgroundColor = color; }
 	inline void SetBackgroundColorForAlphaFade() { backgroundColor = lineColor; backgroundColor.SetAlpha(0.0); }
 
+	// Maybe instead of Update/Draw, we should have a Build() method that:
+	// 1.  Creates openGL objects
+	// 2.  Loads data to openGL
+	// 3.  Deletes CPU-side memory
+	// 4.  Returns openGL handls
+	// So this object can be a temporary and as long as owner maintains object hangles, everything is OK?
+
 	void Update(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
 		const unsigned int &y2) const;
 	void Update(const double &x1, const double &y1, const double &x2, const double &y2) const;
@@ -49,7 +56,7 @@ public:
 
 private:
 	static const double fadeDistance;
-	double halfWidth;// Due to the fading, setting the half width equal to the width seems to create a nice match for desired line width
+	double halfWidth;
 	Color lineColor;
 	Color backgroundColor;
 	bool pretty;

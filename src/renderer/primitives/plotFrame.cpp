@@ -30,7 +30,7 @@
 // Input Arguments:
 //		renderWindow	= RenderWindow&
 //		top				= const Axis&
-//		bootm			= const Axis&
+//		bottom			= const Axis&
 //		left			= const Axis&
 //		right			= const Axis&
 //

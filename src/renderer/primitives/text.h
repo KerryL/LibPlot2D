@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -60,6 +60,8 @@ private:
 	// (0, 0) represents the lower left corner of the text bounding box
 	bool centered;
 	double x, y;
+
+	// TODO:  This object should have its own modelview matrix
 };
 
 #endif// TEXT_H_
