@@ -2205,10 +2205,10 @@ void PlotObject::ComputeTransformationMatrices()
 	RenderWindow::Scale(left, xScale, leftYScale, 1.0);
 	RenderWindow::Scale(right, xScale, rightYScale, 1.0);
 
-	RenderWindow::Translate(left, xCenter + axisLeft->GetOffsetFromWindowEdge() / xScale,
+	/*RenderWindow::Translate(left, xCenter + axisLeft->GetOffsetFromWindowEdge() / xScale,
 		leftYCenter - axisBottom->GetOffsetFromWindowEdge() / leftYScale, 0.0);
 	RenderWindow::Translate(right, xCenter + axisLeft->GetOffsetFromWindowEdge() / xScale,
-		rightYCenter - axisBottom->GetOffsetFromWindowEdge() / rightYScale, 0.0);
+		rightYCenter - axisBottom->GetOffsetFromWindowEdge() / rightYScale, 0.0);*/
 
 	renderer.SetLeftModelview(left);
 	renderer.SetLeftModelview(right);
