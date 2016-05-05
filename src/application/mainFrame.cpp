@@ -3238,6 +3238,7 @@ void MainFrame::SetNewAxisRange(const PlotContext &axis, const double &min, cons
 	default:
 	case PlotContextXAxis:
 		plotArea->SetXLimits(min, max);
+		break;
 
 	case PlotContextPlotArea:
 		assert(false);

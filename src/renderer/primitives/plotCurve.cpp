@@ -142,6 +142,14 @@ void PlotCurve::Update(const unsigned int& i)
 		line.SetBackgroundColorForAlphaFade();
 		line.SetWidth(lineSize * lineSizeScale);
 		line.Build(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
+
+		int width, height;
+		renderWindow.GetSize(&width, &height);
+		width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+		height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+
+		line.SetXScale((xAxis->GetMaximum() - xAxis->GetMinimum()) / width);
+		line.SetYScale((yAxis->GetMaximum() - yAxis->GetMinimum()) / height);
 	}
 	else
 		line.SetWidth(0.0);

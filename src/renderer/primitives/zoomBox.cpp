@@ -66,15 +66,9 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(rend
 //		None
 //
 //==========================================================================
-void ZoomBox::InitializeVertexBuffer(const unsigned int& i)
+void ZoomBox::InitializeVertexBuffer(const unsigned int& /*i*/)
 {
-	delete[] bufferInfo[i].vertexBuffer;
-
-	bufferInfo[i].vertexCount = 4;
-	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
-
-	glGenVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
-	glGenBuffers(1, &bufferInfo[i].vertexBufferIndex);
+	// Handled by box
 }
 
 //==========================================================================
@@ -93,7 +87,7 @@ void ZoomBox::InitializeVertexBuffer(const unsigned int& i)
 //		None
 //
 //==========================================================================
-void ZoomBox::Update(const unsigned int& i)
+void ZoomBox::Update(const unsigned int& /*i*/)
 {
 	std::vector<std::pair<double, double> > points;
 	points.push_back(std::make_pair(xAnchor, yAnchor));

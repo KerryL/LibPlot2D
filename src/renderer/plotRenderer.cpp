@@ -267,8 +267,12 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 	if (rightCursor->GetIsVisible())
 		rightCursor->SetVisibility(true);
 
-	if (legend)
-		legend->SetModified();
+	unsigned int i;
+	for (i = 0; i < primitiveList.GetCount(); i++)// TODO:  Necessary?
+		primitiveList[i]->SetModified();
+
+	/*if (legend)
+		legend->SetModified();*/
 
 	UpdateDisplay();
 

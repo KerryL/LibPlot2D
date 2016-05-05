@@ -2198,10 +2198,6 @@ void PlotObject::ComputeTransformationMatrices()
 	double leftYScale = plotAreaHeight / (axisLeft->GetMaximum() - axisLeft->GetMinimum());
 	double rightYScale = plotAreaHeight / (axisRight->GetMaximum() - axisRight->GetMinimum());
 
-	double xCenter = axisBottom->GetMinimum() + 0.5 * (axisBottom->GetMaximum() - axisBottom->GetMinimum());
-	double leftYCenter = axisLeft->GetMinimum() + 0.5 * (axisLeft->GetMaximum() - axisLeft->GetMinimum());
-	double rightYCenter = axisRight->GetMinimum() + 0.5 * (axisRight->GetMaximum() - axisRight->GetMinimum());
-
 	RenderWindow::Translate(left, axisLeft->GetOffsetFromWindowEdge(),
 		axisBottom->GetOffsetFromWindowEdge(), 0.0);
 	RenderWindow::Translate(right, axisLeft->GetOffsetFromWindowEdge(),

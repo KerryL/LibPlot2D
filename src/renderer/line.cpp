@@ -44,7 +44,8 @@
 // Don't want to sacrifice crisp thin lines we can achieve under MSW, so
 // we add this #if
 #ifdef __WXMSW__
-const double Line::fadeDistance(0.05);
+//const double Line::fadeDistance(0.05);
+const double Line::fadeDistance(15.0);// TODO:  Fix
 #else
 const double Line::fadeDistance(0.6);
 #endif
@@ -71,6 +72,9 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 	SetWidth(1.0);
 	lineColor = Color::ColorBlack;
 	SetBackgroundColorForAlphaFade();
+
+	xScale = 1.0;
+	yScale = 1.0;
 
 	bufferInfo.vertexBuffer = NULL;
 	bufferInfo.vertexCountModified = false;
@@ -241,10 +245,7 @@ void Line::Build(const double* const x, const double* const y, const unsigned in
 void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
 {
-	// TODO:  These offsets need to consider the scaling of PlotRenderer (i.e. need to convert from screen coords to model coords)
-	// TODO:  Could improve line endings - instead of drawing them |- to core line,
-	//        we could instead "miter" the corners to nicely meet adjacent segments
-	/*if (PlotMath::IsZero(y2 - y1))
+	if (PlotMath::IsZero(y2 - y1))
 	{
 		dxLine = 0.0;
 		dyLine = halfWidth * PlotMath::Sign(x2 - x1);
@@ -269,11 +270,61 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 
 		dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
 		dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
-	}*/
-	dxEdge = 0.0;
-	dyEdge = 0.0;
-	dxLine = 0.01;
-	dyLine = 0.01;
+	}
+
+	dxEdge *= xScale;
+	dyEdge *= yScale;
+	dxLine *= xScale;
+	dyLine *= yScale;
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		ComputeOffsets
+//
+// Description:		Computes the offsets for the outside vertices based on the
+//					line width and orientation.
+//
+// Input Arguments:
+//		xPrior	= const double&
+//		yPrior	= const double&
+//		x		= const double&
+//		y		= const double&
+//		xNext	= const double&
+//		yNext	= const double&
+//
+// Output Arguments:
+//		dxLine	= const double&
+//		dyLine	= const double&
+//		dxEdge	= const double&
+//		dyEdge	= const double&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
+	const double &x, const double &y, const double &xNext, const double &yNext,
+	double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
+{
+	const double anglePrior(atan2(y - yPrior, x - xPrior));
+	const double angleNext(atan2(yNext - y, xNext - x));
+	double miter(0.5 * (anglePrior + angleNext));
+	
+	if (fabs(angleNext - anglePrior) < M_PI)
+		miter += M_PI * 0.5;
+	else
+		miter -= M_PI * 0.5;
+
+	double miterLength(halfWidth);
+	if (!PlotMath::IsZero(cos(miter)))
+		miterLength /= fabs(cos(miter));// TODO:  This still isnt' right...
+
+	dxLine = miterLength * cos(miter) * xScale;
+	dyLine = miterLength * sin(miter) * yScale;
+
+	dxEdge = dxLine * (miterLength + fadeDistance) / halfWidth;
+	dyEdge = dyLine * (miterLength + fadeDistance) / halfWidth;
 }
 
 //==========================================================================
@@ -359,7 +410,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
 }
 
@@ -486,7 +537,7 @@ void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, co
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
 }
 
@@ -542,7 +593,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
 }
 
@@ -599,11 +650,15 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 	unsigned int i;
 	for (i = 0; i < points.size(); i++)
 	{
-		if (i > 0)
+		if (i == 0)
+			ComputeOffsets(points[i].first, points[i].second, points[i + 1].first,
+				points[i + 1].second, dxLine, dyLine, dxEdge, dyEdge);
+		else if (i == points.size() - 1)
 			ComputeOffsets(points[i - 1].first, points[i - 1].second, points[i].first,
 				points[i].second, dxLine, dyLine, dxEdge, dyEdge);
 		else
-			ComputeOffsets(points[i].first, points[i].second, points[i + 1].first,
+			ComputeOffsets(points[i - 1].first, points[i - 1].second,
+				points[i].first, points[i].second, points[i + 1].first,
 				points[i + 1].second, dxLine, dyLine, dxEdge, dyEdge);
 
 		offsets[i].dxLine = dxLine;
@@ -616,6 +671,18 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 
 		bufferInfo.vertexBuffer[i * (dimension * 2) + dimension] = (float)(points[i].first - offsets[i].dxEdge);
 		bufferInfo.vertexBuffer[i * (dimension * 2) + dimension + 1] = (float)(points[i].second - offsets[i].dyEdge);
+
+		// TODO:  Remove
+		if (i % 2 == 0)
+		{
+			lineColor = Color::ColorGray;
+			backgroundColor = Color::ColorBlue;
+		}
+		else
+		{
+			lineColor = Color::ColorRed;
+			backgroundColor = Color::ColorBlack;
+		}
 
 		bufferInfo.vertexBuffer[colorStartLeft + i * 8] = (float)lineColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartLeft + i * 8 + 1] = (float)lineColor.GetGreen();
@@ -637,6 +704,18 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2) + dimension] = (float)(points[i].first + offsets[i].dxLine);
 		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2) + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
 
+		// TODO:  Remove
+		if (i % 2 == 0)
+		{
+			lineColor = Color::ColorGray;
+			backgroundColor = Color::ColorBlue;
+		}
+		else
+		{
+			lineColor = Color::ColorRed;
+			backgroundColor = Color::ColorBlack;
+		}
+
 		bufferInfo.vertexBuffer[colorStartCenter + i * 8] = (float)lineColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartCenter + i * 8 + 1] = (float)lineColor.GetGreen();
 		bufferInfo.vertexBuffer[colorStartCenter + i * 8 + 2] = (float)lineColor.GetBlue();
@@ -657,6 +736,18 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 
 		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2) + dimension] = (float)(points[i].first + offsets[i].dxLine);
 		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2) + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
+
+		// TODO:  Remove
+		if (i % 2 == 0)
+		{
+			lineColor = Color::ColorGray;
+			backgroundColor = Color::ColorBlue;
+		}
+		else
+		{
+			lineColor = Color::ColorRed;
+			backgroundColor = Color::ColorBlack;
+		}
 
 		bufferInfo.vertexBuffer[colorStartRight + i * 8] = (float)backgroundColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartRight + i * 8 + 1] = (float)backgroundColor.GetGreen();
@@ -686,7 +777,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;// TODO:  Correct to delete this here?
+	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
 }
 

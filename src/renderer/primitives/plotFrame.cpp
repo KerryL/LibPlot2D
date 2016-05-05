@@ -110,7 +110,7 @@ void PlotFrame::InitializeVertexBuffer(const unsigned int& i)
 //==========================================================================
 void PlotFrame::Update(const unsigned int& i)
 {
-	// TODO:  This doesn't get updated on a re-size
+	// TODO:  This doesn't get updated when axes window offsets change...
 	int width, height;
 	renderWindow.GetSize(&width, &height);
 
