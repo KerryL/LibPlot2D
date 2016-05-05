@@ -1655,9 +1655,9 @@ void RenderWindow::BuildShaders()
 //==========================================================================
 void RenderWindow::Translate(Matrix& m, const double& x, const double& y, const double& z)
 {
-	Matrix translation(4, 4, 1.0, 0.0, 0.0, -x,
-							 0.0, 1.0, 0.0, -y,
-							 0.0, 0.0, 1.0, -z,
+	Matrix translation(4, 4, 1.0, 0.0, 0.0, x,
+							 0.0, 1.0, 0.0, y,
+							 0.0, 0.0, 1.0, z,
 							 0.0, 0.0, 0.0, 1.0);
 	m *= translation;
 }

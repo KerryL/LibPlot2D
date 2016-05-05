@@ -2202,14 +2202,17 @@ void PlotObject::ComputeTransformationMatrices()
 	double leftYCenter = axisLeft->GetMinimum() + 0.5 * (axisLeft->GetMaximum() - axisLeft->GetMinimum());
 	double rightYCenter = axisRight->GetMinimum() + 0.5 * (axisRight->GetMaximum() - axisRight->GetMinimum());
 
+	RenderWindow::Translate(left, axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(), 0.0);
+	RenderWindow::Translate(right, axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(), 0.0);
+
 	RenderWindow::Scale(left, xScale, leftYScale, 1.0);
 	RenderWindow::Scale(right, xScale, rightYScale, 1.0);
 
-	/*RenderWindow::Translate(left, xCenter + axisLeft->GetOffsetFromWindowEdge() / xScale,
-		leftYCenter - axisBottom->GetOffsetFromWindowEdge() / leftYScale, 0.0);
-	RenderWindow::Translate(right, xCenter + axisLeft->GetOffsetFromWindowEdge() / xScale,
-		rightYCenter - axisBottom->GetOffsetFromWindowEdge() / rightYScale, 0.0);*/
+	RenderWindow::Translate(left, -axisBottom->GetMinimum(), -axisLeft->GetMinimum(), 0.0);
+	RenderWindow::Translate(right, -axisBottom->GetMinimum(), -axisRight->GetMinimum(), 0.0);
 
 	renderer.SetLeftModelview(left);
-	renderer.SetLeftModelview(right);
+	renderer.SetRightModelview(right);
 }

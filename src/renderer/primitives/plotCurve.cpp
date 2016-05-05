@@ -111,10 +111,9 @@ PlotCurve::~PlotCurve()
 //		None
 //
 //==========================================================================
-void PlotCurve::InitializeVertexBuffer(const unsigned int& i)
+void PlotCurve::InitializeVertexBuffer(const unsigned int& /*i*/)
 {
-	bufferInfo[i].vertexCount = 4 * data.GetNumberOfPoints();
-	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	// Handled by line object
 }
 
 //==========================================================================

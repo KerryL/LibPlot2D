@@ -241,6 +241,7 @@ void Line::Build(const double* const x, const double* const y, const unsigned in
 void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
 {
+	// TODO:  These offsets need to consider the scaling of PlotRenderer (i.e. need to convert from screen coords to model coords)
 	// TODO:  Could improve line endings - instead of drawing them |- to core line,
 	//        we could instead "miter" the corners to nicely meet adjacent segments
 	/*if (PlotMath::IsZero(y2 - y1))
