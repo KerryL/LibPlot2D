@@ -44,8 +44,7 @@
 // Don't want to sacrifice crisp thin lines we can achieve under MSW, so
 // we add this #if
 #ifdef __WXMSW__
-//const double Line::fadeDistance(0.05);
-const double Line::fadeDistance(15.0);// TODO:  Fix
+const double Line::fadeDistance(0.05);
 #else
 const double Line::fadeDistance(0.6);
 #endif
@@ -73,7 +72,8 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 	lineColor = Color::ColorBlack;
 	SetBackgroundColorForAlphaFade();
 
-	scale = 1.0;
+	xScale = 1.0;
+	yScale = 1.0;
 
 	bufferInfo.vertexBuffer = NULL;
 	bufferInfo.vertexCountModified = false;
@@ -256,17 +256,17 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	}
 	else
 	{
-		double slope = (y2 - y1) / (x2 - x1);
+		double slope = (y2 - y1) / (x2 - x1) * xScale / yScale;
 		double miterLength(halfWidth);
 		if (!PlotMath::IsZero(sin(atan(slope))))
-			miterLength *= fabs(sin(atan(slope)));
+			miterLength /= fabs(sin(atan(slope)));
 
 		dyLine = sqrt(miterLength * miterLength / (1.0 + slope * slope)) * PlotMath::Sign(x2 - x1);
 		dxLine = fabs(slope * dyLine) * PlotMath::Sign(y1 - y2);
 	}
 
-	dxLine *= scale;
-	dyLine *= scale;
+	dxLine *= xScale;
+	dyLine *= yScale;
 
 	dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
 	dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
@@ -311,12 +311,16 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 		miter -= M_PI * 0.5;
 
 	double miterLength(halfWidth);
-	if (!PlotMath::IsZero(sin(miter)))
-		miterLength /= fabs(sin(miter));
+	const double divisor(cos(anglePrior + M_PI - miter));
+	if (!PlotMath::IsZero(divisor))
+		miterLength /= fabs(divisor);
 
-	// TODO:  Line size/end angles should not be affected by aspect ratio!
-	dxLine = miterLength * cos(miter) * scale;// TODO:  Do I need separate X and Y scales?
-	dyLine = miterLength * sin(miter) * scale;
+	// TODO:  Line size/miter angle should not be affected by aspect ratio!
+	// I think the fundamental problem is that I want the line sizes to be
+	// w.r.t. screen coords, but the points themselves need to be w.r.t.
+	// model coords.
+	dxLine = miterLength * cos(miter) * xScale;
+	dyLine = miterLength * sin(miter) * yScale;
 
 	dxEdge = dxLine * (miterLength + fadeDistance) / halfWidth;
 	dyEdge = dyLine * (miterLength + fadeDistance) / halfWidth;

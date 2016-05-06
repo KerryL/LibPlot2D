@@ -271,9 +271,12 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 	for (i = 0; i < primitiveList.GetCount(); i++)// TODO:  Necessary?
 		primitiveList[i]->SetModified();
 
+	// TODO:  UPdate stencil buffer
+
 	/*if (legend)
 		legend->SetModified();*/
 
+	UpdateStencilBuffer();
 	UpdateDisplay();
 
 	// Skip this event so the base class OnSize event fires, too
@@ -2997,4 +3000,26 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 	}
 
 	glUniformMatrix4fv(modelviewLocation, 1, GL_FALSE, glModelviewMatrix);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		UpdateStencilBuffer
+//
+// Description:		Updates the stencil buffer according to the size of the
+//					plot area.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::UpdateStencilBuffer()
+{
+	// TODO
 }

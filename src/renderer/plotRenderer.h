@@ -214,6 +214,8 @@ private:
 	void ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const;
 	void UpdateLegendAnchor();
 
+	void UpdateStencilBuffer();
+
 protected:
 	void ProcessZoom(wxMouseEvent &event);
 	void ProcessZoomWithBox(wxMouseEvent &event);
