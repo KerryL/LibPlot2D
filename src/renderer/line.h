@@ -42,8 +42,7 @@ public:
 	inline void SetBackgroundColor(const Color &color) { backgroundColor = color; }
 	inline void SetBackgroundColorForAlphaFade() { backgroundColor = lineColor; backgroundColor.SetAlpha(0.0); }
 
-	inline void SetXScale(const double& scale) { assert(scale > 0.0); xScale = scale; }
-	inline void SetYScale(const double& scale) { assert(scale > 0.0); yScale = scale; }
+	inline void SetScale(const double& scale) { assert(scale > 0.0); this->scale = scale; }
 
 	// Geometry is constructed in Build() call, so all options need to be set prior
 	void Build(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
@@ -65,8 +64,7 @@ private:
 	Color backgroundColor;
 	bool pretty;
 
-	double xScale;
-	double yScale;
+	double scale;
 
 	const RenderWindow& renderWindow;
 	Primitive::BufferInfo bufferInfo;

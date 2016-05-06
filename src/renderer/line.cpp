@@ -73,8 +73,7 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 	lineColor = Color::ColorBlack;
 	SetBackgroundColorForAlphaFade();
 
-	xScale = 1.0;
-	yScale = 1.0;
+	scale = 1.0;
 
 	bufferInfo.vertexBuffer = NULL;
 	bufferInfo.vertexCountModified = false;
@@ -249,33 +248,28 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	{
 		dxLine = 0.0;
 		dyLine = halfWidth * PlotMath::Sign(x2 - x1);
-
-		dxEdge = 0.0;
-		dyEdge = (halfWidth + fadeDistance) * PlotMath::Sign(x2 - x1);
 	}
 	else if (PlotMath::IsZero(x2 - x1))
 	{
 		dxLine = halfWidth * PlotMath::Sign(y1 - y2);
 		dyLine = 0.0;
-
-		dxEdge = (halfWidth + fadeDistance) * PlotMath::Sign(y1 - y2);
-		dyEdge = 0.0;
 	}
 	else
 	{
 		double slope = (y2 - y1) / (x2 - x1);
+		double miterLength(halfWidth);
+		if (!PlotMath::IsZero(sin(atan(slope))))
+			miterLength *= fabs(sin(atan(slope)));
 
-		dyLine = sqrt(halfWidth * halfWidth / (1.0 + slope * slope)) * PlotMath::Sign(x2 - x1);
+		dyLine = sqrt(miterLength * miterLength / (1.0 + slope * slope)) * PlotMath::Sign(x2 - x1);
 		dxLine = fabs(slope * dyLine) * PlotMath::Sign(y1 - y2);
-
-		dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
-		dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
 	}
 
-	dxEdge *= xScale;
-	dyEdge *= yScale;
-	dxLine *= xScale;
-	dyLine *= yScale;
+	dxLine *= scale;
+	dyLine *= scale;
+
+	dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
+	dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
 }
 
 //==========================================================================
@@ -317,11 +311,12 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 		miter -= M_PI * 0.5;
 
 	double miterLength(halfWidth);
-	if (!PlotMath::IsZero(cos(miter)))
-		miterLength /= fabs(cos(miter));// TODO:  This still isnt' right...
+	if (!PlotMath::IsZero(sin(miter)))
+		miterLength /= fabs(sin(miter));
 
-	dxLine = miterLength * cos(miter) * xScale;
-	dyLine = miterLength * sin(miter) * yScale;
+	// TODO:  Line size/end angles should not be affected by aspect ratio!
+	dxLine = miterLength * cos(miter) * scale;// TODO:  Do I need separate X and Y scales?
+	dyLine = miterLength * sin(miter) * scale;
 
 	dxEdge = dxLine * (miterLength + fadeDistance) / halfWidth;
 	dyEdge = dyLine * (miterLength + fadeDistance) / halfWidth;
@@ -672,18 +667,6 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 		bufferInfo.vertexBuffer[i * (dimension * 2) + dimension] = (float)(points[i].first - offsets[i].dxEdge);
 		bufferInfo.vertexBuffer[i * (dimension * 2) + dimension + 1] = (float)(points[i].second - offsets[i].dyEdge);
 
-		// TODO:  Remove
-		if (i % 2 == 0)
-		{
-			lineColor = Color::ColorGray;
-			backgroundColor = Color::ColorBlue;
-		}
-		else
-		{
-			lineColor = Color::ColorRed;
-			backgroundColor = Color::ColorBlack;
-		}
-
 		bufferInfo.vertexBuffer[colorStartLeft + i * 8] = (float)lineColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartLeft + i * 8 + 1] = (float)lineColor.GetGreen();
 		bufferInfo.vertexBuffer[colorStartLeft + i * 8 + 2] = (float)lineColor.GetBlue();
@@ -703,18 +686,6 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 
 		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2) + dimension] = (float)(points[i].first + offsets[i].dxLine);
 		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2) + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
-
-		// TODO:  Remove
-		if (i % 2 == 0)
-		{
-			lineColor = Color::ColorGray;
-			backgroundColor = Color::ColorBlue;
-		}
-		else
-		{
-			lineColor = Color::ColorRed;
-			backgroundColor = Color::ColorBlack;
-		}
 
 		bufferInfo.vertexBuffer[colorStartCenter + i * 8] = (float)lineColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartCenter + i * 8 + 1] = (float)lineColor.GetGreen();
@@ -736,18 +707,6 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 
 		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2) + dimension] = (float)(points[i].first + offsets[i].dxLine);
 		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2) + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
-
-		// TODO:  Remove
-		if (i % 2 == 0)
-		{
-			lineColor = Color::ColorGray;
-			backgroundColor = Color::ColorBlue;
-		}
-		else
-		{
-			lineColor = Color::ColorRed;
-			backgroundColor = Color::ColorBlack;
-		}
 
 		bufferInfo.vertexBuffer[colorStartRight + i * 8] = (float)backgroundColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartRight + i * 8 + 1] = (float)backgroundColor.GetGreen();

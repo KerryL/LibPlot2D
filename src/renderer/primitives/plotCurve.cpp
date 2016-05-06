@@ -148,8 +148,8 @@ void PlotCurve::Update(const unsigned int& i)
 		width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 		height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 
-		line.SetXScale((xAxis->GetMaximum() - xAxis->GetMinimum()) / width);
-		line.SetYScale((yAxis->GetMaximum() - yAxis->GetMinimum()) / height);
+		line.SetScale(0.5 * ((xAxis->GetMaximum() - xAxis->GetMinimum()) / width
+			+ (yAxis->GetMaximum() - yAxis->GetMinimum()) / height));
 	}
 	else
 		line.SetWidth(0.0);
