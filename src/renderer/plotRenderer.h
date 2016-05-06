@@ -163,8 +163,6 @@ public:
 
 	wxImage GetImage() const;
 
-	virtual void SetBackgroundColor(const Color& backgroundColor);
-
 	virtual unsigned int GetVertexDimension() const { return 2; }
 
 	enum Modelview
@@ -213,8 +211,6 @@ private:
 
 	void ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const;
 	void UpdateLegendAnchor();
-
-	void UpdateStencilBuffer();
 
 protected:
 	void ProcessZoom(wxMouseEvent &event);

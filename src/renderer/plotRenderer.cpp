@@ -267,16 +267,14 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 	if (rightCursor->GetIsVisible())
 		rightCursor->SetVisibility(true);
 
-	unsigned int i;
+	/*unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)// TODO:  Necessary?
-		primitiveList[i]->SetModified();
+		primitiveList[i]->SetModified();*/
 
-	// TODO:  UPdate stencil buffer
+	if (legend)
+		legend->SetModified();
 
-	/*if (legend)
-		legend->SetModified();*/
-
-	UpdateStencilBuffer();
+	plot->UpdateScissorBuffer();
 	UpdateDisplay();
 
 	// Skip this event so the base class OnSize event fires, too
@@ -2944,28 +2942,6 @@ unsigned long long PlotRenderer::GetTotalPointCount() const
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		SetBackgroundColor
-//
-// Description:		Sets the background color for the plot area.
-//
-// Input Arguments:
-//		backgroundColor	= const Color&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotRenderer::SetBackgroundColor(const Color& backgroundColor)
-{
-	RenderWindow::SetBackgroundColor(backgroundColor);
-	plot->SetBackgroundColor(backgroundColor);
-}
-
-//==========================================================================
-// Class:			PlotRenderer
 // Function:		LoadModelviewUniform
 //
 // Description:		Loads the specified modelview matrix to the openGL uniform.
@@ -3000,26 +2976,4 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 	}
 
 	glUniformMatrix4fv(modelviewLocation, 1, GL_FALSE, glModelviewMatrix);
-}
-
-//==========================================================================
-// Class:			PlotRenderer
-// Function:		UpdateStencilBuffer
-//
-// Description:		Updates the stencil buffer according to the size of the
-//					plot area.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotRenderer::UpdateStencilBuffer()
-{
-	// TODO
 }

@@ -13,6 +13,9 @@
 // Description:  Intermediate class for creating plots from arrays of data.
 // History:
 
+// GLEW headers
+#include <GL\glew.h>
+
 // FTGL headers
 #include <FTGL/ftgl.h>
 
@@ -24,7 +27,6 @@
 #include "renderer/primitives/plotCurve.h"
 #include "renderer/primitives/text.h"
 #include "renderer/primitives/legend.h"
-#include "renderer/primitives/plotFrame.h"// TODO:  See if this can be replaced with stencil buffer
 #include "utilities/math/plotMath.h"
 #include "utilities/dataset2D.h"
 #include "utilities/fontFinder.h"
@@ -71,7 +73,6 @@ PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 {
 	InitializeFonts();
 	CreateAxisObjects();
-	frame = new PlotFrame(renderer, *axisTop, *axisBottom, *axisLeft, *axisRight);
 
 	ResetAutoScaling();
 }
@@ -2146,27 +2147,6 @@ unsigned long long PlotObject::GetTotalPointCount() const
 
 //==========================================================================
 // Class:			PlotObject
-// Function:		SetBackgroundColor
-//
-// Description:		Sets the plot background color.
-//
-// Input Arguments:
-//		color	= const Color&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotObject::SetBackgroundColor(const Color& color)
-{
-	frame->SetColor(color);
-}
-
-//==========================================================================
-// Class:			PlotObject
 // Function:		ComputeTransformationMatrices
 //
 // Description:		Calculates the transformation matrices for plot curves
@@ -2211,4 +2191,35 @@ void PlotObject::ComputeTransformationMatrices()
 
 	renderer.SetLeftModelview(left);
 	renderer.SetRightModelview(right);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		UpdateScissorBuffer
+//
+// Description:		Updates the scissor buffer according to the size of the
+//					plot area.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::UpdateScissorBuffer() const
+{
+	glClear(GL_SCISSOR_BIT);
+
+	int width, height;
+	renderer.GetSize(&width, &height);
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(axisLeft->GetOffsetFromWindowEdge(), axisBottom->GetOffsetFromWindowEdge(),
+		width - axisRight->GetOffsetFromWindowEdge() - axisLeft->GetOffsetFromWindowEdge(),
+		height - axisTop->GetOffsetFromWindowEdge() - axisBottom->GetOffsetFromWindowEdge());
+
+	glDisable(GL_SCISSOR_TEST);
 }

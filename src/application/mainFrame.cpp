@@ -219,7 +219,7 @@ void MainFrame::CreateControls()
 PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 {
 	wxGLAttributes displayAttributes;
-	displayAttributes.PlatformDefaults().RGBA().DoubleBuffer().SampleBuffers(1).Samplers(4).EndList();
+	displayAttributes.PlatformDefaults().RGBA().DoubleBuffer().SampleBuffers(1).Samplers(4).Stencil(1).EndList();
 	assert(wxGLCanvas::IsDisplaySupported(displayAttributes));
 	plotArea = new PlotRenderer(*parent, *this, wxID_ANY, displayAttributes);
 

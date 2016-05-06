@@ -31,7 +31,6 @@ class TextRendering;
 class PlotCurve;
 class Dataset2D;
 class Color;
-class PlotFrame;
 
 // FTGL forward declarations
 class FTFont;
@@ -89,8 +88,6 @@ public:
 
 	void SetPrettyCurves(const bool &pretty) { this->pretty = pretty; }
 
-	void SetBackgroundColor(const Color& color);
-
 	inline double GetXMajorResolution() const { return xMajorResolution; }
 	inline double GetLeftYMajorResolution() const { return yLeftMajorResolution; }
 	inline double GetRightYMajorResolution() const { return yRightMajorResolution; }
@@ -134,6 +131,8 @@ public:
 	unsigned int GetHorizontalAxisOffset(const bool &withLabel) const;
 	unsigned int GetVerticalAxisOffset(const bool &withLabel) const;
 
+	void UpdateScissorBuffer() const;
+
 private:
 	PlotRenderer &renderer;
 
@@ -147,8 +146,6 @@ private:
 	Axis *axisBottom;
 	Axis *axisLeft;
 	Axis *axisRight;
-
-	PlotFrame *frame;
 
 	TextRendering *titleObject;
 

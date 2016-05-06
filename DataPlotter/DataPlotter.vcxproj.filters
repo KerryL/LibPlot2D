@@ -192,9 +192,6 @@
     <ClInclude Include="..\src\renderer\line.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\primitives\plotFrame.h">
-      <Filter>Header Files\renderer\primitives</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="../src\renderer\primitives\axis.cpp">
@@ -328,9 +325,6 @@
     </ClCompile>
     <ClCompile Include="..\src\application\gitHash.cpp">
       <Filter>Source Files\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\primitives\plotFrame.cpp">
-      <Filter>Source Files\renderer\primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
