@@ -75,6 +75,8 @@ PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 	CreateAxisObjects();
 
 	ResetAutoScaling();
+
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -591,7 +593,11 @@ void PlotObject::FormatPlot()
 	ApplyRangeLimits(xMinor, xMajor, yLeftMinor, yLeftMajor, yRightMinor, yRightMajor);
 	UpdateLimitValues();
 
-	UpdateScissorBuffer();
+	if (needScissorUpdate)
+	{
+		UpdateScissorArea();
+		needScissorUpdate = false;
+	}
 }
 
 //==========================================================================
@@ -1829,6 +1835,7 @@ bool PlotObject::GetMinorGrid()
 void PlotObject::SetXLabel(wxString text)
 {
 	axisBottom->SetLabel(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -1850,6 +1857,7 @@ void PlotObject::SetXLabel(wxString text)
 void PlotObject::SetLeftYLabel(wxString text)
 {
 	axisLeft->SetLabel(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -1871,6 +1879,7 @@ void PlotObject::SetLeftYLabel(wxString text)
 void PlotObject::SetRightYLabel(wxString text)
 {
 	axisRight->SetLabel(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -1892,6 +1901,7 @@ void PlotObject::SetRightYLabel(wxString text)
 void PlotObject::SetTitle(wxString text)
 {
 	titleObject->SetText(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -2197,7 +2207,7 @@ void PlotObject::ComputeTransformationMatrices()
 
 //==========================================================================
 // Class:			PlotObject
-// Function:		UpdateScissorBuffer
+// Function:		UpdateScissorArea
 //
 // Description:		Updates the scissor buffer according to the size of the
 //					plot area.
@@ -2212,7 +2222,7 @@ void PlotObject::ComputeTransformationMatrices()
 //		None
 //
 //==========================================================================
-void PlotObject::UpdateScissorBuffer() const
+void PlotObject::UpdateScissorArea() const
 {
 	glClear(GL_SCISSOR_BIT);
 

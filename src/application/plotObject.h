@@ -131,7 +131,7 @@ public:
 	unsigned int GetHorizontalAxisOffset(const bool &withLabel) const;
 	unsigned int GetVerticalAxisOffset(const bool &withLabel) const;
 
-	void UpdateScissorBuffer() const;
+	inline void UpdatePlotAreaSize() { needScissorUpdate = true; }
 
 private:
 	PlotRenderer &renderer;
@@ -169,6 +169,8 @@ private:
 	double xMajorResolution;
 	double yLeftMajorResolution;
 	double yRightMajorResolution;
+
+	bool needScissorUpdate;
 
 	// The actual plot objects
 	std::vector<PlotCurve*> plotList;
@@ -217,6 +219,8 @@ private:
 	void ResetOriginalLimits();
 	void MatchYAxes();
 	double GetFirstValidValue(const double* data, const unsigned int &size) const;
+
+	void UpdateScissorArea() const;
 };
 
 #endif// PLOT_OBJECT_H_

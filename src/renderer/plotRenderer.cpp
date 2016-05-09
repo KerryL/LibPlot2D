@@ -274,7 +274,7 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 	if (legend)
 		legend->SetModified();
 
-	//plot->UpdateScissorBuffer();
+	plot->UpdatePlotAreaSize();
 	UpdateDisplay();
 
 	// Skip this event so the base class OnSize event fires, too
