@@ -590,6 +590,8 @@ void PlotObject::FormatPlot()
 	ResetOriginalLimits();
 	ApplyRangeLimits(xMinor, xMajor, yLeftMinor, yLeftMajor, yRightMinor, yRightMajor);
 	UpdateLimitValues();
+
+	UpdateScissorBuffer();
 }
 
 //==========================================================================

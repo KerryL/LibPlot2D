@@ -134,38 +134,46 @@ void PlotCurve::InitializeVertexBuffer(const unsigned int& /*i*/)
 //==========================================================================
 void PlotCurve::Update(const unsigned int& i)
 {
-	if (lineSize > 0)
+	if (i == 0)
 	{
-		const double lineSizeScale(1.2);
+		if (lineSize > 0)
+		{
+			const double lineSizeScale(1.2);
 
-		line.SetLineColor(color);
-		line.SetBackgroundColorForAlphaFade();
-		line.SetWidth(lineSize * lineSizeScale);
-		line.Build(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
+			line.SetLineColor(color);
+			line.SetBackgroundColorForAlphaFade();
+			line.SetWidth(lineSize * lineSizeScale);
+			line.Build(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
 
-		int width, height;
-		renderWindow.GetSize(&width, &height);
-		width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
-		height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+			int width, height;
+			renderWindow.GetSize(&width, &height);
+			width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+			height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 
-		line.SetXScale((xAxis->GetMaximum() - xAxis->GetMinimum()) / width);
-		line.SetYScale((yAxis->GetMaximum() - yAxis->GetMinimum()) / height);
+			line.SetXScale((xAxis->GetMaximum() - xAxis->GetMinimum()) / width);
+			line.SetYScale((yAxis->GetMaximum() - yAxis->GetMinimum()) / height);
+		}
+		else
+			line.SetWidth(0.0);
+
+		// TODO:  Need to delete openGL objects?
+		if (bufferInfo.size() == 0)
+			bufferInfo.push_back(line.GetBufferInfo());
+		else
+			bufferInfo[i] = line.GetBufferInfo();
 	}
 	else
-		line.SetWidth(0.0);
-
-	// TODO:  Need to delete openGL objects?
-	bufferInfo.clear();
-	bufferInfo.push_back(line.GetBufferInfo());
-
-	// TODO:  Need markers
-	/*if (markerSize > 0 || (markerSize < 0 && SmallRange()))
 	{
-		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-		glBegin(GL_QUADS);
-		PlotMarkers();
-		glEnd();
-	}*/
+
+		// TODO:  Need markers
+		/*if (markerSize > 0 || (markerSize < 0 && SmallRange()))
+		{
+			glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
+			glBegin(GL_QUADS);
+			PlotMarkers();
+			glEnd();
+		}*/
+	}
 }
 
 //==========================================================================

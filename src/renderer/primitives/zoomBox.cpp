@@ -98,8 +98,10 @@ void ZoomBox::Update(const unsigned int& /*i*/)
 	box.Build(points);
 
 	// TODO:  Need to delete openGL objects?
-	bufferInfo.clear();
-	bufferInfo.push_back(box.GetBufferInfo());
+	if (bufferInfo.size() == 0)
+		bufferInfo.push_back(box.GetBufferInfo());
+	else
+		bufferInfo[0] = box.GetBufferInfo();
 }
 
 //==========================================================================
