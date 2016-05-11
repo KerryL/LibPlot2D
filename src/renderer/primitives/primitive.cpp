@@ -49,8 +49,6 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 
 	// Add a default info block to ensure the initialize and update functions get called
 	bufferInfo.push_back(BufferInfo());
-	bufferInfo.back().vertexBuffer = NULL;
-	bufferInfo.back().vertexCountModified = true;
 
 	modified = true;
 }
@@ -105,9 +103,7 @@ Primitive::~Primitive()
 	unsigned int i;
 	for (i = 0; i < bufferInfo.size(); i++)
 	{
-		glDeleteBuffers(1, &bufferInfo[i].vertexBufferIndex);
-		glDeleteVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
-
+		bufferInfo[i].FreeOpenGLObjects();
 		delete[] bufferInfo[i].vertexBuffer;
 		bufferInfo[i].vertexBuffer = NULL;
 	}
@@ -293,4 +289,80 @@ void Primitive::DisableAlphaBlending()
 {
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
+}
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		BufferInfo
+//
+// Description:		Constructor for the Primitive::BufferInfo struct.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Primitive::BufferInfo::BufferInfo()
+{
+	vertexBuffer = NULL;
+	vertexCountModified = true;
+	vertexCount = 0;
+	openGLObjectsExist = false;
+}
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		GetOpenGLIndices
+//
+// Description:		Method for safely initializing this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::BufferInfo::GetOpenGLIndices()
+{
+	if (!openGLObjectsExist)
+	{
+		glGenVertexArrays(1, &vertexArrayIndex);
+		glGenBuffers(1, &vertexBufferIndex);
+		openGLObjectsExist = true;
+	}
+}
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		FreeOpenGLObjects
+//
+// Description:		Frees OpenGL resources.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::BufferInfo::FreeOpenGLObjects()
+{
+	if (openGLObjectsExist)
+	{
+		glDeleteVertexArrays(1, &vertexArrayIndex);
+		glDeleteBuffers(1, &vertexBufferIndex);
+		openGLObjectsExist = false;
+	}
 }

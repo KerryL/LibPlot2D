@@ -78,7 +78,6 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
 	}
 
-	// TODO:  Need to delete openGL objects?
 	if (bufferInfo.size() == 0)
 		bufferInfo.push_back(line.GetBufferInfo());
 	else

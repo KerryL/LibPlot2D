@@ -53,8 +53,6 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 	pretty = true;
 
 	bufferInfo.push_back(BufferInfo());// Add a second empty info block for the markers
-	bufferInfo[1].vertexCountModified = true;
-	bufferInfo[1].vertexBuffer = NULL;
 }
 
 //==========================================================================
@@ -119,9 +117,7 @@ void PlotCurve::InitializeMarkerVertexBuffer()
 {
 	delete[] bufferInfo[1].vertexBuffer;
 
-	// TODO:  Do we leak these gl objects?
-	glGenVertexArrays(1, &bufferInfo[1].vertexArrayIndex);
-	glGenBuffers(1, &bufferInfo[1].vertexBufferIndex);
+	bufferInfo[1].GetOpenGLIndices();
 
 	bufferInfo[1].vertexCount = data.GetNumberOfPoints() * 4;
 	bufferInfo[1].vertexBuffer = new float[bufferInfo[1].vertexCount * (renderWindow.GetVertexDimension() + 4)];
@@ -347,8 +343,8 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 //==========================================================================
 void PlotCurve::BuildMarkers()
 {
-	float halfMarkerXSize = 2 * markerSize * xScale;// TODO:  OK to be 4x off on size?
-	float halfMarkerYSize = 2 * markerSize * yScale;// TODO:  OK to be 4x off on size?
+	float halfMarkerXSize = 2 * markerSize * xScale;
+	float halfMarkerYSize = 2 * markerSize * yScale;
 	const unsigned int dimension(renderWindow.GetVertexDimension());
 	const unsigned int colorStart(data.GetNumberOfPoints() * dimension * 4);
 

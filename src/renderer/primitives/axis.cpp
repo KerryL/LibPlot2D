@@ -71,6 +71,11 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), line(renderWin
 
 	gridColor.Set(0.8, 0.8, 0.8, 1.0);
 	SetDrawOrder(2500);
+
+	bufferInfo.push_back(BufferInfo());// Ticks
+	bufferInfo.push_back(BufferInfo());// Values
+	bufferInfo.push_back(BufferInfo());// Gridlines
+	bufferInfo.push_back(BufferInfo());// Label
 }
 
 //==========================================================================

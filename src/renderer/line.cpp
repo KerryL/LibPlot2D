@@ -74,9 +74,6 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 
 	xScale = 1.0;
 	yScale = 1.0;
-
-	bufferInfo.vertexBuffer = NULL;
-	bufferInfo.vertexCountModified = false;
 }
 
 //==========================================================================
@@ -292,7 +289,7 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 		miter -= M_PI * 0.5;
 
 	double miterLength(halfWidth), fade(fadeDistance);
-	const double divisor(sin((M_PI - angleNext + anglePrior) * 0.5));// TODO:  This is wrong
+	const double divisor(sin((M_PI - angleNext + anglePrior) * 0.5));
 	if (!PlotMath::IsZero(divisor))
 	{
 		miterLength /= fabs(divisor);
@@ -324,9 +321,7 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 //==========================================================================
 void Line::AllocateBuffer(const unsigned int& vertexCount)
 {
-	// TODO:  Do we leak these gl objects?
-	glGenVertexArrays(1, &bufferInfo.vertexArrayIndex);
-	glGenBuffers(1, &bufferInfo.vertexBufferIndex);
+	bufferInfo.GetOpenGLIndices();
 
 	bufferInfo.vertexCount = vertexCount;
 	bufferInfo.vertexBuffer = new float[bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4)];

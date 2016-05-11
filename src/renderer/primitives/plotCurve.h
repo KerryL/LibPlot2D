@@ -34,7 +34,7 @@ public:
 	virtual ~PlotCurve();
 
 	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
-	inline void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
+	inline void SetMarkerSize(const double &size) { markerSize = size; modified = true; }
 	inline void SetPretty(const bool &pretty) { this->pretty = pretty; line.SetPretty(pretty); modified = true; }
 
 	// For setting up the plot
@@ -64,7 +64,7 @@ private:
 
 	bool pretty;
 	double lineSize;
-	int markerSize;
+	double markerSize;
 
 	bool PointIsValid(const unsigned int &i) const;
 

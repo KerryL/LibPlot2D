@@ -53,9 +53,15 @@ public:
 	{
 		unsigned int vertexCount;
 		float *vertexBuffer;
+		bool vertexCountModified;
+
 		unsigned int vertexBufferIndex;
 		unsigned int vertexArrayIndex;
-		bool vertexCountModified;
+		bool openGLObjectsExist;
+
+		BufferInfo();
+		void GetOpenGLIndices();
+		void FreeOpenGLObjects();
 	};
 
 protected:
