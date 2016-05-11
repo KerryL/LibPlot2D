@@ -203,7 +203,6 @@ void PlotCurve::GenerateGeometry()
 	else
 		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewRight);
 
-	// TODO:  Can stencil buffer state be saved in VAO?
 	glEnable(GL_SCISSOR_TEST);
 	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 
@@ -212,10 +211,10 @@ void PlotCurve::GenerateGeometry()
 	else
 		Line::DoUglyDraw(bufferInfo[0].vertexCount);
 
+	// TODO:  markers?
+
 	glBindVertexArray(0);
 	glDisable(GL_SCISSOR_TEST);
-
-	// TODO:  markers?
 
 	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewFixed);
 }

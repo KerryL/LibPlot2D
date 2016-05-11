@@ -244,29 +244,10 @@ void Line::Build(const double* const x, const double* const y, const unsigned in
 void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
 {
-	if (PlotMath::IsZero(y2 - y1))
-	{
-		dxLine = 0.0;
-		dyLine = halfWidth * PlotMath::Sign(x2 - x1);
-	}
-	else if (PlotMath::IsZero(x2 - x1))
-	{
-		dxLine = halfWidth * PlotMath::Sign(y1 - y2);
-		dyLine = 0.0;
-	}
-	else
-	{
-		double slope = (y2 - y1) / (x2 - x1) * xScale / yScale;
-		double miterLength(halfWidth);
-		if (!PlotMath::IsZero(sin(atan(slope))))
-			miterLength /= fabs(sin(atan(slope)));
+	double miter(atan2((y2 - y1) / yScale, (x2 - x1) / xScale) + M_PI * 0.5);
 
-		dyLine = sqrt(miterLength * miterLength / (1.0 + slope * slope)) * PlotMath::Sign(x2 - x1);
-		dxLine = fabs(slope * dyLine) * PlotMath::Sign(y1 - y2);
-	}
-
-	dxLine *= xScale;
-	dyLine *= yScale;
+	dxLine = halfWidth * cos(miter) * xScale;
+	dyLine = halfWidth * sin(miter) * yScale;
 
 	dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
 	dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
@@ -301,8 +282,8 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 	const double &x, const double &y, const double &xNext, const double &yNext,
 	double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
 {
-	const double anglePrior(atan2(y - yPrior, x - xPrior));
-	const double angleNext(atan2(yNext - y, xNext - x));
+	const double anglePrior(atan2((y - yPrior) / yScale, (x - xPrior) / xScale));
+	const double angleNext(atan2((yNext - y) / yScale, (xNext - x) / xScale));
 	double miter(0.5 * (anglePrior + angleNext));
 	
 	if (fabs(angleNext - anglePrior) < M_PI)
@@ -310,20 +291,19 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 	else
 		miter -= M_PI * 0.5;
 
-	double miterLength(halfWidth);
-	const double divisor(cos(anglePrior + M_PI - miter));
+	double miterLength(halfWidth), fade(fadeDistance);
+	const double divisor(sin((M_PI - angleNext + anglePrior) * 0.5));// TODO:  This is wrong
 	if (!PlotMath::IsZero(divisor))
+	{
 		miterLength /= fabs(divisor);
+		fade /= fabs(divisor);
+	}
 
-	// TODO:  Line size/miter angle should not be affected by aspect ratio!
-	// I think the fundamental problem is that I want the line sizes to be
-	// w.r.t. screen coords, but the points themselves need to be w.r.t.
-	// model coords.
 	dxLine = miterLength * cos(miter) * xScale;
 	dyLine = miterLength * sin(miter) * yScale;
 
-	dxEdge = dxLine * (miterLength + fadeDistance) / halfWidth;
-	dyEdge = dyLine * (miterLength + fadeDistance) / halfWidth;
+	dxEdge = dxLine * (miterLength + fade) / miterLength;
+	dyEdge = dyLine * (miterLength + fade) / miterLength;
 }
 
 //==========================================================================
@@ -623,7 +603,6 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 	};
 
 	std::vector<Offsets> offsets(points.size());
-	double dxLine, dyLine, dxEdge, dyEdge;
 
 	/* Draw the line in three passes, first from center to one side, then from
 	   center to the other side
@@ -651,19 +630,17 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 	{
 		if (i == 0)
 			ComputeOffsets(points[i].first, points[i].second, points[i + 1].first,
-				points[i + 1].second, dxLine, dyLine, dxEdge, dyEdge);
+				points[i + 1].second, offsets[i].dxLine, offsets[i].dyLine,
+				offsets[i].dxEdge, offsets[i].dyEdge);
 		else if (i == points.size() - 1)
 			ComputeOffsets(points[i - 1].first, points[i - 1].second, points[i].first,
-				points[i].second, dxLine, dyLine, dxEdge, dyEdge);
+				points[i].second, offsets[i].dxLine, offsets[i].dyLine,
+				offsets[i].dxEdge, offsets[i].dyEdge);
 		else
 			ComputeOffsets(points[i - 1].first, points[i - 1].second,
 				points[i].first, points[i].second, points[i + 1].first,
-				points[i + 1].second, dxLine, dyLine, dxEdge, dyEdge);
-
-		offsets[i].dxLine = dxLine;
-		offsets[i].dyLine = dyLine;
-		offsets[i].dxEdge = dxEdge;
-		offsets[i].dyEdge = dyEdge;
+				points[i + 1].second, offsets[i].dxLine, offsets[i].dyLine,
+				offsets[i].dxEdge, offsets[i].dyEdge);
 
 		bufferInfo.vertexBuffer[i * (dimension * 2)] = (float)(points[i].first - offsets[i].dxLine);
 		bufferInfo.vertexBuffer[i * (dimension * 2) + 1] = (float)(points[i].second - offsets[i].dyLine);
@@ -763,6 +740,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 void Line::DoUglyDraw(const unsigned int& vertexCount)
 {
 	glDrawArrays(GL_LINE_STRIP, 0, vertexCount);
+	glLineWidth(1.0f);// TODO:  Better way to do this?
 }
 
 //==========================================================================
@@ -783,7 +761,7 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 //==========================================================================
 void Line::DoPrettyDraw(const unsigned int& vertexCount)
 {
-	assert(vertexCount % 3 == 0);
+	assert(vertexCount % 3 == 0 || vertexCount == 8);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount / 3);
 	glDrawArrays(GL_TRIANGLE_STRIP, vertexCount / 3, vertexCount / 3);
 	glDrawArrays(GL_TRIANGLE_STRIP, 2 * vertexCount / 3, vertexCount / 3);
