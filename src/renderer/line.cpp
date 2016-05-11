@@ -46,7 +46,7 @@
 #ifdef __WXMSW__
 const double Line::fadeDistance(0.05);
 #else
-const double Line::fadeDistance(0.6);
+const double Line::fadeDistance(0.6);// TODO:  Can this be reduced?
 #endif
 
 //==========================================================================
