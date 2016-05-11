@@ -79,31 +79,6 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 
 //==========================================================================
 // Class:			Legend
-// Function:		InitializeVertexBuffer
-//
-// Description:		Initializes the vertex buffer containing this object's vertices.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::InitializeVertexBuffer(const unsigned int& i)
-{
-	bufferInfo[i].vertexCount = 4 + 2 * entries.size();
-	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
-
-	// TODO:  Text?
-	// TODO:  quads for markers?
-}
-
-//==========================================================================
-// Class:			Legend
 // Function:		Update
 //
 // Description:		Updates the GL buffers associated with this object.

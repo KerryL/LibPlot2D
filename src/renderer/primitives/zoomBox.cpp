@@ -52,27 +52,6 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(rend
 
 //==========================================================================
 // Class:			ZoomBox
-// Function:		InitializeVertexBuffer
-//
-// Description:		Initializes the vertex buffer containing this object's vertices.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void ZoomBox::InitializeVertexBuffer(const unsigned int& /*i*/)
-{
-	// Handled by box
-}
-
-//==========================================================================
-// Class:			ZoomBox
 // Function:		Update
 //
 // Description:		Updates the GL buffers associated with this object.

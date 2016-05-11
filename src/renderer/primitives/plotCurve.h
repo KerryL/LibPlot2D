@@ -52,7 +52,6 @@ protected:
 	virtual bool HasValidParameters();
 	virtual void Update(const unsigned int& i);
 	virtual void GenerateGeometry();
-	virtual void InitializeVertexBuffer(const unsigned int& i);
 
 private:
 	// The axes with which this object is associated
@@ -69,8 +68,8 @@ private:
 
 	bool PointIsValid(const unsigned int &i) const;
 
-	void PlotMarkers() const;
-	void DrawMarker(const double &x, const double &y) const;
+	bool NeedsMarkersDrawn() const;
+	void BuildMarkers();
 
 	enum RangeSize
 	{
@@ -79,11 +78,14 @@ private:
 		RangeSizeUndetermined
 	};
 
-	bool SmallRange() const;
-	RangeSize SmallXRange() const;
-	RangeSize SmallYRange() const;
+	bool RangeIsSmall() const;
+	RangeSize XRangeIsSmall() const;
+	RangeSize YRangeIsSmall() const;
 
-	// TODO:  This object should have its own modelview matrix?
+	double xScale;
+	double yScale;
+
+	void InitializeMarkerVertexBuffer();
 };
 
 #endif// PLOT_CURVE_H_

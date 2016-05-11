@@ -642,11 +642,11 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 				points[i + 1].second, offsets[i].dxLine, offsets[i].dyLine,
 				offsets[i].dxEdge, offsets[i].dyEdge);
 
-		bufferInfo.vertexBuffer[i * (dimension * 2)] = (float)(points[i].first - offsets[i].dxLine);
-		bufferInfo.vertexBuffer[i * (dimension * 2) + 1] = (float)(points[i].second - offsets[i].dyLine);
+		bufferInfo.vertexBuffer[i * dimension * 2] = (float)(points[i].first - offsets[i].dxLine);
+		bufferInfo.vertexBuffer[i * dimension * 2 + 1] = (float)(points[i].second - offsets[i].dyLine);
 
-		bufferInfo.vertexBuffer[i * (dimension * 2) + dimension] = (float)(points[i].first - offsets[i].dxEdge);
-		bufferInfo.vertexBuffer[i * (dimension * 2) + dimension + 1] = (float)(points[i].second - offsets[i].dyEdge);
+		bufferInfo.vertexBuffer[i * dimension * 2 + dimension] = (float)(points[i].first - offsets[i].dxEdge);
+		bufferInfo.vertexBuffer[i * dimension * 2 + dimension + 1] = (float)(points[i].second - offsets[i].dyEdge);
 
 		bufferInfo.vertexBuffer[colorStartLeft + i * 8] = (float)lineColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartLeft + i * 8 + 1] = (float)lineColor.GetGreen();
@@ -662,11 +662,11 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 	const unsigned int colorStartCenter(colorStartLeft + colorValuesPerStripe);
 	for (i = 0; i < points.size(); i++)
 	{
-		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2)] = (float)(points[i].first - offsets[i].dxLine);
-		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2) + 1] = (float)(points[i].second - offsets[i].dyLine);
+		bufferInfo.vertexBuffer[coordinatesPerStripe + i * dimension * 2] = (float)(points[i].first - offsets[i].dxLine);
+		bufferInfo.vertexBuffer[coordinatesPerStripe + i * dimension * 2 + 1] = (float)(points[i].second - offsets[i].dyLine);
 
-		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2) + dimension] = (float)(points[i].first + offsets[i].dxLine);
-		bufferInfo.vertexBuffer[coordinatesPerStripe + i * (dimension * 2) + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
+		bufferInfo.vertexBuffer[coordinatesPerStripe + i * dimension * 2 + dimension] = (float)(points[i].first + offsets[i].dxLine);
+		bufferInfo.vertexBuffer[coordinatesPerStripe + i * dimension * 2 + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
 
 		bufferInfo.vertexBuffer[colorStartCenter + i * 8] = (float)lineColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartCenter + i * 8 + 1] = (float)lineColor.GetGreen();
@@ -683,11 +683,11 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 	const unsigned int colorStartRight(colorStartCenter + colorValuesPerStripe);
 	for (i = 0; i < points.size(); i++)
 	{
-		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2)] = (float)(points[i].first + offsets[i].dxEdge);
-		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2) + 1] = (float)(points[i].second + offsets[i].dyEdge);
+		bufferInfo.vertexBuffer[vertexStartRight + i * dimension * 2] = (float)(points[i].first + offsets[i].dxEdge);
+		bufferInfo.vertexBuffer[vertexStartRight + i * dimension * 2 + 1] = (float)(points[i].second + offsets[i].dyEdge);
 
-		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2) + dimension] = (float)(points[i].first + offsets[i].dxLine);
-		bufferInfo.vertexBuffer[vertexStartRight + i * (dimension * 2) + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
+		bufferInfo.vertexBuffer[vertexStartRight + i * dimension * 2 + dimension] = (float)(points[i].first + offsets[i].dxLine);
+		bufferInfo.vertexBuffer[vertexStartRight + i * dimension * 2 + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
 
 		bufferInfo.vertexBuffer[colorStartRight + i * 8] = (float)backgroundColor.GetRed();
 		bufferInfo.vertexBuffer[colorStartRight + i * 8 + 1] = (float)backgroundColor.GetGreen();

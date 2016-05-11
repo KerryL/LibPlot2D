@@ -74,14 +74,10 @@ protected:
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
 
-	virtual void InitializeVertexBuffer(const unsigned int& i) = 0;
-
 	std::vector<BufferInfo> bufferInfo;
 
 private:
 	unsigned int drawOrder;
-
-	void HandleVertexBufferModification(const unsigned int& i);
 };
 
 #endif// PRIMITIVE_H_

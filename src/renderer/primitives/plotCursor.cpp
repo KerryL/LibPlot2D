@@ -49,27 +49,6 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 
 //==========================================================================
 // Class:			PlotCursor
-// Function:		InitializeVertexBuffer
-//
-// Description:		Initializes the vertex buffer containing this object's vertices.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCursor::InitializeVertexBuffer(const unsigned int& i)
-{
-	// Handled by line object
-}
-
-//==========================================================================
-// Class:			PlotCursor
 // Function:		Update
 //
 // Description:		Updates the GL buffers associated with this object.

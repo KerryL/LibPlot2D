@@ -48,7 +48,6 @@ protected:
 	virtual bool HasValidParameters();
 	virtual void Update(const unsigned int& i);
 	virtual void GenerateGeometry();
-	virtual void InitializeVertexBuffer(const unsigned int& i);
 
 private:
 	double angle;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen

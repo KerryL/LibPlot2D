@@ -51,6 +51,10 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 	lineSize = 1;
 	markerSize = -1;
 	pretty = true;
+
+	bufferInfo.push_back(BufferInfo());// Add a second empty info block for the markers
+	bufferInfo[1].vertexCountModified = true;
+	bufferInfo[1].vertexBuffer = NULL;
 }
 
 //==========================================================================
@@ -97,9 +101,9 @@ PlotCurve::~PlotCurve()
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		InitializeVertexBuffer
+// Function:		InitializeMarkerVertexBuffer
 //
-// Description:		Initializes the vertex buffer containing this object's vertices.
+// Description:		Initializes the vertex buffer for storing the marker information.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -111,9 +115,19 @@ PlotCurve::~PlotCurve()
 //		None
 //
 //==========================================================================
-void PlotCurve::InitializeVertexBuffer(const unsigned int& /*i*/)
+void PlotCurve::InitializeMarkerVertexBuffer()
 {
-	// Handled by line object
+	delete[] bufferInfo[1].vertexBuffer;
+
+	// TODO:  Do we leak these gl objects?
+	glGenVertexArrays(1, &bufferInfo[1].vertexArrayIndex);
+	glGenBuffers(1, &bufferInfo[1].vertexBufferIndex);
+
+	bufferInfo[1].vertexCount = data.GetNumberOfPoints() * 4;
+	bufferInfo[1].vertexBuffer = new float[bufferInfo[1].vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	assert(renderWindow.GetVertexDimension() == 2);
+
+	bufferInfo[1].vertexCountModified = false;
 }
 
 //==========================================================================
@@ -136,6 +150,14 @@ void PlotCurve::Update(const unsigned int& i)
 {
 	if (i == 0)
 	{
+		int width, height;
+			renderWindow.GetSize(&width, &height);
+			width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+			height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+
+			xScale = (xAxis->GetMaximum() - xAxis->GetMinimum()) / width;
+			yScale = (yAxis->GetMaximum() - yAxis->GetMinimum()) / height;
+
 		if (lineSize > 0)
 		{
 			const double lineSizeScale(1.2);
@@ -143,14 +165,8 @@ void PlotCurve::Update(const unsigned int& i)
 			line.SetLineColor(color);
 			line.SetBackgroundColorForAlphaFade();
 			line.SetWidth(lineSize * lineSizeScale);
-
-			int width, height;
-			renderWindow.GetSize(&width, &height);
-			width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
-			height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
-
-			line.SetXScale((xAxis->GetMaximum() - xAxis->GetMinimum()) / width);
-			line.SetYScale((yAxis->GetMaximum() - yAxis->GetMinimum()) / height);
+			line.SetXScale(xScale);
+			line.SetYScale(yScale);
 
 			line.Build(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
 		}
@@ -165,15 +181,26 @@ void PlotCurve::Update(const unsigned int& i)
 	}
 	else
 	{
+		if (bufferInfo[i].vertexCountModified)
+			InitializeMarkerVertexBuffer();
 
-		// TODO:  Need markers
-		/*if (markerSize > 0 || (markerSize < 0 && SmallRange()))
-		{
-			glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-			glBegin(GL_QUADS);
-			PlotMarkers();
-			glEnd();
-		}*/
+		BuildMarkers();
+
+		glBindVertexArray(bufferInfo[i].vertexArrayIndex);
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufferInfo[i].vertexBufferIndex);
+		glBufferData(GL_ARRAY_BUFFER,
+			sizeof(GLfloat) * bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4),
+			bufferInfo[i].vertexBuffer, GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+		glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glEnableVertexAttribArray(renderWindow.GetColorLocation());
+		glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+			(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo[i].vertexCount));
+
+		glBindVertexArray(0);
 	}
 }
 
@@ -212,7 +239,11 @@ void PlotCurve::GenerateGeometry()
 	else
 		Line::DoUglyDraw(bufferInfo[0].vertexCount);
 
-	// TODO:  markers?
+	if (NeedsMarkersDrawn())
+	{
+		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
+		glDrawArrays(GL_QUADS, 0, bufferInfo[1].vertexCount);
+	}
 
 	glBindVertexArray(0);
 	glDisable(GL_SCISSOR_TEST);
@@ -300,7 +331,7 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		PlotMarkers
+// Function:		BuildMarkers
 //
 // Description:		Plots markers at all un-interpolated points.
 //
@@ -314,45 +345,53 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 //		None
 //
 //==========================================================================
-void PlotCurve::PlotMarkers() const
+void PlotCurve::BuildMarkers()
 {
+	float halfMarkerXSize = 2 * markerSize * xScale;// TODO:  OK to be 4x off on size?
+	float halfMarkerYSize = 2 * markerSize * yScale;// TODO:  OK to be 4x off on size?
+	const unsigned int dimension(renderWindow.GetVertexDimension());
+	const unsigned int colorStart(data.GetNumberOfPoints() * dimension * 4);
+
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
-			DrawMarker(data.GetXData(i), data.GetYData(i));
+	{
+		bufferInfo[1].vertexBuffer[i * 4 * dimension] = (float)data.GetXData(i) + halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = (float)data.GetYData(i) + halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension] = (float)data.GetXData(i) + halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension + 1] = (float)data.GetYData(i) - halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension] = (float)data.GetXData(i) - halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension + 1] = (float)data.GetYData(i) - halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension] = (float)data.GetXData(i) - halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension + 1] = (float)data.GetYData(i) + halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 1] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 2] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 3] = (float)color.GetAlpha();
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 4] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 5] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 6] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 7] = (float)color.GetAlpha();
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 8] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 9] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 10] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 11] = (float)color.GetAlpha();
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 12] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 13] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 14] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 15] = (float)color.GetAlpha();
+	}
 }
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		DrawMarker
-//
-// Description:		Draws a marker at the specified location.
-//
-// Input Arguments:
-//		x	= const double&
-//		y	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::DrawMarker(const double &x, const double &y) const
-{
-	double point[2] = {x, y};
-
-	int halfMarkerSize = 2 * markerSize;
-
-	glVertex2i(point[0] + halfMarkerSize, point[1] + halfMarkerSize);
-	glVertex2i(point[0] + halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] + halfMarkerSize);
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		SmallRange
+// Function:		RangeIsSmall
 //
 // Description:		Determines if the range is small enough to warrant
 //					drawing the point markers.
@@ -367,12 +406,12 @@ void PlotCurve::DrawMarker(const double &x, const double &y) const
 //		bool
 //
 //==========================================================================
-bool PlotCurve::SmallRange() const
+bool PlotCurve::RangeIsSmall() const
 {
 	if (data.GetNumberOfPoints() < 2)
 		return false;
 
-	switch (SmallXRange())
+	switch (XRangeIsSmall())
 	{
 	case RangeSizeSmall:
 		return true;
@@ -385,12 +424,12 @@ bool PlotCurve::SmallRange() const
 		break;
 	}
 
-	return SmallYRange() == RangeSizeSmall;
+	return YRangeIsSmall() == RangeSizeSmall;
 }
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		SmallXRange
+// Function:		XRangeIsSmall
 //
 // Description:		Determines if the x-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
@@ -407,7 +446,7 @@ bool PlotCurve::SmallRange() const
 //		PlotCurve::RangeSize
 //
 //==========================================================================
-PlotCurve::RangeSize PlotCurve::SmallXRange() const
+PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
 	double period = data.GetXData(1) - data.GetXData(0);
 	if (period == 0.0)
@@ -429,7 +468,7 @@ PlotCurve::RangeSize PlotCurve::SmallXRange() const
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		SmallYRange
+// Function:		YRangeIsSmall
 //
 // Description:		Determines if the y-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
@@ -446,7 +485,7 @@ PlotCurve::RangeSize PlotCurve::SmallXRange() const
 //		PlotCurve::RangeSize
 //
 //==========================================================================
-PlotCurve::RangeSize PlotCurve::SmallYRange() const
+PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
 	double period = data.GetYData(1) - data.GetYData(0);
 	if (period == 0.0)
@@ -464,4 +503,25 @@ PlotCurve::RangeSize PlotCurve::SmallYRange() const
 		return RangeSizeSmall;
 
 	return RangeSizeLarge;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		NeedsMarkersDrawn
+//
+// Description:		Determines if we should draw plot markers.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool PlotCurve::NeedsMarkersDrawn() const
+{
+	return markerSize > 0 || (markerSize < 0 && RangeIsSmall());
 }

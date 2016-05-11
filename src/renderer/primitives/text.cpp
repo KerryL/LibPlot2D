@@ -72,27 +72,6 @@ TextRendering::~TextRendering()
 
 //==========================================================================
 // Class:			TextRendering
-// Function:		InitializeVertexBuffer
-//
-// Description:		Initializes the vertex buffer containing this object's vertices.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void TextRendering::InitializeVertexBuffer(const unsigned int& i)
-{
-	delete[] bufferInfo[i].vertexBuffer;
-}
-
-//==========================================================================
-// Class:			TextRendering
 // Function:		Update
 //
 // Description:		Updates the GL buffers associated with this object.

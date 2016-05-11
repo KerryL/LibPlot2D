@@ -95,26 +95,6 @@ Axis::~Axis()
 
 //==========================================================================
 // Class:			Axis
-// Function:		InitializeVertexBuffer
-//
-// Description:		Initializes the vertex buffer containing this object's vertices.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Axis::InitializeVertexBuffer(const unsigned int& i)
-{
-}
-
-//==========================================================================
-// Class:			Axis
 // Function:		Update
 //
 // Description:		Updates the GL buffers associated with this object.

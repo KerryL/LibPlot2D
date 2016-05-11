@@ -47,6 +47,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
+	// Add a default info block to ensure the initialize and update functions get called
 	bufferInfo.push_back(BufferInfo());
 	bufferInfo.back().vertexBuffer = NULL;
 	bufferInfo.back().vertexCountModified = true;
@@ -139,49 +140,11 @@ void Primitive::Draw()
 	for (i = 0; i < bufferInfo.size(); i++)
 	{
 		if (bufferInfo[i].vertexCountModified || modified)
-		{
-			if (bufferInfo[i].vertexCountModified)
-				HandleVertexBufferModification(i);
-
 			Update(i);
-		}
 	}
 
 	modified = false;
 	GenerateGeometry();
-}
-
-//==========================================================================
-// Class:			Primitive
-// Function:		HandleVertexBufferModification
-//
-// Description:		Handles clean-up of existing buffer objects and creats
-//					new ones.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Primitive::HandleVertexBufferModification(const unsigned int& i)
-{
-	if (bufferInfo[i].vertexBuffer)
-	{
-		delete[] bufferInfo[i].vertexBuffer;
-		glDeleteBuffers(1, &bufferInfo[i].vertexBufferIndex);
-		glDeleteVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
-	}
-
-	InitializeVertexBuffer(i);
-	bufferInfo[i].vertexCountModified = false;
-
-	glGenVertexArrays(1, &bufferInfo[i].vertexArrayIndex);
-	glGenBuffers(1, &bufferInfo[i].vertexBufferIndex);
 }
 
 //==========================================================================

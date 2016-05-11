@@ -99,7 +99,6 @@ protected:
 	virtual bool HasValidParameters();
 	virtual void Update(const unsigned int& i);
 	virtual void GenerateGeometry();
-	virtual void InitializeVertexBuffer(const unsigned int& i);
 
 private:
 	static const unsigned int entrySpacing;// [pixels]

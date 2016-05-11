@@ -102,7 +102,6 @@ protected:
 	virtual bool HasValidParameters();
 	virtual void Update(const unsigned int& i);
 	virtual void GenerateGeometry();
-	virtual void InitializeVertexBuffer(const unsigned int& i);
 
 private:
 	// This object's orientation
