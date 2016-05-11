@@ -44,6 +44,7 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 {
 	isVisible = false;
 	color = Color::ColorBlack;
+	line.SetLineColor(color);
 }
 
 //==========================================================================
@@ -64,8 +65,7 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 //==========================================================================
 void PlotCursor::InitializeVertexBuffer(const unsigned int& i)
 {
-	bufferInfo[i].vertexCount = 2;
-	bufferInfo[i].vertexBuffer = new float[bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	// Handled by line object
 }
 
 //==========================================================================

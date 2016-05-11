@@ -761,8 +761,13 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 //==========================================================================
 void Line::DoPrettyDraw(const unsigned int& vertexCount)
 {
-	assert(vertexCount % 3 == 0 || vertexCount == 8);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount / 3);
-	glDrawArrays(GL_TRIANGLE_STRIP, vertexCount / 3, vertexCount / 3);
-	glDrawArrays(GL_TRIANGLE_STRIP, 2 * vertexCount / 3, vertexCount / 3);
+	if (vertexCount == 8)
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
+	else
+	{
+		assert(vertexCount % 3 == 0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount / 3);
+		glDrawArrays(GL_TRIANGLE_STRIP, vertexCount / 3, vertexCount / 3);
+		glDrawArrays(GL_TRIANGLE_STRIP, 2 * vertexCount / 3, vertexCount / 3);
+	}
 }
