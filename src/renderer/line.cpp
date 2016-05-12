@@ -364,6 +364,8 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 	bufferInfo.indexCount = triangleCount * 3;
 	if (triangleCount > 0)
 		bufferInfo.indexBuffer = new unsigned int[bufferInfo.indexCount];
+
+	//bufferInfo.vertexCountModified = false;// TODO:  Would be good to use this, but need a way to trigger update requests
 }
 
 //==========================================================================
@@ -705,13 +707,13 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double> >& point
 	unsigned int i;
 	for (i = 0; i < points.size(); i++)
 	{
-		if (i == 0)
+		if (i == 0 || (style == StyleSegments && i % 2 == 0))
 			ComputeOffsets(points[i].first, points[i].second, points[i + 1].first,
 				points[i + 1].second, offsets[i].dxLine, offsets[i].dyLine,
 				offsets[i].dxEdge, offsets[i].dyEdge);
-		else if (style == StyleSegments && i % 2 == 0)
+		else if (style == StyleSegments)
 			offsets[i] = offsets[i - 1];
-		else if (i == points.size() - 1 || style == StyleSegments)
+		else if (i == points.size() - 1)
 			ComputeOffsets(points[i - 1].first, points[i - 1].second, points[i].first,
 				points[i].second, offsets[i].dxLine, offsets[i].dyLine,
 				offsets[i].dxEdge, offsets[i].dyEdge);
