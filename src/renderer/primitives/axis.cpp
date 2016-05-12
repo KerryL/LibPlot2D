@@ -116,6 +116,27 @@ Axis::~Axis()
 //==========================================================================
 void Axis::Update(const unsigned int& i)
 {
+	// TODO:  Can we do it this way?  Maybe need dynamic vectors of Lines?
+	if (i == 0)// Axis
+	{
+		// TODO
+	}
+	else if (i == 1)// Ticks
+	{
+		// TODO
+	}
+	else if (i == 2)// Values
+	{
+		// TODO
+	}
+	else if (i == 3)// Gridlines
+	{
+		// TODO
+	}
+	else if (i == 4)// Label
+	{
+		// TODO
+	}
 }
 
 //==========================================================================

@@ -78,10 +78,7 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
 	}
 
-	if (bufferInfo.size() == 0)
-		bufferInfo.push_back(line.GetBufferInfo());
-	else
-		bufferInfo[0] = line.GetBufferInfo();
+	bufferInfo[0] = line.GetBufferInfo();
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
 	value = axis.PixelToValue(locationAlongAxis);

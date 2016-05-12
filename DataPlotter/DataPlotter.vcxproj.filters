@@ -192,6 +192,9 @@
     <ClInclude Include="..\src\renderer\line.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\renderer\multiLine.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="../src\renderer\primitives\axis.cpp">
@@ -325,6 +328,9 @@
     </ClCompile>
     <ClCompile Include="..\src\application\gitHash.cpp">
       <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\multiLine.cpp">
+      <Filter>Source Files\renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

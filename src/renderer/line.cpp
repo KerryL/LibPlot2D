@@ -735,7 +735,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 void Line::DoUglyDraw(const unsigned int& vertexCount)
 {
 	glDrawArrays(GL_LINE_STRIP, 0, vertexCount);
-	glLineWidth(1.0f);// TODO:  Better way to do this?
+	glLineWidth(1.0f);// TODO:  Better way to do this? (prevent all lines after this from being drawn at this line's width)
 }
 
 //==========================================================================

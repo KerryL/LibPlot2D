@@ -169,11 +169,7 @@ void PlotCurve::Update(const unsigned int& i)
 		else
 			line.SetWidth(0.0);
 
-		// TODO:  Need to delete openGL objects?
-		if (bufferInfo.size() == 0)
-			bufferInfo.push_back(line.GetBufferInfo());
-		else
-			bufferInfo[i] = line.GetBufferInfo();
+		bufferInfo[i] = line.GetBufferInfo();
 	}
 	else
 	{

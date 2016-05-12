@@ -35,6 +35,7 @@ class Line
 {
 public:
 	Line(const RenderWindow& renderWindow);
+	virtual ~Line() {}
 
 	inline void SetPretty(const bool &pretty) { this->pretty = pretty; }
 	inline void SetWidth(const double &width) { assert(width >= 0.0); halfWidth = 0.5 * width; }
@@ -61,6 +62,8 @@ public:
 private:
 	static const double fadeDistance;
 	double halfWidth;
+
+protected:
 	Color lineColor;
 	Color backgroundColor;
 	bool pretty;
