@@ -98,7 +98,7 @@ void ZoomBox::Update(const unsigned int& /*i*/)
 void ZoomBox::GenerateGeometry()
 {
 	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
-	Line::DoPrettyDraw(bufferInfo[0].vertexCount);
+	Line::DoPrettyDraw(bufferInfo[0].indexCount);
 	glBindVertexArray(0);
 }
 

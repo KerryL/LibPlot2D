@@ -93,7 +93,7 @@ protected:
 	void DoUglyDraw(const std::vector<std::pair<double, double> > &points);
 	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points);
 
-	void AllocateBuffer(const unsigned int& vertexCount);
+	void AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount);
 };
 
 #endif// LINE_H_

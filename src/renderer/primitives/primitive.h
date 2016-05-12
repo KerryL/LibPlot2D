@@ -52,15 +52,19 @@ public:
 	struct BufferInfo
 	{
 		unsigned int vertexCount;
-		float *vertexBuffer;
+		float* vertexBuffer;
+		unsigned int indexCount;
+		unsigned int* indexBuffer;
 		bool vertexCountModified;
 
 		unsigned int vertexBufferIndex;
 		unsigned int vertexArrayIndex;
-		bool openGLObjectsExist;
+		unsigned int indexBufferIndex;
+		bool glVertexBufferExists;
+		bool glIndexBufferExists;
 
 		BufferInfo();
-		void GetOpenGLIndices();
+		void GetOpenGLIndices(const bool& needIndexObject = false);
 		void FreeOpenGLObjects();
 	};
 

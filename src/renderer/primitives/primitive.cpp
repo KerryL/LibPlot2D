@@ -106,6 +106,8 @@ Primitive::~Primitive()
 		bufferInfo[i].FreeOpenGLObjects();
 		delete[] bufferInfo[i].vertexBuffer;
 		bufferInfo[i].vertexBuffer = NULL;
+		delete[] bufferInfo[i].indexBuffer;
+		bufferInfo[i].indexBuffer = NULL;
 	}
 }
 
@@ -312,7 +314,10 @@ Primitive::BufferInfo::BufferInfo()
 	vertexBuffer = NULL;
 	vertexCountModified = true;
 	vertexCount = 0;
-	openGLObjectsExist = false;
+	indexBuffer = NULL;
+	indexCount = 0;
+	glVertexBufferExists = false;
+	glIndexBufferExists = false;
 }
 
 //==========================================================================
@@ -322,7 +327,7 @@ Primitive::BufferInfo::BufferInfo()
 // Description:		Method for safely initializing this object.
 //
 // Input Arguments:
-//		None
+//		needIndexObject	= const bool&
 //
 // Output Arguments:
 //		None
@@ -331,13 +336,19 @@ Primitive::BufferInfo::BufferInfo()
 //		None
 //
 //==========================================================================
-void Primitive::BufferInfo::GetOpenGLIndices()
+void Primitive::BufferInfo::GetOpenGLIndices(const bool& needIndexObject)
 {
-	if (!openGLObjectsExist)
+	if (!glVertexBufferExists)
 	{
 		glGenVertexArrays(1, &vertexArrayIndex);
 		glGenBuffers(1, &vertexBufferIndex);
-		openGLObjectsExist = true;
+		glVertexBufferExists = true;
+	}
+
+	if (needIndexObject && !glIndexBufferExists)
+	{
+		glGenBuffers(1, &indexBufferIndex);
+		glIndexBufferExists = true;
 	}
 }
 
@@ -359,10 +370,16 @@ void Primitive::BufferInfo::GetOpenGLIndices()
 //==========================================================================
 void Primitive::BufferInfo::FreeOpenGLObjects()
 {
-	if (openGLObjectsExist)
+	if (glVertexBufferExists)
 	{
 		glDeleteVertexArrays(1, &vertexArrayIndex);
 		glDeleteBuffers(1, &vertexBufferIndex);
-		openGLObjectsExist = false;
+		glVertexBufferExists = false;
+	}
+
+	if (glIndexBufferExists)
+	{
+		glDeleteBuffers(1, &indexBufferIndex);
+		glIndexBufferExists = false;
 	}
 }

@@ -192,6 +192,10 @@ void PlotCurve::Update(const unsigned int& i)
 		glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 			(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo[i].vertexCount));
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].indexBufferIndex);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo[i].indexCount,
+			bufferInfo[i].indexBuffer, GL_DYNAMIC_DRAW);
+
 		glBindVertexArray(0);
 	}
 }
@@ -227,7 +231,7 @@ void PlotCurve::GenerateGeometry()
 	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 
 	if (pretty)
-		Line::DoPrettyDraw(bufferInfo[0].vertexCount);
+		Line::DoPrettyDraw(bufferInfo[0].indexCount);
 	else
 		Line::DoUglyDraw(bufferInfo[0].vertexCount);
 
