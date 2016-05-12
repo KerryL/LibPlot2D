@@ -125,7 +125,12 @@ void Line::Build(const double &x1, const double &y1,
 	const double &x2, const double &y2)
 {
 	if (pretty)
-		DoPrettyDraw(x1, y1, x2, y2);
+	{
+		std::vector<std::pair<double, double> > v;
+		v.push_back(std::make_pair(x1, y1));
+		v.push_back(std::make_pair(x2, y2));
+		DoPrettyDraw(v);
+	}
 	else
 		DoUglyDraw(x1, y1, x2, y2);
 }
@@ -213,6 +218,34 @@ void Line::Build(const double* const x, const double* const y, const unsigned in
 		dPoints[i].second = static_cast<double>(y[i]);
 	}
 	Build(dPoints);
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		BuildSegments
+//
+// Description:		Builds the specified disconnected line segments.
+//
+// Input Arguments:
+//		points	= const std::vector<std::pair<double, double> >
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::BuildSegments(const std::vector<std::pair<double, double> > &points)
+{
+	if (points.size() == 0)
+		return;
+	assert(points.size() % 2 == 0);
+
+	if (pretty)
+		DoPrettySegmentDraw(points);
+	else
+		DoUglyDraw(points);
 }
 
 //==========================================================================
@@ -395,148 +428,6 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 
 //==========================================================================
 // Class:			Line
-// Function:		DoPrettyDraw
-//
-// Description:		Draws a line using OpenGL triangles.
-//
-// Input Arguments:
-//		x1	= const double&
-//		y1	= const double&
-//		x2	= const double&
-//		y2	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Line::DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2)
-{
-	double dxLine, dyLine, dxEdge, dyEdge;
-	ComputeOffsets(x1, y1, x2, y2, dxLine, dyLine, dxEdge, dyEdge);
-
-	/* Six triangles per segment - two on each side of the core line, plus two for the line itself
-	   Triangles need to be drawn in counter clockwise direction
-	
-	We do this:
-
-	1    3    5    7
-	+----+----+----+
-	|\   |\   |\   |
-	| \  | \  | \  |
-	|  \ |  \ |  \ |
-	|   \|   \|   \|
-	+----+----+----+
-	0    2    4    6
-
-	where the line (x1, y1) to (x2, y2) passes halfway between points (3 and 5) and (4 and 6)
-	*/
-
-	AllocateBuffer(8, 6);
-
-	bufferInfo.vertexBuffer[0] = (float)(x1 - dxEdge);
-	bufferInfo.vertexBuffer[1] = (float)(y1 - dyEdge);
-
-	bufferInfo.vertexBuffer[2] = (float)(x2 - dxEdge);
-	bufferInfo.vertexBuffer[3] = (float)(y2 - dyEdge);
-
-	bufferInfo.vertexBuffer[4] = (float)(x1 - dxLine);
-	bufferInfo.vertexBuffer[5] = (float)(y1 - dyLine);
-
-	bufferInfo.vertexBuffer[6] = (float)(x2 - dxLine);
-	bufferInfo.vertexBuffer[7] = (float)(y2 - dyLine);
-
-	bufferInfo.vertexBuffer[8] = (float)(x1 + dxLine);
-	bufferInfo.vertexBuffer[9] = (float)(y1 + dyLine);
-
-	bufferInfo.vertexBuffer[10] = (float)(x2 + dxLine);
-	bufferInfo.vertexBuffer[11] = (float)(y2 + dyLine);
-
-	bufferInfo.vertexBuffer[12] = (float)(x1 + dxEdge);
-	bufferInfo.vertexBuffer[13] = (float)(y1 + dyEdge);
-
-	bufferInfo.vertexBuffer[14] = (float)(x2 + dxEdge);
-	bufferInfo.vertexBuffer[15] = (float)(y2 + dyEdge);
-
-	bufferInfo.vertexBuffer[16] = (float)backgroundColor.GetRed();
-	bufferInfo.vertexBuffer[17] = (float)backgroundColor.GetGreen();
-	bufferInfo.vertexBuffer[18] = (float)backgroundColor.GetBlue();
-	bufferInfo.vertexBuffer[19] = (float)backgroundColor.GetAlpha();
-
-	bufferInfo.vertexBuffer[20] = (float)backgroundColor.GetRed();
-	bufferInfo.vertexBuffer[21] = (float)backgroundColor.GetGreen();
-	bufferInfo.vertexBuffer[22] = (float)backgroundColor.GetBlue();
-	bufferInfo.vertexBuffer[23] = (float)backgroundColor.GetAlpha();
-
-	bufferInfo.vertexBuffer[24] = (float)lineColor.GetRed();
-	bufferInfo.vertexBuffer[25] = (float)lineColor.GetGreen();
-	bufferInfo.vertexBuffer[26] = (float)lineColor.GetBlue();
-	bufferInfo.vertexBuffer[27] = (float)lineColor.GetAlpha();
-
-	bufferInfo.vertexBuffer[28] = (float)lineColor.GetRed();
-	bufferInfo.vertexBuffer[29] = (float)lineColor.GetGreen();
-	bufferInfo.vertexBuffer[30] = (float)lineColor.GetBlue();
-	bufferInfo.vertexBuffer[31] = (float)lineColor.GetAlpha();
-
-	bufferInfo.vertexBuffer[32] = (float)lineColor.GetRed();
-	bufferInfo.vertexBuffer[33] = (float)lineColor.GetGreen();
-	bufferInfo.vertexBuffer[34] = (float)lineColor.GetBlue();
-	bufferInfo.vertexBuffer[35] = (float)lineColor.GetAlpha();
-
-	bufferInfo.vertexBuffer[36] = (float)lineColor.GetRed();
-	bufferInfo.vertexBuffer[37] = (float)lineColor.GetGreen();
-	bufferInfo.vertexBuffer[38] = (float)lineColor.GetBlue();
-	bufferInfo.vertexBuffer[39] = (float)lineColor.GetAlpha();
-
-	bufferInfo.vertexBuffer[40] = (float)backgroundColor.GetRed();
-	bufferInfo.vertexBuffer[41] = (float)backgroundColor.GetGreen();
-	bufferInfo.vertexBuffer[42] = (float)backgroundColor.GetBlue();
-	bufferInfo.vertexBuffer[43] = (float)backgroundColor.GetAlpha();
-
-	bufferInfo.vertexBuffer[44] = (float)backgroundColor.GetRed();
-	bufferInfo.vertexBuffer[45] = (float)backgroundColor.GetGreen();
-	bufferInfo.vertexBuffer[46] = (float)backgroundColor.GetBlue();
-	bufferInfo.vertexBuffer[47] = (float)backgroundColor.GetAlpha();
-
-	unsigned int i;
-	for (i = 0; i < 6; i++)
-	{
-		bufferInfo.indexBuffer[i * 3] = i;
-		bufferInfo.indexBuffer[i * 3 + 1] = i + 1;
-		bufferInfo.indexBuffer[i * 3 + 2] = i + 2;
-	}
-
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
-
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(renderWindow.GetColorLocation());
-	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo.vertexCount));
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
-		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
-
-	glBindVertexArray(0);
-
-	delete[] bufferInfo.vertexBuffer;
-	bufferInfo.vertexBuffer = NULL;
-
-	delete[] bufferInfo.indexBuffer;
-	bufferInfo.indexBuffer = NULL;
-}
-
-//==========================================================================
-// Class:			Line
 // Function:		DoUglyDraw
 //
 // Description:		Draws a line strip using OpenGL lines.
@@ -609,14 +500,6 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 //==========================================================================
 void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 {
-	struct Offsets
-	{
-		double dxLine;
-		double dyLine;
-		double dxEdge;
-		double dyEdge;
-	};
-
 	std::vector<Offsets> offsets(points.size());
 
 	/* Draw the line as follows:
@@ -640,7 +523,181 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 	*/
 
 	AllocateBuffer(points.size() * 4, 6 * (points.size() - 1));
+	AssignVertexData(points);
 
+	unsigned int i;
+	for (i = 0; i < points.size() - 1; i++)
+	{
+		bufferInfo.indexBuffer[i * 18] = i * 4;
+		bufferInfo.indexBuffer[i * 18 + 1] = i * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 2] = (i + 1) * 4;
+
+		bufferInfo.indexBuffer[i * 18 + 3] = i * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 4] = i * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 5] = (i + 1) * 4 + 1;
+
+		bufferInfo.indexBuffer[i * 18 + 6] = i * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 7] = i * 4 + 3;
+		bufferInfo.indexBuffer[i * 18 + 8] = (i + 1) * 4 + 2;
+
+		bufferInfo.indexBuffer[i * 18 + 9] = i * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 10] = (i + 1) * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 11] = (i + 1) * 4;
+
+		bufferInfo.indexBuffer[i * 18 + 12] = i * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 13] = (i + 1) * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 14] = (i + 1) * 4 + 1;
+
+		bufferInfo.indexBuffer[i * 18 + 15] = i * 4 + 3;
+		bufferInfo.indexBuffer[i * 18 + 16] = (i + 1) * 4 + 3;
+		bufferInfo.indexBuffer[i * 18 + 17] = (i + 1) * 4 + 2;
+	}
+
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(),
+		renderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(renderWindow.GetColorLocation());
+	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
+		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
+
+	glBindVertexArray(0);
+
+	delete[] bufferInfo.vertexBuffer;
+	bufferInfo.vertexBuffer = NULL;
+
+	delete[] bufferInfo.indexBuffer;
+	bufferInfo.indexBuffer = NULL;
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoPrettySegmentDraw
+//
+// Description:		Draws disconnected lines using OpenGL triangles.
+//
+// Input Arguments:
+//		vertexCount	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points)
+{
+	/* Draw the segments as follows:
+
+	3+----+7
+	 |\   |
+	 | \  |
+	 |  \ |
+	 |   \|
+	2+----+6
+	 |\   |
+	 | \  | __> Direction of segment
+	 |  \ |
+	 |   \|
+	1+----+5
+	 |\   |
+	 | \  |
+	 |  \ |
+	 |   \|
+	0+----+4
+	*/
+
+	assert(points.size() % 2 == 0);
+	AllocateBuffer(points.size() * 4, 6 * (points.size() / 2));
+	AssignVertexData(points);
+
+	unsigned int i;
+	for (i = 0; i < points.size() / 2; i += 2)
+	{
+		bufferInfo.indexBuffer[i * 18] = i * 4;
+		bufferInfo.indexBuffer[i * 18 + 1] = i * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 2] = (i + 1) * 4;
+
+		bufferInfo.indexBuffer[i * 18 + 3] = i * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 4] = i * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 5] = (i + 1) * 4 + 1;
+
+		bufferInfo.indexBuffer[i * 18 + 6] = i * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 7] = i * 4 + 3;
+		bufferInfo.indexBuffer[i * 18 + 8] = (i + 1) * 4 + 2;
+
+		bufferInfo.indexBuffer[i * 18 + 9] = i * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 10] = (i + 1) * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 11] = (i + 1) * 4;
+
+		bufferInfo.indexBuffer[i * 18 + 12] = i * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 13] = (i + 1) * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 14] = (i + 1) * 4 + 1;
+
+		bufferInfo.indexBuffer[i * 18 + 15] = i * 4 + 3;
+		bufferInfo.indexBuffer[i * 18 + 16] = (i + 1) * 4 + 3;
+		bufferInfo.indexBuffer[i * 18 + 17] = (i + 1) * 4 + 2;
+	}
+
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(),
+		renderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(renderWindow.GetColorLocation());
+	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
+		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
+
+	glBindVertexArray(0);
+
+	delete[] bufferInfo.vertexBuffer;
+	bufferInfo.vertexBuffer = NULL;
+
+	delete[] bufferInfo.indexBuffer;
+	bufferInfo.indexBuffer = NULL;
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		AssignVertexData
+//
+// Description:		Assigns vertex data to the vertex buffer (pretty lines).
+//
+// Input Arguments:
+//		points	= const std::vector<std::pair<double, double> >
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::AssignVertexData(const std::vector<std::pair<double, double> >& points)
+{
+	std::vector<Offsets> offsets(points.size());
 	const unsigned int dimension(renderWindow.GetVertexDimension());
 	const unsigned int colorStart(dimension * 4 * points.size());
 	unsigned int i;
@@ -692,60 +749,6 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 		bufferInfo.vertexBuffer[colorStart + i * 16 + 14] = (float)backgroundColor.GetBlue();
 		bufferInfo.vertexBuffer[colorStart + i * 16 + 15] = (float)backgroundColor.GetAlpha();
 	}
-
-	for (i = 0; i < points.size() - 1; i++)
-	{
-		bufferInfo.indexBuffer[i * 18] = i * 4;
-		bufferInfo.indexBuffer[i * 18 + 1] = i * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 2] = (i + 1) * 4;
-
-		bufferInfo.indexBuffer[i * 18 + 3] = i * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 4] = i * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 5] = (i + 1) * 4 + 1;
-
-		bufferInfo.indexBuffer[i * 18 + 6] = i * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 7] = i * 4 + 3;
-		bufferInfo.indexBuffer[i * 18 + 8] = (i + 1) * 4 + 2;
-
-		bufferInfo.indexBuffer[i * 18 + 9] = i * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 10] = (i + 1) * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 11] = (i + 1) * 4;
-
-		bufferInfo.indexBuffer[i * 18 + 12] = i * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 13] = (i + 1) * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 14] = (i + 1) * 4 + 1;
-
-		bufferInfo.indexBuffer[i * 18 + 15] = i * 4 + 3;
-		bufferInfo.indexBuffer[i * 18 + 16] = (i + 1) * 4 + 3;
-		bufferInfo.indexBuffer[i * 18 + 17] = (i + 1) * 4 + 2;
-	}
-
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
-
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-	glVertexAttribPointer(renderWindow.GetPositionLocation(),
-		renderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(renderWindow.GetColorLocation());
-	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * colorStart));
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
-		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
-
-	glBindVertexArray(0);
-
-	delete[] bufferInfo.vertexBuffer;
-	bufferInfo.vertexBuffer = NULL;
-
-	delete[] bufferInfo.indexBuffer;
-	bufferInfo.indexBuffer = NULL;
 }
 
 //==========================================================================
@@ -773,9 +776,9 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 
 //==========================================================================
 // Class:			Line
-// Function:		DoPrettyDraw
+// Function:		DoUglyDraw
 //
-// Description:		Draws a line strip using OpenGL triangles.
+// Description:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
 //		vertexCount	= const unsigned int&
@@ -787,7 +790,30 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 //		None
 //
 //==========================================================================
-void Line::DoPrettyDraw(const unsigned int& triangleCount)
+void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 {
-	glDrawElements(GL_TRIANGLES, triangleCount, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_LINES, 0, vertexCount);
+	glLineWidth(1.0f);// TODO:  Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
+	// Is it better to not even have ugly lines now?
+}
+
+//==========================================================================
+// Class:			Line
+// Function:		DoPrettyDraw
+//
+// Description:		Draws a line strip using OpenGL triangles.
+//
+// Input Arguments:
+//		indexCount	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Line::DoPrettyDraw(const unsigned int& indexCount)
+{
+	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 }

@@ -53,17 +53,19 @@ public:
 	void Build(const std::vector<std::pair<unsigned int, unsigned int> > &points);
 	void Build(const std::vector<std::pair<double, double> > &points);
 	void Build(const double* const x, const double* const y, const unsigned int& count);
+	void BuildSegments(const std::vector<std::pair<double, double> > &points);
 
 	Primitive::BufferInfo GetBufferInfo() const { return bufferInfo; }
 
 	static void DoUglyDraw(const unsigned int& vertexCount);
-	static void DoPrettyDraw(const unsigned int& vertexCount);
+	static void DoPrettyDraw(const unsigned int& indexCount);
+
+	static void DoUglySegmentDraw(const unsigned int& vertexCount);
 
 private:
 	static const double fadeDistance;
 	double halfWidth;
 
-protected:
 	Color lineColor;
 	Color backgroundColor;
 	bool pretty;
@@ -89,9 +91,12 @@ protected:
 	};
 
 	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2);
-	void DoPrettyDraw(const double &x1, const double &y1, const double &x2, const double &y2);
 	void DoUglyDraw(const std::vector<std::pair<double, double> > &points);
 	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points);
+
+	void DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points);
+
+	void AssignVertexData(const std::vector<std::pair<double, double> >& points);
 
 	void AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount);
 };

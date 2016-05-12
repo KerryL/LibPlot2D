@@ -219,9 +219,6 @@ void PlotCurve::Update(const unsigned int& i)
 //==========================================================================
 void PlotCurve::GenerateGeometry()
 {
-	if (bufferInfo.size() == 0)
-		return;
-
 	if (yAxis->GetOrientation() == Axis::OrientationLeft)
 		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewLeft);
 	else
