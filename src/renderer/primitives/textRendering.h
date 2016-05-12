@@ -7,14 +7,14 @@
 
 ===================================================================================*/
 
-// File:  text.h
+// File:  textRendering.h
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive, this class is used to draw text.
 // History:
 
-#ifndef TEXT_H_
-#define TEXT_H_
+#ifndef TEXT_RENDERING_H_
+#define TEXT_RENDERING_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -63,4 +63,4 @@ private:
 	// TODO:  This object should have its own modelview matrix
 };
 
-#endif// TEXT_H_
+#endif// TEXT_RENDERING_H_

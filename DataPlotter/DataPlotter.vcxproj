@@ -89,8 +89,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;FTGL_LIBRARY_STATIC;GLEW_STATIC;_DATAPLOTTER_64_BIT_;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../src/;$(FREETYPE)\include;$(WXWIN)\lib\vc_dll\mswud;$(WXWIN)\include;$(GLEW)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;GLEW_STATIC;_DATAPLOTTER_64_BIT_;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../src/;$(FREETYPE)\include\freetype2;$(WXWIN)\lib\vc_dll\mswud;$(WXWIN)\include;$(GLEW)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4458;4456</DisableSpecificWarnings>
     </ClCompile>
@@ -136,8 +136,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;FTGL_LIBRARY_STATIC;_DATAPLOTTER_64_BIT_;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(FREETYPE)\include;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(GLEW)\include;../src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;_DATAPLOTTER_64_BIT_;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(FREETYPE)\include\freetype2;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(GLEW)\include;../src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4458;4456</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -233,7 +233,7 @@
     <ClInclude Include="../src\renderer\primitives\plotCursor.h" />
     <ClInclude Include="../src\renderer\primitives\plotCurve.h" />
     <ClInclude Include="../src\renderer\primitives\primitive.h" />
-    <ClInclude Include="../src\renderer\primitives\text.h" />
+    <ClInclude Include="..\src\renderer\primitives\textRendering.h" />
     <ClInclude Include="../src\renderer\primitives\zoomBox.h" />
     <ClInclude Include="../src\renderer\renderWindow.h" />
     <ClInclude Include="../src\utilities\dataset2D.h" />
@@ -253,6 +253,7 @@
     <ClInclude Include="../src\utilities\signals\rms.h" />
     <ClInclude Include="..\src\renderer\line.h" />
     <ClInclude Include="..\src\renderer\primitives\legend.h" />
+    <ClInclude Include="..\src\renderer\text.h" />
     <ClInclude Include="..\src\utilities\arrayStringCompare.h" />
   </ItemGroup>
   <ItemGroup>
@@ -280,7 +281,7 @@
     <ClCompile Include="../src\renderer\primitives\plotCursor.cpp" />
     <ClCompile Include="../src\renderer\primitives\plotCurve.cpp" />
     <ClCompile Include="../src\renderer\primitives\primitive.cpp" />
-    <ClCompile Include="../src\renderer\primitives\text.cpp" />
+    <ClCompile Include="..\src\renderer\primitives\textRendering.cpp" />
     <ClCompile Include="../src\renderer\primitives\zoomBox.cpp" />
     <ClCompile Include="../src\renderer\renderWindow.cpp" />
     <ClCompile Include="../src\utilities\dataset2D.cpp" />
@@ -299,6 +300,7 @@
     <ClCompile Include="..\src\application\gitHash.cpp" />
     <ClCompile Include="..\src\renderer\line.cpp" />
     <ClCompile Include="..\src\renderer\primitives\legend.cpp" />
+    <ClCompile Include="..\src\renderer\text.cpp" />
     <ClCompile Include="..\src\utilities\arrayStringCompare.cpp" />
   </ItemGroup>
   <ItemGroup>

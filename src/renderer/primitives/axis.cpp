@@ -26,9 +26,6 @@
 #include "renderer/renderWindow.h"
 #include "utilities/math/plotMath.h"
 
-// FTGL headers
-#include <FTGL/ftgl.h>
-
 //==========================================================================
 // Class:			Axis
 // Function:		Axis
@@ -67,7 +64,7 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), axisLines(rend
 
 	logarithmic = false;
 
-	font = NULL;
+	//font = NULL;
 
 	minAxis = NULL;
 	maxAxis = NULL;
@@ -680,7 +677,7 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 //==========================================================================
 void Axis::DrawTickLabels()
 {
-	FTBBox boundingBox;
+//	FTBBox boundingBox;
 	int xTranslation, yTranslation;
 	unsigned int precision = GetPrecision();
 
@@ -788,7 +785,7 @@ double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigne
 //		double
 //
 //==========================================================================
-void Axis::ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
+/*void Axis::ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
 	const FTBBox &boundingBox, const double &offset) const
 {
 	if (IsHorizontal())
@@ -811,7 +808,7 @@ void Axis::ComputeTranslations(const double &value, int &xTranslation, int &yTra
 		yTranslation = ValueToPixel(value) -
 			(boundingBox.Upper().Y() - boundingBox.Lower().Y()) / 2.0;
 	}
-}
+}*/
 
 //==========================================================================
 // Class:			Axis

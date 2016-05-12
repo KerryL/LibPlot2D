@@ -16,16 +16,13 @@
 // GLEW headers
 #include <GL\glew.h>
 
-// FTGL headers
-#include <FTGL/ftgl.h>
-
 // Local headers
 #include "application/plotObject.h"
 #include "application/mainFrame.h"
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "renderer/primitives/plotCurve.h"
-#include "renderer/primitives/text.h"
+#include "renderer/primitives/textRendering.h"
 #include "renderer/primitives/legend.h"
 #include "utilities/math/plotMath.h"
 #include "utilities/dataset2D.h"
@@ -97,10 +94,11 @@ PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 //==========================================================================
 PlotObject::~PlotObject()
 {
-	delete axisFont;
+/*	delete axisFont;
 	axisFont = NULL;
 	delete titleFont;
-	titleFont = NULL;
+	titleFont = NULL;*/
+	// TODO:  Fix
 }
 
 //==========================================================================
@@ -214,7 +212,7 @@ void PlotObject::InitializeFonts()
 //==========================================================================
 void PlotObject::CreateFontObjects(const wxString &fontFile)
 {
-	axisFont = new FTGLTextureFont(fontFile.c_str());
+	/*axisFont = new FTGLTextureFont(fontFile.c_str());
 	titleFont = new FTGLTextureFont(fontFile.c_str());
 
 	if (axisFont->Error())
@@ -241,7 +239,7 @@ void PlotObject::CreateFontObjects(const wxString &fontFile)
 	{
 		titleFont->FaceSize(18);
 		titleFont->CharMap(FT_ENCODING_UNICODE);
-	}
+	}*/// TODO:  Fix
 }
 
 //==========================================================================
@@ -739,7 +737,7 @@ void PlotObject::UpdateAxesOffsets()
 void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 {
 	axisBottom->SetOrientation(Axis::OrientationBottom);
-	axisBottom->SetFont(axisFont);
+//	axisBottom->SetFont(axisFont);
 	axisBottom->SetTickStyle(tickStyle);
 }
 
@@ -784,7 +782,7 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 {
 	axisLeft->SetOrientation(Axis::OrientationLeft);
-	axisLeft->SetFont(axisFont);
+//	axisLeft->SetFont(axisFont);
 	axisLeft->SetTickStyle(tickStyle);
 }
 
@@ -807,7 +805,7 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 {
 	axisRight->SetOrientation(Axis::OrientationRight);
-	axisRight->SetFont(axisFont);
+//	axisRight->SetFont(axisFont);
 	axisRight->SetTickStyle(tickStyle);
 }
 

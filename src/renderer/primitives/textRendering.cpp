@@ -7,19 +7,17 @@
 
 ===================================================================================*/
 
-// File:  text.cpp
+// File:  textRendering.cpp
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive for creating text objects on a plot.
 // History:
 
 // Local headers
-#include "renderer/primitives/text.h"
+#include "renderer/primitives/textRendering.h"
+#include "renderer/text.h"
 #include "renderer/renderWindow.h"
 #include "utilities/math/plotMath.h"
-
-// FTGL headers
-#include <FTGL/ftgl.h>
 
 //==========================================================================
 // Class:			TextRendering
@@ -178,9 +176,10 @@ double TextRendering::GetTextHeight() const
 	if (!font)
 		return 0.0;
 
-	FTBBox boundingBox = font->BBox(text.mb_str());
+	/*FTBBox boundingBox = font->BBox(text.mb_str());
 
-	return boundingBox.Upper().Y() - boundingBox.Lower().Y();
+	return boundingBox.Upper().Y() - boundingBox.Lower().Y();*/
+	return 0.0;// TODO:  Fix
 }
 
 //==========================================================================
@@ -205,7 +204,8 @@ double TextRendering::GetTextWidth() const
 	if (!font)
 		return 0.0;
 
-	FTBBox boundingBox = font->BBox(text.mb_str());
+/*	FTBBox boundingBox = font->BBox(text.mb_str());
 
-	return boundingBox.Upper().X() - boundingBox.Lower().X();
+	return boundingBox.Upper().X() - boundingBox.Lower().X();*/
+	return 0.0;// TODO:  Fix
 }

@@ -23,10 +23,11 @@
 // Local headers
 #include "renderer/primitives/primitive.h"
 #include "renderer/line.h"
+#include "renderer/text.h"
 
 // FTGL forward declarations
-class FTFont;
-class FTBBox;
+/*class FTFont;
+class FTBBox;*/// TODO:  Fix
 
 class Axis : public Primitive
 {
@@ -61,7 +62,7 @@ public:
 	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; modified = true; }
 	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; modified = true; }
 	void SetLabel(wxString label) { this->label = label; modified = true; }
-	void SetFont(FTFont *font) { this->font = font; modified = true; }
+	//void SetFont(FTFont *font) { this->font = font; modified = true; }
 	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; modified = true; }
 	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; modified = true; }
 	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; modified = true; }
@@ -135,7 +136,7 @@ private:
 
 	// The axis label and font
 	wxString label;
-	FTFont *font;
+	//FTFont *font;
 
 	Line axisLines;
 	Line gridLines;
@@ -160,8 +161,8 @@ private:
 
 	double GetAxisLabelTranslation(const double &offset, const double &fontHeight) const;
 	unsigned int GetPrecision() const;
-	void ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
-		const FTBBox &boundingBox, const double &offset) const;
+	/*void ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
+		const FTBBox &boundingBox, const double &offset) const;*/
 };
 
 #endif// AXIS_H_

@@ -16,13 +16,11 @@
 // GLEW headers
 #include <GL/glew.h>
 
-// FTGL headers
-#include <FTGL/ftgl.h>
-
 // Local headers
 #include "renderer/primitives/legend.h"
 #include "renderer/renderWindow.h"
 #include "renderer/line.h"
+#include "renderer/text.h"
 
 //==========================================================================
 // Class:			Legend
@@ -345,7 +343,7 @@ std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
 //==========================================================================
 void Legend::UpdateBoundingBox()
 {
-	FTBBox boundingBox;
+/*	FTBBox boundingBox;
 	unsigned int maxStringWidth(0);
 	unsigned int i;
 	for (i = 0; i < entries.size(); i++)
@@ -358,7 +356,8 @@ void Legend::UpdateBoundingBox()
 	width = 3 * entrySpacing + sampleLength + maxStringWidth;
 	
 	boundingBox = font->BBox("H");
-	height = (boundingBox.Upper().Y() + entrySpacing) * i + entrySpacing;
+	height = (boundingBox.Upper().Y() + entrySpacing) * i + entrySpacing;*/
+	// TODO:  Fix
 }
 
 //==========================================================================
