@@ -96,7 +96,14 @@ private:
 
 	void DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points);
 
-	void AssignVertexData(const std::vector<std::pair<double, double> >& points);
+	enum LineStyle
+	{
+		StyleContinuous,
+		StyleSegments
+	};
+
+	void AssignVertexData(const std::vector<std::pair<double, double> >& points,
+		const LineStyle& style);
 
 	void AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount);
 };

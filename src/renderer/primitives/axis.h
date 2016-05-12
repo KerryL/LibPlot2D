@@ -137,16 +137,19 @@ private:
 	wxString label;
 	FTFont *font;
 
-	Line line;
+	Line axisLines;
+	Line gridLines;
+	std::vector<std::pair<double, double> > axisPoints;
+	std::vector<std::pair<double, double> > gridPoints;
 
 	void DrawFullAxis();
 	int ComputeMainAxisLocation() const;
 	void ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount = NULL);
-	void DrawMainAxis(const int &mainAxisLocation) const;
-	void DrawHorizontalGrid(const unsigned int &count) const;
-	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation) const;
-	void DrawVerticalGrid(const unsigned int &count) const;
-	void DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation) const;
+	void DrawMainAxis(const int &mainAxisLocation);
+	void DrawHorizontalGrid(const unsigned int &count);
+	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation);
+	void DrawVerticalGrid(const unsigned int &count);
+	void DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation);
 	void InitializeTickParameters(int &inside, int &outside, int &sign) const;
 	void GetNextLogValue(const bool &first, double &value) const;
 	double GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const;

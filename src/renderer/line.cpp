@@ -523,7 +523,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 	*/
 
 	AllocateBuffer(points.size() * 4, 6 * (points.size() - 1));
-	AssignVertexData(points);
+	AssignVertexData(points, StyleContinuous);
 
 	unsigned int i;
 	for (i = 0; i < points.size() - 1; i++)
@@ -621,34 +621,34 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 
 	assert(points.size() % 2 == 0);
 	AllocateBuffer(points.size() * 4, 6 * (points.size() / 2));
-	AssignVertexData(points);
+	AssignVertexData(points, StyleSegments);
 
 	unsigned int i;
-	for (i = 0; i < points.size() / 2; i += 2)
+	for (i = 0; i < points.size() / 2; i++)
 	{
-		bufferInfo.indexBuffer[i * 18] = i * 4;
-		bufferInfo.indexBuffer[i * 18 + 1] = i * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 2] = (i + 1) * 4;
+		bufferInfo.indexBuffer[i * 18] = i * 8;
+		bufferInfo.indexBuffer[i * 18 + 1] = i * 8 + 1;
+		bufferInfo.indexBuffer[i * 18 + 2] = i * 8 + 4;
 
-		bufferInfo.indexBuffer[i * 18 + 3] = i * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 4] = i * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 5] = (i + 1) * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 3] = i * 8 + 1;
+		bufferInfo.indexBuffer[i * 18 + 4] = i * 8 + 2;
+		bufferInfo.indexBuffer[i * 18 + 5] = i * 8 + 5;
 
-		bufferInfo.indexBuffer[i * 18 + 6] = i * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 7] = i * 4 + 3;
-		bufferInfo.indexBuffer[i * 18 + 8] = (i + 1) * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 6] = i * 8 + 2;
+		bufferInfo.indexBuffer[i * 18 + 7] = i * 8 + 3;
+		bufferInfo.indexBuffer[i * 18 + 8] = i * 8 + 6;
 
-		bufferInfo.indexBuffer[i * 18 + 9] = i * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 10] = (i + 1) * 4 + 1;
-		bufferInfo.indexBuffer[i * 18 + 11] = (i + 1) * 4;
+		bufferInfo.indexBuffer[i * 18 + 9] = i * 8 + 1;
+		bufferInfo.indexBuffer[i * 18 + 10] = i * 8 + 5;
+		bufferInfo.indexBuffer[i * 18 + 11] = i * 8 + 4;
 
-		bufferInfo.indexBuffer[i * 18 + 12] = i * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 13] = (i + 1) * 4 + 2;
-		bufferInfo.indexBuffer[i * 18 + 14] = (i + 1) * 4 + 1;
+		bufferInfo.indexBuffer[i * 18 + 12] = i * 8 + 2;
+		bufferInfo.indexBuffer[i * 18 + 13] = i * 8 + 6;
+		bufferInfo.indexBuffer[i * 18 + 14] = i * 8 + 5;
 
-		bufferInfo.indexBuffer[i * 18 + 15] = i * 4 + 3;
-		bufferInfo.indexBuffer[i * 18 + 16] = (i + 1) * 4 + 3;
-		bufferInfo.indexBuffer[i * 18 + 17] = (i + 1) * 4 + 2;
+		bufferInfo.indexBuffer[i * 18 + 15] = i * 8 + 3;
+		bufferInfo.indexBuffer[i * 18 + 16] = i * 8 + 7;
+		bufferInfo.indexBuffer[i * 18 + 17] = i * 8 + 6;
 	}
 
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
@@ -686,7 +686,8 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 // Description:		Assigns vertex data to the vertex buffer (pretty lines).
 //
 // Input Arguments:
-//		points	= const std::vector<std::pair<double, double> >
+//		points	= const std::vector<std::pair<double, double> >&
+//		style	= const LineStyle&
 //
 // Output Arguments:
 //		None
@@ -695,7 +696,8 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 //		None
 //
 //==========================================================================
-void Line::AssignVertexData(const std::vector<std::pair<double, double> >& points)
+void Line::AssignVertexData(const std::vector<std::pair<double, double> >& points,
+	const LineStyle& style)
 {
 	std::vector<Offsets> offsets(points.size());
 	const unsigned int dimension(renderWindow.GetVertexDimension());
@@ -707,7 +709,9 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double> >& point
 			ComputeOffsets(points[i].first, points[i].second, points[i + 1].first,
 				points[i + 1].second, offsets[i].dxLine, offsets[i].dyLine,
 				offsets[i].dxEdge, offsets[i].dyEdge);
-		else if (i == points.size() - 1)
+		else if (style == StyleSegments && i % 2 == 0)
+			offsets[i] = offsets[i - 1];
+		else if (i == points.size() - 1 || style == StyleSegments)
 			ComputeOffsets(points[i - 1].first, points[i - 1].second, points[i].first,
 				points[i].second, offsets[i].dxLine, offsets[i].dyLine,
 				offsets[i].dxEdge, offsets[i].dyEdge);

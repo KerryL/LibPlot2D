@@ -2229,10 +2229,10 @@ void PlotObject::UpdateScissorArea() const
 	int width, height;
 	renderer.GetSize(&width, &height);
 	glEnable(GL_SCISSOR_TEST);
-	glScissor(axisLeft->GetOffsetFromWindowEdge() - 1,
-		axisBottom->GetOffsetFromWindowEdge() - 1,
-		width - axisRight->GetOffsetFromWindowEdge() - axisLeft->GetOffsetFromWindowEdge() + 2,
-		height - axisTop->GetOffsetFromWindowEdge() - axisBottom->GetOffsetFromWindowEdge() + 2);
+	glScissor(axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(),
+		width - axisRight->GetOffsetFromWindowEdge() - axisLeft->GetOffsetFromWindowEdge(),
+		height - axisTop->GetOffsetFromWindowEdge() - axisBottom->GetOffsetFromWindowEdge());
 
 	glDisable(GL_SCISSOR_TEST);
 }
