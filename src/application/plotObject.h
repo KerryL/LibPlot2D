@@ -32,9 +32,6 @@ class PlotCurve;
 class Dataset2D;
 class Color;
 
-// FTGL forward declarations
-class FTFont;
-
 class PlotObject
 {
 public:
@@ -126,12 +123,12 @@ public:
 	unsigned int GetCurveCount() const { return plotList.size(); }
 	unsigned long long GetTotalPointCount() const;
 
-	FTFont* GetAxisFont() const { return axisFont; }
-
 	unsigned int GetHorizontalAxisOffset(const bool &withLabel) const;
 	unsigned int GetVerticalAxisOffset(const bool &withLabel) const;
 
 	inline void UpdatePlotAreaSize() { needScissorUpdate = true; }
+
+	inline std::string GetAxisFont() const { return fontFileName; }
 
 private:
 	PlotRenderer &renderer;
@@ -148,9 +145,6 @@ private:
 	Axis *axisRight;
 
 	TextRendering *titleObject;
-
-	FTFont *axisFont;
-	FTFont *titleFont;
 
 	// The minimums and maximums for the axis
 	double xMin, xMax, yLeftMin, yLeftMax, yRightMin, yRightMax;
@@ -176,9 +170,9 @@ private:
 	std::vector<PlotCurve*> plotList;
 	std::vector<const Dataset2D*> dataList;
 
+	std::string fontFileName;
 	void CreateAxisObjects();
 	void InitializeFonts();
-	void CreateFontObjects(const wxString &fontFile);
 
 	// Handles all of the formatting for the plot
 	void FormatPlot();

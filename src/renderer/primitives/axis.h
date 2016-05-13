@@ -25,10 +25,6 @@
 #include "renderer/line.h"
 #include "renderer/text.h"
 
-// FTGL forward declarations
-/*class FTFont;
-class FTBBox;*/// TODO:  Fix
-
 class Axis : public Primitive
 {
 public:
@@ -62,7 +58,7 @@ public:
 	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; modified = true; }
 	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; modified = true; }
 	void SetLabel(wxString label) { this->label = label; modified = true; }
-	//void SetFont(FTFont *font) { this->font = font; modified = true; }
+	bool InitializeFonts(const std::string& fontFileName, const double& size);
 	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; modified = true; }
 	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; modified = true; }
 	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; modified = true; }
@@ -136,7 +132,8 @@ private:
 
 	// The axis label and font
 	wxString label;
-	//FTFont *font;
+	Text labelText;
+	Text valueText;
 
 	Line axisLines;
 	Line gridLines;
@@ -156,7 +153,7 @@ private:
 	double GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const;
 	double GetNextGridValue(const unsigned int &tick) const;
 
-	void DrawAxisLabel() const;
+	void DrawAxisLabel();
 	void DrawTickLabels();
 
 	double GetAxisLabelTranslation(const double &offset, const double &fontHeight) const;

@@ -68,8 +68,8 @@ const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 //==========================================================================
 PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 {
-	InitializeFonts();
 	CreateAxisObjects();
+	InitializeFonts();
 
 	ResetAutoScaling();
 
@@ -94,11 +94,6 @@ PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 //==========================================================================
 PlotObject::~PlotObject()
 {
-/*	delete axisFont;
-	axisFont = NULL;
-	delete titleFont;
-	titleFont = NULL;*/
-	// TODO:  Fix
 }
 
 //==========================================================================
@@ -175,8 +170,6 @@ void PlotObject::InitializeFonts()
 
 	if (!foundFont)
 	{
-		axisFont = NULL;
-		titleFont = NULL;
 		if (!fontFile.IsEmpty())
 		{
 			wxString fontName;
@@ -191,55 +184,13 @@ void PlotObject::InitializeFonts()
 		return;
 	}
 
-	CreateFontObjects(fontFile);
-}
+	fontFileName = fontFile.ToStdString();
+	axisBottom->InitializeFonts(fontFileName, 12);
+	axisTop->InitializeFonts(fontFileName, 12);
+	axisLeft->InitializeFonts(fontFileName, 12);
+	axisRight->InitializeFonts(fontFileName, 12);
 
-//==========================================================================
-// Class:			PlotObject
-// Function:		CreateFontObjects
-//
-// Description:		Creates the font objects.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotObject::CreateFontObjects(const wxString &fontFile)
-{
-	/*axisFont = new FTGLTextureFont(fontFile.c_str());
-	titleFont = new FTGLTextureFont(fontFile.c_str());
-
-	if (axisFont->Error())
-	{
-		delete axisFont;
-		axisFont = NULL;
-
-		wxMessageBox(_T("Error loading axis font"));
-	}
-	else
-	{
-		axisFont->FaceSize(12);
-		axisFont->CharMap(FT_ENCODING_UNICODE);
-	}
-
-	if (titleFont->Error())
-	{
-		delete titleFont;
-		titleFont = NULL;
-
-		wxMessageBox(_T("Error loading title font"));
-	}
-	else
-	{
-		titleFont->FaceSize(18);
-		titleFont->CharMap(FT_ENCODING_UNICODE);
-	}*/// TODO:  Fix
+	//titleObject->InitializeFonts(fontFileName, 18);// TODO:  Implement
 }
 
 //==========================================================================
@@ -851,7 +802,6 @@ void PlotObject::SetAxesColor(const Color &color)
 //==========================================================================
 void PlotObject::FormatTitle()
 {
-	titleObject->SetFont(titleFont);
 	titleObject->SetCentered(true);
 	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
 		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);

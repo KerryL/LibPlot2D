@@ -42,8 +42,8 @@
 //		None
 //
 //==========================================================================
-Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), axisLines(renderWindow),
-	gridLines(renderWindow)
+Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(renderWindow),
+	valueText(renderWindow), axisLines(renderWindow), gridLines(renderWindow)
 {
 	color.Set(0.0, 0.0, 0.0, 1.0);
 
@@ -75,8 +75,8 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), axisLines(rend
 
 	bufferInfo.push_back(BufferInfo());// Axis and ticks, gridlines and borders
 	bufferInfo.push_back(BufferInfo());// Gridlines
-	/*bufferInfo.push_back(BufferInfo());// Values
-	bufferInfo.push_back(BufferInfo());// Label*/
+	bufferInfo.push_back(BufferInfo());// Values
+	bufferInfo.push_back(BufferInfo());// Label
 }
 
 //==========================================================================
@@ -144,7 +144,8 @@ void Axis::Update(const unsigned int& i)
 	}
 	else if (i == 3)// Label
 	{
-		// TODO
+		DrawAxisLabel();
+		bufferInfo[i] = labelText.BuildText();
 	}
 }
 
@@ -178,8 +179,6 @@ void Axis::GenerateGeometry()
 	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 	Line::DoPrettyDraw(bufferInfo[0].indexCount);
 
-	glBindVertexArray(0);
-
 	// TODO
 	/*if (font)
 	{
@@ -188,6 +187,14 @@ void Axis::GenerateGeometry()
 
 		DrawTickLabels();
 	}*/
+
+	if (!label.IsEmpty())
+	{
+		glBindVertexArray(bufferInfo[3].vertexArrayIndex);
+		labelText.RenderBufferedGlyph(bufferInfo[3].vertexCount);
+	}
+
+	glBindVertexArray(0);
 }
 
 //==========================================================================
@@ -583,23 +590,21 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //		None
 //
 //==========================================================================
-void Axis::DrawAxisLabel() const
+void Axis::DrawAxisLabel()
 {
-	// TODO:  Update for OGL4
-	/*
 	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
 
 	// TODO:  Change plot dimension if there is a title? or if there is a title and a label for the top axis?
-	FTBBox boundingBox = font->BBox("H");// Some capital letter to assure uniform spacing
-	double yTranslation = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.Upper().Y());
+	Text::BoundingBox boundingBox = labelText.GetBoundingBox("H");// Some capital letter to assure uniform spacing
+	double yTranslation = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.yUp);
 
-	boundingBox = font->BBox(label.mb_str());
-	double textWidth = boundingBox.Upper().X() - boundingBox.Lower().X();
+	boundingBox = labelText.GetBoundingBox(label.ToStdString());
+	double textWidth = boundingBox.xRight - boundingBox.xLeft;
 	double plotOffset = (double)minAxis->GetOffsetFromWindowEdge() - (double)maxAxis->GetOffsetFromWindowEdge();
 
-	glPushMatrix();
+	/*glPushMatrix();
 		glLoadIdentity();
 
 		if (IsHorizontal())
@@ -608,10 +613,12 @@ void Axis::DrawAxisLabel() const
 		{
 			glRotated(90.0, 0.0, 0.0, 1.0);
 			glTranslated(0.5 * (renderWindow.GetSize().GetHeight() - textWidth + plotOffset), -yTranslation, 0.0);
-		}
+		}*/
 
-		font->Render(label.mb_str());
-	glPopMatrix();*/
+	labelText.SetText(label.ToStdString());
+	labelText.SetPosition(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), yTranslation);
+		//font->Render(label.mb_str());
+	//glPopMatrix();
 }
 
 //==========================================================================
@@ -677,7 +684,6 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 //==========================================================================
 void Axis::DrawTickLabels()
 {
-//	FTBBox boundingBox;
 	int xTranslation, yTranslation;
 	unsigned int precision = GetPrecision();
 
@@ -1003,4 +1009,35 @@ unsigned int Axis::GetAxisLength() const
 			- minAxis->GetOffsetFromWindowEdge()
 			- maxAxis->GetOffsetFromWindowEdge();
 	}
+}
+
+//==========================================================================
+// Class:			Axis
+// Function:		InitializeFonts
+//
+// Description:		Initializes the font objects.
+//
+// Input Arguments:
+//		fontFileName	= const std::string&
+//		size			= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool Axis::InitializeFonts(const std::string& fontFileName, const double& size)
+{
+	if (!labelText.SetFace(fontFileName) || !valueText.SetFace(fontFileName))
+		return false;
+
+	labelText.SetColor(Color::ColorBlack);
+	valueText.SetColor(Color::ColorBlack);
+
+	labelText.SetSize(size);
+	valueText.SetSize(size);
+
+	return true;
 }

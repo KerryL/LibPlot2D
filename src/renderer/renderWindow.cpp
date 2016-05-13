@@ -1746,7 +1746,7 @@ void RenderWindow::Scale(Matrix& m, const double& x, const double& y, const doub
 //		None
 //
 //==========================================================================
-void RenderWindow::UseDefaultProgram()
+void RenderWindow::UseDefaultProgram() const
 {
 	glUseProgram(defaultProgram);
 }

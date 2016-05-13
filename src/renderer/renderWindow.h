@@ -90,7 +90,7 @@ public:
 	static GLuint CreateProgram(const std::vector<GLuint>& shaderList);
 
 	void ShiftForExactPixelization();
-	void UseDefaultProgram();
+	void UseDefaultProgram() const;
 
 	GLuint GetPositionLocation() const { return positionAttributeLocation; }
 	GLuint GetColorLocation() const { return colorAttributeLocation; }

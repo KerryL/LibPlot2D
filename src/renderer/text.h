@@ -30,26 +30,58 @@
 class Text
 {
 public:
-	Text();
+	Text(const RenderWindow& renderer);
+	~Text();
 
 	void SetSize(const double& height);
 	void SetSize(const double& width, const double& height);
 
 	bool SetFace(const std::string& fontFileName);
 
-	// TODO:  Orientation?  Color?
+	inline void SetColor(const Color& color) { this->color = color; }
+	// TODO:  Orientation?
 
-	Primitive::BufferInfo SetText(const std::string& text);
-	void RenderBufferedGlyph();
+	inline void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; }
+	inline void SetScale(const double& scale) { assert(scale > 0.0); this->scale = scale; }
+	inline void SetText(const std::string& text) { this->text = text; }
 
+	Primitive::BufferInfo BuildText();
+	void RenderBufferedGlyph(const unsigned int& characterCount);
+
+	struct BoundingBox
+	{
+		int xLeft;
+		int xRight;
+		int yUp;
+		int yDown;
+	};
+
+	BoundingBox GetBoundingBox(const std::string& s);
+
+	bool IsOK() const { return isOK; }
+
+private:
 	static const std::string vertexShader;
 	static const std::string fragmentShader;
 
-private:
-	FT_Library ft;
+	const RenderWindow& renderer;
+
+	static unsigned int program;
+	static unsigned int colorLocation;
+
+	static FT_Library ft;
+	static unsigned int ftReferenceCount;
+
 	Primitive::BufferInfo bufferInfo;
 
 	FT_Face face;
+	Color color;
+
+	double x;
+	double y;
+	double scale;// TODO:  Do I really need scale?
+
+	std::string text;
 
 	struct Glyph
 	{
@@ -63,7 +95,14 @@ private:
 
 	std::map<char, Glyph> glyphs;
 
+	void DoInternalInitialization();
 	bool GenerateGlyphs();
+	static bool initialized;
+	bool glyphsGenerated;
+
+	void Initialize();
+	void FreeFTResources();
+	bool isOK;
 };
 
 #endif// TEXT_H_

@@ -20,7 +20,6 @@
 #include "renderer/primitives/legend.h"
 #include "renderer/renderWindow.h"
 #include "renderer/line.h"
-#include "renderer/text.h"
 
 //==========================================================================
 // Class:			Legend
@@ -56,7 +55,7 @@ const unsigned int Legend::entrySpacing(5);// [pixels]
 //		None
 //
 //==========================================================================
-Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
+Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow), text(renderWindow)
 {
 	fontColor = Color::ColorBlack;
 	backgroundColor = Color::ColorWhite;
@@ -69,8 +68,6 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 
 	windowRef = BottomLeft;
 	legendRef = Center;
-
-	font = NULL;
 
 	SetDrawOrder(3000);// Draw this last
 }
@@ -149,9 +146,7 @@ void Legend::GenerateGeometry()
 //==========================================================================
 bool Legend::HasValidParameters()
 {
-	if (!font)
-		return false;
-	else if (entries.size() == 0)
+	if (entries.size() == 0)
 		return false;
 		
 	return true;
@@ -358,6 +353,28 @@ void Legend::UpdateBoundingBox()
 	boundingBox = font->BBox("H");
 	height = (boundingBox.Upper().Y() + entrySpacing) * i + entrySpacing;*/
 	// TODO:  Fix
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		SetFont
+//
+// Description:		Sets up the font object.
+//
+// Input Arguments:
+//		fontFileName	= const std::string&
+//		size			= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::SetFont(const std::string& fontFileName, const double& size)
+{
+	// TODO:  Implement
 }
 
 //==========================================================================

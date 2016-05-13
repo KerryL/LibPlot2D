@@ -60,12 +60,14 @@ public:
 		unsigned int vertexBufferIndex;
 		unsigned int vertexArrayIndex;
 		unsigned int indexBufferIndex;
-		bool glVertexBufferExists;
-		bool glIndexBufferExists;
 
 		BufferInfo();
 		void GetOpenGLIndices(const bool& needIndexObject = false);
 		void FreeOpenGLObjects();
+
+	private:
+		bool glVertexBufferExists;
+		bool glIndexBufferExists;
 	};
 
 protected:

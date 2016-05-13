@@ -25,9 +25,7 @@
 
 // Local headers
 #include "renderer/primitives/primitive.h"
-
-// FTGL forward declarations
-class FTFont;
+#include "renderer/text.h"
 
 class Legend : public Primitive
 {
@@ -39,7 +37,7 @@ public:
 	virtual ~Legend() {}
 
 	// Set option methods
-	void SetFont(FTFont *font) { this->font = font; modified = true; }
+	void SetFont(const std::string& fontFileName, const double& size);
 	void SetFontColor(const Color &color) { fontColor = color; modified = true; }
 	void SetBackgroundColor(const Color &color) { backgroundColor = color; modified = true; }
 	void SetBorderColor(const Color &color) { borderColor = color; modified = true; }
@@ -102,7 +100,7 @@ protected:
 
 private:
 	static const unsigned int entrySpacing;// [pixels]
-	FTFont *font;
+	Text text;
 
 	Color fontColor;
 	Color backgroundColor;

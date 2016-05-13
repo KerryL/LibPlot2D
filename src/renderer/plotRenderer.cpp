@@ -227,12 +227,12 @@ void PlotRenderer::CreateActors()
 	leftCursor = new PlotCursor(*this, *plot->GetBottomAxis());
 	rightCursor = new PlotCursor(*this, *plot->GetBottomAxis());
 
-	if (plot->GetAxisFont())
+	if (!plot->GetAxisFont().empty())
 	{
 		plot->Update();// Need to make sure sizes update before we reference them to position the legend
 		const unsigned int offset(5);
 		legend = new Legend(*this);
-		legend->SetFont(plot->GetAxisFont());
+		legend->SetFont(plot->GetAxisFont(), 12);
 		legend->SetLegendReference(Legend::TopRight);
 		legend->SetWindowReference(Legend::TopRight);
 		legend->SetPosition(plot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
