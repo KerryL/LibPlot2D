@@ -84,18 +84,17 @@ const std::string Text::vertexShader(
 const std::string Text::fragmentShader(
 	"#version 330\n"
 	"\n"
-//	"uniform sampler2D text;\n"
+	"uniform sampler2D text;\n"
 	"uniform vec3 textColor;\n"
 	"\n"
-//	"in vec2 texCoords;\n"
+	"in vec2 texCoords;\n"
 	"\n"
 	"out vec4 color;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-//	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
-//	"    color = vec4(textColor, 1.0) * sampled;\n"
-"color=vec4(1.0,1.0,0.0,1.0);\n"
+	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
+	"    color = vec4(textColor, 1.0) * sampled;\n"
 	"}\n"
 );
 

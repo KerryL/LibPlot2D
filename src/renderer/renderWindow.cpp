@@ -1259,11 +1259,14 @@ void RenderWindow::Initialize2D()
 
 /*glDisable(GL_DITHER);
 glDisable(GL_ALPHA_TEST);
-glDisable(GL_BLEND);
 glDisable(GL_STENCIL_TEST);
 glDisable(GL_FOG);
 glDisable(GL_DEPTH_TEST);
 glPixelZoom(1.0, 1.0);*/
+
+	// Enable blending to support font rendering
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	modelviewMatrix.MakeIdentity();
 	ShiftForExactPixelization();
