@@ -46,7 +46,7 @@ public:
 	inline void SetText(const std::string& text) { this->text = text; }
 
 	Primitive::BufferInfo BuildText();
-	void RenderBufferedGlyph(const unsigned int& characterCount);
+	void RenderBufferedGlyph(const unsigned int& vertexCount);
 
 	struct BoundingBox
 	{

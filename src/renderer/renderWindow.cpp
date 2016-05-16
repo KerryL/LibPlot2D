@@ -1243,7 +1243,7 @@ glDisable(GL_ALPHA_TEST);
 glDisable(GL_BLEND);
 glDisable(GL_STENCIL_TEST);
 glDisable(GL_FOG);
-glDisable(GL_TEXTURE_2D);
+//glDisable(GL_TEXTURE_2D);
 glDisable(GL_DEPTH_TEST);
 glPixelZoom(1.0, 1.0);
 

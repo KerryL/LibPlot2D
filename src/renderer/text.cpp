@@ -119,17 +119,17 @@ void Text::SetSize(const double& width, const double& height)
 
 bool Text::GenerateGlyphs()
 {
+	// TODO:  Better to use texture atlas?
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	Glyph g;
-  
+
 	for (GLubyte c = 0; c < 128; c++)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			return false;
 
-		GLuint texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glGenTextures(1, &g.id);
+		glBindTexture(GL_TEXTURE_2D, g.id);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED,
 			face->glyph->bitmap.width, face->glyph->bitmap.rows, 0,
 			GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
@@ -139,7 +139,6 @@ bool Text::GenerateGlyphs()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		g.id = texture;
 		g.xSize = face->glyph->bitmap.width;
 		g.ySize = face->glyph->bitmap.rows;
 		g.xBearing = face->glyph->bitmap_left;
@@ -149,9 +148,10 @@ bool Text::GenerateGlyphs()
 		glyphs.insert(std::make_pair(c, g));
 	}
 
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glyphsGenerated = true;
 
-	return true;
+	return glGetError() == GL_NO_ERROR;
 }
 
 void Text::FreeFTResources()
@@ -170,12 +170,12 @@ Primitive::BufferInfo Text::BuildText()
 
 	Primitive::BufferInfo bufferInfo;
 	bufferInfo.GetOpenGLIndices();
-	bufferInfo.vertexCount = 6 * text.length();
+	bufferInfo.vertexCount = 4 * text.length();
 	bufferInfo.vertexBuffer = new float[bufferInfo.vertexCount * 4];
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	double xStart(x);
 
 	unsigned int i(0);
 	std::string::const_iterator c;
@@ -183,17 +183,17 @@ Primitive::BufferInfo Text::BuildText()
 	{
 		Glyph g = glyphs[*c];
 
-		GLfloat xpos = x + g.xBearing * scale;
+		GLfloat xpos = xStart + g.xBearing * scale;
 		GLfloat ypos = y - (g.ySize - g.yBearing) * scale;
 
 		GLfloat w = g.xSize * scale;
 		GLfloat h = g.ySize * scale;
 
         // Update VBO for each character
-		bufferInfo.vertexBuffer[i++] = xpos;
+		/*bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;*/
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
@@ -205,12 +205,17 @@ Primitive::BufferInfo Text::BuildText()
 		bufferInfo.vertexBuffer[i++] = 1.0;
 		bufferInfo.vertexBuffer[i++] = 1.0;
 
+		bufferInfo.vertexBuffer[i++] = xpos + w;
+		bufferInfo.vertexBuffer[i++] = ypos + h;
+		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
 		bufferInfo.vertexBuffer[i++] = 0.0;
 		bufferInfo.vertexBuffer[i++] = 0.0;
 
-		bufferInfo.vertexBuffer[i++] = xpos + w;
+		/*bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 1.0;
 		bufferInfo.vertexBuffer[i++] = 1.0;
@@ -218,26 +223,29 @@ Primitive::BufferInfo Text::BuildText()
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
 		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;*/
 
 		// Render glyph texture over quad
-		glBindTexture(GL_TEXTURE_2D, g.id);
+		//glBindTexture(GL_TEXTURE_2D, g.id);
 
 		// Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-		x += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
+		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
     }
 
 	// Update content of VBO memory
     glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
 		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Render quad
 	//glDrawArrays(GL_TRIANGLES, 0, 6);// TODO:  Move to rendering method?
 
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
 
 	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
@@ -245,12 +253,14 @@ Primitive::BufferInfo Text::BuildText()
 	return bufferInfo;
 }
 
-void Text::RenderBufferedGlyph(const unsigned int& characterCount)
+void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	glUseProgram(program);
 	glUniform3f(colorLocation, color.GetRed(), color.GetGreen(), color.GetBlue());
-	glDrawArrays(GL_TRIANGLES, 0, 6 * characterCount);
+	glBindTexture(GL_TEXTURE_2D, 65);
+	glDrawArrays(GL_QUADS, 0, vertexCount);
 	renderer.UseDefaultProgram();
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Text::BoundingBox Text::GetBoundingBox(const std::string& s)
