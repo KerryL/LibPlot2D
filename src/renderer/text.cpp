@@ -33,24 +33,54 @@ bool Text::initialized;
 FT_Library Text::ft;
 unsigned int Text::ftReferenceCount(0);
 
+//==========================================================================
+// Class:			Text
+// Function:		vertexShader
+//
+// Description:		Text vertex shader.
+//
+// Input Arguments:
+//		0	= vertex
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 const std::string Text::vertexShader(
 	"#version 330\n"
 	"\n"
-//	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec4 vertex;// <vec2 pos, vec2 tex>\n"
 	"\n"
-//	"out vec2 texCoords;\n"
+	"out vec2 texCoords;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-//	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
 	"    gl_Position = projectionMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
-//	"    texCoords = vertex.zw;\n"
+	"    texCoords = vertex.zw;\n"
 	"}\n"
 );
 
+//==========================================================================
+// Class:			Text
+// Function:		fragmentShader
+//
+// Description:		Text fragment shader.
+//
+// Input Arguments:
+//		0	= position
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 const std::string Text::fragmentShader(
 	"#version 330\n"
 	"\n"
@@ -63,12 +93,28 @@ const std::string Text::fragmentShader(
 	"\n"
 	"void main()\n"
 	"{\n"
-/*	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
-	"    color = vec4(textColor, 1.0) * sampled;\n"*/
-	"color = vec4(1.0, 0.0, 0.0, 1.0);\n"
+//	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
+//	"    color = vec4(textColor, 1.0) * sampled;\n"
+"color=vec4(1.0,1.0,0.0,1.0);\n"
 	"}\n"
 );
 
+//==========================================================================
+// Class:			Text
+// Function:		Text
+//
+// Description:		Constructor for Text object.
+//
+// Input Arguments:
+//		renderer	= RenderWindow&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 Text::Text(RenderWindow& renderer) : renderer(renderer)
 {
 	color = Color::ColorBlack;
@@ -81,11 +127,44 @@ Text::Text(RenderWindow& renderer) : renderer(renderer)
 	Initialize();
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		~Text
+//
+// Description:		Destructor for Text object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 Text::~Text()
 {
 	FreeFTResources();
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		Initialize
+//
+// Description:		Initializes the Freetype back-end of this object.  Must
+//					be called prior to any other post-creation method.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 void Text::Initialize()
 {
 	assert(!glyphsGenerated);
@@ -100,6 +179,23 @@ void Text::Initialize()
 	ftReferenceCount++;
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		Initialize
+//
+// Description:		Initializes the Freetype back-end of this object.  Must
+//					be called prior to any other post-creation method.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 bool Text::SetFace(const std::string& fontFileName)
 {
 	assert(!glyphsGenerated);
@@ -109,17 +205,67 @@ bool Text::SetFace(const std::string& fontFileName)
 	return true;
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		SetSize
+//
+// Description:		Sets the width and height to use for the font.  Width is
+//					calculated to maintain proper aspect ratio.
+//
+// Input Arguments:
+//		height	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 void Text::SetSize(const double& height)
 {
 	SetSize(0, height);
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		SetSize
+//
+// Description:		Sets the width and height to use for the font.
+//
+// Input Arguments:
+//		width	= const double&
+//		height	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 void Text::SetSize(const double& width, const double& height)
 {
 	assert(!glyphsGenerated);
 	FT_Set_Pixel_Sizes(face, width, height);
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		GenerateGlyphs
+//
+// Description:		Generates the set of glyphs.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
 bool Text::GenerateGlyphs()
 {
 	// TODO:  Better to use texture atlas?
@@ -157,6 +303,23 @@ bool Text::GenerateGlyphs()
 	return glGetError() == GL_NO_ERROR;
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		FreeFTResources
+//
+// Description:		Frees previously allocated Freetype resources (with
+//					reference counting).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 void Text::FreeFTResources()
 {
 	FT_Done_Face(face);
@@ -167,6 +330,22 @@ void Text::FreeFTResources()
 		FT_Done_FreeType(ft);
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		BuildText
+//
+// Description:		Generates the vertex buffer information for this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
 Primitive::BufferInfo Text::BuildText()
 {
 	DoInternalInitialization();
@@ -176,7 +355,6 @@ Primitive::BufferInfo Text::BuildText()
 	bufferInfo.vertexCount = 4 * text.length();
 	bufferInfo.vertexBuffer = new float[bufferInfo.vertexCount * 4];
 
-	//glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 	double xStart(x);
 
@@ -248,9 +426,6 @@ Primitive::BufferInfo Text::BuildText()
 		bufferInfo.vertexBuffer[i++] = 1.0;
 		bufferInfo.vertexBuffer[i++] = 0.0;
 
-		// Render glyph texture over quad
-		//glBindTexture(GL_TEXTURE_2D, g.id);
-
 		// Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
 		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
     }
@@ -264,11 +439,7 @@ Primitive::BufferInfo Text::BuildText()
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// Render quad
-	//glDrawArrays(GL_TRIANGLES, 0, 6);// TODO:  Move to rendering method?
-
     glBindVertexArray(0);
-    //glBindTexture(GL_TEXTURE_2D, 0);
 
 	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
@@ -276,12 +447,28 @@ Primitive::BufferInfo Text::BuildText()
 	return bufferInfo;
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		BuildText
+//
+// Description:		Generates the vertex buffer information for this object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
 void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	glUseProgram(program);
 	glUniform3f(colorLocation, color.GetRed(), color.GetGreen(), color.GetBlue());
 
-	glActiveTexture(GL_TEXTURE0);// TODO:  Needed?
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 70);// TODO:  Remove this or correctly implement it
 
 	glDrawArrays(GL_QUADS, 0, vertexCount);
@@ -290,6 +477,23 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		GetBoundingBox
+//
+// Description:		Returns the bounding box for the specified text string
+//					given this object's font and size settings.
+//
+// Input Arguments:
+//		s	= const std::string&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Bounding Box
+//
+//==========================================================================
 Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 {
 	DoInternalInitialization();
@@ -319,6 +523,22 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 	return b;
 }
 
+//==========================================================================
+// Class:			Text
+// Function:		DoInternalInitialization
+//
+// Description:		Performs necessary static-state initialization.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
 void Text::DoInternalInitialization()
 {
 	if (!glyphsGenerated)

@@ -593,7 +593,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 //
 // Input Arguments:
 //		interaction	= InteractionType specifying which type of motion to create
-//		event	= wxMouseEvent&
+//		event		= wxMouseEvent&
 //
 // Output Arguments:
 //		None
@@ -1653,6 +1653,8 @@ void RenderWindow::BuildShaders()
 
 	positionAttributeLocation = glGetAttribLocation(s.programId, positionName.c_str());
 	colorAttributeLocation = glGetAttribLocation(s.programId, colorName.c_str());
+
+	AddShader(s);
 }
 
 //==========================================================================
