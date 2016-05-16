@@ -101,6 +101,19 @@ public:
 	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);
 	static void Scale(Matrix& m, const double& x, const double& y, const double& z);
 
+	struct ShaderInfo
+	{
+		GLuint programId;
+
+		bool needsProjection;
+		GLuint projectionLocation;
+
+		bool needsModelview;
+		GLuint modelViewLocation;
+	};
+
+	void AddShader(const ShaderInfo& shader);
+
 private:
 	wxGLContext *context;
 	wxGLContext* GetContext();
@@ -168,7 +181,6 @@ private:
 	static const std::string defaultVertexShader;
 	static const std::string defaultFragmentShader;
 
-	GLuint defaultProgram;
 	void BuildShaders();
 
 	GLuint CreateDefaultVertexShader();
@@ -212,8 +224,7 @@ protected:
 	Matrix modelviewMatrix;
 	Matrix projectionMatrix;
 
-	GLint modelviewLocation;
-	GLint projectionLocation;
+	std::vector<ShaderInfo> shaders;
 
 	DECLARE_EVENT_TABLE()
 

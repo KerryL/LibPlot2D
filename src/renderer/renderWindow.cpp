@@ -289,12 +289,9 @@ void RenderWindow::Render()
 	if (sizeUpdateRequired)
 		DoResize();
 
-	UseDefaultProgram();
-
 	if (modified)
 		Initialize();
-
-	if (modelviewModified)
+	else if (modelviewModified)
 		UpdateModelviewMatrix();
 
 	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
@@ -497,9 +494,22 @@ void RenderWindow::Initialize()
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	float glProjectionMatrix[16];
-	ConvertMatrixToGL(projectionMatrix, glProjectionMatrix);
-	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glProjectionMatrix);
+	float glMatrix[16];
+	GLuint i;
+	for (i = shaders.size(); i > 0; i--)
+	{
+		if (shaders[i - 1].needsModelview || shaders[i - 1].needsProjection)
+			glUseProgram(shaders[i - 1].programId);
+
+		ConvertMatrixToGL(modelviewMatrix, glMatrix);
+		if (shaders[i - 1].needsModelview && modelviewModified)
+			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1, GL_FALSE, glMatrix);
+		modelviewModified = false;
+
+		ConvertMatrixToGL(projectionMatrix, glMatrix);
+		if (shaders[i - 1].needsProjection)
+			glUniformMatrix4fv(shaders[i - 1].projectionLocation, 1, GL_FALSE, glMatrix);
+	}
 
 	modified = false;
 }
@@ -890,7 +900,16 @@ void RenderWindow::UpdateModelviewMatrix()
 {
 	float glModelviewMatrix[16];
 	ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
-	glUniformMatrix4fv(modelviewLocation, 1, GL_FALSE, glModelviewMatrix);
+
+	unsigned int i;
+	for (i = shaders.size(); i > 0; i--)
+	{
+		if (shaders[i - 1].needsModelview)
+		{
+			glUseProgram(shaders[i - 1].programId);
+			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
+		}
+	}
 	modelviewModified = false;
 }
 
@@ -1238,14 +1257,13 @@ void RenderWindow::Initialize2D()
 	// Disable unused options to speed-up 2D rendering
 	glDepthMask(GL_FALSE);
 
-glDisable(GL_DITHER);
+/*glDisable(GL_DITHER);
 glDisable(GL_ALPHA_TEST);
 glDisable(GL_BLEND);
 glDisable(GL_STENCIL_TEST);
 glDisable(GL_FOG);
-//glDisable(GL_TEXTURE_2D);
 glDisable(GL_DEPTH_TEST);
-glPixelZoom(1.0, 1.0);
+glPixelZoom(1.0, 1.0);*/
 
 	modelviewMatrix.MakeIdentity();
 	ShiftForExactPixelization();
@@ -1625,13 +1643,16 @@ void RenderWindow::BuildShaders()
 	shaderList.push_back(CreateDefaultVertexShader());
 	shaderList.push_back(CreateDefaultFragmentShader());
 
-	defaultProgram = CreateProgram(shaderList);
+	ShaderInfo s;
+	s.programId = CreateProgram(shaderList);
+	s.needsModelview = true;
+	s.needsProjection = true;
 
-	modelviewLocation = glGetUniformLocation(defaultProgram, modelviewName.c_str());
-	projectionLocation = glGetUniformLocation(defaultProgram, projectionName.c_str());
+	s.modelViewLocation = glGetUniformLocation(s.programId, modelviewName.c_str());
+	s.projectionLocation = glGetUniformLocation(s.programId, projectionName.c_str());
 
-	positionAttributeLocation = glGetAttribLocation(defaultProgram, positionName.c_str());
-	colorAttributeLocation = glGetAttribLocation(defaultProgram, colorName.c_str());
+	positionAttributeLocation = glGetAttribLocation(s.programId, positionName.c_str());
+	colorAttributeLocation = glGetAttribLocation(s.programId, colorName.c_str());
 }
 
 //==========================================================================
@@ -1748,7 +1769,7 @@ void RenderWindow::Scale(Matrix& m, const double& x, const double& y, const doub
 //==========================================================================
 void RenderWindow::UseDefaultProgram() const
 {
-	glUseProgram(defaultProgram);
+	glUseProgram(shaders[0].programId);
 }
 
 //==========================================================================
@@ -1770,4 +1791,25 @@ void RenderWindow::UseDefaultProgram() const
 void RenderWindow::ShiftForExactPixelization()
 {
 	Translate(modelviewMatrix, exactPixelShift, exactPixelShift, 0.0);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		AddShader
+//
+// Description:		Adds a shader to our list of managed shaders.
+//
+// Input Arguments:
+//		shader	= const ShaderInfo&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::AddShader(const ShaderInfo& shader)
+{
+	shaders.push_back(shader);
 }

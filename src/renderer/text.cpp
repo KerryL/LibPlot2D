@@ -28,6 +28,7 @@
 
 unsigned int Text::program;
 unsigned int Text::colorLocation;
+unsigned int Text::projectionMatrixLocation;
 bool Text::initialized;
 FT_Library Text::ft;
 unsigned int Text::ftReferenceCount(0);
@@ -35,38 +36,40 @@ unsigned int Text::ftReferenceCount(0);
 const std::string Text::vertexShader(
 	"#version 330\n"
 	"\n"
-	"uniform mat4 modelviewMatrix;\n"
+//	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec4 vertex;// <vec2 pos, vec2 tex>\n"
 	"\n"
-	"out vec2 texCoords;\n"
+//	"out vec2 texCoords;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
-	"    texCoords = vertex.zw;\n"
+//	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
+	"    gl_Position = projectionMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
+//	"    texCoords = vertex.zw;\n"
 	"}\n"
 );
 
 const std::string Text::fragmentShader(
 	"#version 330\n"
 	"\n"
-	"uniform sampler2D text;\n"
+//	"uniform sampler2D text;\n"
 	"uniform vec3 textColor;\n"
 	"\n"
-	"in vec2 texCoords;\n"
+//	"in vec2 texCoords;\n"
 	"\n"
 	"out vec4 color;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
-	"    color = vec4(textColor, 1.0) * sampled;\n"
+/*	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
+	"    color = vec4(textColor, 1.0) * sampled;\n"*/
+	"color = vec4(1.0, 0.0, 0.0, 1.0);\n"
 	"}\n"
 );
 
-Text::Text(const RenderWindow& renderer) : renderer(renderer)
+Text::Text(RenderWindow& renderer) : renderer(renderer)
 {
 	color = Color::ColorBlack;
 	scale = 1.0;
@@ -173,7 +176,7 @@ Primitive::BufferInfo Text::BuildText()
 	bufferInfo.vertexCount = 4 * text.length();
 	bufferInfo.vertexBuffer = new float[bufferInfo.vertexCount * 4];
 
-	glActiveTexture(GL_TEXTURE0);
+	//glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 	double xStart(x);
 
@@ -195,7 +198,7 @@ Primitive::BufferInfo Text::BuildText()
 		bufferInfo.vertexBuffer[i++] = 0.0;
 		bufferInfo.vertexBuffer[i++] = 0.0;*/
 
-		bufferInfo.vertexBuffer[i++] = xpos;
+		/*bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 0.0;
 		bufferInfo.vertexBuffer[i++] = 1.0;
@@ -213,7 +216,7 @@ Primitive::BufferInfo Text::BuildText()
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;*/
 
 		/*bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos;
@@ -224,6 +227,26 @@ Primitive::BufferInfo Text::BuildText()
 		bufferInfo.vertexBuffer[i++] = ypos + h;
 		bufferInfo.vertexBuffer[i++] = 1.0;
 		bufferInfo.vertexBuffer[i++] = 0.0;*/
+
+		bufferInfo.vertexBuffer[i++] = xpos;
+		bufferInfo.vertexBuffer[i++] = ypos;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos;
+		bufferInfo.vertexBuffer[i++] = ypos + h;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = 1.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos + w;
+		bufferInfo.vertexBuffer[i++] = ypos + h;
+		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = 1.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos + w;
+		bufferInfo.vertexBuffer[i++] = ypos;
+		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		// Render glyph texture over quad
 		//glBindTexture(GL_TEXTURE_2D, g.id);
@@ -257,8 +280,12 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	glUseProgram(program);
 	glUniform3f(colorLocation, color.GetRed(), color.GetGreen(), color.GetBlue());
-	glBindTexture(GL_TEXTURE_2D, 65);
+
+	glActiveTexture(GL_TEXTURE0);// TODO:  Needed?
+	glBindTexture(GL_TEXTURE_2D, 70);// TODO:  Remove this or correctly implement it
+
 	glDrawArrays(GL_QUADS, 0, vertexCount);
+
 	renderer.UseDefaultProgram();
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -311,6 +338,13 @@ void Text::DoInternalInitialization()
 
 		program = renderer.CreateProgram(shaderList);
 		colorLocation = glGetUniformLocation(program, "textColor");
+
+		RenderWindow::ShaderInfo s;
+		s.programId = program;
+		s.needsModelview = false;
+		s.needsProjection = true;
+		s.projectionLocation = glGetUniformLocation(program, "projectionMatrix");
+		renderer.AddShader(s);
 
 		initialized = true;
 	}

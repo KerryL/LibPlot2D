@@ -30,7 +30,7 @@
 class Text
 {
 public:
-	Text(const RenderWindow& renderer);
+	Text(RenderWindow& renderer);
 	~Text();
 
 	void SetSize(const double& height);
@@ -64,15 +64,14 @@ private:
 	static const std::string vertexShader;
 	static const std::string fragmentShader;
 
-	const RenderWindow& renderer;
+	RenderWindow& renderer;
 
 	static unsigned int program;
 	static unsigned int colorLocation;
+	static unsigned int projectionMatrixLocation;
 
 	static FT_Library ft;
 	static unsigned int ftReferenceCount;
-
-	Primitive::BufferInfo bufferInfo;
 
 	FT_Face face;
 	Color color;

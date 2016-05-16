@@ -140,7 +140,9 @@ void Axis::Update(const unsigned int& i)
 	}
 	else if (i == 2)// Values
 	{
-		// TODO
+		// TODO:  Implement
+		/*DrawTickLabels();
+		bufferInfo[i] = valueText.BuildText();*/
 	}
 	else if (i == 3)// Label
 	{
@@ -179,16 +181,14 @@ void Axis::GenerateGeometry()
 	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 	Line::DoPrettyDraw(bufferInfo[0].indexCount);
 
-	// TODO
-	/*if (font)
+	if (valueText.IsOK())
 	{
-		if (!label.IsEmpty())
-			DrawAxisLabel();
+		// TODO:  Render value labels (bufferInfo[2]);
+		/*glBindVertexArray(bufferInfo[2].vertexArrayIndex);
+		labelText.RenderBufferedGlyph(bufferInfo[2].vertexCount);*/
+	}
 
-		DrawTickLabels();
-	}*/
-
-	if (!label.IsEmpty())
+	if (!label.IsEmpty() && labelText.IsOK())
 	{
 		glBindVertexArray(bufferInfo[3].vertexArrayIndex);
 		labelText.RenderBufferedGlyph(bufferInfo[3].vertexCount);
