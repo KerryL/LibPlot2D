@@ -26,9 +26,25 @@
 // Freetype headers
 #include FT_MODULE_H
 
+//==========================================================================
+// Class:			Text
+// Function:		Constant declarations
+//
+// Description:		Constant declarations for Text class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
 unsigned int Text::program;
 unsigned int Text::colorLocation;
-unsigned int Text::projectionMatrixLocation;
+unsigned int Text::modelviewMatrixLocation;
 bool Text::initialized;
 FT_Library Text::ft;
 unsigned int Text::ftReferenceCount(0);
@@ -53,6 +69,7 @@ const std::string Text::vertexShader(
 	"#version 330\n"
 	"\n"
 	"uniform mat4 projectionMatrix;\n"
+	"uniform mat4 modelviewMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec4 vertex;// <vec2 pos, vec2 tex>\n"
 	"\n"
@@ -60,7 +77,7 @@ const std::string Text::vertexShader(
 	"\n"
 	"void main()\n"
 	"{\n"
-	"    gl_Position = projectionMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
+	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
 	"    texCoords = vertex.zw;\n"
 	"}\n"
 );
@@ -72,7 +89,7 @@ const std::string Text::vertexShader(
 // Description:		Text fragment shader.
 //
 // Input Arguments:
-//		0	= position
+//		0	= texCoords
 //
 // Output Arguments:
 //		None
@@ -122,6 +139,9 @@ Text::Text(RenderWindow& renderer) : renderer(renderer)
 	glyphsGenerated = false;
 	face = NULL;
 	isOK = true;
+
+	modelview.Resize(4, 4);
+	SetOrientation(0.0);
 
 	Initialize();
 }
@@ -369,67 +389,29 @@ Primitive::BufferInfo Text::BuildText()
 		GLfloat w = g.xSize * scale;
 		GLfloat h = g.ySize * scale;
 
-        // Update VBO for each character
-		/*bufferInfo.vertexBuffer[i++] = xpos;
-		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;*/
-
-		/*bufferInfo.vertexBuffer[i++] = xpos;
+		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 0.0;
 		bufferInfo.vertexBuffer[i++] = 1.0;
-
-		bufferInfo.vertexBuffer[i++] = xpos + w;
-		bufferInfo.vertexBuffer[i++] = ypos;
-		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 1.0;
-
-		bufferInfo.vertexBuffer[i++] = xpos + w;
-		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;*/
-
-		/*bufferInfo.vertexBuffer[i++] = xpos + w;
-		bufferInfo.vertexBuffer[i++] = ypos;
-		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
 		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;*/
-
-		bufferInfo.vertexBuffer[i++] = xpos;
-		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;
-
-		bufferInfo.vertexBuffer[i++] = xpos;
-		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 1.0;
-
-		bufferInfo.vertexBuffer[i++] = xpos + w;
-		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 1.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = 1.0;
 
-		// Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
 		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
     }
 
-	// Update content of VBO memory
     glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
 		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
@@ -459,16 +441,22 @@ Primitive::BufferInfo Text::BuildText()
 //		None
 //
 // Return Value:
-//		Primitive::BufferInfo
+//		None
 //
 //==========================================================================
 void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	glUseProgram(program);
+
+	// TODO:  Really, we don't want to access state here that isn't contained within BufferInfo
+	// Are we making an exception for color and orientation?  Assume that this object will
+	// be used only to render text having the same color and orientation (and size?).
+	// Maybe put some assertions in the Set() methods then to ensure it hasn't yet been initialized?
 	glUniform3f(colorLocation, color.GetRed(), color.GetGreen(), color.GetBlue());
+	RenderWindow::SendUniformMatrix(modelview, modelviewMatrixLocation);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 70);// TODO:  Remove this or correctly implement it
+	glBindTexture(GL_TEXTURE_2D, 66);// TODO:  Remove this and correctly implement it
 
 	glDrawArrays(GL_QUADS, 0, vertexCount);
 
@@ -535,7 +523,7 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 //		None
 //
 // Return Value:
-//		Primitive::BufferInfo
+//		None
 //
 //==========================================================================
 void Text::DoInternalInitialization()
@@ -563,8 +551,31 @@ void Text::DoInternalInitialization()
 		s.needsModelview = false;
 		s.needsProjection = true;
 		s.projectionLocation = glGetUniformLocation(program, "projectionMatrix");
+		modelviewMatrixLocation = glGetUniformLocation(program, "modelviewMatrix");
 		renderer.AddShader(s);
 
 		initialized = true;
 	}
+}
+
+//==========================================================================
+// Class:			Text
+// Function:		SetOrientation
+//
+// Description:		Alters the modelview matrix according to the text rotation angle.
+//
+// Input Arguments:
+//		angle	= const double& [rad]
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Text::SetOrientation(const double& angle)
+{
+	modelview.MakeIdentity();
+	renderer.Rotate(modelview, angle, 0.0, 0.0, 1.0);
 }

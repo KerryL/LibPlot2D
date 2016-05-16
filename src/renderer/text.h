@@ -26,6 +26,7 @@
 
 // Local headers
 #include "renderer/primitives/primitive.h"
+#include "utilities/math/matrix.h"
 
 class Text
 {
@@ -39,7 +40,7 @@ public:
 	bool SetFace(const std::string& fontFileName);
 
 	inline void SetColor(const Color& color) { this->color = color; }
-	// TODO:  Orientation?
+	void SetOrientation(const double& angle);// [rad]
 
 	inline void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; }
 	inline void SetScale(const double& scale) { assert(scale > 0.0); this->scale = scale; }
@@ -68,7 +69,7 @@ private:
 
 	static unsigned int program;
 	static unsigned int colorLocation;
-	static unsigned int projectionMatrixLocation;
+	static unsigned int modelviewMatrixLocation;
 
 	static FT_Library ft;
 	static unsigned int ftReferenceCount;
@@ -102,6 +103,8 @@ private:
 	void Initialize();
 	void FreeFTResources();
 	bool isOK;
+
+	Matrix modelview;
 };
 
 #endif// TEXT_H_

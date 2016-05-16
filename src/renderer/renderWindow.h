@@ -113,6 +113,7 @@ public:
 	};
 
 	void AddShader(const ShaderInfo& shader);
+	static void SendUniformMatrix(const Matrix& m, const GLuint& location);
 
 private:
 	wxGLContext *context;

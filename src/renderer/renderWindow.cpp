@@ -1818,3 +1818,27 @@ void RenderWindow::AddShader(const ShaderInfo& shader)
 {
 	shaders.push_back(shader);
 }
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		SendUniformMatrix
+//
+// Description:		Loads uniform matrix to openGL.
+//
+// Input Arguments:
+//		shader	= const ShaderInfo&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::SendUniformMatrix(const Matrix& m, const GLuint& location)
+{
+	float glMatrix[16];
+	ConvertMatrixToGL(m, glMatrix);
+
+	glUniformMatrix4fv(location, 1, GL_FALSE, glMatrix);
+}
