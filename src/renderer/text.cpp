@@ -15,6 +15,7 @@
 
 // Standard C++ headers
 #include <cassert>
+#include <algorithm>
 
 // GLEW headers
 #include <GL/glew.h>
@@ -57,6 +58,7 @@ unsigned int Text::ftReferenceCount(0);
 //
 // Input Arguments:
 //		0	= vertex
+//		1	= texIndex
 //
 // Output Arguments:
 //		None
@@ -72,13 +74,17 @@ const std::string Text::vertexShader(
 	"uniform mat4 modelviewMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec4 vertex;// <vec2 pos, vec2 tex>\n"
+	//"layout(location = 1) in int texIndex;\n"
 	"\n"
 	"out vec2 texCoords;\n"
+	"flat out uint index;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
 	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
 	"    texCoords = vertex.zw;\n"
+	//"    index = texIndex;\n"
+	"index = 66u;\n"
 	"}\n"
 );
 
@@ -101,16 +107,17 @@ const std::string Text::vertexShader(
 const std::string Text::fragmentShader(
 	"#version 330\n"
 	"\n"
-	"uniform sampler2D text;\n"
+	"uniform sampler2DArray text;\n"
 	"uniform vec3 textColor;\n"
 	"\n"
 	"in vec2 texCoords;\n"
+	"flat in uint index;\n"
 	"\n"
 	"out vec4 color;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
+	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, vec3(texCoords, index)).r);\n"
 	"    color = vec4(textColor, 1.0) * sampled;\n"
 	"}\n"
 );
@@ -165,6 +172,9 @@ Text::Text(RenderWindow& renderer) : renderer(renderer)
 Text::~Text()
 {
 	FreeFTResources();
+
+	if (glIsTexture(textureId))
+		glDeleteTextures(1, &textureId);
 }
 
 //==========================================================================
@@ -287,26 +297,46 @@ void Text::SetSize(const double& width, const double& height)
 //==========================================================================
 bool Text::GenerateGlyphs()
 {
-	// TODO:  Better to use texture atlas?
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	Glyph g;
+	GLubyte c;
 
-	for (GLubyte c = 0; c < 128; c++)
+	g.xSize = 0;
+	g.ySize = 0;
+
+	// First loop determines max required image size
+	const unsigned int glyphCount(128);
+	for (c = 0; c < glyphCount; c++)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			return false;
 
-		glGenTextures(1, &g.id);
-		glBindTexture(GL_TEXTURE_2D, g.id);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED,
-			face->glyph->bitmap.width, face->glyph->bitmap.rows, 0,
+		g.xSize = std::max((unsigned int)g.xSize, face->glyph->bitmap.width);
+		g.ySize = std::max((unsigned int)g.ySize, face->glyph->bitmap.rows);
+	}
+
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, g.xSize, g.ySize, glyphCount,
+		0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Second loop actually builds and stores the textures
+	for (c = 0; c < glyphCount; c++)
+	{
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+			return false;
+
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, c,
+			face->glyph->bitmap.width, face->glyph->bitmap.rows, 1,
 			GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+		g.index = c;
 		g.xSize = face->glyph->bitmap.width;
 		g.ySize = face->glyph->bitmap.rows;
 		g.xBearing = face->glyph->bitmap_left;
@@ -316,7 +346,7 @@ bool Text::GenerateGlyphs()
 		glyphs.insert(std::make_pair(c, g));
 	}
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	glyphsGenerated = true;
 
 	return glGetError() == GL_NO_ERROR;
@@ -456,7 +486,7 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 	RenderWindow::SendUniformMatrix(modelview, modelviewMatrixLocation);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 66);// TODO:  Remove this and correctly implement it
+	glBindTexture(GL_TEXTURE_2D_ARRAY, textureId);
 
 	glDrawArrays(GL_QUADS, 0, vertexCount);
 

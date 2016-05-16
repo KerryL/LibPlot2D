@@ -85,7 +85,7 @@ private:
 
 	struct Glyph
 	{
-		unsigned int id;
+		unsigned int index;
 		int xSize;
 		int ySize;
 		int xBearing;
@@ -94,6 +94,7 @@ private:
 	};
 
 	std::map<char, Glyph> glyphs;
+	unsigned int textureId;
 
 	void DoInternalInitialization();
 	bool GenerateGlyphs();
