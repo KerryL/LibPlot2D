@@ -45,6 +45,8 @@
 //==========================================================================
 unsigned int Text::program;
 unsigned int Text::colorLocation;
+unsigned int Text::vertexLocation;
+unsigned int Text::indexLocation;
 unsigned int Text::modelviewMatrixLocation;
 bool Text::initialized;
 FT_Library Text::ft;
@@ -74,7 +76,7 @@ const std::string Text::vertexShader(
 	"uniform mat4 modelviewMatrix;\n"
 	"\n"
 	"layout(location = 0) in vec4 vertex;// <vec2 pos, vec2 tex>\n"
-	//"layout(location = 1) in int texIndex;\n"
+	"layout(location = 1) in uint texIndex;\n"
 	"\n"
 	"out vec2 texCoords;\n"
 	"flat out uint index;\n"
@@ -83,8 +85,8 @@ const std::string Text::vertexShader(
 	"{\n"
 	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
 	"    texCoords = vertex.zw;\n"
-	//"    index = texIndex;\n"
-	"index = 66u;\n"
+	"    index = texIndex;\n"
+	//"    index = 65u;\n"
 	"}\n"
 );
 
@@ -325,6 +327,8 @@ bool Text::GenerateGlyphs()
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
 
 	// Second loop actually builds and stores the textures
 	for (c = 0; c < glyphCount; c++)
@@ -400,9 +404,11 @@ Primitive::BufferInfo Text::BuildText()
 	DoInternalInitialization();
 
 	Primitive::BufferInfo bufferInfo;
-	bufferInfo.GetOpenGLIndices();
+	bufferInfo.GetOpenGLIndices(true);
 	bufferInfo.vertexCount = 4 * text.length();
-	bufferInfo.vertexBuffer = new float[bufferInfo.vertexCount * 4];
+	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * 4];
+	bufferInfo.indexCount = text.length();
+	bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
 
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 	double xStart(x);
@@ -418,6 +424,8 @@ Primitive::BufferInfo Text::BuildText()
 
 		GLfloat w = g.xSize * scale;
 		GLfloat h = g.ySize * scale;
+
+		bufferInfo.indexBuffer[i / 16] = 65;//g.index;// TODO:  Fix
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
@@ -446,14 +454,24 @@ Primitive::BufferInfo Text::BuildText()
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
 		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(vertexLocation);
+	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
+		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(indexLocation);
+	glVertexAttribIPointer(indexLocation, 1, GL_UNSIGNED_INT, 0, 0);
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
 
 	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
+
+	delete[] bufferInfo.indexBuffer;
+	bufferInfo.indexBuffer = NULL;
 
 	return bufferInfo;
 }
@@ -583,6 +601,9 @@ void Text::DoInternalInitialization()
 		s.projectionLocation = glGetUniformLocation(program, "projectionMatrix");
 		modelviewMatrixLocation = glGetUniformLocation(program, "modelviewMatrix");
 		renderer.AddShader(s);
+
+		vertexLocation = glGetAttribLocation(program, "vertex");
+		indexLocation = glGetAttribLocation(program, "texIndex");
 
 		initialized = true;
 	}

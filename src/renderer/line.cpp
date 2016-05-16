@@ -358,12 +358,12 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 	bufferInfo.GetOpenGLIndices(triangleCount > 0);
 
 	bufferInfo.vertexCount = vertexCount;
-	bufferInfo.vertexBuffer = new float[bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4)];
 	assert(renderWindow.GetVertexDimension() == 2);
 
 	bufferInfo.indexCount = triangleCount * 3;
 	if (triangleCount > 0)
-		bufferInfo.indexBuffer = new unsigned int[bufferInfo.indexCount];
+		bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
 
 	//bufferInfo.vertexCountModified = false;// TODO:  Would be good to use this, but need a way to trigger update requests
 }

@@ -1036,7 +1036,7 @@ bool Axis::InitializeFonts(const std::string& fontFileName, const double& size)
 	labelText.SetColor(Color::ColorBlack);
 	valueText.SetColor(Color::ColorBlack);
 
-	labelText.SetSize(size);
+	labelText.SetSize(size*3);// TODO:  Fix
 	valueText.SetSize(size);
 
 	return true;

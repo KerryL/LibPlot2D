@@ -68,7 +68,9 @@ private:
 	RenderWindow& renderer;
 
 	static unsigned int program;
+	static unsigned int vertexLocation;
 	static unsigned int colorLocation;
+	static unsigned int indexLocation;
 	static unsigned int modelviewMatrixLocation;
 
 	static FT_Library ft;
