@@ -45,6 +45,8 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 	isVisible = false;
 	color = Color::ColorBlack;
 	line.SetLineColor(color);
+
+	SetDrawOrder(2800);
 }
 
 //==========================================================================

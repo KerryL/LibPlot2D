@@ -64,8 +64,6 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(rend
 
 	logarithmic = false;
 
-	//font = NULL;
-
 	minAxis = NULL;
 	maxAxis = NULL;
 	oppositeAxis = NULL;
