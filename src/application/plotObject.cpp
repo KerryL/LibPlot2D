@@ -186,7 +186,7 @@ void PlotObject::InitializeFonts()
 
 	fontFileName = fontFile.ToStdString();
 	axisBottom->InitializeFonts(fontFileName, 12);
-	axisTop->InitializeFonts(fontFileName, 12);
+	//axisTop->InitializeFonts(fontFileName, 12);// No tick labels for top axis
 	axisLeft->InitializeFonts(fontFileName, 12);
 	axisRight->InitializeFonts(fontFileName, 12);
 
@@ -688,7 +688,6 @@ void PlotObject::UpdateAxesOffsets()
 void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 {
 	axisBottom->SetOrientation(Axis::OrientationBottom);
-//	axisBottom->SetFont(axisFont);
 	axisBottom->SetTickStyle(tickStyle);
 }
 
@@ -733,7 +732,6 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 {
 	axisLeft->SetOrientation(Axis::OrientationLeft);
-//	axisLeft->SetFont(axisFont);
 	axisLeft->SetTickStyle(tickStyle);
 }
 
@@ -756,7 +754,6 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 {
 	axisRight->SetOrientation(Axis::OrientationRight);
-//	axisRight->SetFont(axisFont);
 	axisRight->SetTickStyle(tickStyle);
 }
 

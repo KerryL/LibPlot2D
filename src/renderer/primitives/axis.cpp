@@ -73,7 +73,6 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(rend
 	gridColor.Set(0.8, 0.8, 0.8, 1.0);
 	SetDrawOrder(2500);
 
-	bufferInfo.push_back(BufferInfo());// Axis and ticks, gridlines and borders
 	bufferInfo.push_back(BufferInfo());// Gridlines
 	bufferInfo.push_back(BufferInfo());// Values
 	bufferInfo.push_back(BufferInfo());// Label
@@ -138,12 +137,12 @@ void Axis::Update(const unsigned int& i)
 		gridLines.BuildSegments(gridPoints);
 		bufferInfo[i] = gridLines.GetBufferInfo();
 	}
-	else if (i == 2)// Values
+	else if (i == 2 && valueText.IsOK())// Values
 	{
 		DrawTickLabels();
 		bufferInfo[i] = valueText.BuildText();
 	}
-	else if (i == 3)// Label
+	else if (i == 3 && labelText.IsOK())// Label
 	{
 		DrawAxisLabel();
 		bufferInfo[i] = labelText.BuildText();

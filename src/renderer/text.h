@@ -61,7 +61,7 @@ public:
 
 	BoundingBox GetBoundingBox(const std::string& s);
 
-	bool IsOK() const { return isOK; }
+	bool IsOK() const { return isOK && (glyphsGenerated || face); }
 
 private:
 	static const std::string vertexShader;
