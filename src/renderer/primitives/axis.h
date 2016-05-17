@@ -158,8 +158,8 @@ private:
 
 	double GetAxisLabelTranslation(const double &offset, const double &fontHeight) const;
 	unsigned int GetPrecision() const;
-	/*void ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
-		const FTBBox &boundingBox, const double &offset) const;*/
+	void ComputeTranslations(const double &value, float &xTranslation, float &yTranslation,
+		const Text::BoundingBox &boundingBox, const double &offset) const;
 };
 
 #endif// AXIS_H_

@@ -81,7 +81,7 @@ private:
 
 	double x;
 	double y;
-	double scale;// TODO:  Do I really need scale?
+	double scale;
 
 	unsigned int maxXSize;
 	unsigned int maxYSize;

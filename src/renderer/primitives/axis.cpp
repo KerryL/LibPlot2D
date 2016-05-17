@@ -140,9 +140,8 @@ void Axis::Update(const unsigned int& i)
 	}
 	else if (i == 2)// Values
 	{
-		// TODO:  Implement
-		/*DrawTickLabels();
-		bufferInfo[i] = valueText.BuildText();*/
+		DrawTickLabels();
+		bufferInfo[i] = valueText.BuildText();// TODO:  This will need to change!
 	}
 	else if (i == 3)// Label
 	{
@@ -183,9 +182,8 @@ void Axis::GenerateGeometry()
 
 	if (valueText.IsOK())
 	{
-		// TODO:  Render value labels (bufferInfo[2]);
-		/*glBindVertexArray(bufferInfo[2].vertexArrayIndex);
-		labelText.RenderBufferedGlyph(bufferInfo[2].vertexCount);*/
+		glBindVertexArray(bufferInfo[2].vertexArrayIndex);
+		labelText.RenderBufferedGlyph(bufferInfo[2].vertexCount);
 	}
 
 	if (!label.IsEmpty() && labelText.IsOK())
@@ -592,33 +590,30 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //==========================================================================
 void Axis::DrawAxisLabel()
 {
+	if (label.IsEmpty())
+		return;
+
 	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
 
 	// TODO:  Change plot dimension if there is a title? or if there is a title and a label for the top axis?
 	Text::BoundingBox boundingBox = labelText.GetBoundingBox("H");// Some capital letter to assure uniform spacing
-	double yTranslation = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.yUp);
+	double edgeOffset = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.yUp);
 
 	boundingBox = labelText.GetBoundingBox(label.ToStdString());
 	double textWidth = boundingBox.xRight - boundingBox.xLeft;
 	double plotOffset = (double)minAxis->GetOffsetFromWindowEdge() - (double)maxAxis->GetOffsetFromWindowEdge();
 
-	/*glPushMatrix();
-		glLoadIdentity();
-
-		if (IsHorizontal())
-			glTranslated(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), yTranslation, 0.0);
-		else
-		{
-			glRotated(90.0, 0.0, 0.0, 1.0);
-			glTranslated(0.5 * (renderWindow.GetSize().GetHeight() - textWidth + plotOffset), -yTranslation, 0.0);
-		}*/
+	if (IsHorizontal())
+		labelText.SetPosition(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), edgeOffset);
+	else
+	{
+		labelText.SetOrientation(M_PI * 0.5);
+		labelText.SetPosition(0.5 * (renderWindow.GetSize().GetHeight() - textWidth + plotOffset), -edgeOffset);
+	}
 
 	labelText.SetText(label.ToStdString());
-	labelText.SetPosition(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), yTranslation);
-		//font->Render(label.mb_str());
-	//glPopMatrix();
 }
 
 //==========================================================================
@@ -684,7 +679,7 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 //==========================================================================
 void Axis::DrawTickLabels()
 {
-	int xTranslation, yTranslation;
+	float xTranslation, yTranslation;
 	unsigned int precision = GetPrecision();
 
 	if (!wxString::Format("%0.*f", precision, minimum).ToDouble(&minimum)) { /*Warn the user?*/ }
@@ -699,14 +694,12 @@ void Axis::DrawTickLabels()
 		value = std::min(GetNextTickValue(tick == 0, tick == numberOfTicks + 1, tick), maximum);
 		valueLabel.Printf("%0.*f", precision, value);
 
-		// TODO:  Update for OGL4
 		// TODO:  Don't draw it if it's too close to the maximum (based on text size)
-		/*glPushMatrix();
-			glLoadIdentity();
-			ComputeTranslations(value, xTranslation, yTranslation, font->BBox(valueLabel.mb_str()), valueOffsetFromEdge);
-			glTranslated(xTranslation, yTranslation, 0.0);
-			font->Render(valueLabel.mb_str());
-		glPopMatrix();*/
+		ComputeTranslations(value, xTranslation, yTranslation,
+			valueText.GetBoundingBox(valueLabel.ToStdString()), valueOffsetFromEdge);
+		valueText.SetPosition(xTranslation, yTranslation);
+		valueText.SetText(valueLabel.ToStdString());
+		// TODO:  How to we handle using this to draw many tick labels?
 	}
 
 	valueLabel.Printf("%0.*f", precision, maximum);
@@ -780,41 +773,41 @@ double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigne
 //
 // Input Arguments:
 //		value			= const double&
-//		boundingBox		= const FTBBox&
+//		boundingBox		= const Text::BoundingBox&
 //		offset			= const double&
 //
 // Output Arguments:
-//		xTranslation	= int&
-//		yTranslation	= int&
+//		xTranslation	= float&
+//		yTranslation	= float&
 //
 // Return Value:
 //		double
 //
 //==========================================================================
-/*void Axis::ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
-	const FTBBox &boundingBox, const double &offset) const
+void Axis::ComputeTranslations(const double &value, float &xTranslation, float &yTranslation,
+	const Text::BoundingBox &boundingBox, const double &offset) const
 {
 	if (IsHorizontal())
 	{
 		if (orientation == OrientationBottom)
-			yTranslation = offset - boundingBox.Upper().Y();
+			yTranslation = offset - boundingBox.yUp;
 		else
 			yTranslation = renderWindow.GetSize().GetHeight() - offset;
 
 		xTranslation = ValueToPixel(value) -
-			(boundingBox.Upper().X() - boundingBox.Lower().X()) / 2.0;
+			(boundingBox.xRight - boundingBox.xLeft) / 2.0;
 	}
 	else
 	{
 		if (orientation == OrientationLeft)
-			xTranslation = offset - boundingBox.Upper().X();
+			xTranslation = offset - boundingBox.xRight;
 		else
 			xTranslation = renderWindow.GetSize().GetWidth() - offset;
 
 		yTranslation = ValueToPixel(value) -
-			(boundingBox.Upper().Y() - boundingBox.Lower().Y()) / 2.0;
+			(boundingBox.yUp - boundingBox.yDown) / 2.0;
 	}
-}*/
+}
 
 //==========================================================================
 // Class:			Axis
@@ -1036,8 +1029,16 @@ bool Axis::InitializeFonts(const std::string& fontFileName, const double& size)
 	labelText.SetColor(Color::ColorBlack);
 	valueText.SetColor(Color::ColorBlack);
 
-	labelText.SetSize(size);
-	valueText.SetSize(size);
+	// For some reason, fonts tend to render more clearly at a larger size.  So
+	// we up-scale to render the fonts then down-scale to achieve the desired
+	// on-screen size.
+	// TODO:  Better to use a fixed large size and adjust scale accordingly?
+	const double factor(3.0);
+	labelText.SetSize(size * factor);
+	valueText.SetSize(size * factor);
+
+	labelText.SetScale(1.0 / factor);
+	valueText.SetScale(1.0 / factor);
 
 	return true;
 }
