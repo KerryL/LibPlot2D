@@ -44,7 +44,9 @@ public:
 
 	inline void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; }
 	inline void SetScale(const double& scale) { assert(scale > 0.0); this->scale = scale; }
+
 	inline void SetText(const std::string& text) { this->text = text; }
+	void AppendText(const std::string& text);
 
 	Primitive::BufferInfo BuildText();
 	void RenderBufferedGlyph(const unsigned int& vertexCount);
@@ -111,6 +113,13 @@ private:
 	bool isOK;
 
 	Matrix modelview;
+
+	std::vector<Primitive::BufferInfo> bufferVector;
+	Primitive::BufferInfo AssembleBuffers();
+	Primitive::BufferInfo BuildLocalText();
+	void ConfigureVertexArray(Primitive::BufferInfo& bufferInfo);
+
+	void FreeBufferMemory(Primitive::BufferInfo& buffer);
 };
 
 #endif// TEXT_H_

@@ -400,95 +400,12 @@ void Text::FreeFTResources()
 //==========================================================================
 Primitive::BufferInfo Text::BuildText()
 {
-	DoInternalInitialization();
+	if (bufferVector.size() > 0)
+		return AssembleBuffers();
 
-	assert(sizeof(GLfloat) == sizeof(float));
-	assert(sizeof(GLuint) == sizeof(unsigned int));
-
-	Primitive::BufferInfo bufferInfo;
-	bufferInfo.GetOpenGLIndices(true);
-	bufferInfo.vertexCount = 6 * text.length();
-	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * 4];
-	bufferInfo.indexCount = bufferInfo.vertexCount;
-	bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
-
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
-	double xStart(x);
-
-	unsigned int i(0), texI(0);
-	std::string::const_iterator c;
-	for (c = text.begin(); c != text.end(); c++)
-	{
-		Glyph g = glyphs[*c];
-
-		GLfloat xpos = xStart + g.xBearing * scale;
-		GLfloat ypos = y - (g.ySize - g.yBearing) * scale;
-
-		GLfloat w = g.xSize * scale;
-		GLfloat h = g.ySize * scale;
-
-		bufferInfo.indexBuffer[texI++] = g.index;
-		bufferInfo.indexBuffer[texI++] = g.index;
-		bufferInfo.indexBuffer[texI++] = g.index;
-		bufferInfo.indexBuffer[texI++] = g.index;
-		bufferInfo.indexBuffer[texI++] = g.index;
-		bufferInfo.indexBuffer[texI++] = g.index;
-
-		bufferInfo.vertexBuffer[i++] = xpos;
-		bufferInfo.vertexBuffer[i++] = ypos;
-		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
-
-		bufferInfo.vertexBuffer[i++] = xpos;
-		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 0.0;
-
-		bufferInfo.vertexBuffer[i++] = xpos + w;
-		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
-		bufferInfo.vertexBuffer[i++] = 0.0;
-
-		bufferInfo.vertexBuffer[i++] = xpos + w;
-		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
-		bufferInfo.vertexBuffer[i++] = 0.0;
-
-		bufferInfo.vertexBuffer[i++] = xpos + w;
-		bufferInfo.vertexBuffer[i++] = ypos;
-		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
-		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
-
-		bufferInfo.vertexBuffer[i++] = xpos;
-		bufferInfo.vertexBuffer[i++] = ypos;
-		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
-
-		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
-		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(vertexLocation);
-	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
-		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(indexLocation);
-	glVertexAttribIPointer(indexLocation, 1, GL_UNSIGNED_INT, 0, 0);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glBindVertexArray(0);
-
-	delete[] bufferInfo.vertexBuffer;
-	bufferInfo.vertexBuffer = NULL;
-
-	delete[] bufferInfo.indexBuffer;
-	bufferInfo.indexBuffer = NULL;
+	Primitive::BufferInfo bufferInfo(BuildLocalText());
+	ConfigureVertexArray(bufferInfo);
+	FreeBufferMemory(bufferInfo);
 
 	return bufferInfo;
 }
@@ -646,4 +563,238 @@ void Text::SetOrientation(const double& angle)
 {
 	modelview.MakeIdentity();
 	renderer.Rotate(modelview, angle, 0.0, 0.0, 1.0);
+}
+
+//==========================================================================
+// Class:			Text
+// Function:		AppendText
+//
+// Description:		Appends text to the render buffer.  Use this instead of
+//					SetText() when multiple text values must be rendered with
+//					different positions, scales, etc.  Text will be rendered
+//					with current settings (i.e. this must be the last call
+//					for this string in the update loop).
+//
+// Input Arguments:
+//		text	= const std::string&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Text::AppendText(const std::string& text)
+{
+	SetText(text);
+	bufferVector.push_back(BuildLocalText());
+}
+
+//==========================================================================
+// Class:			Text
+// Function:		AssembleBuffers
+//
+// Description:		Assembles
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Primitive::BufferInfo Text::AssembleBuffers()
+{
+	Primitive::BufferInfo bufferInfo;
+
+	unsigned int i;
+	for (i = 0; i < bufferVector.size(); i++)
+	{
+		bufferInfo.indexCount += bufferVector[i].indexCount;
+		bufferInfo.vertexCount += bufferVector[i].vertexCount;
+	}
+
+	assert(sizeof(GLfloat) == sizeof(float));
+	assert(sizeof(GLuint) == sizeof(unsigned int));
+
+	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * 4];
+	bufferInfo.indexBuffer = new unsigned int[bufferInfo.indexCount];
+
+	unsigned int j, k(0);
+	for (i = 0; i < bufferVector.size(); i++)
+	{
+		for (j = 0; j < bufferVector[i].vertexCount; j++)
+		{
+			bufferInfo.indexBuffer[k] = bufferVector[i].indexBuffer[j];
+
+			bufferInfo.vertexBuffer[k * 4] = bufferVector[i].vertexBuffer[j * 4];
+			bufferInfo.vertexBuffer[k * 4 + 1] = bufferVector[i].vertexBuffer[j * 4 + 1];
+			bufferInfo.vertexBuffer[k * 4 + 2] = bufferVector[i].vertexBuffer[j * 4 + 2];
+			bufferInfo.vertexBuffer[k * 4 + 3] = bufferVector[i].vertexBuffer[j * 4 + 3];
+			k++;
+		}
+
+		FreeBufferMemory(bufferVector[i]);
+	}
+
+	ConfigureVertexArray(bufferInfo);
+	bufferVector.clear();
+	FreeBufferMemory(bufferInfo);
+
+	return bufferInfo;
+}
+
+//==========================================================================
+// Class:			Text
+// Function:		BuildLocalText
+//
+// Description:		Allocates buffers and populates local (CPU-side) memory
+//					to render text.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
+Primitive::BufferInfo Text::BuildLocalText()
+{
+	DoInternalInitialization();
+
+	assert(sizeof(GLfloat) == sizeof(float));
+	assert(sizeof(GLuint) == sizeof(unsigned int));
+
+	Primitive::BufferInfo bufferInfo;
+	bufferInfo.vertexCount = 6 * text.length();
+	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * 4];
+	bufferInfo.indexCount = bufferInfo.vertexCount;
+	bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
+
+	double xStart(x);
+
+	unsigned int i(0), texI(0);
+	std::string::const_iterator c;
+	for (c = text.begin(); c != text.end(); c++)
+	{
+		Glyph g = glyphs[*c];
+
+		GLfloat xpos = xStart + g.xBearing * scale;
+		GLfloat ypos = y - (g.ySize - g.yBearing) * scale;
+
+		GLfloat w = g.xSize * scale;
+		GLfloat h = g.ySize * scale;
+
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+
+		bufferInfo.vertexBuffer[i++] = xpos;
+		bufferInfo.vertexBuffer[i++] = ypos;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
+
+		bufferInfo.vertexBuffer[i++] = xpos;
+		bufferInfo.vertexBuffer[i++] = ypos + h;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos + w;
+		bufferInfo.vertexBuffer[i++] = ypos + h;
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
+		bufferInfo.vertexBuffer[i++] = 0.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos + w;
+		bufferInfo.vertexBuffer[i++] = ypos + h;
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
+		bufferInfo.vertexBuffer[i++] = 0.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos + w;
+		bufferInfo.vertexBuffer[i++] = ypos;
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
+
+		bufferInfo.vertexBuffer[i++] = xpos;
+		bufferInfo.vertexBuffer[i++] = ypos;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
+
+		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
+    }
+
+	return bufferInfo;
+}
+
+//==========================================================================
+// Class:			Text
+// Function:		FreeBufferMemory
+//
+// Description:		Frees dynamically allocated buffers.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
+void Text::FreeBufferMemory(Primitive::BufferInfo& buffer)
+{
+	delete[] buffer.vertexBuffer;
+	buffer.vertexBuffer = NULL;
+
+	delete[] buffer.indexBuffer;
+	buffer.indexBuffer = NULL;
+}
+
+//==========================================================================
+// Class:			Text
+// Function:		ConfigureVertexArray
+//
+// Description:		Handles configuration of OpenGL vertex array object.
+//
+// Input Arguments:
+//		bufferInfo	= Primitive::BufferInfo&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
+void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo)
+{
+	bufferInfo.GetOpenGLIndices(true);
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(vertexLocation);
+	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
+		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(indexLocation);
+	glVertexAttribIPointer(indexLocation, 1, GL_UNSIGNED_INT, 0, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindVertexArray(0);
 }

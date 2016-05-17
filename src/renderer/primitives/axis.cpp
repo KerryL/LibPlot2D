@@ -141,7 +141,7 @@ void Axis::Update(const unsigned int& i)
 	else if (i == 2)// Values
 	{
 		DrawTickLabels();
-		bufferInfo[i] = valueText.BuildText();// TODO:  This will need to change!
+		bufferInfo[i] = valueText.BuildText();
 	}
 	else if (i == 3)// Label
 	{
@@ -183,7 +183,7 @@ void Axis::GenerateGeometry()
 	if (valueText.IsOK())
 	{
 		glBindVertexArray(bufferInfo[2].vertexArrayIndex);
-		labelText.RenderBufferedGlyph(bufferInfo[2].vertexCount);
+		valueText.RenderBufferedGlyph(bufferInfo[2].vertexCount);
 	}
 
 	if (!label.IsEmpty() && labelText.IsOK())
@@ -698,8 +698,7 @@ void Axis::DrawTickLabels()
 		ComputeTranslations(value, xTranslation, yTranslation,
 			valueText.GetBoundingBox(valueLabel.ToStdString()), valueOffsetFromEdge);
 		valueText.SetPosition(xTranslation, yTranslation);
-		valueText.SetText(valueLabel.ToStdString());
-		// TODO:  How to we handle using this to draw many tick labels?
+		valueText.AppendText(valueLabel.ToStdString());
 	}
 
 	valueLabel.Printf("%0.*f", precision, maximum);
