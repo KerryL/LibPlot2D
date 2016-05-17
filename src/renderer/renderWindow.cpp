@@ -278,6 +278,8 @@ void RenderWindow::Render()
 	SetCurrent(*context);
 	wxPaintDC(this);
 
+	assert(!GLHasError());
+
 	if (!glewInitialized)
 	{
 		if (glewInit() != GLEW_OK)
@@ -285,6 +287,8 @@ void RenderWindow::Render()
 		BuildShaders();
 		glewInitialized = true;
 	}
+
+	assert(!GLHasError());
 
 	if (sizeUpdateRequired)
 		DoResize();
@@ -323,8 +327,12 @@ void RenderWindow::Render()
 	for (i = 0; i < primitiveList.GetCount(); i++)
 		primitiveList[i]->Draw();
 
+	assert(!GLHasError());
+
 	glFlush();
 	SwapBuffers();
+
+	assert(!GLHasError());
 }
 
 //==========================================================================
@@ -1023,23 +1031,44 @@ void RenderWindow::AutoSetFrustum()
 //		wxString containing the error description
 //
 //==========================================================================
-wxString RenderWindow::GetGLError() const
+wxString RenderWindow::GetGLError()
 {
-	int error = glGetError();
+	int e = glGetError();
 
-	if (error == GL_NO_ERROR)
+	return GetGLError(e);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		GetGLError
+//
+// Description:		Returns a string describing any openGL errors.
+//
+// Input Arguments:
+//		e	= const GLint&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing the error description
+//
+//==========================================================================
+wxString RenderWindow::GetGLError(const GLint& e)
+{
+	if (e == GL_NO_ERROR)
 		return _T("No errors");
-	else if (error == GL_INVALID_ENUM)
+	else if (e == GL_INVALID_ENUM)
 		return _T("Invalid enumeration");
-	else if (error == GL_INVALID_VALUE)
+	else if (e == GL_INVALID_VALUE)
 		return _T("Invalid value");
-	else if (error == GL_INVALID_OPERATION)
+	else if (e == GL_INVALID_OPERATION)
 		return _T("Invalid operation");
-	else if (error == GL_STACK_OVERFLOW)
+	else if (e == GL_STACK_OVERFLOW)
 		return _T("Stack overflow");
-	else if (error == GL_STACK_UNDERFLOW)
+	else if (e == GL_STACK_UNDERFLOW)
 		return _T("Stack underflow");
-	else if (error == GL_OUT_OF_MEMORY)
+	else if (e == GL_OUT_OF_MEMORY)
 		return _T("Out of memory");
 
 	return _T("Unrecognized error");
@@ -1841,4 +1870,33 @@ void RenderWindow::SendUniformMatrix(const Matrix& m, const GLuint& location)
 	ConvertMatrixToGL(m, glMatrix);
 
 	glUniformMatrix4fv(location, 1, GL_FALSE, glMatrix);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		GLHasError
+//
+// Description:		Returns true if OpenGL has any errors.  Intended as a
+//					useful place to break on OpenGL errors.  Allows checking
+//					error codes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+bool RenderWindow::GLHasError()
+{
+	int e = glGetError();
+	if (e == GL_NO_ERROR)
+		return false;
+
+	wxString errorString = GetGLError(e);
+
+	return true;
 }

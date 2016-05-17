@@ -74,7 +74,9 @@ public:
 	inline double GetAspectRatio() const { return aspectRatio; }
 
 	// Returns a string containing any OpenGL errors
-	wxString GetGLError() const;
+	static wxString GetGLError();
+	static wxString GetGLError(const GLint& e);
+	static bool GLHasError();
 
 	// Writes the current image to file
 	bool WriteImageToFile(wxString pathAndFileName) const;

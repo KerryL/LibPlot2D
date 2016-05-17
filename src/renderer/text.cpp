@@ -298,6 +298,8 @@ void Text::SetSize(const double& width, const double& height)
 //==========================================================================
 bool Text::GenerateGlyphs()
 {
+	assert(!RenderWindow::GLHasError());
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	Glyph g;
 	GLubyte c;
@@ -316,11 +318,11 @@ bool Text::GenerateGlyphs()
 		maxYSize = std::max(maxYSize, face->glyph->bitmap.rows);
 	}
 
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, textureId);
+
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, maxXSize, maxYSize, glyphCount,
 		0, GL_RED, GL_UNSIGNED_BYTE, NULL);
-
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_2D, textureId);
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -334,6 +336,11 @@ bool Text::GenerateGlyphs()
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			return false;
+
+		int w, h, d;
+		glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_WIDTH, &w);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_HEIGHT, &h);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_DEPTH, &d);
 
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, c,
 			face->glyph->bitmap.width, face->glyph->bitmap.rows, 1,
@@ -352,7 +359,8 @@ bool Text::GenerateGlyphs()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	glyphsGenerated = true;
 
-	return glGetError() == GL_NO_ERROR;
+	assert(!RenderWindow::GLHasError());
+	return true;
 }
 
 //==========================================================================
@@ -428,6 +436,8 @@ Primitive::BufferInfo Text::BuildText()
 //==========================================================================
 void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
+	assert(vertexCount > 0);
+
 	glUseProgram(program);
 
 	// TODO:  Really, we don't want to access state here that isn't contained within BufferInfo
@@ -444,6 +454,8 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 
 	renderer.UseDefaultProgram();
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================

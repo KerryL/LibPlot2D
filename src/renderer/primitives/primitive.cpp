@@ -141,8 +141,12 @@ void Primitive::Draw()
 			Update(i);
 	}
 
+	assert(!RenderWindow::GLHasError());
+
 	modified = false;
 	GenerateGeometry();
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================

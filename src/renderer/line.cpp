@@ -426,6 +426,8 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 
 	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -482,6 +484,8 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 
 	delete[] bufferInfo.vertexBuffer;
 	bufferInfo.vertexBuffer = NULL;
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -581,6 +585,8 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 
 	delete[] bufferInfo.indexBuffer;
 	bufferInfo.indexBuffer = NULL;
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -601,6 +607,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 //==========================================================================
 void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points)
 {
+	assert(!RenderWindow::GLHasError());
 	/* Draw the segments as follows:
 
 	3+----+7
@@ -679,6 +686,8 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 
 	delete[] bufferInfo.indexBuffer;
 	bufferInfo.indexBuffer = NULL;
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -775,9 +784,12 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double> >& point
 //==========================================================================
 void Line::DoUglyDraw(const unsigned int& vertexCount)
 {
+	assert(vertexCount > 0);
 	glDrawArrays(GL_LINE_STRIP, 0, vertexCount);
 	glLineWidth(1.0f);// TODO:  Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
 	// Is it better to not even have ugly lines now?
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -798,9 +810,12 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 //==========================================================================
 void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 {
+	assert(vertexCount > 0);
 	glDrawArrays(GL_LINES, 0, vertexCount);
 	glLineWidth(1.0f);// TODO:  Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
 	// Is it better to not even have ugly lines now?
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -821,5 +836,8 @@ void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 //==========================================================================
 void Line::DoPrettyDraw(const unsigned int& indexCount)
 {
+	assert(indexCount > 0);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+
+	assert(!RenderWindow::GLHasError());
 }
