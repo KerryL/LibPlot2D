@@ -86,7 +86,6 @@ const std::string Text::vertexShader(
 	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex.xy, 0.0, 1.0);\n"
 	"    texCoords = vertex.zw;\n"
 	"    index = texIndex;\n"
-	//"    index = 65u;\n"
 	"}\n"
 );
 
@@ -403,17 +402,20 @@ Primitive::BufferInfo Text::BuildText()
 {
 	DoInternalInitialization();
 
+	assert(sizeof(GLfloat) == sizeof(float));
+	assert(sizeof(GLuint) == sizeof(unsigned int));
+
 	Primitive::BufferInfo bufferInfo;
 	bufferInfo.GetOpenGLIndices(true);
-	bufferInfo.vertexCount = 4 * text.length();
+	bufferInfo.vertexCount = 6 * text.length();
 	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * 4];
-	bufferInfo.indexCount = text.length();
+	bufferInfo.indexCount = bufferInfo.vertexCount;
 	bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
 
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 	double xStart(x);
 
-	unsigned int i(0);
+	unsigned int i(0), texI(0);
 	std::string::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
@@ -425,7 +427,12 @@ Primitive::BufferInfo Text::BuildText()
 		GLfloat w = g.xSize * scale;
 		GLfloat h = g.ySize * scale;
 
-		bufferInfo.indexBuffer[i / 16] = 65;//g.index;// TODO:  Fix
+		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
+		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
+		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
+		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
+		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
+		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
@@ -443,8 +450,18 @@ Primitive::BufferInfo Text::BuildText()
 		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
+		bufferInfo.vertexBuffer[i++] = ypos + h;
+		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = 0.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = 1.0;
+
+		bufferInfo.vertexBuffer[i++] = xpos;
+		bufferInfo.vertexBuffer[i++] = ypos;
+		bufferInfo.vertexBuffer[i++] = 0.0;
 		bufferInfo.vertexBuffer[i++] = 1.0;
 
 		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
@@ -506,7 +523,7 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureId);
 
-	glDrawArrays(GL_QUADS, 0, vertexCount);
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
 	renderer.UseDefaultProgram();
 	glBindTexture(GL_TEXTURE_2D, 0);
