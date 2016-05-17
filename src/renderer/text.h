@@ -83,6 +83,9 @@ private:
 	double y;
 	double scale;// TODO:  Do I really need scale?
 
+	unsigned int maxXSize;
+	unsigned int maxYSize;
+
 	std::string text;
 
 	struct Glyph

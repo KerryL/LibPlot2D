@@ -302,8 +302,8 @@ bool Text::GenerateGlyphs()
 	Glyph g;
 	GLubyte c;
 
-	g.xSize = 0;
-	g.ySize = 0;
+	maxXSize = 0;
+	maxYSize = 0;
 
 	// First loop determines max required image size
 	const unsigned int glyphCount(128);
@@ -312,11 +312,11 @@ bool Text::GenerateGlyphs()
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			return false;
 
-		g.xSize = std::max((unsigned int)g.xSize, face->glyph->bitmap.width);
-		g.ySize = std::max((unsigned int)g.ySize, face->glyph->bitmap.rows);
+		maxXSize = std::max(maxXSize, face->glyph->bitmap.width);
+		maxYSize = std::max(maxYSize, face->glyph->bitmap.rows);
 	}
 
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, g.xSize, g.ySize, glyphCount,
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, maxXSize, maxYSize, glyphCount,
 		0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
 	glGenTextures(1, &textureId);
@@ -427,17 +427,17 @@ Primitive::BufferInfo Text::BuildText()
 		GLfloat w = g.xSize * scale;
 		GLfloat h = g.ySize * scale;
 
-		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
-		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
-		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
-		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
-		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
-		bufferInfo.indexBuffer[texI++] = g.index;// TODO:  Fix
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
+		bufferInfo.indexBuffer[texI++] = g.index;
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
@@ -446,23 +446,23 @@ Primitive::BufferInfo Text::BuildText()
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
 		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
 		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos;
-		bufferInfo.vertexBuffer[i++] = 1.0;
-		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = 1.0;
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
 
 		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
     }
