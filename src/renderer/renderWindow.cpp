@@ -288,8 +288,6 @@ void RenderWindow::Render()
 		glewInitialized = true;
 	}
 
-	assert(!GLHasError());
-
 	if (sizeUpdateRequired)
 		DoResize();
 
@@ -326,8 +324,6 @@ void RenderWindow::Render()
 	unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 		primitiveList[i]->Draw();
-
-	assert(!GLHasError());
 
 	glFlush();
 	SwapBuffers();

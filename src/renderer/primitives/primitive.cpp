@@ -354,6 +354,8 @@ void Primitive::BufferInfo::GetOpenGLIndices(const bool& needIndexObject)
 		glGenBuffers(1, &indexBufferIndex);
 		glIndexBufferExists = true;
 	}
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -386,4 +388,6 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 		glDeleteBuffers(1, &indexBufferIndex);
 		glIndexBufferExists = false;
 	}
+
+	assert(!RenderWindow::GLHasError());
 }

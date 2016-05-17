@@ -198,6 +198,8 @@ void PlotCurve::Update(const unsigned int& i)
 
 		glBindVertexArray(0);
 	}
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -240,6 +242,8 @@ void PlotCurve::GenerateGeometry()
 
 	glBindVertexArray(0);
 	glDisable(GL_SCISSOR_TEST);
+
+	assert(!RenderWindow::GLHasError());
 
 	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewFixed);
 }

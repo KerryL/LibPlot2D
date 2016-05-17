@@ -174,7 +174,6 @@ void Axis::GenerateGeometry()
 		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
 		Line::DoPrettyDraw(bufferInfo[1].indexCount);
 	}
-	assert(!RenderWindow::GLHasError());
 
 	// Axis and ticks next
 	if (bufferInfo[0].vertexCount > 0)
@@ -182,21 +181,18 @@ void Axis::GenerateGeometry()
 		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 		Line::DoPrettyDraw(bufferInfo[0].indexCount);
 	}
-	assert(!RenderWindow::GLHasError());
 
 	if (valueText.IsOK() && bufferInfo[2].vertexCount > 0)
 	{
 		glBindVertexArray(bufferInfo[2].vertexArrayIndex);
 		valueText.RenderBufferedGlyph(bufferInfo[2].vertexCount);
 	}
-	assert(!RenderWindow::GLHasError());
 
 	if (!label.IsEmpty() && labelText.IsOK() && bufferInfo[3].vertexCount > 0)
 	{
 		glBindVertexArray(bufferInfo[3].vertexArrayIndex);
 		labelText.RenderBufferedGlyph(bufferInfo[3].vertexCount);
 	}
-	assert(!RenderWindow::GLHasError());
 
 	glBindVertexArray(0);
 }

@@ -2169,7 +2169,7 @@ void PlotObject::ComputeTransformationMatrices()
 //==========================================================================
 void PlotObject::UpdateScissorArea() const
 {
-	glClear(GL_SCISSOR_BIT);
+	assert(!RenderWindow::GLHasError());
 
 	int width, height;
 	renderer.GetSize(&width, &height);
@@ -2180,4 +2180,6 @@ void PlotObject::UpdateScissorArea() const
 		height - axisTop->GetOffsetFromWindowEdge() - axisBottom->GetOffsetFromWindowEdge());
 
 	glDisable(GL_SCISSOR_TEST);
+
+	assert(!RenderWindow::GLHasError());
 }
