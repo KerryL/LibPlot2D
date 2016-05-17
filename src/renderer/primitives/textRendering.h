@@ -21,9 +21,7 @@
 
 // Local headers
 #include "renderer/primitives/primitive.h"
-
-// FTGL forward declarations
-class FTFont;
+#include "renderer/text.h"
 
 class TextRendering : public Primitive
 {
@@ -32,14 +30,14 @@ public:
 	~TextRendering();
 
 	// Set option methods
-	void SetAngle(const double& angle) { this->angle = angle; modified = true; }
-	void SetFont(FTFont *font) { this->font = font; modified = true; }
+	void SetAngle(const double& angle) { this->angle = angle; modified = true; }// [rad]
+	void InitializeFonts(const std::string& fontFileName, const double& size);
 	void SetText(const wxString& text) { this->text = text; modified = true; }
 	void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; modified = true; }
 	void SetCentered(const bool& centered) { this->centered = centered; modified = true; }
 
-	double GetTextHeight() const;
-	double GetTextWidth() const;
+	double GetTextHeight();
+	double GetTextWidth();
 	wxString GetText() const { return text; }
 
 protected:
@@ -53,14 +51,12 @@ private:
 	double angle;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen
 
 	wxString text;
-	FTFont *font;
+	Text font;
 
 	// Flag indicating whether the text is centered at (X, Y) or if, if false,
 	// (0, 0) represents the lower left corner of the text bounding box
 	bool centered;
 	double x, y;
-
-	// TODO:  This object should have its own modelview matrix
 };
 
 #endif// TEXT_RENDERING_H_

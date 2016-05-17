@@ -1027,13 +1027,13 @@ bool Axis::InitializeFonts(const std::string& fontFileName, const double& size)
 	if (!labelText.SetFace(fontFileName) || !valueText.SetFace(fontFileName))
 		return false;
 
-	labelText.SetColor(Color::ColorBlack);
-	valueText.SetColor(Color::ColorBlack);
+	labelText.SetColor(color);
+	valueText.SetColor(color);
 
 	// For some reason, fonts tend to render more clearly at a larger size.  So
 	// we up-scale to render the fonts then down-scale to achieve the desired
 	// on-screen size.
-	// TODO:  Better to use a fixed large size and adjust scale accordingly?
+	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
 	const double factor(3.0);
 	labelText.SetSize(size * factor);
 	valueText.SetSize(size * factor);

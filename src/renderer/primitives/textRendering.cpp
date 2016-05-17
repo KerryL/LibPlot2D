@@ -13,6 +13,9 @@
 // Description:  Derived from Primitive for creating text objects on a plot.
 // History:
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/textRendering.h"
 #include "renderer/text.h"
@@ -35,7 +38,8 @@
 //		None
 //
 //==========================================================================
-TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindow)
+TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindow),
+	font(renderWindow)
 {
 	color.Set(0.0, 0.0, 0.0, 1.0);
 
@@ -45,7 +49,6 @@ TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindo
 	text = wxEmptyString;
 
 	centered = false;
-	font = NULL;
 }
 
 //==========================================================================
@@ -84,8 +87,22 @@ TextRendering::~TextRendering()
 //		None
 //
 //==========================================================================
-void TextRendering::Update(const unsigned int& i)
+void TextRendering::Update(const unsigned int& /*i*/)
 {
+	font.SetColor(color);
+	font.SetOrientation(angle);
+	font.SetText(text.ToStdString());
+
+	if (centered)
+	{
+		// TODO:  Is this correct?
+		font.SetPosition(x - GetTextWidth() * 0.5 * cos(angle) + GetTextHeight() * 0.5 * sin(angle),
+			y - GetTextWidth() * 0.5 * sin(angle) - GetTextHeight() * 0.5 * cos(angle));
+	}
+	else
+		font.SetPosition(x, y);
+
+	bufferInfo[0] = font.BuildText();
 }
 
 //==========================================================================
@@ -107,22 +124,11 @@ void TextRendering::Update(const unsigned int& i)
 //==========================================================================
 void TextRendering::GenerateGeometry()
 {
-	/*glPushMatrix();
-		glLoadIdentity();
-
-		// Position the text
-		if (centered)
-			glTranslated(x - GetTextWidth() / 2.0 * cos(angle * PlotMath::pi / 180.0)
-				+ GetTextHeight() / 2.0 * sin(angle * PlotMath::pi / 180.0),
-				y - GetTextWidth() / 2.0 * sin(angle * PlotMath::pi / 180.0)
-				- GetTextHeight() / 2.0 * cos(angle * PlotMath::pi / 180.0), 0.0);
-		else
-			glTranslated(x, y, 0.0);
-		glRotated(angle, 0.0, 0.0, 1.0);
-
-		// Render the text
-		font->Render(text.mb_str());
-	glPopMatrix();*/
+	if (font.IsOK() && bufferInfo[0].vertexCount > 0)
+	{
+		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+		font.RenderBufferedGlyph(bufferInfo[0].vertexCount);
+	}
 }
 
 //==========================================================================
@@ -148,7 +154,7 @@ bool TextRendering::HasValidParameters()
 	if (PlotMath::IsNaN(angle))
 		return false;
 
-	if (!font || !text.IsEmpty())
+	if (!font.IsOK() || !text.IsEmpty())
 		return false;
 
 	return true;
@@ -171,15 +177,14 @@ bool TextRendering::HasValidParameters()
 //		double, height in pixels of the current text
 //
 //==========================================================================
-double TextRendering::GetTextHeight() const
+double TextRendering::GetTextHeight()
 {
-	if (!font)
+	if (!font.IsOK())
 		return 0.0;
 
-	/*FTBBox boundingBox = font->BBox(text.mb_str());
+	Text::BoundingBox boundingBox(font.GetBoundingBox(text.ToStdString()));
 
-	return boundingBox.Upper().Y() - boundingBox.Lower().Y();*/
-	return 0.0;// TODO:  Fix
+	return boundingBox.yUp - boundingBox.yDown;
 }
 
 //==========================================================================
@@ -199,13 +204,44 @@ double TextRendering::GetTextHeight() const
 //		double, width in pixels of the current text
 //
 //==========================================================================
-double TextRendering::GetTextWidth() const
+double TextRendering::GetTextWidth()
 {
-	if (!font)
+	if (!font.IsOK())
 		return 0.0;
 
-/*	FTBBox boundingBox = font->BBox(text.mb_str());
+	Text::BoundingBox boundingBox(font.GetBoundingBox(text.ToStdString()));
 
-	return boundingBox.Upper().X() - boundingBox.Lower().X();*/
-	return 0.0;// TODO:  Fix
+	return boundingBox.xRight - boundingBox.xLeft;
+}
+
+//==========================================================================
+// Class:			TextRendering
+// Function:		InitializeFonts
+//
+// Description:		Initializes the font object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double, width in pixels of the current text
+//
+//==========================================================================
+void TextRendering::InitializeFonts(const std::string& fontFileName, const double& size)
+{
+	if (!font.SetFace(fontFileName))
+		return;
+
+	font.SetColor(color);
+
+	// For some reason, fonts tend to render more clearly at a larger size.  So
+	// we up-scale to render the fonts then down-scale to achieve the desired
+	// on-screen size.
+	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
+	const double factor(3.0);
+	font.SetSize(size * factor);
+	font.SetScale(1.0 / factor);
 }

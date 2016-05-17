@@ -352,7 +352,7 @@ void Legend::UpdateBoundingBox()
 	
 	boundingBox = font->BBox("H");
 	height = (boundingBox.Upper().Y() + entrySpacing) * i + entrySpacing;*/
-	// TODO:  Fix
+	// TODO:  OGL4 Fix
 }
 
 //==========================================================================
@@ -374,7 +374,7 @@ void Legend::UpdateBoundingBox()
 //==========================================================================
 void Legend::SetFont(const std::string& fontFileName, const double& size)
 {
-	// TODO:  Implement
+	// TODO:  OGL4 Implement
 }
 
 //==========================================================================

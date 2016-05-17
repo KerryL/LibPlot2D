@@ -87,7 +87,7 @@ public:
 		int markerSize;
 	};
 
-	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; }// TODO:  This will need to change size of bufferInfo
+	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; }// TODO:  OGL4 This will need to change size of bufferInfo
 
 	bool IsUnder(const unsigned int &x, const unsigned int &y) const;
 
@@ -125,8 +125,6 @@ private:
 	PositionReference windowRef;
 	PositionReference legendRef;
 	void GetAdjustedPosition(double &x, double &y) const;
-
-	// TODO:  This object should have its own modelview matrix
 };
 
 #endif// LEGEND_H_

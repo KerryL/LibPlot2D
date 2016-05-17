@@ -244,7 +244,7 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	modified	= primitive.modified;
 	drawOrder	= primitive.drawOrder;
 
-	// TODO:  Need to go over handling of openGL stuff here
+	// TODO:  OGL4 Need to go over handling of openGL stuff here
 	assert(false);
 
 	return *this;

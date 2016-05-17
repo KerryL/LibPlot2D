@@ -190,7 +190,7 @@ void PlotObject::InitializeFonts()
 	axisLeft->InitializeFonts(fontFileName, 12);
 	axisRight->InitializeFonts(fontFileName, 12);
 
-	//titleObject->InitializeFonts(fontFileName, 18);// TODO:  Implement
+	titleObject->InitializeFonts(fontFileName, 18);
 }
 
 //==========================================================================

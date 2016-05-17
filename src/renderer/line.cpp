@@ -46,7 +46,7 @@
 #ifdef __WXMSW__
 const double Line::fadeDistance(0.05);
 #else
-const double Line::fadeDistance(0.6);// TODO:  Can this be reduced?
+const double Line::fadeDistance(0.6);// TODO:  OGL4 Can this be reduced?
 #endif
 
 //==========================================================================
@@ -365,7 +365,7 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 	if (triangleCount > 0)
 		bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
 
-	//bufferInfo.vertexCountModified = false;// TODO:  Would be good to use this, but need a way to trigger update requests
+	//bufferInfo.vertexCountModified = false;// TODO:  OGL4 Would be good to use this, but need a way to trigger update requests
 }
 
 //==========================================================================
@@ -786,7 +786,7 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
 	glDrawArrays(GL_LINE_STRIP, 0, vertexCount);
-	glLineWidth(1.0f);// TODO:  Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
+	glLineWidth(1.0f);// TODO:  OGL4 Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
 	// Is it better to not even have ugly lines now?
 
 	assert(!RenderWindow::GLHasError());
@@ -812,7 +812,7 @@ void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
 	glDrawArrays(GL_LINES, 0, vertexCount);
-	glLineWidth(1.0f);// TODO:  Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
+	glLineWidth(1.0f);// TODO:  OGL4 Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
 	// Is it better to not even have ugly lines now?
 
 	assert(!RenderWindow::GLHasError());
