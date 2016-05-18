@@ -129,6 +129,7 @@ private:
 	std::vector<Primitive::BufferInfo> bufferVector;
 	Primitive::BufferInfo BuildBackground() const;
 	void BuildMarkers();
+	void BuildLabelStrings();
 	Primitive::BufferInfo AssembleBuffers();
 	std::vector<std::pair<double, double> > BuildBorderPoints() const;
 	void BuildSampleLines();

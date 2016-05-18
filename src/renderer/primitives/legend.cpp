@@ -119,8 +119,9 @@ void Legend::Update(const unsigned int& i)
 	}
 	else if (i == 1)// Text
 	{
-		//text.SetColor(fontColor);
-		// TODO:  Implement OGL4
+		text.SetColor(fontColor);
+		BuildLabelStrings();
+		bufferInfo[i] = text.BuildText();
 	}
 }
 
@@ -186,41 +187,6 @@ bool Legend::HasValidParameters()
 		
 	return true;
 }
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawNextEntry
-//
-// Description:		Draws the next legend entry.
-//
-// Input Arguments:
-//		info	= const LegendEntryInfo&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-/*void Legend::DrawNextEntry(const double &index) const
-{
-	// TODO:  Update for OGL4
-	double x, y;
-	GetAdjustedPosition(x, y);
-	y += height;
-	
-	y -= (entrySpacing + textHeight) * (index + 1);
-
-	// Draw label text
-	glPushMatrix();
-		glColor4d(0.0, 0.0, 0.0, 1.0);
-		glLoadIdentity();
-		renderWindow.ShiftForExactPixelization();
-		glTranslated(x + 2 * entrySpacing + sampleLength, y, 0.0);
-		font->Render(entries[index].text.mb_str());
-	glPopMatrix();
-}*/
 
 //==========================================================================
 // Class:			Legend
@@ -1117,4 +1083,35 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		BuildLabelStrings
+//
+// Description:		Generates text for each entry.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::BuildLabelStrings()
+{
+	double x, y;
+	GetAdjustedPosition(x, y);
+	y += height;
+	
+	unsigned int i;
+	for (i = 0; i < entries.size(); i++)
+	{
+		y -= entrySpacing + textHeight;
+		text.SetPosition(x + 2 * entrySpacing + sampleLength, y);
+		text.AppendText(entries[i].text.ToStdString());
+	}
 }
