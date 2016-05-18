@@ -112,12 +112,9 @@ private:
 	double x, y;// [pixels]
 	unsigned int borderSize;// [pixels]
 	unsigned int sampleLength;// [pixels]
+	double textHeight;// [pixels]
 
-	void DrawNextEntry(const double &index) const;
-	void DrawBackground() const;
-	void DrawBorder() const;
 	std::vector<std::pair<double, double> > GetCornerVertices() const;
-	void DrawMarker(const unsigned int &x, const unsigned int &y, const unsigned int &size) const;
 
 	void UpdateBoundingBox();
 	unsigned int height;
@@ -127,16 +124,14 @@ private:
 	PositionReference legendRef;
 	void GetAdjustedPosition(double &x, double &y) const;
 
-	std::vector<std::pair<double, double> > lineSegments;
 	Line lines;
 
 	std::vector<Primitive::BufferInfo> bufferVector;
 	Primitive::BufferInfo BuildBackground() const;
-	Primitive::BufferInfo BuildMarkers() const;
+	void BuildMarkers();
 	Primitive::BufferInfo AssembleBuffers();
-	void AppendCornerVertices(std::vector<std::pair<double, double> >& lineList) const;
-	void AppendLegendLines(std::vector<std::pair<double, double> >& lineList) const;
-	void AdjustLineSegmentColors(Primitive::BufferInfo& buffer) const;
+	std::vector<std::pair<double, double> > BuildBorderPoints() const;
+	void BuildSampleLines();
 	void ConfigureVertexArray(Primitive::BufferInfo& buffer) const;
 };
 

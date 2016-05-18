@@ -92,24 +92,28 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
 //==========================================================================
 void Legend::Update(const unsigned int& i)
 {
+	// TODO:  Alternative approach is to only update if entries change
+	// and to use local modelview to handle position changes.
+	if (!text.IsOK())
+		return;
+
 	if (i == 0)// Background, border, lines and markers
 	{
+		// Captial "H" gives good idea of text height
+		textHeight = text.GetBoundingBox("H").yUp;
+
 		UpdateBoundingBox();
 
 		bufferVector.push_back(BuildBackground());
 
-		lineSegments.clear();
+		lines.SetWidth(1.0);
 		lines.SetLineColor(borderColor);
 		lines.SetBackgroundColorForAlphaFade();
-
-		AppendCornerVertices(lineSegments);
-		AppendLegendLines(lineSegments);
-		lines.BuildSegments(lineSegments, Line::UpdateManual);
-
+		lines.Build(BuildBorderPoints(), Line::UpdateManual);
 		bufferVector.push_back(lines.GetBufferInfo());
-		AdjustLineSegmentColors(bufferVector.back());
 
-		bufferVector.push_back(BuildMarkers());
+		BuildSampleLines();
+		BuildMarkers();
 
 		bufferInfo[i] = AssembleBuffers();
 	}
@@ -151,25 +155,11 @@ void Legend::GenerateGeometry()
 	}
 
 	// Text last
-	/*if (text.IsOK() && bufferInfo[1].vertexCount > 0)
+	if (text.IsOK() && bufferInfo[1].vertexCount > 0)
 	{
 		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
 		text.RenderBufferedGlyph(bufferInfo[1].vertexCount);
-	}*/
-	/*UpdateBoundingBox();
-
-	glPushMatrix();
-		glLoadIdentity();
-		renderWindow.ShiftForExactPixelization();
-
-		DrawBackground();
-		DrawBorder();
-
-		unsigned int i;
-		for (i = 0; i < entries.size(); i++)
-			DrawNextEntry(i);
-
-	glPopMatrix();*/
+	}
 }
 
 //==========================================================================
@@ -213,26 +203,14 @@ bool Legend::HasValidParameters()
 //		None
 //
 //==========================================================================
-void Legend::DrawNextEntry(const double &index) const
+/*void Legend::DrawNextEntry(const double &index) const
 {
 	// TODO:  Update for OGL4
-	/*double x, y;
+	double x, y;
 	GetAdjustedPosition(x, y);
 	y += height;
 	
-	FTBBox boundingBox = font->BBox("H");// Some capital letter to assure uniform spacing
-	y -= (entrySpacing + boundingBox.Upper().Y()) * (index + 1);
-
-	// Draw sample line
-	const unsigned int lineYOffset(entrySpacing);
-	Line line;
-	line.SetWidth(entries[index].lineSize);
-	line.SetLineColor(entries[index].color);
-	line.SetBackgroundColorForAlphaFade();
-	line.Draw(x + entrySpacing, y + lineYOffset, x + entrySpacing + sampleLength, y + lineYOffset);
-	
-	if (entries[index].markerSize > 0)
-		DrawMarker(x + entrySpacing + sampleLength * 0.5, y + lineYOffset, entries[index].markerSize);
+	y -= (entrySpacing + textHeight) * (index + 1);
 
 	// Draw label text
 	glPushMatrix();
@@ -241,98 +219,8 @@ void Legend::DrawNextEntry(const double &index) const
 		renderWindow.ShiftForExactPixelization();
 		glTranslated(x + 2 * entrySpacing + sampleLength, y, 0.0);
 		font->Render(entries[index].text.mb_str());
-	glPopMatrix();*/
-}
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawMarker
-//
-// Description:		Draws the marker at the specified location.
-//
-// Input Arguments:
-//		x		= const unsigned int &
-//		y		= const unsigned int &
-//		size	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::DrawMarker(const unsigned int &x, const unsigned int &y,
-	const unsigned int &size) const
-{
-	// TODO:  Update for OGL4
-	/*const unsigned int halfSize(size * 2);
-	glBegin(GL_QUADS);
-	glVertex2i(x - halfSize, y - halfSize);
-	glVertex2i(x + halfSize, y - halfSize);
-	glVertex2i(x + halfSize, y + halfSize);
-	glVertex2i(x - halfSize, y + halfSize);
-	glEnd();*/
-}
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawBackground
-//
-// Description:		Draws the background area.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::DrawBackground() const
-{
-	// TODO:  Update for OGL4
-	/*glBegin(GL_QUADS);
-	glColor4d(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-	
-	double x, y;
-	GetAdjustedPosition(x, y);
-
-	glVertex2i(x, y);
-	glVertex2i(x + width, y);
-	glVertex2i(x + width, y + height);
-	glVertex2i(x, y + height);
-
-	glEnd();*/
-}
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawBorder
-//
-// Description:		Draws the border around the legend.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::DrawBorder() const
-{
-	// TODO:  Update for OGL4
-	/*Line border;
-	border.SetWidth(borderSize);
-	border.SetLineColor(borderColor);
-	border.SetBackgroundColorForAlphaFade();
-	border.Draw(GetCornerVertices());*/
-}
+	glPopMatrix();
+}*/
 
 //==========================================================================
 // Class:			Legend
@@ -394,9 +282,7 @@ void Legend::UpdateBoundingBox()
 	}
 	
 	width = 3 * entrySpacing + sampleLength + maxStringWidth;
-	
-	boundingBox = text.GetBoundingBox("H");
-	height = (boundingBox.yUp + entrySpacing) * i + entrySpacing;
+	height = (textHeight + entrySpacing) * i + entrySpacing;
 }
 
 //==========================================================================
@@ -901,34 +787,26 @@ void Legend::GetPosition(const PositionReference& legendRef,
 
 //==========================================================================
 // Class:			Legend
-// Function:		AppendCornerVertices
+// Function:		BuildBorderPoints
 //
-// Description:		Appends vertices for the border lines to the vector.
+// Description:		Returns a vector containing pairs of border points.
 //
 // Input Arguments:
-//		lineList	= std::vector<std::pair<double, double> >&
+//		None
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		None
+//		std::vector<std::pair<double, double> >
 //
 //==========================================================================
-void Legend::AppendCornerVertices(std::vector<std::pair<double, double> >& lineList) const
+std::vector<std::pair<double, double> > Legend::BuildBorderPoints() const
 {
 	std::vector<std::pair<double, double> > corners(GetCornerVertices());
-	lineList.push_back(corners[0]);
-	lineList.push_back(corners[1]);
+	corners.push_back(corners[0]);
 
-	lineList.push_back(corners[1]);
-	lineList.push_back(corners[2]);
-
-	lineList.push_back(corners[2]);
-	lineList.push_back(corners[3]);
-
-	lineList.push_back(corners[3]);
-	lineList.push_back(corners[0]);
+	return corners;
 }
 
 //==========================================================================
@@ -1015,16 +893,79 @@ Primitive::BufferInfo Legend::BuildBackground() const
 //		None
 //
 // Return Value:
-//		Primitive::BufferInfo
+//		None
 //
 //==========================================================================
-Primitive::BufferInfo Legend::BuildMarkers() const
+void Legend::BuildMarkers()
 {
+	const unsigned int lineYOffset(entrySpacing);
+
 	Primitive::BufferInfo buffer;
 
-	// TODO:  Implement
+	double x, y, halfSize;
+	GetAdjustedPosition(x, y);
 
-	return buffer;
+	x += entrySpacing + 0.5 * sampleLength;
+	y += height + lineYOffset;
+
+	unsigned int i;
+	for (i = 0; i < entries.size(); i++)
+	{
+		halfSize = entries[i].markerSize * 2.0;// This relationship comes from PlotCurve class
+		y -= entrySpacing + textHeight;
+
+		if (halfSize <= 0.0)
+			continue;
+
+		buffer.vertexCount = 4;
+		buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (renderWindow.GetVertexDimension() + 4)];
+		assert(renderWindow.GetVertexDimension() == 2);
+
+		buffer.indexCount = 6;
+		buffer.indexBuffer = new unsigned int[buffer.indexCount];
+
+		buffer.vertexBuffer[0] = x - halfSize;
+		buffer.vertexBuffer[1] = y - halfSize;
+
+		buffer.vertexBuffer[2] = x - halfSize;
+		buffer.vertexBuffer[3] = y + halfSize;
+
+		buffer.vertexBuffer[4] = x + halfSize;
+		buffer.vertexBuffer[5] = y + halfSize;
+
+		buffer.vertexBuffer[6] = x + halfSize;
+		buffer.vertexBuffer[7] = y - halfSize;
+
+		buffer.vertexBuffer[8] = entries[i].color.GetRed();
+		buffer.vertexBuffer[9] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[10] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[11] = entries[i].color.GetAlpha();
+
+		buffer.vertexBuffer[12] = entries[i].color.GetRed();
+		buffer.vertexBuffer[13] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[14] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[15] = entries[i].color.GetAlpha();
+
+		buffer.vertexBuffer[16] = entries[i].color.GetRed();
+		buffer.vertexBuffer[17] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[18] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[19] = entries[i].color.GetAlpha();
+
+		buffer.vertexBuffer[20] = entries[i].color.GetRed();
+		buffer.vertexBuffer[21] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[22] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[23] = entries[i].color.GetAlpha();
+
+		buffer.indexBuffer[0] = 0;
+		buffer.indexBuffer[1] = 1;
+		buffer.indexBuffer[2] = 2;
+
+		buffer.indexBuffer[3] = 2;
+		buffer.indexBuffer[4] = 3;
+		buffer.indexBuffer[5] = 0;
+
+		bufferVector.push_back(buffer);
+	}
 }
 
 //==========================================================================
@@ -1098,13 +1039,13 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 
 //==========================================================================
 // Class:			Legend
-// Function:		AppendLegendLines
+// Function:		BuildSampleLines
 //
 // Description:		Appends lines corresponding to the legend entries to the
-//					list.
+//					buffer vector.
 //
 // Input Arguments:
-//		lineList	= std::vector<std::pair<double, double> >&
+//		None
 //
 // Output Arguments:
 //		None
@@ -1113,31 +1054,28 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 //		None
 //
 //==========================================================================
-void Legend::AppendLegendLines(std::vector<std::pair<double, double> >& lineList) const
+void Legend::BuildSampleLines()
 {
-	// TODO:  Implement
-}
+	const unsigned int lineYOffset(entrySpacing);
 
-//==========================================================================
-// Class:			Legend
-// Function:		AdjustLineSegmentColors
-//
-// Description:		Adjusts the colors of the non-border lines in the specified
-//					buffer.
-//
-// Input Arguments:
-//		buffer	= Primitive::BufferInfo&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::AdjustLineSegmentColors(Primitive::BufferInfo& buffer) const
-{
-	// TODO:  Implement
+	double x, y;
+	GetAdjustedPosition(x, y);
+
+	y += height + lineYOffset;
+
+	unsigned int i;
+	for (i = 0; i < entries.size(); i++)
+	{
+		lines.SetLineColor(entries[i].color);
+		lines.SetBackgroundColorForAlphaFade();
+		lines.SetWidth(entries[i].lineSize);
+
+		y -= entrySpacing + textHeight;
+
+		lines.Build(x + entrySpacing, y,
+			x + entrySpacing + sampleLength, y, Line::UpdateManual);
+		bufferVector.push_back(lines.GetBufferInfo());
+	}
 }
 
 //==========================================================================
