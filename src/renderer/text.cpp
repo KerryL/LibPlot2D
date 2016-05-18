@@ -413,7 +413,7 @@ Primitive::BufferInfo Text::BuildText()
 
 	Primitive::BufferInfo bufferInfo(BuildLocalText());
 	ConfigureVertexArray(bufferInfo);
-	FreeBufferMemory(bufferInfo);
+	bufferInfo.FreeDynamicMemory();
 
 	return bufferInfo;
 }
@@ -650,12 +650,12 @@ Primitive::BufferInfo Text::AssembleBuffers()
 			k++;
 		}
 
-		FreeBufferMemory(bufferVector[i]);
+		bufferVector[i].FreeDynamicMemory();
 	}
 
 	ConfigureVertexArray(bufferInfo);
 	bufferVector.clear();
-	FreeBufferMemory(bufferInfo);
+	bufferInfo.FreeDynamicMemory();
 
 	return bufferInfo;
 }
@@ -749,31 +749,6 @@ Primitive::BufferInfo Text::BuildLocalText()
 
 //==========================================================================
 // Class:			Text
-// Function:		FreeBufferMemory
-//
-// Description:		Frees dynamically allocated buffers.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		Primitive::BufferInfo
-//
-//==========================================================================
-void Text::FreeBufferMemory(Primitive::BufferInfo& buffer)
-{
-	delete[] buffer.vertexBuffer;
-	buffer.vertexBuffer = NULL;
-
-	delete[] buffer.indexBuffer;
-	buffer.indexBuffer = NULL;
-}
-
-//==========================================================================
-// Class:			Text
 // Function:		ConfigureVertexArray
 //
 // Description:		Handles configuration of OpenGL vertex array object.
@@ -788,7 +763,7 @@ void Text::FreeBufferMemory(Primitive::BufferInfo& buffer)
 //		Primitive::BufferInfo
 //
 //==========================================================================
-void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo)
+void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 {
 	bufferInfo.GetOpenGLIndices(true);
 	glBindVertexArray(bufferInfo.vertexArrayIndex);

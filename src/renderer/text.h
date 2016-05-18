@@ -117,9 +117,7 @@ private:
 	std::vector<Primitive::BufferInfo> bufferVector;
 	Primitive::BufferInfo AssembleBuffers();
 	Primitive::BufferInfo BuildLocalText();
-	void ConfigureVertexArray(Primitive::BufferInfo& bufferInfo);
-
-	void FreeBufferMemory(Primitive::BufferInfo& buffer);
+	void ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const;
 };
 
 #endif// TEXT_H_

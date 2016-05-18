@@ -64,6 +64,7 @@ public:
 		BufferInfo();
 		void GetOpenGLIndices(const bool& needIndexObject = false);
 		void FreeOpenGLObjects();
+		void FreeDynamicMemory();
 
 	private:
 		bool glVertexBufferExists;

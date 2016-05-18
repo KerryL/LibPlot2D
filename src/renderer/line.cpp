@@ -424,8 +424,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;
-	bufferInfo.vertexBuffer = NULL;
+	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }
@@ -482,8 +481,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;
-	bufferInfo.vertexBuffer = NULL;
+	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }
@@ -580,11 +578,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;
-	bufferInfo.vertexBuffer = NULL;
-
-	delete[] bufferInfo.indexBuffer;
-	bufferInfo.indexBuffer = NULL;
+	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }
@@ -681,11 +675,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 
 	glBindVertexArray(0);
 
-	delete[] bufferInfo.vertexBuffer;
-	bufferInfo.vertexBuffer = NULL;
-
-	delete[] bufferInfo.indexBuffer;
-	bufferInfo.indexBuffer = NULL;
+	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }

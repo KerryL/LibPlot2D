@@ -391,3 +391,28 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 
 	assert(!RenderWindow::GLHasError());
 }
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		FreeDynamicMemory
+//
+// Description:		Frees dynamic resources.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::BufferInfo::FreeDynamicMemory()
+{
+	delete[] vertexBuffer;
+	vertexBuffer = NULL;
+
+	delete[] indexBuffer;
+	indexBuffer = NULL;
+}
