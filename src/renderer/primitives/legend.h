@@ -26,6 +26,7 @@
 // Local headers
 #include "renderer/primitives/primitive.h"
 #include "renderer/text.h"
+#include "renderer/line.h"
 
 class Legend : public Primitive
 {
@@ -125,6 +126,18 @@ private:
 	PositionReference windowRef;
 	PositionReference legendRef;
 	void GetAdjustedPosition(double &x, double &y) const;
+
+	std::vector<std::pair<double, double> > lineSegments;
+	Line lines;
+
+	std::vector<Primitive::BufferInfo> bufferVector;
+	Primitive::BufferInfo BuildBackground() const;
+	Primitive::BufferInfo BuildMarkers() const;
+	Primitive::BufferInfo AssembleBuffers();
+	void AppendCornerVertices(std::vector<std::pair<double, double> >& lineList) const;
+	void AppendLegendLines(std::vector<std::pair<double, double> >& lineList) const;
+	void AdjustLineSegmentColors(Primitive::BufferInfo& buffer) const;
+	void ConfigureVertexArray(Primitive::BufferInfo& buffer) const;
 };
 
 #endif// LEGEND_H_

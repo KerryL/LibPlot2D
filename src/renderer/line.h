@@ -46,14 +46,25 @@ public:
 	inline void SetXScale(const double& scale) { assert(scale > 0.0); xScale = scale; }
 	inline void SetYScale(const double& scale) { assert(scale > 0.0); yScale = scale; }
 
+	enum UpdateMethod
+	{
+		UpdateImmediate,// Send to OpenGL immediately
+		UpdateManual// Caller is responsible for sending to OpenGL
+	};
+
 	// Geometry is constructed in Build() call, so all options need to be set prior
 	void Build(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
-		const unsigned int &y2);
-	void Build(const double &x1, const double &y1, const double &x2, const double &y2);
-	void Build(const std::vector<std::pair<unsigned int, unsigned int> > &points);
-	void Build(const std::vector<std::pair<double, double> > &points);
-	void Build(const double* const x, const double* const y, const unsigned int& count);
-	void BuildSegments(const std::vector<std::pair<double, double> > &points);
+		const unsigned int &y2, const UpdateMethod& update = UpdateImmediate);
+	void Build(const double &x1, const double &y1, const double &x2, const double &y2,
+		const UpdateMethod& update = UpdateImmediate);
+	void Build(const std::vector<std::pair<unsigned int, unsigned int> > &points,
+		const UpdateMethod& update = UpdateImmediate);
+	void Build(const std::vector<std::pair<double, double> > &points,
+		const UpdateMethod& update = UpdateImmediate);
+	void Build(const double* const x, const double* const y, const unsigned int& count,
+		const UpdateMethod& update = UpdateImmediate);
+	void BuildSegments(const std::vector<std::pair<double, double> > &points,
+		const UpdateMethod& update = UpdateImmediate);
 
 	Primitive::BufferInfo GetBufferInfo() const { return bufferInfo; }
 
@@ -90,11 +101,11 @@ private:
 		double dyEdge;
 	};
 
-	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2);
-	void DoUglyDraw(const std::vector<std::pair<double, double> > &points);
-	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points);
+	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2, const UpdateMethod& update);
+	void DoUglyDraw(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update);
+	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update);
 
-	void DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points);
+	void DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update);
 
 	enum LineStyle
 	{

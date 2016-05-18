@@ -87,6 +87,7 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 //		y1	= const unsigned int&
 //		x2	= const unsigned int&
 //		y2	= const unsigned int&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -96,10 +97,10 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 //
 //==========================================================================
 void Line::Build(const unsigned int &x1, const unsigned int &y1,
-	const unsigned int &x2, const unsigned int &y2)
+	const unsigned int &x2, const unsigned int &y2, const UpdateMethod& update)
 {
 	Build(static_cast<double>(x1), static_cast<double>(y1),
-		static_cast<double>(x2), static_cast<double>(y2));
+		static_cast<double>(x2), static_cast<double>(y2), update);
 }
 
 //==========================================================================
@@ -113,6 +114,7 @@ void Line::Build(const unsigned int &x1, const unsigned int &y1,
 //		y1	= const double&
 //		x2	= const double&
 //		y2	= const double&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -122,17 +124,17 @@ void Line::Build(const unsigned int &x1, const unsigned int &y1,
 //
 //==========================================================================
 void Line::Build(const double &x1, const double &y1,
-	const double &x2, const double &y2)
+	const double &x2, const double &y2, const UpdateMethod& update)
 {
 	if (pretty)
 	{
 		std::vector<std::pair<double, double> > v;
 		v.push_back(std::make_pair(x1, y1));
 		v.push_back(std::make_pair(x2, y2));
-		DoPrettyDraw(v);
+		DoPrettyDraw(v, update);
 	}
 	else
-		DoUglyDraw(x1, y1, x2, y2);
+		DoUglyDraw(x1, y1, x2, y2, update);
 }
 
 //==========================================================================
@@ -143,6 +145,7 @@ void Line::Build(const double &x1, const double &y1,
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<unsigned int, unsigned int> >&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -151,7 +154,8 @@ void Line::Build(const double &x1, const double &y1,
 //		None
 //
 //==========================================================================
-void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &points)
+void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &points,
+	const UpdateMethod& update)
 {
 	std::vector<std::pair<double, double> > dPoints(points.size());
 	unsigned int i;
@@ -160,7 +164,7 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 		dPoints[i].first = static_cast<double>(points[i].first);
 		dPoints[i].second = static_cast<double>(points[i].second);
 	}
-	Build(dPoints);
+	Build(dPoints, update);
 }
 
 //==========================================================================
@@ -171,6 +175,7 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 //
 // Input Arguments:
 //		points	= cosnt std::vector<std::pair<double, double> >&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -179,15 +184,15 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 //		None
 //
 //==========================================================================
-void Line::Build(const std::vector<std::pair<double, double> > &points)
+void Line::Build(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update)
 {
 	if (points.size() < 2)
 		return;
 
 	if (pretty)
-		DoPrettyDraw(points);
+		DoPrettyDraw(points, update);
 	else
-		DoUglyDraw(points);
+		DoUglyDraw(points, update);
 }
 
 //==========================================================================
@@ -200,6 +205,7 @@ void Line::Build(const std::vector<std::pair<double, double> > &points)
 //		x		= const double* const
 //		y		= const double* const
 //		count	= const unsigned int&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -208,7 +214,8 @@ void Line::Build(const std::vector<std::pair<double, double> > &points)
 //		None
 //
 //==========================================================================
-void Line::Build(const double* const x, const double* const y, const unsigned int& count)
+void Line::Build(const double* const x, const double* const y,
+	const unsigned int& count, const UpdateMethod& update)
 {
 	std::vector<std::pair<double, double> > dPoints(count);
 	unsigned int i;
@@ -217,7 +224,7 @@ void Line::Build(const double* const x, const double* const y, const unsigned in
 		dPoints[i].first = static_cast<double>(x[i]);
 		dPoints[i].second = static_cast<double>(y[i]);
 	}
-	Build(dPoints);
+	Build(dPoints, update);
 }
 
 //==========================================================================
@@ -228,6 +235,7 @@ void Line::Build(const double* const x, const double* const y, const unsigned in
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -236,16 +244,17 @@ void Line::Build(const double* const x, const double* const y, const unsigned in
 //		None
 //
 //==========================================================================
-void Line::BuildSegments(const std::vector<std::pair<double, double> > &points)
+void Line::BuildSegments(const std::vector<std::pair<double, double> > &points,
+	const UpdateMethod& update)
 {
 	if (points.size() == 0)
 		return;
 	assert(points.size() % 2 == 0);
 
 	if (pretty)
-		DoPrettySegmentDraw(points);
+		DoPrettySegmentDraw(points, update);
 	else
-		DoUglyDraw(points);
+		DoUglyDraw(points, update);
 }
 
 //==========================================================================
@@ -379,6 +388,7 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 //		y1	= const double&
 //		x2	= const double&
 //		y2	= const double&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -387,7 +397,8 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 //		None
 //
 //==========================================================================
-void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2)
+void Line::DoUglyDraw(const double &x1, const double &y1,
+	const double &x2, const double &y2, const UpdateMethod& update)
 {
 	AllocateBuffer(2, 0);
 
@@ -405,6 +416,9 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 	bufferInfo.vertexBuffer[9] = (float)lineColor.GetGreen();
 	bufferInfo.vertexBuffer[10] = (float)lineColor.GetBlue();
 	bufferInfo.vertexBuffer[11] = (float)lineColor.GetAlpha();
+
+	if (update != UpdateImmediate)
+		return;
 
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 
@@ -437,6 +451,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -445,7 +460,8 @@ void Line::DoUglyDraw(const double &x1, const double &y1, const double &x2, cons
 //		None
 //
 //==========================================================================
-void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
+void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
+	const UpdateMethod& update)
 {
 	AllocateBuffer(points.size(), 0);
 
@@ -462,6 +478,9 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 		bufferInfo.vertexBuffer[start + i * 4 + 2] = (float)lineColor.GetBlue();
 		bufferInfo.vertexBuffer[start + i * 4 + 3] = (float)lineColor.GetAlpha();
 	}
+
+	if (update != UpdateImmediate)
+		return;
 
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 
@@ -494,6 +513,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -502,7 +522,8 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points)
 //		None
 //
 //==========================================================================
-void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
+void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
+	const UpdateMethod& update)
 {
 	std::vector<Offsets> offsets(points.size());
 
@@ -557,6 +578,9 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 		bufferInfo.indexBuffer[i * 18 + 17] = (i + 1) * 4 + 2;
 	}
 
+	if (update != UpdateImmediate)
+		return;
+
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
@@ -590,7 +614,8 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 // Description:		Draws disconnected lines using OpenGL triangles.
 //
 // Input Arguments:
-//		vertexCount	= const unsigned int&
+//		points	= const std::vector<std::pair<double, double> >&
+//		update	= const UpdateMethod&
 //
 // Output Arguments:
 //		None
@@ -599,7 +624,8 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points)
 //		None
 //
 //==========================================================================
-void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points)
+void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points,
+	const UpdateMethod& update)
 {
 	assert(!RenderWindow::GLHasError());
 	/* Draw the segments as follows:
@@ -653,6 +679,9 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 		bufferInfo.indexBuffer[i * 18 + 16] = i * 8 + 7;
 		bufferInfo.indexBuffer[i * 18 + 17] = i * 8 + 6;
 	}
+
+	if (update != UpdateImmediate)
+		return;
 
 	glBindVertexArray(bufferInfo.vertexArrayIndex);
 
