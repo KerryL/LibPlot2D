@@ -453,7 +453,7 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
 	renderer.UseDefaultProgram();
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
 	assert(!RenderWindow::GLHasError());
 }
