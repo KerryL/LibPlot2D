@@ -225,10 +225,10 @@ wxSizer* FilterDialog::CreateCheckBoxes()
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
 	butterworthCheckBox = new wxCheckBox(this, ButterworthID, _T("Butterworth"));
-	sizer->Add(butterworthCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxALL, 2);
+	sizer->Add(butterworthCheckBox, 0, wxALL, 2);
 
 	phaselessCheckBox = new wxCheckBox(this, wxID_ANY, _T("Phaseless"));
-	sizer->Add(phaselessCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxALL, 2);
+	sizer->Add(phaselessCheckBox, 0, wxALL, 2);
 
 	if (parameters.butterworth)
 		butterworthCheckBox->SetValue(true);
