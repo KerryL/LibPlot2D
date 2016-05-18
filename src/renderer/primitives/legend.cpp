@@ -951,7 +951,53 @@ Primitive::BufferInfo Legend::BuildBackground() const
 {
 	Primitive::BufferInfo buffer;
 
-	// TODO:  Implement
+	buffer.vertexCount = 4;
+	buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (4 + renderWindow.GetVertexDimension())];
+	assert(renderWindow.GetVertexDimension() == 2);
+
+	buffer.indexCount = 6;
+	buffer.indexBuffer = new unsigned int[buffer.indexCount];
+
+	std::vector<std::pair<double, double> > corners(GetCornerVertices());
+	buffer.vertexBuffer[0] = (float)corners[0].first;
+	buffer.vertexBuffer[1] = (float)corners[0].second;
+
+	buffer.vertexBuffer[2] = (float)corners[1].first;
+	buffer.vertexBuffer[3] = (float)corners[1].second;
+
+	buffer.vertexBuffer[4] = (float)corners[2].first;
+	buffer.vertexBuffer[5] = (float)corners[2].second;
+
+	buffer.vertexBuffer[6] = (float)corners[3].first;
+	buffer.vertexBuffer[7] = (float)corners[3].second;
+
+	buffer.vertexBuffer[8] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[9] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[10] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[11] = (float)backgroundColor.GetAlpha();
+
+	buffer.vertexBuffer[12] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[13] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[14] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[15] = (float)backgroundColor.GetAlpha();
+
+	buffer.vertexBuffer[16] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[17] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[18] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[19] = (float)backgroundColor.GetAlpha();
+
+	buffer.vertexBuffer[20] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[21] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[22] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[23] = (float)backgroundColor.GetAlpha();
+
+	buffer.indexBuffer[0] = 0;
+	buffer.indexBuffer[1] = 1;
+	buffer.indexBuffer[2] = 2;
+
+	buffer.indexBuffer[3] = 2;
+	buffer.indexBuffer[4] = 3;
+	buffer.indexBuffer[5] = 0;
 
 	return buffer;
 }
@@ -1012,25 +1058,32 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 	assert(sizeof(GLfloat) == sizeof(float));
 	assert(sizeof(GLuint) == sizeof(unsigned int));
 
-	buffer.vertexBuffer = new GLfloat[buffer.vertexCount * 6];
+	buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (renderWindow.GetVertexDimension() + 4)];
 	buffer.indexBuffer = new unsigned int[buffer.indexCount];
 
-	unsigned int j, k(0), m(0);
+	const unsigned int colorStart(buffer.vertexCount * renderWindow.GetVertexDimension());
+
+	unsigned int j, k(0), m(0), indexShift(0), bufferColorStart;
 	for (i = 0; i < bufferVector.size(); i++)
 	{
+		bufferColorStart = bufferVector[i].vertexCount * renderWindow.GetVertexDimension();
+
 		for (j = 0; j < bufferVector[i].vertexCount; j++)
 		{
-			buffer.vertexBuffer[k * 6] = bufferVector[i].vertexBuffer[j * 6];
-			buffer.vertexBuffer[k * 6 + 1] = bufferVector[i].vertexBuffer[j * 6 + 1];
-			buffer.vertexBuffer[k * 6 + 2] = bufferVector[i].vertexBuffer[j * 6+ 2];
-			buffer.vertexBuffer[k * 6 + 3] = bufferVector[i].vertexBuffer[j * 6 + 3];
-			buffer.vertexBuffer[k * 6 + 4] = bufferVector[i].vertexBuffer[j * 6 + 4];
-			buffer.vertexBuffer[k * 6 + 5] = bufferVector[i].vertexBuffer[j * 6 + 5];
+			buffer.vertexBuffer[k * 2] = bufferVector[i].vertexBuffer[j * 2];
+			buffer.vertexBuffer[k * 2 + 1] = bufferVector[i].vertexBuffer[j * 2 + 1];
+
+			buffer.vertexBuffer[colorStart + k * 4] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4];
+			buffer.vertexBuffer[colorStart + k * 4 + 1] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 1];
+			buffer.vertexBuffer[colorStart + k * 4 + 2] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 2];
+			buffer.vertexBuffer[colorStart + k * 4 + 3] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 3];
 			k++;
 		}
 
 		for (j = 0; j < bufferVector[i].indexCount; j++)
-			buffer.indexBuffer[m++] = bufferVector[i].indexBuffer[j];
+			buffer.indexBuffer[m++] = bufferVector[i].indexBuffer[j] + indexShift;
+
+		indexShift += bufferVector[i].vertexCount;
 
 		bufferVector[i].FreeDynamicMemory();
 		bufferVector[i].FreeOpenGLObjects();
