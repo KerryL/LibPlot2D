@@ -400,7 +400,6 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 //==========================================================================
 void Axis::DrawHorizontalGrid(const unsigned int &count)
 {
-	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	double location;
 	for (grid = 0; grid < count; grid++)
@@ -442,12 +441,11 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
-	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
 	double location;
-	for (tick = 1; tick <= count + 1; tick++)
+	for (tick = 0; tick < count; tick++)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
@@ -475,7 +473,6 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 //==========================================================================
 void Axis::DrawVerticalGrid(const unsigned int &count)
 {
-	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	double location;
 	for (grid = 0; grid < count; grid++)
@@ -517,13 +514,11 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
-	// The first inside tick never needs to be drawn
-	// The last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
 	double location;
-	for (tick = 1; tick <= count + 1; tick++)
+	for (tick = 0; tick < count; tick++)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
