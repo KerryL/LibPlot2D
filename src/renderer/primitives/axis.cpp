@@ -69,7 +69,7 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(rend
 	oppositeAxis = NULL;
 
 	gridColor.Set(0.8, 0.8, 0.8, 1.0);
-	SetDrawOrder(2500);
+	SetDrawOrder(500);
 
 	bufferInfo.push_back(BufferInfo());// Gridlines
 	bufferInfo.push_back(BufferInfo());// Values
@@ -403,12 +403,12 @@ void Axis::DrawHorizontalGrid(const unsigned int &count)
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	double location;
-	for (grid = 1; grid <= count + 1; grid++)
+	for (grid = 0; grid < count; grid++)
 	{
 		if (minorGrid)
-			location = ValueToPixel(GetNextGridValue(grid));
+			location = ValueToPixel(GetNextGridValue(grid + 1));
 		else
-			location = ValueToPixel(GetNextTickValue(false, false, grid));
+			location = ValueToPixel(GetNextTickValue(false, false, grid + 1));
 
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
@@ -478,12 +478,12 @@ void Axis::DrawVerticalGrid(const unsigned int &count)
 	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	double location;
-	for (grid = 1; grid <= count + 1; grid++)
+	for (grid = 0; grid < count; grid++)
 	{
 		if (minorGrid)
-			location = ValueToPixel(GetNextGridValue(grid));
+			location = ValueToPixel(GetNextGridValue(grid + 1));
 		else
-			location = ValueToPixel(GetNextTickValue(false, false, grid));
+			location = ValueToPixel(GetNextTickValue(false, false, grid + 1));
 
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
