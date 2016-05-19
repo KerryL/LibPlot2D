@@ -106,7 +106,7 @@ void Legend::Update(const unsigned int& i)
 
 		bufferVector.push_back(BuildBackground());
 
-		lines.SetWidth(1.0);
+		lines.SetWidth(borderSize);
 		lines.SetLineColor(borderColor);
 		lines.SetBackgroundColorForAlphaFade();
 		lines.Build(BuildBorderPoints(), Line::UpdateManual);
@@ -123,6 +123,8 @@ void Legend::Update(const unsigned int& i)
 		BuildLabelStrings();
 		bufferInfo[i] = text.BuildText();
 	}
+
+	bufferInfo[i].vertexCountModified = false;
 }
 
 //==========================================================================
@@ -484,7 +486,7 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 		break;
 	}
 	
-	modified = true;
+	RequiresRedraw();
 }
 
 //==========================================================================
@@ -1114,4 +1116,28 @@ void Legend::BuildLabelStrings()
 		text.SetPosition(x + 2 * entrySpacing + sampleLength, y);
 		text.AppendText(entries[i].text.ToStdString());
 	}
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		RequiresRedraw
+//
+// Description:		Sets flags indicating we want to re-perform OpenGL stuff.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::RequiresRedraw()
+{
+	modified = true;
+	unsigned int i;
+	for (i = 0; i < bufferInfo.size(); i++)
+		bufferInfo[i].vertexCountModified = true;
 }

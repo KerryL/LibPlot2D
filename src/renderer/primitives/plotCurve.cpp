@@ -52,6 +52,8 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 	markerSize = -1;
 	pretty = true;
 
+	line.SetBufferHint(GL_STATIC_DRAW);
+
 	bufferInfo.push_back(BufferInfo());// Add a second empty info block for the markers
 }
 

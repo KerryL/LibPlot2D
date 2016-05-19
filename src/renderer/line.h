@@ -46,6 +46,8 @@ public:
 	inline void SetXScale(const double& scale) { assert(scale > 0.0); xScale = scale; }
 	inline void SetYScale(const double& scale) { assert(scale > 0.0); yScale = scale; }
 
+	inline void SetBufferHint(const GLenum& hint) { this->hint = hint; }
+
 	enum UpdateMethod
 	{
 		UpdateImmediate,// Send to OpenGL immediately
@@ -83,6 +85,8 @@ private:
 
 	double xScale;
 	double yScale;
+
+	GLenum hint;
 
 	const RenderWindow& renderWindow;
 	Primitive::BufferInfo bufferInfo;

@@ -39,11 +39,11 @@ public:
 
 	// Set option methods
 	void SetFont(const std::string& fontFileName, const double& size);
-	void SetFontColor(const Color &color) { fontColor = color; modified = true; }
-	void SetBackgroundColor(const Color &color) { backgroundColor = color; modified = true; }
-	void SetBorderColor(const Color &color) { borderColor = color; modified = true; }
-	void SetBorderSize(const unsigned int &size) { borderSize = size; modified = true; }
-	void SetSampleLineLength(const unsigned int &size) { sampleLength = size; modified = true; }
+	void SetFontColor(const Color &color) { fontColor = color; RequiresRedraw(); }
+	void SetBackgroundColor(const Color &color) { backgroundColor = color; RequiresRedraw(); }
+	void SetBorderColor(const Color &color) { borderColor = color; RequiresRedraw(); }
+	void SetBorderSize(const unsigned int &size) { borderSize = size; RequiresRedraw(); }
+	void SetSampleLineLength(const unsigned int &size) { sampleLength = size; RequiresRedraw(); }
 
 	enum PositionReference
 	{
@@ -65,7 +65,7 @@ public:
 	PositionReference GetLegendReference() const { return legendRef; }
 
 	// Specifies bottom left corner of legend
-	void SetPosition(const double &x, const double &y) { this->x = x; this->y = y; modified = true; }
+	void SetPosition(const double &x, const double &y) { this->x = x; this->y = y; RequiresRedraw(); }
 	void SetDeltaPosition(const double &x, const double &y);
 
 	// These are w.r.t. reference specified by SetWindowRef()
@@ -88,7 +88,7 @@ public:
 		int markerSize;
 	};
 
-	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; modified = true; }// TODO:  OGL4 This will need to change size of bufferInfo
+	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; RequiresRedraw(); }
 
 	bool IsUnder(const unsigned int &x, const unsigned int &y) const;
 
@@ -134,6 +134,7 @@ private:
 	std::vector<std::pair<double, double> > BuildBorderPoints() const;
 	void BuildSampleLines();
 	void ConfigureVertexArray(Primitive::BufferInfo& buffer) const;
+	void RequiresRedraw();
 };
 
 #endif// LEGEND_H_
