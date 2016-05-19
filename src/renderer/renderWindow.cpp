@@ -278,6 +278,8 @@ void RenderWindow::Render()
 	SetCurrent(*context);
 	wxPaintDC(this);
 
+	const unsigned int shaderCount(shaders.size());
+
 	assert(!GLHasError());
 
 	if (!glewInitialized)
@@ -327,6 +329,10 @@ void RenderWindow::Render()
 
 	glFlush();
 	SwapBuffers();
+
+	// If shaders are added mid-render, we need to re-render to ensure everything gets displayed
+	if (shaders.size() != shaderCount)
+		Render();
 
 	assert(!GLHasError());
 }
@@ -1841,6 +1847,7 @@ void RenderWindow::ShiftForExactPixelization()
 void RenderWindow::AddShader(const ShaderInfo& shader)
 {
 	shaders.push_back(shader);
+	modified = true;
 }
 
 //==========================================================================
