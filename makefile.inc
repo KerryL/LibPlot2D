@@ -43,13 +43,13 @@ RANLIB = ranlib
 
 # Compiler flags
 CFLAGS = -Wall -Wextra $(INCDIRS) `pkg-config --cflags ftgl` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -Wno-unused-local-typedefs -std=c++0x
-CFLAGS_RELEASE = $(CFLAGS) -O2 `wx-config --version=3.0 --debug=no --cppflags`
-CFLAGS_DEBUG = $(CFLAGS) -g `wx-config --version=3.0 --debug=yes --cppflags`
+CFLAGS_RELEASE = $(CFLAGS) -O2 `wx-config --debug=no --cppflags`
+CFLAGS_DEBUG = $(CFLAGS) -g `wx-config --debug=yes --cppflags`
 
 # Linker flags
 LDFLAGS = $(LIBDIRS) $(LIBS) `pkg-config --libs ftgl,gl`
-LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --version=3.0 --debug=yes --libs all`
-LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --version=3.0 --debug=no --libs all`
+LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --debug=yes --libs all`
+LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --debug=no --libs all`
 
 # Object file output directory
 OBJDIR = $(CURDIR)/.obj/
