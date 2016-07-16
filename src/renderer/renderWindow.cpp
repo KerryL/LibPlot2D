@@ -27,9 +27,10 @@
 #include <wx/image.h>
 
 // OpenGL headers
-#include <gl/glcorearb.h>
 #ifdef _MSC_VER
+#include <GL/glcorearb.h>
 #undef Yield// Added to fix compiler error in wxThread caused by including windows.h (within glcorearb.h)
+#include <GL/gl.h>
 #endif
 
 // Local headers
