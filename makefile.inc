@@ -42,12 +42,12 @@ AR = ar rcs
 RANLIB = ranlib
 
 # Compiler flags
-CFLAGS = -Wall -Wextra $(INCDIRS) `pkg-config --cflags glew` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -Wno-unused-local-typedefs -std=c++0x
+CFLAGS = -Wall -Wextra $(INCDIRS) `pkg-config --cflags glew, freetype2` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -Wno-unused-local-typedefs -std=c++0x
 CFLAGS_RELEASE = $(CFLAGS) -O2 `wx-config --version=3.1 --debug=no --cppflags`
 CFLAGS_DEBUG = $(CFLAGS) -g `wx-config --version=3.1 --debug=yes --cppflags`
 
 # Linker flags
-LDFLAGS = $(LIBDIRS) $(LIBS) `pkg-config --libs gl,glew`
+LDFLAGS = $(LIBDIRS) $(LIBS) `pkg-config --libs gl,glew,freetype2`
 LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --version=3.1 --debug=yes --libs all`
 LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --version=3.1 --debug=no --libs all`
 

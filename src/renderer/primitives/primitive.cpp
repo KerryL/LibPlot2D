@@ -14,7 +14,7 @@
 // History:
 
 // GLEW headers
-#include <GL\glew.h>
+#include <GL/glew.h>
 
 // Local headers
 #include "renderer/primitives/primitive.h"
