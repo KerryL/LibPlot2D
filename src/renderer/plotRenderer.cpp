@@ -70,15 +70,15 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //
 //==========================================================================
 const std::string PlotRenderer::defaultVertexShader(
-	"#version 330\n"
+	"#version 300 es\n"
 	"\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
-	"layout(location = 0) in vec2 position;\n"
-	"layout(location = 1) in vec4 color;\n"
+	"layout(location = 0) in highp vec2 position;\n"
+	"layout(location = 1) in highp vec4 color;\n"
 	"\n"
-	"out vec4 vertexColor;\n"
+	"out highp vec4 vertexColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"

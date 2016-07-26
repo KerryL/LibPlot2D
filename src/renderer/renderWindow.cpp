@@ -21,6 +21,7 @@
 // Standard C++ headers
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 // wxWidgets headers
 #include <wx/dcclient.h>
@@ -73,15 +74,15 @@ const double RenderWindow::exactPixelShift(0.375);
 //
 //==========================================================================
 const std::string RenderWindow::defaultVertexShader(
-	"#version 330\n"
+	"#version 300 es\n"
 	"\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
-	"layout(location = 0) in vec4 position;\n"
-	"layout(location = 1) in vec4 color;\n"
+	"layout(location = 0) in highp vec4 position;\n"
+	"layout(location = 1) in highp vec4 color;\n"
 	"\n"
-	"out vec4 vertexColor;\n"
+	"out highp vec4 vertexColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -107,11 +108,11 @@ const std::string RenderWindow::defaultVertexShader(
 //
 //==========================================================================
 const std::string RenderWindow::defaultFragmentShader(
-	"#version 330\n"
+	"#version 300 es\n"
 	"\n"
-	"in vec4 vertexColor;\n"
+	"in highp vec4 vertexColor;\n"
 	"\n"
-	"out vec4 outputColor;\n"
+	"out highp vec4 outputColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -1600,7 +1601,8 @@ GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderC
         
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
 		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
-		assert(false && strInfoLog);
+		std::cerr << strInfoLog << std::endl;
+		assert(false);
 		delete[] strInfoLog;
 	}
 
@@ -1640,7 +1642,8 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
         
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
 		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
-		assert(false && strInfoLog);
+		std::cerr << strInfoLog << std::endl;
+		assert(false);
 		delete[] strInfoLog;
 	}
 

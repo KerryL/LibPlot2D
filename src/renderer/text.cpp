@@ -70,15 +70,15 @@ unsigned int Text::ftReferenceCount(0);
 //
 //==========================================================================
 const std::string Text::vertexShader(
-	"#version 330\n"
+	"#version 300 es\n"
 	"\n"
 	"uniform mat4 projectionMatrix;\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"\n"
-	"layout(location = 0) in vec4 vertex;// <vec2 pos, vec2 tex>\n"
+	"layout(location = 0) in highp vec4 vertex;// <vec2 pos, vec2 tex>\n"
 	"layout(location = 1) in uint texIndex;\n"
 	"\n"
-	"out vec2 texCoords;\n"
+	"out highp vec2 texCoords;\n"
 	"flat out uint index;\n"
 	"\n"
 	"void main()\n"
@@ -106,19 +106,19 @@ const std::string Text::vertexShader(
 //
 //==========================================================================
 const std::string Text::fragmentShader(
-	"#version 330\n"
+	"#version 300 es\n"
 	"\n"
-	"uniform sampler2DArray text;\n"
-	"uniform vec3 textColor;\n"
+	"uniform highp sampler2DArray text;\n"
+	"uniform highp vec3 textColor;\n"
 	"\n"
-	"in vec2 texCoords;\n"
+	"in highp vec2 texCoords;\n"
 	"flat in uint index;\n"
 	"\n"
-	"out vec4 color;\n"
+	"out highp vec4 color;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, vec3(texCoords, index)).r);\n"
+	"    highp vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, vec3(texCoords, index)).r);\n"
 	"    color = vec4(textColor, 1.0) * sampled;\n"
 	"}\n"
 );
