@@ -1533,11 +1533,11 @@ void MainFrame::RemoveCurve(const unsigned int &i)
 //==========================================================================
 void MainFrame::UpdateCurveQuality()
 {
-	if (plotArea->GetTotalPointCount() > highQualityCurvePointLimit)
+	//if (plotArea->GetTotalPointCount() > highQualityCurvePointLimit)
 		plotArea->SetCurveQuality(PlotRenderer::QualityHighWrite);
-	else
+	/*else
 		plotArea->SetCurveQuality(static_cast<PlotRenderer::CurveQuality>(
-		PlotRenderer::QualityHighStatic | PlotRenderer::QualityHighWrite));
+		PlotRenderer::QualityHighStatic | PlotRenderer::QualityHighWrite));*/// TODO:  Fix this after line rendering is improved
 }
 
 //==========================================================================
