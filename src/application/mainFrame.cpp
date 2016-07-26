@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -65,7 +65,7 @@
 #endif
 
 // Testing prototypes
-//void TestSignalOperations(void);
+//void TestSignalOperations();
 
 //==========================================================================
 // Class:			MainFrame
@@ -178,7 +178,7 @@ const wxString MainFrame::pathToConfigFile = _T("dataplotter.ini");
 //		None
 //
 //==========================================================================
-void MainFrame::CreateControls(void)
+void MainFrame::CreateControls()
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxSplitterWindow *splitter = new wxSplitterWindow(this);
@@ -219,7 +219,7 @@ void MainFrame::CreateControls(void)
 PlotRenderer* MainFrame::CreatePlotArea(wxWindow *parent)
 {
 	wxGLAttributes displayAttributes;
-	displayAttributes.PlatformDefaults().RGBA().DoubleBuffer().SampleBuffers(1).Samplers(4).EndList();
+	displayAttributes.PlatformDefaults().RGBA().DoubleBuffer().SampleBuffers(1).Samplers(4).Stencil(1).EndList();
 	assert(wxGLCanvas::IsDisplaySupported(displayAttributes));
 	plotArea = new PlotRenderer(*parent, *this, wxID_ANY, displayAttributes);
 
@@ -336,7 +336,7 @@ wxBoxSizer* MainFrame::CreateButtons(wxWindow *parent)
 //		None
 //
 //==========================================================================
-void MainFrame::SetProperties(void)
+void MainFrame::SetProperties()
 {
 	SetTitle(DataPlotterApp::dataPlotterTitle);
 	SetName(DataPlotterApp::dataPlotterName);
@@ -838,7 +838,7 @@ void MainFrame::CreatePlotContextMenu(const wxPoint &position, const PlotContext
 //		wxMenu*
 //
 //==========================================================================
-wxMenu* MainFrame::CreatePlotAreaContextMenu(void) const
+wxMenu* MainFrame::CreatePlotAreaContextMenu() const
 {
 	wxMenu *contextMenu = new wxMenu();
 	contextMenu->Append(idPlotContextCopy, _T("Copy"));
@@ -1215,7 +1215,7 @@ wxString MainFrame::ExtractFileNameFromPath(const wxString &pathAndFileName) con
 //		None
 //
 //==========================================================================
-void MainFrame::ClearAllCurves(void)
+void MainFrame::ClearAllCurves()
 {
 	while (plotList.GetCount() > 0)
 		RemoveCurve(0);
@@ -1371,7 +1371,7 @@ void MainFrame::AddCurve(Dataset2D *data, wxString name)
 //		None
 //
 //==========================================================================
-void MainFrame::AddTimeRowToGrid(void)
+void MainFrame::AddTimeRowToGrid()
 {
 	optionsGrid->AppendRows();
 
@@ -3238,6 +3238,7 @@ void MainFrame::SetNewAxisRange(const PlotContext &axis, const double &min, cons
 	default:
 	case PlotContextXAxis:
 		plotArea->SetXLimits(min, max);
+		break;
 
 	case PlotContextPlotArea:
 		assert(false);
@@ -3679,7 +3680,7 @@ void MainFrame::ContextGridColor(wxCommandEvent& WXUNUSED(event))
 //		FilterParameters describing the user-specified filter (order = 0 for cancelled dialog)
 //
 //==========================================================================
-FilterParameters MainFrame::DisplayFilterDialog(void)
+FilterParameters MainFrame::DisplayFilterDialog()
 {
 	FilterDialog dialog(this);
 	if (dialog.ShowModal() != wxID_OK)
@@ -3975,7 +3976,7 @@ DataFile* MainFrame::GetDataFile(const wxString &fileName)
 //		None
 //
 //==========================================================================
-void MainFrame::DoCopy(void)
+void MainFrame::DoCopy()
 {
 	wxInitAllImageHandlers();
 	if (wxTheClipboard->Open())
@@ -4001,7 +4002,7 @@ void MainFrame::DoCopy(void)
 //		None
 //
 //==========================================================================
-void MainFrame::DoPaste(void)
+void MainFrame::DoPaste()
 {
 	if (wxTheClipboard->Open())
 	{
@@ -4031,7 +4032,7 @@ void MainFrame::DoPaste(void)
 //		None
 //
 //==========================================================================
-/*void TestSignalOperations(void)
+/*void TestSignalOperations()
 {
 	// Create test data:
 	Dataset2D set1(500);

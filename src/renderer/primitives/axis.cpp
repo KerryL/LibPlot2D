@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -15,6 +15,9 @@
 //	11/17/2010	- Fixed some bugs related to rendering of ticks and grid lines, K. Loux.
 //	07/30/2012	- Added logarithmically-scalled plotting, K. Loux.
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Standard C++ headers
 #include <algorithm>
 
@@ -22,9 +25,6 @@
 #include "renderer/primitives/axis.h"
 #include "renderer/renderWindow.h"
 #include "utilities/math/plotMath.h"
-
-// FTGL headers
-#include <FTGL/ftgl.h>
 
 //==========================================================================
 // Class:			Axis
@@ -42,7 +42,8 @@
 //		None
 //
 //==========================================================================
-Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow)
+Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(renderWindow),
+	valueText(renderWindow), axisLines(renderWindow), gridLines(renderWindow)
 {
 	color.Set(0.0, 0.0, 0.0, 1.0);
 
@@ -63,13 +64,16 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow)
 
 	logarithmic = false;
 
-	font = NULL;
-
 	minAxis = NULL;
 	maxAxis = NULL;
 	oppositeAxis = NULL;
 
 	gridColor.Set(0.8, 0.8, 0.8, 1.0);
+	SetDrawOrder(500);
+
+	bufferInfo.push_back(BufferInfo());// Gridlines
+	bufferInfo.push_back(BufferInfo());// Values
+	bufferInfo.push_back(BufferInfo());// Label
 }
 
 //==========================================================================
@@ -94,6 +98,57 @@ Axis::~Axis()
 
 //==========================================================================
 // Class:			Axis
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Axis::Update(const unsigned int& i)
+{
+	if (i == 0)// Axis and ticks
+	{
+		axisLines.SetWidth(1.0);
+		axisLines.SetLineColor(color);
+		axisLines.SetBackgroundColorForAlphaFade();
+
+		gridLines.SetWidth(1.0);
+		gridLines.SetLineColor(gridColor);
+		gridLines.SetBackgroundColorForAlphaFade();
+
+		axisPoints.clear();
+		gridPoints.clear();
+		DrawFullAxis();
+		axisLines.BuildSegments(axisPoints);
+		bufferInfo[i] = axisLines.GetBufferInfo();
+	}
+	else if (i == 1)// Gridlines
+	{
+		gridLines.BuildSegments(gridPoints);
+		bufferInfo[i] = gridLines.GetBufferInfo();
+	}
+	else if (i == 2 && valueText.IsOK())// Values
+	{
+		DrawTickLabels();
+		bufferInfo[i] = valueText.BuildText();
+	}
+	else if (i == 3 && labelText.IsOK())// Label
+	{
+		DrawAxisLabel();
+		bufferInfo[i] = labelText.BuildText();
+	}
+}
+
+//==========================================================================
+// Class:			Axis
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
@@ -111,17 +166,33 @@ Axis::~Axis()
 //==========================================================================
 void Axis::GenerateGeometry()
 {
-	DrawFullAxis();
-
-	glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-
-	if (font)
+	// Draw gridlines first
+	if ((majorGrid || minorGrid) && bufferInfo[1].indexCount > 0)
 	{
-		if (!label.IsEmpty())
-			DrawAxisLabel();
-
-		DrawTickLabels();
+		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
+		Line::DoPrettyDraw(bufferInfo[1].indexCount);
 	}
+
+	// Axis and ticks next
+	if (bufferInfo[0].vertexCount > 0)
+	{
+		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+		Line::DoPrettyDraw(bufferInfo[0].indexCount);
+	}
+
+	if (valueText.IsOK() && bufferInfo[2].vertexCount > 0)
+	{
+		glBindVertexArray(bufferInfo[2].vertexArrayIndex);
+		valueText.RenderBufferedGlyph(bufferInfo[2].vertexCount);
+	}
+
+	if (!label.IsEmpty() && labelText.IsOK() && bufferInfo[3].vertexCount > 0)
+	{
+		glBindVertexArray(bufferInfo[3].vertexArrayIndex);
+		labelText.RenderBufferedGlyph(bufferInfo[3].vertexCount);
+	}
+
+	glBindVertexArray(0);
 }
 
 //==========================================================================
@@ -146,10 +217,6 @@ void Axis::DrawFullAxis()
 	int mainAxisLocation = ComputeMainAxisLocation();
 
 	ComputeGridAndTickCounts(numberOfTicks, &numberOfGridLines);
-
-	line.SetWidth(1.0);
-	line.SetLineColor(color);
-	line.SetBackgroundColorForAlphaFade();
 
 	if (IsHorizontal())
 	{
@@ -261,16 +328,20 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 //		None
 //
 //==========================================================================
-void Axis::DrawMainAxis(const int &mainAxisLocation) const
+void Axis::DrawMainAxis(const int &mainAxisLocation)
 {
 	if (IsHorizontal())
-		line.Draw(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation,
-			renderWindow.GetSize().GetWidth()
-			- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation);
+	{
+		axisPoints.push_back(std::make_pair(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation));
+		axisPoints.push_back(std::make_pair(renderWindow.GetSize().GetWidth()
+			- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation));
+	}
 	else
-		line.Draw(mainAxisLocation, minAxis->GetOffsetFromWindowEdge(),
-			mainAxisLocation, renderWindow.GetSize().GetHeight() -
-			maxAxis->GetOffsetFromWindowEdge());
+	{
+		axisPoints.push_back(std::make_pair(mainAxisLocation, minAxis->GetOffsetFromWindowEdge()));
+		axisPoints.push_back(std::make_pair(mainAxisLocation, renderWindow.GetSize().GetHeight() -
+			maxAxis->GetOffsetFromWindowEdge()));
+	}
 }
 
 //==========================================================================
@@ -327,28 +398,24 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 //		None
 //
 //==========================================================================
-void Axis::DrawHorizontalGrid(const unsigned int &count) const
+void Axis::DrawHorizontalGrid(const unsigned int &count)
 {
-	Line gridLine;
-	gridLine.SetLineColor(gridColor);
-	gridLine.SetBackgroundColorForAlphaFade();
-
-	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	double location;
-	for (grid = 1; grid <= count + 1; grid++)
+	for (grid = 0; grid < count; grid++)
 	{
 		if (minorGrid)
-			location = ValueToPixel(GetNextGridValue(grid));
+			location = ValueToPixel(GetNextGridValue(grid + 1));
 		else
-			location = ValueToPixel(GetNextTickValue(false, false, grid));
+			location = ValueToPixel(GetNextTickValue(false, false, grid + 1));
 
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		gridLine.Draw(location, static_cast<double>(offsetFromWindowEdge), location,
-			static_cast<double>(renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge()));
+		gridPoints.push_back(std::make_pair(location, static_cast<double>(offsetFromWindowEdge)));
+		gridPoints.push_back(std::make_pair(location,
+			static_cast<double>(renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge())));
 	}
 }
 
@@ -369,23 +436,22 @@ void Axis::DrawHorizontalGrid(const unsigned int &count) const
 //		None
 //
 //==========================================================================
-void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation) const
+void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation)
 {
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
-	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
 	double location;
-	for (tick = 1; tick <= count + 1; tick++)
+	for (tick = 0; tick < count; tick++)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		line.Draw(location, static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign),
-			location, static_cast<double>(mainAxisLocation + tickSize * insideTick * sign));
+		axisPoints.push_back(std::make_pair(location, static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign)));
+		axisPoints.push_back(std::make_pair(location, static_cast<double>(mainAxisLocation + tickSize * insideTick * sign)));
 	}
 }
 
@@ -405,28 +471,24 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 //		None
 //
 //==========================================================================
-void Axis::DrawVerticalGrid(const unsigned int &count) const
+void Axis::DrawVerticalGrid(const unsigned int &count)
 {
-	Line gridLine;
-	gridLine.SetLineColor(gridColor);
-	gridLine.SetBackgroundColorForAlphaFade();
-
-	// The first and last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int grid;
 	double location;
-	for (grid = 1; grid <= count + 1; grid++)
+	for (grid = 0; grid < count; grid++)
 	{
 		if (minorGrid)
-			location = ValueToPixel(GetNextGridValue(grid));
+			location = ValueToPixel(GetNextGridValue(grid + 1));
 		else
-			location = ValueToPixel(GetNextTickValue(false, false, grid));
+			location = ValueToPixel(GetNextTickValue(false, false, grid + 1));
 
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		gridLine.Draw(static_cast<double>(offsetFromWindowEdge), location,
-			static_cast<double>(renderWindow.GetSize().GetWidth() - oppositeAxis->GetOffsetFromWindowEdge()), location);
+		gridPoints.push_back(std::make_pair(static_cast<double>(offsetFromWindowEdge), location));
+		gridPoints.push_back(std::make_pair(static_cast<double>(renderWindow.GetSize().GetWidth()
+			- oppositeAxis->GetOffsetFromWindowEdge()), location));
 	}
 }
 
@@ -447,24 +509,22 @@ void Axis::DrawVerticalGrid(const unsigned int &count) const
 //		None
 //
 //==========================================================================
-void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation) const
+void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation)
 {
 	int insideTick, outsideTick, sign;
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
-	// The first inside tick never needs to be drawn
-	// The last inside ticks do not need to be drawn, thus we start this loop with tick = 1.
 	unsigned int tick;
 	double location;
-	for (tick = 1; tick <= count + 1; tick++)
+	for (tick = 0; tick < count; tick++)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, tick));
+		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		line.Draw(static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign), location,
-			static_cast<double>(mainAxisLocation + tickSize * insideTick * sign), location);
+		axisPoints.push_back(std::make_pair(static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign), location));
+		axisPoints.push_back(std::make_pair(static_cast<double>(mainAxisLocation + tickSize * insideTick * sign), location));
 	}
 }
 
@@ -523,33 +583,32 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //		None
 //
 //==========================================================================
-void Axis::DrawAxisLabel() const
+void Axis::DrawAxisLabel()
 {
+	if (label.IsEmpty())
+		return;
+
 	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
 
 	// TODO:  Change plot dimension if there is a title? or if there is a title and a label for the top axis?
-	FTBBox boundingBox = font->BBox("H");// Some capital letter to assure uniform spacing
-	double yTranslation = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.Upper().Y());
+	Text::BoundingBox boundingBox = labelText.GetBoundingBox("H");// Some capital letter to assure uniform spacing
+	double edgeOffset = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.yUp);
 
-	boundingBox = font->BBox(label.mb_str());
-	double textWidth = boundingBox.Upper().X() - boundingBox.Lower().X();
+	boundingBox = labelText.GetBoundingBox(label.ToStdString());
+	double textWidth = boundingBox.xRight - boundingBox.xLeft;
 	double plotOffset = (double)minAxis->GetOffsetFromWindowEdge() - (double)maxAxis->GetOffsetFromWindowEdge();
 
-	glPushMatrix();
-		glLoadIdentity();
+	if (IsHorizontal())
+		labelText.SetPosition(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), edgeOffset);
+	else
+	{
+		labelText.SetOrientation(M_PI * 0.5);
+		labelText.SetPosition(0.5 * (renderWindow.GetSize().GetHeight() - textWidth + plotOffset), -edgeOffset);
+	}
 
-		if (IsHorizontal())
-			glTranslated(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), yTranslation, 0.0);
-		else
-		{
-			glRotated(90.0, 0.0, 0.0, 1.0);
-			glTranslated(0.5 * (renderWindow.GetSize().GetHeight() - textWidth + plotOffset), -yTranslation, 0.0);
-		}
-
-		font->Render(label.mb_str());
-	glPopMatrix();
+	labelText.SetText(label.ToStdString());
 }
 
 //==========================================================================
@@ -615,8 +674,7 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 //==========================================================================
 void Axis::DrawTickLabels()
 {
-	FTBBox boundingBox;
-	int xTranslation, yTranslation;
+	float xTranslation, yTranslation;
 	unsigned int precision = GetPrecision();
 
 	if (!wxString::Format("%0.*f", precision, minimum).ToDouble(&minimum)) { /*Warn the user?*/ }
@@ -632,12 +690,10 @@ void Axis::DrawTickLabels()
 		valueLabel.Printf("%0.*f", precision, value);
 
 		// TODO:  Don't draw it if it's too close to the maximum (based on text size)
-		glPushMatrix();
-			glLoadIdentity();
-			ComputeTranslations(value, xTranslation, yTranslation, font->BBox(valueLabel.mb_str()), valueOffsetFromEdge);
-			glTranslated(xTranslation, yTranslation, 0.0);
-			font->Render(valueLabel.mb_str());
-		glPopMatrix();
+		ComputeTranslations(value, xTranslation, yTranslation,
+			valueText.GetBoundingBox(valueLabel.ToStdString()), valueOffsetFromEdge);
+		valueText.SetPosition(xTranslation, yTranslation);
+		valueText.AppendText(valueLabel.ToStdString());
 	}
 
 	valueLabel.Printf("%0.*f", precision, maximum);
@@ -711,39 +767,39 @@ double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigne
 //
 // Input Arguments:
 //		value			= const double&
-//		boundingBox		= const FTBBox&
+//		boundingBox		= const Text::BoundingBox&
 //		offset			= const double&
 //
 // Output Arguments:
-//		xTranslation	= int&
-//		yTranslation	= int&
+//		xTranslation	= float&
+//		yTranslation	= float&
 //
 // Return Value:
 //		double
 //
 //==========================================================================
-void Axis::ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
-	const FTBBox &boundingBox, const double &offset) const
+void Axis::ComputeTranslations(const double &value, float &xTranslation, float &yTranslation,
+	const Text::BoundingBox &boundingBox, const double &offset) const
 {
 	if (IsHorizontal())
 	{
 		if (orientation == OrientationBottom)
-			yTranslation = offset - boundingBox.Upper().Y();
+			yTranslation = offset - boundingBox.yUp;
 		else
 			yTranslation = renderWindow.GetSize().GetHeight() - offset;
 
 		xTranslation = ValueToPixel(value) -
-			(boundingBox.Upper().X() - boundingBox.Lower().X()) / 2.0;
+			(boundingBox.xRight - boundingBox.xLeft) / 2.0;
 	}
 	else
 	{
 		if (orientation == OrientationLeft)
-			xTranslation = offset - boundingBox.Upper().X();
+			xTranslation = offset - boundingBox.xRight;
 		else
 			xTranslation = renderWindow.GetSize().GetWidth() - offset;
 
 		yTranslation = ValueToPixel(value) -
-			(boundingBox.Upper().Y() - boundingBox.Lower().Y()) / 2.0;
+			(boundingBox.yUp - boundingBox.yDown) / 2.0;
 	}
 }
 
@@ -940,4 +996,43 @@ unsigned int Axis::GetAxisLength() const
 			- minAxis->GetOffsetFromWindowEdge()
 			- maxAxis->GetOffsetFromWindowEdge();
 	}
+}
+
+//==========================================================================
+// Class:			Axis
+// Function:		InitializeFonts
+//
+// Description:		Initializes the font objects.
+//
+// Input Arguments:
+//		fontFileName	= const std::string&
+//		size			= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for success, false otherwise
+//
+//==========================================================================
+bool Axis::InitializeFonts(const std::string& fontFileName, const double& size)
+{
+	if (!labelText.SetFace(fontFileName) || !valueText.SetFace(fontFileName))
+		return false;
+
+	labelText.SetColor(color);
+	valueText.SetColor(color);
+
+	// For some reason, fonts tend to render more clearly at a larger size.  So
+	// we up-scale to render the fonts then down-scale to achieve the desired
+	// on-screen size.
+	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
+	const double factor(3.0);
+	labelText.SetSize(size * factor);
+	valueText.SetSize(size * factor);
+
+	labelText.SetScale(1.0 / factor);
+	valueText.SetScale(1.0 / factor);
+
+	return true;
 }

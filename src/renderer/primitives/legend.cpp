@@ -13,13 +13,12 @@
 // Description:  Derived from Primitive, this class is used to draw plot legends.
 // History:
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/legend.h"
 #include "renderer/renderWindow.h"
-#include "renderer/line.h"
-
-// FTGL headers
-#include <FTGL/ftgl.h>
 
 //==========================================================================
 // Class:			Legend
@@ -55,7 +54,8 @@ const unsigned int Legend::entrySpacing(5);// [pixels]
 //		None
 //
 //==========================================================================
-Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
+Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
+	text(renderWindow), lines(renderWindow)
 {
 	fontColor = Color::ColorBlack;
 	backgroundColor = Color::ColorWhite;
@@ -69,9 +69,62 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 	windowRef = BottomLeft;
 	legendRef = Center;
 
-	font = NULL;
+	SetDrawOrder(3000);// Draw this last
 
-	SetDrawOrder(1000);// Draw this last
+	bufferInfo.push_back(BufferInfo());// Text
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::Update(const unsigned int& i)
+{
+	// TODO:  Alternative approach is to only update if entries change
+	// and to use local modelview to handle position changes.
+	if (!text.IsOK())
+		return;
+
+	if (i == 0)// Background, border, lines and markers
+	{
+		// Captial "H" gives good idea of text height
+		textHeight = text.GetBoundingBox("H").yUp;
+
+		UpdateBoundingBox();
+
+		bufferVector.push_back(BuildBackground());
+
+		lines.SetWidth(borderSize);
+		lines.SetLineColor(borderColor);
+		lines.SetBackgroundColorForAlphaFade();
+		lines.Build(BuildBorderPoints(), Line::UpdateManual);
+		bufferVector.push_back(lines.GetBufferInfo());
+
+		BuildSampleLines();
+		BuildMarkers();
+
+		bufferInfo[i] = AssembleBuffers();
+	}
+	else if (i == 1)// Text
+	{
+		text.SetColor(fontColor);
+		BuildLabelStrings();
+		bufferInfo[i] = text.BuildText();
+	}
+
+	bufferInfo[i].vertexCountModified = false;
 }
 
 //==========================================================================
@@ -93,20 +146,23 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow)
 //==========================================================================
 void Legend::GenerateGeometry()
 {
-	UpdateBoundingBox();
+	// Background, border, lines and markers first
+	// We can use the Line::DoPrettyDraw to render the background and markers
+	// even though they aren't lines because DoPrettyDraw renders triangle
+	// elements.  We only need to ensure that the additional triangles are
+	// intended to be built as elements of the index array.
+	if (bufferInfo[0].vertexCount > 0)
+	{
+		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+		Line::DoPrettyDraw(bufferInfo[0].indexCount);
+	}
 
-	glPushMatrix();
-		glLoadIdentity();
-		renderWindow.ShiftForExactPixelization();
-
-		DrawBackground();
-		DrawBorder();
-
-		unsigned int i;
-		for (i = 0; i < entries.size(); i++)
-			DrawNextEntry(i);
-
-	glPopMatrix();
+	// Text last
+	if (text.IsOK() && bufferInfo[1].vertexCount > 0)
+	{
+		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
+		text.RenderBufferedGlyph(bufferInfo[1].vertexCount);
+	}
 }
 
 //==========================================================================
@@ -126,147 +182,12 @@ void Legend::GenerateGeometry()
 //		bool, true for OK to draw, false otherwise
 //
 //==========================================================================
-bool Legend::HasValidParameters(void)
+bool Legend::HasValidParameters()
 {
-	if (!font)
-		return false;
-	else if (entries.size() == 0)
+	if (entries.size() == 0)
 		return false;
 		
 	return true;
-}
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawNextEntry
-//
-// Description:		Draws the next legend entry.
-//
-// Input Arguments:
-//		info	= const LegendEntryInfo&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::DrawNextEntry(const double &index) const
-{
-	double x, y;
-	GetAdjustedPosition(x, y);
-	y += height;
-	
-	FTBBox boundingBox = font->BBox("H");// Some capital letter to assure uniform spacing
-	y -= (entrySpacing + boundingBox.Upper().Y()) * (index + 1);
-
-	// Draw sample line
-	const unsigned int lineYOffset(entrySpacing);
-	Line line;
-	line.SetWidth(entries[index].lineSize);
-	line.SetLineColor(entries[index].color);
-	line.SetBackgroundColorForAlphaFade();
-	line.Draw(x + entrySpacing, y + lineYOffset, x + entrySpacing + sampleLength, y + lineYOffset);
-	
-	if (entries[index].markerSize > 0)
-		DrawMarker(x + entrySpacing + sampleLength * 0.5, y + lineYOffset, entries[index].markerSize);
-
-	// Draw label text
-	glPushMatrix();
-		glColor4d(0.0, 0.0, 0.0, 1.0);
-		glLoadIdentity();
-		renderWindow.ShiftForExactPixelization();
-		glTranslated(x + 2 * entrySpacing + sampleLength, y, 0.0);
-		font->Render(entries[index].text.mb_str());
-	glPopMatrix();
-}
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawMarker
-//
-// Description:		Draws the marker at the specified location.
-//
-// Input Arguments:
-//		x		= const unsigned int &
-//		y		= const unsigned int &
-//		size	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::DrawMarker(const unsigned int &x, const unsigned int &y,
-	const unsigned int &size) const
-{
-	const unsigned int halfSize(size * 2);
-	glBegin(GL_QUADS);
-	glVertex2i(x - halfSize, y - halfSize);
-	glVertex2i(x + halfSize, y - halfSize);
-	glVertex2i(x + halfSize, y + halfSize);
-	glVertex2i(x - halfSize, y + halfSize);
-	glEnd();
-}
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawBackground
-//
-// Description:		Draws the background area.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::DrawBackground() const
-{
-	glBegin(GL_QUADS);
-	glColor4d(backgroundColor.GetRed(), backgroundColor.GetGreen(), backgroundColor.GetBlue(), backgroundColor.GetAlpha());
-	
-	double x, y;
-	GetAdjustedPosition(x, y);
-
-	glVertex2i(x, y);
-	glVertex2i(x + width, y);
-	glVertex2i(x + width, y + height);
-	glVertex2i(x, y + height);
-
-	glEnd();
-}
-
-//==========================================================================
-// Class:			Legend
-// Function:		DrawBorder
-//
-// Description:		Draws the border around the legend.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void Legend::DrawBorder() const
-{
-	Line border;
-	border.SetWidth(borderSize);
-	border.SetLineColor(borderColor);
-	border.SetBackgroundColorForAlphaFade();
-	border.Draw(GetCornerVertices());
 }
 
 //==========================================================================
@@ -318,20 +239,51 @@ std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
 //==========================================================================
 void Legend::UpdateBoundingBox()
 {
-	FTBBox boundingBox;
+	Text::BoundingBox boundingBox;
 	unsigned int maxStringWidth(0);
 	unsigned int i;
 	for (i = 0; i < entries.size(); i++)
 	{
-		boundingBox = font->BBox(entries[i].text.mb_str());
-		if (boundingBox.Upper().X() > maxStringWidth)
-			maxStringWidth = boundingBox.Upper().X();
+		boundingBox = text.GetBoundingBox(entries[i].text.ToStdString());
+		if (boundingBox.xRight > (int)maxStringWidth)
+			maxStringWidth = boundingBox.xRight;
 	}
 	
 	width = 3 * entrySpacing + sampleLength + maxStringWidth;
-	
-	boundingBox = font->BBox("H");
-	height = (boundingBox.Upper().Y() + entrySpacing) * i + entrySpacing;
+	height = (textHeight + entrySpacing) * i + entrySpacing;
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		SetFont
+//
+// Description:		Sets up the font object.
+//
+// Input Arguments:
+//		fontFileName	= const std::string&
+//		size			= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::SetFont(const std::string& fontFileName, const double& size)
+{
+	if (!text.SetFace(fontFileName))
+		return;
+
+	text.SetColor(fontColor);
+
+	// For some reason, fonts tend to render more clearly at a larger size.  So
+	// we up-scale to render the fonts then down-scale to achieve the desired
+	// on-screen size.
+	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
+	const double factor(3.0);
+	text.SetSize(size * factor);
+	text.SetScale(1.0 / factor);
 }
 
 //==========================================================================
@@ -534,7 +486,7 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 		break;
 	}
 	
-	modified = true;
+	RequiresRedraw();
 }
 
 //==========================================================================
@@ -799,4 +751,393 @@ void Legend::GetPosition(const PositionReference& legendRef,
 			y += height;
 		break;
 	}
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		BuildBorderPoints
+//
+// Description:		Returns a vector containing pairs of border points.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		std::vector<std::pair<double, double> >
+//
+//==========================================================================
+std::vector<std::pair<double, double> > Legend::BuildBorderPoints() const
+{
+	std::vector<std::pair<double, double> > corners(GetCornerVertices());
+	corners.push_back(corners[0]);
+
+	return corners;
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		BuildBackground
+//
+// Description:		Builds the buffer required to draw the background.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
+Primitive::BufferInfo Legend::BuildBackground() const
+{
+	Primitive::BufferInfo buffer;
+
+	buffer.vertexCount = 4;
+	buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (4 + renderWindow.GetVertexDimension())];
+	assert(renderWindow.GetVertexDimension() == 2);
+
+	buffer.indexCount = 6;
+	buffer.indexBuffer = new unsigned int[buffer.indexCount];
+
+	std::vector<std::pair<double, double> > corners(GetCornerVertices());
+	buffer.vertexBuffer[0] = (float)corners[0].first;
+	buffer.vertexBuffer[1] = (float)corners[0].second;
+
+	buffer.vertexBuffer[2] = (float)corners[1].first;
+	buffer.vertexBuffer[3] = (float)corners[1].second;
+
+	buffer.vertexBuffer[4] = (float)corners[2].first;
+	buffer.vertexBuffer[5] = (float)corners[2].second;
+
+	buffer.vertexBuffer[6] = (float)corners[3].first;
+	buffer.vertexBuffer[7] = (float)corners[3].second;
+
+	buffer.vertexBuffer[8] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[9] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[10] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[11] = (float)backgroundColor.GetAlpha();
+
+	buffer.vertexBuffer[12] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[13] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[14] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[15] = (float)backgroundColor.GetAlpha();
+
+	buffer.vertexBuffer[16] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[17] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[18] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[19] = (float)backgroundColor.GetAlpha();
+
+	buffer.vertexBuffer[20] = (float)backgroundColor.GetRed();
+	buffer.vertexBuffer[21] = (float)backgroundColor.GetGreen();
+	buffer.vertexBuffer[22] = (float)backgroundColor.GetBlue();
+	buffer.vertexBuffer[23] = (float)backgroundColor.GetAlpha();
+
+	buffer.indexBuffer[0] = 0;
+	buffer.indexBuffer[1] = 1;
+	buffer.indexBuffer[2] = 2;
+
+	buffer.indexBuffer[3] = 2;
+	buffer.indexBuffer[4] = 3;
+	buffer.indexBuffer[5] = 0;
+
+	return buffer;
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		BuildMarkers
+//
+// Description:		Builds the buffers for rendering plot markers.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::BuildMarkers()
+{
+	const unsigned int lineYOffset(entrySpacing);
+
+	Primitive::BufferInfo buffer;
+
+	double x, y, halfSize;
+	GetAdjustedPosition(x, y);
+
+	x += entrySpacing + 0.5 * sampleLength;
+	y += height + lineYOffset;
+
+	unsigned int i;
+	for (i = 0; i < entries.size(); i++)
+	{
+		halfSize = entries[i].markerSize * 2.0;// This relationship comes from PlotCurve class
+		y -= entrySpacing + textHeight;
+
+		if (halfSize <= 0.0)
+			continue;
+
+		buffer.vertexCount = 4;
+		buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (renderWindow.GetVertexDimension() + 4)];
+		assert(renderWindow.GetVertexDimension() == 2);
+
+		buffer.indexCount = 6;
+		buffer.indexBuffer = new unsigned int[buffer.indexCount];
+
+		buffer.vertexBuffer[0] = x - halfSize;
+		buffer.vertexBuffer[1] = y - halfSize;
+
+		buffer.vertexBuffer[2] = x - halfSize;
+		buffer.vertexBuffer[3] = y + halfSize;
+
+		buffer.vertexBuffer[4] = x + halfSize;
+		buffer.vertexBuffer[5] = y + halfSize;
+
+		buffer.vertexBuffer[6] = x + halfSize;
+		buffer.vertexBuffer[7] = y - halfSize;
+
+		buffer.vertexBuffer[8] = entries[i].color.GetRed();
+		buffer.vertexBuffer[9] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[10] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[11] = entries[i].color.GetAlpha();
+
+		buffer.vertexBuffer[12] = entries[i].color.GetRed();
+		buffer.vertexBuffer[13] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[14] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[15] = entries[i].color.GetAlpha();
+
+		buffer.vertexBuffer[16] = entries[i].color.GetRed();
+		buffer.vertexBuffer[17] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[18] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[19] = entries[i].color.GetAlpha();
+
+		buffer.vertexBuffer[20] = entries[i].color.GetRed();
+		buffer.vertexBuffer[21] = entries[i].color.GetGreen();
+		buffer.vertexBuffer[22] = entries[i].color.GetBlue();
+		buffer.vertexBuffer[23] = entries[i].color.GetAlpha();
+
+		buffer.indexBuffer[0] = 0;
+		buffer.indexBuffer[1] = 1;
+		buffer.indexBuffer[2] = 2;
+
+		buffer.indexBuffer[3] = 2;
+		buffer.indexBuffer[4] = 3;
+		buffer.indexBuffer[5] = 0;
+
+		bufferVector.push_back(buffer);
+	}
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		AssembleBuffers
+//
+// Description:		Combines the triangle buffers into a single BufferInfo
+//					object.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
+Primitive::BufferInfo Legend::AssembleBuffers()
+{
+	Primitive::BufferInfo buffer;
+
+	unsigned int i;
+	for (i = 0; i < bufferVector.size(); i++)
+	{
+		buffer.indexCount += bufferVector[i].indexCount;
+		buffer.vertexCount += bufferVector[i].vertexCount;
+	}
+
+	assert(sizeof(GLfloat) == sizeof(float));
+	assert(sizeof(GLuint) == sizeof(unsigned int));
+
+	buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	buffer.indexBuffer = new unsigned int[buffer.indexCount];
+
+	const unsigned int colorStart(buffer.vertexCount * renderWindow.GetVertexDimension());
+
+	unsigned int j, k(0), m(0), indexShift(0), bufferColorStart;
+	for (i = 0; i < bufferVector.size(); i++)
+	{
+		bufferColorStart = bufferVector[i].vertexCount * renderWindow.GetVertexDimension();
+
+		for (j = 0; j < bufferVector[i].vertexCount; j++)
+		{
+			buffer.vertexBuffer[k * 2] = bufferVector[i].vertexBuffer[j * 2];
+			buffer.vertexBuffer[k * 2 + 1] = bufferVector[i].vertexBuffer[j * 2 + 1];
+
+			buffer.vertexBuffer[colorStart + k * 4] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4];
+			buffer.vertexBuffer[colorStart + k * 4 + 1] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 1];
+			buffer.vertexBuffer[colorStart + k * 4 + 2] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 2];
+			buffer.vertexBuffer[colorStart + k * 4 + 3] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 3];
+			k++;
+		}
+
+		for (j = 0; j < bufferVector[i].indexCount; j++)
+			buffer.indexBuffer[m++] = bufferVector[i].indexBuffer[j] + indexShift;
+
+		indexShift += bufferVector[i].vertexCount;
+
+		bufferVector[i].FreeDynamicMemory();
+		bufferVector[i].FreeOpenGLObjects();
+	}
+
+	ConfigureVertexArray(buffer);
+	bufferVector.clear();
+	buffer.FreeDynamicMemory();
+
+	return buffer;
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		BuildSampleLines
+//
+// Description:		Appends lines corresponding to the legend entries to the
+//					buffer vector.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::BuildSampleLines()
+{
+	const unsigned int lineYOffset(entrySpacing);
+
+	double x, y;
+	GetAdjustedPosition(x, y);
+
+	y += height + lineYOffset;
+
+	unsigned int i;
+	for (i = 0; i < entries.size(); i++)
+	{
+		lines.SetLineColor(entries[i].color);
+		lines.SetBackgroundColorForAlphaFade();
+		lines.SetWidth(entries[i].lineSize);
+
+		y -= entrySpacing + textHeight;
+
+		lines.Build(x + entrySpacing, y,
+			x + entrySpacing + sampleLength, y, Line::UpdateManual);
+		bufferVector.push_back(lines.GetBufferInfo());
+	}
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		ConfigureVertexArray
+//
+// Description:		Handles configuration of OpenGL vertex array object.
+//
+// Input Arguments:
+//		bufferInfo	= Primitive::BufferInfo&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive::BufferInfo
+//
+//==========================================================================
+void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
+{
+	bufferInfo.GetOpenGLIndices(true);
+	glBindVertexArray(bufferInfo.vertexArrayIndex);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+	glVertexAttribPointer(renderWindow.GetPositionLocation(),
+		renderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(renderWindow.GetColorLocation());
+	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * bufferInfo.vertexCount * renderWindow.GetVertexDimension()));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
+		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
+
+	glBindVertexArray(0);
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		BuildLabelStrings
+//
+// Description:		Generates text for each entry.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::BuildLabelStrings()
+{
+	double x, y;
+	GetAdjustedPosition(x, y);
+	y += height;
+	
+	unsigned int i;
+	for (i = 0; i < entries.size(); i++)
+	{
+		y -= entrySpacing + textHeight;
+		text.SetPosition(x + 2 * entrySpacing + sampleLength, y);
+		text.AppendText(entries[i].text.ToStdString());
+	}
+}
+
+//==========================================================================
+// Class:			Legend
+// Function:		RequiresRedraw
+//
+// Description:		Sets flags indicating we want to re-perform OpenGL stuff.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Legend::RequiresRedraw()
+{
+	modified = true;
+	unsigned int i;
+	for (i = 0; i < bufferInfo.size(); i++)
+		bufferInfo[i].vertexCountModified = true;
 }

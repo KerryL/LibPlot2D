@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -248,6 +248,32 @@ void Vector::Rotate(const double &angle, const Axis &about)
 //==========================================================================
 void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 {
+	Matrix rotationMatrix = GenerateRotationMatrix(angle, rotationAxis);
+
+	// Apply the rotation
+	*this = rotationMatrix * *this;
+}
+
+//==========================================================================
+// Class:			Vector
+// Function:		GenerateRotationMatrix
+//
+// Description:		Creates a 3x3 rotation matrix for rotation about the
+//					specified (arbitrary) axis.
+//
+// Input Arguments:
+//		angle			= const double& specifying the distance to rotate this object [rad]
+//		rotationAxis	= const Vector&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Matrix, 3x3 rotation matrix
+//
+//==========================================================================
+Matrix Vector::GenerateRotationMatrix(const double &angle, const Vector& rotationAxis)
+{
 	// To rotate this vector about an arbitrary axis, we use the following matrix
 	Matrix rotationMatrix(3, 3);
 
@@ -274,8 +300,7 @@ void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 		term21, term22, term23,
 		term31, term32, term33);
 
-	// Apply the rotation
-	*this = rotationMatrix * *this;
+	return rotationMatrix;
 }
 
 //==========================================================================
@@ -453,7 +478,7 @@ ostream &operator << (ostream &writeOut, const Vector &v)
 //		wxString containing the formatted vector data
 //
 //==========================================================================
-wxString Vector::Print(void) const
+wxString Vector::Print() const
 {
 	// Format and fill the string
 	wxString temp;
@@ -506,7 +531,7 @@ void Vector::Set(const double &_x, const double &_y, const double &_z)
 //		Vector representing the normalized object
 //
 //==========================================================================
-Vector Vector::Normalize(void) const
+Vector Vector::Normalize() const
 {
 	// Get the length of the vector
 	double magnitude = Length();

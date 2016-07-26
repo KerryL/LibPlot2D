@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -99,7 +99,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 //		None
 //
 //==========================================================================
-/*void CurveFit::DoMatrixTest(void)
+/*void CurveFit::DoMatrixTest()
 {
 	Matrix M(4,5);
 	M(0,0) = 1.0;

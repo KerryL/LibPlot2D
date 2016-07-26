@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -62,7 +62,7 @@ public:
 	};
 
 	// Vector norm
-	double Length(void) const { return sqrt(x * x + y * y + z * z); };
+	double Length() const { return sqrt(x * x + y * y + z * z); };
 
 	// Calculates the distance between this and v
 	double Distance(const Vector &v) const { return sqrt((x - v.x) * (x - v.x)
@@ -82,15 +82,16 @@ public:
 	Vector AnglesTo(const Vector &v) const;
 
 	// Prints the object to a string
-	wxString Print(void) const;
+	wxString Print() const;
 
 	// Set this object to the specified values
 	void Set(const double &_x, const double &_y, const double &_z);
 
 	// Force magnitude == 1 while preserving the direction
-	Vector Normalize(void) const;
+	Vector Normalize() const;
 
 	static Matrix GenerateRotationMatrix(const Axis &axis, const double &angle);
+	static Matrix GenerateRotationMatrix(const double &angle, const Vector& rotationAxis);
 
 	// Multiplication that results in a 3x3 matrix
 	Matrix OuterProduct(const Vector &v) const;

@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -91,7 +91,7 @@ END_EVENT_TABLE()
 //		None
 //
 //==========================================================================
-void FFTDialog::CreateControls(void)
+void FFTDialog::CreateControls()
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -126,7 +126,7 @@ void FFTDialog::CreateControls(void)
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* FFTDialog::CreateInputControls(void)
+wxSizer* FFTDialog::CreateInputControls()
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxFlexGridSizer *sizer = new wxFlexGridSizer(2, 5, 5);
@@ -179,7 +179,7 @@ wxSizer* FFTDialog::CreateInputControls(void)
 //		wxSizer*
 //
 //==========================================================================
-wxSizer* FFTDialog::CreateOutputControls(void)
+wxSizer* FFTDialog::CreateOutputControls()
 {
 	wxFlexGridSizer *sizer = new wxFlexGridSizer(2, 5, 5);
 
@@ -222,7 +222,7 @@ wxSizer* FFTDialog::CreateOutputControls(void)
 //		None
 //
 //==========================================================================
-void FFTDialog::ConfigureControls(void)
+void FFTDialog::ConfigureControls()
 {
 	unsigned int maxPower(FastFourierTransform::GetMaxPowerOfTwo(GetPointCount()));
 	windowSizeCombo->Clear();
@@ -250,7 +250,7 @@ void FFTDialog::ConfigureControls(void)
 //		None
 //
 //==========================================================================
-void FFTDialog::SetCheckBoxDefaults(void)
+void FFTDialog::SetCheckBoxDefaults()
 {
 	if (zoomDataPoints == dataPoints || zoomDataPoints == 0)
 	{
@@ -282,7 +282,7 @@ void FFTDialog::SetCheckBoxDefaults(void)
 //		wxArrayString
 //
 //==========================================================================
-wxArrayString FFTDialog::GetWindowList(void) const
+wxArrayString FFTDialog::GetWindowList() const
 {
 	wxArrayString list;
 
@@ -372,7 +372,7 @@ void FFTDialog::OnTextBoxEvent(wxCommandEvent& WXUNUSED(event))
 //		bool, true if all data is valid, false otherwise
 //
 //==========================================================================
-bool FFTDialog::TransferDataFromWindow(void)
+bool FFTDialog::TransferDataFromWindow()
 {
 	double value;
 	if (!overlapTextBox->GetValue().ToDouble(&value) || value < 0.0 || value > 1.0)
@@ -400,7 +400,7 @@ bool FFTDialog::TransferDataFromWindow(void)
 //		FastFourierTransform::FFTWindow
 //
 //==========================================================================
-FastFourierTransform::FFTWindow FFTDialog::GetFFTWindow(void) const
+FastFourierTransform::FFTWindow FFTDialog::GetFFTWindow() const
 {
 	return (FastFourierTransform::FFTWindow)windowCombo->GetSelection();
 }
@@ -421,7 +421,7 @@ FastFourierTransform::FFTWindow FFTDialog::GetFFTWindow(void) const
 //		unsigned int
 //
 //==========================================================================
-unsigned int FFTDialog::GetWindowSize(void) const
+unsigned int FFTDialog::GetWindowSize() const
 {
 	unsigned long value;
 	windowSizeCombo->GetValue().ToULong(&value);
@@ -445,7 +445,7 @@ unsigned int FFTDialog::GetWindowSize(void) const
 //		unsigned int
 //
 //==========================================================================
-double FFTDialog::GetOverlap(void) const
+double FFTDialog::GetOverlap() const
 {
 	double value;
 	overlapTextBox->GetValue().ToDouble(&value);
@@ -470,7 +470,7 @@ double FFTDialog::GetOverlap(void) const
 //		bool
 //
 //==========================================================================
-bool FFTDialog::GetUseZoomedData(void) const
+bool FFTDialog::GetUseZoomedData() const
 {
 	return useZoomCheckBox->GetValue();
 }
@@ -492,7 +492,7 @@ bool FFTDialog::GetUseZoomedData(void) const
 //		bool
 //
 //==========================================================================
-bool FFTDialog::GetSubtractMean(void) const
+bool FFTDialog::GetSubtractMean() const
 {
 	return subtractMeanCheckBox->GetValue();
 }
@@ -513,7 +513,7 @@ bool FFTDialog::GetSubtractMean(void) const
 //		None
 //
 //==========================================================================
-void FFTDialog::UpdateOutputControls(void)
+void FFTDialog::UpdateOutputControls()
 {
 	if (!frequencyRange || !frequencyResolution || !numberOfAverages)
 		return;
@@ -540,7 +540,7 @@ void FFTDialog::UpdateOutputControls(void)
 //		unsigned int
 //
 //==========================================================================
-unsigned int FFTDialog::GetPointCount(void) const
+unsigned int FFTDialog::GetPointCount() const
 {
 	if (useZoomCheckBox->GetValue())
 		return zoomDataPoints;

@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -916,7 +916,7 @@ unsigned int Dataset2D::GetNumberOfZoomedPoints(const double &min, const double 
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoLog(void)
+Dataset2D& Dataset2D::DoLog()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -941,7 +941,7 @@ Dataset2D& Dataset2D::DoLog(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoLog10(void)
+Dataset2D& Dataset2D::DoLog10()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -966,7 +966,7 @@ Dataset2D& Dataset2D::DoLog10(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoExp(void)
+Dataset2D& Dataset2D::DoExp()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -991,7 +991,7 @@ Dataset2D& Dataset2D::DoExp(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoAbs(void)
+Dataset2D& Dataset2D::DoAbs()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -1016,7 +1016,7 @@ Dataset2D& Dataset2D::DoAbs(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoSin(void)
+Dataset2D& Dataset2D::DoSin()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -1041,7 +1041,7 @@ Dataset2D& Dataset2D::DoSin(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoCos(void)
+Dataset2D& Dataset2D::DoCos()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -1066,7 +1066,7 @@ Dataset2D& Dataset2D::DoCos(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoTan(void)
+Dataset2D& Dataset2D::DoTan()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -1091,7 +1091,7 @@ Dataset2D& Dataset2D::DoTan(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoArcSin(void)
+Dataset2D& Dataset2D::DoArcSin()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -1116,7 +1116,7 @@ Dataset2D& Dataset2D::DoArcSin(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoArcCos(void)
+Dataset2D& Dataset2D::DoArcCos()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -1141,7 +1141,7 @@ Dataset2D& Dataset2D::DoArcCos(void)
 //		Dataset2D&
 //
 //==========================================================================
-Dataset2D& Dataset2D::DoArcTan(void)
+Dataset2D& Dataset2D::DoArcTan()
 {
 	unsigned int i;
 	for (i = 0; i < numberOfPoints; i++)
@@ -1166,7 +1166,7 @@ Dataset2D& Dataset2D::DoArcTan(void)
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoLog(void) const
+const Dataset2D Dataset2D::DoLog() const
 {
 	Dataset2D result(*this);
 	return result.DoLog();
@@ -1188,7 +1188,7 @@ const Dataset2D Dataset2D::DoLog(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoLog10(void) const
+const Dataset2D Dataset2D::DoLog10() const
 {
 	Dataset2D result(*this);
 	return result.DoLog10();
@@ -1210,7 +1210,7 @@ const Dataset2D Dataset2D::DoLog10(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoExp(void) const
+const Dataset2D Dataset2D::DoExp() const
 {
 	Dataset2D result(*this);
 	return result.DoExp();
@@ -1232,7 +1232,7 @@ const Dataset2D Dataset2D::DoExp(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoAbs(void) const
+const Dataset2D Dataset2D::DoAbs() const
 {
 	Dataset2D result(*this);
 	return result.DoAbs();
@@ -1254,7 +1254,7 @@ const Dataset2D Dataset2D::DoAbs(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoSin(void) const
+const Dataset2D Dataset2D::DoSin() const
 {
 	Dataset2D result(*this);
 	return result.DoSin();
@@ -1276,7 +1276,7 @@ const Dataset2D Dataset2D::DoSin(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoCos(void) const
+const Dataset2D Dataset2D::DoCos() const
 {
 	Dataset2D result(*this);
 	return result.DoCos();
@@ -1298,7 +1298,7 @@ const Dataset2D Dataset2D::DoCos(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoTan(void) const
+const Dataset2D Dataset2D::DoTan() const
 {
 	Dataset2D result(*this);
 	return result.DoTan();
@@ -1320,7 +1320,7 @@ const Dataset2D Dataset2D::DoTan(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoArcSin(void) const
+const Dataset2D Dataset2D::DoArcSin() const
 {
 	Dataset2D result(*this);
 	return result.DoArcSin();
@@ -1342,7 +1342,7 @@ const Dataset2D Dataset2D::DoArcSin(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoArcCos(void) const
+const Dataset2D Dataset2D::DoArcCos() const
 {
 	Dataset2D result(*this);
 	return result.DoArcCos();
@@ -1364,7 +1364,7 @@ const Dataset2D Dataset2D::DoArcCos(void) const
 //		const Dataset2D
 //
 //==========================================================================
-const Dataset2D Dataset2D::DoArcTan(void) const
+const Dataset2D Dataset2D::DoArcTan() const
 {
 	Dataset2D result(*this);
 	return result.DoArcTan();
@@ -1434,7 +1434,7 @@ const Dataset2D Dataset2D::ApplyPower(const double &target) const
 //		double
 //
 //==========================================================================
-double Dataset2D::ComputeYMean(void) const
+double Dataset2D::ComputeYMean() const
 {
 	double sum(0.0);
 	unsigned int i;
@@ -1460,7 +1460,7 @@ double Dataset2D::ComputeYMean(void) const
 //		double
 //
 //==========================================================================
-double Dataset2D::GetAverageDeltaX(void) const
+double Dataset2D::GetAverageDeltaX() const
 {
 	double sum(0.0);
 	unsigned int i;

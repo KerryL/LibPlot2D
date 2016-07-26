@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -31,13 +31,13 @@ public:
 		const wxArrayString& choices, long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
 		wxArrayInt *defaultChoices = NULL, bool *removeExisting = NULL);
 
-	virtual wxArrayInt GetSelections(void) const { return selections; };
+	virtual wxArrayInt GetSelections() const { return selections; };
 
-	bool RemoveExistingCurves(void) const;
+	bool RemoveExistingCurves() const;
 
 private:
 	void CreateControls(const wxString& message, const wxArrayString& choices);
-	wxSizer* CreateButtons(void);
+	wxSizer* CreateButtons();
 	int ComputeListBoxHeight(const wxArrayString& choices) const;
 
 	wxCheckListBox *choiceListBox;

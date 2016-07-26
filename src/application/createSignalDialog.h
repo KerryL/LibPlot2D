@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -31,8 +31,8 @@ public:
 	CreateSignalDialog(wxWindow *parent, const double &startTime, const double &duration,
 		const double &sampleRate);
 
-	Dataset2D *GetSignal(void) const { return dataset; };
-	wxString GetSignalName(void) const;
+	Dataset2D *GetSignal() const { return dataset; };
+	wxString GetSignalName() const;
 
 private:
 	void CreateControls(const double &startTime, const double &duration,
@@ -92,7 +92,7 @@ private:
 
 	static wxString GetSignalName(const SignalType &type);
 
-	virtual bool TransferDataFromWindow(void);
+	virtual bool TransferDataFromWindow();
 
 	void OnSignalTypeChangeEvent(wxCommandEvent &event);
 	void OnAmplitudeChangeEvent(wxCommandEvent &event);
@@ -102,16 +102,16 @@ private:
 	void OnPhaseAngleChangeEvent(wxCommandEvent &event);
 	void OnPhaseTimeChangeEvent(wxCommandEvent &event);
 
-	void SetTextBoxLabelsAndEnables(void);
-	void SetDefaultInputs(void);
+	void SetTextBoxLabelsAndEnables();
+	void SetDefaultInputs();
 	SignalType lastSelection;
 
-	void UpdatePhaseAngle(void);
-	void UpdatePhaseTime(void);
+	void UpdatePhaseAngle();
+	void UpdatePhaseTime();
 	bool keepPhaseAngle;
 
-	void UpdateAmplitude(void);
-	void UpdateSlope(void);
+	void UpdateAmplitude();
+	void UpdateSlope();
 	bool keepAmplitude;
 
 	DECLARE_EVENT_TABLE();

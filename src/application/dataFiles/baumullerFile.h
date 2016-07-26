@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -30,8 +30,8 @@ public:
 protected:
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks(void);
-	virtual void DoTypeSpecificProcessTasks(void);
+	virtual void DoTypeSpecificLoadTasks();
+	virtual void DoTypeSpecificProcessTasks();
 
 	bool ConstructNames(std::string &nextLine, std::ifstream &file,
 		wxArrayString &names, wxArrayString &previousLines) const;

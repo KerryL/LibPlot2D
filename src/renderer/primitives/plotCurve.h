@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -28,22 +28,14 @@ class Dataset2D;
 class PlotCurve : public Primitive
 {
 public:
-	PlotCurve(RenderWindow &renderWindow);
+	PlotCurve(RenderWindow &renderWindow, const Dataset2D& data);
 	PlotCurve(const PlotCurve &plotCurve);
 
-	~PlotCurve();
-
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
+	virtual ~PlotCurve();
 
 	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
-	inline void SetMarkerSize(const int &size) { markerSize = size; modified = true; }
-	inline void SetPretty(const bool &pretty) { line.SetPretty(pretty); modified = true; }
-
-	void SetData(const Dataset2D *data);
-	inline void ClearData() { data = NULL; }
+	inline void SetMarkerSize(const double &size) { markerSize = size; modified = true; }
+	inline void SetPretty(const bool &pretty) { this->pretty = pretty; line.SetPretty(pretty); modified = true; }
 
 	// For setting up the plot
 	inline void BindToXAxis(Axis *xAxis) { this->xAxis = xAxis; modified = true; }
@@ -54,44 +46,30 @@ public:
 	// Overloaded operators
 	PlotCurve& operator=(const PlotCurve &plotCurve);
 
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update(const unsigned int& i);
+	virtual void GenerateGeometry();
+
 private:
 	// The axes with which this object is associated
 	Axis *xAxis;
 	Axis *yAxis;
 
-	const Dataset2D *data;
+	const Dataset2D& data;
 
 	Line line;
-	std::vector<std::pair<double, double> > points;
 
+	bool pretty;
 	double lineSize;
-	int markerSize;
-
-	void RescalePoint(const double *value, double *coordinate) const;
-
-	bool PointIsWithinPlotArea(const unsigned int &i) const;
-	void PlotPoint(const unsigned int &i);
-	void PlotPoint(const double &x, const double &y);
-	void PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint);
-	void PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second);
-
-	bool PointsCrossBottomAxis(const unsigned int &first, const unsigned int &second) const;
-	bool PointsCrossTopAxis(const unsigned int &first, const unsigned int &second) const;
-	bool PointsCrossLeftAxis(const unsigned int &first, const unsigned int &second) const;
-	bool PointsCrossRightAxis(const unsigned int &first, const unsigned int &second) const;
-
-	bool PointsCrossXOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const;
-	bool PointsCrossYOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const;
-
-	bool PointsJumpPlotArea(const unsigned int &first, const unsigned int &second) const;
+	double markerSize;
 
 	bool PointIsValid(const unsigned int &i) const;
 
-	double GetInterpolatedXOrdinate(const unsigned int &first, const unsigned int &second, const double &yValue) const;
-	double GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const;
-
-	void PlotMarkers() const;
-	void DrawMarker(const double &x, const double &y) const;
+	bool NeedsMarkersDrawn() const;
+	void BuildMarkers();
 
 	enum RangeSize
 	{
@@ -100,9 +78,14 @@ private:
 		RangeSizeUndetermined
 	};
 
-	bool SmallRange() const;
-	RangeSize SmallXRange() const;
-	RangeSize SmallYRange() const;
+	bool RangeIsSmall() const;
+	RangeSize XRangeIsSmall() const;
+	RangeSize YRangeIsSmall() const;
+
+	double xScale;
+	double yScale;
+
+	void InitializeMarkerVertexBuffer();
 };
 
 #endif// PLOT_CURVE_H_

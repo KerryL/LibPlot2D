@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -12,6 +12,9 @@
 // Author:  K. Loux
 // Description:  Abstract base class for creating 3D objects.
 // History:
+
+// GLEW headers
+#include <GL\glew.h>
 
 // Local headers
 #include "renderer/primitives/primitive.h"
@@ -36,14 +39,18 @@
 Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 {
 	isVisible = true;
-	modified = true;
 
-	color = Color::ColorBlack;
-
-	listIndex = 0;
-	drawOrder = 0;
+	SetColor(Color::ColorBlack);
+	drawOrder = 1000;
 
 	renderWindow.AddActor(this);
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
+
+	// Add a default info block to ensure the initialize and update functions get called
+	bufferInfo.push_back(BufferInfo());
+
+	modified = true;
 }
 
 //==========================================================================
@@ -65,6 +72,11 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
 	*this = primitive;
+
+	modified = true;
+
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
 }
 
 //==========================================================================
@@ -85,9 +97,18 @@ Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.render
 //==========================================================================
 Primitive::~Primitive()
 {
-	// Release the glList for this object (if the list exists)
-	if (listIndex != 0)
-		glDeleteLists(listIndex, 1);
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
+
+	unsigned int i;
+	for (i = 0; i < bufferInfo.size(); i++)
+	{
+		bufferInfo[i].FreeOpenGLObjects();
+		delete[] bufferInfo[i].vertexBuffer;
+		bufferInfo[i].vertexBuffer = NULL;
+		delete[] bufferInfo[i].indexBuffer;
+		bufferInfo[i].indexBuffer = NULL;
+	}
 }
 
 //==========================================================================
@@ -110,37 +131,22 @@ Primitive::~Primitive()
 //==========================================================================
 void Primitive::Draw()
 {
-	if (modified || listIndex == 0)
+	if (!HasValidParameters() || !isVisible)
+		return;
+
+	unsigned int i;
+	for (i = 0; i < bufferInfo.size(); i++)
 	{
-		modified = false;
-
-		if (listIndex == 0)
-			listIndex = glGenLists(1);
-
-		glNewList(listIndex, GL_COMPILE);
-
-		if (!HasValidParameters() || !isVisible)
-		{
-			glEndList();
-			return;
-		}
-
-		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-
-		// If the object is transparent, enable alpha blending
-		/*if (color.GetAlpha() != 1.0)
-			EnableAlphaBlending();*/
-
-		GenerateGeometry();
-
-		/*if (color.GetAlpha() != 1.0)
-			DisableAlphaBlending();*/
-
-		glEndList();
+		if (bufferInfo[i].vertexCountModified || modified)
+			Update(i);
 	}
 
-	if (listIndex != 0)
-		glCallList(listIndex);
+	assert(!RenderWindow::GLHasError());
+
+	modified = false;
+	GenerateGeometry();
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //==========================================================================
@@ -184,7 +190,30 @@ void Primitive::SetVisibility(const bool &isVisible)
 void Primitive::SetColor(const Color &color)
 {
 	this->color = color;
+	renderWindow.SetNeedAlphaSort();
 	modified = true;
+}
+
+//==========================================================================
+// Class:			Primitive
+// Function:		SetDrawOrder
+//
+// Description:		Sets the draw order for the object.
+//
+// Input Arguments:
+//		drawOrder	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::SetDrawOrder(const unsigned int& drawOrder)
+{
+	this->drawOrder = drawOrder;
+	renderWindow.SetNeedOrderSort();
 }
 
 //==========================================================================
@@ -213,9 +242,10 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	isVisible	= primitive.isVisible;
 	color		= primitive.color;
 	modified	= primitive.modified;
+	drawOrder	= primitive.drawOrder;
 
-	// The list index just gets zeroed out
-	listIndex = 0;
+	// TODO:  OGL4 Need to go over handling of openGL stuff here
+	assert(false);
 
 	return *this;
 }
@@ -265,4 +295,124 @@ void Primitive::DisableAlphaBlending()
 {
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
+}
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		BufferInfo
+//
+// Description:		Constructor for the Primitive::BufferInfo struct.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+Primitive::BufferInfo::BufferInfo()
+{
+	vertexBuffer = NULL;
+	vertexCountModified = true;
+	vertexCount = 0;
+	indexBuffer = NULL;
+	indexCount = 0;
+	glVertexBufferExists = false;
+	glIndexBufferExists = false;
+}
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		GetOpenGLIndices
+//
+// Description:		Method for safely initializing this object.
+//
+// Input Arguments:
+//		needIndexObject	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::BufferInfo::GetOpenGLIndices(const bool& needIndexObject)
+{
+	if (!glVertexBufferExists)
+	{
+		glGenVertexArrays(1, &vertexArrayIndex);
+		glGenBuffers(1, &vertexBufferIndex);
+		glVertexBufferExists = true;
+	}
+
+	if (needIndexObject && !glIndexBufferExists)
+	{
+		glGenBuffers(1, &indexBufferIndex);
+		glIndexBufferExists = true;
+	}
+
+	assert(!RenderWindow::GLHasError());
+}
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		FreeOpenGLObjects
+//
+// Description:		Frees OpenGL resources.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::BufferInfo::FreeOpenGLObjects()
+{
+	if (glVertexBufferExists)
+	{
+		glDeleteVertexArrays(1, &vertexArrayIndex);
+		glDeleteBuffers(1, &vertexBufferIndex);
+		glVertexBufferExists = false;
+	}
+
+	if (glIndexBufferExists)
+	{
+		glDeleteBuffers(1, &indexBufferIndex);
+		glIndexBufferExists = false;
+	}
+
+	assert(!RenderWindow::GLHasError());
+}
+
+//==========================================================================
+// Class:			Primitive::BufferInfo
+// Function:		FreeDynamicMemory
+//
+// Description:		Frees dynamic resources.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void Primitive::BufferInfo::FreeDynamicMemory()
+{
+	delete[] vertexBuffer;
+	vertexBuffer = NULL;
+
+	delete[] indexBuffer;
+	indexBuffer = NULL;
 }

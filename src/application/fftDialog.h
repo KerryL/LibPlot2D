@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -29,24 +29,24 @@ public:
 	FFTDialog(wxWindow *parent, const unsigned int &_dataPoints,
 		const unsigned int &_zoomDataPoints, const double &_sampleTime);
 
-	FastFourierTransform::FFTWindow GetFFTWindow(void) const;
-	unsigned int GetWindowSize(void) const;
-	double GetOverlap(void) const;
-	bool GetUseZoomedData(void) const;
-	bool GetSubtractMean(void) const;
+	FastFourierTransform::FFTWindow GetFFTWindow() const;
+	unsigned int GetWindowSize() const;
+	double GetOverlap() const;
+	bool GetUseZoomedData() const;
+	bool GetSubtractMean() const;
 
 private:
-	void CreateControls(void);
-	wxSizer* CreateInputControls(void);
-	wxSizer* CreateOutputControls(void);
-	void ConfigureControls(void);
-	void SetCheckBoxDefaults(void);
+	void CreateControls();
+	wxSizer* CreateInputControls();
+	wxSizer* CreateOutputControls();
+	void ConfigureControls();
+	void SetCheckBoxDefaults();
 
 	unsigned int dataPoints;
 	unsigned int zoomDataPoints;
 	double sampleTime;
 
-	unsigned int GetPointCount(void) const;
+	unsigned int GetPointCount() const;
 
 	wxComboBox *windowSizeCombo;
 	wxComboBox *windowCombo;
@@ -58,14 +58,14 @@ private:
 	wxStaticText *frequencyResolution;
 	wxStaticText *numberOfAverages;
 
-	virtual bool TransferDataFromWindow(void);
+	virtual bool TransferDataFromWindow();
 
 	void OnCheckBoxEvent(wxCommandEvent &event);
 	void OnComboBoxEvent(wxCommandEvent &event);
 	void OnTextBoxEvent(wxCommandEvent &event);
 
-	wxArrayString GetWindowList(void) const;
-	void UpdateOutputControls(void);
+	wxArrayString GetWindowList() const;
+	void UpdateOutputControls();
 
 	DECLARE_EVENT_TABLE()
 };

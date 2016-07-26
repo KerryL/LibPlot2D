@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -27,10 +27,8 @@
 // Local headers
 #include "utilities/managedList.h"
 #include "utilities/math/vector.h"
+#include "utilities/math/matrix.h"
 #include "renderer/primitives/primitive.h"
-
-// Local forward declarations
-class Matrix;
 
 class RenderWindow : public wxGLCanvas
 {
@@ -39,10 +37,7 @@ public:
 		const wxPoint& position, const wxSize& size, long style = 0);
 	virtual ~RenderWindow();
 
-	// Sets up all of the open GL parameters
 	void Initialize();
-
-	// Sets up the camera
 	void SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection);
 
 	// Transforms between the model coordinate system and the view (openGL) coordinate system
@@ -69,7 +64,7 @@ public:
 	inline void SetFarClip(const double& farClip) { this->farClip = farClip; modified = true; }
 	inline void SetView3D(const bool& view3D) { this->view3D = view3D; modified = true; }
 
-	inline void SetBackgroundColor(const Color& backgroundColor) { this->backgroundColor = backgroundColor; modified = true; }
+	virtual void SetBackgroundColor(const Color& backgroundColor) { this->backgroundColor = backgroundColor; modified = true; }
 	inline Color GetBackgroundColor() { return backgroundColor; }
 
 	inline bool GetWireFrame() const { return wireFrame; };
@@ -79,7 +74,9 @@ public:
 	inline double GetAspectRatio() const { return aspectRatio; }
 
 	// Returns a string containing any OpenGL errors
-	wxString GetGLError() const;
+	static wxString GetGLError();
+	static wxString GetGLError(const GLint& e);
+	static bool GLHasError();
 
 	// Writes the current image to file
 	bool WriteImageToFile(wxString pathAndFileName) const;
@@ -87,13 +84,43 @@ public:
 
 	// Determines if a particular primitive is in the scene owned by this object
 	bool IsThisRendererSelected(const Primitive *pickedObject) const;
-	
-	void ShiftForExactPixelization() const;
+
+	void SetNeedAlphaSort() { needAlphaSort = true; }
+	void SetNeedOrderSort() { needOrderSort = true; }
+
+	static GLuint CreateShader(const GLenum& type, const std::string& shaderContents);
+	static GLuint CreateProgram(const std::vector<GLuint>& shaderList);
+
+	void ShiftForExactPixelization();
+	void UseDefaultProgram() const;
+
+	GLuint GetPositionLocation() const { return positionAttributeLocation; }
+	GLuint GetColorLocation() const { return colorAttributeLocation; }
+
+	virtual unsigned int GetVertexDimension() const { return 4; }
+
+	static void Translate(Matrix& m, const double& x, const double& y, const double& z);
+	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);
+	static void Scale(Matrix& m, const double& x, const double& y, const double& z);
+
+	struct ShaderInfo
+	{
+		GLuint programId;
+
+		bool needsProjection;
+		GLuint projectionLocation;
+
+		bool needsModelview;
+		GLuint modelViewLocation;
+	};
+
+	void AddShader(const ShaderInfo& shader);
+	static void SendUniformMatrix(const Matrix& m, const GLuint& location);
 
 private:
 	wxGLContext *context;
 	wxGLContext* GetContext();
-	
+
 	static const double exactPixelShift;
 
 	// Flags describing the options for this object's functionality
@@ -108,23 +135,11 @@ private:
 
 	Color backgroundColor;
 
-	// List of item indexes and alphas for sorting by alpha
-	struct ListItem
-	{
-		ListItem(const double& alpha, const int& i)
-		{
-			this->alpha = alpha;
-			this->i = i;
-		};
+	static bool AlphaSortPredicate(const Primitive* p1, const Primitive* p2);
+	static bool OrderSortPredicate(const Primitive* p1, const Primitive* p2);
 
-		double alpha;
-		int i;
-
-		bool operator< (const ListItem &right) const
-		{
-			return alpha < right.alpha;
-		};
-	};
+	bool needAlphaSort;
+	bool needOrderSort;
 
 	// Event handlers-----------------------------------------------------
 	// Interactor events
@@ -158,24 +173,30 @@ private:
 	void DoPan(wxMouseEvent &event);
 
 	// Updates the transformation matrices according to the current modelview matrix
-	void UpdateTransformationMatricies();
+	//void UpdateTransformationMatricies();
 	void UpdateModelviewMatrix();
 
-	bool modelviewModified;
-	double glModelviewMatrix[16];
+	static const std::string modelviewName;
+	static const std::string projectionName;
+	static const std::string positionName;
+	static const std::string colorName;
 
-	Matrix *modelToView;
-	Matrix *viewToModel;
+	static const std::string defaultVertexShader;
+	static const std::string defaultFragmentShader;
 
-	Vector cameraPosition;
+	void BuildShaders();
+
+	GLuint CreateDefaultVertexShader();
+	GLuint CreateDefaultFragmentShader();
+
+	GLuint positionAttributeLocation;
+	GLuint colorAttributeLocation;
+
 	Vector focalPoint;
 
-	// Method for re-organizing the PrimitiveList so opaque objects are at the beginning and
-	// transparent objects are at the end
-	void SortPrimitivesByAlpha();
-	void SortPrimitivesByDrawOrder();
-
 	void DoResize();
+
+	bool glewInitialized;
 
 protected:
 	bool view3D;
@@ -193,16 +214,25 @@ protected:
 	// Flag indicating whether or not we should select a new focal point for the interactions
 	bool isInteracting;
 
-	static void ConvertMatrixToGL(const Matrix& matrix, double gl[]);
-	static void ConvertGLToMatrix(Matrix& matrix, const double gl[]);
+	static void ConvertMatrixToGL(const Matrix& matrix, float gl[]);
+	static void ConvertGLToMatrix(Matrix& matrix, const float gl[]);
 
-	void Initialize2D() const;
-	void Initialize3D() const;
+	void Initialize2D();
+	void Initialize3D();
 
 	Matrix Generate2DProjectionMatrix() const;
 	Matrix Generate3DProjectionMatrix() const;
 
+	bool modelviewModified;
+	Matrix modelviewMatrix;
+	Matrix projectionMatrix;
+
+	std::vector<ShaderInfo> shaders;
+
 	DECLARE_EVENT_TABLE()
+
+	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
+	virtual std::string GetDefaultFragmentShader() const { return defaultFragmentShader; }
 };
 
 #endif// RENDER_WINDOW_H_

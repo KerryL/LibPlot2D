@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -25,19 +25,19 @@ public:
 	// Constructors
 	FRFDialog(wxWindow *parent, const wxArrayString &descriptions);
 
-	unsigned int GetInputIndex(void) const;
-	unsigned int GetOutputIndex(void) const;
-	unsigned int GetNumberOfAverages(void) const;
+	unsigned int GetInputIndex() const;
+	unsigned int GetOutputIndex() const;
+	unsigned int GetNumberOfAverages() const;
 
-	bool GetComputePhase(void) const;
-	bool GetComputeCoherence(void) const;
-	bool GetModuloPhase(void) const;
+	bool GetComputePhase() const;
+	bool GetComputeCoherence() const;
+	bool GetModuloPhase() const;
 
 private:
 	void CreateControls(const wxArrayString &descriptions);
 	wxSizer *CreateSelectionControls(const wxArrayString &descriptions);
-	wxSizer *CreateTextBox(void);
-	wxSizer *CreateCheckBoxes(void);
+	wxSizer *CreateTextBox();
+	wxSizer *CreateCheckBoxes();
 
 	wxListBox *inputList;
 	wxListBox *outputList;
@@ -48,7 +48,7 @@ private:
 
 	wxTextCtrl *averagesTextBox;
 
-	virtual bool TransferDataFromWindow(void);
+	virtual bool TransferDataFromWindow();
 };
 
 #endif// _FRF_DIALOG_H_

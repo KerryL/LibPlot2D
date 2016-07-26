@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -18,16 +18,12 @@
 
 // Local headers
 #include "renderer/primitives/primitive.h"
+#include "renderer/line.h"
 
 class ZoomBox : public Primitive
 {
 public:
 	ZoomBox(RenderWindow &renderWindow);
-
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
 
 	void SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor);
 	void SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat);
@@ -37,8 +33,17 @@ public:
 	unsigned int GetXFloat() { return xFloat; }
 	unsigned int GetYFloat() { return yFloat; }
 
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update(const unsigned int& i);
+	virtual void GenerateGeometry();
+
 private:
 	unsigned int xAnchor, yAnchor, xFloat, yFloat;
+
+	Line box;
 };
 
 #endif// ZOOM_BOX_H_

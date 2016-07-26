@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -163,7 +163,23 @@ public:
 
 	wxImage GetImage() const;
 
+	virtual unsigned int GetVertexDimension() const { return 2; }
+
+	enum Modelview
+	{
+		ModelviewFixed,
+		ModelviewLeft,
+		ModelviewRight
+	};
+
+	void LoadModelviewUniform(const Modelview& mv);
+
+	void SetLeftModelview(const Matrix& m) { leftModelview = m; }
+	void SetRightModelview(const Matrix& m) { rightModelview = m; }
+
 private:
+	static const std::string defaultVertexShader;
+
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();
 
@@ -213,6 +229,12 @@ protected:
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
 
+	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
+
+	// Use RenderWindow::glModelViewMatrix for window-fixed things like axes and gridlines
+	float glModelViewMatrixLeftAxis[16];
+	float glModelViewMatrixRightAxis[16];
+
 	struct Zoom
 	{
 		double xMin;
@@ -234,6 +256,9 @@ protected:
 
 	bool ignoreNextMouseMove;
 	CurveQuality curveQuality;
+
+	Matrix leftModelview;
+	Matrix rightModelview;
 
 	// For the event table
 	DECLARE_EVENT_TABLE()

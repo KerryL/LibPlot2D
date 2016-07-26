@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -13,8 +13,8 @@
 // Description:  Intermediate class for creating plots from arrays of data.
 // History:
 
-// FTGL headers
-#include <FTGL/ftgl.h>
+// GLEW headers
+#include <GL/glew.h>
 
 // Local headers
 #include "application/plotObject.h"
@@ -22,7 +22,7 @@
 #include "renderer/plotRenderer.h"
 #include "renderer/color.h"
 #include "renderer/primitives/plotCurve.h"
-#include "renderer/primitives/text.h"
+#include "renderer/primitives/textRendering.h"
 #include "renderer/primitives/legend.h"
 #include "utilities/math/plotMath.h"
 #include "utilities/dataset2D.h"
@@ -68,11 +68,12 @@ const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 //==========================================================================
 PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 {
-	InitializeFonts();
 	CreateAxisObjects();
+	InitializeFonts();
 
 	ResetAutoScaling();
-	renderer.SetBackgroundColor(Color::ColorWhite);
+
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -93,10 +94,6 @@ PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 //==========================================================================
 PlotObject::~PlotObject()
 {
-	delete axisFont;
-	axisFont = NULL;
-	delete titleFont;
-	titleFont = NULL;
 }
 
 //==========================================================================
@@ -115,7 +112,7 @@ PlotObject::~PlotObject()
 //		None
 //
 //==========================================================================
-void PlotObject::CreateAxisObjects(void)
+void PlotObject::CreateAxisObjects()
 {
 	axisTop = new Axis(renderer);
 	axisBottom = new Axis(renderer);
@@ -159,7 +156,7 @@ void PlotObject::CreateAxisObjects(void)
 //		None
 //
 //==========================================================================
-void PlotObject::InitializeFonts(void)
+void PlotObject::InitializeFonts()
 {
 	// Find the name of the font that we want to use
 	wxString fontFile;
@@ -173,8 +170,6 @@ void PlotObject::InitializeFonts(void)
 
 	if (!foundFont)
 	{
-		axisFont = NULL;
-		titleFont = NULL;
 		if (!fontFile.IsEmpty())
 		{
 			wxString fontName;
@@ -189,55 +184,13 @@ void PlotObject::InitializeFonts(void)
 		return;
 	}
 
-	CreateFontObjects(fontFile);
-}
+	fontFileName = fontFile.ToStdString();
+	axisBottom->InitializeFonts(fontFileName, 12);
+	//axisTop->InitializeFonts(fontFileName, 12);// No tick labels for top axis
+	axisLeft->InitializeFonts(fontFileName, 12);
+	axisRight->InitializeFonts(fontFileName, 12);
 
-//==========================================================================
-// Class:			PlotObject
-// Function:		CreateFontObjects
-//
-// Description:		Creates the font objects.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotObject::CreateFontObjects(const wxString &fontFile)
-{
-	axisFont = new FTGLTextureFont(fontFile.c_str());
-	titleFont = new FTGLTextureFont(fontFile.c_str());
-
-	if (axisFont->Error())
-	{
-		delete axisFont;
-		axisFont = NULL;
-
-		wxMessageBox(_T("Error loading axis font"));
-	}
-	else
-	{
-		axisFont->FaceSize(12);
-		axisFont->CharMap(FT_ENCODING_UNICODE);
-	}
-
-	if (titleFont->Error())
-	{
-		delete titleFont;
-		titleFont = NULL;
-
-		wxMessageBox(_T("Error loading title font"));
-	}
-	else
-	{
-		titleFont->FaceSize(18);
-		titleFont->CharMap(FT_ENCODING_UNICODE);
-	}
+	titleObject->InitializeFonts(fontFileName, 18);
 }
 
 //==========================================================================
@@ -260,6 +213,7 @@ void PlotObject::CreateFontObjects(const wxString &fontFile)
 void PlotObject::Update()
 {
 	FormatPlot();
+	ComputeTransformationMatrices();
 
 	renderer.UpdateCursors();
 	renderer.GetPlotOwner()->UpdateCursorValues(
@@ -472,7 +426,7 @@ void PlotObject::SetRightYMajorResolution(const double &resolution)
 //		None
 //
 //==========================================================================
-void PlotObject::RemoveExistingPlots(void)
+void PlotObject::RemoveExistingPlots()
 {
 	while (plotList.size() > 0)
 		RemovePlot(0);
@@ -520,13 +474,12 @@ void PlotObject::RemovePlot(const unsigned int &index)
 //==========================================================================
 void PlotObject::AddCurve(const Dataset2D &data)
 {
-	PlotCurve *newPlot = new PlotCurve(renderer);
+	PlotCurve *newPlot = new PlotCurve(renderer, data);
 	plotList.push_back(newPlot);
 	dataList.push_back(&data);
 
 	newPlot->BindToXAxis(axisBottom);
 	newPlot->BindToYAxis(axisLeft);
-	newPlot->SetData(&data);
 }
 
 //==========================================================================
@@ -545,7 +498,7 @@ void PlotObject::AddCurve(const Dataset2D &data)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatPlot(void)
+void PlotObject::FormatPlot()
 {
 	UpdateAxesOffsets();
 	FormatTitle();
@@ -588,6 +541,12 @@ void PlotObject::FormatPlot(void)
 	ResetOriginalLimits();
 	ApplyRangeLimits(xMinor, xMajor, yLeftMinor, yLeftMajor, yRightMinor, yRightMajor);
 	UpdateLimitValues();
+
+	if (needScissorUpdate)
+	{
+		UpdateScissorArea();
+		needScissorUpdate = false;
+	}
 }
 
 //==========================================================================
@@ -606,7 +565,7 @@ void PlotObject::FormatPlot(void)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatAxesBasics(void)
+void PlotObject::FormatAxesBasics()
 {
 	Axis::TickStyle tickStyle = Axis::TickStyleInside;
 
@@ -684,7 +643,7 @@ unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
 //		None
 //
 //==========================================================================
-void PlotObject::UpdateAxesOffsets(void)
+void PlotObject::UpdateAxesOffsets()
 {
 	if (axisBottom->GetLabel().IsEmpty())
 		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
@@ -729,7 +688,6 @@ void PlotObject::UpdateAxesOffsets(void)
 void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 {
 	axisBottom->SetOrientation(Axis::OrientationBottom);
-	axisBottom->SetFont(axisFont);
 	axisBottom->SetTickStyle(tickStyle);
 }
 
@@ -774,7 +732,6 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 {
 	axisLeft->SetOrientation(Axis::OrientationLeft);
-	axisLeft->SetFont(axisFont);
 	axisLeft->SetTickStyle(tickStyle);
 }
 
@@ -797,7 +754,6 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 {
 	axisRight->SetOrientation(Axis::OrientationRight);
-	axisRight->SetFont(axisFont);
 	axisRight->SetTickStyle(tickStyle);
 }
 
@@ -841,9 +797,8 @@ void PlotObject::SetAxesColor(const Color &color)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatTitle(void)
+void PlotObject::FormatTitle()
 {
-	titleObject->SetFont(titleFont);
 	titleObject->SetCentered(true);
 	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
 		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);
@@ -866,7 +821,7 @@ void PlotObject::FormatTitle(void)
 //		None
 //
 //==========================================================================
-void PlotObject::SetOriginalAxisLimits(void)
+void PlotObject::SetOriginalAxisLimits()
 {
 	leftUsed = false;
 	rightUsed = false;
@@ -950,7 +905,7 @@ double PlotObject::GetFirstValidValue(const double* data, const unsigned int &si
 //		None
 //
 //==========================================================================
-void PlotObject::MatchYAxes(void)
+void PlotObject::MatchYAxes()
 {
 	// If one axis is unused, make it match the other
 	if (leftUsed && !rightUsed)
@@ -1118,7 +1073,7 @@ void PlotObject::ValidateRangeLimits(double &min, double &max,
 //		None
 //
 //==========================================================================
-void PlotObject::ResetOriginalLimits(void)
+void PlotObject::ResetOriginalLimits()
 {
 	if (autoScaleX)
 	{
@@ -1215,7 +1170,7 @@ void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
 //		None
 //
 //==========================================================================
-void PlotObject::CheckForZeroRange(void)
+void PlotObject::CheckForZeroRange()
 {
 	if (PlotMath::IsZero(xMaxOriginal - xMinOriginal))
 		HandleZeroRangeAxis(xMinOriginal, xMaxOriginal);
@@ -1285,7 +1240,7 @@ void PlotObject::CheckAutoScaling()
 //		None
 //
 //==========================================================================
-void PlotObject::UpdateLimitValues(void)
+void PlotObject::UpdateLimitValues()
 {
 	axisBottom->Draw();
 	xMin = axisBottom->GetMinimum();
@@ -1774,7 +1729,7 @@ void PlotObject::SetMinorGrid(const bool &gridOn)
 //		None
 //
 //==========================================================================
-bool PlotObject::GetMajorGrid(void)
+bool PlotObject::GetMajorGrid()
 {
 	if (axisBottom == NULL)
 		return false;
@@ -1798,7 +1753,7 @@ bool PlotObject::GetMajorGrid(void)
 //		None
 //
 //==========================================================================
-bool PlotObject::GetMinorGrid(void)
+bool PlotObject::GetMinorGrid()
 {
 	if (axisBottom == NULL)
 		return false;
@@ -1825,6 +1780,7 @@ bool PlotObject::GetMinorGrid(void)
 void PlotObject::SetXLabel(wxString text)
 {
 	axisBottom->SetLabel(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -1846,6 +1802,7 @@ void PlotObject::SetXLabel(wxString text)
 void PlotObject::SetLeftYLabel(wxString text)
 {
 	axisLeft->SetLabel(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -1867,6 +1824,7 @@ void PlotObject::SetLeftYLabel(wxString text)
 void PlotObject::SetRightYLabel(wxString text)
 {
 	axisRight->SetLabel(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -1888,6 +1846,7 @@ void PlotObject::SetRightYLabel(wxString text)
 void PlotObject::SetTitle(wxString text)
 {
 	titleObject->SetText(text);
+	needScissorUpdate = true;
 }
 
 //==========================================================================
@@ -2023,7 +1982,7 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 //		None
 //
 //==========================================================================
-void PlotObject::FormatCurves(void)
+void PlotObject::FormatCurves()
 {
 	unsigned int i;
 	for (i = 0; i < (unsigned int)plotList.size(); i++)
@@ -2049,7 +2008,7 @@ void PlotObject::FormatCurves(void)
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetXLabel(void) const
+wxString PlotObject::GetXLabel() const
 {
 	return axisBottom->GetLabel();
 }
@@ -2070,7 +2029,7 @@ wxString PlotObject::GetXLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetLeftYLabel(void) const
+wxString PlotObject::GetLeftYLabel() const
 {
 	return axisLeft->GetLabel();
 }
@@ -2091,7 +2050,7 @@ wxString PlotObject::GetLeftYLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetRightYLabel(void) const
+wxString PlotObject::GetRightYLabel() const
 {
 	return axisRight->GetLabel();
 }
@@ -2112,7 +2071,7 @@ wxString PlotObject::GetRightYLabel(void) const
 //		wxString
 //
 //==========================================================================
-wxString PlotObject::GetTitle(void) const
+wxString PlotObject::GetTitle() const
 {
 	return titleObject->GetText();
 }
@@ -2141,4 +2100,86 @@ unsigned long long PlotObject::GetTotalPointCount() const
 		count += dataList[i]->GetNumberOfPoints();
 
 	return count;
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		ComputeTransformationMatrices
+//
+// Description:		Calculates the transformation matrices for plot curves
+//					associated with the right and left y-axes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::ComputeTransformationMatrices()
+{
+	Matrix left(4,4), right(4,4);
+	left.MakeIdentity();
+	right.MakeIdentity();
+
+	int width, height;
+	renderer.GetSize(&width, &height);
+
+	double plotAreaWidth = width - axisLeft->GetOffsetFromWindowEdge() - axisRight->GetOffsetFromWindowEdge();
+	double plotAreaHeight = height - axisBottom->GetOffsetFromWindowEdge() - axisTop->GetOffsetFromWindowEdge();
+
+	double xScale = plotAreaWidth / (axisBottom->GetMaximum() - axisBottom->GetMinimum());
+	double leftYScale = plotAreaHeight / (axisLeft->GetMaximum() - axisLeft->GetMinimum());
+	double rightYScale = plotAreaHeight / (axisRight->GetMaximum() - axisRight->GetMinimum());
+
+	RenderWindow::Translate(left, axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(), 0.0);
+	RenderWindow::Translate(right, axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(), 0.0);
+
+	RenderWindow::Scale(left, xScale, leftYScale, 1.0);
+	RenderWindow::Scale(right, xScale, rightYScale, 1.0);
+
+	RenderWindow::Translate(left, -axisBottom->GetMinimum(), -axisLeft->GetMinimum(), 0.0);
+	RenderWindow::Translate(right, -axisBottom->GetMinimum(), -axisRight->GetMinimum(), 0.0);
+
+	renderer.SetLeftModelview(left);
+	renderer.SetRightModelview(right);
+}
+
+//==========================================================================
+// Class:			PlotObject
+// Function:		UpdateScissorArea
+//
+// Description:		Updates the scissor buffer according to the size of the
+//					plot area.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotObject::UpdateScissorArea() const
+{
+	assert(!RenderWindow::GLHasError());
+
+	int width, height;
+	renderer.GetSize(&width, &height);
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(),
+		width - axisRight->GetOffsetFromWindowEdge() - axisLeft->GetOffsetFromWindowEdge(),
+		height - axisTop->GetOffsetFromWindowEdge() - axisBottom->GetOffsetFromWindowEdge());
+
+	glDisable(GL_SCISSOR_TEST);
+
+	assert(!RenderWindow::GLHasError());
 }

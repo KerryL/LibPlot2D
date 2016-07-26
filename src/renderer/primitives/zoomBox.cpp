@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -13,10 +13,12 @@
 // Description:  Logic for drawing the zoom box as the user moves the mouse.
 // History:
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/zoomBox.h"
 #include "renderer/renderWindow.h"
-#include "renderer/line.h"
 
 //==========================================================================
 // Class:			ZoomBox
@@ -34,7 +36,7 @@
 //		None
 //
 //==========================================================================
-ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
+ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(renderWindow)
 {
 	// Initially, we don't want to draw this
 	isVisible = false;
@@ -46,6 +48,35 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 	yFloat = 0;
 
 	color = Color::ColorBlack;
+}
+
+//==========================================================================
+// Class:			ZoomBox
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void ZoomBox::Update(const unsigned int& /*i*/)
+{
+	std::vector<std::pair<double, double> > points;
+	points.push_back(std::make_pair(xAnchor, yAnchor));
+	points.push_back(std::make_pair(xFloat, yAnchor));
+	points.push_back(std::make_pair(xFloat, yFloat));
+	points.push_back(std::make_pair(xAnchor, yFloat));
+	points.push_back(std::make_pair(xAnchor, yAnchor));
+	box.Build(points);
+
+	bufferInfo[0] = box.GetBufferInfo();
 }
 
 //==========================================================================
@@ -66,14 +97,9 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow)
 //==========================================================================
 void ZoomBox::GenerateGeometry()
 {
-	Line box;
-	std::vector<std::pair<double, double> > points;
-	points.push_back(std::make_pair(xAnchor, yAnchor));
-	points.push_back(std::make_pair(xFloat, yAnchor));
-	points.push_back(std::make_pair(xFloat, yFloat));
-	points.push_back(std::make_pair(xAnchor, yFloat));
-	points.push_back(std::make_pair(xAnchor, yAnchor));
-	box.Draw(points);
+	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+	Line::DoPrettyDraw(bufferInfo[0].indexCount);
+	glBindVertexArray(0);
 }
 
 //==========================================================================

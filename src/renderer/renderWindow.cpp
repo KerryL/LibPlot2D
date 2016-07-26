@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -26,17 +26,11 @@
 #include <wx/dcclient.h>
 #include <wx/image.h>
 
-// OpenGL headers
-#ifdef _MSC_VER
-#include <GL/glcorearb.h>
-#undef Yield// Added to fix compiler error in wxThread caused by including windows.h (within glcorearb.h)
-#include <GL/gl.h>
-#endif
+// GLEW headers
+#include <GL/glew.h>
 
 // Local headers
 #include "renderer/renderWindow.h"
-#include "utilities/math/matrix.h"
-#include "utilities/math/vector.h"
 #include "utilities/math/plotMath.h"
 
 //==========================================================================
@@ -55,7 +49,75 @@
 //		None
 //
 //==========================================================================
+const std::string RenderWindow::modelviewName("modelviewMatrix");
+const std::string RenderWindow::projectionName("projectionMatrix");
+const std::string RenderWindow::positionName("position");
+const std::string RenderWindow::colorName("color");
+
 const double RenderWindow::exactPixelShift(0.375);
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		defaultVertexShader
+//
+// Description:		Default vertex shader.
+//
+// Input Arguments:
+//		0	= position
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const std::string RenderWindow::defaultVertexShader(
+	"#version 330\n"
+	"\n"
+	"uniform mat4 modelviewMatrix;\n"
+	"uniform mat4 projectionMatrix;\n"
+	"\n"
+	"layout(location = 0) in vec4 position;\n"
+	"layout(location = 1) in vec4 color;\n"
+	"\n"
+	"out vec4 vertexColor;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"    vertexColor = color;\n"
+	"    gl_Position = projectionMatrix * modelviewMatrix * position;\n"
+	"}\n"
+);
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		defaultFragmentShader
+//
+// Description:		Default fragment shader.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const std::string RenderWindow::defaultFragmentShader(
+	"#version 330\n"
+	"\n"
+	"in vec4 vertexColor;\n"
+	"\n"
+	"out vec4 outputColor;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"    outputColor = vertexColor;\n"
+	"}\n"
+);
 
 //==========================================================================
 // Class:			RenderWindow
@@ -84,6 +146,7 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
 {
 	context = NULL;
+	glewInitialized = false;
 
 	wireFrame = false;
 	view3D = true;
@@ -96,11 +159,8 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 
 	AutoSetFrustum();
 
-	modelToView = new Matrix(3, 3);
-	modelToView->MakeIdentity();
-
-	viewToModel = new Matrix(3, 3);
-	viewToModel->MakeIdentity();
+	modelviewMatrix.Resize(4, 4);
+	projectionMatrix.Resize(4, 4);
 
 	SetCameraView(Vector(1.0, 0.0, 0.0), Vector(0.0, 0.0, 0.0), Vector(0.0, 0.0, 1.0));
 	isInteracting = false;
@@ -110,6 +170,8 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 	modified = true;
 	sizeUpdateRequired = true;
 	modelviewModified = true;
+	needAlphaSort = true;
+	needOrderSort = true;
 }
 
 //==========================================================================
@@ -132,12 +194,6 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 RenderWindow::~RenderWindow()
 {
 	primitiveList.Clear();
-
-	delete modelToView;
-	modelToView = NULL;
-
-	delete viewToModel;
-	viewToModel = NULL;
 
 	delete GetContext();
 	context = NULL;
@@ -222,14 +278,25 @@ void RenderWindow::Render()
 	SetCurrent(*context);
 	wxPaintDC(this);
 
+	const unsigned int shaderCount(shaders.size());
+
+	assert(!GLHasError());
+
+	if (!glewInitialized)
+	{
+		if (glewInit() != GLEW_OK)
+			return;
+		BuildShaders();
+		glewInitialized = true;
+	}
+
 	if (sizeUpdateRequired)
 		DoResize();
 
-	if (modelviewModified)
-		UpdateModelviewMatrix();
-
 	if (modified)
 		Initialize();
+	else if (modelviewModified)
+		UpdateModelviewMatrix();
 
 	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
 		(float)backgroundColor.GetBlue(), (float)backgroundColor.GetAlpha());
@@ -239,20 +306,35 @@ void RenderWindow::Render()
 	else
 		glClear(GL_COLOR_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-
 	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-	SortPrimitivesByAlpha();
+	if (needAlphaSort)
+	{
+		std::sort(primitiveList.begin(), primitiveList.end(), AlphaSortPredicate);
+		needAlphaSort = false;
+	}
 
 	// Generally, all objects will have the same draw order and this won't do anything,
 	// but for some cases we do want to override the draw order just before rendering
-	SortPrimitivesByDrawOrder();
+	if (needOrderSort)
+	{
+		std::stable_sort(primitiveList.begin(), primitiveList.end(), OrderSortPredicate);
+		needOrderSort = false;
+	}
 
+	// NOTE:  Any primitive that uses it's own program should re-load the default program
+	// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
 	unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 		primitiveList[i]->Draw();
 
+	glFlush();
 	SwapBuffers();
+
+	// If shaders are added mid-render, we need to re-render to ensure everything gets displayed
+	if (shaders.size() != shaderCount)
+		Render();
+
+	assert(!GLHasError());
 }
 
 //==========================================================================
@@ -320,7 +402,7 @@ void RenderWindow::DoResize()
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 	int w, h;
 	GetClientSize(&w, &h);
-	glViewport(0, 0, (GLint) w, (GLint) h);
+	glViewport(0, 0, w, h);
 
 	AutoSetFrustum();// This takes care of any change in aspect ratio
 
@@ -417,19 +499,27 @@ void RenderWindow::Initialize()
 		projectionMatrix = Generate2DProjectionMatrix();
 	}
 
-	glEnable(GL_COLOR_MATERIAL);
-
 	if (wireFrame)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	glMatrixMode(GL_PROJECTION);
+	float glMatrix[16];
+	GLuint i;
+	for (i = shaders.size(); i > 0; i--)
+	{
+		if (shaders[i - 1].needsModelview || shaders[i - 1].needsProjection)
+			glUseProgram(shaders[i - 1].programId);
 
-	// Convert from double** to double* where rows are appended to create the single vector representing the matrix
-	double glMatrix[16];
-	ConvertMatrixToGL(projectionMatrix, glMatrix);
-	glLoadMatrixd(glMatrix);
+		ConvertMatrixToGL(modelviewMatrix, glMatrix);
+		if (shaders[i - 1].needsModelview && modelviewModified)
+			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1, GL_FALSE, glMatrix);
+		modelviewModified = false;
+
+		ConvertMatrixToGL(projectionMatrix, glMatrix);
+		if (shaders[i - 1].needsProjection)
+			glUniformMatrix4fv(shaders[i - 1].projectionLocation, 1, GL_FALSE, glMatrix);
+	}
 
 	modified = false;
 }
@@ -513,7 +603,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 //
 // Input Arguments:
 //		interaction	= InteractionType specifying which type of motion to create
-//		event	= wxMouseEvent&
+//		event		= wxMouseEvent&
 //
 // Output Arguments:
 //		None
@@ -525,9 +615,6 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent &event)
 {
 	SetCurrent(*GetContext());
-	glGetDoublev(GL_MODELVIEW_MATRIX, glModelviewMatrix);
-	UpdateTransformationMatricies();
-	glMatrixMode(GL_MODELVIEW);
 
 	if (!isInteracting)
 	{
@@ -641,9 +728,10 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 	double angle = sqrt(fabs(double((xDistance - lastXDistance) * (xDistance - lastXDistance))
 		+ double((yDistance - lastYDistance) * (yDistance - lastYDistance)))) / 800.0 * 360.0;// [deg]
 
-	glTranslated(focalPoint.x, focalPoint.y, focalPoint.z);
-	glRotated(angle, axisOfRotation.x, axisOfRotation.y, axisOfRotation.z);
-	glTranslated(-focalPoint.x, -focalPoint.y, -focalPoint.z);
+	Translate(modelviewMatrix, focalPoint.x, focalPoint.y, focalPoint.z);
+	Rotate(modelviewMatrix, angle, axisOfRotation.x, axisOfRotation.y, axisOfRotation.z);
+	Translate(modelviewMatrix, -focalPoint.x, -focalPoint.y, -focalPoint.z);
+	modelviewModified = true;
 }
 
 //==========================================================================
@@ -744,14 +832,12 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 		// position as a normal)
 		Vector mouseMotion = mouseVector - lastMouseVector;
 
-		// Determine and apply the motion factor
 		double motionFactor = 0.15;
 		mouseMotion *= motionFactor;
 
-		// Apply the translation
-		glTranslated(mouseMotion.x, mouseMotion.y, mouseMotion.z);
+		Translate(modelviewMatrix, mouseMotion.x, mouseMotion.y, mouseMotion.z);
+		modelviewModified = true;
 
-		// Update the focal point
 		focalPoint -= mouseMotion;
 	}
 	else
@@ -792,20 +878,16 @@ void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt,
 	if (!PlotMath::IsZero(s))
 	{
 		Vector u = s.Cross(f);
-		Matrix modelViewMatrix(4, 4, s.x, s.y, s.z, 0.0,
-									 u.x, u.y, u.z, 0.0,
-									 -f.x, -f.y, -f.z, 0.0,
-									 0.0, 0.0, 0.0, 1.0);
-		Matrix translation(4, 4, 1.0, 0.0, 0.0, -position.x,
-								 0.0, 1.0, 0.0, -position.y,
-								 0.0, 0.0, 1.0, -position.z,
-								 0.0, 0.0, 0.0, 1.0);
-
-		ConvertMatrixToGL(modelViewMatrix * translation, glModelviewMatrix);
+		modelviewMatrix.Set(s.x, s.y, s.z, 0.0,
+							u.x, u.y, u.z, 0.0,
+							-f.x, -f.y, -f.z, 0.0,
+							0.0, 0.0, 0.0, 1.0);
+		
+		Translate(modelviewMatrix, -position.x, -position.y, -position.z);
+		modelviewModified = true;
 	}
 
 	focalPoint = lookAt;
-	UpdateTransformationMatricies();
 }
 
 //==========================================================================
@@ -826,10 +908,18 @@ void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt,
 //==========================================================================
 void RenderWindow::UpdateModelviewMatrix()
 {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glLoadMatrixd(glModelviewMatrix);
+	float glModelviewMatrix[16];
+	ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
 
+	unsigned int i;
+	for (i = shaders.size(); i > 0; i--)
+	{
+		if (shaders[i - 1].needsModelview)
+		{
+			glUseProgram(shaders[i - 1].programId);
+			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
+		}
+	}
 	modelviewModified = false;
 }
 
@@ -852,7 +942,7 @@ void RenderWindow::UpdateModelviewMatrix()
 //==========================================================================
 Vector RenderWindow::TransformToView(const Vector &modelVector) const
 {
-	return (*modelToView) * modelVector;
+	return modelviewMatrix.GetSubMatrix(0, 0, 3, 3) * modelVector;
 }
 
 //==========================================================================
@@ -874,16 +964,14 @@ Vector RenderWindow::TransformToView(const Vector &modelVector) const
 //==========================================================================
 Vector RenderWindow::TransformToModel(const Vector &viewVector) const
 {
-	return (*viewToModel) * viewVector;
+	return modelviewMatrix.GetSubMatrix(0, 0, 3, 3).Transpose() * viewVector;
 }
 
 //==========================================================================
 // Class:			RenderWindow
-// Function:		UpdateTransformationMatricies
+// Function:		GetCameraPosition
 //
-// Description:		Updates the matrices for transforming from model coordinates
-//					to view coordinates and vice-versa.  Also updates the camera
-//					position variable.
+// Description:		Extracts the camera position from the modelview matrix.
 //
 // Input Arguments:
 //		None
@@ -895,22 +983,10 @@ Vector RenderWindow::TransformToModel(const Vector &viewVector) const
 //		None
 //
 //==========================================================================
-void RenderWindow::UpdateTransformationMatricies()
+Vector RenderWindow::GetCameraPosition() const
 {
-	Matrix modelViewMatrix(4, 4);
-	ConvertGLToMatrix(modelViewMatrix, glModelviewMatrix);
-
-	// Extract the orientation matrices
-	(*modelToView) = modelViewMatrix.GetSubMatrix(0, 0, 3, 3);
-	(*viewToModel) = (*modelToView);
-	*viewToModel = viewToModel->GetTranspose();
-
-	// Get the last column of the modelview matrix, which contains the translation information
-	cameraPosition.x = modelViewMatrix.GetElement(0, 3);
-	cameraPosition.y = modelViewMatrix.GetElement(1, 3);
-	cameraPosition.z = modelViewMatrix.GetElement(2, 3);
-
-	cameraPosition = TransformToModel(cameraPosition);
+	Vector cameraPosition(modelviewMatrix(0, 3), modelviewMatrix(1, 3), modelviewMatrix(2, 3));
+	return TransformToModel(cameraPosition);
 }
 
 //==========================================================================
@@ -957,23 +1033,44 @@ void RenderWindow::AutoSetFrustum()
 //		wxString containing the error description
 //
 //==========================================================================
-wxString RenderWindow::GetGLError() const
+wxString RenderWindow::GetGLError()
 {
-	int error = glGetError();
+	int e = glGetError();
 
-	if (error == GL_NO_ERROR)
+	return GetGLError(e);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		GetGLError
+//
+// Description:		Returns a string describing any openGL errors.
+//
+// Input Arguments:
+//		e	= const GLint&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString containing the error description
+//
+//==========================================================================
+wxString RenderWindow::GetGLError(const GLint& e)
+{
+	if (e == GL_NO_ERROR)
 		return _T("No errors");
-	else if (error == GL_INVALID_ENUM)
+	else if (e == GL_INVALID_ENUM)
 		return _T("Invalid enumeration");
-	else if (error == GL_INVALID_VALUE)
+	else if (e == GL_INVALID_VALUE)
 		return _T("Invalid value");
-	else if (error == GL_INVALID_OPERATION)
+	else if (e == GL_INVALID_OPERATION)
 		return _T("Invalid operation");
-	else if (error == GL_STACK_OVERFLOW)
+	else if (e == GL_STACK_OVERFLOW)
 		return _T("Stack overflow");
-	else if (error == GL_STACK_UNDERFLOW)
+	else if (e == GL_STACK_UNDERFLOW)
 		return _T("Stack underflow");
-	else if (error == GL_OUT_OF_MEMORY)
+	else if (e == GL_OUT_OF_MEMORY)
 		return _T("Out of memory");
 
 	return _T("Unrecognized error");
@@ -1073,67 +1170,46 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 
 //==========================================================================
 // Class:			RenderWindow
-// Function:		SortPrimitivesByAlpha
+// Function:		AlphaSortPredicate
 //
-// Description:		Sorts the PrimitiveList by Color.Alpha to ensure that
-//					opaque objects are rendered prior to transparent objects.
+// Description:		Predicate for sorting by alpha.
 //
 // Input Arguments:
-//		None
+//		p1	= const Primitive*
+//		p2	= const Primitive*
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		None
+//		bool, true if ???
 //
 //==========================================================================
-void RenderWindow::SortPrimitivesByAlpha()
+bool RenderWindow::AlphaSortPredicate(const Primitive* p1, const Primitive* p2)
 {
-	unsigned int i;
-	std::vector<ListItem> primitiveOrder;
-	for (i = 0; i < primitiveList.GetCount(); i++)
-		primitiveOrder.push_back(ListItem(primitiveList[i]->GetColor().GetAlpha(), i));
-
-	std::stable_sort(primitiveOrder.rbegin(), primitiveOrder.rend());
-
-	std::vector<unsigned int> order;
-	for (i = 0; i < primitiveOrder.size(); i++)
-		order.push_back(primitiveOrder[i].i);
-
-	primitiveList.ReorderObjects(order);
+	return p1->GetColor().GetAlpha() > p2->GetColor().GetAlpha();
 }
 
 //==========================================================================
 // Class:			RenderWindow
-// Function:		SortPrimitivesByDrawOrder
+// Function:		OrderSortPredicate
 //
-// Description:		Sorts the PrimitiveList by draw order.
+// Description:		Predicate for sorting by draw order.
 //
 // Input Arguments:
-//		None
+//		p1	= const Primitive*
+//		p2	= const Primitive*
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		None
+//		bool, true if ???
 //
 //==========================================================================
-void RenderWindow::SortPrimitivesByDrawOrder()
+bool RenderWindow::OrderSortPredicate(const Primitive* p1, const Primitive* p2)
 {
-	unsigned int i;
-	std::vector<ListItem> primitiveOrder;
-	for (i = 0; i < primitiveList.GetCount(); i++)
-		primitiveOrder.push_back(ListItem(primitiveList[i]->GetDrawOrder(), i));
-
-	std::stable_sort(primitiveOrder.begin(), primitiveOrder.end());
-
-	std::vector<unsigned int> order;
-	for (i = 0; i < primitiveOrder.size(); i++)
-		order.push_back(primitiveOrder[i].i);
-
-	primitiveList.ReorderObjects(order);
+	return p1->GetDrawOrder() < p2->GetDrawOrder();
 }
 
 //==========================================================================
@@ -1148,13 +1224,13 @@ void RenderWindow::SortPrimitivesByDrawOrder()
 //		matrix	= const Matrix& containing the original data
 //
 // Output Arguments:
-//		gl		= double[] in the form expected by OpenGL
+//		gl		= float[] in the form expected by OpenGL
 //
 // Return Value:
 //		None
 //
 //==========================================================================
-void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, double gl[])
+void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, float gl[])
 {
 	unsigned int i, j;
 	for (i = 0; i < matrix.GetNumberOfRows(); i++)
@@ -1172,7 +1248,7 @@ void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, double gl[])
 //					must be set before this call.
 //
 // Input Arguments:
-//		gl		= double[] in the form expected by OpenGL
+//		gl		= float[] in the form expected by OpenGL
 //
 // Output Arguments:
 //		matrix	= const Matrix& containing the original data
@@ -1181,7 +1257,7 @@ void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, double gl[])
 //		None
 //
 //==========================================================================
-void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const double gl[])
+void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const float gl[])
 {
 	unsigned int i, j;
 	for (i = 0; i < matrix.GetNumberOfRows(); i++)
@@ -1207,20 +1283,24 @@ void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const double gl[])
 //		None
 //
 //==========================================================================
-void RenderWindow::Initialize2D() const
+void RenderWindow::Initialize2D()
 {
-	// Disable Z-buffering, but allow testing
-	//glEnable(GL_DEPTH_TEST);// NOTE:  Can't uncomment this line or the app fails to paint on any target machine (don't know why)
+	// Disable unused options to speed-up 2D rendering
 	glDepthMask(GL_FALSE);
+	glDisable(GL_DITHER);
+	glDisable(GL_ALPHA_TEST);
+	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_FOG);
+	glDisable(GL_DEPTH_TEST);
+	glPixelZoom(1.0, 1.0);
 
-	// Turn lighting off
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
+	// Enable blending to support font rendering
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
+	modelviewMatrix.MakeIdentity();
 	ShiftForExactPixelization();
+	modelviewModified = true;
 
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
@@ -1242,7 +1322,7 @@ void RenderWindow::Initialize2D() const
 //		None
 //
 //==========================================================================
-void RenderWindow::Initialize3D() const
+void RenderWindow::Initialize3D()
 {
 	// Turn Z-buffering on
 	glEnable(GL_DEPTH_TEST);
@@ -1251,14 +1331,6 @@ void RenderWindow::Initialize3D() const
 	// Z-buffer settings
 	glClearDepth(1.0);
 	glDepthFunc(GL_LEQUAL);
-
-	// Turn lighting on
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-
-	// Smooth shading for nice-looking object
-	glShadeModel(GL_SMOOTH);
 
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
@@ -1372,10 +1444,10 @@ void RenderWindow::SetViewOrthogonal(const bool &viewOrthogonal)
 	// TODO:  Would be better to have some parameter that is common between the
 	// two modes and to just compute the projection matrix accordingly.
 	
-	// We can compute the distance at which we are focused (according to last call
-	// to SetCameraPosition()), and then determine the correct value of SetTopMinusBottom()
-	// in order to maintain unit scale at this distance.
-	double nominalDistance = cameraPosition.Distance(focalPoint);
+	// We can compute the distance at which we are focused, and then determine
+	// the correct value of SetTopMinusBottom() in order to maintain unit scale
+	// at this distance.
+	double nominalDistance = GetCameraPosition().Distance(focalPoint);
 	if (viewOrthogonal)// was perspective
 		topMinusBottom *= nominalDistance / nearClip;
 	else// was orthogonal
@@ -1453,6 +1525,290 @@ bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, Interaction
 
 //==========================================================================
 // Class:			RenderWindow
+// Function:		CreateDefaultVertexShader
+//
+// Description:		Builds the default vertex shader and returns its index.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint
+//
+//==========================================================================
+GLuint RenderWindow::CreateDefaultVertexShader()
+{
+	return CreateShader(GL_VERTEX_SHADER, GetDefaultVertexShader());
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		CreateDefaultFragmentShader
+//
+// Description:		Builds the default fragment shader and returns its index.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint
+//
+//==========================================================================
+GLuint RenderWindow::CreateDefaultFragmentShader()
+{
+	return CreateShader(GL_FRAGMENT_SHADER, GetDefaultFragmentShader());
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		CreateShader
+//
+// Description:		Compiles the specified shader.
+//
+// Input Arguments:
+//		type			= const GLenum&
+//		shaderContents	= const std::string& containing the actual string
+//						  contents of the shader
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint specifying the index of the shader
+//
+//==========================================================================
+GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderContents)
+{
+	GLuint shader = glCreateShader(type);
+	const char* shaderString = shaderContents.c_str();
+	glShaderSource(shader, 1, &shaderString, NULL);
+
+	glCompileShader(shader);
+
+	GLint status;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+	if (status == GL_FALSE)
+	{
+		GLint infoLogLength;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+        
+		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+		assert(false && strInfoLog);
+		delete[] strInfoLog;
+	}
+
+	return shader;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		CreateProgram
+//
+// Description:		Builds the default program.
+//
+// Input Arguments:
+//		shaderList	= const std::vector<GLuint>&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint specifying the index of the program
+//
+//==========================================================================
+GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
+{
+	GLuint program = glCreateProgram();
+	size_t i;
+	for (i = 0; i < shaderList.size(); i++)
+		glAttachShader(program, shaderList[i]);
+
+	glLinkProgram(program);
+	GLint status;
+	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	if (status == GL_FALSE)
+	{
+		GLint infoLogLength;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+        
+		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+		assert(false && strInfoLog);
+		delete[] strInfoLog;
+	}
+
+	for (i = 0; i < shaderList.size(); i++)
+	{
+		glDetachShader(program, shaderList[i]);
+		glDeleteShader(shaderList[i]);
+	}
+
+	return program;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		BuildShaders
+//
+// Description:		Builds the default shaders and sets the indices to the
+//					matrices we need to track.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::BuildShaders()
+{
+	std::vector<GLuint> shaderList;
+	shaderList.push_back(CreateDefaultVertexShader());
+	shaderList.push_back(CreateDefaultFragmentShader());
+
+	ShaderInfo s;
+	s.programId = CreateProgram(shaderList);
+	s.needsModelview = true;
+	s.needsProjection = true;
+
+	s.modelViewLocation = glGetUniformLocation(s.programId, modelviewName.c_str());
+	s.projectionLocation = glGetUniformLocation(s.programId, projectionName.c_str());
+
+	positionAttributeLocation = glGetAttribLocation(s.programId, positionName.c_str());
+	colorAttributeLocation = glGetAttribLocation(s.programId, colorName.c_str());
+
+	AddShader(s);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Translate
+//
+// Description:		Applies the specified translation to the specified matrix.
+//
+// Input Arguments:
+//		m	= Matrix&
+//		x	= const double&
+//		y	= const double&
+//		z	= const double&
+//
+// Output Arguments:
+//		m	= Matrix&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::Translate(Matrix& m, const double& x, const double& y, const double& z)
+{
+	Matrix translation(4, 4, 1.0, 0.0, 0.0, x,
+							 0.0, 1.0, 0.0, y,
+							 0.0, 0.0, 1.0, z,
+							 0.0, 0.0, 0.0, 1.0);
+	m *= translation;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Rotate
+//
+// Description:		Applies the specified rotation to the specified matrix.
+//
+// Input Arguments:
+//		m		= Matrix&
+//		angle	= const double& (radians)
+//		x		= const double& axis of rotation x-component
+//		y		= const double& axis of rotation y-component
+//		z		= const double& axis of rotation z-component
+//
+// Output Arguments:
+//		m	= Matrix&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::Rotate(Matrix& m, const double& angle,
+	const double& x, const double& y, const double& z)
+{
+	Vector axis(x, y, z);
+	Matrix rotation3 = Vector::GenerateRotationMatrix(angle, axis);
+	Matrix rotation4(4, 4);
+	rotation4.MakeIdentity();
+
+	unsigned int r, c;
+	for (r = 0; r < 3; r++)
+	{
+		for (c = 0; c < 3; c++)
+			rotation4(r, c) = rotation3(r, c);
+	}
+
+	m *= rotation4;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		Scale
+//
+// Description:		Applies the specified scaling to the specified matrix.
+//
+// Input Arguments:
+//		m		= Matrix&
+//		x		= const double&
+//		y		= const double&
+//		z		= const double&
+//
+// Output Arguments:
+//		m	= Matrix&
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::Scale(Matrix& m, const double& x, const double& y, const double& z)
+{
+	Matrix scale(4, 4);
+	scale.MakeIdentity();
+	scale(0,0) = x;
+	scale(1,1) = y;
+	scale(2,2) = z;
+
+	m *= scale;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		UseDefaultProgram
+//
+// Description:		Loads the default OpenGL program.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::UseDefaultProgram() const
+{
+	glUseProgram(shaders[0].programId);
+}
+
+//==========================================================================
+// Class:			RenderWindow
 // Function:		ShiftForExactPixelization
 //
 // Description:		Applies shift trick to enabled exact pixelization.
@@ -1467,7 +1823,82 @@ bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, Interaction
 //		None
 //
 //==========================================================================
-void RenderWindow::ShiftForExactPixelization() const
+void RenderWindow::ShiftForExactPixelization()
 {
-	glTranslated(exactPixelShift, exactPixelShift, 0.0);
+	Translate(modelviewMatrix, exactPixelShift, exactPixelShift, 0.0);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		AddShader
+//
+// Description:		Adds a shader to our list of managed shaders.
+//
+// Input Arguments:
+//		shader	= const ShaderInfo&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::AddShader(const ShaderInfo& shader)
+{
+	shaders.push_back(shader);
+	modified = true;
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		SendUniformMatrix
+//
+// Description:		Loads uniform matrix to openGL.
+//
+// Input Arguments:
+//		shader	= const ShaderInfo&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void RenderWindow::SendUniformMatrix(const Matrix& m, const GLuint& location)
+{
+	float glMatrix[16];
+	ConvertMatrixToGL(m, glMatrix);
+
+	glUniformMatrix4fv(location, 1, GL_FALSE, glMatrix);
+}
+
+//==========================================================================
+// Class:			RenderWindow
+// Function:		GLHasError
+//
+// Description:		Returns true if OpenGL has any errors.  Intended as a
+//					useful place to break on OpenGL errors.  Allows checking
+//					error codes.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+bool RenderWindow::GLHasError()
+{
+	int e = glGetError();
+	if (e == GL_NO_ERROR)
+		return false;
+
+	wxString errorString = GetGLError(e);
+
+	return true;
 }

@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -25,8 +25,8 @@ public:
 	// Constructor
 	RangeLimitsDialog(wxWindow *parent, const double &min, const double &max);
 
-	double GetMinimum(void) const;
-	double GetMaximum(void) const;
+	double GetMinimum() const;
+	double GetMaximum() const;
 
 private:
 	wxTextCtrl *minBox;

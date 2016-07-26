@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -36,7 +36,7 @@ public:
 	void ExportDataToFile(wxString pathAndFileName) const;
 
 	void Resize(const unsigned int &numberOfPoints);
-	void Reverse(void);
+	void Reverse();
 
 	double ComputeYMean() const;
 	double GetAverageDeltaX() const;
@@ -82,30 +82,30 @@ public:
 	Dataset2D& ToPower(const double &target);
 	Dataset2D& ToPower(const Dataset2D &target);
 	Dataset2D& ApplyPower(const double &target);
-	Dataset2D& DoLog(void);
-	Dataset2D& DoLog10(void);
-	Dataset2D& DoExp(void);
-	Dataset2D& DoAbs(void);
-	Dataset2D& DoSin(void);
-	Dataset2D& DoCos(void);
-	Dataset2D& DoTan(void);
-	Dataset2D& DoArcSin(void);
-	Dataset2D& DoArcCos(void);
-	Dataset2D& DoArcTan(void);
+	Dataset2D& DoLog();
+	Dataset2D& DoLog10();
+	Dataset2D& DoExp();
+	Dataset2D& DoAbs();
+	Dataset2D& DoSin();
+	Dataset2D& DoCos();
+	Dataset2D& DoTan();
+	Dataset2D& DoArcSin();
+	Dataset2D& DoArcCos();
+	Dataset2D& DoArcTan();
 
 	const Dataset2D ToPower(const double &target) const;
 	const Dataset2D ToPower(const Dataset2D &target) const;
 	const Dataset2D ApplyPower(const double &target) const;
-	const Dataset2D DoLog(void) const;
-	const Dataset2D DoLog10(void) const;
-	const Dataset2D DoExp(void) const;
-	const Dataset2D DoAbs(void) const;
-	const Dataset2D DoSin(void) const;
-	const Dataset2D DoCos(void) const;
-	const Dataset2D DoTan(void) const;
-	const Dataset2D DoArcSin(void) const;
-	const Dataset2D DoArcCos(void) const;
-	const Dataset2D DoArcTan(void) const;
+	const Dataset2D DoLog() const;
+	const Dataset2D DoLog10() const;
+	const Dataset2D DoExp() const;
+	const Dataset2D DoAbs() const;
+	const Dataset2D DoSin() const;
+	const Dataset2D DoCos() const;
+	const Dataset2D DoTan() const;
+	const Dataset2D DoArcSin() const;
+	const Dataset2D DoArcCos() const;
+	const Dataset2D DoArcTan() const;
 
 	static Dataset2D DoUnsyncrhonizedAdd(const Dataset2D &d1, const Dataset2D &d2);
 	static Dataset2D DoUnsyncrhonizedSubtract(const Dataset2D &d1, const Dataset2D &d2);

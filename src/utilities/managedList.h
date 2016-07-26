@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -40,15 +40,27 @@ public:
 	// Private data accessors
 	unsigned int Add(T *toAdd);
 	virtual void Remove(const unsigned int &index);
-	inline unsigned int GetCount(void) const { return list.size(); };
+	inline unsigned int GetCount() const { return list.size(); };
 
 	// Removes all objects from the list
-	virtual void Clear(void);
+	virtual void Clear();
 
 	// Re-organizes the data in the list
 	void ReorderObjects(const std::vector<unsigned int> &order);
 
 	T *operator [](const unsigned int &index) const;
+
+	typename std::vector<T*>::iterator begin() { return list.begin(); }
+	typename std::vector<T*>::const_iterator begin() const { return list.begin(); }
+
+	typename std::vector<T*>::iterator end() { return list.end(); }
+	typename std::vector<T*>::const_iterator end() const { return list.end(); }
+
+	typename std::vector<T*>::reverse_iterator rbegin() { return list.rbegin(); }
+	typename std::vector<T*>::const_reverse_iterator rbegin() const { return list.rbegin(); }
+
+	typename std::vector<T*>::reverse_iterator rend() { return list.rend(); }
+	typename std::vector<T*>::const_reverse_iterator rend() const { return list.rend(); }
 
 private:
 	std::vector<T*> list;
@@ -199,7 +211,7 @@ void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 //
 //==========================================================================
 template <class T>
-void ManagedList<T>::Clear(void)
+void ManagedList<T>::Clear()
 {
 	unsigned int i;
 	for (i = 0; i < list.size(); i++)

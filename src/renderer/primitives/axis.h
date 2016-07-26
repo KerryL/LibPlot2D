@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -23,21 +23,13 @@
 // Local headers
 #include "renderer/primitives/primitive.h"
 #include "renderer/line.h"
-
-// FTGL forward declarations
-class FTFont;
-class FTBBox;
+#include "renderer/text.h"
 
 class Axis : public Primitive
 {
 public:
 	Axis(RenderWindow &renderWindow);
 	~Axis();
-
-	// Mandatory overloads from Primitive - for creating geometry and testing the
-	// validity of this object's parameters
-	void GenerateGeometry();
-	bool HasValidParameters();
 
 	// Enumeration for the axis orientations
 	enum AxisOrientation
@@ -66,7 +58,7 @@ public:
 	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; modified = true; }
 	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; modified = true; }
 	void SetLabel(wxString label) { this->label = label; modified = true; }
-	void SetFont(FTFont *font) { this->font = font; modified = true; }
+	bool InitializeFonts(const std::string& fontFileName, const double& size);
 	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; modified = true; }
 	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; modified = true; }
 	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; modified = true; }
@@ -90,6 +82,7 @@ public:
 	inline const Axis* GetAxisAtMinEnd() const { return minAxis; }
 	inline const Axis* GetAxisAtMaxEnd() const { return maxAxis; }
 	inline const Axis* GetOppositeAxis() const { return oppositeAxis; }
+	inline AxisOrientation GetOrientation() const { return orientation; }
 
 	unsigned int GetAxisLength() const;
 
@@ -99,6 +92,13 @@ public:
 
 	double ValueToPixel(const double &value) const;
 	double PixelToValue(const int &pixel) const;
+
+protected:
+	// Mandatory overloads from Primitive - for creating geometry and testing the
+	// validity of this object's parameters
+	virtual bool HasValidParameters();
+	virtual void Update(const unsigned int& i);
+	virtual void GenerateGeometry();
 
 private:
 	// This object's orientation
@@ -132,30 +132,34 @@ private:
 
 	// The axis label and font
 	wxString label;
-	FTFont *font;
+	Text labelText;
+	Text valueText;
 
-	Line line;
+	Line axisLines;
+	Line gridLines;
+	std::vector<std::pair<double, double> > axisPoints;
+	std::vector<std::pair<double, double> > gridPoints;
 
 	void DrawFullAxis();
 	int ComputeMainAxisLocation() const;
 	void ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount = NULL);
-	void DrawMainAxis(const int &mainAxisLocation) const;
-	void DrawHorizontalGrid(const unsigned int &count) const;
-	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation) const;
-	void DrawVerticalGrid(const unsigned int &count) const;
-	void DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation) const;
+	void DrawMainAxis(const int &mainAxisLocation);
+	void DrawHorizontalGrid(const unsigned int &count);
+	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation);
+	void DrawVerticalGrid(const unsigned int &count);
+	void DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocation);
 	void InitializeTickParameters(int &inside, int &outside, int &sign) const;
 	void GetNextLogValue(const bool &first, double &value) const;
 	double GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const;
 	double GetNextGridValue(const unsigned int &tick) const;
 
-	void DrawAxisLabel() const;
+	void DrawAxisLabel();
 	void DrawTickLabels();
 
 	double GetAxisLabelTranslation(const double &offset, const double &fontHeight) const;
 	unsigned int GetPrecision() const;
-	void ComputeTranslations(const double &value, int &xTranslation, int &yTranslation,
-		const FTBBox &boundingBox, const double &offset) const;
+	void ComputeTranslations(const double &value, float &xTranslation, float &yTranslation,
+		const Text::BoundingBox &boundingBox, const double &offset) const;
 };
 
 #endif// AXIS_H_

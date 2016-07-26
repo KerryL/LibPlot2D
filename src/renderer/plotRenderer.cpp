@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -17,6 +17,9 @@
 // Standard C++ headers
 #include <cassert>
 #include <algorithm>
+
+// GLEW headers
+#include <GL/glew.h>
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -49,6 +52,40 @@
 //==========================================================================
 const unsigned int PlotRenderer::maxXTicks(7);
 const unsigned int PlotRenderer::maxYTicks(10);
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		defaultVertexShader
+//
+// Description:		Default vertex shader.
+//
+// Input Arguments:
+//		0	= position
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+const std::string PlotRenderer::defaultVertexShader(
+	"#version 330\n"
+	"\n"
+	"uniform mat4 modelviewMatrix;\n"
+	"uniform mat4 projectionMatrix;\n"
+	"\n"
+	"layout(location = 0) in vec2 position;\n"
+	"layout(location = 1) in vec4 color;\n"
+	"\n"
+	"out vec4 vertexColor;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"    vertexColor = color;\n"
+	"    gl_Position = projectionMatrix * modelviewMatrix * vec4(position, 0.0, 1.0);\n"
+	"}\n"
+);
 
 //==========================================================================
 // Class:			PlotRenderer
@@ -183,18 +220,19 @@ void PlotRenderer::UpdateDisplay()
 void PlotRenderer::CreateActors()
 {
 	plot = new PlotObject(*this);
+	SetBackgroundColor(Color::ColorWhite);
 
 	// Also create the zoom box and cursors, even though they aren't drawn yet
 	zoomBox = new ZoomBox(*this);
 	leftCursor = new PlotCursor(*this, *plot->GetBottomAxis());
 	rightCursor = new PlotCursor(*this, *plot->GetBottomAxis());
 
-	if (plot->GetAxisFont())
+	if (!plot->GetAxisFont().empty())
 	{
 		plot->Update();// Need to make sure sizes update before we reference them to position the legend
 		const unsigned int offset(5);
 		legend = new Legend(*this);
-		legend->SetFont(plot->GetAxisFont());
+		legend->SetFont(plot->GetAxisFont(), 12);
 		legend->SetLegendReference(Legend::TopRight);
 		legend->SetWindowReference(Legend::TopRight);
 		legend->SetPosition(plot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
@@ -232,6 +270,7 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 	if (legend)
 		legend->SetModified();
 
+	plot->UpdatePlotAreaSize();
 	UpdateDisplay();
 
 	// Skip this event so the base class OnSize event fires, too
@@ -2895,4 +2934,42 @@ wxImage PlotRenderer::GetImage() const
 unsigned long long PlotRenderer::GetTotalPointCount() const
 {
 	return plot->GetTotalPointCount();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		LoadModelviewUniform
+//
+// Description:		Loads the specified modelview matrix to the openGL uniform.
+//
+// Input Arguments:
+//		mv	= const Modelview&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
+{
+	float glModelviewMatrix[16];
+
+	switch(mv)
+	{
+	case ModelviewLeft:
+		ConvertMatrixToGL(leftModelview, glModelviewMatrix);
+		break;
+
+	case ModelviewRight:
+		ConvertMatrixToGL(rightModelview, glModelviewMatrix);
+		break;
+
+	default:
+	case ModelviewFixed:
+		ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
+	}
+
+	glUniformMatrix4fv(shaders[0].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
 }

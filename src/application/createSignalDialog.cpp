@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -104,7 +104,7 @@ END_EVENT_TABLE()
 //		wxString
 //
 //==========================================================================
-wxString CreateSignalDialog::GetSignalName(void) const
+wxString CreateSignalDialog::GetSignalName() const
 {
 	return signalNameTextBox->GetValue();
 }
@@ -296,7 +296,7 @@ wxString CreateSignalDialog::GetSignalName(const SignalType &type)
 //		bool, true for all inputs valid, false otherwise
 //
 //==========================================================================
-bool CreateSignalDialog::TransferDataFromWindow(void)
+bool CreateSignalDialog::TransferDataFromWindow()
 {
 	if (signalNameTextBox->GetValue().IsEmpty())
 	{
@@ -639,7 +639,7 @@ void CreateSignalDialog::OnSignalTypeChangeEvent(wxCommandEvent& WXUNUSED(event)
 //		None
 //
 //==========================================================================
-void CreateSignalDialog::SetTextBoxLabelsAndEnables(void)
+void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 {
 	// Prepare inputs for non-periodic functions
 	if (lastSelection == SignalStep ||
@@ -711,7 +711,7 @@ void CreateSignalDialog::SetTextBoxLabelsAndEnables(void)
 //		None
 //
 //==========================================================================
-void CreateSignalDialog::SetDefaultInputs(void)
+void CreateSignalDialog::SetDefaultInputs()
 {
 	// Defaults for non-periodic functions
 	if (lastSelection == SignalStep ||
@@ -922,7 +922,7 @@ void CreateSignalDialog::OnPhaseTimeChangeEvent(wxCommandEvent& WXUNUSED(event))
 //		None
 //
 //==========================================================================
-void CreateSignalDialog::UpdatePhaseAngle(void)
+void CreateSignalDialog::UpdatePhaseAngle()
 {
 	// Don't execute until we've been fully created
 	if (!frequencyTextBox || !phaseTimeTextBox)
@@ -952,7 +952,7 @@ void CreateSignalDialog::UpdatePhaseAngle(void)
 //		None
 //
 //==========================================================================
-void CreateSignalDialog::UpdatePhaseTime(void)
+void CreateSignalDialog::UpdatePhaseTime()
 {
 	// Don't execute until we've been fully created
 	if (!frequencyTextBox || !phaseTimeTextBox)
@@ -982,7 +982,7 @@ void CreateSignalDialog::UpdatePhaseTime(void)
 //		None
 //
 //==========================================================================
-void CreateSignalDialog::UpdateAmplitude(void)
+void CreateSignalDialog::UpdateAmplitude()
 {
 	// Don't execute until we've been fully created
 	if (!periodTextBox || !slopeTextBox)
@@ -1016,7 +1016,7 @@ void CreateSignalDialog::UpdateAmplitude(void)
 //		None
 //
 //==========================================================================
-void CreateSignalDialog::UpdateSlope(void)
+void CreateSignalDialog::UpdateSlope()
 {
 	// Don't execute until we've been fully created
 	if (!periodTextBox || !initialValueTextBox)

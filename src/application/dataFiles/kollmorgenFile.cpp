@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -119,7 +119,7 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 //		None
 //
 //==========================================================================
-void KollmorgenFile::DoTypeSpecificLoadTasks(void)
+void KollmorgenFile::DoTypeSpecificLoadTasks()
 {
 	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())

@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -89,6 +89,8 @@ public:
 	Matrix GetInverse() const;
 	Matrix GetPsuedoInverse() const;
 	Matrix GetDiagonalInverse() const;
+
+	Matrix& Transpose();
 
 	bool LeftDivide(const Matrix& b, Matrix &x) const;// x = A \ b
 	Matrix GetRowReduced() const;

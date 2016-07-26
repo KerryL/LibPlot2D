@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -15,6 +15,9 @@
 
 #ifndef PRIMITIVE_H_
 #define PRIMITIVE_H_
+
+// Standard C++ headers
+#include <vector>
 
 // Local headers
 #include "renderer/color.h"
@@ -33,18 +36,11 @@ public:
 	// Performs the drawing operations
 	void Draw();
 
-	// Called when something is modified to re-create this object with
-	// all of the latest information
-	virtual void GenerateGeometry() = 0;
-
-	// Checks to see if this object's parameters are valid and allow drawing
-	virtual bool HasValidParameters() = 0;
-
 	// Private data accessors
 	void SetVisibility(const bool &isVisible);
 	void SetColor(const Color &color);
-	inline Color GetColor() { return color; }
-	inline void SetDrawOrder(const unsigned int &drawOrder) { this->drawOrder = drawOrder; }
+	inline Color GetColor() const { return color; }
+	void SetDrawOrder(const unsigned int &drawOrder);
 	inline void SetModified() { modified = true; }// Forces a re-draw
 
 	inline bool GetIsVisible() const { return isVisible; }
@@ -52,6 +48,28 @@ public:
 
 	// Overloaded operators
 	Primitive& operator=(const Primitive &primitive);
+
+	struct BufferInfo
+	{
+		unsigned int vertexCount;
+		float* vertexBuffer;
+		unsigned int indexCount;
+		unsigned int* indexBuffer;
+		bool vertexCountModified;
+
+		unsigned int vertexBufferIndex;
+		unsigned int vertexArrayIndex;
+		unsigned int indexBufferIndex;
+
+		BufferInfo();
+		void GetOpenGLIndices(const bool& needIndexObject = false);
+		void FreeOpenGLObjects();
+		void FreeDynamicMemory();
+
+	private:
+		bool glVertexBufferExists;
+		bool glIndexBufferExists;
+	};
 
 protected:
 	bool isVisible;
@@ -62,12 +80,16 @@ protected:
 
 	RenderWindow &renderWindow;
 
+	virtual bool HasValidParameters() = 0;
+	virtual void Update(const unsigned int& i) = 0;
+	virtual void GenerateGeometry() = 0;
+
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
 
+	std::vector<BufferInfo> bufferInfo;
+
 private:
-	// The openGL list index
-	unsigned int listIndex;
 	unsigned int drawOrder;
 };
 

@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -58,7 +58,7 @@ bool CustomXMLFile::IsType(const wxString &fileName)
 //		wxArrayString
 //
 //==========================================================================
-wxArrayString CustomXMLFile::CreateDelimiterList(void) const
+wxArrayString CustomXMLFile::CreateDelimiterList() const
 {
 	if (fileFormat.GetDelimiter().IsEmpty())
 		return DataFile::CreateDelimiterList();
@@ -199,7 +199,7 @@ bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawDat
 	wxString data = channel->GetAttribute(fileFormat.GetXMLYDataKey(), wxEmptyString);
 	if (data.IsEmpty())
 	{
-		errorString = _T("Could not read y-data!"), _T("Error Reading File");
+		errorString = _T("Could not read y-data!");
 		return false;
 	}
 	if (!DataStringToVector(data, rawData[set], factors[set], errorString))

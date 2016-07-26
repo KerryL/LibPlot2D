@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -14,11 +14,13 @@
 // History:
 //  5/12/2011 - Renamed to PlotCursor from Cursor due to conflict in X.h, K. Loux
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/plotCursor.h"
 #include "renderer/primitives/axis.h"
 #include "renderer/renderWindow.h"
-#include "renderer/line.h"
 
 //==========================================================================
 // Class:			PlotCursor
@@ -38,10 +40,50 @@
 //
 //==========================================================================
 PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
-	: Primitive(renderWindow), axis(axis)
+	: Primitive(renderWindow), axis(axis), line(renderWindow)
 {
 	isVisible = false;
 	color = Color::ColorBlack;
+	line.SetLineColor(color);
+
+	SetDrawOrder(2800);
+}
+
+//==========================================================================
+// Class:			PlotCursor
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCursor::Update(const unsigned int& /*i*/)
+{
+	if (axis.IsHorizontal())
+	{
+		line.Build(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
+			locationAlongAxis, renderWindow.GetSize().GetHeight()
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
+	}
+	else
+	{
+		line.Build(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
+			renderWindow.GetSize().GetWidth()
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
+	}
+
+	bufferInfo[0] = line.GetBufferInfo();
+
+	// Update the value of the cursor (required for accuracy when zoom changes, for example)
+	value = axis.PixelToValue(locationAlongAxis);
 }
 
 //==========================================================================
@@ -62,22 +104,12 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 //==========================================================================
 void PlotCursor::GenerateGeometry()
 {
-	Line line;
-	if (axis.IsHorizontal())
-	{
-		line.Draw(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
-			locationAlongAxis, renderWindow.GetSize().GetHeight()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
-	}
-	else
-	{
-		line.Draw(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
-			renderWindow.GetSize().GetWidth()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
-	}
+	if (bufferInfo.size() == 0)
+		return;
 
-	// Update the value of the cursor (required for accuracy when zoom changes, for example)
-	value = axis.PixelToValue(locationAlongAxis);
+	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+	Line::DoPrettyDraw(bufferInfo[0].indexCount);
+	glBindVertexArray(0);
 }
 
 //==========================================================================

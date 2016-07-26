@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -33,27 +33,27 @@ public:
 	// Constructor
 	CustomFileFormat(const wxString &pathAndFileName);
 
-	bool IsCustomFormat(void) const { return !formatName.IsEmpty(); };
-	bool IsAsynchronous(void) const { return asynchronous; };
+	bool IsCustomFormat() const { return !formatName.IsEmpty(); };
+	bool IsAsynchronous() const { return asynchronous; };
 
-	wxString GetDelimiter(void) const { return delimiter; };
-	wxString GetTimeUnits(void) const { return timeUnits; };
-	wxString GetTimeFormat(void) const { return timeFormat; };
-	wxString GetEndIdentifier(void) const { return endIdentifier; };
+	wxString GetDelimiter() const { return delimiter; };
+	wxString GetTimeUnits() const { return timeUnits; };
+	wxString GetTimeFormat() const { return timeFormat; };
+	wxString GetEndIdentifier() const { return endIdentifier; };
 
-	bool IsXML(void) const { return isXML; };
+	bool IsXML() const { return isXML; };
 
-	wxString GetXMLXDataNode(void) const { return xDataNode; };
-	wxString GetXMLXDataKey(void) const { return xDataKey; };
-	wxString GetXMLYDataNode(void) const { return yDataNode; };
-	wxString GetXMLYDataKey(void) const { return yDataKey; };
-	wxString GetXMLChannelParentNode(void) const { return channelParentNode; };
-	wxString GetXMLChannelNode(void) const { return channelNode; };
-	wxString GetXMLCodeKey(void) const { return codeKey; };
+	wxString GetXMLXDataNode() const { return xDataNode; };
+	wxString GetXMLXDataKey() const { return xDataKey; };
+	wxString GetXMLYDataNode() const { return yDataNode; };
+	wxString GetXMLYDataKey() const { return yDataKey; };
+	wxString GetXMLChannelParentNode() const { return channelParentNode; };
+	wxString GetXMLChannelNode() const { return channelNode; };
+	wxString GetXMLCodeKey() const { return codeKey; };
 
 	void ProcessChannels(wxArrayString &names, std::vector<double> &scales) const;
 
-	inline static bool CustomDefinitionsExist(void) { return wxFileExists(customFormatsXMLFileName); };
+	inline static bool CustomDefinitionsExist() { return wxFileExists(customFormatsXMLFileName); };
 
 private:
 	static const wxString customFormatsXMLFileName;
@@ -122,7 +122,7 @@ private:
 	bool ReadChannelTag(wxXmlNode &channelNode);
 	bool ReadAdditionalXMLProperties(wxXmlNode &formatNode);
 
-	void ClearData(void);
+	void ClearData();
 
 	bool ProcessLocationID(const wxString &value, Identifier &id) const;
 	bool ProcessFormatChildren(wxXmlNode *formatChild, Identifier &id);

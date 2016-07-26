@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -14,9 +14,13 @@
 // History:
 //	11/9/2010	- Modified to accomodate 3D plots, K. Loux.
 
+// GLEW headers
+#include <GL/glew.h>
+
 // Local headers
 #include "renderer/primitives/plotCurve.h"
 #include "renderer/renderWindow.h"
+#include "renderer/plotRenderer.h"
 #include "renderer/primitives/axis.h"
 #include "utilities/dataset2D.h"
 #include "utilities/math/plotMath.h"
@@ -29,6 +33,7 @@
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow* pointing to the object that owns this
+//		data			= const Dataset2D&
 //
 // Output Arguments:
 //		None
@@ -37,13 +42,19 @@
 //		None
 //
 //==========================================================================
-PlotCurve::PlotCurve(RenderWindow &renderWindow) : Primitive(renderWindow)
+PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
+	: Primitive(renderWindow), data(data), line(renderWindow)
 {
 	xAxis = NULL;
 	yAxis = NULL;
 
 	lineSize = 1;
 	markerSize = -1;
+	pretty = true;
+
+	line.SetBufferHint(GL_STATIC_DRAW);
+
+	bufferInfo.push_back(BufferInfo());// Add a second empty info block for the markers
 }
 
 //==========================================================================
@@ -62,7 +73,8 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow) : Primitive(renderWindow)
 //		None
 //
 //==========================================================================
-PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve)
+PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
+	data(plotCurve.data), line(renderWindow)
 {
 	*this = plotCurve;
 }
@@ -89,6 +101,111 @@ PlotCurve::~PlotCurve()
 
 //==========================================================================
 // Class:			PlotCurve
+// Function:		InitializeMarkerVertexBuffer
+//
+// Description:		Initializes the vertex buffer for storing the marker information.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::InitializeMarkerVertexBuffer()
+{
+	delete[] bufferInfo[1].vertexBuffer;
+
+	bufferInfo[1].GetOpenGLIndices();
+
+	bufferInfo[1].vertexCount = data.GetNumberOfPoints() * 4;
+	bufferInfo[1].vertexBuffer = new float[bufferInfo[1].vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	assert(renderWindow.GetVertexDimension() == 2);
+
+	bufferInfo[1].vertexCountModified = false;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		Update
+//
+// Description:		Updates the GL buffers associated with this object.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotCurve::Update(const unsigned int& i)
+{
+	if (i == 0)
+	{
+		int width, height;
+			renderWindow.GetSize(&width, &height);
+			width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+			height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+
+			xScale = (xAxis->GetMaximum() - xAxis->GetMinimum()) / width;
+			yScale = (yAxis->GetMaximum() - yAxis->GetMinimum()) / height;
+
+		if (lineSize > 0)
+		{
+			const double lineSizeScale(1.2);
+
+			line.SetLineColor(color);
+			line.SetBackgroundColorForAlphaFade();
+			line.SetWidth(lineSize * lineSizeScale);
+			line.SetXScale(xScale);
+			line.SetYScale(yScale);
+
+			line.Build(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
+		}
+		else
+			line.SetWidth(0.0);
+
+		bufferInfo[i] = line.GetBufferInfo();
+	}
+	else
+	{
+		if (bufferInfo[i].vertexCountModified)
+			InitializeMarkerVertexBuffer();
+
+		BuildMarkers();
+
+		glBindVertexArray(bufferInfo[i].vertexArrayIndex);
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufferInfo[i].vertexBufferIndex);
+		glBufferData(GL_ARRAY_BUFFER,
+			sizeof(GLfloat) * bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4),
+			bufferInfo[i].vertexBuffer, GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(renderWindow.GetPositionLocation());
+		glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glEnableVertexAttribArray(renderWindow.GetColorLocation());
+		glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+			(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo[i].vertexCount));
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].indexBufferIndex);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo[i].indexCount,
+			bufferInfo[i].indexBuffer, GL_DYNAMIC_DRAW);
+
+		glBindVertexArray(0);
+	}
+
+	assert(!RenderWindow::GLHasError());
+}
+
+//==========================================================================
+// Class:			PlotCurve
 // Function:		GenerateGeometry
 //
 // Description:		Creates the OpenGL instructions to create this object in
@@ -106,206 +223,31 @@ PlotCurve::~PlotCurve()
 //==========================================================================
 void PlotCurve::GenerateGeometry()
 {
-	if (lineSize > 0)
+	if (yAxis->GetOrientation() == Axis::OrientationLeft)
+		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewLeft);
+	else
+		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewRight);
+
+	glEnable(GL_SCISSOR_TEST);
+	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+
+	if (pretty)
+		Line::DoPrettyDraw(bufferInfo[0].indexCount);
+	else
+		Line::DoUglyDraw(bufferInfo[0].vertexCount);
+
+	if (NeedsMarkersDrawn())
 	{
-		const double lineSizeScale(1.2);
-
-		line.SetLineColor(color);
-		line.SetBackgroundColorForAlphaFade();
-		line.SetWidth(lineSize * lineSizeScale);
-		points.clear();
-
-		unsigned int i;
-		for (i = 0; i < data->GetNumberOfPoints(); i++)
-		{
-			if (PointIsWithinPlotArea(i))
-			{
-				if (i > 0 && !PointIsWithinPlotArea(i - 1))
-					PlotInterpolatedPoint(i - 1, i, true);
-				PlotPoint(i);
-			}
-			else if (i > 0 && PointIsWithinPlotArea(i - 1))
-				PlotInterpolatedPoint(i - 1, i, false);
-			else if (i > 0 && PointsJumpPlotArea(i - 1, i))
-				PlotInterpolatedJumpPoints(i - 1, i);
-		}
-
-		line.Draw(points);
+		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
+		glDrawArrays(GL_QUADS, 0, bufferInfo[1].vertexCount);
 	}
 
-	if (markerSize > 0 || (markerSize < 0 && SmallRange()))
-	{
-		glColor4d(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-		glBegin(GL_QUADS);
-		PlotMarkers();
-		glEnd();
-	}
-}
+	glBindVertexArray(0);
+	glDisable(GL_SCISSOR_TEST);
 
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointIsWithinPlotArea
-//
-// Description:		Checks to see if the point with the specified index is
-//					within the plot area.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for points within the plot area, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointIsWithinPlotArea(const unsigned int &i) const
-{
-	if (data->GetXData(i) >= xAxis->GetMinimum() &&
-		data->GetXData(i) <= xAxis->GetMaximum() &&
-		data->GetYData(i) >= yAxis->GetMinimum() &&
-		data->GetYData(i) <= yAxis->GetMaximum())
-		return true;
+	assert(!RenderWindow::GLHasError());
 
-	return false;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PlotPoint
-//
-// Description:		Plots the coordinate with the specified data index.
-//
-// Input Arguments:
-//		i	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::PlotPoint(const unsigned int &i)
-{
-	PlotPoint(data->GetXData(i), data->GetYData(i));
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PlotPoint
-//
-// Description:		Plots the coordinate with the specified coordinates.
-//
-// Input Arguments:
-//		x	= const double&
-//		y	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::PlotPoint(const double &x, const double &y)
-{
-	double doublePoint[2] = {x, y};
-	double point[2];
-
-	RescalePoint(doublePoint, point);
-	points.push_back(std::make_pair(point[0], point[1]));
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PlotInterpolatedPoint
-//
-// Description:		Plots the coordinate where the line between the specified
-//					indecies crosses out of/in to the plot area.
-//
-// Input Arguments:
-//		first			= const unsigned int&
-//		second			= const unsigned int&
-//		startingPoint	= const bool& indicates whether this point is a
-//						  continuation of an existing line strip, or if we
-//						  are starting a new line strip
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::PlotInterpolatedPoint(const unsigned int &first, const unsigned int &second, const bool &startingPoint)
-{
-	if (startingPoint)
-	{
-		line.Draw(points);
-		points.clear();
-	}
-
-	if (PointIsValid(first) && PointIsValid(second))
-	{
-		if (PointsCrossBottomAxis(first, second))
-			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
-		else if (PointsCrossTopAxis(first, second))
-			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
-		else if (PointsCrossLeftAxis(first, second))
-			PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
-		else if (PointsCrossRightAxis(first, second))
-			PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
-		else
-			assert(false);
-	}
-
-	if (!startingPoint)
-	{
-		line.Draw(points);
-		points.clear();
-	}
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PlotInterpolatedJumpPoints
-//
-// Description:		Plots the coordinate where the line between the specified
-//					indecies crosses out of/in to the plot area.  It is assumed
-//					that exactly two of the if clauses will evaluate true.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::PlotInterpolatedJumpPoints(const unsigned int &first, const unsigned int &second)
-{
-	line.Draw(points);
-
-	if (PointIsValid(first) && PointIsValid(second))
-	{
-		points.clear();
-
-		if (PointsCrossBottomAxis(first, second))
-			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum()), yAxis->GetMinimum());
-		if (PointsCrossTopAxis(first, second))
-			PlotPoint(GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum()), yAxis->GetMaximum());
-		if (PointsCrossLeftAxis(first, second))
-			PlotPoint(xAxis->GetMinimum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum()));
-		if (PointsCrossRightAxis(first, second))
-			PlotPoint(xAxis->GetMaximum(), GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum()));
-
-		line.Draw(points);
-	}
-	points.clear();
+	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewFixed);
 }
 
 //==========================================================================
@@ -326,10 +268,10 @@ void PlotCurve::PlotInterpolatedJumpPoints(const unsigned int &first, const unsi
 //==========================================================================
 bool PlotCurve::PointIsValid(const unsigned int &i) const
 {
-	assert(i < data->GetNumberOfPoints());
+	assert(i < data.GetNumberOfPoints());
 
-	return PlotMath::IsValid<double>(data->GetXData(i)) &&
-		PlotMath::IsValid<double>(data->GetYData(i));
+	return PlotMath::IsValid<double>(data.GetXData(i)) &&
+		PlotMath::IsValid<double>(data.GetYData(i));
 }
 
 //==========================================================================
@@ -351,7 +293,7 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 //==========================================================================
 bool PlotCurve::HasValidParameters()
 {
-	if (xAxis != NULL && yAxis != NULL && data->GetNumberOfPoints() > 1)
+	if (xAxis != NULL && yAxis != NULL && data.GetNumberOfPoints() > 1)
 	{
 		if (xAxis->IsHorizontal() && !yAxis->IsHorizontal())
 			return true;
@@ -388,337 +330,7 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		SetData
-//
-// Description:		Assigns data to the curve.
-//
-// Input Arguments:
-//		data	= const Dataset2D* to plot
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::SetData(const Dataset2D *data)
-{
-	this->data = data;
-	modified = true;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		RescalePoint
-//
-// Description:		Rescales the onscreen position of the point according to
-//					the size of the axis with which this object is associated.
-//
-// Input Arguments:
-//		value	= const double* containing the location of the point in plot
-//				  coordinates
-//
-// Output Arguments:
-//		coordinate	= double* specifying the location of the object in screen coordinates
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::RescalePoint(const double *value, double *coordinate) const
-{
-	if (!value || !coordinate)
-		return;
-
-	coordinate[0] = xAxis->ValueToPixel(value[0]);
-	coordinate[1] = yAxis->ValueToPixel(value[1]);
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointsCrossBottomAxis
-//
-// Description:		Determines whether or not the specified points span the
-//					bottom axis.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for crossing, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointsCrossBottomAxis(const unsigned int &first, const unsigned int &second) const
-{
-	if (!PointsCrossYOrdinate(first, second, yAxis->GetMinimum()))
-		return false;
-
-	double crossing = GetInterpolatedXOrdinate(first, second, yAxis->GetMinimum());
-	if (crossing < xAxis->GetMinimum() || crossing > xAxis->GetMaximum())
-		return false;
-
-	return true;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointsCrossTopAxis
-//
-// Description:		Determines whether or not the specified points span the
-//					top axis.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for crossing, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointsCrossTopAxis(const unsigned int &first, const unsigned int &second) const
-{
-	if (!PointsCrossYOrdinate(first, second, yAxis->GetMaximum()))
-		return false;
-
-	double crossing = GetInterpolatedXOrdinate(first, second, yAxis->GetMaximum());
-	if (crossing < xAxis->GetMinimum() || crossing > xAxis->GetMaximum())
-		return false;
-
-	return true;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointsCrossLeftAxis
-//
-// Description:		Determines whether or not the specified points span the
-//					left axis.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for crossing, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointsCrossLeftAxis(const unsigned int &first, const unsigned int &second) const
-{
-	if (!PointsCrossXOrdinate(first, second, xAxis->GetMinimum()))
-		return false;
-
-	double crossing = GetInterpolatedYOrdinate(first, second, xAxis->GetMinimum());
-	if (crossing < yAxis->GetMinimum() || crossing > yAxis->GetMaximum())
-		return false;
-
-	return true;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointsCrossRightAxis
-//
-// Description:		Determines whether or not the specified points span the
-//					right axis.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for crossing, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointsCrossRightAxis(const unsigned int &first, const unsigned int &second) const
-{
-	if (!PointsCrossXOrdinate(first, second, xAxis->GetMaximum()))
-		return false;
-
-	double crossing = GetInterpolatedYOrdinate(first, second, xAxis->GetMaximum());
-	if (crossing < yAxis->GetMinimum() || crossing > yAxis->GetMaximum())
-		return false;
-
-	return true;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointsCrossXOrdinate
-//
-// Description:		Determines whether or not the specified points span the
-//					specified x-value.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//		value	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for crossing, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointsCrossXOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const
-{
-	if ((data->GetXData(first) <= value && data->GetXData(second) >= value) ||
-		(data->GetXData(first) >= value && data->GetXData(second) <= value))
-		return true;
-
-	return false;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointsCrossYOrdinate
-//
-// Description:		Determines whether or not the specified points span the
-//					specified y-value.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//		value	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for crossing, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointsCrossYOrdinate(const unsigned int &first, const unsigned int &second, const double &value) const
-{
-	if ((data->GetYData(first) <= value && data->GetYData(second) >= value) ||
-		(data->GetYData(first) >= value && data->GetYData(second) <= value))
-		return true;
-
-	return false;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PointsJumpPlotArea
-//
-// Description:		Determines whether or not the specified points result in
-//					a line through the plot area without either point lying
-//					inside the plot area.  This assumes that neither point is
-//					within the plot area (must have been previously determined).
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		bool, true for jumping, false otherwise
-//
-//==========================================================================
-bool PlotCurve::PointsJumpPlotArea(const unsigned int &first, const unsigned int &second) const
-{
-	unsigned int crossings(0);
-	crossings += (unsigned int)PointsCrossBottomAxis(first, second);
-	crossings += (unsigned int)PointsCrossTopAxis(first, second);
-	crossings += (unsigned int)PointsCrossLeftAxis(first, second);
-	crossings += (unsigned int)PointsCrossRightAxis(first, second);
-
-	assert(crossings == 0 || crossings == 2);
-
-	return crossings == 2;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		GetInterpolatedXOrdinate
-//
-// Description:		Interpolates to find the x-value most closesly matching
-//					the specified y-value.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//		yValue	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		double
-//
-//==========================================================================
-double PlotCurve::GetInterpolatedXOrdinate(const unsigned int &first,
-	const unsigned int &second, const double &yValue) const
-{
-	double fraction;
-	if (yAxis->IsLogarithmic())
-		fraction = (log10(yValue) - log10(data->GetYData(first))) / (log10(data->GetYData(second)) - log10(data->GetYData(first)));
-	else
-		fraction = (yValue - data->GetYData(first)) / (data->GetYData(second) - data->GetYData(first));
-
-	if (PlotMath::IsNaN(fraction))
-		fraction = 1.0;
-
-	if (xAxis->IsLogarithmic())
-		return pow(data->GetXData(second), fraction) * pow(data->GetXData(first), 1.0 - fraction);
-	return data->GetXData(first) + (data->GetXData(second) - data->GetXData(first)) * fraction;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		GetInterpolatedYOrdinate
-//
-// Description:		Interpolates to find the y-value most closesly matching
-//					the specified x-value.
-//
-// Input Arguments:
-//		first	= const unsigned int&
-//		second	= const unsigned int&
-//		xValue	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		double
-//
-//==========================================================================
-double PlotCurve::GetInterpolatedYOrdinate(const unsigned int &first, const unsigned int &second, const double &xValue) const
-{
-	double fraction;
-	if (xAxis->IsLogarithmic())
-		fraction = (log10(xValue) - log10(data->GetXData(first))) / (log10(data->GetXData(second)) - log10(data->GetXData(first)));
-	else
-		fraction = (xValue - data->GetXData(first)) / (data->GetXData(second) - data->GetXData(first));
-
-	if (PlotMath::IsNaN(fraction))
-		fraction = 1.0;
-
-	if (yAxis->IsLogarithmic())
-		return pow(data->GetYData(second), fraction) * pow(data->GetYData(first), 1.0 - fraction);
-
-	return data->GetYData(first) + (data->GetYData(second) - data->GetYData(first)) * fraction;
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		PlotMarkers
+// Function:		BuildMarkers
 //
 // Description:		Plots markers at all un-interpolated points.
 //
@@ -732,50 +344,53 @@ double PlotCurve::GetInterpolatedYOrdinate(const unsigned int &first, const unsi
 //		None
 //
 //==========================================================================
-void PlotCurve::PlotMarkers() const
+void PlotCurve::BuildMarkers()
 {
+	float halfMarkerXSize = 2 * markerSize * xScale;
+	float halfMarkerYSize = 2 * markerSize * yScale;
+	const unsigned int dimension(renderWindow.GetVertexDimension());
+	const unsigned int colorStart(data.GetNumberOfPoints() * dimension * 4);
+
 	unsigned int i;
-	for (i = 0; i < data->GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); i++)
 	{
-		if (PointIsWithinPlotArea(i))
-			DrawMarker(data->GetXData(i), data->GetYData(i));
+		bufferInfo[1].vertexBuffer[i * 4 * dimension] = (float)data.GetXData(i) + halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = (float)data.GetYData(i) + halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension] = (float)data.GetXData(i) + halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension + 1] = (float)data.GetYData(i) - halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension] = (float)data.GetXData(i) - halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension + 1] = (float)data.GetYData(i) - halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension] = (float)data.GetXData(i) - halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension + 1] = (float)data.GetYData(i) + halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 1] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 2] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 3] = (float)color.GetAlpha();
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 4] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 5] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 6] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 7] = (float)color.GetAlpha();
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 8] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 9] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 10] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 11] = (float)color.GetAlpha();
+
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 12] = (float)color.GetRed();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 13] = (float)color.GetGreen();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 14] = (float)color.GetBlue();
+		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 15] = (float)color.GetAlpha();
 	}
 }
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		DrawMarker
-//
-// Description:		Draws a marker at the specified location.
-//
-// Input Arguments:
-//		x	= const double&
-//		y	= const double&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-void PlotCurve::DrawMarker(const double &x, const double &y) const
-{
-	double doublePoint[2] = {x, y};
-	double point[2];
-	RescalePoint(doublePoint, point);
-
-	int halfMarkerSize = 2 * markerSize;
-
-	glVertex2i(point[0] + halfMarkerSize, point[1] + halfMarkerSize);
-	glVertex2i(point[0] + halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] - halfMarkerSize);
-	glVertex2i(point[0] - halfMarkerSize, point[1] + halfMarkerSize);
-}
-
-//==========================================================================
-// Class:			PlotCurve
-// Function:		SmallRange
+// Function:		RangeIsSmall
 //
 // Description:		Determines if the range is small enough to warrant
 //					drawing the point markers.
@@ -790,12 +405,12 @@ void PlotCurve::DrawMarker(const double &x, const double &y) const
 //		bool
 //
 //==========================================================================
-bool PlotCurve::SmallRange() const
+bool PlotCurve::RangeIsSmall() const
 {
-	if (data->GetNumberOfPoints() < 2)
+	if (data.GetNumberOfPoints() < 2)
 		return false;
 
-	switch (SmallXRange())
+	switch (XRangeIsSmall())
 	{
 	case RangeSizeSmall:
 		return true;
@@ -808,12 +423,12 @@ bool PlotCurve::SmallRange() const
 		break;
 	}
 
-	return SmallYRange() == RangeSizeSmall;
+	return YRangeIsSmall() == RangeSizeSmall;
 }
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		SmallXRange
+// Function:		XRangeIsSmall
 //
 // Description:		Determines if the x-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
@@ -830,9 +445,9 @@ bool PlotCurve::SmallRange() const
 //		PlotCurve::RangeSize
 //
 //==========================================================================
-PlotCurve::RangeSize PlotCurve::SmallXRange() const
+PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
-	double period = data->GetXData(1) - data->GetXData(0);
+	double period = data.GetXData(1) - data.GetXData(0);
 	if (period == 0.0)
 		return RangeSizeUndetermined;
 
@@ -852,7 +467,7 @@ PlotCurve::RangeSize PlotCurve::SmallXRange() const
 
 //==========================================================================
 // Class:			PlotCurve
-// Function:		SmallYRange
+// Function:		YRangeIsSmall
 //
 // Description:		Determines if the y-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
@@ -869,9 +484,9 @@ PlotCurve::RangeSize PlotCurve::SmallXRange() const
 //		PlotCurve::RangeSize
 //
 //==========================================================================
-PlotCurve::RangeSize PlotCurve::SmallYRange() const
+PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
-	double period = data->GetYData(1) - data->GetYData(0);
+	double period = data.GetYData(1) - data.GetYData(0);
 	if (period == 0.0)
 		return RangeSizeUndetermined;
 
@@ -887,4 +502,25 @@ PlotCurve::RangeSize PlotCurve::SmallYRange() const
 		return RangeSizeSmall;
 
 	return RangeSizeLarge;
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		NeedsMarkersDrawn
+//
+// Description:		Determines if we should draw plot markers.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//==========================================================================
+bool PlotCurve::NeedsMarkersDrawn() const
+{
+	return markerSize > 0 || (markerSize < 0 && RangeIsSmall());
 }

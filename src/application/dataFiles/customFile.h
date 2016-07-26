@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -31,13 +31,13 @@ public:
 protected:
 	CustomFileFormat fileFormat;
 
-	virtual wxArrayString CreateDelimiterList(void) const;
+	virtual wxArrayString CreateDelimiterList() const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const;
 	virtual void AssembleDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks(void);
+	virtual void DoTypeSpecificLoadTasks();
 	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
 
 	bool ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,

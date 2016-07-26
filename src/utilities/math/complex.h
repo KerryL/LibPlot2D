@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -27,13 +27,13 @@ public:
 	~Complex();
 
 	// Prints the value to a string
-	wxString Print(void) const;
+	wxString Print() const;
 
 	// Gets the complex conjugate of this object
-	const Complex GetConjugate(void) const;
+	const Complex GetConjugate() const;
 
-	double GetPolarLength(void) const;
-	double GetPolarAngle(void) const;
+	double GetPolarLength() const;
+	double GetPolarAngle() const;
 
 	// Operators
 	const Complex operator + (const Complex &complex) const;

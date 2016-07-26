@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -107,7 +107,7 @@ END_EVENT_TABLE()
 //		double indicating current value in the minimum box
 //
 //==========================================================================
-double RangeLimitsDialog::GetMinimum(void) const
+double RangeLimitsDialog::GetMinimum() const
 {
 	double value;
 	if (!minBox->GetValue().ToDouble(&value))
@@ -132,7 +132,7 @@ double RangeLimitsDialog::GetMinimum(void) const
 //		double indicating current value in the maximum box
 //
 //==========================================================================
-double RangeLimitsDialog::GetMaximum(void) const
+double RangeLimitsDialog::GetMaximum() const
 {
 	double value;
 	if (!maxBox->GetValue().ToDouble(&value))

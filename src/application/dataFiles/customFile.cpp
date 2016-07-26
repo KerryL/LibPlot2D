@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -60,7 +60,7 @@ bool CustomFile::IsType(const wxString &fileName)
 //		wxArrayString
 //
 //==========================================================================
-wxArrayString CustomFile::CreateDelimiterList(void) const
+wxArrayString CustomFile::CreateDelimiterList() const
 {
 	if (fileFormat.GetDelimiter().IsEmpty())
 		return DataFile::CreateDelimiterList();
@@ -415,7 +415,7 @@ void CustomFile::AssembleAsynchronousDatasets(const std::vector<double> *rawData
 //		None
 //
 //==========================================================================
-void CustomFile::DoTypeSpecificLoadTasks(void)
+void CustomFile::DoTypeSpecificLoadTasks()
 {
 	ignoreConsecutiveDelimiters = !fileFormat.IsAsynchronous();
 	timeIsFormatted = !fileFormat.GetTimeFormat().IsEmpty();

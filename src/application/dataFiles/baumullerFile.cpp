@@ -1,6 +1,6 @@
 /*===================================================================================
                                     DataPlotter
-                          Copyright Kerry R. Loux 2011-2013
+                          Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
@@ -167,7 +167,7 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 //		None
 //
 //==========================================================================
-void BaumullerFile::DoTypeSpecificLoadTasks(void)
+void BaumullerFile::DoTypeSpecificLoadTasks()
 {
 	ignoreConsecutiveDelimiters = false;
 }
@@ -188,7 +188,7 @@ void BaumullerFile::DoTypeSpecificLoadTasks(void)
 //		None
 //
 //==========================================================================
-void BaumullerFile::DoTypeSpecificProcessTasks(void)
+void BaumullerFile::DoTypeSpecificProcessTasks()
 {
 	ignoreConsecutiveDelimiters = true;
 }
