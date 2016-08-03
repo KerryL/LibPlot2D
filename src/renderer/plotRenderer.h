@@ -20,6 +20,7 @@
 // Standard C++ headers
 #include <stack>
 #include <vector>
+#include <cmath>
 
 // Local headers
 #include "renderer/renderWindow.h"
@@ -177,6 +178,19 @@ public:
 	void SetLeftModelview(const Matrix& m) { leftModelview = m; }
 	void SetRightModelview(const Matrix& m) { rightModelview = m; }
 
+	// Scaling functions for handling differences in linear and logarithmic axis scales
+	inline double DoXScale(const double& value) { return xScaleFunction(value); }
+	inline double DoLeftYScale(const double& value) { return leftYScaleFunction(value); }
+	inline double DoRightYScale(const double& value) { return rightYScaleFunction(value); }
+
+	typedef double (*ScalingFunction)(const double&);
+	ScalingFunction GetXScaleFunction() { return xScaleFunction; }
+	ScalingFunction GetLeftYScaleFunction() { return leftYScaleFunction; }
+	ScalingFunction GetRightYScaleFunction() { return rightYScaleFunction; }
+
+	static inline double DoLineaerScale(const double& value) { return value; }
+	static inline double DoLogarithmicScale(const double& value) { return log10(value); }
+
 private:
 	static const std::string defaultVertexShader;
 
@@ -259,6 +273,11 @@ protected:
 
 	Matrix leftModelview;
 	Matrix rightModelview;
+
+	// Function pointers for working with plot values
+	ScalingFunction xScaleFunction;
+	ScalingFunction leftYScaleFunction;
+	ScalingFunction rightYScaleFunction;
 
 	// For the event table
 	DECLARE_EVENT_TABLE()

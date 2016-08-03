@@ -86,6 +86,7 @@ private:
 	double yScale;
 
 	void InitializeMarkerVertexBuffer();
+	static double* DoLogarithmicScale(const double* values, const unsigned int& count);
 };
 
 #endif// PLOT_CURVE_H_

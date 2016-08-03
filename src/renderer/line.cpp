@@ -216,8 +216,8 @@ void Line::Build(const double* const x, const double* const y,
 	unsigned int i;
 	for (i = 0; i < dPoints.size(); i++)
 	{
-		dPoints[i].first = static_cast<double>(x[i]);
-		dPoints[i].second = static_cast<double>(y[i]);
+		dPoints[i].first = x[i];
+		dPoints[i].second = y[i];
 	}
 	Build(dPoints, update);
 }

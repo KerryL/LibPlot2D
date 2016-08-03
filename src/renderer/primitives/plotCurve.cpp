@@ -153,8 +153,15 @@ void PlotCurve::Update(const unsigned int& i)
 			width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 			height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 
-			xScale = (xAxis->GetMaximum() - xAxis->GetMinimum()) / width;
-			yScale = (yAxis->GetMaximum() - yAxis->GetMinimum()) / height;
+			if (xAxis->IsLogarithmic())
+				xScale = (log10(xAxis->GetMaximum()) - log10(xAxis->GetMinimum())) / width;
+			else
+				xScale = (xAxis->GetMaximum() - xAxis->GetMinimum()) / width;
+
+			if (yAxis->IsLogarithmic())
+				yScale = (log10(yAxis->GetMaximum()) - log10(yAxis->GetMinimum())) / height;
+			else
+				yScale = (yAxis->GetMaximum() - yAxis->GetMinimum()) / height;
 
 		if (lineSize > 0)
 		{
@@ -166,7 +173,26 @@ void PlotCurve::Update(const unsigned int& i)
 			line.SetXScale(xScale);
 			line.SetYScale(yScale);
 
-			line.Build(data.GetXPointer(), data.GetYPointer(), data.GetNumberOfPoints());
+			const double* xPointer;
+			const double* yPointer;
+			if (xAxis->IsLogarithmic())
+				xPointer = DoLogarithmicScale(data.GetXPointer(), data.GetNumberOfPoints());
+			else
+				xPointer = data.GetXPointer();
+
+			if (yAxis->IsLogarithmic())
+				yPointer = DoLogarithmicScale(data.GetYPointer(), data.GetNumberOfPoints());
+			else
+				yPointer = data.GetYPointer();
+
+			line.Build(xPointer, yPointer, data.GetNumberOfPoints());
+
+			// Clean up dynamically allocated memory, if necessary
+			if (xAxis->IsLogarithmic())
+				delete[] xPointer;
+
+			if (yAxis->IsLogarithmic())
+				delete[] yPointer;
 		}
 		else
 			line.SetWidth(0.0);
@@ -351,20 +377,34 @@ void PlotCurve::BuildMarkers()
 	const unsigned int dimension(renderWindow.GetVertexDimension());
 	const unsigned int colorStart(data.GetNumberOfPoints() * dimension * 4);
 
+	// Use function pointers to save a few checks in the loop
+	PlotRenderer::ScalingFunction xScaleFunction(
+		dynamic_cast<PlotRenderer&>(renderWindow).GetXScaleFunction());
+	PlotRenderer::ScalingFunction yScaleFunction;
+
+	if (yAxis->GetOrientation() == Axis::OrientationLeft)
+		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetLeftYScaleFunction();
+	else
+		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetRightYScaleFunction();
+
+	float x, y;
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); i++)
 	{
-		bufferInfo[1].vertexBuffer[i * 4 * dimension] = (float)data.GetXData(i) + halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = (float)data.GetYData(i) + halfMarkerYSize;
+		x = static_cast<float>(xScaleFunction(data.GetXData(i)));
+		y = static_cast<float>(yScaleFunction(data.GetYData(i)));
 
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension] = (float)data.GetXData(i) + halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension + 1] = (float)data.GetYData(i) - halfMarkerYSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension] = x + halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = y + halfMarkerYSize;
 
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension] = (float)data.GetXData(i) - halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension + 1] = (float)data.GetYData(i) - halfMarkerYSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension] = x + halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension + 1] = y - halfMarkerYSize;
 
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension] = (float)data.GetXData(i) - halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension + 1] = (float)data.GetYData(i) + halfMarkerYSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension] = x - halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension + 1] = y - halfMarkerYSize;
+
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension] = x - halfMarkerXSize;
+		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension + 1] = y + halfMarkerYSize;
 
 		bufferInfo[1].vertexBuffer[colorStart + i * 16] = (float)color.GetRed();
 		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 1] = (float)color.GetGreen();
@@ -386,6 +426,32 @@ void PlotCurve::BuildMarkers()
 		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 14] = (float)color.GetBlue();
 		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 15] = (float)color.GetAlpha();
 	}
+}
+
+//==========================================================================
+// Class:			PlotCurve
+// Function:		DoLogarithmicScale
+//
+// Description:		Handles scaling for arrays of logarithmic data.
+//
+// Input Arguments:
+//		value	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double*
+//
+//==========================================================================
+double* PlotCurve::DoLogarithmicScale(const double* values, const unsigned int& count)
+{
+	double* scaledValues = new double[count];
+	unsigned int i;
+	for (i = 0; i < count; i++)
+		scaledValues[i] = PlotRenderer::DoLogarithmicScale(values[i]);
+
+	return scaledValues;
 }
 
 //==========================================================================

@@ -2128,12 +2128,17 @@ void PlotObject::ComputeTransformationMatrices()
 	int width, height;
 	renderer.GetSize(&width, &height);
 
-	double plotAreaWidth = width - axisLeft->GetOffsetFromWindowEdge() - axisRight->GetOffsetFromWindowEdge();
-	double plotAreaHeight = height - axisBottom->GetOffsetFromWindowEdge() - axisTop->GetOffsetFromWindowEdge();
+	double plotAreaWidth = width - axisLeft->GetOffsetFromWindowEdge()
+		- axisRight->GetOffsetFromWindowEdge();
+	double plotAreaHeight = height - axisBottom->GetOffsetFromWindowEdge()
+		- axisTop->GetOffsetFromWindowEdge();
 
-	double xScale = plotAreaWidth / (axisBottom->GetMaximum() - axisBottom->GetMinimum());
-	double leftYScale = plotAreaHeight / (axisLeft->GetMaximum() - axisLeft->GetMinimum());
-	double rightYScale = plotAreaHeight / (axisRight->GetMaximum() - axisRight->GetMinimum());
+	double xScale = plotAreaWidth / (renderer.DoXScale(axisBottom->GetMaximum())
+		- renderer.DoXScale(axisBottom->GetMinimum()));
+	double leftYScale = plotAreaHeight / (renderer.DoLeftYScale(axisLeft->GetMaximum())
+		- renderer.DoLeftYScale(axisLeft->GetMinimum()));
+	double rightYScale = plotAreaHeight / (renderer.DoRightYScale(axisRight->GetMaximum())
+		- renderer.DoRightYScale(axisRight->GetMinimum()));
 
 	RenderWindow::Translate(left, axisLeft->GetOffsetFromWindowEdge(),
 		axisBottom->GetOffsetFromWindowEdge(), 0.0);
@@ -2143,8 +2148,10 @@ void PlotObject::ComputeTransformationMatrices()
 	RenderWindow::Scale(left, xScale, leftYScale, 1.0);
 	RenderWindow::Scale(right, xScale, rightYScale, 1.0);
 
-	RenderWindow::Translate(left, -axisBottom->GetMinimum(), -axisLeft->GetMinimum(), 0.0);
-	RenderWindow::Translate(right, -axisBottom->GetMinimum(), -axisRight->GetMinimum(), 0.0);
+	RenderWindow::Translate(left, -renderer.DoXScale(axisBottom->GetMinimum()),
+		-renderer.DoLeftYScale(axisLeft->GetMinimum()), 0.0);
+	RenderWindow::Translate(right, -renderer.DoXScale(axisBottom->GetMinimum()),
+		-renderer.DoRightYScale(axisRight->GetMinimum()), 0.0);
 
 	renderer.SetLeftModelview(left);
 	renderer.SetRightModelview(right);

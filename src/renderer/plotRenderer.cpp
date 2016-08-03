@@ -110,7 +110,9 @@ PlotRenderer::PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID 
 	: RenderWindow(wxParent, id, attr, wxDefaultPosition, wxDefaultSize),
 	plotOwner(plotOwner)
 {
-	CreateActors();
+	xScaleFunction = DoLineaerScale;
+	leftYScaleFunction = DoLineaerScale;
+	rightYScaleFunction = DoLineaerScale;
 
 	SetView3D(false);
 
@@ -121,6 +123,8 @@ PlotRenderer::PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID 
 	ignoreNextMouseMove = false;
 
 	curveQuality = QualityAlwaysHigh;
+
+	CreateActors();
 }
 
 //==========================================================================
@@ -196,6 +200,21 @@ END_EVENT_TABLE()
 //==========================================================================
 void PlotRenderer::UpdateDisplay()
 {
+	if (GetXLogarithmic())
+		xScaleFunction = DoLogarithmicScale;
+	else
+		xScaleFunction = DoLineaerScale;
+
+	if (GetLeftLogarithmic())
+		leftYScaleFunction = DoLogarithmicScale;
+	else
+		leftYScaleFunction = DoLineaerScale;
+
+	if (GetRightLogarithmic())
+		rightYScaleFunction = DoLogarithmicScale;
+	else
+		rightYScaleFunction = DoLineaerScale;
+
 	plot->Update();
 	Refresh();
 	Update();
@@ -1971,9 +1990,9 @@ double PlotRenderer::GetXMin() const
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetXMin
+// Function:		GetXMax
 //
-// Description:		Returns the minimum value of the X-axis.
+// Description:		Returns the maximum value of the X-axis.
 //
 // Input Arguments:
 //		None
@@ -1992,9 +2011,9 @@ double PlotRenderer::GetXMax() const
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetXMin
+// Function:		GetLeftYMin
 //
-// Description:		Returns the minimum value of the X-axis.
+// Description:		Returns the minimum value of the left y-axis.
 //
 // Input Arguments:
 //		None
@@ -2013,9 +2032,9 @@ double PlotRenderer::GetLeftYMin() const
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetXMin
+// Function:		GetLeftYMax
 //
-// Description:		Returns the minimum value of the X-axis.
+// Description:		Returns the maximum value of the left y-axis.
 //
 // Input Arguments:
 //		None
@@ -2034,9 +2053,9 @@ double PlotRenderer::GetLeftYMax() const
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetXMin
+// Function:		GetRightYMin
 //
-// Description:		Returns the minimum value of the X-axis.
+// Description:		Returns the minimum value of the right y-axis.
 //
 // Input Arguments:
 //		None
@@ -2055,9 +2074,9 @@ double PlotRenderer::GetRightYMin() const
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		GetXMin
+// Function:		GetRightYMax
 //
-// Description:		Returns the minimum value of the X-axis.
+// Description:		Returns the maximum value of the right y-axis.
 //
 // Input Arguments:
 //		None
