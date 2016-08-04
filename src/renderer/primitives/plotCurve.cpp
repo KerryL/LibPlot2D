@@ -163,7 +163,7 @@ void PlotCurve::Update(const unsigned int& i)
 			else
 				yScale = (yAxis->GetMaximum() - yAxis->GetMinimum()) / height;
 
-		if (lineSize > 0)
+		if (lineSize > 0.0)
 		{
 			const double lineSizeScale(1.2);
 
@@ -255,12 +255,16 @@ void PlotCurve::GenerateGeometry()
 		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewRight);
 
 	glEnable(GL_SCISSOR_TEST);
-	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 
-	if (pretty)
-		Line::DoPrettyDraw(bufferInfo[0].indexCount);
-	else
-		Line::DoUglyDraw(bufferInfo[0].vertexCount);
+	if (lineSize > 0.0)
+	{
+		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+
+		if (pretty)
+			Line::DoPrettyDraw(bufferInfo[0].indexCount);
+		else
+			Line::DoUglyDraw(bufferInfo[0].vertexCount);
+	}
 
 	if (NeedsMarkersDrawn())
 	{
