@@ -1047,7 +1047,9 @@ bool MainFrame::LoadFiles(const wxArrayString &fileList)
 	SetXDataLabel(genericXAxisLabel);
 	plotArea->SaveCurrentZoom();
 
-	lastFilesLoaded = fileList;
+	// Because fileList is a reference (and may refer to lastFilesLoaded), we need to check for self-assignment
+	if (&fileList != &lastFilesLoaded)
+		lastFilesLoaded = fileList;
 	lastSelectionInfo = selectionInfo;
 	lastDescriptions = files[files.size() - 1]->GetAllDescriptions();
 
