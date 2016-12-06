@@ -1,4 +1,4 @@
-# makefile.inc (DataPlotter)
+# makefile.inc (libPlot2D)
 # This file contains all of the environment definitions
 # common to each of the makefiles within the project. 
 #

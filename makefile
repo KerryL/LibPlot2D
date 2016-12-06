@@ -1,11 +1,11 @@
-# makefile (DataPlotter)
+# makefile (libPlot2D)
 #
 # Include the common definitions
 include makefile.inc
 
 # Name of the executable to compile and link
-TARGET = DataPlotter
-TARGET_DEBUG = DataPlotterd
+TARGET = libPlot2d.lib
+TARGET_DEBUG = libPlot2d_debug.lib
 
 # Directories in which to search for source files
 DIRS = \
@@ -19,7 +19,7 @@ DIRS = \
 
 # Source files
 SRC = $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
-VERSION_FILE = src/application/gitHash.cpp
+VERSION_FILE = src/gitHash.cpp
 
 # Object files
 TEMP_OBJS_DEBUG = $(addprefix $(OBJDIR_DEBUG),$(SRC:.cpp=.o))
