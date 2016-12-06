@@ -1,11 +1,7 @@
 # Ignore MSVC++ binary and object directories
 Debug/
 Release/
-Debug wx2.8/
-Release wx2.8/
 ipch/
-DataPlotter/Debug
-DataPlotter/Release
 *.opendb
 *.db
 
@@ -17,7 +13,6 @@ DataPlotter/Release
 # Ignore GKT directories
 bin/
 .obj/
-/DataPlotter/nbproject/private/
 
 # Ignore automatically generated files
 gitHash.cpp
