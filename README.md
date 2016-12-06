@@ -1,4 +1,4 @@
-LibPlot2S
+LibPlot2D
 ===========
 
 LibPlot2D is a lightweight 2D data plotting and analysis library.  It is licsensed under the GPLv2 license.
