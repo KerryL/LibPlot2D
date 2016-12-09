@@ -16,8 +16,8 @@
 //				 required definitions is not used.
 // History:
 
-#ifndef _MACHINE_DEFS_H_
-#define _MACHINE_DEFS_H_
+#ifndef MACHINE_DEFS_H_
+#define MACHINE_DEFS_H_
 
 // Standard C++ headers
 #include <stdint.h>
@@ -86,4 +86,4 @@ inline uint64_t ReadUInt64(uint32_t in)
 
 }// namespace LibPlot2D
 
-#endif// _MACHINE_DEFS_H_
+#endif// MACHINE_DEFS_H_

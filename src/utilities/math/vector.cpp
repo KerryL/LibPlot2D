@@ -59,9 +59,9 @@ Vector::Vector()
 // Description:		Constructor for the Vector class.
 //
 // Input Arguments:
-//		_x	= const double& specifying first component of the vector
-//		_y	= const double& specifying second component of the vector
-//		_z	= const double& specifying third component of the vector
+//		x	= const double& specifying first component of the vector
+//		y	= const double& specifying second component of the vector
+//		z	= const double& specifying third component of the vector
 //
 // Output Arguments:
 //		None
@@ -70,12 +70,8 @@ Vector::Vector()
 //		None
 //
 //==========================================================================
-Vector::Vector(const double &_x, const double &_y, const double &_z)
+Vector::Vector(const double &x, const double &y, const double &z) : x(x), y(y), z(z)
 {
-	// Assign the arguments to the class members
-	x = _x;
-	y = _y;
-	z = _z;
 }
 
 //==========================================================================
@@ -98,26 +94,6 @@ Vector::Vector(const Vector &v)
 {
 	// Copy from the argument to this
 	*this = v;
-}
-
-//==========================================================================
-// Class:			Vector
-// Function:		~Vector
-//
-// Description:		Destructor for the Vector class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-Vector::~Vector()
-{
 }
 
 //==========================================================================
@@ -497,9 +473,9 @@ wxString Vector::Print() const
 // Description:		Sets the contents of this vector as specified.
 //
 // Input Arguments:
-//		_x	= const double& specifying first component of the vector
-//		_y	= const double& specifying second component of the vector
-//		_z	= const double& specifying third component of the vector
+//		xIn	= const double& specifying first component of the vector
+//		yIn	= const double& specifying second component of the vector
+//		zIn	= const double& specifying third component of the vector
 //
 // Output Arguments:
 //		None
@@ -508,12 +484,12 @@ wxString Vector::Print() const
 //		None
 //
 //==========================================================================
-void Vector::Set(const double &_x, const double &_y, const double &_z)
+void Vector::Set(const double &xIn, const double &yIn, const double &zIn)
 {
 	// Assign the arguments to the class members
-	x = _x;
-	y = _y;
-	z = _z;
+	x = xIn;
+	y = yIn;
+	z = zIn;
 }
 
 //==========================================================================

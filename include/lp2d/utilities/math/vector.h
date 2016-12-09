@@ -45,11 +45,8 @@ class Vector
 public:
 	// Constructors
 	Vector();
-	Vector(const double &_x, const double &_y, const double &_z);
+	Vector(const double &x, const double &y, const double &z);
 	Vector(const Vector &v);
-
-	// Destructor
-	~Vector();
 
 	// Main class data
 	double x, y, z;
@@ -86,7 +83,7 @@ public:
 	wxString Print() const;
 
 	// Set this object to the specified values
-	void Set(const double &_x, const double &_y, const double &_z);
+	void Set(const double &x, const double &y, const double &z);
 
 	// Force magnitude == 1 while preserving the direction
 	Vector Normalize() const;

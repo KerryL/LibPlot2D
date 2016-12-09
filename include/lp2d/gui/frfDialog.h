@@ -13,8 +13,8 @@
 // Description:  Dialog for selection of frequency response function data.
 // History:
 
-#ifndef _FRF_DIALOG_H_
-#define _FRF_DIALOG_H_
+#ifndef FRF_DIALOG_H_
+#define FRF_DIALOG_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -56,4 +56,4 @@ private:
 
 }// namespace LibPlot2D
 
-#endif// _FRF_DIALOG_H_
+#endif// FRF_DIALOG_H_

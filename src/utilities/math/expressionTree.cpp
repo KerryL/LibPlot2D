@@ -83,9 +83,10 @@ const unsigned int ExpressionTree::printfPrecision = 15;
 //		wxString, empty for success, error string if unsuccessful
 //
 //==========================================================================
-wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData, const double &xAxisFactor)
+wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData,
+	const double &xAxisFactor)
 {
-	this->xAxisFactor = xAxisFactor;
+	mXAxisFactor = xAxisFactor;
 
 	if (!ParenthesesBalanced(expression))
 		return _T("Imbalanced parentheses!");
@@ -1027,7 +1028,7 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 	else if (function.CmpNoCase(_T("ddt")) == 0)
 		return DiscreteDerivative::ComputeTimeHistory(set);
 	else if (function.CmpNoCase(_T("fft")) == 0)
-		return FastFourierTransform::ComputeFFT(set).MultiplyXData(xAxisFactor);
+		return FastFourierTransform::ComputeFFT(set).MultiplyXData(mXAxisFactor);
 	else if (function.CmpNoCase(_T("log")) == 0)
 		return set.DoLog();
 	else if (function.CmpNoCase(_T("log10")) == 0)

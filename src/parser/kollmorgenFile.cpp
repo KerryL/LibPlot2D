@@ -27,7 +27,7 @@ namespace LibPlot2D
 //					type of file.
 //
 // Input Arguments:
-//		_fileName	= const wxString&
+//		testFile	= const wxString&
 //
 // Output Arguments:
 //		None
@@ -36,12 +36,12 @@ namespace LibPlot2D
 //		bool, true if this object can process the specified file, false otherwise
 //
 //==========================================================================
-bool KollmorgenFile::IsType(const wxString &_fileName)
+bool KollmorgenFile::IsType(const wxString &testFile)
 {
-	std::ifstream file(_fileName.mb_str(), std::ios::in);
+	std::ifstream file(testFile.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + _fileName + _T("'!"),
+		wxMessageBox(_T("Could not open file '") + testFile + _T("'!"),
 			_T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}

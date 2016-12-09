@@ -16,8 +16,8 @@
 //	11/7/2011	- Corrected camelCase, K. Loux.
 //	8/10/2012	- Removed dependence on ObjectList in favor of std::vector, K. Loux.
 
-#ifndef _MANAGED_LIST_H_
-#define _MANAGED_LIST_H_
+#ifndef MANAGED_LIST_H_
+#define MANAGED_LIST_H_
 
 // Standard C++ headers
 #include <cstdlib>
@@ -225,4 +225,4 @@ void ManagedList<T>::Clear()
 
 }// namespace LibPlot2D
 
-#endif// _MANAGED_LIST_H_
+#endif// MANAGED_LIST_H_

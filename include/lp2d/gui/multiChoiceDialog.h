@@ -14,8 +14,8 @@
 //				 but with a select all button.
 // History:
 
-#ifndef _MULTI_CHOICE_DIALOG_H_
-#define _MULTI_CHOICE_DIALOG_H_
+#ifndef MULTI_CHOICE_DIALOG_H_
+#define MULTI_CHOICE_DIALOG_H_
 
 // Standard C++ headers
 #include <vector>
@@ -74,4 +74,4 @@ private:
 
 }// namespace LibPlot2D
 
-#endif// _MULTI_CHOICE_DIALOG_H_
+#endif// MULTI_CHOICE_DIALOG_H_

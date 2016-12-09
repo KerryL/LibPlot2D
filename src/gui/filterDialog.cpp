@@ -55,7 +55,7 @@ const unsigned int FilterDialog::maxFilterOrder(10000);
 //
 // Input Arguments:
 //		parent		= wxWindow* that owns this object
-//		_parameters	= const FilterParameters*
+//		parameters	= const FilterParameters*
 //
 // Output Arguments:
 //		None
@@ -64,24 +64,22 @@ const unsigned int FilterDialog::maxFilterOrder(10000);
 //		None
 //
 //==========================================================================
-FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* _parameters)
-	: wxDialog(parent, wxID_ANY, _T("Specify Filter"), wxDefaultPosition)
+FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* parameters)
+	: wxDialog(parent, wxID_ANY, _T("Specify Filter"), wxDefaultPosition), initialized(false)
 {
-	initialized = false;
-
-	if (_parameters)
-		parameters = *_parameters;
+	if (parameters)
+		mParameters = *parameters;
 	else
 	{
-		parameters.cutoffFrequency = 5.0;
-		parameters.dampingRatio = 1.0;
-		parameters.order = 2;
-		parameters.type = FilterParameters::TypeLowPass;
-		parameters.phaseless = false;
-		parameters.butterworth = false;
-		parameters.width = parameters.cutoffFrequency;
-		parameters.numerator.Clear();
-		parameters.denominator.Clear();
+		mParameters.cutoffFrequency = 5.0;
+		mParameters.dampingRatio = 1.0;
+		mParameters.order = 2;
+		mParameters.type = FilterParameters::TypeLowPass;
+		mParameters.phaseless = false;
+		mParameters.butterworth = false;
+		mParameters.width = mParameters.cutoffFrequency;
+		mParameters.numerator.Clear();
+		mParameters.denominator.Clear();
 	}
 
 	automaticStringPrecision = true;
@@ -185,21 +183,21 @@ wxSizer* FilterDialog::CreateTextBoxes()
 	sizer->AddGrowableCol(1);
 
 	cutoffFrequencyBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		PlotMath::GetPrecision(parameters.cutoffFrequency, stringPrecision), parameters.cutoffFrequency));
+		PlotMath::GetPrecision(mParameters.cutoffFrequency, stringPrecision), mParameters.cutoffFrequency));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Cutoff Frequency [Hz]")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(cutoffFrequencyBox, 0, wxEXPAND);
 
 	dampingRatioBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		PlotMath::GetPrecision(parameters.dampingRatio, stringPrecision), parameters.dampingRatio));
+		PlotMath::GetPrecision(mParameters.dampingRatio, stringPrecision), mParameters.dampingRatio));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Damping Ratio")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(dampingRatioBox, 0, wxEXPAND);
 
 	widthBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		PlotMath::GetPrecision(parameters.width, stringPrecision), parameters.width));
+		PlotMath::GetPrecision(mParameters.width, stringPrecision), mParameters.width));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Width [Hz]")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(widthBox, 0, wxEXPAND);
 
-	orderSpin = new wxSpinCtrl(this, SpinID, wxString::Format("%i", parameters.order));
+	orderSpin = new wxSpinCtrl(this, SpinID, wxString::Format("%i", mParameters.order));
 	orderSpin->SetRange(1, maxFilterOrder);
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Order")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(orderSpin);
@@ -233,9 +231,9 @@ wxSizer* FilterDialog::CreateCheckBoxes()
 	phaselessCheckBox = new wxCheckBox(this, wxID_ANY, _T("Phaseless"));
 	sizer->Add(phaselessCheckBox, 0, wxALL, 2);
 
-	if (parameters.butterworth)
+	if (mParameters.butterworth)
 		butterworthCheckBox->SetValue(true);
-	if (parameters.phaseless)
+	if (mParameters.phaseless)
 		phaselessCheckBox->SetValue(true);
 
 	return sizer;
@@ -275,17 +273,17 @@ wxSizer* FilterDialog::CreateRadioButtons()
 	typeSizer->Add(notchRadio, 0, wxALL, 2);
 	typeSizer->Add(customRadio, 0, wxALL, 2);
 
-	if (parameters.type == FilterParameters::TypeHighPass)
+	if (mParameters.type == FilterParameters::TypeHighPass)
 		highPassRadio->SetValue(true);
-	else if (parameters.type == FilterParameters::TypeLowPass)
+	else if (mParameters.type == FilterParameters::TypeLowPass)
 		lowPassRadio->SetValue(true);
-	else if (parameters.type == FilterParameters::TypeBandStop)
+	else if (mParameters.type == FilterParameters::TypeBandStop)
 		bandStopRadio->SetValue(true);
-	else if (parameters.type == FilterParameters::TypeBandPass)
+	else if (mParameters.type == FilterParameters::TypeBandPass)
 		bandPassRadio->SetValue(true);
-	else if (parameters.type == FilterParameters::TypeNotch)
+	else if (mParameters.type == FilterParameters::TypeNotch)
 		notchRadio->SetValue(true);
-	else if (parameters.type == FilterParameters::TypeCustom)
+	else if (mParameters.type == FilterParameters::TypeCustom)
 		customRadio->SetValue(true);
 	else
 		assert(false);
@@ -319,8 +317,8 @@ wxSizer* FilterDialog::CreateTransferFunctionControls()
 	numeratorBox = new wxTextCtrl(this, TransferFunctionID);
 	denominatorBox = new wxTextCtrl(this, TransferFunctionID);
 
-	numeratorBox->ChangeValue(parameters.numerator);
-	denominatorBox->ChangeValue(parameters.denominator);
+	numeratorBox->ChangeValue(mParameters.numerator);
+	denominatorBox->ChangeValue(mParameters.denominator);
 
 	wxBoxSizer *tfSizer = new wxBoxSizer(wxVERTICAL);
 	tfSizer->Add(numeratorBox, 1, wxGROW | wxALL, 2);
@@ -555,12 +553,12 @@ bool FilterDialog::TransferDataFromWindow()
 		}
 	}
 
-	parameters.order = orderSpin->GetValue();
-	parameters.phaseless = phaselessCheckBox->GetValue();
-	parameters.butterworth = butterworthCheckBox->GetValue();
-	parameters.numerator = numeratorBox->GetValue();
-	parameters.denominator = denominatorBox->GetValue();
-	parameters.type = GetType();
+	mParameters.order = orderSpin->GetValue();
+	mParameters.phaseless = phaselessCheckBox->GetValue();
+	mParameters.butterworth = butterworthCheckBox->GetValue();
+	mParameters.numerator = numeratorBox->GetValue();
+	mParameters.denominator = denominatorBox->GetValue();
+	mParameters.type = GetType();
 
 	if (!CutoffFrequencyIsValid() ||
 		!DampingRatioIsValid() ||
@@ -596,12 +594,12 @@ bool FilterDialog::TransferDataFromWindow()
 //==========================================================================
 bool FilterDialog::CutoffFrequencyIsValid()
 {
-	if (!cutoffFrequencyBox->GetValue().ToDouble(&parameters.cutoffFrequency))
+	if (!cutoffFrequencyBox->GetValue().ToDouble(&mParameters.cutoffFrequency))
 	{
 		wxMessageBox(_T("ERROR:  Cutoff frequency must be numeric!"), _T("Error Defining Filter"));
 		return false;
 	}
-	else if (parameters.cutoffFrequency <= 0.0)
+	else if (mParameters.cutoffFrequency <= 0.0)
 	{
 		wxMessageBox(_T("ERROR:  Cutoff frequency must be strictly positive!"), _T("Error Defining Filter"));
 		return false;
@@ -630,12 +628,12 @@ bool FilterDialog::DampingRatioIsValid()
 {
 	if (DampingRatioInputRequired())
 	{
-		if (!dampingRatioBox->GetValue().ToDouble(&parameters.dampingRatio))
+		if (!dampingRatioBox->GetValue().ToDouble(&mParameters.dampingRatio))
 		{
 			wxMessageBox(_T("ERROR:  Damping ratio must be numeric!"), _T("Error Defining Filter"));
 			return false;
 		}
-		else if (parameters.dampingRatio <= 0.0)
+		else if (mParameters.dampingRatio <= 0.0)
 		{
 			wxMessageBox(_T("ERROR:  Damping ratio must be strictly positive!"), _T("Error Defining Filter"));
 			return false;
@@ -663,16 +661,16 @@ bool FilterDialog::DampingRatioIsValid()
 //==========================================================================
 bool FilterDialog::WidthIsValid()
 {
-	if (parameters.type == FilterParameters::TypeBandStop ||
-		parameters.type == FilterParameters::TypeBandPass ||
-		parameters.type == FilterParameters::TypeNotch)
+	if (mParameters.type == FilterParameters::TypeBandStop ||
+		mParameters.type == FilterParameters::TypeBandPass ||
+		mParameters.type == FilterParameters::TypeNotch)
 	{
-		if (!widthBox->GetValue().ToDouble(&parameters.width))
+		if (!widthBox->GetValue().ToDouble(&mParameters.width))
 		{
 			wxMessageBox(_T("ERROR:  Width must be numeric!"), _T("Error Defining Filter"));
 			return false;
 		}
-		else if (parameters.width < 0.0)
+		else if (mParameters.width < 0.0)
 		{
 			wxMessageBox(_T("ERROR:  Width must be positive!"), _T("Error Defining Filter"));
 			return false;
@@ -700,7 +698,7 @@ bool FilterDialog::WidthIsValid()
 //==========================================================================
 bool FilterDialog::ExpressionIsValid(const wxString &expression)
 {
-	if (parameters.type != FilterParameters::TypeCustom)
+	if (mParameters.type != FilterParameters::TypeCustom)
 		return true;
 
 	ExpressionTree e;

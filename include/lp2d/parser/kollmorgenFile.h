@@ -13,8 +13,8 @@
 // Description:  File class for Kollmorgen files.
 // History:
 
-#ifndef _KOLLMORGEN_FILE_H_
-#define _KOLLMORGEN_FILE_H_
+#ifndef KOLLMORGEN_FILE_H_
+#define KOLLMORGEN_FILE_H_
 
 // Local headers
 #include "lp2d/parser/dataFile.h"
@@ -29,7 +29,7 @@ public:
 	KollmorgenFile(const wxString& fileName)
 		: DataFile(fileName) {}
 
-	static bool IsType(const wxString &testFile);
+	static bool IsType(const wxString &fileName);
 
 protected:
 	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
@@ -45,4 +45,4 @@ private:
 
 }// namespace LibPlot2D
 
-#endif//_KOLLMORGEN_FILE_H_
+#endif// KOLLMORGEN_FILE_H_

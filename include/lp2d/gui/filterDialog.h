@@ -61,9 +61,9 @@ class FilterDialog : public wxDialog
 {
 public:
 	// Constructor
-	FilterDialog(wxWindow *parent, const FilterParameters* _parameters = NULL);
+	FilterDialog(wxWindow *parent, const FilterParameters* parameters = NULL);
 
-	const FilterParameters& GetFilterParameters() const { return parameters; };
+	const FilterParameters& GetFilterParameters() const { return mParameters; };
 	static wxString GetFilterNamePrefix(const FilterParameters &parameters);
 
 private:
@@ -91,7 +91,7 @@ private:
 	wxTextCtrl *numeratorBox;
 	wxTextCtrl *denominatorBox;
 
-	FilterParameters parameters;
+	FilterParameters mParameters;
 
 	// Overload from wxDialog
 	virtual bool TransferDataFromWindow();

@@ -24,7 +24,7 @@ class Complex
 public:
 	// Constructor
 	Complex();
-	Complex(const double &_real, const double &_imaginary);
+	Complex(const double &real, const double &imaginary);
 
 	// Destructor
 	~Complex();

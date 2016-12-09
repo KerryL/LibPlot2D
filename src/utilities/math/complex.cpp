@@ -52,8 +52,8 @@ Complex::Complex()
 // Description:		Constructor for the Complex class.
 //
 // Input Arguments:
-//		_real		= const double& real component of the complex number
-//		_imaginary	= const double& imaginary component of the complex number
+//		real		= const double& real component of the complex number
+//		imaginary	= const double& imaginary component of the complex number
 //
 // Output Arguments:
 //		None
@@ -62,11 +62,8 @@ Complex::Complex()
 //		None
 //
 //==========================================================================
-Complex::Complex(const double &_real, const double &_imaginary)
+Complex::Complex(const double &real, const double &imaginary) : real(real), imaginary(imaginary)
 {
-	// Assign the arguments to the class members
-	real = _real;
-	imaginary = _imaginary;
 }
 
 //==========================================================================

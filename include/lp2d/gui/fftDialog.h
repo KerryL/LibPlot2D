@@ -13,8 +13,8 @@
 // Description:  Dialog for specification of FFT options.
 // History:
 
-#ifndef _FFT_DIALOG_H_
-#define _FFT_DIALOG_H_
+#ifndef FFT_DIALOG_H_
+#define FFT_DIALOG_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -29,8 +29,8 @@ class FFTDialog : public wxDialog
 {
 public:
 	// Constructor
-	FFTDialog(wxWindow *parent, const unsigned int &_dataPoints,
-		const unsigned int &_zoomDataPoints, const double &_sampleTime);
+	FFTDialog(wxWindow *parent, const unsigned int &dataPoints,
+		const unsigned int &zoomDataPoints, const double &sampleTime);
 
 	FastFourierTransform::FFTWindow GetFFTWindow() const;
 	unsigned int GetWindowSize() const;
@@ -75,4 +75,4 @@ private:
 
 }// namespace LibPlot2D
 
-#endif// _FFT_DIALOG_H_
+#endif// FFT_DIALOG_H_

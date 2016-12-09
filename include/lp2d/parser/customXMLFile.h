@@ -13,8 +13,8 @@
 // Description:  File class for custom (XML) files defined by the user using an XML file.
 // History:
 
-#ifndef _CUSTOM_XML_FILE_H_
-#define _CUSTOM_XML_FILE_H_
+#ifndef CUSTOM_XML_FILE_H_
+#define CUSTOM_XML_FILE_H_
 
 // Local headers
 #include "lp2d/parser/dataFile.h"
@@ -33,7 +33,7 @@ public:
 	CustomXMLFile(const wxString& fileName) : DataFile(fileName),
 		fileFormat(fileName) {}
 
-	static bool IsType(const wxString &testFile);
+	static bool IsType(const wxString &fileName);
 
 protected:
 	CustomFileFormat fileFormat;
@@ -60,4 +60,4 @@ protected:
 
 }// namespace LibPlot2D
 
-#endif//_CUSTOM_XML_FILE_H_
+#endif// CUSTOM_XML_FILE_H_

@@ -41,18 +41,12 @@ namespace LibPlot2D
 //		None
 //
 //==========================================================================
-FFTDialog::FFTDialog(wxWindow *parent, const unsigned int &_dataPoints,
-	const unsigned int &_zoomDataPoints, const double &_sampleTime)
-	: wxDialog(parent, wxID_ANY, _T("Fast Fourier Transform"), wxDefaultPosition)
+FFTDialog::FFTDialog(wxWindow *parent, const unsigned int &dataPoints,
+	const unsigned int &zoomDataPoints, const double &sampleTime)
+	: wxDialog(parent, wxID_ANY, _T("Fast Fourier Transform"), wxDefaultPosition),
+	dataPoints(dataPoints), zoomDataPoints(zoomDataPoints), sampleTime(sampleTime),
+	frequencyRange(nullptr), frequencyResolution(nullptr), numberOfAverages(nullptr)
 {
-	dataPoints = _dataPoints;
-	zoomDataPoints = _zoomDataPoints;
-	sampleTime = _sampleTime;
-
-	frequencyRange = NULL;
-	frequencyResolution = NULL;
-	numberOfAverages = NULL;
-
 	CreateControls();
 }
 

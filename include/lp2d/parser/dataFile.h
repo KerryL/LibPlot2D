@@ -13,8 +13,8 @@
 // Description:  Base class for data file classes.
 // History:
 
-#ifndef _DATA_FILE_H_
-#define _DATA_FILE_H_
+#ifndef DATA_FILE_H_
+#define DATA_FILE_H_
 
 // Standard C++ headers
 #include <vector>
@@ -112,4 +112,4 @@ protected:
 
 }// namespace LibPlot2D
 
-#endif// _DATA_FILE_H_
+#endif// DATA_FILE_H_

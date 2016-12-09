@@ -13,8 +13,8 @@
 // Description:  File class for Baumuller files.
 // History:
 
-#ifndef _BAUMULLER_FILE_H_
-#define _BAUMULLER_FILE_H_
+#ifndef BAUMULLER_FILE_H_
+#define BAUMULLER_FILE_H_
 
 // Local headers
 #include "lp2d/parser/dataFile.h"
@@ -28,7 +28,7 @@ public:
 	// Constructor
 	BaumullerFile(const wxString& fileName) : DataFile(fileName) {}
 
-	static bool IsType(const wxString &testFile);
+	static bool IsType(const wxString &fileName);
 
 protected:
 	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
@@ -43,4 +43,4 @@ protected:
 
 }// namespace LibPlot2D
 
-#endif//_BAUMULLER_FILE_H_
+#endif//BAUMULLER_FILE_H_

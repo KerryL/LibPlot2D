@@ -37,7 +37,7 @@ public:
 	ExpressionTree(const ManagedList<const Dataset2D> *_list = NULL);
 
 	// Main solver method
-	wxString Solve(wxString expression, Dataset2D &solvedData, const double &_xAxisFactor);
+	wxString Solve(wxString expression, Dataset2D &solvedData, const double &xAxisFactor);
 	std::string Solve(std::string expression, std::string &solvedExpression);
 
 	static wxArrayString BreakApartTerms(const wxString &s);
@@ -47,7 +47,7 @@ private:
 	static const unsigned int printfPrecision;
 	const ManagedList<const Dataset2D> *list;
 
-	double xAxisFactor;
+	double mXAxisFactor;
 
 	std::queue<wxString> outputQueue;
 

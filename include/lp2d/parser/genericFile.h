@@ -13,8 +13,8 @@
 // Description:  Generic delimited data file.
 // History:
 
-#ifndef _GENERIC_FILE_H_
-#define _GENERIC_FILE_H_
+#ifndef GENERIC_FILE_H_
+#define GENERIC_FILE_H_
 
 // Local headers
 #include "lp2d/parser/dataFile.h"
@@ -28,9 +28,9 @@ public:
 	// Constructor
 	GenericFile(const wxString& fileName) : DataFile(fileName) {}
 
-	static bool IsType(const wxString &testFile);
+	static bool IsType(const wxString &fileName);
 };
 
 }// namespace LibPlot2D
 
-#endif//_GENERIC_FILE_H_
+#endif//GENERIC_FILE_H_

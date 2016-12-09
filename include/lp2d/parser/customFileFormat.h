@@ -14,8 +14,8 @@
 //				 file and reading them into Dataset2D objects.
 // History:
 
-#ifndef _CUSTOM_FILE_FORMAT_H_
-#define _CUSTOM_FILE_FORMAT_H_
+#ifndef CUSTOM_FILE_FORMAT_H_
+#define CUSTOM_FILE_FORMAT_H_
 
 // Standard C++ headers
 #include <vector>
@@ -138,4 +138,4 @@ private:
 
 }// namespace LibPlot2D
 
-#endif//_CUSTOM_FILE_FORMAT_H_
+#endif// CUSTOM_FILE_FORMAT_H_
