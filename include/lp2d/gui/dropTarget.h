@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
 //				 when the user drags-and-drops them onto the main window.
-// History:
 
 #ifndef DROP_TARGET_H_
 #define DROP_TARGET_H_
@@ -24,14 +23,14 @@ namespace LibPlot2D
 {
 
 // Local forward declarations
-class MainFrame;
+class GuiInterface;
 
 // The main class declaration
 class DropTarget : public wxDropTarget
 {
 public:
 	// Constructor
-	DropTarget(MainFrame &_mainFrame);
+	DropTarget(GuiInterface &guiInterface);
 
 	// Destructor
 	virtual ~DropTarget();
@@ -39,8 +38,7 @@ public:
 	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);
 
 private:
-	// Reference to main frame
-	MainFrame &mainFrame;
+	GuiInterface &guiInterface;
 
 	bool OnDropFiles(const wxArrayString &filenames);
 	bool OnDropText(const wxString& data);

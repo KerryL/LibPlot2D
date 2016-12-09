@@ -16,6 +16,7 @@
 
 // Local headers
 #include "lp2d/gui/dropTarget.h"
+#include "lp2d/gui/guiInterface.h"
 
 namespace LibPlot2D
 {
@@ -27,7 +28,7 @@ namespace LibPlot2D
 // Description:		Constructor for DropTarget class.
 //
 // Input Arguments:
-//		_mainFrame	= &MainFrame, reference to main application window
+//		guiInterface	= &GuiInterface, reference to main application window
 //
 // Output Arguments:
 //		None
@@ -36,7 +37,7 @@ namespace LibPlot2D
 //		None
 //
 //==========================================================================
-DropTarget::DropTarget(MainFrame &_mainFrame) : mainFrame(_mainFrame)
+DropTarget::DropTarget(GuiInterface &guiInterface) : guiInterface(guiInterface)
 {
 	wxDataObjectComposite *dataObject = new wxDataObjectComposite;
 
@@ -88,8 +89,8 @@ DropTarget::~DropTarget()
 //==========================================================================
 bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 {
-	mainFrame.LoadFiles(filenames);
-	return true;
+	guiInterface.LoadFiles(filenames);
+	return true;// TODO:  Should I ever return false?
 }
 
 //==========================================================================
@@ -110,9 +111,8 @@ bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 //==========================================================================
 bool DropTarget::OnDropText(const wxString& data)
 {
-	mainFrame.LoadText(data);
-
-	return true;
+	guiInterface.LoadText(data);
+	return true;// TODO:  Should I ever return false?
 }
 
 //==========================================================================

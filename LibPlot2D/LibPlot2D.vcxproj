@@ -16,7 +16,9 @@
     <ClInclude Include="..\include\lp2d\gui\fftDialog.h" />
     <ClInclude Include="..\include\lp2d\gui\filterDialog.h" />
     <ClInclude Include="..\include\lp2d\gui\frfDialog.h" />
+    <ClInclude Include="..\include\lp2d\gui\guiInterface.h" />
     <ClInclude Include="..\include\lp2d\gui\multiChoiceDialog.h" />
+    <ClInclude Include="..\include\lp2d\gui\plotListGrid.h" />
     <ClInclude Include="..\include\lp2d\gui\plotObject.h" />
     <ClInclude Include="..\include\lp2d\gui\rangeLimitsDialog.h" />
     <ClInclude Include="..\include\lp2d\gui\textInputDialog.h" />
@@ -42,6 +44,7 @@
     <ClInclude Include="..\include\lp2d\utilities\arrayStringCompare.h" />
     <ClInclude Include="..\include\lp2d\utilities\dataset2D.h" />
     <ClInclude Include="..\include\lp2d\utilities\fontFinder.h" />
+    <ClInclude Include="..\include\lp2d\utilities\guiUtilities.h" />
     <ClInclude Include="..\include\lp2d\utilities\machineDefinitions.h" />
     <ClInclude Include="..\include\lp2d\utilities\managedList.h" />
     <ClInclude Include="..\include\lp2d\utilities\math\complex.h" />
@@ -62,7 +65,9 @@
     <ClCompile Include="..\src\gui\fftDialog.cpp" />
     <ClCompile Include="..\src\gui\filterDialog.cpp" />
     <ClCompile Include="..\src\gui\frfDialog.cpp" />
+    <ClCompile Include="..\src\gui\guiInterface.cpp" />
     <ClCompile Include="..\src\gui\multiChoiceDialog.cpp" />
+    <ClCompile Include="..\src\gui\plotListGrid.cpp" />
     <ClCompile Include="..\src\gui\plotObject.cpp" />
     <ClCompile Include="..\src\gui\rangeLimitsDialog.cpp" />
     <ClCompile Include="..\src\gui\textInputDialog.cpp" />
@@ -88,6 +93,7 @@
     <ClCompile Include="..\src\utilities\arrayStringCompare.cpp" />
     <ClCompile Include="..\src\utilities\dataset2D.cpp" />
     <ClCompile Include="..\src\utilities\fontFinder.cpp" />
+    <ClCompile Include="..\src\utilities\guiUtilities.cpp" />
     <ClCompile Include="..\src\utilities\math\complex.cpp" />
     <ClCompile Include="..\src\utilities\math\expressionTree.cpp" />
     <ClCompile Include="..\src\utilities\math\matrix.cpp" />
@@ -162,6 +168,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug wx2.8|Win32'">
     <LinkIncremental>true</LinkIncremental>

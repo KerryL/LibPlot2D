@@ -32,20 +32,18 @@ class wxString;
 namespace LibPlot2D
 {
 
-/*class MainFrame;
-typedef MainFrame PlotOwner;*/// TODO:  Use template
-
 // Local forward declarations
 class PlotObject;
 class Dataset2D;
 class ZoomBox;
 class PlotCursor;
+class GuiInterface;
 
-//template<typename PlotOwner>
 class PlotRenderer : public RenderWindow
 {
 public:
-	PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID id, const wxGLAttributes& attr);
+	PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent, wxWindowID id,
+		const wxGLAttributes& attr);
 	~PlotRenderer();
 
 	// Gets properties for actors
@@ -125,10 +123,10 @@ public:
 	void SetLeftLogarithmic(const bool &log);
 	void SetRightLogarithmic(const bool &log);
 
-	bool GetMajorGridOn();
-	bool GetMinorGridOn();
+	bool GetMajorGridOn() const;
+	bool GetMinorGridOn() const;
 	
-	bool LegendIsVisible();
+	bool LegendIsVisible() const;
 	void SetLegendOn();
 	void SetLegendOff();
 	void UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entries);
@@ -142,8 +140,6 @@ public:
 	double GetRightCursorValue() const;
 
 	void UpdateCursors();
-
-	PlotOwner *GetPlotOwner() { return &plotOwner; }
 
 	void SaveCurrentZoom();
 	void ClearZoomStack();
@@ -195,13 +191,22 @@ public:
 	static inline double DoLineaerScale(const double& value) { return value; }
 	static inline double DoLogarithmicScale(const double& value) { return log10(value); }
 
+	enum PlotContext
+	{
+		PlotContextXAxis,
+		PlotContextLeftYAxis,
+		PlotContextRightYAxis,
+		PlotContextPlotArea
+	};
+
+	void DisplayAxisRangeDialog(const PlotContext &axis);
+
 private:
 	static const std::string defaultVertexShader;
 
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();
 
-	PlotOwner &plotOwner;
 	PlotObject *plot;
 
 	// Overload of size event
@@ -230,7 +235,14 @@ private:
 	void ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const;
 	void UpdateLegendAnchor();
 
+	void CreatePlotContextMenu(const wxPoint &position, const PlotContext &context);
+
+	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
+	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);
+
 protected:
+	GuiInterface& guiInterface;
+
 	void ProcessZoom(wxMouseEvent &event);
 	void ProcessZoomWithBox(wxMouseEvent &event);
 	void ProcessPan(wxMouseEvent &event);
@@ -282,6 +294,97 @@ protected:
 	ScalingFunction xScaleFunction;
 	ScalingFunction leftYScaleFunction;
 	ScalingFunction rightYScaleFunction;
+
+	void DoCopy();
+	void DoPaste();
+
+	// The event IDs
+	enum MainFrameEventID
+	{
+		idPlotContextCopy,
+		idPlotContextPaste,
+		idPlotContextMajorGridlines,
+		idPlotContextMinorGridlines,
+		idPlotContextShowLegend,
+		idPlotContextAutoScale,
+		idPlotContextWriteImageFile,
+		idPlotContextExportData,
+
+		idPlotContextBGColor,
+		idPlotContextGridColor,
+
+		idPlotContextBottomMajorGridlines,// Maintain this order for each axis' context IDs
+		idPlotContextBottomMinorGridlines,
+		idPlotContextAutoScaleBottom,
+		idPlotContextSetBottomRange,
+		idPlotContextSetBottomMajorResolution,
+		idPlotContextBottomLogarithmic,
+		idPlotContextEditBottomLabel,
+
+		/*idPlotContextTopMajorGridlines,
+		idPlotContextTopMinorGridlines,
+		idPlotContextAutoScaleTop,
+		idPlotContextSetTopRange,
+		idPlotContextSetTopMajorResolution,
+		idPlotContextTopLogarithmic,
+		idPlotContextEditTopLabel,*/
+
+		idPlotContextLeftMajorGridlines,
+		idPlotContextLeftMinorGridlines,
+		idPlotContextAutoScaleLeft,
+		idPlotContextSetLeftRange,
+		idPlotContextSetLeftMajorResolution,
+		idPlotContextLeftLogarithmic,
+		idPlotContextEditLeftLabel,
+
+		idPlotContextRightMajorGridlines,
+		idPlotContextRightMinorGridlines,
+		idPlotContextAutoScaleRight,
+		idPlotContextSetRightRange,
+		idPlotContextSetRightMajorResolution,
+		idPlotContextRightLogarithmic,
+		idPlotContextEditRightLabel
+	};
+
+	wxMenu *CreateAxisContextMenu(const unsigned int &baseEventId) const;
+	wxMenu *CreatePlotAreaContextMenu() const;
+
+	// Context menu events
+	void ContextCopy(wxCommandEvent &event);
+	void ContextPaste(wxCommandEvent &event);
+	void ContextToggleMajorGridlines(wxCommandEvent &event);
+	void ContextToggleMinorGridlines(wxCommandEvent &event);
+	void ContextToggleLegend(wxCommandEvent &event);
+	void ContextAutoScale(wxCommandEvent &event);
+	void ContextWriteImageFile(wxCommandEvent &event);
+	void ContextExportData(wxCommandEvent &event);
+
+	void ContextPlotBGColor(wxCommandEvent &event);
+	void ContextGridColor(wxCommandEvent &event);
+
+	void ContextToggleMajorGridlinesBottom(wxCommandEvent &event);
+	void ContextToggleMinorGridlinesBottom(wxCommandEvent &event);
+	void ContextAutoScaleBottom(wxCommandEvent &event);
+	void ContextSetRangeBottom(wxCommandEvent &event);
+	void ContextSetMajorResolutionBottom(wxCommandEvent &event);
+	void ContextSetLogarithmicBottom(wxCommandEvent &event);
+	void ContextEditBottomLabel(wxCommandEvent &event);
+
+	void ContextToggleMajorGridlinesLeft(wxCommandEvent &event);
+	void ContextToggleMinorGridlinesLeft(wxCommandEvent &event);
+	void ContextAutoScaleLeft(wxCommandEvent &event);
+	void ContextSetRangeLeft(wxCommandEvent &event);
+	void ContextSetMajorResolutionLeft(wxCommandEvent &event);
+	void ContextSetLogarithmicLeft(wxCommandEvent &event);
+	void ContextEditLeftLabel(wxCommandEvent &event);
+
+	void ContextToggleMajorGridlinesRight(wxCommandEvent &event);
+	void ContextToggleMinorGridlinesRight(wxCommandEvent &event);
+	void ContextAutoScaleRight(wxCommandEvent &event);
+	void ContextSetRangeRight(wxCommandEvent &event);
+	void ContextSetMajorResolutionRight(wxCommandEvent &event);
+	void ContextSetLogarithmicRight(wxCommandEvent &event);
+	void ContextEditRightLabel(wxCommandEvent &event);
 
 	// For the event table
 	DECLARE_EVENT_TABLE()

@@ -189,6 +189,15 @@
     <ClInclude Include="..\include\lp2d\parser\kollmorgenFile.h">
       <Filter>Header Files\parser</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\lp2d\gui\guiInterface.h">
+      <Filter>Header Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\lp2d\gui\plotListGrid.h">
+      <Filter>Header Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\lp2d\utilities\guiUtilities.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gui\createSignalDialog.cpp">
@@ -316,6 +325,15 @@
     </ClCompile>
     <ClCompile Include="..\src\utilities\signals\rms.cpp">
       <Filter>Source Files\utilities\signals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gui\guiInterface.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gui\plotListGrid.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utilities\guiUtilities.cpp">
+      <Filter>Source Files\utilities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

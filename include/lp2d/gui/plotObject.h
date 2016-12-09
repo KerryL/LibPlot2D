@@ -34,12 +34,12 @@ class TextRendering;
 class PlotCurve;
 class Dataset2D;
 class Color;
+class GuiInterface;
 
 class PlotObject
 {
 public:
-	PlotObject(PlotRenderer &renderer);
-	~PlotObject();
+	PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface);
 
 	void Update();
 
@@ -135,6 +135,7 @@ public:
 
 private:
 	PlotRenderer &renderer;
+	GuiInterface &guiInterface;
 
 	static const unsigned int horizontalOffsetWithLabel;
 	static const unsigned int horizontalOffsetWithoutLabel;

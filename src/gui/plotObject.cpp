@@ -18,6 +18,7 @@
 
 // Local headers
 #include "lp2d/gui/plotObject.h"
+#include "lp2d/gui/guiInterface.h"
 #include "lp2d/renderer/plotRenderer.h"
 #include "lp2d/renderer/color.h"
 #include "lp2d/renderer/primitives/plotCurve.h"
@@ -58,8 +59,9 @@ const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 // Description:		Constructor for PlotObject class.
 //
 // Input Arguments:
-//		renderer	= PlotRenderer& reference to the object that handles the
-//					  drawing operations
+//		renderer		= PlotRenderer& reference to the object that handles the
+//						  drawing operations
+//		guiInterface	= GuiInterface&
 //
 // Output Arguments:
 //		None
@@ -68,7 +70,8 @@ const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 //		None
 //
 //==========================================================================
-PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
+PlotObject::PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface)
+	: renderer(renderer), guiInterface(guiInterface)
 {
 	CreateAxisObjects();
 	InitializeFonts();
@@ -76,26 +79,6 @@ PlotObject::PlotObject(PlotRenderer &renderer) : renderer(renderer)
 	ResetAutoScaling();
 
 	needScissorUpdate = true;
-}
-
-//==========================================================================
-// Class:			PlotObject
-// Function:		~PlotObject
-//
-// Description:		Destructor for PlotObject class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-PlotObject::~PlotObject()
-{
 }
 
 //==========================================================================
@@ -218,7 +201,7 @@ void PlotObject::Update()
 	ComputeTransformationMatrices();
 
 	renderer.UpdateCursors();
-	renderer.GetPlotOwner()->UpdateCursorValues(
+	guiInterface.UpdateCursorValues(
 		renderer.GetLeftCursorVisible(), renderer.GetRightCursorVisible(),
 		renderer.GetLeftCursorValue(), renderer.GetRightCursorValue());
 }

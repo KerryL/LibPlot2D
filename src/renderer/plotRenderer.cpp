@@ -17,21 +17,29 @@
 // Standard C++ headers
 #include <cassert>
 #include <algorithm>
+#include <fstream>
 
 // GLEW headers
 #include <GL/glew.h>
 
 // wxWidgets headers
 #include <wx/wx.h>
+#include <wx/file.h>
+#include <wx/clipbrd.h>
+#include <wx/colordlg.h>
 
 // Local headers
 #include "lp2d/renderer/plotRenderer.h"
 #include "lp2d/gui/plotObject.h"
+#include "lp2d/gui/textInputDialog.h"
+#include "lp2d/gui/guiInterface.h"
+#include "lp2d/gui/dropTarget.h"
 #include "lp2d/renderer/primitives/zoomBox.h"
 #include "lp2d/renderer/primitives/plotCursor.h"
 #include "lp2d/renderer/primitives/axis.h"
 #include "lp2d/renderer/primitives/legend.h"
 #include "lp2d/utilities/math/plotMath.h"
+#include "lp2d/utilities/guiUtilities.h"
 
 namespace LibPlot2D
 {
@@ -96,10 +104,10 @@ const std::string PlotRenderer::defaultVertexShader(
 // Description:		Constructor for PlotRenderer class.
 //
 // Input Arguments:
-//		wxParent	= wxWindow&
-//		plotOwner	= PlotOwner& reference to this applications's main window
-//		id			= wxWindowID
-//		attr		= const wxGLAttributes& NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
+//		guiInterface	= GuiInterface&
+//		wxParent		= wxWindow&
+//		id				= wxWindowID
+//		attr			= const wxGLAttributes& NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
 //
 // Output Arguments:
 //		None
@@ -108,9 +116,9 @@ const std::string PlotRenderer::defaultVertexShader(
 //		None
 //
 //==========================================================================
-PlotRenderer::PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID id, const wxGLAttributes& attr)
-	: RenderWindow(wxParent, id, attr, wxDefaultPosition, wxDefaultSize),
-	plotOwner(plotOwner)
+PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent,
+	wxWindowID id, const wxGLAttributes& attr) : RenderWindow(wxParent, id, attr,
+	wxDefaultPosition, wxDefaultSize), guiInterface(guiInterface)
 {
 	xScaleFunction = DoLineaerScale;
 	leftYScaleFunction = DoLineaerScale;
@@ -125,6 +133,8 @@ PlotRenderer::PlotRenderer(wxWindow &wxParent, PlotOwner &plotOwner, wxWindowID 
 	ignoreNextMouseMove = false;
 
 	curveQuality = QualityAlwaysHigh;
+
+	SetDropTarget(static_cast<wxDropTarget*>(new DropTarget(guiInterface)));
 
 	CreateActors();
 }
@@ -171,17 +181,62 @@ BEGIN_EVENT_TABLE(PlotRenderer, RenderWindow)
 	EVT_SIZE(PlotRenderer::OnSize)
 
 	// Interaction events
-	EVT_MOUSEWHEEL(		PlotRenderer::OnMouseWheelEvent)
-	EVT_MOTION(			PlotRenderer::OnMouseMoveEvent)
+	EVT_MOUSEWHEEL(									PlotRenderer::OnMouseWheelEvent)
+	EVT_MOTION(										PlotRenderer::OnMouseMoveEvent)
 
-	EVT_LEAVE_WINDOW(	PlotRenderer::OnMouseLeaveWindowEvent)
+	EVT_LEAVE_WINDOW(								PlotRenderer::OnMouseLeaveWindowEvent)
 
 	// Click events
-	EVT_LEFT_DCLICK(	PlotRenderer::OnDoubleClickEvent)
-	EVT_RIGHT_UP(		PlotRenderer::OnRightButtonUpEvent)
-	EVT_LEFT_UP(		PlotRenderer::OnLeftButtonUpEvent)
-	EVT_LEFT_DOWN(		PlotRenderer::OnLeftButtonDownEvent)
-	EVT_MIDDLE_UP(		PlotRenderer::OnMiddleButtonUpEvent)
+	EVT_LEFT_DCLICK(								PlotRenderer::OnDoubleClickEvent)
+	EVT_RIGHT_UP(									PlotRenderer::OnRightButtonUpEvent)
+	EVT_LEFT_UP(									PlotRenderer::OnLeftButtonUpEvent)
+	EVT_LEFT_DOWN(									PlotRenderer::OnLeftButtonDownEvent)
+	EVT_MIDDLE_UP(									PlotRenderer::OnMiddleButtonUpEvent)
+
+	// Context menu
+	EVT_MENU(idPlotContextCopy,						PlotRenderer::ContextCopy)
+	EVT_MENU(idPlotContextPaste,					PlotRenderer::ContextPaste)
+	EVT_MENU(idPlotContextMajorGridlines,			PlotRenderer::ContextToggleMajorGridlines)
+	EVT_MENU(idPlotContextMinorGridlines,			PlotRenderer::ContextToggleMinorGridlines)
+	EVT_MENU(idPlotContextShowLegend,				PlotRenderer::ContextToggleLegend)
+	EVT_MENU(idPlotContextAutoScale,				PlotRenderer::ContextAutoScale)
+	EVT_MENU(idPlotContextWriteImageFile,			PlotRenderer::ContextWriteImageFile)
+	EVT_MENU(idPlotContextExportData,				PlotRenderer::ContextExportData)
+
+	EVT_MENU(idPlotContextBGColor,					PlotRenderer::ContextPlotBGColor)
+	EVT_MENU(idPlotContextGridColor,				PlotRenderer::ContextGridColor)
+
+	EVT_MENU(idPlotContextBottomMajorGridlines,		PlotRenderer::ContextToggleMajorGridlinesBottom)
+	EVT_MENU(idPlotContextBottomMinorGridlines,		PlotRenderer::ContextToggleMinorGridlinesBottom)
+	EVT_MENU(idPlotContextSetBottomRange,			PlotRenderer::ContextSetRangeBottom)
+	EVT_MENU(idPlotContextSetBottomMajorResolution,	PlotRenderer::ContextSetMajorResolutionBottom)
+	EVT_MENU(idPlotContextBottomLogarithmic,		PlotRenderer::ContextSetLogarithmicBottom)
+	EVT_MENU(idPlotContextAutoScaleBottom,			PlotRenderer::ContextAutoScaleBottom)
+	EVT_MENU(idPlotContextEditBottomLabel,			PlotRenderer::ContextEditBottomLabel)
+
+	//EVT_MENU(idPlotContextTopMajorGridlines,		PlotRenderer::)
+	//EVT_MENU(idPlotContextTopMinorGridlines,		PlotRenderer::)
+	//EVT_MENU(idPlotContextSetTopRange,			PlotRenderer::)
+	//EVT_MENU(idPlotContextSetTopMajorResolution,	PlotRenderer::)
+	//EVT_MENU(idPlotContextTopLogarithmic,			PlotRenderer::)
+	//EVT_MENU(idPlotContextAutoScaleTop,			PlotRenderer::)
+	//EVT_MENU(idPlotContextEditTopLabel,			PlotRenderer::)
+
+	EVT_MENU(idPlotContextLeftMajorGridlines,		PlotRenderer::ContextToggleMajorGridlinesLeft)
+	EVT_MENU(idPlotContextLeftMinorGridlines,		PlotRenderer::ContextToggleMinorGridlinesLeft)
+	EVT_MENU(idPlotContextSetLeftRange,				PlotRenderer::ContextSetRangeLeft)
+	EVT_MENU(idPlotContextSetLeftMajorResolution,	PlotRenderer::ContextSetMajorResolutionLeft)
+	EVT_MENU(idPlotContextLeftLogarithmic,			PlotRenderer::ContextSetLogarithmicLeft)
+	EVT_MENU(idPlotContextAutoScaleLeft,			PlotRenderer::ContextAutoScaleLeft)
+	EVT_MENU(idPlotContextEditLeftLabel,			PlotRenderer::ContextEditLeftLabel)
+
+	EVT_MENU(idPlotContextRightMajorGridlines,		PlotRenderer::ContextToggleMajorGridlinesRight)
+	EVT_MENU(idPlotContextRightMinorGridlines,		PlotRenderer::ContextToggleMinorGridlinesRight)
+	EVT_MENU(idPlotContextSetRightRange,			PlotRenderer::ContextSetRangeRight)
+	EVT_MENU(idPlotContextSetRightMajorResolution,	PlotRenderer::ContextSetMajorResolutionRight)
+	EVT_MENU(idPlotContextRightLogarithmic,			PlotRenderer::ContextSetLogarithmicRight)
+	EVT_MENU(idPlotContextAutoScaleRight,			PlotRenderer::ContextAutoScaleRight)
+	EVT_MENU(idPlotContextEditRightLabel,			PlotRenderer::ContextEditRightLabel)
 END_EVENT_TABLE()
 
 //==========================================================================
@@ -240,7 +295,7 @@ void PlotRenderer::UpdateDisplay()
 //==========================================================================
 void PlotRenderer::CreateActors()
 {
-	plot = new PlotObject(*this);
+	plot = new PlotObject(*this, guiInterface);
 	SetBackgroundColor(Color::ColorWhite);
 
 	// Also create the zoom box and cursors, even though they aren't drawn yet
@@ -611,7 +666,7 @@ void PlotRenderer::ClearZoomStack()
 //		bool, true for visible, false for hidden
 //
 //==========================================================================
-bool PlotRenderer::GetMajorGridOn()
+bool PlotRenderer::GetMajorGridOn() const
 {
 	return plot->GetMajorGrid();
 }
@@ -632,7 +687,7 @@ bool PlotRenderer::GetMajorGridOn()
 //		bool, true for visible, false for hidden
 //
 //==========================================================================
-bool PlotRenderer::GetMinorGridOn()
+bool PlotRenderer::GetMinorGridOn() const
 {
 	return plot->GetMinorGrid();
 }
@@ -763,7 +818,7 @@ void PlotRenderer::SetCurveQuality(const CurveQuality& curveQuality)
 //		bool
 //
 //==========================================================================
-bool PlotRenderer::LegendIsVisible()
+bool PlotRenderer::LegendIsVisible() const
 {
 	if (!legend)
 		return false;
@@ -2583,23 +2638,23 @@ void PlotRenderer::ProcessPlotAreaDoubleClick(const unsigned int &x)
 void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y)
 {
 	// Determine the context
-	PlotOwner::PlotContext context;
+	PlotContext context;
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::PlotContextLeftYAxis;
+		context = PlotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::PlotContextRightYAxis;
+		context = PlotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::PlotContextXAxis;
+		context = PlotContextXAxis;
 	else
-		context = PlotOwner::PlotContextPlotArea;
+		context = PlotContextPlotArea;
 
-	plotOwner.DisplayAxisRangeDialog(context);
+	DisplayAxisRangeDialog(context);
 }
 
 //==========================================================================
@@ -2621,26 +2676,27 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 {
 	// Determine the context
-	PlotOwner::PlotContext context;
+	PlotContext context;
 	unsigned int x = event.GetX();
 	unsigned int y = event.GetY();
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::PlotContextLeftYAxis;
+		context = PlotContextLeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::PlotContextRightYAxis;
+		context = PlotContextRightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = PlotOwner::PlotContextXAxis;
+		context = PlotContextXAxis;
 	else
-		context = PlotOwner::PlotContextPlotArea;
+		context = PlotContextPlotArea;
 
-	// Display the context menu (further events handled by Parent)
-	plotOwner.CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
+	// Display the context menu
+	CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
+
 	ignoreNextMouseMove = true;
 }
 
@@ -2993,6 +3049,1120 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 	}
 
 	glUniformMatrix4fv(shaders[0].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextWriteImageFile
+//
+// Description:		Calls the object of interest's write image file method.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
+{
+	wxArrayString pathAndFileName = GuiUtilities::GetFileNameFromUser(this,
+		_T("Save Image File"), wxEmptyString, wxEmptyString,
+		_T("PNG Image (*.png)|*.png|Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|TIFF Image (*.tif)|*.tif"),
+		wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	if (pathAndFileName.IsEmpty())
+		return;
+
+	WriteImageToFile(pathAndFileName[0]);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContexExportData
+//
+// Description:		Exports the data to file.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextExportData(wxCommandEvent& WXUNUSED(event))
+{
+	wxString wildcard(_T("Comma Separated (*.csv)|*.csv"));
+	wildcard.append("|Tab Delimited (*.txt)|*.txt");
+
+	wxArrayString pathAndFileName = GuiUtilities::GetFileNameFromUser(this, _T("Save As"),
+		wxEmptyString, wxEmptyString, wildcard, wxFD_SAVE);
+
+	if (pathAndFileName.Count() == 0)
+		return;
+
+	if (wxFile::Exists(pathAndFileName[0]))
+	{
+		if (wxMessageBox(_T("File exists.  Overwrite?"), _T("Overwrite File?"), wxYES_NO, this) == wxNO)
+			return;
+	}
+
+	wxString delimiter;
+	if (pathAndFileName[0].Mid(pathAndFileName[0].Last('.')).CmpNoCase(_T(".txt")) == 0)
+		delimiter = _T("\t");
+	else
+		delimiter = _T(",");// FIXME:  Need to handle descriptions containing commas so we don't have problems with import later on
+
+	// Export both x and y data in case of asynchronous data or FFT, etc.
+	std::ofstream outFile(pathAndFileName[0].mb_str(), std::ios::out);
+	if (!outFile.is_open() || !outFile.good())
+	{
+		wxMessageBox(_T("Could not open '") + pathAndFileName[0] + _T("' for output."),
+			_T("Error Writing File"), wxICON_ERROR, this);
+		return;
+	}
+
+	unsigned int i, j(0);
+	wxString temp;
+	for (i = 1; i < plotList.GetCount() + 1; i++)
+	{
+		if (optionsGrid->GetCellValue(i, colName).Contains(_T("FFT")) ||
+			optionsGrid->GetCellValue(i, colName).Contains(_T("FRF")))
+			outFile << _T("Frequency [Hz]") << delimiter;
+		else
+		{
+			if (delimiter.Cmp(",") == 0)
+			{
+				temp = genericXAxisLabel;
+				temp.Replace(",", ";");
+				outFile << temp << delimiter;
+			}
+			else
+				outFile << genericXAxisLabel << delimiter;
+		}
+
+		if (delimiter.Cmp(",") == 0)
+		{
+			temp = optionsGrid->GetCellValue(i, colName);
+			temp.Replace(",", ";");
+			outFile << temp;
+		}
+		else
+			outFile << optionsGrid->GetCellValue(i, colName);
+
+		if (i == plotList.GetCount())
+			outFile << std::endl;
+		else
+			outFile << delimiter;
+	}
+
+	outFile.precision(14);
+
+	bool done(false);
+	while (!done)
+	{
+		done = true;
+		for (i = 0; i < plotList.GetCount(); i++)
+		{
+			if (j < plotList[i]->GetNumberOfPoints())
+				outFile << plotList[i]->GetXData(j) << delimiter << plotList[i]->GetYData(j);
+			else
+				outFile << delimiter;
+
+			if (i == plotList.GetCount() - 1)
+				outFile << std::endl;
+			else
+				outFile << delimiter;
+
+			if (j + 1 < plotList[i]->GetNumberOfPoints())
+				done = false;
+		}
+
+		j++;
+	}
+
+	outFile.close();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		CreatePlotContextMenu
+//
+// Description:		Displays a context menu for the plot.
+//
+// Input Arguments:
+//		position	= const wxPoint& specifying the position to display the menu
+//		context		= const PlotContext& describing the area of the plot
+//					  on which the click occured
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::CreatePlotContextMenu(const wxPoint &position, const PlotContext &context)
+{
+	wxMenu *contextMenu;
+
+	switch (context)
+	{
+	case PlotContextXAxis:
+		contextMenu = CreateAxisContextMenu(idPlotContextBottomMajorGridlines);
+		contextMenu->Check(idPlotContextBottomLogarithmic, GetXLogarithmic());
+		contextMenu->Check(idPlotContextBottomMajorGridlines, GetBottomMajorGrid());
+		contextMenu->Check(idPlotContextBottomMinorGridlines, GetBottomMinorGrid());
+		break;
+
+	case PlotContextLeftYAxis:
+		contextMenu = CreateAxisContextMenu(idPlotContextLeftMajorGridlines);
+		contextMenu->Check(idPlotContextLeftLogarithmic, GetLeftLogarithmic());
+		contextMenu->Check(idPlotContextLeftMajorGridlines, GetLeftMajorGrid());
+		contextMenu->Check(idPlotContextLeftMinorGridlines, GetLeftMinorGrid());
+		break;
+
+	case PlotContextRightYAxis:
+		contextMenu = CreateAxisContextMenu(idPlotContextRightMajorGridlines);
+		contextMenu->Check(idPlotContextRightLogarithmic, GetRightLogarithmic());
+		contextMenu->Check(idPlotContextRightMajorGridlines, GetRightMajorGrid());
+		contextMenu->Check(idPlotContextRightMinorGridlines, GetRightMinorGrid());
+		break;
+
+	default:
+	case PlotContextPlotArea:
+		contextMenu = CreatePlotAreaContextMenu();
+		break;
+	}
+
+	PopupMenu(contextMenu, position);
+
+	delete contextMenu;
+	contextMenu = NULL;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		CreatePlotAreaContextMenu
+//
+// Description:		Displays a context menu for the specified plot axis.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxMenu*
+//
+//==========================================================================
+wxMenu* PlotRenderer::CreatePlotAreaContextMenu() const
+{
+	wxMenu *contextMenu = new wxMenu();
+	contextMenu->Append(idPlotContextCopy, _T("Copy"));
+	contextMenu->Append(idPlotContextPaste, _T("Paste"));
+	contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
+	contextMenu->Append(idPlotContextExportData, _T("Export Data"));
+	contextMenu->AppendSeparator();
+	contextMenu->AppendCheckItem(idPlotContextMajorGridlines, _T("Major Gridlines"));
+	contextMenu->AppendCheckItem(idPlotContextMinorGridlines, _T("Minor Gridlines"));
+	contextMenu->AppendCheckItem(idPlotContextShowLegend, _T("Legend"));
+	contextMenu->Append(idPlotContextAutoScale, _T("Auto Scale"));
+	contextMenu->Append(idPlotContextBGColor, _T("Set Background Color"));
+	contextMenu->Append(idPlotContextGridColor, _T("Set Gridline Color"));
+
+	if (wxTheClipboard->Open())
+	{
+		if (!wxTheClipboard->IsSupported(wxDF_TEXT))
+			contextMenu->Enable(idPlotContextPaste, false);
+		wxTheClipboard->Close();
+	}
+	else
+		contextMenu->Enable(idPlotContextPaste, false);
+
+	contextMenu->Check(idPlotContextMajorGridlines, GetMajorGridOn());
+	contextMenu->Check(idPlotContextMinorGridlines, GetMinorGridOn());
+	contextMenu->Check(idPlotContextShowLegend, LegendIsVisible());
+
+	return contextMenu;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		CreateAxisContextMenu
+//
+// Description:		Displays a context menu for the specified plot axis.
+//
+// Input Arguments:
+//		baseEventId	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxMenu*
+//
+//==========================================================================
+wxMenu* PlotRenderer::CreateAxisContextMenu(const unsigned int &baseEventId) const
+{
+	wxMenu* contextMenu = new wxMenu();
+
+	unsigned int i = baseEventId;
+	contextMenu->AppendCheckItem(i++, _T("Major Gridlines"));
+	contextMenu->AppendCheckItem(i++, _T("Minor Gridlines"));
+	contextMenu->Append(i++, _T("Auto Scale Axis"));
+	contextMenu->Append(i++, _T("Set Range"));
+	contextMenu->Append(i++, _T("Set Major Resolution"));
+	contextMenu->AppendCheckItem(i++, _T("Logarithmic Scale"));
+	contextMenu->Append(i++, _T("Edit Label"));
+
+	return contextMenu;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextCopy
+//
+// Description:		Handles context menu copy command events.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextCopy(wxCommandEvent& WXUNUSED(event))
+{
+	DoCopy();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextPaste
+//
+// Description:		Handles context menu paste command events.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextPaste(wxCommandEvent& WXUNUSED(event))
+{
+	DoPaste();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMajorGridlines
+//
+// Description:		Toggles major gridlines for the entire plot on and off.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMajorGridlines(wxCommandEvent& WXUNUSED(event))
+{
+	if (GetMajorGridOn())
+		SetMajorGridOff();
+	else
+		SetMajorGridOn();
+
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMinorGridlines
+//
+// Description:		Toggles minor gridlines for the entire plot on and off.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMinorGridlines(wxCommandEvent& WXUNUSED(event))
+{
+	if (GetMinorGridOn())
+		SetMinorGridOff();
+	else
+		SetMinorGridOn();
+
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleLegend
+//
+// Description:		Toggles legend visibility on and off.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleLegend(wxCommandEvent& WXUNUSED(event))
+{
+	if (LegendIsVisible())
+		SetLegendOff();
+	else
+		SetLegendOn();
+
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextAutoScale
+//
+// Description:		Autoscales the plot.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextAutoScale(wxCommandEvent& WXUNUSED(event))
+{
+	AutoScale();
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		GetCurrentAxisRange
+//
+// Description:		Returns the range for the specified axis.
+//
+// Input Arguments:
+//		axis	= const PlotContext&
+//
+// Output Arguments:
+//		min		= double&
+//		max		= double&
+//
+// Return Value:
+//		bool, true on success, false otherwise
+//
+//==========================================================================
+bool PlotRenderer::GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const
+{
+	switch (axis)
+	{
+	case PlotContextXAxis:
+		min = GetXMin();
+		max = GetXMax();
+		break;
+
+	case PlotContextLeftYAxis:
+		min = GetLeftYMin();
+		max = GetLeftYMax();
+		break;
+
+	case PlotContextRightYAxis:
+		min = GetRightYMin();
+		max = GetRightYMax();
+		break;
+
+	default:
+	case PlotContextPlotArea:
+		// Plot area is not a valid context in which we can set axis limits
+		return false;
+	}
+
+	return true;
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		SetNewAxisRange
+//
+// Description:		Returns the range for the specified axis.
+//
+// Input Arguments:
+//		axis	= const PlotContext&
+//		min		= const double&
+//		max		= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::SetNewAxisRange(const PlotContext &axis, const double &min, const double &max)
+{
+	switch (axis)
+	{
+	case PlotContextLeftYAxis:
+		SetLeftYLimits(min, max);
+		break;
+
+	case PlotContextRightYAxis:
+		SetRightYLimits(min, max);
+		break;
+
+	default:
+	case PlotContextXAxis:
+		SetXLimits(min, max);
+		break;
+
+	case PlotContextPlotArea:
+		assert(false);
+	}
+
+	UpdateDisplay();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMajorGridlinesBottom
+//
+// Description:		Toggles major gridlines for the bottom axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMajorGridlinesBottom(wxCommandEvent& WXUNUSED(event))
+{
+	SetBottomMajorGrid(!GetBottomMajorGrid());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMinorGridlinesBottom
+//
+// Description:		Toggles major gridlines for the bottom axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMinorGridlinesBottom(wxCommandEvent& WXUNUSED(event))
+{
+	SetBottomMinorGrid(!GetBottomMinorGrid());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextAutoScaleBottom
+//
+// Description:		Auto-scales the bottom axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
+{
+	AutoScaleBottom();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetRangeBottom
+//
+// Description:		Dispalys a dialog box for setting the axis range.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
+{
+	DisplayAxisRangeDialog(PlotContextXAxis);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetMajorResolutionBottom
+//
+// Description:		Dispalys a dialog box for setting the axis major resolution.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetMajorResolutionBottom(wxCommandEvent& WXUNUSED(event))
+{
+	double resolution(GetBottomMajorResolution());
+	wxString resStr;
+	do {
+		resStr = wxGetTextFromUser(_T("Specify the major resolution (set to 0 for auto):"),
+			_T("Set Major Resolution"),
+			wxString::Format("%f", std::max(resolution, 0.0)), this);
+		if (resStr.IsEmpty())
+			return;
+		resStr.ToDouble(&resolution);
+	} while (resolution < 0.0);
+
+	SetBottomMajorResolution(resolution);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMajorGridlinesLeft
+//
+// Description:		Toggles major gridlines for the left axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMajorGridlinesLeft(wxCommandEvent& WXUNUSED(event))
+{
+	SetLeftMajorGrid(!GetLeftMajorGrid());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMinorGridlinesLeft
+//
+// Description:		Toggles major gridlines for the left axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMinorGridlinesLeft(wxCommandEvent& WXUNUSED(event))
+{
+	SetLeftMinorGrid(!GetLeftMinorGrid());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextAutoScaleLeft
+//
+// Description:		Toggles gridlines for the bottom axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
+{
+	AutoScaleLeft();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetRangeLeft
+//
+// Description:		Dispalys a dialog box for setting the axis range.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
+{
+	DisplayAxisRangeDialog(PlotContextLeftYAxis);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetMajorResolutionLeft
+//
+// Description:		Dispalys a dialog box for setting the axis major resolution.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetMajorResolutionLeft(wxCommandEvent& WXUNUSED(event))
+{
+	double resolution(GetLeftMajorResolution());
+	wxString resStr;
+	do {
+		resStr = wxGetTextFromUser(_T("Specify the major resolution (set to 0 for auto):"),
+			_T("Set Major Resolution"),
+			wxString::Format("%f", std::max(resolution, 0.0)), this);
+		if (resStr.IsEmpty())
+			return;
+		resStr.ToDouble(&resolution);
+	} while (resolution < 0.0);
+
+	SetLeftMajorResolution(resolution);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMajorGridlinesRight
+//
+// Description:		Toggles major gridlines for the right axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMajorGridlinesRight(wxCommandEvent& WXUNUSED(event))
+{
+	SetRightMajorGrid(!GetRightMajorGrid());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextToggleMinorGridlinesRight
+//
+// Description:		Toggles minor gridlines for the right axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextToggleMinorGridlinesRight(wxCommandEvent& WXUNUSED(event))
+{
+	SetRightMinorGrid(!GetRightMinorGrid());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextAutoScaleRight
+//
+// Description:		Toggles gridlines for the bottom axis.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
+{
+	AutoScaleRight();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetRangeRight
+//
+// Description:		Dispalys a dialog box for setting the axis range.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
+{
+	DisplayAxisRangeDialog(PlotContextRightYAxis);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetMajorResolutionRight
+//
+// Description:		Dispalys a dialog box for setting the axis major resolution.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetMajorResolutionRight(wxCommandEvent& WXUNUSED(event))
+{
+	double resolution(GetRightMajorResolution());
+	wxString resStr;
+	do {
+		resStr = wxGetTextFromUser(_T("Specify the major resolution (set to 0 for auto):"),
+			_T("Set Major Resolution"),
+			wxString::Format("%f", std::max(resolution, 0.0)), this);
+		if (resStr.IsEmpty())
+			return;
+		resStr.ToDouble(&resolution);
+	} while (resolution < 0.0);
+
+	SetRightMajorResolution(resolution);
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextPlotBGColor
+//
+// Description:		Displays a dialog allowing the user to specify the plot's
+//					background color.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextPlotBGColor(wxCommandEvent& WXUNUSED(event))
+{
+	wxColourData colorData;
+	colorData.SetColour(GetBackgroundColor().ToWxColor());
+
+	wxColourDialog dialog(this, &colorData);
+	dialog.CenterOnParent();
+	dialog.SetTitle(_T("Choose Background Color"));
+	if (dialog.ShowModal() == wxID_OK)
+    {
+		LibPlot2D::Color color;
+		color.Set(dialog.GetColourData().GetColour());
+		SetBackgroundColor(color);
+		UpdateDisplay();
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextGridColor
+//
+// Description:		Dispalys a dialog box allowing the user to specify the
+//					gridline color.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextGridColor(wxCommandEvent& WXUNUSED(event))
+{
+	wxColourData colorData;
+	colorData.SetColour(GetGridColor().ToWxColor());
+
+	wxColourDialog dialog(this, &colorData);
+	dialog.CenterOnParent();
+	dialog.SetTitle(_T("Choose Background Color"));
+	if (dialog.ShowModal() == wxID_OK)
+    {
+		LibPlot2D::Color color;
+		color.Set(dialog.GetColourData().GetColour());
+		SetGridColor(color);
+		UpdateDisplay();
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetLogarithmicBottom
+//
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetLogarithmicBottom(wxCommandEvent& WXUNUSED(event))
+{
+	SetXLogarithmic(!GetXLogarithmic());
+	ClearZoomStack();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetLogarithmicLeft
+//
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetLogarithmicLeft(wxCommandEvent& WXUNUSED(event))
+{
+	SetLeftLogarithmic(!GetLeftLogarithmic());
+	ClearZoomStack();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextSetLogarithmicRight
+//
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextSetLogarithmicRight(wxCommandEvent& WXUNUSED(event))
+{
+	SetRightLogarithmic(!GetRightLogarithmic());
+	ClearZoomStack();
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextEditBottomLabel
+//
+// Description:		Displays a message box asking the user to specify the text
+//					for the label.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextEditBottomLabel(wxCommandEvent& WXUNUSED(event))
+{
+	TextInputDialog dialog(_T("Specify label text:"), _T("Edit Label"), GetXLabel(), this);
+	if (dialog.ShowModal() == wxID_OK)
+		SetXLabel(dialog.GetText());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextEditLeftLabel
+//
+// Description:		Displays a message box asking the user to specify the text
+//					for the label.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextEditLeftLabel(wxCommandEvent& WXUNUSED(event))
+{
+	TextInputDialog dialog(_T("Specify label text:"), _T("Edit Label"), GetLeftYLabel(), this);
+	if (dialog.ShowModal() == wxID_OK)
+		SetLeftYLabel(dialog.GetText());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		ContextEditRightLabel
+//
+// Description:		Displays a message box asking the user to specify the text
+//					for the label.
+//
+// Input Arguments:
+//		event	= wxCommandEvent& (unused)
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::ContextEditRightLabel(wxCommandEvent& WXUNUSED(event))
+{
+	TextInputDialog dialog(_T("Specify label text:"), _T("Edit Label"), GetRightYLabel(), this);
+	if (dialog.ShowModal() == wxID_OK)
+		SetRightYLabel(dialog.GetText());
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		DoCopy
+//
+// Description:		Handles "copy to clipboard" actions.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::DoCopy()
+{
+	wxInitAllImageHandlers();
+	if (wxTheClipboard->Open())
+	{
+		wxTheClipboard->SetData(new wxBitmapDataObject(GetImage()));
+		wxTheClipboard->Close();
+	}
+}
+
+//==========================================================================
+// Class:			PlotRenderer
+// Function:		DoPaste
+//
+// Description:		Handles "paste from clipboard" actions.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//==========================================================================
+void PlotRenderer::DoPaste()
+{
+	if (wxTheClipboard->Open())
+	{
+		if (wxTheClipboard->IsSupported(wxDF_TEXT))
+		{
+			wxTextDataObject data;
+			wxTheClipboard->GetData(data);
+			guiInterface.LoadText(data.GetText(), this);
+		}
+		wxTheClipboard->Close();
+	}
 }
 
 }// namespace LibPlot2D
