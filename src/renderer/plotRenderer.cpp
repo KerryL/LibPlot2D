@@ -25,14 +25,16 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "renderer/plotRenderer.h"
-#include "application/plotObject.h"
-#include "application/mainFrame.h"
-#include "renderer/primitives/zoomBox.h"
-#include "renderer/primitives/plotCursor.h"
-#include "renderer/primitives/axis.h"
-#include "renderer/primitives/legend.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/renderer/plotRenderer.h"
+#include "lp2d/gui/plotObject.h"
+#include "lp2d/renderer/primitives/zoomBox.h"
+#include "lp2d/renderer/primitives/plotCursor.h"
+#include "lp2d/renderer/primitives/axis.h"
+#include "lp2d/renderer/primitives/legend.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			PlotRenderer
@@ -2992,3 +2994,5 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 
 	glUniformMatrix4fv(shaders[0].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
 }
+
+}// namespace LibPlot2D

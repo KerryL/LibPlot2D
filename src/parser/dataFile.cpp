@@ -17,9 +17,12 @@
 #include <locale>
 
 // Local headers
-#include "application/dataFiles/dataFile.h"
-#include "application/multiChoiceDialog.h"
-#include "application/mainFrame.h"
+#include "lp2d/parser/dataFile.h"
+#include "lp2d/gui/multiChoiceDialog.h"
+#include "lp2d/utilities/dataset2D.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			DataFile
@@ -997,3 +1000,5 @@ DataFile::SelectionData::SelectionData()
 {
 	removeExisting = true;
 }
+
+}// namespace LibPlot2D

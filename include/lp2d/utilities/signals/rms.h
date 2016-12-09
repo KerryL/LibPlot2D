@@ -16,6 +16,9 @@
 #ifndef RMS_H_
 #define RMS_H_
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Dataset2D;
 
@@ -24,5 +27,7 @@ class RootMeanSquare
 public:
 	static Dataset2D ComputeTimeHistory(const Dataset2D &data);
 };
+
+}// namespace LibPlot2D
 
 #endif// RMS_H_

@@ -21,7 +21,10 @@
 #include <wx/statline.h>
 
 // Local headers
-#include "multiChoiceDialog.h"
+#include "lp2d/gui/multiChoiceDialog.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			MultiChoiceDialog
@@ -447,3 +450,5 @@ bool MultiChoiceDialog::IsSelected(const int &i) const
 
 	return false;
 }
+
+}// namespace LibPlot2D

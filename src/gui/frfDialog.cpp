@@ -17,7 +17,10 @@
 #include <algorithm>
 
 // Local headers
-#include "application/frfDialog.h"
+#include "lp2d/gui/frfDialog.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			FRFDialog
@@ -341,3 +344,5 @@ bool FRFDialog::GetModuloPhase() const
 {
 	return moduloPhaseCheckBox->GetValue();
 }
+
+}// namespace LibPlot2D

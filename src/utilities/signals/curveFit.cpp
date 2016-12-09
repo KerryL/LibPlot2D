@@ -17,9 +17,12 @@
 #include <cmath>
 
 // Local headers
-#include "utilities/signals/curveFit.h"
-#include "utilities/dataset2D.h"
-#include "utilities/math/matrix.h"
+#include "lp2d/utilities/signals/curveFit.h"
+#include "lp2d/utilities/dataset2D.h"
+#include "lp2d/utilities/math/matrix.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			CurveFit
@@ -198,3 +201,5 @@ double CurveFit::EvaluateFit(const double &x, const PolynomialFit& fit)
 
 	return value;
 }
+
+}// namespace LibPlot2D

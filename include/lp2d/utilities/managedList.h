@@ -24,12 +24,15 @@
 #include <vector>
 #include <assert.h>
 
+namespace LibPlot2D
+{
+
 // Disable warning C4505 for this file
 // This warning occurs because some types (every T= is a different type) do not
 // use all of the overloaded methods in this object
-#ifdef __WXMSW__
+/*#ifdef __WXMSW__
 #pragma warning (disable:4505)
-#endif
+#endif*/
 
 template <class T>
 class ManagedList
@@ -219,5 +222,7 @@ void ManagedList<T>::Clear()
 
 	list.clear();
 }
+
+}// namespace LibPlot2D
 
 #endif// _MANAGED_LIST_H_

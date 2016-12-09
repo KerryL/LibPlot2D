@@ -18,9 +18,12 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/primitives/plotCursor.h"
-#include "renderer/primitives/axis.h"
-#include "renderer/renderWindow.h"
+#include "lp2d/renderer/primitives/plotCursor.h"
+#include "lp2d/renderer/primitives/axis.h"
+#include "lp2d/renderer/renderWindow.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			PlotCursor
@@ -219,3 +222,5 @@ PlotCursor& PlotCursor::operator=(const PlotCursor &target)
 
 	return *this;
 }
+
+}// namespace LibPlot2D

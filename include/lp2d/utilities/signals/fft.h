@@ -21,6 +21,9 @@
 #include <set>
 #include <vector>
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Dataset2D;
 
@@ -329,5 +332,7 @@ private:
 	static unsigned int ComputeRequiredOverlapPoints(const unsigned int &dataSize,
 		const unsigned int &windowSize, const unsigned int &averages);
 };
+
+}// namespace LibPlot2D
 
 #endif// FFT_H_

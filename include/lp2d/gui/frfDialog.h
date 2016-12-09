@@ -19,6 +19,9 @@
 // wxWidgets headers
 #include <wx/wx.h>
 
+namespace LibPlot2D
+{
+
 class FRFDialog : public wxDialog
 {
 public:
@@ -50,5 +53,7 @@ private:
 
 	virtual bool TransferDataFromWindow();
 };
+
+}// namespace LibPlot2D
 
 #endif// _FRF_DIALOG_H_

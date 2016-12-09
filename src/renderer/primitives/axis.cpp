@@ -22,9 +22,12 @@
 #include <algorithm>
 
 // Local headers
-#include "renderer/primitives/axis.h"
-#include "renderer/renderWindow.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/renderer/primitives/axis.h"
+#include "lp2d/renderer/renderWindow.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Axis
@@ -1036,3 +1039,5 @@ bool Axis::InitializeFonts(const std::string& fontFileName, const double& size)
 
 	return true;
 }
+
+}// namespace LibPlot2D

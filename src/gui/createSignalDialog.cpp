@@ -21,9 +21,12 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "application/createSignalDialog.h"
-#include "utilities/dataset2D.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/gui/createSignalDialog.h"
+#include "lp2d/utilities/dataset2D.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			CreateSignalDialog
@@ -1033,3 +1036,5 @@ void CreateSignalDialog::UpdateSlope()
 
 	slopeTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(amplitude / period * factor), amplitude / period * factor));
 }
+
+}// namespace LibPlot2D

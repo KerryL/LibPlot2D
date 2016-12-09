@@ -26,10 +26,13 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/math/plotMath.h"
-#include "utilities/math/vector.h"
-#include "utilities/math/matrix.h"
-#include "utilities/dataset2D.h"
+#include "lp2d/utilities/math/plotMath.h"
+#include "lp2d/utilities/math/vector.h"
+#include "lp2d/utilities/math/matrix.h"
+#include "lp2d/utilities/dataset2D.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Namespace:		PlotMath
@@ -498,3 +501,5 @@ unsigned int PlotMath::GetPrecision(const double &minimum, const double &majorRe
 
 	return -log10(baseValue) + 1;
 }
+
+}// namespace LibPlot2D

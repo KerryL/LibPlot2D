@@ -19,6 +19,9 @@
 // wxWidgets forward declarations
 class wxString;
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Vector;
 
@@ -122,5 +125,7 @@ private:
 	void ZeroRowByScalingAndAdding(const unsigned int &pivotRow,
 		const unsigned int &pivotColumn, const unsigned int &targetRow);
 };
+
+}// namespace LibPlot2D
 
 #endif// MATRIX_H_

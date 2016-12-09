@@ -16,6 +16,9 @@
 #ifndef CURVE_FIT_H_
 #define CURVE_FIT_H_
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Dataset2D;
 
@@ -37,5 +40,7 @@ private:
 	static void ComputeRSquared(const Dataset2D &data, PolynomialFit& fit);
 	//static void DoMatrixTest();
 };
+
+}// namespace LibPlot2D
 
 #endif// CURVE_FIT_H_

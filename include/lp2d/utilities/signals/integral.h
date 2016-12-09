@@ -16,6 +16,9 @@
 #ifndef INTEGRAL_H_
 #define INTEGRAL_H_
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Dataset2D;
 
@@ -24,5 +27,7 @@ class DiscreteIntegral
 public:
 	static Dataset2D ComputeTimeHistory(const Dataset2D &data);
 };
+
+}// namespace LibPlot2D
 
 #endif// INTEGRAL_H_

@@ -14,15 +14,18 @@
 // History:
 
 // Local headers
-#include "application/filterDialog.h"
-#include "utilities/math/plotMath.h"
-#include "utilities/math/expressionTree.h"
-#include "utilities/signals/filter.h"
+#include "lp2d/gui/filterDialog.h"
+#include "lp2d/utilities/math/plotMath.h"
+#include "lp2d/utilities/math/expressionTree.h"
+#include "lp2d/utilities/signals/filter.h"
 
 // wxWidgets headers
 #include <wx/spinctrl.h>
 #include <wx/radiobut.h>
 #include <wx/statline.h>
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			FilterDialog
@@ -1612,3 +1615,5 @@ bool FilterDialog::DampingRatioInputRequired()
 
 	return true;
 }*/
+
+}// namespace LibPlot2D

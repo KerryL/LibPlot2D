@@ -20,8 +20,11 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "renderer/text.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/renderer/text.h"
+
+namespace LibPlot2D
+{
 
 class TextRendering : public Primitive
 {
@@ -58,5 +61,7 @@ private:
 	bool centered;
 	double x, y;
 };
+
+}// namespace LibPlot2D
 
 #endif// TEXT_RENDERING_H_

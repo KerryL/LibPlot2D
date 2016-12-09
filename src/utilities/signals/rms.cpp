@@ -17,8 +17,11 @@
 #include <cmath>
 
 // Local headers
-#include "utilities/signals/rms.h"
-#include "utilities/dataset2D.h"
+#include "lp2d/utilities/signals/rms.h"
+#include "lp2d/utilities/dataset2D.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			RootMeanSquare
@@ -51,3 +54,5 @@ Dataset2D RootMeanSquare::ComputeTimeHistory(const Dataset2D &data)
 
 	return rms;
 }
+
+}// namespace LibPlot2D

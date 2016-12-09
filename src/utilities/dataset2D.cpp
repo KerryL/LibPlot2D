@@ -22,8 +22,11 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/dataset2D.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/utilities/dataset2D.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Dataset2D
@@ -1649,3 +1652,5 @@ void Dataset2D::GetOverlappingOnSameTimebase(const Dataset2D &d1,
 		d2.GetYAt(x, d2Out.GetYPointer()[i]);
 	}
 }
+
+}// namespace LibPlot2D

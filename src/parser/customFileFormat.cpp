@@ -21,7 +21,10 @@
 #include <wx/xml/xml.h>
 
 // Local headers
-#include "application/dataFiles/customFileFormat.h"
+#include "lp2d/parser/customFileFormat.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			CustomFileFormat
@@ -755,3 +758,5 @@ bool CustomFileFormat::ReadColumn(wxXmlNode& WXUNUSED(channelNode), Channel &cha
 
 	return true;
 }
+
+}// namespace LibPlot2D

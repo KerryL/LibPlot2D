@@ -20,7 +20,10 @@
 #include <vector>
 
 // Local headers
-#include "renderer/color.h"
+#include "lp2d/renderer/color.h"
+
+namespace LibPlot2D
+{
 
 // Forward declarations
 class RenderWindow;
@@ -92,5 +95,7 @@ protected:
 private:
 	unsigned int drawOrder;
 };
+
+}// namespace LibPlot2D
 
 #endif// PRIMITIVE_H_

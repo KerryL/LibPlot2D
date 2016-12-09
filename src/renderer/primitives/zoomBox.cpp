@@ -17,8 +17,11 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/primitives/zoomBox.h"
-#include "renderer/renderWindow.h"
+#include "lp2d/renderer/primitives/zoomBox.h"
+#include "lp2d/renderer/renderWindow.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			ZoomBox
@@ -177,3 +180,5 @@ void ZoomBox::SetFloatingCorner(const unsigned int &xFloat, const unsigned int &
 
 	modified = true;
 }
+
+}// namespace LibPlot2D

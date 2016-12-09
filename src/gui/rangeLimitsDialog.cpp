@@ -14,7 +14,10 @@
 // History:
 
 // Local headers
-#include "application/rangeLimitsDialog.h"
+#include "lp2d/gui/rangeLimitsDialog.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			RangeLimitsDialog
@@ -170,3 +173,5 @@ void RangeLimitsDialog::OnOKButton(wxCommandEvent &event)
 	// Skip this event if the data is valid
 	event.Skip();
 }
+
+}// namespace LibPlot2D

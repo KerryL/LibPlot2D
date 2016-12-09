@@ -17,11 +17,14 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/math/expressionTree.h"
-#include "utilities/signals/derivative.h"
-#include "utilities/signals/integral.h"
-#include "utilities/signals/fft.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/utilities/math/expressionTree.h"
+#include "lp2d/utilities/signals/derivative.h"
+#include "lp2d/utilities/signals/integral.h"
+#include "lp2d/utilities/signals/fft.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			ExpressionTree
@@ -2291,3 +2294,5 @@ void ExpressionTree::AddToExpressionString(wxString &expression,
 				PlotMath::GetPrecision(coefficient, printfPrecision), coefficient, power));
 	}
 }
+
+}// namespace LibPlot2D

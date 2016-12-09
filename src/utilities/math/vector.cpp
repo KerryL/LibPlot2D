@@ -26,8 +26,11 @@
 #include <wx/wx.h>
 
 // VVASE headers
-#include "utilities/math/vector.h"
-#include "utilities/math/matrix.h"
+#include "lp2d/utilities/math/vector.h"
+#include "lp2d/utilities/math/matrix.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Vector
@@ -448,13 +451,13 @@ Vector Vector::AnglesTo(const Vector &v) const
 //		v	= const Vector& to be printed
 //
 // Output Arguments:
-//		WriteOut	= &ostream to which the vector will be printed
+//		WriteOut	= &std::ostream to which the vector will be printed
 //
 // Return Value:
-//		&ostream containing the printed vector
+//		&std::ostream containing the printed vector
 //
 //==========================================================================
-ostream &operator << (ostream &writeOut, const Vector &v)
+std::ostream &operator << (std::ostream &writeOut, const Vector &v)
 {
 	// Add the string to the stream
 	writeOut << v.Print();
@@ -808,3 +811,5 @@ bool Vector::operator != (const Vector &v) const
 {
 	return !(*this == v);
 }
+
+}// namespace LibPlot2D

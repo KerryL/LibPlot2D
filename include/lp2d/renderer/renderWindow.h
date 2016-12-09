@@ -25,10 +25,13 @@
 #include <wx/glcanvas.h>
 
 // Local headers
-#include "utilities/managedList.h"
-#include "utilities/math/vector.h"
-#include "utilities/math/matrix.h"
-#include "renderer/primitives/primitive.h"
+#include "lp2d/utilities/managedList.h"
+#include "lp2d/utilities/math/vector.h"
+#include "lp2d/utilities/math/matrix.h"
+#include "lp2d/renderer/primitives/primitive.h"
+
+namespace LibPlot2D
+{
 
 class RenderWindow : public wxGLCanvas
 {
@@ -234,5 +237,7 @@ protected:
 	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
 	virtual std::string GetDefaultFragmentShader() const { return defaultFragmentShader; }
 };
+
+}// namespace LibPlot2D
 
 #endif// RENDER_WINDOW_H_

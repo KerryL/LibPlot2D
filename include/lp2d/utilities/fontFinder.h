@@ -21,7 +21,10 @@
 class wxString;
 
 // Local headers
-#include "utilities/machineDefinitions.h"
+#include "lp2d/utilities/machineDefinitions.h"
+
+namespace LibPlot2D
+{
 
 class FontFinder
 {
@@ -98,5 +101,7 @@ private:
 	static TT_NAME_TABLE_HEADER GetNameTableHeader(std::ifstream &file, const size_t &offset);
 	static wxString CheckHeaderForName(std::ifstream &file, const size_t &offset);
 };
+
+}// namespace LibPlot2D
 
 #endif// _FONT_FINDER_H_

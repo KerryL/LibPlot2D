@@ -24,8 +24,8 @@
 //	11/22/2009	- Moved to vMath.lib, K. Loux.
 //	11/1/2010	- Removed non-const Normalize(), K. Loux.
 
-#ifndef _VECTOR_H_
-#define _VECTOR_H_
+#ifndef VECTOR_H_
+#define VECTOR_H_
 
 // Standard C++ headers
 #include <cmath>
@@ -34,10 +34,11 @@
 // wxWidgets forward declarations
 class wxString;
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Matrix;
-
-using namespace std;
 
 class Vector
 {
@@ -97,19 +98,21 @@ public:
 	Matrix OuterProduct(const Vector &v) const;
 
 	// Operators
-	Vector operator + (const Vector &v) const;
-	Vector operator - (const Vector &v) const;
-	double operator * (const Vector &v) const { return x * v.x + y * v.y + z * v.z; };// Dot product
-	Vector operator * (const double &n) const;// Scalar multiplication
-	Vector operator / (const double &n) const;// Scalar division
+	Vector operator+(const Vector &v) const;
+	Vector operator-(const Vector &v) const;
+	double operator*(const Vector &v) const { return x * v.x + y * v.y + z * v.z; };// Dot product
+	Vector operator*(const double &n) const;// Scalar multiplication
+	Vector operator/(const double &n) const;// Scalar division
 	Vector Cross(const Vector &v) const;
-	Vector& operator += (const Vector &v);
-	Vector& operator -= (const Vector &v);
-	Vector& operator *= (const double &n) { x *= n; y *= n; z *= n; return *this; };
-	Vector& operator /= (const double &n) { x /= n; y /= n; z /= n; return *this; };
-	bool operator == (const Vector &vector) const;
-	bool operator != (const Vector &vector) const;
-	friend ostream& operator << (ostream &writeOut, const Vector &v);
+	Vector& operator+=(const Vector &v);
+	Vector& operator-=(const Vector &v);
+	Vector& operator*=(const double &n) { x *= n; y *= n; z *= n; return *this; };
+	Vector& operator/=(const double &n) { x /= n; y /= n; z /= n; return *this; };
+	bool operator==(const Vector &vector) const;
+	bool operator!=(const Vector &vector) const;
+	friend std::ostream& operator<<(std::ostream &writeOut, const Vector &v);
 };
 
-#endif// _VECTOR_H_
+}// namespace LibPlot2D
+
+#endif// VECTOR_H_

@@ -21,9 +21,12 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "renderer/line.h"
-#include "renderer/text.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/renderer/line.h"
+#include "lp2d/renderer/text.h"
+
+namespace LibPlot2D
+{
 
 class Axis : public Primitive
 {
@@ -161,5 +164,7 @@ private:
 	void ComputeTranslations(const double &value, float &xTranslation, float &yTranslation,
 		const Text::BoundingBox &boundingBox, const double &offset) const;
 };
+
+}// namespace LibPlot2D
 
 #endif// AXIS_H_

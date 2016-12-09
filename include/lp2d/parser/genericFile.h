@@ -17,15 +17,20 @@
 #define _GENERIC_FILE_H_
 
 // Local headers
-#include "application/dataFiles/dataFile.h"
+#include "lp2d/parser/dataFile.h"
+
+namespace LibPlot2D
+{
 
 class GenericFile : public DataFile
 {
 public:
 	// Constructor
-	GenericFile(const wxString& fileName) : DataFile(fileName) {};
+	GenericFile(const wxString& fileName) : DataFile(fileName) {}
 
-	static bool IsType(const wxString &_fileName);
+	static bool IsType(const wxString &testFile);
 };
+
+}// namespace LibPlot2D
 
 #endif//_GENERIC_FILE_H_

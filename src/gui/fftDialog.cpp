@@ -17,7 +17,10 @@
 #include <wx/sizer.h>
 
 // Local headers
-#include "application/fftDialog.h"
+#include "lp2d/gui/fftDialog.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			FFTDialog
@@ -547,3 +550,5 @@ unsigned int FFTDialog::GetPointCount() const
 
 	return dataPoints;
 }
+
+}// namespace LibPlot2D

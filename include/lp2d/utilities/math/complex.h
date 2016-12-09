@@ -13,8 +13,11 @@
 // Description:  Contains class declaration for complex number class.
 // History:
 
-#ifndef _Complex_H_
-#define _Complex_H_
+#ifndef COMPLEX_H_
+#define COMPLEX_H_
+
+namespace LibPlot2D
+{
 
 class Complex
 {
@@ -68,4 +71,6 @@ public:
 	static const Complex i;
 };
 
-#endif// _Complex_H_
+}// namespace LibPlot2D
+
+#endif// COMPLEX_H_

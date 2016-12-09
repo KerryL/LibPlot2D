@@ -17,10 +17,13 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/primitives/textRendering.h"
-#include "renderer/text.h"
-#include "renderer/renderWindow.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/renderer/primitives/textRendering.h"
+#include "lp2d/renderer/text.h"
+#include "lp2d/renderer/renderWindow.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			TextRendering
@@ -245,3 +248,5 @@ void TextRendering::InitializeFonts(const std::string& fontFileName, const doubl
 	font.SetSize(size * factor);
 	font.SetScale(1.0 / factor);
 }
+
+}// namespace LibPlot2D

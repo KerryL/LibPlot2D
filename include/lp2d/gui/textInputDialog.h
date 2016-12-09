@@ -14,8 +14,11 @@
 //				 canceling and returning an empty string.
 // History:
 
-#ifndef _TEXT_INPUT_DIALOG_H_
-#define _TEXT_INPUT_DIALOG_H_
+#ifndef TEXT_INPUT_DIALOG_H_
+#define TEXT_INPUT_DIALOG_H_
+
+namespace LibPlot2D
+{
 
 // wxWidgets headers
 #include <wx/dialog.h>
@@ -34,4 +37,6 @@ private:
 	void CreateControls(const wxString &message, const wxString &defaultText);
 };
 
-#endif// _TEXT_INPUT_DIALOG_H_
+}// namespace LibPlot2D
+
+#endif// TEXT_INPUT_DIALOG_H_

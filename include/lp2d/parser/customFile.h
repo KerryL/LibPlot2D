@@ -17,38 +17,51 @@
 #define _CUSTOM_FILE_H_
 
 // Local headers
-#include "application/dataFiles/dataFile.h"
-#include "application/dataFiles/customFileFormat.h"
+#include "lp2d/parser/dataFile.h"
+#include "lp2d/parser/customFileFormat.h"
+
+namespace LibPlot2D
+{
 
 class CustomFile : public DataFile
 {
 public:
 	// Constructor
-	CustomFile(const wxString& fileName) : DataFile(fileName), fileFormat(fileName) {};
+	CustomFile(const wxString& fileName) : DataFile(fileName),
+		fileFormat(fileName) {}
 
-	static bool IsType(const wxString &_fileName);
+	static bool IsType(const wxString &testFile);
 
 protected:
 	CustomFileFormat fileFormat;
 
-	virtual wxArrayString CreateDelimiterList() const;
-	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const;
-	virtual void AssembleDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
-	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
-		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks();
-	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
+	wxArrayString CreateDelimiterList() const override;
+	bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
+		std::vector<double> *rawData, std::vector<double> &factors,
+		wxString &errorString) const override;
+	void AssembleDatasets(const std::vector<double> *rawData,
+		const unsigned int &dataSize) override;
+	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
+		std::vector<double> &factors,
+		wxArrayInt &nonNumericColumns) const override;
+	void DoTypeSpecificLoadTasks() override;
+	unsigned int GetRawDataSize(
+		const unsigned int &selectedCount) const override;
 
 	bool ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const;
-	bool ExtractAsynchronousData(double &timeZero, const wxArrayString &parsedLine,
-		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
+		std::vector<double> *rawData, std::vector<double> &factors,
+		wxString &errorString) const;
+	bool ExtractAsynchronousData(double &timeZero,
+		const wxArrayString &parsedLine, std::vector<double> *rawData,
+		std::vector<double> &factors, const wxArrayInt &choices,
 		wxString &errorString) const;
 	bool ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
-		std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
-		wxString &errorString) const;
-	void AssembleAsynchronousDatasets(const std::vector<double> *rawData, const unsigned int &dataSize);
+		std::vector<double> *rawData, std::vector<double> &factors,
+		const wxArrayInt &choices, wxString &errorString) const;
+	void AssembleAsynchronousDatasets(const std::vector<double> *rawData,
+		const unsigned int &dataSize);
 };
+
+}// namespace LibPlot2D
 
 #endif//_CUSTOM_FILE_H_

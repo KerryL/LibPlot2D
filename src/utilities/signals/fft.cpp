@@ -18,10 +18,13 @@
 #include <algorithm>
 
 // Local headers
-#include "utilities/signals/fft.h"
-#include "utilities/dataset2D.h"
-#include "utilities/math/plotMath.h"
-#include "utilities/signals/derivative.h"
+#include "lp2d/utilities/signals/fft.h"
+#include "lp2d/utilities/dataset2D.h"
+#include "lp2d/utilities/math/plotMath.h"
+#include "lp2d/utilities/signals/derivative.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			FastFourierTransform
@@ -1218,3 +1221,5 @@ unsigned int FastFourierTransform::ComputeRequiredOverlapPoints(const unsigned i
 
 	return (unsigned int)ceil(overlap);
 }
+
+}// namespace LibPlot2D

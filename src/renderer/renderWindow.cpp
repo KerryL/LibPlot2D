@@ -31,8 +31,11 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/renderWindow.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/renderer/renderWindow.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			RenderWindow
@@ -1905,3 +1908,5 @@ bool RenderWindow::GLHasError()
 
 	return true;
 }
+
+}// namespace LibPlot2D

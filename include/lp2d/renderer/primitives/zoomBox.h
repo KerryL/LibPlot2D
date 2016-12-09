@@ -17,8 +17,11 @@
 #define ZOOM_BOX_H_
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "renderer/line.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/renderer/line.h"
+
+namespace LibPlot2D
+{
 
 class ZoomBox : public Primitive
 {
@@ -45,5 +48,7 @@ private:
 
 	Line box;
 };
+
+}// namespace LibPlot2D
 
 #endif// ZOOM_BOX_H_

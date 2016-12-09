@@ -23,6 +23,9 @@
 // wxWidgets headers
 #include <wx/wx.h>
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Dataset2D;
 
@@ -57,7 +60,7 @@ public:
 	bool DescriptionsMatch(const wxArrayString &descriptions) const;
 
 	// Classes derived from this should have this method:
-	//static bool IsType(const wxString& _fileName);
+	//static bool IsType(const wxString& testFile);
 
 protected:
 	const wxString fileName;
@@ -106,5 +109,7 @@ protected:
 	wxArrayInt AdjustForSkippedColumns(const wxArrayInt& selections) const;
 	unsigned int AdjustForSkippedColumns(const unsigned int &i) const;
 };
+
+}// namespace LibPlot2D
 
 #endif// _DATA_FILE_H_

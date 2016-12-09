@@ -24,9 +24,12 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "renderer/text.h"
-#include "renderer/line.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/renderer/text.h"
+#include "lp2d/renderer/line.h"
+
+namespace LibPlot2D
+{
 
 class Legend : public Primitive
 {
@@ -136,5 +139,7 @@ private:
 	void ConfigureVertexArray(Primitive::BufferInfo& buffer) const;
 	void RequiresRedraw();
 };
+
+}// namespace LibPlot2D
 
 #endif// LEGEND_H_

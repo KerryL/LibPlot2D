@@ -20,6 +20,9 @@
 #include <vector>
 #include <string>
 
+namespace LibPlot2D
+{
+
 class Filter
 {
 public:
@@ -74,5 +77,7 @@ private:
 	static std::vector<std::pair<int, double> > CollectLikeTerms(std::vector<std::pair<int, double> > terms);
 	static std::vector<std::pair<int, double> > PadMissingTerms(std::vector<std::pair<int, double> > terms);
 };
+
+}// namespace LibPlot2D
 
 #endif// FILTER_H_

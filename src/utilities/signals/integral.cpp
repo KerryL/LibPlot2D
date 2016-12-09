@@ -14,8 +14,11 @@
 // History:
 
 // Local headers
-#include "utilities/signals/integral.h"
-#include "utilities/dataset2D.h"
+#include "lp2d/utilities/signals/integral.h"
+#include "lp2d/utilities/dataset2D.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			DiscreteIntegral
@@ -51,3 +54,5 @@ Dataset2D DiscreteIntegral::ComputeTimeHistory(const Dataset2D &data)
 
 	return integral;
 }
+
+}// namespace LibPlot2D

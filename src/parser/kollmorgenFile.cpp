@@ -14,7 +14,10 @@
 // History:
 
 // Local headers
-#include "application/dataFiles/kollmorgenFile.h"
+#include "lp2d/parser/kollmorgenFile.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			KollmorgenFile
@@ -206,3 +209,5 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	}
 	return true;
 }
+
+}// namespace LibPlot2D

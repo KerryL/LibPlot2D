@@ -24,7 +24,10 @@
 #include <wx/fontenum.h>
 
 // Local headers
-#include "utilities/fontFinder.h"
+#include "lp2d/utilities/fontFinder.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			FontFinder
@@ -54,8 +57,8 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 	fontDirectory = _T("/usr/share/fonts/");
 #else
 	// Unknown platform - warn the user
-#	warning "Unrecognized platform - unable to locate font files!"
-	return wxEmptyString;
+	#	warning "Unrecognized platform - unable to locate font files!"
+		return wxEmptyString;
 #endif
 
 	wxArrayString fontFiles;
@@ -95,7 +98,7 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 //
 //==========================================================================
 bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
-		const wxArrayString &preferredFonts, const bool &fixedWidth, wxString &fontFile)
+	const wxArrayString &preferredFonts, const bool &fixedWidth, wxString &fontFile)
 {
 	// Get a list of the fonts found on the system
 	wxArrayString fontList = wxFontEnumerator::GetFacenames(encoding, fixedWidth);
@@ -206,7 +209,7 @@ bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 	TT_OFFSET_TABLE ttOffsetTable = ReadOffsetTable(fontStream);
 
 	// Make sure this is a version 1.0 TrueType Font
-	if(ttOffsetTable.majorVersion != 1 || ttOffsetTable.minorVersion != 0)
+	if (ttOffsetTable.majorVersion != 1 || ttOffsetTable.minorVersion != 0)
 		return false;
 
 	TT_TABLE_DIRECTORY tblDir;
@@ -288,7 +291,7 @@ bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offset
 		tempTagString += table.tag[1];
 		tempTagString += table.tag[2];
 		tempTagString += table.tag[3];
-		if(tempTagString.CmpNoCase(tableName) == 0)
+		if (tempTagString.CmpNoCase(tableName) == 0)
 		{
 			SwapEndian(table.length);
 			SwapEndian(table.offset);
@@ -373,10 +376,12 @@ wxString FontFinder::CheckHeaderForName(std::ifstream &file, const size_t &offse
 		// we only assign the proper length if the string is not already empty
 		if (!name.IsEmpty())
 			name.resize(ttRecord.stringLength);
-		delete [] nameBuffer;
+		delete[] nameBuffer;
 
 		file.seekg(nPos, std::ios_base::beg);
 	}
 
 	return name;
 }
+
+}// namespace LibPlot2D

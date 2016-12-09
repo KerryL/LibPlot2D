@@ -22,6 +22,9 @@
 class wxString;
 class wxColor;
 
+namespace LibPlot2D
+{
+
 class Color
 {
 public:
@@ -77,5 +80,7 @@ private:
 	// Checks to make sure all values are between 0 and 1 (forces this to be true)
 	void ValidateColor();
 };
+
+}// namespace LibPlot2D
 
 #endif// COLOR_H_

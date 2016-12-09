@@ -17,8 +17,11 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/primitives/legend.h"
-#include "renderer/renderWindow.h"
+#include "lp2d/renderer/primitives/legend.h"
+#include "lp2d/renderer/renderWindow.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Legend
@@ -1141,3 +1144,5 @@ void Legend::RequiresRedraw()
 	for (i = 0; i < bufferInfo.size(); i++)
 		bufferInfo[i].vertexCountModified = true;
 }
+
+}// namespace LibPlot2D

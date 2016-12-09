@@ -17,27 +17,32 @@
 #define _KOLLMORGEN_FILE_H_
 
 // Local headers
-#include "application/dataFiles/dataFile.h"
+#include "lp2d/parser/dataFile.h"
 
-class KollmorgenFile : public DataFile
+namespace LibPlot2D
+{
+
+class KollmorgenFile final : public DataFile
 {
 public:
 	// Constructor
 	KollmorgenFile(const wxString& fileName)
-		: DataFile(fileName) {};
+		: DataFile(fileName) {}
 
-	static bool IsType(const wxString &_fileName);
+	static bool IsType(const wxString &testFile);
 
 protected:
-	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
-		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks();
-	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
+	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
+		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const override;
+	void DoTypeSpecificLoadTasks() override;
+	bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<double> *rawData, std::vector<double> &factors,
-		wxString &errorString) const;
+		wxString &errorString) const override;
 
 private:
 	double timeStep;// [sec]
 };
+
+}// namespace LibPlot2D
 
 #endif//_KOLLMORGEN_FILE_H_

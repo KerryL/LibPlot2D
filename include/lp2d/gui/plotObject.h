@@ -23,7 +23,10 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "renderer/primitives/axis.h"
+#include "lp2d/renderer/primitives/axis.h"
+
+namespace LibPlot2D
+{
 
 // Local forward declarations
 class PlotRenderer;
@@ -216,5 +219,7 @@ private:
 
 	void UpdateScissorArea() const;
 };
+
+}// namespace LibPlot2D
 
 #endif// PLOT_OBJECT_H_

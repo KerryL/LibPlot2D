@@ -23,6 +23,9 @@
 // wxWidgets headers
 #include <wx/wx.h>
 
+namespace LibPlot2D
+{
+
 class MultiChoiceDialog : public wxDialog
 {
 public:
@@ -68,5 +71,7 @@ private:
 
 	DECLARE_EVENT_TABLE();
 };
+
+}// namespace LibPlot2D
 
 #endif// _MULTI_CHOICE_DIALOG_H_

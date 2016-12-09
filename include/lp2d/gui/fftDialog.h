@@ -20,7 +20,10 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/signals/fft.h"
+#include "lp2d/utilities/signals/fft.h"
+
+namespace LibPlot2D
+{
 
 class FFTDialog : public wxDialog
 {
@@ -69,5 +72,7 @@ private:
 
 	DECLARE_EVENT_TABLE()
 };
+
+}// namespace LibPlot2D
 
 #endif// _FFT_DIALOG_H_

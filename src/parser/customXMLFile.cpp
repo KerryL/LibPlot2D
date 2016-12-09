@@ -14,7 +14,10 @@
 // History:
 
 // Local headers
-#include "application/dataFiles/customXMLFile.h"
+#include "lp2d/parser/customXMLFile.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			CustomXMLFile
@@ -403,3 +406,5 @@ bool CustomXMLFile::DataStringToVector(const wxString &data,
 
 	return true;
 }
+
+}// namespace LibPlot2D

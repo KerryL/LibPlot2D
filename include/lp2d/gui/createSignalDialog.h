@@ -13,14 +13,17 @@
 // Description:  Dialog for creating a variety of signals (not dependent on other curves).
 // History:
 
-#ifndef _CREATE_SIGNAL_DIALOG_H_
-#define _CREATE_SIGNAL_DIALOG_H_
+#ifndef CREATE_SIGNAL_DIALOG_H_
+#define CREATE_SIGNAL_DIALOG_H_
 
 // wxWidgets headers
 #include <wx/dialog.h>
 
 // wxWidgets forward declarations
 class wxTextCtrl;
+
+namespace LibPlot2D
+{
 
 // Local forward declarations
 class Dataset2D;
@@ -117,4 +120,6 @@ private:
 	DECLARE_EVENT_TABLE();
 };
 
-#endif// _CREATE_SIGNAL_DIALOG_H_
+}// namespace LibPlot2D
+
+#endif// CREATE_SIGNAL_DIALOG_H_

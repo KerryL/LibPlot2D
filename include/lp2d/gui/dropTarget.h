@@ -14,11 +14,14 @@
 //				 when the user drags-and-drops them onto the main window.
 // History:
 
-#ifndef _DROP_TARGET_H_
-#define _DROP_TARGET_H_
+#ifndef DROP_TARGET_H_
+#define DROP_TARGET_H_
 
 // wxWidgets headers
 #include <wx/dnd.h>
+
+namespace LibPlot2D
+{
 
 // Local forward declarations
 class MainFrame;
@@ -47,4 +50,6 @@ private:
 	void ClearBuffer();
 };
 
-#endif//  _DROP_TARGET_H_
+}// namespace LibPlot2D
+
+#endif// DROP_TARGET_H_

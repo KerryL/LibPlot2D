@@ -20,9 +20,12 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/line.h"
-#include "utilities/math/plotMath.h"
-#include "renderer/renderWindow.h"
+#include "lp2d/renderer/line.h"
+#include "lp2d/utilities/math/plotMath.h"
+#include "lp2d/renderer/renderWindow.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Line
@@ -855,3 +858,5 @@ void Line::DoPrettyDraw(const unsigned int& indexCount)
 
 	assert(!RenderWindow::GLHasError());
 }
+
+}// namespace LibPlot2D

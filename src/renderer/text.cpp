@@ -21,11 +21,14 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/text.h"
-#include "renderer/renderWindow.h"
+#include "lp2d/renderer/text.h"
+#include "lp2d/renderer/renderWindow.h"
 
 // Freetype headers
 #include FT_MODULE_H
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Text
@@ -785,3 +788,5 @@ void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 
     glBindVertexArray(0);
 }
+
+}// namespace LibPlot2D

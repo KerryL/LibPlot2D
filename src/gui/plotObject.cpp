@@ -17,16 +17,18 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "application/plotObject.h"
-#include "application/mainFrame.h"
-#include "renderer/plotRenderer.h"
-#include "renderer/color.h"
-#include "renderer/primitives/plotCurve.h"
-#include "renderer/primitives/textRendering.h"
-#include "renderer/primitives/legend.h"
-#include "utilities/math/plotMath.h"
-#include "utilities/dataset2D.h"
-#include "utilities/fontFinder.h"
+#include "lp2d/gui/plotObject.h"
+#include "lp2d/renderer/plotRenderer.h"
+#include "lp2d/renderer/color.h"
+#include "lp2d/renderer/primitives/plotCurve.h"
+#include "lp2d/renderer/primitives/textRendering.h"
+#include "lp2d/renderer/primitives/legend.h"
+#include "lp2d/utilities/math/plotMath.h"
+#include "lp2d/utilities/dataset2D.h"
+#include "lp2d/utilities/fontFinder.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			PlotObject
@@ -2190,3 +2192,5 @@ void PlotObject::UpdateScissorArea() const
 
 	assert(!RenderWindow::GLHasError());
 }
+
+}// namespace LibPlot2D

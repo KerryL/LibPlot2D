@@ -21,10 +21,15 @@
 // Standard C++ headers
 #include <limits>// For QNaN
 
+// wxWidgets forward declarations
+class wxString;
+
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Vector;
 class Dataset2D;
-class wxString;
 
 namespace PlotMath
 {
@@ -141,5 +146,7 @@ bool PlotMath::IsValid(const T &value)
 {
 	return !IsNaN<T>(value) && !IsInf<T>(value);
 }
+
+}// namespace LibPlot2D
 
 #endif// PLOT_MATH_H_

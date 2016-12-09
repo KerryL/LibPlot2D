@@ -17,9 +17,12 @@
 #define PLOT_CURVE_H_
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "utilities/managedList.h"
-#include "renderer/line.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/utilities/managedList.h"
+#include "lp2d/renderer/line.h"
+
+namespace LibPlot2D
+{
 
 // Local forward declarations
 class Axis;
@@ -88,5 +91,7 @@ private:
 	void InitializeMarkerVertexBuffer();
 	static double* DoLogarithmicScale(const double* values, const unsigned int& count);
 };
+
+}// namespace LibPlot2D
 
 #endif// PLOT_CURVE_H_

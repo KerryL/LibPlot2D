@@ -18,12 +18,15 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/primitives/plotCurve.h"
-#include "renderer/renderWindow.h"
-#include "renderer/plotRenderer.h"
-#include "renderer/primitives/axis.h"
-#include "utilities/dataset2D.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/renderer/primitives/plotCurve.h"
+#include "lp2d/renderer/renderWindow.h"
+#include "lp2d/renderer/plotRenderer.h"
+#include "lp2d/renderer/primitives/axis.h"
+#include "lp2d/utilities/dataset2D.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			PlotCurve
@@ -594,3 +597,5 @@ bool PlotCurve::NeedsMarkersDrawn() const
 {
 	return markerSize > 0 || (markerSize < 0 && RangeIsSmall());
 }
+
+}// namespace LibPlot2D

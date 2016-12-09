@@ -13,11 +13,14 @@
 // Description:  Dialog box for entering a minimum and maximum value for an axis.
 // History:
 
-#ifndef _RANGE_LIMITS_DIALOG_H_
-#define _RANGE_LIMITS_DIALOG_H_
+#ifndef RANGE_LIMITS_DIALOG_H_
+#define RANGE_LIMITS_DIALOG_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
+
+namespace LibPlot2D
+{
 
 class RangeLimitsDialog : public wxDialog
 {
@@ -39,4 +42,6 @@ private:
 	DECLARE_EVENT_TABLE();
 };
 
-#endif// _RANGE_LIMITS_DIALOG_H_
+}// namespace LibPlot2D
+
+#endif// RANGE_LIMITS_DIALOG_H_

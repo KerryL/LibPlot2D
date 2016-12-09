@@ -24,13 +24,19 @@
 
 // NOTE:  See wxPlatformInfo for run-time determination of OS address width
 
-#ifdef _DATAPLOTTER_32_BIT_
+#ifdef LIBPLOT2D_32_BIT_
 #define DP_ULONG unsigned long
-#elif _DATAPLOTTER_64_BIT_
+#elif LIBPLOT2D_64_BIT_
 #define DP_ULONG unsigned int
 #else
-#error "Must define preprocessor flags _DATAPLOTTER_32_BIT_ or _DATAPLOTTER_64_BIT_"
-#endif
+#error "Must define preprocessor flags LIBPLOT2D_32_BIT_ or LIBPLOT2D_64_BIT_"
+#endif// TODO:  Is this necessary?  At the very least, can we deduce with preprocessor?
+
+namespace LibPlot2D
+{
+
+namespace MachineDefinitions
+{
 
 // Conversion to signed 32-bit integers
 inline int32_t ReadInt32(int64_t in)
@@ -75,5 +81,9 @@ inline uint64_t ReadUInt64(uint32_t in)
 {
 	return in;
 }
+
+}// namespace MachineDefinitions
+
+}// namespace LibPlot2D
 
 #endif// _MACHINE_DEFS_H_

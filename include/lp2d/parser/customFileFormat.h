@@ -27,33 +27,36 @@
 class wxXmlNode;
 class wxXmlDocument;
 
+namespace LibPlot2D
+{
+
 class CustomFileFormat
 {
 public:
 	// Constructor
 	CustomFileFormat(const wxString &pathAndFileName);
 
-	bool IsCustomFormat() const { return !formatName.IsEmpty(); };
-	bool IsAsynchronous() const { return asynchronous; };
+	bool IsCustomFormat() const { return !formatName.IsEmpty(); }
+	bool IsAsynchronous() const { return asynchronous; }
 
-	wxString GetDelimiter() const { return delimiter; };
-	wxString GetTimeUnits() const { return timeUnits; };
-	wxString GetTimeFormat() const { return timeFormat; };
-	wxString GetEndIdentifier() const { return endIdentifier; };
+	wxString GetDelimiter() const { return delimiter; }
+	wxString GetTimeUnits() const { return timeUnits; }
+	wxString GetTimeFormat() const { return timeFormat; }
+	wxString GetEndIdentifier() const { return endIdentifier; }
 
 	bool IsXML() const { return isXML; };
 
-	wxString GetXMLXDataNode() const { return xDataNode; };
-	wxString GetXMLXDataKey() const { return xDataKey; };
-	wxString GetXMLYDataNode() const { return yDataNode; };
-	wxString GetXMLYDataKey() const { return yDataKey; };
-	wxString GetXMLChannelParentNode() const { return channelParentNode; };
-	wxString GetXMLChannelNode() const { return channelNode; };
-	wxString GetXMLCodeKey() const { return codeKey; };
+	wxString GetXMLXDataNode() const { return xDataNode; }
+	wxString GetXMLXDataKey() const { return xDataKey; }
+	wxString GetXMLYDataNode() const { return yDataNode; }
+	wxString GetXMLYDataKey() const { return yDataKey; }
+	wxString GetXMLChannelParentNode() const { return channelParentNode; }
+	wxString GetXMLChannelNode() const { return channelNode; }
+	wxString GetXMLCodeKey() const { return codeKey; }
 
 	void ProcessChannels(wxArrayString &names, std::vector<double> &scales) const;
 
-	inline static bool CustomDefinitionsExist() { return wxFileExists(customFormatsXMLFileName); };
+	inline static bool CustomDefinitionsExist() { return wxFileExists(customFormatsXMLFileName); }
 
 private:
 	static const wxString customFormatsXMLFileName;
@@ -132,5 +135,7 @@ private:
 	bool ReadCode(wxXmlNode &channelNode, Channel &channel) const;
 	bool ReadColumn(wxXmlNode &channelNode, Channel &channel) const;
 };
+
+}// namespace LibPlot2D
 
 #endif//_CUSTOM_FILE_FORMAT_H_

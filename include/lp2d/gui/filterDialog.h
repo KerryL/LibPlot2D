@@ -23,11 +23,14 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/math/complex.h"
+#include "lp2d/utilities/math/complex.h"
 
 // wxWidgets forward declarations
 class wxSpinCtrl;
 class wxSpinEvent;
+
+namespace LibPlot2D
+{
 
 struct FilterParameters
 {
@@ -169,5 +172,7 @@ private:
 	// For the event table
 	DECLARE_EVENT_TABLE();
 };
+
+}// namespace LibPlot2D
 
 #endif// FILTER_DIALOG_H_

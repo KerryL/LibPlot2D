@@ -17,8 +17,11 @@
 #include <GL/glew.h>
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "renderer/renderWindow.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/renderer/renderWindow.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Primitive
@@ -416,3 +419,5 @@ void Primitive::BufferInfo::FreeDynamicMemory()
 	delete[] indexBuffer;
 	indexBuffer = NULL;
 }
+
+}// namespace LibPlot2D

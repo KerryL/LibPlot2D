@@ -23,6 +23,9 @@
 // wxWidgets forward declarations
 class wxString;
 
+namespace LibPlot2D
+{
+
 class Dataset2D
 {
 public:
@@ -120,5 +123,7 @@ private:
 	static void GetOverlappingOnSameTimebase(const Dataset2D &d1,
 		const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out);
 };
+
+}// namespace LibPlot2D
 
 #endif// DATASET_H_

@@ -18,7 +18,10 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "application/textInputDialog.h"
+#include "lp2d/gui/textInputDialog.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			TextInputDialog
@@ -102,3 +105,5 @@ void TextInputDialog::CreateControls(const wxString &message, const wxString &de
 
 	text->SetFocus();
 }
+
+}// namespace LibPlot2D

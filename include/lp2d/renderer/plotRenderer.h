@@ -23,14 +23,17 @@
 #include <cmath>
 
 // Local headers
-#include "renderer/renderWindow.h"
-#include "renderer/primitives/legend.h"
+#include "lp2d/renderer/renderWindow.h"
+#include "lp2d/renderer/primitives/legend.h"
 
 // wxWidgets forward declarations
 class wxString;
 
-class MainFrame;
-typedef MainFrame PlotOwner;
+namespace LibPlot2D
+{
+
+/*class MainFrame;
+typedef MainFrame PlotOwner;*/// TODO:  Use template
 
 // Local forward declarations
 class PlotObject;
@@ -38,6 +41,7 @@ class Dataset2D;
 class ZoomBox;
 class PlotCursor;
 
+//template<typename PlotOwner>
 class PlotRenderer : public RenderWindow
 {
 public:
@@ -282,5 +286,7 @@ protected:
 	// For the event table
 	DECLARE_EVENT_TABLE()
 };
+
+}// namespace LibPlot2D
 
 #endif// PLOT_RENDERER_H_

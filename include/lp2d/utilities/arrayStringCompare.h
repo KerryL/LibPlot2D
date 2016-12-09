@@ -15,8 +15,12 @@
 #ifndef ARRAY_STRING_COMPARE_H_
 #define ARRAY_STRING_COMPARE_H_
 
-// wxWidgets typedefs
+// wxWidgets forward declarations
 class wxArrayString;
+class wxString;
+
+namespace LibPlot2D
+{
 
 class ArrayStringCompare
 {
@@ -26,5 +30,7 @@ public:
 private:
 	wxString GenerateSingleString(const wxArrayString &a) const;
 };
+
+}// namespace LibPlot2D
 
 #endif// ARRAY_STRING_COMPARE_H_

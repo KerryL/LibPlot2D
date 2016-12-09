@@ -14,8 +14,11 @@
 // History:
 
 // Local headers
-#include "utilities/signals/derivative.h"
-#include "utilities/dataset2D.h"
+#include "lp2d/utilities/signals/derivative.h"
+#include "lp2d/utilities/dataset2D.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			DiscreteDerivative
@@ -50,3 +53,5 @@ Dataset2D DiscreteDerivative::ComputeTimeHistory(const Dataset2D &data)
 
 	return derivative;
 }
+
+}// namespace LibPlot2D

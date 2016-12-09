@@ -25,8 +25,11 @@
 #include <cassert>
 
 // Local headers
-#include "renderer/color.h"
-#include "renderer/primitives/primitive.h"
+#include "lp2d/renderer/color.h"
+#include "lp2d/renderer/primitives/primitive.h"
+
+namespace LibPlot2D
+{
 
 // Local forward declarations
 class RenderWindow;
@@ -122,5 +125,7 @@ private:
 
 	void AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount);
 };
+
+}// namespace LibPlot2D
 
 #endif// LINE_H_

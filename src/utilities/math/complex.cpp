@@ -20,9 +20,10 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/math/complex.h"
+#include "lp2d/utilities/math/complex.h"
 
-using namespace std;
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Complex
@@ -123,7 +124,7 @@ const Complex Complex::i(0.0, 1.0);
 //		&ostream containing the formatted value
 //
 //==========================================================================
-ostream &operator << (ostream &writeOut, const Complex &complex)
+std::ostream &operator << (std::ostream &writeOut, const Complex &complex)
 {
 	writeOut << complex.Print();
 
@@ -723,3 +724,5 @@ const Complex Complex::operator / (const double &value) const
 
 	return temp;
 }
+
+}// namespace LibPlot2D

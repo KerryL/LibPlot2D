@@ -16,7 +16,10 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "arrayStringCompare.h"
+#include "lp2d/utilities/arrayStringCompare.h"
+
+namespace LibPlot2D
+{
 
 bool ArrayStringCompare::operator()(const wxArrayString &a1, const wxArrayString &a2) const
 {
@@ -32,3 +35,5 @@ wxString ArrayStringCompare::GenerateSingleString(const wxArrayString &a) const
 
 	return s;
 }
+
+}// namespace LibPlot2D

@@ -17,24 +17,30 @@
 #define _BAUMULLER_FILE_H_
 
 // Local headers
-#include "application/dataFiles/dataFile.h"
+#include "lp2d/parser/dataFile.h"
 
-class BaumullerFile : public DataFile
+namespace LibPlot2D
+{
+
+class BaumullerFile final : public DataFile
 {
 public:
 	// Constructor
-	BaumullerFile(const wxString& fileName) : DataFile(fileName) {};
+	BaumullerFile(const wxString& fileName) : DataFile(fileName) {}
 
-	static bool IsType(const wxString &_fileName);
+	static bool IsType(const wxString &testFile);
 
 protected:
-	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
-		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks();
-	virtual void DoTypeSpecificProcessTasks();
+	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
+		std::vector<double> &factors,
+		wxArrayInt &nonNumericColumns) const override;
+	void DoTypeSpecificLoadTasks() override;
+	void DoTypeSpecificProcessTasks() override;
 
 	bool ConstructNames(std::string &nextLine, std::ifstream &file,
 		wxArrayString &names, wxArrayString &previousLines) const;
 };
+
+}// namespace LibPlot2D
 
 #endif//_BAUMULLER_FILE_H_

@@ -16,6 +16,9 @@
 #ifndef DERIVATIVE_H_
 #define DERIVATIVE_H_
 
+namespace LibPlot2D
+{
+
 // Local forward declarations
 class Dataset2D;
 
@@ -24,5 +27,7 @@ class DiscreteDerivative
 public:
 	static Dataset2D ComputeTimeHistory(const Dataset2D &data);
 };
+
+}// namespace LibPlot2D
 
 #endif// DERIVATIVE_H_

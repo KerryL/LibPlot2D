@@ -25,8 +25,11 @@
 #include FT_FREETYPE_H
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "utilities/math/matrix.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/utilities/math/matrix.h"
+
+namespace LibPlot2D
+{
 
 class Text
 {
@@ -119,5 +122,7 @@ private:
 	Primitive::BufferInfo BuildLocalText();
 	void ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const;
 };
+
+}// namespace LibPlot2D
 
 #endif// TEXT_H_

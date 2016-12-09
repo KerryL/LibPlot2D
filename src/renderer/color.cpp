@@ -23,8 +23,11 @@
 #include <wx/colour.h>
 
 // Local headers
-#include "renderer/color.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/renderer/color.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Color
@@ -498,3 +501,5 @@ Color Color::GetColor(const double &red, const double &green, const double &blue
 	Color c(red, green, blue, alpha);
 	return c;
 }
+
+}// namespace LibPlot2D

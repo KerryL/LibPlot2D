@@ -15,8 +15,11 @@
 // History:
 
 // Local headers
-#include "application/dataFiles/customFile.h"
-#include "utilities/dataset2D.h"
+#include "lp2d/parser/customFile.h"
+#include "lp2d/utilities/dataset2D.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			CustomFile
@@ -420,3 +423,5 @@ void CustomFile::DoTypeSpecificLoadTasks()
 	ignoreConsecutiveDelimiters = !fileFormat.IsAsynchronous();
 	timeIsFormatted = !fileFormat.GetTimeFormat().IsEmpty();
 }
+
+}// namespace LibPlot2D

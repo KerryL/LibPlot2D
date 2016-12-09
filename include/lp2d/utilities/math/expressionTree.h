@@ -22,11 +22,14 @@
 #include <string>
 
 // Local headers
-#include "utilities/managedList.h"
-#include "utilities/dataset2D.h"
+#include "lp2d/utilities/managedList.h"
+#include "lp2d/utilities/dataset2D.h"
 
 // wxWidgets headers
 #include <wx/wx.h>
+
+namespace LibPlot2D
+{
 
 class ExpressionTree
 {
@@ -140,5 +143,7 @@ private:
 
 	void AddToExpressionString(wxString &expression, const double &coefficient, const int &power) const;
 };
+
+}// namespace LibPlot2D
 
 #endif// EXPRESSION_TREE_H_

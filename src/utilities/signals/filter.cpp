@@ -19,9 +19,12 @@
 #include <functional>
 
 // Local headers
-#include "utilities/signals/filter.h"
-#include "utilities/math/expressionTree.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/utilities/signals/filter.h"
+#include "lp2d/utilities/math/expressionTree.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Filter
@@ -611,3 +614,5 @@ double Filter::ComputeSteadyStateGain() const
 
 	return numeratorSum / denominatorSum;
 }
+
+}// namespace LibPlot2D

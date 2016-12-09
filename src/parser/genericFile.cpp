@@ -14,7 +14,10 @@
 // History:
 
 // Local headers
-#include "application/dataFiles/genericFile.h"
+#include "lp2d/parser/genericFile.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			GenericFile
@@ -37,3 +40,5 @@ bool GenericFile::IsType(const wxString& WXUNUSED(fileName))
 {
 	return true;
 }
+
+}// namespace LibPlot2D

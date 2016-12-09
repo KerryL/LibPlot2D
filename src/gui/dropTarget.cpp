@@ -15,8 +15,10 @@
 // History:
 
 // Local headers
-#include "application/dropTarget.h"
-#include "application/mainFrame.h"
+#include "lp2d/gui/dropTarget.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			DropTarget
@@ -133,8 +135,8 @@ bool DropTarget::OnDropText(const wxString& data)
 //==========================================================================
 wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDragResult def)
 {
-    if (!GetData())
-        return wxDragNone;
+	if (!GetData())
+		return wxDragNone;
 
 	ClearBuffer();
 
@@ -157,7 +159,7 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 		textData.SetData(bufferSize, buffer);
 		return OnDropText(textData.GetText()) ? wxDragCopy : wxDragNone;
 	}
-	
+
 	assert(false);
 	return wxDragNone;
 }
@@ -181,6 +183,8 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 void DropTarget::ClearBuffer()
 {
 	if (buffer)
-		delete [] buffer;
+		delete[] buffer;
 	buffer = NULL;
 }
+
+}// namespace LibPlot2D

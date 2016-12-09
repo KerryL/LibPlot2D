@@ -22,9 +22,12 @@
 #include <wx/wx.h>
 
 // Local headers
-#include "utilities/math/matrix.h"
-#include "utilities/math/vector.h"
-#include "utilities/math/plotMath.h"
+#include "lp2d/utilities/math/matrix.h"
+#include "lp2d/utilities/math/vector.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			Matrix
@@ -1928,3 +1931,5 @@ Matrix Matrix::GetIdentity(const unsigned int &rows, const unsigned int &columns
 
 	return identity.MakeIdentity();
 }
+
+}// namespace LibPlot2D

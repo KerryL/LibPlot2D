@@ -14,7 +14,10 @@
 // History:
 
 // Local headers
-#include "application/dataFiles/baumullerFile.h"
+#include "lp2d/parser/baumullerFile.h"
+
+namespace LibPlot2D
+{
 
 //==========================================================================
 // Class:			BaumullerFile
@@ -192,3 +195,5 @@ void BaumullerFile::DoTypeSpecificProcessTasks()
 {
 	ignoreConsecutiveDelimiters = true;
 }
+
+}// namespace LibPlot2D

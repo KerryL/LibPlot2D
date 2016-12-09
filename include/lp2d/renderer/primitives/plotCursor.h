@@ -18,8 +18,11 @@
 #define CURSOR_H_
 
 // Local headers
-#include "renderer/primitives/primitive.h"
-#include "renderer/line.h"
+#include "lp2d/renderer/primitives/primitive.h"
+#include "lp2d/renderer/line.h"
+
+namespace LibPlot2D
+{
 
 // Local forward declarations
 class Axis;
@@ -54,5 +57,7 @@ private:
 	double value;
 	int locationAlongAxis;
 };
+
+}// namespace LibPlot2D
 
 #endif// CURSOR_H_
