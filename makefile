@@ -9,8 +9,8 @@ TARGET_DEBUG = libPlot2d_debug.lib
 
 # Directories in which to search for source files
 DIRS = \
-	src/application \
-	src/application/dataFiles \
+	src/gui \
+	src/parser \
 	src/renderer \
 	src/renderer/primitives \
 	src/utilities \
