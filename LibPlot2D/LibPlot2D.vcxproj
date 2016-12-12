@@ -22,6 +22,7 @@
     <ClInclude Include="..\include\lp2d\gui\plotObject.h" />
     <ClInclude Include="..\include\lp2d\gui\rangeLimitsDialog.h" />
     <ClInclude Include="..\include\lp2d\gui\textInputDialog.h" />
+    <ClInclude Include="..\include\lp2d\libPlot2D.h" />
     <ClInclude Include="..\include\lp2d\parser\baumullerFile.h" />
     <ClInclude Include="..\include\lp2d\parser\customFile.h" />
     <ClInclude Include="..\include\lp2d\parser\customFileFormat.h" />
@@ -60,6 +61,7 @@
     <ClInclude Include="..\include\lp2d\utilities\signals\rms.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\gitHash.cpp" />
     <ClCompile Include="..\src\gui\createSignalDialog.cpp" />
     <ClCompile Include="..\src\gui\dropTarget.cpp" />
     <ClCompile Include="..\src\gui\fftDialog.cpp" />

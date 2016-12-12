@@ -15,6 +15,7 @@
 //        modify and perform actions on curves.
 
 #ifndef PLOT_LIST_GRID_H_
+#define PLOT_LIST_GRID_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -30,53 +31,45 @@ namespace LibPlot2D
 class Color;
 struct FilterParameters;
 class Dataset2D;
+class GuiInterface;
 
 class PlotListGrid : public wxGrid
 {
 public:
-	PlotListGrid(wxWindow *parent, wxWindowID id = wxID_ANY);
+	PlotListGrid(GuiInterface& guiInterface, wxWindow* parent,
+		wxWindowID id = wxID_ANY);
 
 	// For displaying a menu that was crated by this form
 	// NOTE:  When calculating the Position to display this context menu,
 	// consider that the coordinates for the calling object might be different
 	// from the coordinates for this object!
-	void CreateGridContextMenu(const wxPoint &position, const unsigned int &row);
+	void CreateGridContextMenu(const wxPoint& position, const unsigned int& row);
 
-	Color GetNextColor(const unsigned int &index) const;
+	Color GetNextColor(const unsigned int& index) const;
 	void AddTimeRow();
-	unsigned int AddDataRow(const wxString &name);
-
-private:
-	void Build();
-
-	void UpdateCurveProperties(const unsigned int &index,
-		const LibPlot2D::Color &color, const bool &visible,
-		const bool &rightAxis);
-	void UpdateCurveProperties(const unsigned int &index);
-
-	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);
-	FilterParameters DisplayFilterDialog();
-	void ApplyFilter(const FilterParameters &parameters, Dataset2D &data);
-
-	Dataset2D *GetCurveFitData(const unsigned int &order, const Dataset2D* data, wxString &name) const;
-	wxString GetCurveFitName(const CurveFit::PolynomialFit &fitData, const unsigned int &row) const;
-
-	static bool ItemIsInArray(const wxArrayInt& a, const int& item);
+	unsigned int AddDataRow(const wxString& name);
 
 	enum Columns
 	{
-		colName = 0,
-		colColor,
-		colLineSize,
-		colMarkerSize,
-		colLeftCursor,
-		colRightCursor,
-		colDifference,
-		colVisible,
-		colRightAxis,
+		ColName = 0,
+		ColColor,
+		ColLineSize,
+		ColMarkerSize,
+		ColLeftCursor,
+		ColRightCursor,
+		ColDifference,
+		ColVisible,
+		ColRightAxis,
 
-		colCount
+		ColCount
 	};
+
+private:
+	GuiInterface& guiInterface;
+
+	void Build();
+
+	static bool ItemIsInArray(const wxArrayInt& a, const int& item);
 
 	// The event IDs
 	enum MainFrameEventID
@@ -92,6 +85,7 @@ private:
 		idContextPlotIntegral,
 		idContextPlotRMS,
 		idContextPlotFFT,
+		idContextRemoveCurve,
 		idContextTimeShift,
 		idContextBitMask,
 
@@ -116,11 +110,14 @@ private:
 	void ContextPlotIntegralEvent(wxCommandEvent &event);
 	void ContextPlotRMSEvent(wxCommandEvent &event);
 	void ContextPlotFFTEvent(wxCommandEvent &event);
+	void ContextRemoveCurveEvent(wxCommandEvent &event);
 	void ContextTimeShiftEvent(wxCommandEvent &event);
 	void ContextBitMaskEvent(wxCommandEvent &event);
 
 	void ContextFilterEvent(wxCommandEvent &event);
 	void ContextFitCurve(wxCommandEvent &event);
+
+	DECLARE_EVENT_TABLE()
 };
 
 }// namespace LibPlot2D

@@ -67,4 +67,31 @@ wxArrayString GuiUtilities::GetFileNameFromUser(wxWindow* parent,
 	return pathsAndFileNames;
 }
 
+//==========================================================================
+// Namespace:		GuiUtilities
+// Function:		ExtractFileNameFromPath
+//
+// Description:		Removes the path from the path and file name.
+//
+// Input Arguments:
+//		pathAndFileName	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//==========================================================================
+wxString GuiUtilities::ExtractFileNameFromPath(const wxString &pathAndFileName)
+{
+	unsigned int start;
+#ifdef __WXMSW__
+	start = pathAndFileName.find_last_of(_T("\\")) + 1;
+#else
+	start = pathAndFileName.find_last_of(_T("/")) + 1;
+#endif
+	return pathAndFileName.Mid(start);
+}
+
 }// namespace LibPlot2D

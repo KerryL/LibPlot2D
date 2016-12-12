@@ -137,28 +137,8 @@ PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent,
 	SetDropTarget(static_cast<wxDropTarget*>(new DropTarget(guiInterface)));
 
 	CreateActors();
-}
 
-//==========================================================================
-// Class:			PlotRenderer
-// Function:		~PlotRenderer
-//
-// Description:		Destructor for PlotRenderer class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-PlotRenderer::~PlotRenderer()
-{
-	delete plot;
-	plot = NULL;
+	guiInterface.SetRenderWindow(this);
 }
 
 //==========================================================================
@@ -295,7 +275,7 @@ void PlotRenderer::UpdateDisplay()
 //==========================================================================
 void PlotRenderer::CreateActors()
 {
-	plot = new PlotObject(*this, guiInterface);
+	plot = std::make_unique<PlotObject>(*this, guiInterface);
 	SetBackgroundColor(Color::ColorWhite);
 
 	// Also create the zoom box and cursors, even though they aren't drawn yet
@@ -2654,7 +2634,7 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 	else
 		context = PlotContextPlotArea;
 
-	DisplayAxisRangeDialog(context);
+	guiInterface.DisplayAxisRangeDialog(context);
 }
 
 //==========================================================================
@@ -3082,7 +3062,7 @@ void PlotRenderer::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 
 //==========================================================================
 // Class:			PlotRenderer
-// Function:		ContexExportData
+// Function:		ContextExportData
 //
 // Description:		Exports the data to file.
 //
@@ -3098,96 +3078,7 @@ void PlotRenderer::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void PlotRenderer::ContextExportData(wxCommandEvent& WXUNUSED(event))
 {
-	wxString wildcard(_T("Comma Separated (*.csv)|*.csv"));
-	wildcard.append("|Tab Delimited (*.txt)|*.txt");
-
-	wxArrayString pathAndFileName = GuiUtilities::GetFileNameFromUser(this, _T("Save As"),
-		wxEmptyString, wxEmptyString, wildcard, wxFD_SAVE);
-
-	if (pathAndFileName.Count() == 0)
-		return;
-
-	if (wxFile::Exists(pathAndFileName[0]))
-	{
-		if (wxMessageBox(_T("File exists.  Overwrite?"), _T("Overwrite File?"), wxYES_NO, this) == wxNO)
-			return;
-	}
-
-	wxString delimiter;
-	if (pathAndFileName[0].Mid(pathAndFileName[0].Last('.')).CmpNoCase(_T(".txt")) == 0)
-		delimiter = _T("\t");
-	else
-		delimiter = _T(",");// FIXME:  Need to handle descriptions containing commas so we don't have problems with import later on
-
-	// Export both x and y data in case of asynchronous data or FFT, etc.
-	std::ofstream outFile(pathAndFileName[0].mb_str(), std::ios::out);
-	if (!outFile.is_open() || !outFile.good())
-	{
-		wxMessageBox(_T("Could not open '") + pathAndFileName[0] + _T("' for output."),
-			_T("Error Writing File"), wxICON_ERROR, this);
-		return;
-	}
-
-	unsigned int i, j(0);
-	wxString temp;
-	for (i = 1; i < plotList.GetCount() + 1; i++)
-	{
-		if (optionsGrid->GetCellValue(i, colName).Contains(_T("FFT")) ||
-			optionsGrid->GetCellValue(i, colName).Contains(_T("FRF")))
-			outFile << _T("Frequency [Hz]") << delimiter;
-		else
-		{
-			if (delimiter.Cmp(",") == 0)
-			{
-				temp = genericXAxisLabel;
-				temp.Replace(",", ";");
-				outFile << temp << delimiter;
-			}
-			else
-				outFile << genericXAxisLabel << delimiter;
-		}
-
-		if (delimiter.Cmp(",") == 0)
-		{
-			temp = optionsGrid->GetCellValue(i, colName);
-			temp.Replace(",", ";");
-			outFile << temp;
-		}
-		else
-			outFile << optionsGrid->GetCellValue(i, colName);
-
-		if (i == plotList.GetCount())
-			outFile << std::endl;
-		else
-			outFile << delimiter;
-	}
-
-	outFile.precision(14);
-
-	bool done(false);
-	while (!done)
-	{
-		done = true;
-		for (i = 0; i < plotList.GetCount(); i++)
-		{
-			if (j < plotList[i]->GetNumberOfPoints())
-				outFile << plotList[i]->GetXData(j) << delimiter << plotList[i]->GetYData(j);
-			else
-				outFile << delimiter;
-
-			if (i == plotList.GetCount() - 1)
-				outFile << std::endl;
-			else
-				outFile << delimiter;
-
-			if (j + 1 < plotList[i]->GetNumberOfPoints())
-				done = false;
-		}
-
-		j++;
-	}
-
-	outFile.close();
+	guiInterface.ExportData();
 }
 
 //==========================================================================
@@ -3210,7 +3101,7 @@ void PlotRenderer::ContextExportData(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void PlotRenderer::CreatePlotContextMenu(const wxPoint &position, const PlotContext &context)
 {
-	wxMenu *contextMenu;
+	std::unique_ptr<wxMenu> contextMenu;
 
 	switch (context)
 	{
@@ -3241,10 +3132,7 @@ void PlotRenderer::CreatePlotContextMenu(const wxPoint &position, const PlotCont
 		break;
 	}
 
-	PopupMenu(contextMenu, position);
-
-	delete contextMenu;
-	contextMenu = NULL;
+	PopupMenu(contextMenu.get(), position);
 }
 
 //==========================================================================
@@ -3260,12 +3148,13 @@ void PlotRenderer::CreatePlotContextMenu(const wxPoint &position, const PlotCont
 //		None
 //
 // Return Value:
-//		wxMenu*
+//		std::unique_ptr<wxMenu>
 //
 //==========================================================================
-wxMenu* PlotRenderer::CreatePlotAreaContextMenu() const
+std::unique_ptr<wxMenu> PlotRenderer::CreatePlotAreaContextMenu() const
 {
-	wxMenu *contextMenu = new wxMenu();
+	std::unique_ptr<wxMenu> contextMenu(std::make_unique<wxMenu>());
+
 	contextMenu->Append(idPlotContextCopy, _T("Copy"));
 	contextMenu->Append(idPlotContextPaste, _T("Paste"));
 	contextMenu->Append(idPlotContextWriteImageFile, _T("Write Image File"));
@@ -3307,12 +3196,12 @@ wxMenu* PlotRenderer::CreatePlotAreaContextMenu() const
 //		None
 //
 // Return Value:
-//		wxMenu*
+//		std::unique_ptr<wxMenu>
 //
 //==========================================================================
-wxMenu* PlotRenderer::CreateAxisContextMenu(const unsigned int &baseEventId) const
+std::unique_ptr<wxMenu> PlotRenderer::CreateAxisContextMenu(const unsigned int &baseEventId) const
 {
-	wxMenu* contextMenu = new wxMenu();
+	std::unique_ptr<wxMenu> contextMenu(std::make_unique<wxMenu>());
 
 	unsigned int i = baseEventId;
 	contextMenu->AppendCheckItem(i++, _T("Major Gridlines"));
@@ -3636,7 +3525,7 @@ void PlotRenderer::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void PlotRenderer::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 {
-	DisplayAxisRangeDialog(PlotContextXAxis);
+	guiInterface.DisplayAxisRangeDialog(PlotContextXAxis);
 }
 
 //==========================================================================
@@ -3752,7 +3641,7 @@ void PlotRenderer::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void PlotRenderer::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 {
-	DisplayAxisRangeDialog(PlotContextLeftYAxis);
+	guiInterface.DisplayAxisRangeDialog(PlotContextLeftYAxis);
 }
 
 //==========================================================================
@@ -3868,7 +3757,7 @@ void PlotRenderer::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 //==========================================================================
 void PlotRenderer::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 {
-	DisplayAxisRangeDialog(PlotContextRightYAxis);
+	guiInterface.DisplayAxisRangeDialog(PlotContextRightYAxis);
 }
 
 //==========================================================================
@@ -3930,7 +3819,7 @@ void PlotRenderer::ContextPlotBGColor(wxCommandEvent& WXUNUSED(event))
 	dialog.SetTitle(_T("Choose Background Color"));
 	if (dialog.ShowModal() == wxID_OK)
     {
-		LibPlot2D::Color color;
+		Color color;
 		color.Set(dialog.GetColourData().GetColour());
 		SetBackgroundColor(color);
 		UpdateDisplay();
@@ -3961,10 +3850,10 @@ void PlotRenderer::ContextGridColor(wxCommandEvent& WXUNUSED(event))
 
 	wxColourDialog dialog(this, &colorData);
 	dialog.CenterOnParent();
-	dialog.SetTitle(_T("Choose Background Color"));
+	dialog.SetTitle(_T("Choose Gridline Color"));
 	if (dialog.ShowModal() == wxID_OK)
     {
-		LibPlot2D::Color color;
+		Color color;
 		color.Set(dialog.GetColourData().GetColour());
 		SetGridColor(color);
 		UpdateDisplay();
@@ -4159,7 +4048,7 @@ void PlotRenderer::DoPaste()
 		{
 			wxTextDataObject data;
 			wxTheClipboard->GetData(data);
-			guiInterface.LoadText(data.GetText(), this);
+			guiInterface.LoadText(data.GetText());
 		}
 		wxTheClipboard->Close();
 	}

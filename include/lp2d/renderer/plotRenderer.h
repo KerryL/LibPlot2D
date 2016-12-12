@@ -21,6 +21,7 @@
 #include <stack>
 #include <vector>
 #include <cmath>
+#include <memory>
 
 // Local headers
 #include "lp2d/renderer/renderWindow.h"
@@ -44,7 +45,7 @@ class PlotRenderer : public RenderWindow
 public:
 	PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent, wxWindowID id,
 		const wxGLAttributes& attr);
-	~PlotRenderer();
+	~PlotRenderer() = default;
 
 	// Gets properties for actors
 	bool GetBottomMajorGrid() const;
@@ -199,7 +200,8 @@ public:
 		PlotContextPlotArea
 	};
 
-	void DisplayAxisRangeDialog(const PlotContext &axis);
+	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
+	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);
 
 private:
 	static const std::string defaultVertexShader;
@@ -207,7 +209,7 @@ private:
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();
 
-	PlotObject *plot;
+	std::unique_ptr<PlotObject> plot;
 
 	// Overload of size event
 	void OnSize(wxSizeEvent &event);
@@ -236,9 +238,6 @@ private:
 	void UpdateLegendAnchor();
 
 	void CreatePlotContextMenu(const wxPoint &position, const PlotContext &context);
-
-	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
-	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);
 
 protected:
 	GuiInterface& guiInterface;
@@ -346,8 +345,8 @@ protected:
 		idPlotContextEditRightLabel
 	};
 
-	wxMenu *CreateAxisContextMenu(const unsigned int &baseEventId) const;
-	wxMenu *CreatePlotAreaContextMenu() const;
+	std::unique_ptr<wxMenu> CreateAxisContextMenu(const unsigned int &baseEventId) const;
+	std::unique_ptr<wxMenu> CreatePlotAreaContextMenu() const;
 
 	// Context menu events
 	void ContextCopy(wxCommandEvent &event);

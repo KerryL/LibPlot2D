@@ -198,6 +198,9 @@
     <ClInclude Include="..\include\lp2d\utilities\guiUtilities.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\lp2d\libPlot2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gui\createSignalDialog.cpp">
@@ -334,6 +337,9 @@
     </ClCompile>
     <ClCompile Include="..\src\utilities\guiUtilities.cpp">
       <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gitHash.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -19,6 +19,7 @@
 // Local headers
 #include "lp2d/parser/dataFile.h"
 #include "lp2d/gui/multiChoiceDialog.h"
+#include "lp2d/gui/guiInterface.h"
 #include "lp2d/utilities/dataset2D.h"
 
 namespace LibPlot2D
@@ -862,7 +863,7 @@ double DataFile::GetTimeValue(const wxString &timeString,
 	const wxString &timeFormat, const wxString &timeUnits) const
 {
 	double factor;
-	if (!MainFrame::UnitStringToFactor(timeUnits, factor))
+	if (!GuiInterface::UnitStringToFactor(timeUnits, factor))
 		factor = 1.0;
 
 	wxChar delimiter(':');

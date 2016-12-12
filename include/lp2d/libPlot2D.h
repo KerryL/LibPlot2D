@@ -7,30 +7,23 @@
 
 ===================================================================================*/
 
-// File:  guiUtilities.h
-// Date:  12/9/2016
-// Auth:  K. Loux
-// Desc:  Utility methods for interacting with the user.
+// File:  plotterApp.h
+// Created:  5/2/2011
+// Author:  K. Loux
+// Description:  The application class.
+// History:
 
-#ifndef GUI_UTILITIES_H_
+#ifndef LIBPLOT2D_H_
+#define LIBPLOT2D_H_
 
 // wxWidgets headers
 #include <wx/wx.h>
 
 namespace LibPlot2D
 {
-
-namespace GuiUtilities
-{
-
-wxArrayString GetFileNameFromUser(wxWindow* parent, wxString dialogTitle,
-	wxString defaultDirectory, wxString defaultFileName, wxString wildcard,
-	long style);
-
-wxString ExtractFileNameFromPath(const wxString &pathAndFileName);
-
-}// namespace GuiUtilities
+	extern const wxString versionString;
+	extern const wxString gitHash;
 
 }// namespace LibPlot2D
 
-#endif// GUI_UTILITIES_H_
+#endif// LIBPLOT2D_H_
