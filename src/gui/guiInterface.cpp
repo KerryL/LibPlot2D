@@ -2050,4 +2050,14 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index,
 	renderer->SaveCurrentZoom();
 }
 
+void GuiInterface::Copy()
+{
+	renderer->DoCopy();
+}
+
+void GuiInterface::Paste()
+{
+	renderer->DoPaste();
+}
+
 }// namespace LibPlot2D

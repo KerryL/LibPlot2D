@@ -245,8 +245,7 @@ void PlotListGrid::GridRightClickEvent(wxGridEvent &event)
 		!ItemIsInArray(GetSelectedRows(), event.GetRow()))
 		SelectRow(event.GetRow());
 
-	CreateGridContextMenu(event.GetPosition() + GetPosition()
-		+ GetParent()->GetPosition(), event.GetRow());
+	CreateGridContextMenu(event.GetPosition(), event.GetRow());
 }
 
 //==========================================================================
@@ -387,8 +386,7 @@ void PlotListGrid::GridLabelRightClickEvent(wxGridEvent &event)
 
 	contextMenu->Append(idContextCreateSignal, _T("Create Signal"));
 
-	PopupMenu(contextMenu, event.GetPosition() + GetPosition()
-		+ GetParent()->GetPosition());
+	PopupMenu(contextMenu, event.GetPosition());
 
 	delete contextMenu;
 	contextMenu = NULL;

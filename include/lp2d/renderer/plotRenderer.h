@@ -203,6 +203,9 @@ public:
 	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
 	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);
 
+	void DoCopy();
+	void DoPaste();
+
 private:
 	static const std::string defaultVertexShader;
 
@@ -293,9 +296,6 @@ protected:
 	ScalingFunction xScaleFunction;
 	ScalingFunction leftYScaleFunction;
 	ScalingFunction rightYScaleFunction;
-
-	void DoCopy();
-	void DoPaste();
 
 	// The event IDs
 	enum MainFrameEventID

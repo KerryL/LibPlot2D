@@ -43,6 +43,9 @@ public:
 	bool LoadText(const wxString& data);
 	void ReloadData();
 
+	void Copy();
+	void Paste();
+
 	void UpdateCursorValues(const bool &leftVisible, const bool &rightVisible,
 		const double &leftValue, const double &rightValue);
 
