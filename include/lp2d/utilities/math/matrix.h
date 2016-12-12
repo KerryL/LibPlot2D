@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class declaration for Matrix classes.
-// History:
 
 #ifndef MATRIX_H_
 #define MATRIX_H_

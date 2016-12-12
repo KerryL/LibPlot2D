@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Derived from RenderWindow, this class is used to display plots on
 //				 the screen.
-// History:
 
 // Standard C++ headers
 #include <cassert>

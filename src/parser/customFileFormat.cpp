@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Object for interpreting user-specified custom file formats from XML
 //				 file and reading them into Dataset2D objects.
-// History:
 
 // Standard C++ headers
 #include <fstream>

@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  The application class.
-// History:
 
 #ifndef LIBPLOT2D_H_
 #define LIBPLOT2D_H_
@@ -19,6 +18,7 @@
 // wxWidgets headers
 #include <wx/wx.h>
 
+/// Core namespace for the LibPlot2D library.
 namespace LibPlot2D
 {
 	extern const wxString versionString;

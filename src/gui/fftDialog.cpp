@@ -11,7 +11,6 @@
 // Created:  8/15/2012
 // Author:  K. Loux
 // Description:  Dialog for specification of FFT options.
-// History:
 
 // wxWidgets headers
 #include <wx/sizer.h>

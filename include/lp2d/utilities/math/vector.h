@@ -11,18 +11,6 @@
 // Created:  11/3/2007
 // Author:  K. Loux
 // Description:  Contains class declaration for Vector class.  Vector class is for three element vector.
-// History:
-//	2/25/2008	- Changed RAD_TO_DEG and RAD_TO_DEG from constants to inline functions, K. Loux.
-//	2/26/2008	- Made order of rotations an argument in the Rotate member function, K. Loux.
-//	3/3/2008	- Changed function arguments to addresses where applicable to reduce overhead, K. Loux.
-//	3/9/2008	- Removed dependency on MFC class CString by switching to wxString, K. Loux.
-//	3/14/2008	- Added AnglesTo function, K. Loux.
-//	3/23/2008	- Moved RAD_TO_DEG and DEG_TO_RAD and constants to Convert class and changed
-//				  arguments for class functions from degrees to radians, K. Loux.
-//	4/11/2009	- Changed all functions to take addresses of and use const, K. Loux.
-//	4/17/2009	- Renamed ROTATION_AXIS enumeration to AXIS, K. Loux
-//	11/22/2009	- Moved to vMath.lib, K. Loux.
-//	11/1/2010	- Removed non-const Normalize(), K. Loux.
 
 #ifndef VECTOR_H_
 #define VECTOR_H_

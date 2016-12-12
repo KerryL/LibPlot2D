@@ -11,9 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive for creating axis objects on a plot.
-// History:
-//	11/17/2010	- Fixed some bugs related to rendering of ticks and grid lines, K. Loux.
-//	07/30/2012	- Added logarithmically-scalled plotting, K. Loux.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -67,9 +64,9 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(rend
 
 	logarithmic = false;
 
-	minAxis = NULL;
-	maxAxis = NULL;
-	oppositeAxis = NULL;
+	minAxis = nullptr;
+	maxAxis = nullptr;
+	oppositeAxis = nullptr;
 
 	gridColor.Set(0.8, 0.8, 0.8, 1.0);
 	SetDrawOrder(500);

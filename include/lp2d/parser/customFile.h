@@ -11,7 +11,6 @@
 // Created:  10/4/2012
 // Author:  K. Loux
 // Description:  File class for custom (non-XML) files defined by the user using an XML file.
-// History:
 
 #ifndef CUSTOM_FILE_H_
 #define CUSTOM_FILE_H_

@@ -11,7 +11,6 @@
 // Created:  8/19/2013
 // Author:  K. Loux
 // Description:  Dialog for creating a variety of signals (not dependent on other curves).
-// History:
 
 // C++ standard headers
 #include <cstdlib>
@@ -51,15 +50,15 @@ CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime
 	const double &duration, const double &sampleRate) : wxDialog(parent, wxID_ANY,
 	_T("Create Signal"), wxPoint(-1,-1))
 {
-	initialValueTextBox = NULL;
-	finalValueTextBox = NULL;
-	slopeTextBox = NULL;
-	frequencyTextBox = NULL;
-	periodTextBox = NULL;
-	phaseAngleTextBox = NULL;
-	phaseTimeTextBox = NULL;
+	initialValueTextBox = nullptr;
+	finalValueTextBox = nullptr;
+	slopeTextBox = nullptr;
+	frequencyTextBox = nullptr;
+	periodTextBox = nullptr;
+	phaseAngleTextBox = nullptr;
+	phaseTimeTextBox = nullptr;
 
-	dataset = NULL;
+	dataset = nullptr;
 	keepPhaseAngle = true;
 	keepAmplitude = true;
 	CreateControls(startTime, duration, sampleRate);

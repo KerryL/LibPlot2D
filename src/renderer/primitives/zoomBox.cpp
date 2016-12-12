@@ -11,7 +11,6 @@
 // Created:  5/5/2011
 // Author:  K. Loux
 // Description:  Logic for drawing the zoom box as the user moves the mouse.
-// History:
 
 // GLEW headers
 #include <GL/glew.h>

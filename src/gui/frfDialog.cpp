@@ -11,7 +11,6 @@
 // Created:  8/15/2012
 // Author:  K. Loux
 // Description:  Dialog for selection of frequency response function data.
-// History:
 
 // Standard C++ headers
 #include <algorithm>

@@ -11,7 +11,6 @@
 // Created:  8/19/2013
 // Author:  K. Loux
 // Description:  Dialog for creating a variety of signals (not dependent on other curves).
-// History:
 
 #ifndef CREATE_SIGNAL_DIALOG_H_
 #define CREATE_SIGNAL_DIALOG_H_

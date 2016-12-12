@@ -11,7 +11,6 @@
 // Created:  5/3/2011
 // Author:  K. Loux
 // Description:  Computes discrete-time derivatives of data.
-// History:
 
 #ifndef DERIVATIVE_H_
 #define DERIVATIVE_H_

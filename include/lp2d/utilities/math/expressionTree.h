@@ -11,7 +11,6 @@
 // Created:  5/6/2011
 // Author:  K. Loux
 // Description:  Handles user-specified mathematical operations on datasets.
-// History:
 
 #ifndef EXPRESSION_TREE_H_
 #define EXPRESSION_TREE_H_
@@ -34,7 +33,7 @@ namespace LibPlot2D
 class ExpressionTree
 {
 public:
-	ExpressionTree(const ManagedList<const Dataset2D> *_list = NULL);
+	ExpressionTree(const ManagedList<const Dataset2D>* list = nullptr);
 
 	// Main solver method
 	wxString Solve(wxString expression, Dataset2D &solvedData, const double &xAxisFactor);
@@ -62,11 +61,11 @@ private:
 
 	Dataset2D GetSetFromList(const unsigned int &i) const;
 
-	static bool NextIsNumber(const wxString &s, unsigned int *stop = NULL, const bool &lastWasOperator = true);
-	static bool NextIsDataset(const wxString &s, unsigned int *stop = NULL, const bool &lastWasOperator = true);
-	static bool NextIsFunction(const wxString &s, unsigned int *stop = NULL);
-	static bool NextIsOperator(const wxString &s, unsigned int *stop = NULL);
-	static bool NextIsS(const wxString &s, unsigned int *stop = NULL);
+	static bool NextIsNumber(const wxString &s, unsigned int *stop = nullptr, const bool &lastWasOperator = true);
+	static bool NextIsDataset(const wxString &s, unsigned int *stop = nullptr, const bool &lastWasOperator = true);
+	static bool NextIsFunction(const wxString &s, unsigned int *stop = nullptr);
+	static bool NextIsOperator(const wxString &s, unsigned int *stop = nullptr);
+	static bool NextIsS(const wxString &s, unsigned int *stop = nullptr);
 
 	static unsigned int FindEndOfNextTerm(const wxString &s, const unsigned int &start);
 	static int GetTermPower(const wxString &s, unsigned int &start, unsigned int &end);
@@ -125,7 +124,7 @@ private:
 
 	bool SetOperatorValid(const wxString &operation, const bool &leftOperandIsDouble) const;
 	bool ParenthesesBalanced(const wxString &expression) const;
-	static bool BeginningMatchesNoCase(const wxString &s, const wxString &target, unsigned int *length = NULL);
+	static bool BeginningMatchesNoCase(const wxString &s, const wxString &target, unsigned int *length = nullptr);
 
 	wxString StringAdd(const wxString &first, const double &second) const;
 	wxString StringAdd(const double &first, const wxString &second) const;

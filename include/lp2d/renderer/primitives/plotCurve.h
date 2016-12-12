@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive for creating plot curves objects.
-// History:
 
 #ifndef PLOT_CURVE_H_
 #define PLOT_CURVE_H_

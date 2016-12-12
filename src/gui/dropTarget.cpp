@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
 //				 when the user drags-and-drops them onto the main window.
-// History:
 
 // Local headers
 #include "lp2d/gui/dropTarget.h"
@@ -46,7 +45,7 @@ DropTarget::DropTarget(GuiInterface &guiInterface) : guiInterface(guiInterface)
 
 	SetDataObject(dataObject);
 
-	buffer = NULL;
+	buffer = nullptr;
 }
 
 //==========================================================================
@@ -184,7 +183,7 @@ void DropTarget::ClearBuffer()
 {
 	if (buffer)
 		delete[] buffer;
-	buffer = NULL;
+	buffer = nullptr;
 }
 
 }// namespace LibPlot2D

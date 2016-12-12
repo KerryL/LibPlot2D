@@ -11,7 +11,6 @@
 // Created:  5/12/2016
 // Author:  K. Loux
 // Description:  Helper object for building BufferInfo objects for text rendering.
-// History:
 
 // Standard C++ headers
 #include <cassert>
@@ -148,7 +147,7 @@ Text::Text(RenderWindow& renderer) : renderer(renderer)
 	scale = 1.0;
 	initialized = false;
 	glyphsGenerated = false;
-	face = NULL;
+	face = nullptr;
 	isOK = true;
 
 	modelview.Resize(4, 4);
@@ -325,7 +324,7 @@ bool Text::GenerateGlyphs()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureId);
 
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, maxXSize, maxYSize, glyphCount,
-		0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+		0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

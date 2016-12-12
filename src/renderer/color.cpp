@@ -13,7 +13,6 @@
 // Description:  Contains class definition for the Color class.  This class contains
 //				 RGBA color definitions in the form of doubles for use with wxWidgets
 //				 as well as OpenGL.
-// History:
 
 // Standard C++ headers
 #include <algorithm>

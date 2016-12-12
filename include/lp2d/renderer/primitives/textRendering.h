@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive, this class is used to draw text.
-// History:
 
 #ifndef TEXT_RENDERING_H_
 #define TEXT_RENDERING_H_

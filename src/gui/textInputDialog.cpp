@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Dialog box similar to ::wxGetTextFromUser() but allows differentiation between
 //				 canceling and returning an empty string.
-// History:
 
 // wxWidgets headers
 #include <wx/wx.h>

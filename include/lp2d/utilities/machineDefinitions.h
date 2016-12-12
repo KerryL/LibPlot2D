@@ -14,7 +14,6 @@
 //				 have different bits/byte (i.e. 32 vs. 64-bit).  This will require a
 //				 preprocessor definition and will generate an error of one of the
 //				 required definitions is not used.
-// History:
 
 #ifndef MACHINE_DEFS_H_
 #define MACHINE_DEFS_H_

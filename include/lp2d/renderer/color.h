@@ -13,7 +13,6 @@
 // Description:  Contains class declaration for the Color class.  This class contains
 //				 RGBA color definitions in the form of doubles for use with wxWidgets
 //				 as well as OpenGL.
-// History:
 
 #ifndef COLOR_H_
 #define COLOR_H_

@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Object for interpreting user-specified custom file formats from XML
 //				 file and reading them into Dataset2D objects.
-// History:
 
 #ifndef CUSTOM_FILE_FORMAT_H_
 #define CUSTOM_FILE_FORMAT_H_

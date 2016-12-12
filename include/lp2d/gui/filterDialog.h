@@ -11,7 +11,6 @@
 // Created:  4/20/2012
 // Author:  K. Loux
 // Description:  Dialog box for defining filter parameters.
-// History:
 
 #ifndef FILTER_DIALOG_H_
 #define FILTER_DIALOG_H_
@@ -61,7 +60,7 @@ class FilterDialog : public wxDialog
 {
 public:
 	// Constructor
-	FilterDialog(wxWindow *parent, const FilterParameters* parameters = NULL);
+	FilterDialog(wxWindow *parent, const FilterParameters* parameters = nullptr);
 
 	const FilterParameters& GetFilterParameters() const { return mParameters; };
 	static wxString GetFilterNamePrefix(const FilterParameters &parameters);

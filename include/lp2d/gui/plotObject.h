@@ -11,7 +11,6 @@
 // Created:  5/4/2011
 // Author:  K. Loux
 // Description:  Intermediate class for creating plots from arrays of data.
-// History:
 
 #ifndef PLOT_OBJECT_H_
 #define PLOT_OBJECT_H_

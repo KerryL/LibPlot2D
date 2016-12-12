@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Base class for creating 3D objects.
-// History:
 
 #ifndef PRIMITIVE_H_
 #define PRIMITIVE_H_

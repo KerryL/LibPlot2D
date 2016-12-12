@@ -11,7 +11,6 @@
 // Created:  5/3/2011
 // Author:  K. Loux
 // Description:  Computes discrete-time integral of data.
-// History:
 
 #ifndef INTEGRAL_H_
 #define INTEGRAL_H_

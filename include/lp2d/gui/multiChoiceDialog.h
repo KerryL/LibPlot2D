@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Multiple choice dialog box.  Intended to function exaclty as a wxMultiChoiceDialog,
 //				 but with a select all button.
-// History:
 
 #ifndef MULTI_CHOICE_DIALOG_H_
 #define MULTI_CHOICE_DIALOG_H_
@@ -32,7 +31,7 @@ public:
 	// Constructor
 	MultiChoiceDialog(wxWindow* parent, const wxString& message, const wxString& caption,
 		const wxArrayString& choices, long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
-		wxArrayInt *defaultChoices = NULL, bool *removeExisting = NULL);
+		wxArrayInt *defaultChoices = nullptr, bool *removeExisting = nullptr);
 
 	virtual wxArrayInt GetSelections() const { return selections; };
 

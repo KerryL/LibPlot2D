@@ -12,9 +12,6 @@
 // Author:  K. Loux
 // Description:  This is a template class for lists that handle automatic deletion
 //				 of the items in the list.
-// History:
-//	11/7/2011	- Corrected camelCase, K. Loux.
-//	8/10/2012	- Removed dependence on ObjectList in favor of std::vector, K. Loux.
 
 #ifndef MANAGED_LIST_H_
 #define MANAGED_LIST_H_

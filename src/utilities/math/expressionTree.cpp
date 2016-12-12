@@ -11,7 +11,6 @@
 // Created:  5/6/2011
 // Author:  K. Loux
 // Description:  Handles user-specified mathematical operations on datasets.
-// History:
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -552,7 +551,7 @@ bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop, const b
 	bool foundDecimal = s[0] == '.';
 	if (foundDecimal ||
 		(int(s[0]) >= int('0') && int(s[0]) <= int('9')) ||
-		(s[0] == '-' && lastWasOperator && NextIsNumber(s.Mid(1), NULL, false)))
+		(s[0] == '-' && lastWasOperator && NextIsNumber(s.Mid(1), nullptr, false)))
 	{
 		unsigned int i;
 		for (i = 1; i < s.Len(); i++)
@@ -633,7 +632,7 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const 
 		return false;
 
 	if (s[0] == '[' ||
-		(s[0] == '-' && lastWasOperator && NextIsDataset(s.Mid(1), NULL, false)))
+		(s[0] == '-' && lastWasOperator && NextIsDataset(s.Mid(1), nullptr, false)))
 	{
 		unsigned int close = s.Find(']');
 		if (close == (unsigned int)wxNOT_FOUND)

@@ -11,8 +11,6 @@
 // Created:  5/5/2011
 // Author:  K. Loux
 // Description:  Represents an oscilloscope cursor on-screen.
-// History:
-//  5/12/2011 - Renamed to PlotCursor from Cursor due to conflict in X.h, K. Loux
 
 // GLEW headers
 #include <GL/glew.h>

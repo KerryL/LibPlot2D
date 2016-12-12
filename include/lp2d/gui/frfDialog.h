@@ -11,7 +11,6 @@
 // Created:  8/15/2012
 // Author:  K. Loux
 // Description:  Dialog for selection of frequency response function data.
-// History:
 
 #ifndef FRF_DIALOG_H_
 #define FRF_DIALOG_H_

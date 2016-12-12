@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  File class for custom (non-XML) files defined by the user using
 //				 an XML file.
-// History:
 
 // Local headers
 #include "lp2d/parser/customFile.h"

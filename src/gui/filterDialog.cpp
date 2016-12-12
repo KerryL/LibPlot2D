@@ -11,7 +11,6 @@
 // Created:  4/20/2012
 // Author:  K. Loux
 // Description:  Dialog box for defining filter parameters.
-// History:
 
 // Local headers
 #include "lp2d/gui/filterDialog.h"

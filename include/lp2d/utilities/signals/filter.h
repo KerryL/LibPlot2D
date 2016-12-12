@@ -11,7 +11,6 @@
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Class for digital filters.
-// History:
 
 #ifndef FILTER_H_
 #define FILTER_H_

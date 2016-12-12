@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Derived from RenderWindow, this class is used to display plots on
 //				 the screen.
-// History:
 
 #ifndef PLOT_RENDERER_H_
 #define PLOT_RENDERER_H_

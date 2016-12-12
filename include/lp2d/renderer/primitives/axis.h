@@ -11,8 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive, this class is used to draw plot axis.
-// History:
-//	07/30/2012	- Added logarithmically-scalled plotting, K. Loux.
 
 #ifndef AXIS_H_
 #define AXIS_H_
@@ -145,7 +143,7 @@ private:
 
 	void DrawFullAxis();
 	int ComputeMainAxisLocation() const;
-	void ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount = NULL);
+	void ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount = nullptr);
 	void DrawMainAxis(const int &mainAxisLocation);
 	void DrawHorizontalGrid(const unsigned int &count);
 	void DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLocation);

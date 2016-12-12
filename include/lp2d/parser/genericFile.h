@@ -11,7 +11,6 @@
 // Created:  10/3/2012
 // Author:  K. Loux
 // Description:  Generic delimited data file.
-// History:
 
 #ifndef GENERIC_FILE_H_
 #define GENERIC_FILE_H_

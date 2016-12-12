@@ -11,7 +11,6 @@
 // Created:  3/6/2015
 // Author:  K. Loux
 // Description:  Derived from Primitive, this class is used to draw plot legends.
-// History:
 
 // GLEW headers
 #include <GL/glew.h>

@@ -11,7 +11,6 @@
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Contains methods for fitting curves to datasets.
-// History:
 
 // Standard C++ headers
 #include <cmath>

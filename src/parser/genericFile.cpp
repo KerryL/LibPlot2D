@@ -11,7 +11,6 @@
 // Created:  10/3/2012
 // Author:  K. Loux
 // Description:  Generic delimited data file.
-// History:
 
 // Local headers
 #include "lp2d/parser/genericFile.h"

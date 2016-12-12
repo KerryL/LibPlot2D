@@ -11,7 +11,6 @@
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Contains methods for fitting curves to datasets.
-// History:
 
 #ifndef CURVE_FIT_H_
 #define CURVE_FIT_H_

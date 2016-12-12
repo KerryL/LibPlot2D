@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Multiple choice dialog box.  Intended to function exaclty as a wxMultiChoiceDialog,
 //				 but with a select all button.
-// History:
 
 // Standard C++ headers
 #include <algorithm>

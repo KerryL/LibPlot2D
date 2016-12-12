@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Cross-platform methods for working with fonts.  Builds on wxWidgets
 //				 objects.
-// History:
 
 #ifndef FONT_FINDER_H_
 #define FONT_FINDER_H_

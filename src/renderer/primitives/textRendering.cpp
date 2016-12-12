@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive for creating text objects on a plot.
-// History:
 
 // GLEW headers
 #include <GL/glew.h>

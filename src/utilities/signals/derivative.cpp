@@ -11,7 +11,6 @@
 // Created:  5/3/2011
 // Author:  K. Loux
 // Description:  Computes discrete-time derivatives of data.
-// History:
 
 // Local headers
 #include "lp2d/utilities/signals/derivative.h"

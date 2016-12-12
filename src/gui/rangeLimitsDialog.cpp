@@ -11,7 +11,6 @@
 // Created:  5/12/2011
 // Author:  K. Loux
 // Description:  Dialog box for entering a minimum and maximum value for an axis.
-// History:
 
 // Local headers
 #include "lp2d/gui/rangeLimitsDialog.h"

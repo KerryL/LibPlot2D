@@ -11,7 +11,6 @@
 // Created:  5/5/2011
 // Author:  K. Loux
 // Description:  Logic for drawing the zoom box as the user moves the mouse.
-// History:
 
 #ifndef ZOOM_BOX_H_
 #define ZOOM_BOX_H_

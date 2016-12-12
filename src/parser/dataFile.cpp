@@ -11,7 +11,6 @@
 // Created:  10/2/2012
 // Author:  K. Loux
 // Description:  Base class for data file classes.
-// History:
 
 // Standard C++ headers
 #include <locale>

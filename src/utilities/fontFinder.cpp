@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Cross-platform methods for working with fonts.  Builds on wxWidgets
 //				 objects.
-// History:
 
 // Standard C++ headers
 #include <cstdlib>

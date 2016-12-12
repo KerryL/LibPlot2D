@@ -11,7 +11,6 @@
 // Created:  5/3/2011
 // Author:  K. Loux
 // Description:  Performs Fast Fourier Transform on data.
-// History:
 
 #ifndef FFT_H_
 #define FFT_H_
@@ -90,7 +89,7 @@ public:
 		\sa ComputeOverlap
 	*/
 	static void ComputeFRF(const Dataset2D &input, const Dataset2D &output, unsigned int numberOfAverages,
-		const FFTWindow &window, const bool &moduloPhase, Dataset2D &amplitude, Dataset2D *phase = NULL, Dataset2D *coherence = NULL);
+		const FFTWindow &window, const bool &moduloPhase, Dataset2D &amplitude, Dataset2D *phase = nullptr, Dataset2D *coherence = nullptr);
 
 	/// Computes the coherence function for the specified signals.
 	/*!

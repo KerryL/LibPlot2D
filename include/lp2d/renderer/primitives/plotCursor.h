@@ -11,11 +11,9 @@
 // Created:  5/5/2011
 // Author:  K. Loux
 // Description:  Represents an oscilloscope cursor on-screen.
-// History:
-//  5/12/2011 - Renamed to PlotCursor from Cursor due to conflict in X.h, K. Loux
 
-#ifndef CURSOR_H_
-#define CURSOR_H_
+#ifndef PLOT_CURSOR_H_
+#define PLOT_CURSOR_H_
 
 // Local headers
 #include "lp2d/renderer/primitives/primitive.h"
@@ -60,4 +58,4 @@ private:
 
 }// namespace LibPlot2D
 
-#endif// CURSOR_H_
+#endif// PLOT_CURSOR_H_

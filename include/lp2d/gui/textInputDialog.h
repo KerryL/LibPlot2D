@@ -12,7 +12,6 @@
 // Author:  K. Loux
 // Description:  Dialog box similar to ::wxGetTextFromUser() but allows differentiation between
 //				 canceling and returning an empty string.
-// History:
 
 #ifndef TEXT_INPUT_DIALOG_H_
 #define TEXT_INPUT_DIALOG_H_

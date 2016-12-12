@@ -13,7 +13,6 @@
 // Description:  Contains useful functions that don't fit better in another class.  Hopefully this
 //				 file will one day be absolved into a real class instead of just being a kludgy
 //				 collection of functions.
-// History:
 
 // Standard C++ headers
 #include <cstdlib>

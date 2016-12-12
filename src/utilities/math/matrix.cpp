@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class functionality for matrix class.
-// History:
 
 // Standard C++ headers
 #include <cstdlib>
@@ -50,7 +49,7 @@ Matrix::Matrix()
 {
 	rows = 0;
 	columns = 0;
-	elements = NULL;
+	elements = nullptr;
 }
 
 //==========================================================================
@@ -147,7 +146,7 @@ Matrix::Matrix(const unsigned int &rows, const unsigned int &columns, double ele
 //==========================================================================
 Matrix::Matrix(const Matrix &matrix)
 {
-	elements = NULL;
+	elements = nullptr;
 	rows = 0;
 	columns = 0;
 
@@ -1174,7 +1173,7 @@ void Matrix::FreeElements()
 	for (i = 0; i < rows; i++)
 		delete [] elements[i];
 	delete [] elements;
-	elements = NULL;
+	elements = nullptr;
 }
 
 //==========================================================================

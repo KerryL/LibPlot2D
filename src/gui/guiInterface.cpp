@@ -472,7 +472,7 @@ void GuiInterface::RemoveCurves(const wxArrayInt& curves)
 void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &rightVisible,
 		const double &leftValue, const double &rightValue)
 {
-	if (grid == NULL)
+	if (grid == nullptr)
 		return;
 
 	// TODO:  This would be nicer with smart precision so we show enough digits but not too many
@@ -728,7 +728,7 @@ void GuiInterface::GenerateFRF()
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
-	Dataset2D *amplitude = new Dataset2D, *phase = NULL, *coherence = NULL;
+	Dataset2D *amplitude = new Dataset2D, *phase = nullptr, *coherence = nullptr;
 
 	if (dialog.GetComputePhase())
 		phase = new Dataset2D;
@@ -1678,7 +1678,7 @@ Dataset2D* GuiInterface::GetFFTData(const Dataset2D* data)
 		data->GetAverageDeltaX() / factor);
 
 	if (dialog.ShowModal() != wxID_OK)
-		return NULL;
+		return nullptr;
 
 	if (!LibPlot2D::PlotMath::XDataConsistentlySpaced(*data))
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),

@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class functionality for complex number class.
-// History:
 
 // Standard C++ headers
 #include <iostream>

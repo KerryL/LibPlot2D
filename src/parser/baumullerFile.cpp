@@ -11,7 +11,6 @@
 // Created:  10/4/2012
 // Author:  K. Loux
 // Description:  File class for Baumuller files.
-// History:
 
 // Local headers
 #include "lp2d/parser/baumullerFile.h"

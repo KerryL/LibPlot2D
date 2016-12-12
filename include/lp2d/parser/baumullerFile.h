@@ -11,7 +11,6 @@
 // Created:  10/4/2012
 // Author:  K. Loux
 // Description:  File class for Baumuller files.
-// History:
 
 #ifndef BAUMULLER_FILE_H_
 #define BAUMULLER_FILE_H_

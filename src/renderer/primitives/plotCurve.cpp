@@ -11,8 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Derived from Primitive for creating data curves on a plot.
-// History:
-//	11/9/2010	- Modified to accomodate 3D plots, K. Loux.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -48,8 +46,8 @@ namespace LibPlot2D
 PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 	: Primitive(renderWindow), data(data), line(renderWindow)
 {
-	xAxis = NULL;
-	yAxis = NULL;
+	xAxis = nullptr;
+	yAxis = nullptr;
 
 	lineSize = 1;
 	markerSize = -1;
@@ -326,7 +324,7 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 //==========================================================================
 bool PlotCurve::HasValidParameters()
 {
-	if (xAxis != NULL && yAxis != NULL && data.GetNumberOfPoints() > 1)
+	if (xAxis != nullptr && yAxis != nullptr && data.GetNumberOfPoints() > 1)
 	{
 		if (xAxis->IsHorizontal() && !yAxis->IsHorizontal())
 			return true;

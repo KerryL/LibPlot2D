@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Contains class declaration for complex number class.
-// History:
 
 #ifndef COMPLEX_H_
 #define COMPLEX_H_

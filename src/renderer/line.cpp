@@ -14,7 +14,6 @@
 //               color to background color in order to make the lines prettier, be
 //               more consistent from platform to platofrm and to support sub-pixel
 //               widths.
-// History:
 
 // GLEW headers
 #include <GL/glew.h>

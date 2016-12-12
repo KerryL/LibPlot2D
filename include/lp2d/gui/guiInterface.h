@@ -128,7 +128,7 @@ private:
 	FileFormat currentFileFormat = FormatGeneric;
 	wxString genericXAxisLabel;
 
-	bool GetXAxisScalingFactor(double &factor, wxString *label = NULL);
+	bool GetXAxisScalingFactor(double &factor, wxString *label = nullptr);
 
 	void UpdateSingleCursorValue(const unsigned int &row, double value,
 		const unsigned int &column, const bool &isVisible);

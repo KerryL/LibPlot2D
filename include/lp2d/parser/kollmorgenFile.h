@@ -11,7 +11,6 @@
 // Created:  10/4/2012
 // Author:  K. Loux
 // Description:  File class for Kollmorgen files.
-// History:
 
 #ifndef KOLLMORGEN_FILE_H_
 #define KOLLMORGEN_FILE_H_

@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Container for x and y-data series for plotting.
-// History:
 
 #ifndef DATASET_H_
 #define DATASET_H_
@@ -54,7 +53,7 @@ public:
 	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; }
 
 	Dataset2D& MultiplyXData(const double &target);
-	bool GetYAt(const double &x, double &y, bool *exactValue = NULL) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
+	bool GetYAt(const double &x, double &y, bool *exactValue = nullptr) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
 
 	Dataset2D& XShift(const double &shift);
 

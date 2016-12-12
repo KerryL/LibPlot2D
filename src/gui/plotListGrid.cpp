@@ -14,14 +14,17 @@
 //        curves and provides an interface (via right-clicks) for users to
 //        modify and perform actions on curves.
 
-// wxWidgets headers
-#include <wx/colordlg.h>
-
 // Local headers
 #include "lp2d/gui/plotListGrid.h"
 #include "lp2d/gui/guiInterface.h"
 #include "lp2d/utilities/dataset2D.h"
 #include "lp2d/renderer/color.h"
+
+// wxWidgets headers
+#include <wx/colordlg.h>
+
+// Standard C++ headers
+#include <memory>
 
 namespace LibPlot2D
 {
@@ -129,7 +132,7 @@ void PlotListGrid::Build()
 //==========================================================================
 void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned int &row)
 {
-	wxMenu *contextMenu = new wxMenu();
+	std::unique_ptr<wxMenu> contextMenu(std::make_unique<wxMenu>());
 
 	contextMenu->Append(idContextAddMathChannel, _T("Add Math Channel"));
 	contextMenu->Append(idContextFRF, _T("Frequency Response"));
@@ -166,10 +169,7 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 		contextMenu->Append(idContextRemoveCurve, _T("Remove Curve"));
 	}
 
-	PopupMenu(contextMenu, position);
-
-	delete contextMenu;
-	contextMenu = NULL;
+	PopupMenu(contextMenu.get(), position);
 }
 
 //==========================================================================
@@ -382,14 +382,11 @@ void PlotListGrid::GridCellChangeEvent(wxGridEvent &event)
 //==========================================================================
 void PlotListGrid::GridLabelRightClickEvent(wxGridEvent &event)
 {
-	wxMenu *contextMenu = new wxMenu();
+	std::unique_ptr<wxMenu> contextMenu(std::make_unique<wxMenu>());
 
 	contextMenu->Append(idContextCreateSignal, _T("Create Signal"));
 
-	PopupMenu(contextMenu, event.GetPosition());
-
-	delete contextMenu;
-	contextMenu = NULL;
+	PopupMenu(contextMenu.get(), event.GetPosition());
 }
 
 //==========================================================================

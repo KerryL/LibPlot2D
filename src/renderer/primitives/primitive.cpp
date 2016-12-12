@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Abstract base class for creating 3D objects.
-// History:
 
 // GLEW headers
 #include <GL/glew.h>
@@ -108,9 +107,9 @@ Primitive::~Primitive()
 	{
 		bufferInfo[i].FreeOpenGLObjects();
 		delete[] bufferInfo[i].vertexBuffer;
-		bufferInfo[i].vertexBuffer = NULL;
+		bufferInfo[i].vertexBuffer = nullptr;
 		delete[] bufferInfo[i].indexBuffer;
-		bufferInfo[i].indexBuffer = NULL;
+		bufferInfo[i].indexBuffer = nullptr;
 	}
 }
 
@@ -318,10 +317,10 @@ void Primitive::DisableAlphaBlending()
 //==========================================================================
 Primitive::BufferInfo::BufferInfo()
 {
-	vertexBuffer = NULL;
+	vertexBuffer = nullptr;
 	vertexCountModified = true;
 	vertexCount = 0;
-	indexBuffer = NULL;
+	indexBuffer = nullptr;
 	indexCount = 0;
 	glVertexBufferExists = false;
 	glIndexBufferExists = false;
@@ -414,10 +413,10 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 void Primitive::BufferInfo::FreeDynamicMemory()
 {
 	delete[] vertexBuffer;
-	vertexBuffer = NULL;
+	vertexBuffer = nullptr;
 
 	delete[] indexBuffer;
-	indexBuffer = NULL;
+	indexBuffer = nullptr;
 }
 
 }// namespace LibPlot2D

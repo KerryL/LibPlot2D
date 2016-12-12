@@ -15,7 +15,6 @@
 //				 in the scene must be added to the PrimitivesList in order to be drawn.
 //				 Objects in the PrimitivesList become managed by this object and are
 //				 deleted automatically.
-// History:
 
 #ifndef RENDER_WINDOW_H_
 #define RENDER_WINDOW_H_

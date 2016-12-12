@@ -11,7 +11,6 @@
 // Created:  10/4/2012
 // Author:  K. Loux
 // Description:  File class for Kollmorgen files.
-// History:
 
 // Local headers
 #include "lp2d/parser/kollmorgenFile.h"

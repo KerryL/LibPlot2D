@@ -11,7 +11,6 @@
 // Created:  5/3/2011
 // Author:  K. Loux
 // Description:  Performs fast fourier transform on data.
-// History:
 
 // Standard C++ headers
 #include <cmath>

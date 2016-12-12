@@ -11,7 +11,6 @@
 // Created:  5/3/2011
 // Author:  K. Loux
 // Description:  Computes root-mean-square of data.
-// History:
 
 #ifndef RMS_H_
 #define RMS_H_

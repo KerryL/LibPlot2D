@@ -11,7 +11,6 @@
 // Created:  5/16/2011
 // Author:  K. Loux
 // Description:  Base class (abstract) for digital filters.
-// History:
 
 // Standard C++ headers
 #include <cstdlib>
@@ -44,10 +43,10 @@ namespace LibPlot2D
 //==========================================================================
 Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 {
-	a = NULL;
-	b = NULL;
-	u = NULL;
-	y = NULL;
+	a = nullptr;
+	b = nullptr;
+	u = nullptr;
+	y = nullptr;
 }
 
 //==========================================================================

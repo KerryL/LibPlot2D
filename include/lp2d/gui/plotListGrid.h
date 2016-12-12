@@ -39,16 +39,12 @@ public:
 	PlotListGrid(GuiInterface& guiInterface, wxWindow* parent,
 		wxWindowID id = wxID_ANY);
 
-	// For displaying a menu that was crated by this form
-	// NOTE:  When calculating the Position to display this context menu,
-	// consider that the coordinates for the calling object might be different
-	// from the coordinates for this object!
-	void CreateGridContextMenu(const wxPoint& position, const unsigned int& row);
-
 	Color GetNextColor(const unsigned int& index) const;
+
 	void AddTimeRow();
 	unsigned int AddDataRow(const wxString& name);
 
+	/// Enumeration of columns contained within the grid.
 	enum Columns
 	{
 		ColName = 0,
@@ -64,12 +60,10 @@ public:
 		ColCount
 	};
 
-private:
+protected:
 	GuiInterface& guiInterface;
 
-	void Build();
-
-	static bool ItemIsInArray(const wxArrayInt& a, const int& item);
+	virtual void CreateGridContextMenu(const wxPoint& position, const unsigned int& row);
 
 	// The event IDs
 	enum MainFrameEventID
@@ -90,34 +84,39 @@ private:
 		idContextBitMask,
 
 		idContextFilter,
-		idContextFitCurve,
+		idContextFitCurve
 	};
 
 	// Grid events
-	void GridRightClickEvent(wxGridEvent &event);
-	void GridDoubleClickEvent(wxGridEvent &event);
-	void GridLeftClickEvent(wxGridEvent &event);
-	void GridCellChangeEvent(wxGridEvent &event);
-	void GridLabelRightClickEvent(wxGridEvent &event);
+	virtual void GridRightClickEvent(wxGridEvent &event);
+	virtual void GridDoubleClickEvent(wxGridEvent &event);
+	virtual void GridLeftClickEvent(wxGridEvent &event);
+	virtual void GridCellChangeEvent(wxGridEvent &event);
+	virtual void GridLabelRightClickEvent(wxGridEvent &event);
 
 	// Context menu events
-	void ContextAddMathChannelEvent(wxCommandEvent &event);
-	void ContextFRFEvent(wxCommandEvent &event);
-	void ContextCreateSignalEvent(wxCommandEvent &event);
-	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
-	void ContextScaleXDataEvent(wxCommandEvent &event);
-	void ContextPlotDerivativeEvent(wxCommandEvent &event);
-	void ContextPlotIntegralEvent(wxCommandEvent &event);
-	void ContextPlotRMSEvent(wxCommandEvent &event);
-	void ContextPlotFFTEvent(wxCommandEvent &event);
-	void ContextRemoveCurveEvent(wxCommandEvent &event);
-	void ContextTimeShiftEvent(wxCommandEvent &event);
-	void ContextBitMaskEvent(wxCommandEvent &event);
+	virtual void ContextAddMathChannelEvent(wxCommandEvent &event);
+	virtual void ContextFRFEvent(wxCommandEvent &event);
+	virtual void ContextCreateSignalEvent(wxCommandEvent &event);
+	virtual void ContextSetTimeUnitsEvent(wxCommandEvent &event);
+	virtual void ContextScaleXDataEvent(wxCommandEvent &event);
+	virtual void ContextPlotDerivativeEvent(wxCommandEvent &event);
+	virtual void ContextPlotIntegralEvent(wxCommandEvent &event);
+	virtual void ContextPlotRMSEvent(wxCommandEvent &event);
+	virtual void ContextPlotFFTEvent(wxCommandEvent &event);
+	virtual void ContextRemoveCurveEvent(wxCommandEvent &event);
+	virtual void ContextTimeShiftEvent(wxCommandEvent &event);
+	virtual void ContextBitMaskEvent(wxCommandEvent &event);
 
-	void ContextFilterEvent(wxCommandEvent &event);
-	void ContextFitCurve(wxCommandEvent &event);
+	virtual void ContextFilterEvent(wxCommandEvent &event);
+	virtual void ContextFitCurve(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
+
+private:
+	void Build();
+
+	static bool ItemIsInArray(const wxArrayInt& a, const int& item);
 };
 
 }// namespace LibPlot2D

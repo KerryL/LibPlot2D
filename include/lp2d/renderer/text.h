@@ -11,7 +11,6 @@
 // Created:  5/12/2016
 // Author:  K. Loux
 // Description:  Helper object for building BufferInfo objects for text rendering.
-// History:
 
 #ifndef TEXT_H_
 #define TEXT_H_

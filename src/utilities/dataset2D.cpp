@@ -11,7 +11,6 @@
 // Created:  5/2/2011
 // Author:  K. Loux
 // Description:  Container for x and y-data series for plotting.
-// History:
 
 // Standard C++ headers
 #include <fstream>
@@ -48,8 +47,8 @@ Dataset2D::Dataset2D()
 {
 	// Initialize everything to zero size
 	numberOfPoints = 0;
-	xData = NULL;
-	yData = NULL;
+	xData = nullptr;
+	yData = nullptr;
 }
 
 //==========================================================================
@@ -70,8 +69,8 @@ Dataset2D::Dataset2D()
 //==========================================================================
 Dataset2D::Dataset2D(const Dataset2D& target)
 {
-	xData = NULL;
-	yData = NULL;
+	xData = nullptr;
+	yData = nullptr;
 	*this = target;
 }
 
@@ -93,8 +92,8 @@ Dataset2D::Dataset2D(const Dataset2D& target)
 //==========================================================================
 Dataset2D::Dataset2D(const unsigned int &numberOfPoints)
 {
-	xData = NULL;
-	yData = NULL;
+	xData = nullptr;
+	yData = nullptr;
 	Resize(numberOfPoints);
 }
 
@@ -117,10 +116,10 @@ Dataset2D::Dataset2D(const unsigned int &numberOfPoints)
 Dataset2D::~Dataset2D()
 {
 	delete [] xData;
-	xData = NULL;
+	xData = nullptr;
 
 	delete [] yData;
-	yData = NULL;
+	yData = nullptr;
 }
 
 //==========================================================================

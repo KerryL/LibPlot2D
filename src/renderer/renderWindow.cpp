@@ -15,8 +15,6 @@
 //				 in the scene must be added to the PrimitivesList in order to be drawn.
 //				 Objects in the PrimitivesList become managed by this object and are
 //				 deleted automatically.
-// History:
-//	4/25/2010	- Fixed anti-aliasing for 2D plots, K. Loux.
 
 // Standard C++ headers
 #include <vector>
@@ -149,7 +147,7 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
 	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
 {
-	context = NULL;
+	context = nullptr;
 	glewInitialized = false;
 
 	wireFrame = false;
@@ -200,7 +198,7 @@ RenderWindow::~RenderWindow()
 	primitiveList.Clear();
 
 	delete GetContext();
-	context = NULL;
+	context = nullptr;
 }
 
 //==========================================================================
@@ -1591,7 +1589,7 @@ GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderC
 {
 	GLuint shader = glCreateShader(type);
 	const char* shaderString = shaderContents.c_str();
-	glShaderSource(shader, 1, &shaderString, NULL);
+	glShaderSource(shader, 1, &shaderString, nullptr);
 
 	glCompileShader(shader);
 
@@ -1603,7 +1601,7 @@ GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderC
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
         
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+		glGetShaderInfoLog(shader, infoLogLength, nullptr, strInfoLog);
 		std::cerr << strInfoLog << std::endl;
 		assert(false);
 		delete[] strInfoLog;
@@ -1644,7 +1642,7 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
         
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+		glGetProgramInfoLog(program, infoLogLength, nullptr, strInfoLog);
 		std::cerr << strInfoLog << std::endl;
 		assert(false);
 		delete[] strInfoLog;

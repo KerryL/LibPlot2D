@@ -11,16 +11,6 @@
 // Created:  11/3/2007
 // Author:  K. Loux
 // Description:  Contains class functionality for vector class.
-// History:
-//	2/26/2008	- Gave additional arguments to rotation member for choice of rotation order, K. Loux.
-//	3/3/2008	- Made functions take address arguments to reduce overhead, K. Loux.
-//	3/9/2008	- Removed dependency on MFC class CString by switching to wxString, K. Loux.
-//	3/14/2008	- Added AnglesTo function, K. Loux.
-//	3/23/2008	- Changed arguments for class functions from degrees to radians, K. Loux.
-//	4/11/2009	- Changed all functions to take addresses of and use const, K. Loux.
-//	4/17/2009	- Renamed ROTATION_AXIS enumeration to Axis, K. Loux
-//	6/15/2009	- Corrected function signatures for overloaded operators, K. Loux.
-//	11/7/2011	- Corrected camelCase, K. Loux.
 
 // wxWidgets headers
 #include <wx/wx.h>

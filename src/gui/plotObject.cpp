@@ -11,7 +11,6 @@
 // Created:  5/4/2011
 // Author:  K. Loux
 // Description:  Intermediate class for creating plots from arrays of data.
-// History:
 
 // GLEW headers
 #include <GL/glew.h>
@@ -1716,7 +1715,7 @@ void PlotObject::SetMinorGrid(const bool &gridOn)
 //==========================================================================
 bool PlotObject::GetMajorGrid()
 {
-	if (axisBottom == NULL)
+	if (axisBottom == nullptr)
 		return false;
 
 	return axisBottom->GetMajorGrid();
@@ -1740,7 +1739,7 @@ bool PlotObject::GetMajorGrid()
 //==========================================================================
 bool PlotObject::GetMinorGrid()
 {
-	if (axisBottom == NULL)
+	if (axisBottom == nullptr)
 		return false;
 
 	return axisBottom->GetMinorGrid();
