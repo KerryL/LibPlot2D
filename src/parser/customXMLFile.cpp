@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  customXMLFile.cpp
-// Created:  10/4/2012
-// Author:  K. Loux
-// Description:  File class for custom (XML) files defined by the user using an XML file.
+// Date:  10/4/2012
+// Auth:  K. Loux
+// Desc:  File class for custom (XML) files defined by the user using an XML file.
 
 // Local headers
 #include "lp2d/parser/customXMLFile.h"
@@ -18,11 +18,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		IsType
 //
-// Description:		Method for determining if the specified file is this
+// Desc:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:
@@ -34,18 +34,18 @@ namespace LibPlot2D
 // Return Value:
 //		bool, true if this object can process the specified file, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomXMLFile::IsType(const wxString &fileName)
 {
 	CustomFileFormat format(fileName);
 	return format.IsCustomFormat() && format.IsXML();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		CreateDelimiterList
 //
-// Description:		Overload.  Creates the delimiter list.  If no delimiter
+// Desc:		Overload.  Creates the delimiter list.  If no delimiter
 //					is specified in the custom definition, this is the same
 //					as DataFile, otherwise we limit the delimiter list to
 //					contain only the delimiter specified.
@@ -59,7 +59,7 @@ bool CustomXMLFile::IsType(const wxString &fileName)
 // Return Value:
 //		wxArrayString
 //
-//==========================================================================
+//=============================================================================
 wxArrayString CustomXMLFile::CreateDelimiterList() const
 {
 	if (fileFormat.GetDelimiter().IsEmpty())
@@ -70,11 +70,11 @@ wxArrayString CustomXMLFile::CreateDelimiterList() const
 	return delimiterList;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		ExtractData
 //
-// Description:		Parses the file and reads data into vectors.  Only extracts
+// Desc:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.
 //
 // Input Arguments:
@@ -89,7 +89,7 @@ wxArrayString CustomXMLFile::CreateDelimiterList() const
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt &choices,
 	std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const
 {
@@ -129,11 +129,11 @@ bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt 
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		ExtractXData
 //
-// Description:		Reads the X-data into the rawData array.
+// Desc:		Reads the X-data into the rawData array.
 //
 // Input Arguments:
 //		factors		= std::vector<double>& containing the list of scaling factors
@@ -145,7 +145,7 @@ bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt 
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomXMLFile::ExtractXData(std::vector<double> *rawData, std::vector<double> &factors,
 	wxString& errorString) const
 {
@@ -169,11 +169,11 @@ bool CustomXMLFile::ExtractXData(std::vector<double> *rawData, std::vector<doubl
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		ExtractYData
 //
-// Description:		Reads the Y-data into the rawData array.
+// Desc:		Reads the Y-data into the rawData array.
 //
 // Input Arguments:
 //		channel		= wxXmlNode*
@@ -187,7 +187,7 @@ bool CustomXMLFile::ExtractXData(std::vector<double> *rawData, std::vector<doubl
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawData,
 	std::vector<double> &factors, const unsigned int &set, wxString& errorString) const
 {
@@ -214,11 +214,11 @@ bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawDat
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		GetCurveInformation
 //
-// Description:		Parses the file and assembles descriptions for each column
+// Desc:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
 //					the number of header rows back to the calling function.
 //					If custom descriptions and scaling factors are specified,
@@ -235,7 +235,7 @@ bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawDat
 // Return Value:
 //		wxArrayString containing the descriptions
 //
-//==========================================================================
+//=============================================================================
 wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
@@ -273,11 +273,11 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount,
 	return names;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		FollowNodePath
 //
-// Description:		Follows the specified node path and returns the final node.
+// Desc:		Follows the specified node path and returns the final node.
 //
 // Input Arguments:
 //		document	= const wxXmlDocument&
@@ -289,17 +289,17 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount,
 // Return Value:
 //		wxXmlNode*
 //
-//==========================================================================
+//=============================================================================
 wxXmlNode* CustomXMLFile::FollowNodePath(const wxXmlDocument &document, const wxString &path) const
 {
 	return FollowNodePath(document.GetRoot(), path);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		FollowNodePath
 //
-// Description:		Follows the specified node path and returns the final node.
+// Desc:		Follows the specified node path and returns the final node.
 //
 // Input Arguments:
 //		node	= const wxXmlNode*
@@ -311,7 +311,7 @@ wxXmlNode* CustomXMLFile::FollowNodePath(const wxXmlDocument &document, const wx
 // Return Value:
 //		wxXmlNode*
 //
-//==========================================================================
+//=============================================================================
 wxXmlNode* CustomXMLFile::FollowNodePath(wxXmlNode *node, const wxString &path) const
 {
 	node = node->GetChildren();
@@ -333,11 +333,11 @@ wxXmlNode* CustomXMLFile::FollowNodePath(wxXmlNode *node, const wxString &path) 
 	return node;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		SeparateNodes
 //
-// Description:		Takes a node path string (slash-separated) and chops it
+// Desc:		Takes a node path string (slash-separated) and chops it
 //					into separate strings for each XML node along the path.
 //
 // Input Arguments:
@@ -349,7 +349,7 @@ wxXmlNode* CustomXMLFile::FollowNodePath(wxXmlNode *node, const wxString &path) 
 // Return Value:
 //		wxArrayString
 //
-//==========================================================================
+//=============================================================================
 wxArrayString CustomXMLFile::SeparateNodes(const wxString &nodePath) const
 {
 	wxArrayString nodes;
@@ -368,11 +368,11 @@ wxArrayString CustomXMLFile::SeparateNodes(const wxString &nodePath) const
 	return nodes;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomXMLFile
 // Function:		DataStringToVector
 //
-// Description:		Parses the contents of the string and separates discrete
+// Desc:		Parses the contents of the string and separates discrete
 //					data values.  Copies these values into the specified vector.
 //
 // Input Arguments:
@@ -386,7 +386,7 @@ wxArrayString CustomXMLFile::SeparateNodes(const wxString &nodePath) const
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomXMLFile::DataStringToVector(const wxString &data,
 	std::vector<double> &dataVector, const double &factor, wxString& errorString) const
 {

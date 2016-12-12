@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  primitive.cpp
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Abstract base class for creating 3D objects.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Abstract base class for creating 3D objects.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -22,11 +22,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		Primitive
 //
-// Description:		Constructor for the Primitive class.
+// Desc:		Constructor for the Primitive class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow& pointing to the object that owns this
@@ -37,7 +37,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 {
 	isVisible = true;
@@ -55,11 +55,11 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	modified = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		Primitive
 //
-// Description:		Copy constructor for the Primitive class.
+// Desc:		Copy constructor for the Primitive class.
 //
 // Input Arguments:
 //		primitive	= const Primitive& to copy to this object
@@ -70,7 +70,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
 	*this = primitive;
@@ -81,11 +81,11 @@ Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.render
 	renderWindow.SetNeedOrderSort();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		~Primitive
 //
-// Description:		Destructor for the Primitive class.
+// Desc:		Destructor for the Primitive class.
 //
 // Input Arguments:
 //		None
@@ -96,7 +96,7 @@ Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.render
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Primitive::~Primitive()
 {
 	renderWindow.SetNeedAlphaSort();
@@ -113,11 +113,11 @@ Primitive::~Primitive()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		Draw
 //
-// Description:		Calls two mandatory overloads that 1) check to see if the
+// Desc:		Calls two mandatory overloads that 1) check to see if the
 //					information describing this object is valid, and if so, 2)
 //					calls the GenerateGeometry() method to create the object.
 //
@@ -130,7 +130,7 @@ Primitive::~Primitive()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Primitive::Draw()
 {
 	if (!HasValidParameters() || !isVisible)
@@ -151,11 +151,11 @@ void Primitive::Draw()
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		SetVisibility
 //
-// Description:		Sets the visibility flag for this object.
+// Desc:		Sets the visibility flag for this object.
 //
 // Input Arguments:
 //		isVisible	= const bool&
@@ -166,18 +166,18 @@ void Primitive::Draw()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Primitive::SetVisibility(const bool &isVisible)
 {
 	this->isVisible = isVisible;
 	modified = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		SetColor
 //
-// Description:		Sets the color of this object.
+// Desc:		Sets the color of this object.
 //
 // Input Arguments:
 //		color	= const Color&
@@ -188,7 +188,7 @@ void Primitive::SetVisibility(const bool &isVisible)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Primitive::SetColor(const Color &color)
 {
 	this->color = color;
@@ -196,11 +196,11 @@ void Primitive::SetColor(const Color &color)
 	modified = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		SetDrawOrder
 //
-// Description:		Sets the draw order for the object.
+// Desc:		Sets the draw order for the object.
 //
 // Input Arguments:
 //		drawOrder	= const unsigned int&
@@ -211,18 +211,18 @@ void Primitive::SetColor(const Color &color)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Primitive::SetDrawOrder(const unsigned int& drawOrder)
 {
 	this->drawOrder = drawOrder;
 	renderWindow.SetNeedOrderSort();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		operator=
 //
-// Description:		Assignment operator for Primitive class.
+// Desc:		Assignment operator for Primitive class.
 //
 // Input Arguments:
 //		Primitive	= const Primitive& to assign to this object
@@ -233,7 +233,7 @@ void Primitive::SetDrawOrder(const unsigned int& drawOrder)
 // Return Value:
 //		Primitive&, reference to this object
 //
-//==========================================================================
+//=============================================================================
 Primitive& Primitive::operator=(const Primitive &primitive)
 {
 	// Check for self-assignment
@@ -252,11 +252,11 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	return *this;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		EnableAlphaBlending
 //
-// Description:		Assignment operator for Primitive class.
+// Desc:		Assignment operator for Primitive class.
 //
 // Input Arguments:
 //		Primitive	= const Primitive& to assign to this object
@@ -267,7 +267,7 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 // Return Value:
 //		Primitive&, reference to this object
 //
-//==========================================================================
+//=============================================================================
 void Primitive::EnableAlphaBlending()
 {
 	glEnable(GL_BLEND);
@@ -277,11 +277,11 @@ void Primitive::EnableAlphaBlending()
 	glDepthMask(GL_FALSE);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive
 // Function:		DisableAlphaBlending
 //
-// Description:		Assignment operator for Primitive class.
+// Desc:		Assignment operator for Primitive class.
 //
 // Input Arguments:
 //		Primitive	= const Primitive& to assign to this object
@@ -292,18 +292,18 @@ void Primitive::EnableAlphaBlending()
 // Return Value:
 //		Primitive&, reference to this object
 //
-//==========================================================================
+//=============================================================================
 void Primitive::DisableAlphaBlending()
 {
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive::BufferInfo
 // Function:		BufferInfo
 //
-// Description:		Constructor for the Primitive::BufferInfo struct.
+// Desc:		Constructor for the Primitive::BufferInfo struct.
 //
 // Input Arguments:
 //		None
@@ -314,7 +314,7 @@ void Primitive::DisableAlphaBlending()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Primitive::BufferInfo::BufferInfo()
 {
 	vertexBuffer = nullptr;
@@ -326,11 +326,11 @@ Primitive::BufferInfo::BufferInfo()
 	glIndexBufferExists = false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive::BufferInfo
 // Function:		GetOpenGLIndices
 //
-// Description:		Method for safely initializing this object.
+// Desc:		Method for safely initializing this object.
 //
 // Input Arguments:
 //		needIndexObject	= const bool&
@@ -341,7 +341,7 @@ Primitive::BufferInfo::BufferInfo()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Primitive::BufferInfo::GetOpenGLIndices(const bool& needIndexObject)
 {
 	if (!glVertexBufferExists)
@@ -360,11 +360,11 @@ void Primitive::BufferInfo::GetOpenGLIndices(const bool& needIndexObject)
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive::BufferInfo
 // Function:		FreeOpenGLObjects
 //
-// Description:		Frees OpenGL resources.
+// Desc:		Frees OpenGL resources.
 //
 // Input Arguments:
 //		None
@@ -375,7 +375,7 @@ void Primitive::BufferInfo::GetOpenGLIndices(const bool& needIndexObject)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Primitive::BufferInfo::FreeOpenGLObjects()
 {
 	if (glVertexBufferExists)
@@ -394,11 +394,11 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Primitive::BufferInfo
 // Function:		FreeDynamicMemory
 //
-// Description:		Frees dynamic resources.
+// Desc:		Frees dynamic resources.
 //
 // Input Arguments:
 //		None
@@ -409,7 +409,7 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Primitive::BufferInfo::FreeDynamicMemory()
 {
 	delete[] vertexBuffer;

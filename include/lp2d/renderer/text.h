@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  text.h
-// Created:  5/12/2016
-// Author:  K. Loux
-// Description:  Helper object for building BufferInfo objects for text rendering.
+// Date:  5/12/2016
+// Auth:  K. Loux
+// Desc:  Helper object for building BufferInfo objects for text rendering.
 
 #ifndef TEXT_H_
 #define TEXT_H_

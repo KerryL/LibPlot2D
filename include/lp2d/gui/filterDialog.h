@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  filterDialog.h
-// Created:  4/20/2012
-// Author:  K. Loux
-// Description:  Dialog box for defining filter parameters.
+// Date:  4/20/2012
+// Auth:  K. Loux
+// Desc:  Dialog box for defining filter parameters.
 
 #ifndef FILTER_DIALOG_H_
 #define FILTER_DIALOG_H_

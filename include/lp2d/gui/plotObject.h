@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotObject.h
-// Created:  5/4/2011
-// Author:  K. Loux
-// Description:  Intermediate class for creating plots from arrays of data.
+// Date:  5/4/2011
+// Auth:  K. Loux
+// Desc:  Intermediate class for creating plots from arrays of data.
 
 #ifndef PLOT_OBJECT_H_
 #define PLOT_OBJECT_H_

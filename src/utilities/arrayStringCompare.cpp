@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2015
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  mainFrame.cpp
-// Created:  1/27/2015
-// Author:  K. Loux
-// Description:  Comparison class for specializing std::maps on wxArrayString.
+// Date:  1/27/2015
+// Auth:  K. Loux
+// Desc:  Comparison class for specializing std::maps on wxArrayString.
 
 // wxWidgets headers
 #include <wx/wx.h>

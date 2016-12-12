@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  dropTarget.cpp
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
-//				 when the user drags-and-drops them onto the main window.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
+//        when the user drags-and-drops them onto the main window.
 
 // Local headers
 #include "lp2d/gui/dropTarget.h"
@@ -20,11 +20,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			DropTarget
 // Function:		DropTarget
 //
-// Description:		Constructor for DropTarget class.
+// Desc:		Constructor for DropTarget class.
 //
 // Input Arguments:
 //		guiInterface	= &GuiInterface, reference to main application window
@@ -35,7 +35,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 DropTarget::DropTarget(GuiInterface &guiInterface) : guiInterface(guiInterface)
 {
 	wxDataObjectComposite *dataObject = new wxDataObjectComposite;
@@ -44,36 +44,13 @@ DropTarget::DropTarget(GuiInterface &guiInterface) : guiInterface(guiInterface)
 	dataObject->Add(new wxTextDataObject);
 
 	SetDataObject(dataObject);
-
-	buffer = nullptr;
 }
 
-//==========================================================================
-// Class:			DropTarget
-// Function:		~DropTarget
-//
-// Description:		Destructor for DropTarget class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-DropTarget::~DropTarget()
-{
-	ClearBuffer();
-}
-
-//==========================================================================
+//=============================================================================
 // Class:			DropTarget
 // Function:		OnDropFiles
 //
-// Description:		Handles dragging and dropping of files.
+// Desc:		Handles dragging and dropping of files.
 //
 // Input Arguments:
 //		filenames	= const &wxArrayString containing the list of filenames
@@ -85,18 +62,18 @@ DropTarget::~DropTarget()
 // Return Value:
 //		true to accept the data, false to veto
 //
-//==========================================================================
+//=============================================================================
 bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 {
 	guiInterface.LoadFiles(filenames);
 	return true;// TODO:  Should I ever return false?
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			DropTarget
 // Function:		OnDropText
 //
-// Description:		Handles dragging and dropping text.
+// Desc:		Handles dragging and dropping text.
 //
 // Input Arguments:
 //		data	= const &wxString containing the text being dropped
@@ -107,18 +84,18 @@ bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 // Return Value:
 //		true to accept the data, false to veto
 //
-//==========================================================================
+//=============================================================================
 bool DropTarget::OnDropText(const wxString& data)
 {
 	guiInterface.LoadText(data);
 	return true;// TODO:  Should I ever return false?
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			DropTarget
 // Function:		OnData
 //
-// Description:		Overloaded virtual method from wxTextDropTarget.
+// Desc:		Overloaded virtual method from wxTextDropTarget.
 //
 // Input Arguments:
 //		x		= wxCoord (unused)
@@ -131,31 +108,29 @@ bool DropTarget::OnDropText(const wxString& data)
 // Return Value:
 //		wxDragResult
 //
-//==========================================================================
+//=============================================================================
 wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDragResult def)
 {
 	if (!GetData())
 		return wxDragNone;
 
-	ClearBuffer();
-
 	wxDataObjectComposite *dataObject = static_cast<wxDataObjectComposite*>(m_dataObject);
 	size_t bufferSize = dataObject->GetDataSize(dataObject->GetReceivedFormat());
 
-	buffer = new char[bufferSize];
-	if (!dataObject->GetDataHere(dataObject->GetReceivedFormat(), buffer))
+	std::unique_ptr<char[]> buffer(new char[bufferSize]);
+	if (!dataObject->GetDataHere(dataObject->GetReceivedFormat(), buffer.get()))
 		return wxDragNone;
 
 	if (dataObject->GetReceivedFormat().GetType() == wxDF_FILENAME)
 	{
 		wxFileDataObject fileData;
-		fileData.SetData(bufferSize, buffer);
+		fileData.SetData(bufferSize, buffer.get());
 		return OnDropFiles(fileData.GetFilenames()) ? def : wxDragNone;
 	}
 	else if (dataObject->GetReceivedFormat().GetType() == wxDF_TEXT)
 	{
 		wxTextDataObject textData;
-		textData.SetData(bufferSize, buffer);
+		textData.SetData(bufferSize, buffer.get());
 		return OnDropText(textData.GetText()) ? wxDragCopy : wxDragNone;
 	}
 
@@ -163,11 +138,11 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 	return wxDragNone;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			DropTarget
 // Function:		ClearBuffer
 //
-// Description:		Safely deletes the buffer contents.
+// Desc:		Safely deletes the buffer contents.
 //
 // Input Arguments:
 //		None
@@ -178,7 +153,7 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void DropTarget::ClearBuffer()
 {
 	if (buffer)

@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  rangeLimitsDialog.cpp
-// Created:  5/12/2011
-// Author:  K. Loux
-// Description:  Dialog box for entering a minimum and maximum value for an axis.
+// Date:  5/12/2011
+// Auth:  K. Loux
+// Desc:  Dialog box for entering a minimum and maximum value for an axis.
 
 // Local headers
 #include "lp2d/gui/rangeLimitsDialog.h"
@@ -18,11 +18,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			RangeLimitsDialog
 // Function:		RangeLimitsDialog
 //
-// Description:		Constructor for RangeLimitsDialog class.
+// Desc:		Constructor for RangeLimitsDialog class.
 //
 // Input Arguments:
 //		parent	= wxWindow* that owns this object
@@ -35,7 +35,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const double &max)
 									 : wxDialog(parent, wxID_ANY, _T("Set Axis Limits"), wxDefaultPosition)
 {
@@ -73,11 +73,11 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 	Center();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			RangeLimitsDialog
 // Function:		Event Table
 //
-// Description:		Specifies event handlers for dialog events.
+// Desc:		Specifies event handlers for dialog events.
 //
 // Input Arguments:
 //		None
@@ -88,16 +88,16 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 BEGIN_EVENT_TABLE(RangeLimitsDialog, wxDialog)
 	EVT_BUTTON(wxID_OK,	RangeLimitsDialog::OnOKButton)
 END_EVENT_TABLE()
 
-//==========================================================================
+//=============================================================================
 // Class:			RangeLimitsDialog
 // Function:		GetMinimum
 //
-// Description:		Returns the value entered in the minimum box.
+// Desc:		Returns the value entered in the minimum box.
 //
 // Input Arguments:
 //		None
@@ -108,7 +108,7 @@ END_EVENT_TABLE()
 // Return Value:
 //		double indicating current value in the minimum box
 //
-//==========================================================================
+//=============================================================================
 double RangeLimitsDialog::GetMinimum() const
 {
 	double value;
@@ -118,11 +118,11 @@ double RangeLimitsDialog::GetMinimum() const
 	return value;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			RangeLimitsDialog
 // Function:		GetMaximum
 //
-// Description:		Returns the value entered in the maximum box.
+// Desc:		Returns the value entered in the maximum box.
 //
 // Input Arguments:
 //		None
@@ -133,7 +133,7 @@ double RangeLimitsDialog::GetMinimum() const
 // Return Value:
 //		double indicating current value in the maximum box
 //
-//==========================================================================
+//=============================================================================
 double RangeLimitsDialog::GetMaximum() const
 {
 	double value;
@@ -143,11 +143,11 @@ double RangeLimitsDialog::GetMaximum() const
 	return value;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			RangeLimitsDialog
 // Function:		OnOKButton
 //
-// Description:		Validates min and max values when the user chooses OK.
+// Desc:		Validates min and max values when the user chooses OK.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -158,7 +158,7 @@ double RangeLimitsDialog::GetMaximum() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void RangeLimitsDialog::OnOKButton(wxCommandEvent &event)
 {
 	// Validate the values in the min and max boxes

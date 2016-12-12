@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  curveFit.cpp
-// Created:  5/16/2011
-// Author:  K. Loux
-// Description:  Contains methods for fitting curves to datasets.
+// Date:  5/16/2011
+// Auth:  K. Loux
+// Desc:  Contains methods for fitting curves to datasets.
 
 // Standard C++ headers
 #include <cmath>
@@ -23,11 +23,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			CurveFit
 // Function:		DoPolynomialFit
 //
-// Description:		Generates coefficients for a best fit (least squares) curve
+// Desc:		Generates coefficients for a best fit (least squares) curve
 //					of the specified order.  After calling this function, the
 //					programmer is responsible for freeing memory associated with
 //					the array of coefficients.
@@ -42,7 +42,7 @@ namespace LibPlot2D
 // Return Value:
 //		PolynomialFit containing the relevant curve fit data
 //
-//==========================================================================
+//=============================================================================
 /*#include <Windows.h>// Headers for testing matrix operations under MSVC++
 #include <iostream>
 #include <wx/wx.h>*/
@@ -85,11 +85,11 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 	return fit;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CurveFit
 // Function:		DoMatrixTest
 //
-// Description:		Tests SVD algorithm based on example in Wikipedia article.
+// Desc:		Tests SVD algorithm based on example in Wikipedia article.
 //
 // Input Arguments:
 //		None
@@ -100,7 +100,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 /*void CurveFit::DoMatrixTest()
 {
 	Matrix M(4,5);
@@ -129,11 +129,11 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 	OutputDebugString(_T("U * W * V':\n") + originalAgain.Print() + _T("\n"));
 }//*/
 
-//==========================================================================
+//=============================================================================
 // Class:			CurveFit
 // Function:		ComputeRSquared
 //
-// Description:		Computes the coefficient of determination value for the
+// Desc:		Computes the coefficient of determination value for the
 //					specified fit.
 //
 // Input Arguments:
@@ -147,7 +147,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 // Return Value:
 //		PolynomialFit containing the relevant curve fit data
 //
-//==========================================================================
+//=============================================================================
 void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 {
 	// Determine the mean of the sampled data
@@ -171,11 +171,11 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 	fit.rSquared = 1.0 - ssResidual / ssTotal;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CurveFit
 // Function:		EvaluateFit
 //
-// Description:		Returns the calculated y-value at the specified x-value
+// Desc:		Returns the calculated y-value at the specified x-value
 //					for the specified fit.
 //
 // Input Arguments:
@@ -190,7 +190,7 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 //		double indicating the result of evalutign the fit equation at the
 //		specified point
 //
-//==========================================================================
+//=============================================================================
 double CurveFit::EvaluateFit(const double &x, const PolynomialFit& fit)
 {
 	double value(0.0);

@@ -1,20 +1,20 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  renderWindow.h
-// Created:  5/14/2009
-// Author:  K. Loux
-// Description:  Class for creating OpenGL scenes, derived from wxGLCanvas.  Contains
-//				 event handlers for various mouse and keyboard interactions.  All objects
-//				 in the scene must be added to the PrimitivesList in order to be drawn.
-//				 Objects in the PrimitivesList become managed by this object and are
-//				 deleted automatically.
+// Date:  5/14/2009
+// Auth:  K. Loux
+// Desc:  Class for creating OpenGL scenes, derived from wxGLCanvas.  Contains
+//        event handlers for various mouse and keyboard interactions.  All
+//        object in the scene must be added to the PrimitivesList in order to
+//        be drawn.  Objects in the PrimitivesList become managed by this
+//        object and are deleted automatically.
 
 #ifndef RENDER_WINDOW_H_
 #define RENDER_WINDOW_H_

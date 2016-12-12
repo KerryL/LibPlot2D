@@ -1,16 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  customFile.h
-// Created:  10/4/2012
-// Author:  K. Loux
-// Description:  File class for custom (non-XML) files defined by the user using an XML file.
+// Date:  10/4/2012
+// Auth:  K. Loux
+// Desc:  File class for custom (non-XML) files defined by the user using an
+//        XML file.
 
 #ifndef CUSTOM_FILE_H_
 #define CUSTOM_FILE_H_

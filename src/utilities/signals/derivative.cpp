@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  derivative.cpp
-// Created:  5/3/2011
-// Author:  K. Loux
-// Description:  Computes discrete-time derivatives of data.
+// Date:  5/3/2011
+// Auth:  K. Loux
+// Desc:  Computes discrete-time derivatives of data.
 
 // Local headers
 #include "lp2d/utilities/signals/derivative.h"
@@ -19,11 +19,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			DiscreteDerivative
 // Function:		ComputeTimeHistory (static)
 //
-// Description:		Computes the discrete-time derivative time history for
+// Desc:		Computes the discrete-time derivative time history for
 //					the given signal.  Assumes y contains data and x is time.
 //
 // Input Arguments:
@@ -35,7 +35,7 @@ namespace LibPlot2D
 // Return Value:
 //		Dataset2D containing the requested time history
 //
-//==========================================================================
+//=============================================================================
 Dataset2D DiscreteDerivative::ComputeTimeHistory(const Dataset2D &data)
 {
 	Dataset2D derivative(data);

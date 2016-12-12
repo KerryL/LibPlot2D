@@ -1,22 +1,25 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  createSignalDialog.h
-// Created:  8/19/2013
-// Author:  K. Loux
-// Description:  Dialog for creating a variety of signals (not dependent on other curves).
+// Date:  8/19/2013
+// Auth:  K. Loux
+// Desc:  Dialog for creating a variety of signals (not dependent on other curves).
 
 #ifndef CREATE_SIGNAL_DIALOG_H_
 #define CREATE_SIGNAL_DIALOG_H_
 
 // wxWidgets headers
 #include <wx/dialog.h>
+
+// Standard C++ headers
+#include <memory>
 
 // wxWidgets forward declarations
 class wxTextCtrl;
@@ -33,7 +36,7 @@ public:
 	CreateSignalDialog(wxWindow *parent, const double &startTime, const double &duration,
 		const double &sampleRate);
 
-	Dataset2D *GetSignal() const { return dataset; };
+	std::unique_ptr<Dataset2D> GetSignal() const { return dataset; };
 	wxString GetSignalName() const;
 
 private:
@@ -73,7 +76,7 @@ private:
 		idPhaseTime
 	};
 
-	Dataset2D *dataset;
+	std::unique_ptr<Dataset2D> dataset;
 	void CreateSignal(const double &startTime, const double &duration,
 		const double &sampleRate);
 	double GetValue(const double &time);

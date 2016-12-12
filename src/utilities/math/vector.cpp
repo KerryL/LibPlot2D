@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  vector.cpp
-// Created:  11/3/2007
-// Author:  K. Loux
-// Description:  Contains class functionality for vector class.
+// Date:  11/3/2007
+// Auth:  K. Loux
+// Desc:  Contains class functionality for vector class.
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -22,11 +22,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Vector
 //
-// Description:		Constructor for the Vector class.
+// Desc:		Constructor for the Vector class.
 //
 // Input Arguments:
 //		None
@@ -37,16 +37,16 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Vector::Vector()
 {
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Vector
 //
-// Description:		Constructor for the Vector class.
+// Desc:		Constructor for the Vector class.
 //
 // Input Arguments:
 //		x	= const double& specifying first component of the vector
@@ -59,16 +59,16 @@ Vector::Vector()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Vector::Vector(const double &x, const double &y, const double &z) : x(x), y(y), z(z)
 {
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Vector
 //
-// Description:		Copy constructor for the Vector class.
+// Desc:		Copy constructor for the Vector class.
 //
 // Input Arguments:
 //		v	= const Vector& to be copied
@@ -79,18 +79,18 @@ Vector::Vector(const double &x, const double &y, const double &z) : x(x), y(y), 
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Vector::Vector(const Vector &v)
 {
 	// Copy from the argument to this
 	*this = v;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Rotate
 //
-// Description:		Performs Euler rotation of this object around point CoR.
+// Desc:		Performs Euler rotation of this object around point CoR.
 //					Rotations vector contains first (.X), second (.Y), and
 //					third (.Z).  Rotations are performed in that order and
 //					around the global coordinate system each time.
@@ -114,7 +114,7 @@ Vector::Vector(const Vector &v)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Vector::Rotate (const Vector &cor, const Vector &rotations,
 					 Axis first, Axis second, Axis third)
 {
@@ -138,11 +138,11 @@ void Vector::Rotate (const Vector &cor, const Vector &rotations,
 	*this = rotationMatrix * temp + cor;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Rotate
 //
-// Description:		Performs rotation of this object around point CoR.  This
+// Desc:		Performs rotation of this object around point CoR.  This
 //					version only performs rotation about one specified axis.
 //
 // Input Arguments:
@@ -156,7 +156,7 @@ void Vector::Rotate (const Vector &cor, const Vector &rotations,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Vector::Rotate(const Vector &cor, const double &angle, const Axis &about)
 {
 	// Translate the vector to the origin
@@ -169,11 +169,11 @@ void Vector::Rotate(const Vector &cor, const double &angle, const Axis &about)
 	*this = translatedVector + cor;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Rotate
 //
-// Description:		Rotates this object about the specified axis by the
+// Desc:		Rotates this object about the specified axis by the
 //					the specified angle.
 //
 // Input Arguments:
@@ -186,7 +186,7 @@ void Vector::Rotate(const Vector &cor, const double &angle, const Axis &about)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Vector::Rotate(const double &angle, const Axis &about)
 {
 	// Define the rotation matrix using the sine and cosines computed above.
@@ -196,11 +196,11 @@ void Vector::Rotate(const double &angle, const Axis &about)
 	*this = rotationMatrix * *this;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Rotate
 //
-// Description:		Rotates this object about the specified axis by the
+// Desc:		Rotates this object about the specified axis by the
 //					the specified angle.  This assumes the rotation axis
 //					passes through the origin.
 //
@@ -214,7 +214,7 @@ void Vector::Rotate(const double &angle, const Axis &about)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 {
 	Matrix rotationMatrix = GenerateRotationMatrix(angle, rotationAxis);
@@ -223,11 +223,11 @@ void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 	*this = rotationMatrix * *this;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		GenerateRotationMatrix
 //
-// Description:		Creates a 3x3 rotation matrix for rotation about the
+// Desc:		Creates a 3x3 rotation matrix for rotation about the
 //					specified (arbitrary) axis.
 //
 // Input Arguments:
@@ -240,7 +240,7 @@ void Vector::Rotate(const double &angle, const Vector &rotationAxis)
 // Return Value:
 //		Matrix, 3x3 rotation matrix
 //
-//==========================================================================
+//=============================================================================
 Matrix Vector::GenerateRotationMatrix(const double &angle, const Vector& rotationAxis)
 {
 	// To rotate this vector about an arbitrary axis, we use the following matrix
@@ -272,11 +272,11 @@ Matrix Vector::GenerateRotationMatrix(const double &angle, const Vector& rotatio
 	return rotationMatrix;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		GenerateRotationMatrix
 //
-// Description:		Creates a 3x3 rotation matrix for rotation about the
+// Desc:		Creates a 3x3 rotation matrix for rotation about the
 //					specified axis.
 //
 // Input Arguments:
@@ -289,7 +289,7 @@ Matrix Vector::GenerateRotationMatrix(const double &angle, const Vector& rotatio
 // Return Value:
 //		Matrix, 3x3 rotation matrix
 //
-//==========================================================================
+//=============================================================================
 Matrix Vector::GenerateRotationMatrix(const Axis &axis, const double &angle)
 {
 	double s = sin(angle);
@@ -315,11 +315,11 @@ Matrix Vector::GenerateRotationMatrix(const Axis &axis, const double &angle)
 	return rotationMatrix;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		GetAxisName
 //
-// Description:		Returns the name of the specified axis.
+// Desc:		Returns the name of the specified axis.
 //
 // Input Arguments:
 //		Axis	= const Axis& specifying the axis name we want
@@ -330,7 +330,7 @@ Matrix Vector::GenerateRotationMatrix(const Axis &axis, const double &angle)
 // Return Value:
 //		wxString containing the axis name
 //
-//==========================================================================
+//=============================================================================
 wxString Vector::GetAxisName(Axis axis)
 {
 	switch (axis)
@@ -355,11 +355,11 @@ wxString Vector::GetAxisName(Axis axis)
 	return wxEmptyString;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		AnglesTo
 //
-// Description:		Returns the angles between this and Target projected
+// Desc:		Returns the angles between this and Target projected
 //					onto each the X-Y, Y-Z, and X-Z planes.  The returned
 //					vector stores the angles in .X (for Y-Z plane), .Y (for
 //					X-Z plane), and .Z (for X-Y plane).  Angles are
@@ -375,7 +375,7 @@ wxString Vector::GetAxisName(Axis axis)
 // Return Value:
 //		Vector containing the angles between this and v [rad]
 //
-//==========================================================================
+//=============================================================================
 Vector Vector::AnglesTo(const Vector &v) const
 {
 	Vector temp;
@@ -406,11 +406,11 @@ Vector Vector::AnglesTo(const Vector &v) const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			friend of Vector
 // Function:		operator <<
 //
-// Description:		Prints the contents of the specified object to an
+// Desc:		Prints the contents of the specified object to an
 //					ostream object.
 //
 // Input Arguments:
@@ -422,7 +422,7 @@ Vector Vector::AnglesTo(const Vector &v) const
 // Return Value:
 //		&std::ostream containing the printed vector
 //
-//==========================================================================
+//=============================================================================
 std::ostream &operator << (std::ostream &writeOut, const Vector &v)
 {
 	// Add the string to the stream
@@ -431,11 +431,11 @@ std::ostream &operator << (std::ostream &writeOut, const Vector &v)
 	return writeOut;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Print
 //
-// Description:		Prints the contents of this object to a string.
+// Desc:		Prints the contents of this object to a string.
 //
 // Input Arguments:
 //		None
@@ -446,7 +446,7 @@ std::ostream &operator << (std::ostream &writeOut, const Vector &v)
 // Return Value:
 //		wxString containing the formatted vector data
 //
-//==========================================================================
+//=============================================================================
 wxString Vector::Print() const
 {
 	// Format and fill the string
@@ -456,11 +456,11 @@ wxString Vector::Print() const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Set
 //
-// Description:		Sets the contents of this vector as specified.
+// Desc:		Sets the contents of this vector as specified.
 //
 // Input Arguments:
 //		xIn	= const double& specifying first component of the vector
@@ -473,7 +473,7 @@ wxString Vector::Print() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Vector::Set(const double &xIn, const double &yIn, const double &zIn)
 {
 	// Assign the arguments to the class members
@@ -482,11 +482,11 @@ void Vector::Set(const double &xIn, const double &yIn, const double &zIn)
 	z = zIn;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Normalize
 //
-// Description:		Turns this vector into a unit vector (magnitude of 1).
+// Desc:		Turns this vector into a unit vector (magnitude of 1).
 //					Const version (returns a normalized vector, but doesn't
 //					modify this object).
 //
@@ -499,7 +499,7 @@ void Vector::Set(const double &xIn, const double &yIn, const double &zIn)
 // Return Value:
 //		Vector representing the normalized object
 //
-//==========================================================================
+//=============================================================================
 Vector Vector::Normalize() const
 {
 	// Get the length of the vector
@@ -518,11 +518,11 @@ Vector Vector::Normalize() const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		OuterProduct
 //
-// Description:		Performs the multiplication that results in a 3x3 matrix.
+// Desc:		Performs the multiplication that results in a 3x3 matrix.
 //
 // Input Arguments:
 //		v	= const Vector& to be multiplied
@@ -533,7 +533,7 @@ Vector Vector::Normalize() const
 // Return Value:
 //		Matrix(3, 3)
 //
-//==========================================================================
+//=============================================================================
 Matrix Vector::OuterProduct(const Vector &v) const
 {
 	Matrix temp(3, 3,
@@ -544,11 +544,11 @@ Matrix Vector::OuterProduct(const Vector &v) const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator +
 //
-// Description:		Addition operator for Vector class.
+// Desc:		Addition operator for Vector class.
 //
 // Input Arguments:
 //		v	= const Vector& to be added to this
@@ -559,7 +559,7 @@ Matrix Vector::OuterProduct(const Vector &v) const
 // Return Value:
 //		Vector result of the addition
 //
-//==========================================================================
+//=============================================================================
 Vector Vector::operator + (const Vector &v) const
 {
 	// Make a copy of this
@@ -571,11 +571,11 @@ Vector Vector::operator + (const Vector &v) const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator -
 //
-// Description:		Subtraction operator for Vector class.
+// Desc:		Subtraction operator for Vector class.
 //
 // Input Arguments:
 //		v	= const Vector& to be subtracted from this
@@ -586,7 +586,7 @@ Vector Vector::operator + (const Vector &v) const
 // Return Value:
 //		Vector result of the subtraction
 //
-//==========================================================================
+//=============================================================================
 Vector Vector::operator - (const Vector &v) const
 {
 	// Make a copy of this
@@ -598,11 +598,11 @@ Vector Vector::operator - (const Vector &v) const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator *
 //
-// Description:		Scalar multiplication operator for Vector class.
+// Desc:		Scalar multiplication operator for Vector class.
 //
 // Input Arguments:
 //		n	= const double& to multiply each element of this
@@ -613,7 +613,7 @@ Vector Vector::operator - (const Vector &v) const
 // Return Value:
 //		Vector result of the multiplication
 //
-//==========================================================================
+//=============================================================================
 Vector Vector::operator * (const double &n) const
 {
 	// Make a copy of this
@@ -625,11 +625,11 @@ Vector Vector::operator * (const double &n) const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator /
 //
-// Description:		Scalar division operator for Vector class.
+// Desc:		Scalar division operator for Vector class.
 //
 // Input Arguments:
 //		n	= const double& to divide each element of this
@@ -640,7 +640,7 @@ Vector Vector::operator * (const double &n) const
 // Return Value:
 //		Vector result of the division
 //
-//==========================================================================
+//=============================================================================
 Vector Vector::operator / (const double &n) const
 {
 	// Make a copy of this
@@ -652,11 +652,11 @@ Vector Vector::operator / (const double &n) const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		Cross
 //
-// Description:		Vector cross product.
+// Desc:		Vector cross product.
 //
 // Input Arguments:
 //		v	= const Vector& to multiply this object
@@ -667,7 +667,7 @@ Vector Vector::operator / (const double &n) const
 // Return Value:
 //		Vector result of the cross product
 //
-//==========================================================================
+//=============================================================================
 Vector Vector::Cross(const Vector &v) const
 {
 	Vector temp;
@@ -680,11 +680,11 @@ Vector Vector::Cross(const Vector &v) const
 	return temp;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator +=
 //
-// Description:		Addition assignment operator for Vector class.
+// Desc:		Addition assignment operator for Vector class.
 //
 // Input Arguments:
 //		v	= const Vector& to be added to this
@@ -695,7 +695,7 @@ Vector Vector::Cross(const Vector &v) const
 // Return Value:
 //		Vector& result of the addition
 //
-//==========================================================================
+//=============================================================================
 Vector& Vector::operator += (const Vector &v)
 {
 	// Perform the addition
@@ -706,11 +706,11 @@ Vector& Vector::operator += (const Vector &v)
 	return *this;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator -=
 //
-// Description:		Subtraction assignment operator for Vector class.
+// Desc:		Subtraction assignment operator for Vector class.
 //
 // Input Arguments:
 //		v	= const Vector& to be subtracted from this
@@ -721,7 +721,7 @@ Vector& Vector::operator += (const Vector &v)
 // Return Value:
 //		Vector& result of the subtraction
 //
-//==========================================================================
+//=============================================================================
 Vector& Vector::operator -= (const Vector &v)
 {
 	// Perform the subtraction
@@ -732,11 +732,11 @@ Vector& Vector::operator -= (const Vector &v)
 	return *this;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator ==
 //
-// Description:		Equal comparison operator for Vector class.
+// Desc:		Equal comparison operator for Vector class.
 //
 // Input Arguments:
 //		v	= const Vector& to be compared to this
@@ -747,7 +747,7 @@ Vector& Vector::operator -= (const Vector &v)
 // Return Value:
 //		bool, true for is equal to, false for is not equal to
 //
-//==========================================================================
+//=============================================================================
 bool Vector::operator == (const Vector &v) const
 {
 	// Make the comparison
@@ -757,11 +757,11 @@ bool Vector::operator == (const Vector &v) const
 		return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Vector
 // Function:		operator !=
 //
-// Description:		Unequal comparison operator for Vector class.
+// Desc:		Unequal comparison operator for Vector class.
 //
 // Input Arguments:
 //		v	= const Vector& to be compared to this
@@ -772,7 +772,7 @@ bool Vector::operator == (const Vector &v) const
 // Return Value:
 //		bool, false for is equal to, true for is not equal to
 //
-//==========================================================================
+//=============================================================================
 bool Vector::operator != (const Vector &v) const
 {
 	return !(*this == v);

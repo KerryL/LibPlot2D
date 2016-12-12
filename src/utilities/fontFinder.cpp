@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  fontFinder.cpp
-// Created:  11/17/2011
-// Author:  K. Loux
-// Description:  Cross-platform methods for working with fonts.  Builds on wxWidgets
-//				 objects.
+// Date:  11/17/2011
+// Auth:  K. Loux
+// Desc:  Cross-platform methods for working with fonts.  Builds on wxWidgets
+//        objects.
 
 // Standard C++ headers
 #include <cstdlib>
@@ -28,11 +28,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		GetFontFileName
 //
-// Description:		Searches the local hard drive (intelligently) and returns
+// Desc:		Searches the local hard drive (intelligently) and returns
 //					the path and file name for a preferred font.
 //
 // Input Arguments:
@@ -45,7 +45,7 @@ namespace LibPlot2D
 //		wxString containing the path to the font file, or an empty string
 //		if the font could not be located
 //
-//==========================================================================
+//=============================================================================
 wxString FontFinder::GetFontFileName(const wxString &fontName)
 {
 	wxString fontDirectory;
@@ -77,11 +77,11 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 	return wxEmptyString;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		GetPreferredFontFileName
 //
-// Description:		Returns the file name for a best match for a font on the
+// Desc:		Returns the file name for a best match for a font on the
 //					system when given a list of acceptable fonts.
 //
 // Input Arguments:
@@ -95,7 +95,7 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 // Return Value:
 //		bool, true for found a match from the preferred list
 //
-//==========================================================================
+//=============================================================================
 bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 	const wxArrayString &preferredFonts, const bool &fixedWidth, wxString &fontFile)
 {
@@ -131,11 +131,11 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		GetFontFaceName
 //
-// Description:		Returns the best match for a font on the system when given
+// Desc:		Returns the best match for a font on the system when given
 //					a list of acceptable fonts.
 //
 // Input Arguments:
@@ -149,7 +149,7 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 // Return Value:
 //		bool, true for found a match
 //
-//==========================================================================
+//=============================================================================
 bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &preferredFonts,
 	const bool &fixedWidth, wxString &fontName)
 {
@@ -180,11 +180,11 @@ bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &p
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		GetFontName
 //
-// Description:		Returns name of the font for the specified .ttf file.
+// Desc:		Returns name of the font for the specified .ttf file.
 //
 // Input Arguments:
 //		fontFile	= const wxString& specifying the file location
@@ -195,7 +195,7 @@ bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &p
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 {
 	if (fontFile.IsEmpty())
@@ -228,11 +228,11 @@ bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		ReadOffsetTable
 //
-// Description:		Reads the offset table from file.
+// Desc:		Reads the offset table from file.
 //
 // Input Arguments:
 //		file	= std::ifstream& to read from
@@ -243,7 +243,7 @@ bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 // Return Value:
 //		TT_OFFSET_TABLE containing endian-correct table information
 //
-//==========================================================================
+//=============================================================================
 FontFinder::TT_OFFSET_TABLE FontFinder::ReadOffsetTable(std::ifstream &file)
 {
 	TT_OFFSET_TABLE table;
@@ -257,11 +257,11 @@ FontFinder::TT_OFFSET_TABLE FontFinder::ReadOffsetTable(std::ifstream &file)
 	return table;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		GetNameTable
 //
-// Description:		Finds and outputs the name table from the file.
+// Desc:		Finds and outputs the name table from the file.
 //
 // Input Arguments:
 //		file		= std::ifstream& to read from
@@ -273,7 +273,7 @@ FontFinder::TT_OFFSET_TABLE FontFinder::ReadOffsetTable(std::ifstream &file)
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offsetTable, TT_TABLE_DIRECTORY &table)
 {
 	table.offset = 0;// To avoid MSVC++ Warning C4701
@@ -301,11 +301,11 @@ bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offset
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		GetNameTableHeader
 //
-// Description:		Gets the header for the name table from file.
+// Desc:		Gets the header for the name table from file.
 //
 // Input Arguments:
 //		file	= std::ifstream& to read from
@@ -317,7 +317,7 @@ bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offset
 // Return Value:
 //		TT_NAME_TABLE_HEADER filled with endian-correct header info
 //
-//==========================================================================
+//=============================================================================
 FontFinder::TT_NAME_TABLE_HEADER FontFinder::GetNameTableHeader(std::ifstream &file, const size_t &offset)
 {
 	TT_NAME_TABLE_HEADER header;
@@ -331,11 +331,11 @@ FontFinder::TT_NAME_TABLE_HEADER FontFinder::GetNameTableHeader(std::ifstream &f
 	return header;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FontFinder
 // Function:		CheckHeaderForName
 //
-// Description:		Checks the table record (in the ifstream) for a font name.
+// Desc:		Checks the table record (in the ifstream) for a font name.
 //
 // Input Arguments:
 //		file	= std::ifstream& to read from
@@ -347,7 +347,7 @@ FontFinder::TT_NAME_TABLE_HEADER FontFinder::GetNameTableHeader(std::ifstream &f
 // Return Value:
 //		wxString containing the name, or an empty string if not found
 //
-//==========================================================================
+//=============================================================================
 wxString FontFinder::CheckHeaderForName(std::ifstream &file, const size_t &offset)
 {
 	TT_NAME_RECORD ttRecord;

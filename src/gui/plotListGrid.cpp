@@ -1,11 +1,11 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotListGrid.cpp
 // Date:  12/9/2016
@@ -29,11 +29,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		Event Table
 //
-// Description:		Links GUI events with event handler functions.
+// Desc:		Links GUI events with event handler functions.
 //
 // Input Arguments:
 //		None
@@ -44,7 +44,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 BEGIN_EVENT_TABLE(PlotListGrid, wxGrid)
 	// Grid events
 	EVT_GRID_CELL_RIGHT_CLICK(PlotListGrid::GridRightClickEvent)
@@ -113,11 +113,11 @@ void PlotListGrid::Build()
 	EndBatch();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		CreateGridContextMenu
 //
-// Description:		Displays a context menu for the grid control.
+// Desc:		Displays a context menu for the grid control.
 //
 // Input Arguments:
 //		position	= const wxPoint& specifying the position to display the menu
@@ -129,7 +129,7 @@ void PlotListGrid::Build()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned int &row)
 {
 	std::unique_ptr<wxMenu> contextMenu(std::make_unique<wxMenu>());
@@ -172,11 +172,11 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 	PopupMenu(contextMenu.get(), position);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		AddDataRowToGrid
 //
-// Description:		Adds the entry for the data to the options grid.
+// Desc:		Adds the entry for the data to the options grid.
 //
 // Input Arguments:
 //		name	= const wxString&
@@ -187,7 +187,7 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 // Return Value:
 //		unsigned int specifying the index of the new data
 //
-//==========================================================================
+//=============================================================================
 unsigned int PlotListGrid::AddDataRow(const wxString &name)
 {
 	unsigned int index = GetNumberRows();
@@ -222,11 +222,11 @@ unsigned int PlotListGrid::AddDataRow(const wxString &name)
 	return index;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		GridRightClickEvent
 //
-// Description:		Handles right-click events on the grid control.  Displays
+// Desc:		Handles right-click events on the grid control.  Displays
 //					context menu.
 //
 // Input Arguments:
@@ -238,7 +238,7 @@ unsigned int PlotListGrid::AddDataRow(const wxString &name)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::GridRightClickEvent(wxGridEvent &event)
 {
 	if (GetSelectedRows().Count() == 0 ||
@@ -248,11 +248,11 @@ void PlotListGrid::GridRightClickEvent(wxGridEvent &event)
 	CreateGridContextMenu(event.GetPosition(), event.GetRow());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		GridDoubleClickEvent
 //
-// Description:		Handles double click event for the grid control.  If the
+// Desc:		Handles double click event for the grid control.  If the
 //					click occurs on the color box, display the color dialog.
 //
 // Input Arguments:
@@ -264,7 +264,7 @@ void PlotListGrid::GridRightClickEvent(wxGridEvent &event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::GridDoubleClickEvent(wxGridEvent &event)
 {
 	// No color for Time
@@ -292,11 +292,11 @@ void PlotListGrid::GridDoubleClickEvent(wxGridEvent &event)
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		GridLeftClickEvent
 //
-// Description:		Handles grid cell change events (for boolean controls).
+// Desc:		Handles grid cell change events (for boolean controls).
 //
 // Input Arguments:
 //		event	= wxGridEvent&
@@ -307,7 +307,7 @@ void PlotListGrid::GridDoubleClickEvent(wxGridEvent &event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::GridLeftClickEvent(wxGridEvent &event)
 {
 	unsigned int row = event.GetRow();
@@ -334,11 +334,11 @@ void PlotListGrid::GridLeftClickEvent(wxGridEvent &event)
 	guiInterface.UpdateCurveProperties(row - 1);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		GridLeftClickEvent
 //
-// Description:		Handles grid cell change events (for text controls).
+// Desc:		Handles grid cell change events (for text controls).
 //
 // Input Arguments:
 //		event	= wxGridEvent&
@@ -349,7 +349,7 @@ void PlotListGrid::GridLeftClickEvent(wxGridEvent &event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::GridCellChangeEvent(wxGridEvent &event)
 {
 	unsigned int row(event.GetRow());
@@ -364,11 +364,11 @@ void PlotListGrid::GridCellChangeEvent(wxGridEvent &event)
 	guiInterface.UpdateCurveProperties(row - 1);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		GridLabelRightClickEvent
 //
-// Description:		Handles right-click events in blank areas of grid control.
+// Desc:		Handles right-click events in blank areas of grid control.
 //
 // Input Arguments:
 //		event	= wxGridEvent&
@@ -379,7 +379,7 @@ void PlotListGrid::GridCellChangeEvent(wxGridEvent &event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::GridLabelRightClickEvent(wxGridEvent &event)
 {
 	std::unique_ptr<wxMenu> contextMenu(std::make_unique<wxMenu>());
@@ -389,11 +389,11 @@ void PlotListGrid::GridLabelRightClickEvent(wxGridEvent &event)
 	PopupMenu(contextMenu.get(), event.GetPosition());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextAddMathChannelEvent
 //
-// Description:		Adds a user-defined math channel to the plot.
+// Desc:		Adds a user-defined math channel to the plot.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -404,17 +404,17 @@ void PlotListGrid::GridLabelRightClickEvent(wxGridEvent &event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.DisplayMathChannelDialog(wxString::Format("[%i]", GetSelectedRows()[0]));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextFRFEvent
 //
-// Description:		Event handler for context menu transfer function events.
+// Desc:		Event handler for context menu transfer function events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -425,17 +425,17 @@ void PlotListGrid::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.GenerateFRF();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextCreateSignalEvent
 //
-// Description:		Displays dialog for creating various signals.
+// Desc:		Displays dialog for creating various signals.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -446,17 +446,17 @@ void PlotListGrid::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextCreateSignalEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.CreateSignal();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextSetTimeUnitsEvent
 //
-// Description:		Available for the user to clarify the time units when we
+// Desc:		Available for the user to clarify the time units when we
 //					are unable to determine them easily from the input file.
 //
 // Input Arguments:
@@ -468,16 +468,16 @@ void PlotListGrid::ContextCreateSignalEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextSetTimeUnitsEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.SetTimeUnits();
 }
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextScaleXDataEvent
 //
-// Description:		Scales the X-data by the specified factor.
+// Desc:		Scales the X-data by the specified factor.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -488,17 +488,17 @@ void PlotListGrid::ContextSetTimeUnitsEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextScaleXDataEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.ScaleXData(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextPlotDerivativeEvent
 //
-// Description:		Adds a curve showing the derivative of the selected grid
+// Desc:		Adds a curve showing the derivative of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -510,17 +510,17 @@ void PlotListGrid::ContextScaleXDataEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.PlotDerivative(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextPlotIntegralEvent
 //
-// Description:		Adds a curve showing the integral of the selected grid
+// Desc:		Adds a curve showing the integral of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -532,17 +532,17 @@ void PlotListGrid::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.PlotIntegral(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextPlotRMSEvent
 //
-// Description:		Adds a curve showing the RMS of the selected grid
+// Desc:		Adds a curve showing the RMS of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -554,17 +554,17 @@ void PlotListGrid::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.PlotRMS(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextPlotFFTEvent
 //
-// Description:		Adds a curve showing the FFT of the selected grid
+// Desc:		Adds a curve showing the FFT of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -576,17 +576,17 @@ void PlotListGrid::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.PlotFFT(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextRemoveCurveEvent
 //
-// Description:		Removes the curve from the list.
+// Desc:		Removes the curve from the list.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -597,17 +597,17 @@ void PlotListGrid::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextRemoveCurveEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.RemoveCurves(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextBitMaskEvent
 //
-// Description:		Creates bit mask for the specified curve.
+// Desc:		Creates bit mask for the specified curve.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -618,17 +618,17 @@ void PlotListGrid::ContextRemoveCurveEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.BitMask(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextTimeShiftEvent
 //
-// Description:		Adds a new curve equivalent to the selected curve shifted
+// Desc:		Adds a new curve equivalent to the selected curve shifted
 //					by the specified amount.
 //
 // Input Arguments:
@@ -640,17 +640,17 @@ void PlotListGrid::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.TimeShift(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextFilterEvent
 //
-// Description:		Displays a dialog allowing the user to specify the filter,
+// Desc:		Displays a dialog allowing the user to specify the filter,
 //					and adds the filtered curve to the plot.
 //
 // Input Arguments:
@@ -662,17 +662,17 @@ void PlotListGrid::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.FilterCurves(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ContextFitCurve
 //
-// Description:		Fits a curve to the dataset selected in the grid control.
+// Desc:		Fits a curve to the dataset selected in the grid control.
 //					User is asked to specify the order of the fit.
 //
 // Input Arguments:
@@ -684,17 +684,17 @@ void PlotListGrid::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 {
 	guiInterface.FitCurves(GetSelectedRows());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		AddTimeRow
 //
-// Description:		Adds the entry for the time data to the options grid.
+// Desc:		Adds the entry for the time data to the options grid.
 //
 // Input Arguments:
 //		None
@@ -705,7 +705,7 @@ void PlotListGrid::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotListGrid::AddTimeRow()
 {
 	AppendRows();
@@ -717,11 +717,11 @@ void PlotListGrid::AddTimeRow()
 		SetReadOnly(0, i, true);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		GetNextColor
 //
-// Description:		Determines the next color to use (cycles through all the
+// Desc:		Determines the next color to use (cycles through all the
 //					pre-defined colors).
 //
 // Input Arguments:
@@ -733,7 +733,7 @@ void PlotListGrid::AddTimeRow()
 // Return Value:
 //		Color to sue
 //
-//==========================================================================
+//=============================================================================
 Color PlotListGrid::GetNextColor(const unsigned int &index) const
 {
 	unsigned int colorIndex = (index - 1) % 12;
@@ -767,11 +767,11 @@ Color PlotListGrid::GetNextColor(const unsigned int &index) const
 	return Color::ColorBlack;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotListGrid
 // Function:		ItemIsInArray
 //
-// Description:		Checks to see if the specified value is contained in the
+// Desc:		Checks to see if the specified value is contained in the
 //					referenced array.
 //
 // Input Arguments:
@@ -784,7 +784,7 @@ Color PlotListGrid::GetNextColor(const unsigned int &index) const
 // Return Value:
 //		bool, true if item is in the array, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool PlotListGrid::ItemIsInArray(const wxArrayInt& a, const int& item)
 {
 	unsigned int i;

@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  text.cpp
-// Created:  5/12/2016
-// Author:  K. Loux
-// Description:  Helper object for building BufferInfo objects for text rendering.
+// Date:  5/12/2016
+// Auth:  K. Loux
+// Desc:  Helper object for building BufferInfo objects for text rendering.
 
 // Standard C++ headers
 #include <cassert>
@@ -29,11 +29,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		Constant declarations
 //
-// Description:		Constant declarations for Text class.
+// Desc:		Constant declarations for Text class.
 //
 // Input Arguments:
 //		None
@@ -44,7 +44,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 unsigned int Text::program;
 unsigned int Text::colorLocation;
 unsigned int Text::vertexLocation;
@@ -54,11 +54,11 @@ bool Text::initialized;
 FT_Library Text::ft;
 unsigned int Text::ftReferenceCount(0);
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		vertexShader
 //
-// Description:		Text vertex shader.
+// Desc:		Text vertex shader.
 //
 // Input Arguments:
 //		0	= vertex
@@ -70,7 +70,7 @@ unsigned int Text::ftReferenceCount(0);
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 const std::string Text::vertexShader(
 	"#version 300 es\n"
 	"\n"
@@ -91,11 +91,11 @@ const std::string Text::vertexShader(
 	"}\n"
 );
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		fragmentShader
 //
-// Description:		Text fragment shader.
+// Desc:		Text fragment shader.
 //
 // Input Arguments:
 //		0	= texCoords
@@ -106,7 +106,7 @@ const std::string Text::vertexShader(
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 const std::string Text::fragmentShader(
 	"#version 300 es\n"
 	"\n"
@@ -125,11 +125,11 @@ const std::string Text::fragmentShader(
 	"}\n"
 );
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		Text
 //
-// Description:		Constructor for Text object.
+// Desc:		Constructor for Text object.
 //
 // Input Arguments:
 //		renderer	= RenderWindow&
@@ -140,7 +140,7 @@ const std::string Text::fragmentShader(
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Text::Text(RenderWindow& renderer) : renderer(renderer)
 {
 	color = Color::ColorBlack;
@@ -156,11 +156,11 @@ Text::Text(RenderWindow& renderer) : renderer(renderer)
 	Initialize();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		~Text
 //
-// Description:		Destructor for Text object.
+// Desc:		Destructor for Text object.
 //
 // Input Arguments:
 //		None
@@ -171,7 +171,7 @@ Text::Text(RenderWindow& renderer) : renderer(renderer)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Text::~Text()
 {
 	FreeFTResources();
@@ -180,11 +180,11 @@ Text::~Text()
 		glDeleteTextures(1, &textureId);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		Initialize
 //
-// Description:		Initializes the Freetype back-end of this object.  Must
+// Desc:		Initializes the Freetype back-end of this object.  Must
 //					be called prior to any other post-creation method.
 //
 // Input Arguments:
@@ -196,7 +196,7 @@ Text::~Text()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::Initialize()
 {
 	assert(!glyphsGenerated);
@@ -211,11 +211,11 @@ void Text::Initialize()
 	ftReferenceCount++;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		Initialize
 //
-// Description:		Initializes the Freetype back-end of this object.  Must
+// Desc:		Initializes the Freetype back-end of this object.  Must
 //					be called prior to any other post-creation method.
 //
 // Input Arguments:
@@ -227,7 +227,7 @@ void Text::Initialize()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 bool Text::SetFace(const std::string& fontFileName)
 {
 	assert(!glyphsGenerated);
@@ -237,11 +237,11 @@ bool Text::SetFace(const std::string& fontFileName)
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		SetSize
 //
-// Description:		Sets the width and height to use for the font.  Width is
+// Desc:		Sets the width and height to use for the font.  Width is
 //					calculated to maintain proper aspect ratio.
 //
 // Input Arguments:
@@ -253,17 +253,17 @@ bool Text::SetFace(const std::string& fontFileName)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::SetSize(const double& height)
 {
 	SetSize(0, height);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		SetSize
 //
-// Description:		Sets the width and height to use for the font.
+// Desc:		Sets the width and height to use for the font.
 //
 // Input Arguments:
 //		width	= const double&
@@ -275,18 +275,18 @@ void Text::SetSize(const double& height)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::SetSize(const double& width, const double& height)
 {
 	assert(!glyphsGenerated);
 	FT_Set_Pixel_Sizes(face, width, height);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		GenerateGlyphs
 //
-// Description:		Generates the set of glyphs.
+// Desc:		Generates the set of glyphs.
 //
 // Input Arguments:
 //		None
@@ -297,7 +297,7 @@ void Text::SetSize(const double& width, const double& height)
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool Text::GenerateGlyphs()
 {
 	assert(!RenderWindow::GLHasError());
@@ -365,11 +365,11 @@ bool Text::GenerateGlyphs()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		FreeFTResources
 //
-// Description:		Frees previously allocated Freetype resources (with
+// Desc:		Frees previously allocated Freetype resources (with
 //					reference counting).
 //
 // Input Arguments:
@@ -381,7 +381,7 @@ bool Text::GenerateGlyphs()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::FreeFTResources()
 {
 	FT_Done_Face(face);
@@ -392,11 +392,11 @@ void Text::FreeFTResources()
 		FT_Done_FreeType(ft);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		BuildText
 //
-// Description:		Generates the vertex buffer information for this object.
+// Desc:		Generates the vertex buffer information for this object.
 //
 // Input Arguments:
 //		None
@@ -407,7 +407,7 @@ void Text::FreeFTResources()
 // Return Value:
 //		Primitive::BufferInfo
 //
-//==========================================================================
+//=============================================================================
 Primitive::BufferInfo Text::BuildText()
 {
 	if (bufferVector.size() > 0)
@@ -420,11 +420,11 @@ Primitive::BufferInfo Text::BuildText()
 	return bufferInfo;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		BuildText
 //
-// Description:		Generates the vertex buffer information for this object.
+// Desc:		Generates the vertex buffer information for this object.
 //
 // Input Arguments:
 //		None
@@ -435,7 +435,7 @@ Primitive::BufferInfo Text::BuildText()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
@@ -460,11 +460,11 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		GetBoundingBox
 //
-// Description:		Returns the bounding box for the specified text string
+// Desc:		Returns the bounding box for the specified text string
 //					given this object's font and size settings.
 //
 // Input Arguments:
@@ -476,7 +476,7 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 // Return Value:
 //		Bounding Box
 //
-//==========================================================================
+//=============================================================================
 Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 {
 	DoInternalInitialization();
@@ -506,11 +506,11 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 	return b;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		DoInternalInitialization
 //
-// Description:		Performs necessary static-state initialization.
+// Desc:		Performs necessary static-state initialization.
 //
 // Input Arguments:
 //		None
@@ -521,7 +521,7 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::DoInternalInitialization()
 {
 	if (!glyphsGenerated)
@@ -557,11 +557,11 @@ void Text::DoInternalInitialization()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		SetOrientation
 //
-// Description:		Alters the modelview matrix according to the text rotation angle.
+// Desc:		Alters the modelview matrix according to the text rotation angle.
 //
 // Input Arguments:
 //		angle	= const double& [rad]
@@ -572,18 +572,18 @@ void Text::DoInternalInitialization()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::SetOrientation(const double& angle)
 {
 	modelview.MakeIdentity();
 	renderer.Rotate(modelview, angle, 0.0, 0.0, 1.0);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		AppendText
 //
-// Description:		Appends text to the render buffer.  Use this instead of
+// Desc:		Appends text to the render buffer.  Use this instead of
 //					SetText() when multiple text values must be rendered with
 //					different positions, scales, etc.  Text will be rendered
 //					with current settings (i.e. this must be the last call
@@ -598,18 +598,18 @@ void Text::SetOrientation(const double& angle)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Text::AppendText(const std::string& text)
 {
 	SetText(text);
 	bufferVector.push_back(BuildLocalText());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		AssembleBuffers
 //
-// Description:		Assembles
+// Desc:		Assembles
 //
 // Input Arguments:
 //		None
@@ -620,7 +620,7 @@ void Text::AppendText(const std::string& text)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Primitive::BufferInfo Text::AssembleBuffers()
 {
 	Primitive::BufferInfo bufferInfo;
@@ -662,11 +662,11 @@ Primitive::BufferInfo Text::AssembleBuffers()
 	return bufferInfo;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		BuildLocalText
 //
-// Description:		Allocates buffers and populates local (CPU-side) memory
+// Desc:		Allocates buffers and populates local (CPU-side) memory
 //					to render text.
 //
 // Input Arguments:
@@ -678,7 +678,7 @@ Primitive::BufferInfo Text::AssembleBuffers()
 // Return Value:
 //		Primitive::BufferInfo
 //
-//==========================================================================
+//=============================================================================
 Primitive::BufferInfo Text::BuildLocalText()
 {
 	DoInternalInitialization();
@@ -749,11 +749,11 @@ Primitive::BufferInfo Text::BuildLocalText()
 	return bufferInfo;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Text
 // Function:		ConfigureVertexArray
 //
-// Description:		Handles configuration of OpenGL vertex array object.
+// Desc:		Handles configuration of OpenGL vertex array object.
 //
 // Input Arguments:
 //		bufferInfo	= Primitive::BufferInfo&
@@ -764,7 +764,7 @@ Primitive::BufferInfo Text::BuildLocalText()
 // Return Value:
 //		Primitive::BufferInfo
 //
-//==========================================================================
+//=============================================================================
 void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 {
 	bufferInfo.GetOpenGLIndices(true);

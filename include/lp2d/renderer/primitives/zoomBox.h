@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  zoomBox.h
-// Created:  5/5/2011
-// Author:  K. Loux
-// Description:  Logic for drawing the zoom box as the user moves the mouse.
+// Date:  5/5/2011
+// Auth:  K. Loux
+// Desc:  Logic for drawing the zoom box as the user moves the mouse.
 
 #ifndef ZOOM_BOX_H_
 #define ZOOM_BOX_H_

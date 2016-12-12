@@ -1,19 +1,19 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  line.cpp
-// Created:  4/2/2015
-// Author:  K. Loux
-// Description:  Object representing a line, drawn with triangles faded from line
-//               color to background color in order to make the lines prettier, be
-//               more consistent from platform to platofrm and to support sub-pixel
-//               widths.
+// Date:  4/2/2015
+// Auth:  K. Loux
+// Desc:  Object representing a line, drawn with triangles faded from line
+//        color to background color in order to make the lines prettier, be
+//        more consistent from platform to platofrm and to support sub-pixel
+//        widths.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -26,11 +26,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		Constant declarations
 //
-// Description:		Constant declarations for Line class.
+// Desc:		Constant declarations for Line class.
 //
 // Input Arguments:
 //		None
@@ -41,14 +41,14 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 const double Line::fadeDistance(0.05);
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		Line
 //
-// Description:		Constructor for Line class.
+// Desc:		Constructor for Line class.
 //
 // Input Arguments:
 //		renderWindow	= const RenderWindow&
@@ -59,7 +59,7 @@ const double Line::fadeDistance(0.05);
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 {
 	pretty = true;
@@ -73,11 +73,11 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 	hint = GL_DYNAMIC_DRAW;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		Build
 //
-// Description:		Builds the specified line segment.
+// Desc:		Builds the specified line segment.
 //
 // Input Arguments:
 //		x1	= const unsigned int&
@@ -92,7 +92,7 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::Build(const unsigned int &x1, const unsigned int &y1,
 	const unsigned int &x2, const unsigned int &y2, const UpdateMethod& update)
 {
@@ -100,11 +100,11 @@ void Line::Build(const unsigned int &x1, const unsigned int &y1,
 		static_cast<double>(x2), static_cast<double>(y2), update);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		Build
 //
-// Description:		Builds the specified line segment.
+// Desc:		Builds the specified line segment.
 //
 // Input Arguments:
 //		x1	= const double&
@@ -119,7 +119,7 @@ void Line::Build(const unsigned int &x1, const unsigned int &y1,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::Build(const double &x1, const double &y1,
 	const double &x2, const double &y2, const UpdateMethod& update)
 {
@@ -134,11 +134,11 @@ void Line::Build(const double &x1, const double &y1,
 		DoUglyDraw(x1, y1, x2, y2, update);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		Build
 //
-// Description:		Builds the specified line segments.
+// Desc:		Builds the specified line segments.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<unsigned int, unsigned int> >&
@@ -150,7 +150,7 @@ void Line::Build(const double &x1, const double &y1,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &points,
 	const UpdateMethod& update)
 {
@@ -164,11 +164,11 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 	Build(dPoints, update);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		Build
 //
-// Description:		Builds the specified line segments.
+// Desc:		Builds the specified line segments.
 //
 // Input Arguments:
 //		points	= cosnt std::vector<std::pair<double, double> >&
@@ -180,7 +180,7 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::Build(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update)
 {
 	if (points.size() < 2)
@@ -192,11 +192,11 @@ void Line::Build(const std::vector<std::pair<double, double> > &points, const Up
 		DoUglyDraw(points, update);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		Build
 //
-// Description:		Builds the specified line segments.
+// Desc:		Builds the specified line segments.
 //
 // Input Arguments:
 //		x		= const double* const
@@ -210,7 +210,7 @@ void Line::Build(const std::vector<std::pair<double, double> > &points, const Up
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::Build(const double* const x, const double* const y,
 	const unsigned int& count, const UpdateMethod& update)
 {
@@ -224,11 +224,11 @@ void Line::Build(const double* const x, const double* const y,
 	Build(dPoints, update);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		BuildSegments
 //
-// Description:		Builds the specified disconnected line segments.
+// Desc:		Builds the specified disconnected line segments.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >
@@ -240,7 +240,7 @@ void Line::Build(const double* const x, const double* const y,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::BuildSegments(const std::vector<std::pair<double, double> > &points,
 	const UpdateMethod& update)
 {
@@ -254,11 +254,11 @@ void Line::BuildSegments(const std::vector<std::pair<double, double> > &points,
 		DoUglyDraw(points, update);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		ComputeOffsets
 //
-// Description:		Computes the offsets for the outside vertices based on the
+// Desc:		Computes the offsets for the outside vertices based on the
 //					line width and orientation.
 //
 // Input Arguments:
@@ -276,7 +276,7 @@ void Line::BuildSegments(const std::vector<std::pair<double, double> > &points,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
 {
@@ -289,11 +289,11 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		ComputeOffsets
 //
-// Description:		Computes the offsets for the outside vertices based on the
+// Desc:		Computes the offsets for the outside vertices based on the
 //					line width and orientation.
 //
 // Input Arguments:
@@ -313,7 +313,7 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 	const double &x, const double &y, const double &xNext, const double &yNext,
 	double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
@@ -342,11 +342,11 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 	dyEdge = dyLine * (miterLength + fade) / miterLength;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		AllocateBuffer
 //
-// Description:		Allocated local vertex buffer;
+// Desc:		Allocated local vertex buffer;
 //
 // Input Arguments:
 //		vertexCount		= const unsigned int&
@@ -358,7 +358,7 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount)
 {
 	bufferInfo.GetOpenGLIndices(triangleCount > 0);
@@ -374,11 +374,11 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 	//bufferInfo.vertexCountModified = false;// TODO:  OGL4 Would be good to use this, but need a way to trigger update requests
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Description:		Draws a line using OpenGL lines.
+// Desc:		Draws a line using OpenGL lines.
 //
 // Input Arguments:
 //		x1	= const double&
@@ -393,7 +393,7 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::DoUglyDraw(const double &x1, const double &y1,
 	const double &x2, const double &y2, const UpdateMethod& update)
 {
@@ -440,11 +440,11 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Description:		Draws a line strip using OpenGL lines.
+// Desc:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -456,7 +456,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 	const UpdateMethod& update)
 {
@@ -502,11 +502,11 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		DoPrettyDraw
 //
-// Description:		Draws a line strip using OpenGL triangles.
+// Desc:		Draws a line strip using OpenGL triangles.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -518,7 +518,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 	const UpdateMethod& update)
 {
@@ -604,11 +604,11 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		DoPrettySegmentDraw
 //
-// Description:		Draws disconnected lines using OpenGL triangles.
+// Desc:		Draws disconnected lines using OpenGL triangles.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -620,7 +620,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points,
 	const UpdateMethod& update)
 {
@@ -706,11 +706,11 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		AssignVertexData
 //
-// Description:		Assigns vertex data to the vertex buffer (pretty lines).
+// Desc:		Assigns vertex data to the vertex buffer (pretty lines).
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -722,7 +722,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::AssignVertexData(const std::vector<std::pair<double, double> >& points,
 	const LineStyle& style)
 {
@@ -782,11 +782,11 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double> >& point
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Description:		Draws a line strip using OpenGL lines.
+// Desc:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
 //		vertexCount	= const unsigned int&
@@ -797,7 +797,7 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double> >& point
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::DoUglyDraw(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
@@ -808,11 +808,11 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Description:		Draws a line strip using OpenGL lines.
+// Desc:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
 //		vertexCount	= const unsigned int&
@@ -823,7 +823,7 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
@@ -834,11 +834,11 @@ void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Line
 // Function:		DoPrettyDraw
 //
-// Description:		Draws a line strip using OpenGL triangles.
+// Desc:		Draws a line strip using OpenGL triangles.
 //
 // Input Arguments:
 //		indexCount	= const unsigned int&
@@ -849,7 +849,7 @@ void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Line::DoPrettyDraw(const unsigned int& indexCount)
 {
 	assert(indexCount > 0);

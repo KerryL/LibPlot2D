@@ -1,26 +1,27 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  dataFile.h
-// Created:  10/2/2012
-// Author:  K. Loux
-// Description:  Base class for data file classes.
+// Date:  10/2/2012
+// Auth:  K. Loux
+// Desc:  Base class for data file classes.
 
 #ifndef DATA_FILE_H_
 #define DATA_FILE_H_
 
+// wxWidgets headers
+#include <wx/wx.h>
+
 // Standard C++ headers
 #include <vector>
 #include <fstream>
-
-// wxWidgets headers
-#include <wx/wx.h>
+#include <memory>
 
 namespace LibPlot2D
 {
@@ -50,7 +51,7 @@ public:
 
 	bool Load(const SelectionData &selectionInfo);
 
-	Dataset2D* GetDataset(const unsigned int &i) const { return data[i]; }
+	std::unique_ptr<Dataset2D> GetDataset(const unsigned int &i) const { return data[i]; }
 	wxString GetDescription(const unsigned int &i) const { return selectedDescriptions[i]; }
 	wxArrayString GetAllDescriptions() const { return descriptions; }
 	unsigned int GetDataCount() { return data.size(); }
@@ -64,7 +65,7 @@ public:
 protected:
 	const wxString fileName;
 
-	std::vector<Dataset2D*> data;
+	std::vector<std::unique_ptr<Dataset2D>> data;
 	std::vector<double> scales;
 	wxArrayString descriptions, selectedDescriptions;
 	wxString delimiter;

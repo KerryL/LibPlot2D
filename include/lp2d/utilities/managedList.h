@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  managedList.h
-// Created:  1/29/2009
-// Author:  K. Loux
-// Description:  This is a template class for lists that handle automatic deletion
-//				 of the items in the list.
+// Date:  1/29/2009
+// Auth:  K. Loux
+// Desc:  This is a template class for lists that handle automatic deletion of
+//        the items in the list.
 
 #ifndef MANAGED_LIST_H_
 #define MANAGED_LIST_H_
@@ -19,7 +19,8 @@
 // Standard C++ headers
 #include <cstdlib>
 #include <vector>
-#include <assert.h>
+#include <memory>
+#include <cassert>
 
 namespace LibPlot2D
 {
@@ -35,10 +36,10 @@ template <class T>
 class ManagedList
 {
 public:
-	virtual ~ManagedList();
+	virtual ~ManagedList() = default;
 
 	// Private data accessors
-	unsigned int Add(T *toAdd);
+	unsigned int Add(std::unique_ptr<T> toAdd);
 	virtual void Remove(const unsigned int &index);
 	inline unsigned int GetCount() const { return list.size(); };
 
@@ -48,7 +49,7 @@ public:
 	// Re-organizes the data in the list
 	void ReorderObjects(const std::vector<unsigned int> &order);
 
-	T *operator [](const unsigned int &index) const;
+	const std::unique_ptr<T>& operator[](const unsigned int &index) const;
 
 	typename std::vector<T*>::iterator begin() { return list.begin(); }
 	typename std::vector<T*>::const_iterator begin() const { return list.begin(); }
@@ -63,40 +64,18 @@ public:
 	typename std::vector<T*>::const_reverse_iterator rend() const { return list.rend(); }
 
 private:
-	std::vector<T*> list;
+	std::vector<std::unique_ptr<T>> list;
 };
 
-//==========================================================================
-// Class:			ManagedList
-// Function:		~ManagedList
-//
-// Description:		Destructor for the ManagedList class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//==========================================================================
-template <class T>
-ManagedList<T>::~ManagedList()
-{
-	Clear();
-}
-
-//==========================================================================
+//=============================================================================
 // Class:			ManagedList
 // Function:		Add
 //
-// Description:		Adds objects to the list.  Performs the necessary memory
+// Desc:		Adds objects to the list.  Performs the necessary memory
 //					allocating and transferring routines.
 //
 // Input Arguments:
-//		toAdd	= const T*, pointing to the object to add
+//		toAdd	= std::unique_ptr<T>, pointing to the object to add
 //
 // Output Arguments:
 //		None
@@ -104,19 +83,19 @@ ManagedList<T>::~ManagedList()
 // Return Value:
 //		int specifying the index of the newly added item
 //
-//==========================================================================
+//=============================================================================
 template <class T>
-unsigned int ManagedList<T>::Add(T *toAdd)
+unsigned int ManagedList<T>::Add(std::unique_ptr<T> toAdd)
 {
-	list.push_back(toAdd);
+	list.push_back(std::move(toAdd));
 	return list.size() - 1;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ManagedList
 // Function:		Remove
 //
-// Description:		Removes the object at the specified index from the list
+// Desc:		Removes the object at the specified index from the list
 //
 // Input Arguments:
 //		index	= const unsigned int& specifying the object to remove
@@ -127,7 +106,7 @@ unsigned int ManagedList<T>::Add(T *toAdd)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 template <class T>
 void ManagedList<T>::Remove(const unsigned int &index)
 {
@@ -137,11 +116,11 @@ void ManagedList<T>::Remove(const unsigned int &index)
 	list.erase(list.begin() + index);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ManagedList
 // Function:		operator[]
 //
-// Description:		Returns a pointer to the object with the specified index.
+// Desc:		Returns a pointer to the object with the specified index.
 //
 // Input Arguments:
 //		index	= const int& specifying which object we want to retrieve
@@ -150,11 +129,11 @@ void ManagedList<T>::Remove(const unsigned int &index)
 //		None
 //
 // Return Value:
-//		T* pointing to the object at the specified index
+//		const std::unique_ptr<T>& pointing to the object at the specified index
 //
-//==========================================================================
+//=============================================================================
 template <class T>
-T *ManagedList<T>::operator[](const unsigned int &index) const
+const std::unique_ptr<T>& ManagedList<T>::operator[](const unsigned int &index) const
 {
 	// Make sure the index is valid
 	assert(index < list.size());
@@ -162,11 +141,11 @@ T *ManagedList<T>::operator[](const unsigned int &index) const
 	return list[index];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ManagedList
 // Function:		ReorderObjects
 //
-// Description:		Re-organizes all of the objects in the list according to
+// Desc:		Re-organizes all of the objects in the list according to
 //					the specified order.
 //
 // Input Arguments:
@@ -181,7 +160,7 @@ T *ManagedList<T>::operator[](const unsigned int &index) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 template <class T>
 void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 {
@@ -194,11 +173,11 @@ void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 		list[i] = swap[order[i]];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ManagedList
 // Function:		Clear
 //
-// Description:		Removes all items in the list.
+// Desc:		Removes all items in the list.
 //
 // Input Arguments:
 //		None
@@ -209,14 +188,10 @@ void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 template <class T>
 void ManagedList<T>::Clear()
 {
-	unsigned int i;
-	for (i = 0; i < list.size(); i++)
-		delete list[i];
-
 	list.clear();
 }
 

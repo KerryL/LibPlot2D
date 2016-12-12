@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotObject.cpp
-// Created:  5/4/2011
-// Author:  K. Loux
-// Description:  Intermediate class for creating plots from arrays of data.
+// Date:  5/4/2011
+// Auth:  K. Loux
+// Desc:  Intermediate class for creating plots from arrays of data.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -30,11 +30,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		Constant declarations
 //
-// Description:		Constant declarations for PlotObject class.
+// Desc:		Constant declarations for PlotObject class.
 //
 // Input Arguments:
 //		None
@@ -45,17 +45,17 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 const unsigned int PlotObject::horizontalOffsetWithLabel(75);
 const unsigned int PlotObject::horizontalOffsetWithoutLabel(50);
 const unsigned int PlotObject::verticalOffsetWithLabel(100);
 const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		PlotObject
 //
-// Description:		Constructor for PlotObject class.
+// Desc:		Constructor for PlotObject class.
 //
 // Input Arguments:
 //		renderer		= PlotRenderer& reference to the object that handles the
@@ -68,7 +68,7 @@ const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 PlotObject::PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface)
 	: renderer(renderer), guiInterface(guiInterface)
 {
@@ -80,11 +80,11 @@ PlotObject::PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface)
 	needScissorUpdate = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		CreateAxisObjects
 //
-// Description:		Initializes the axis objects.
+// Desc:		Initializes the axis objects.
 //
 // Input Arguments:
 //		None
@@ -95,7 +95,7 @@ PlotObject::PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::CreateAxisObjects()
 {
 	axisTop = new Axis(renderer);
@@ -124,11 +124,11 @@ void PlotObject::CreateAxisObjects()
 	FormatAxesBasics();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		InitializeFonts
 //
-// Description:		Sets up plot fonts.
+// Desc:		Sets up plot fonts.
 //
 // Input Arguments:
 //		None
@@ -139,7 +139,7 @@ void PlotObject::CreateAxisObjects()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::InitializeFonts()
 {
 	// Find the name of the font that we want to use
@@ -177,11 +177,11 @@ void PlotObject::InitializeFonts()
 	titleObject->InitializeFonts(fontFileName, 18);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		Update
 //
-// Description:		Updates the data in the plot and re-sets the fonts, sizes
+// Desc:		Updates the data in the plot and re-sets the fonts, sizes
 //					and positions.
 //
 // Input Arguments:
@@ -193,7 +193,7 @@ void PlotObject::InitializeFonts()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::Update()
 {
 	FormatPlot();
@@ -205,11 +205,11 @@ void PlotObject::Update()
 		renderer.GetLeftCursorValue(), renderer.GetRightCursorValue());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetXMajorGrid
 //
-// Description:		Sets the status of the x-axis major grid.
+// Desc:		Sets the status of the x-axis major grid.
 //
 // Input Arguments:
 //		None
@@ -220,17 +220,17 @@ void PlotObject::Update()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetXMajorGrid(const bool &gridOn)
 {
 	axisBottom->SetMajorGrid(gridOn);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetXMinorGrid
 //
-// Description:		Sets the status of the x-axis minor grid.
+// Desc:		Sets the status of the x-axis minor grid.
 //
 // Input Arguments:
 //		None
@@ -241,17 +241,17 @@ void PlotObject::SetXMajorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetXMinorGrid(const bool &gridOn)
 {
 	axisBottom->SetMinorGrid(gridOn);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetLeftYMajorGrid
 //
-// Description:		Sets the status of the left y-axis major grid.
+// Desc:		Sets the status of the left y-axis major grid.
 //
 // Input Arguments:
 //		None
@@ -262,17 +262,17 @@ void PlotObject::SetXMinorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetLeftYMajorGrid(const bool &gridOn)
 {
 	axisLeft->SetMajorGrid(gridOn);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetLeftYMinorGrid
 //
-// Description:		Sets the status of the left y-axis minor grid.
+// Desc:		Sets the status of the left y-axis minor grid.
 //
 // Input Arguments:
 //		None
@@ -283,17 +283,17 @@ void PlotObject::SetLeftYMajorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetLeftYMinorGrid(const bool &gridOn)
 {
 	axisLeft->SetMinorGrid(gridOn);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetRightYMajorGrid
 //
-// Description:		Sets the status of the right y-axis major grid.
+// Desc:		Sets the status of the right y-axis major grid.
 //
 // Input Arguments:
 //		None
@@ -304,17 +304,17 @@ void PlotObject::SetLeftYMinorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetRightYMajorGrid(const bool &gridOn)
 {
 	axisRight->SetMajorGrid(gridOn);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetRightYMinorGrid
 //
-// Description:		Sets the status of the right y-axis minor grid.
+// Desc:		Sets the status of the right y-axis minor grid.
 //
 // Input Arguments:
 //		None
@@ -325,17 +325,17 @@ void PlotObject::SetRightYMajorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetRightYMinorGrid(const bool &gridOn)
 {
 	axisRight->SetMinorGrid(gridOn);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetXMajorResolution
 //
-// Description:		Sets the major resolution for the bottom axis.
+// Desc:		Sets the major resolution for the bottom axis.
 //
 // Input Arguments:
 //		resolution	= const double&
@@ -346,17 +346,17 @@ void PlotObject::SetRightYMinorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetXMajorResolution(const double &resolution)
 {
 	xMajorResolution = resolution;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetLeftYMajorResolution
 //
-// Description:		Sets the major resolution for the left axis.
+// Desc:		Sets the major resolution for the left axis.
 //
 // Input Arguments:
 //		resolution	= const double&
@@ -367,17 +367,17 @@ void PlotObject::SetXMajorResolution(const double &resolution)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetLeftYMajorResolution(const double &resolution)
 {
 	yLeftMajorResolution = resolution;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetRightYMajorResolution
 //
-// Description:		Sets the major resolution for the right axis.
+// Desc:		Sets the major resolution for the right axis.
 //
 // Input Arguments:
 //		resolution	= const double&
@@ -388,17 +388,17 @@ void PlotObject::SetLeftYMajorResolution(const double &resolution)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetRightYMajorResolution(const double &resolution)
 {
 	yRightMajorResolution = resolution;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		RemoveExistingPlots
 //
-// Description:		Deletes the existing plots.
+// Desc:		Deletes the existing plots.
 //
 // Input Arguments:
 //		None
@@ -409,18 +409,18 @@ void PlotObject::SetRightYMajorResolution(const double &resolution)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::RemoveExistingPlots()
 {
 	while (plotList.size() > 0)
 		RemovePlot(0);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		RemovePlot
 //
-// Description:		Deletes the specified plot.
+// Desc:		Deletes the specified plot.
 //
 // Input Arguments:
 //		index	= const unsigned int& specifying the curve to be removed
@@ -431,7 +431,7 @@ void PlotObject::RemoveExistingPlots()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::RemovePlot(const unsigned int &index)
 {
 	renderer.RemoveActor(plotList[index]);
@@ -440,11 +440,11 @@ void PlotObject::RemovePlot(const unsigned int &index)
 	dataList.erase(dataList.begin() + index);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		AddCurve
 //
-// Description:		Adds a curve to the plot.
+// Desc:		Adds a curve to the plot.
 //
 // Input Arguments:
 //		data	= const Dataset2D& to plot
@@ -455,7 +455,7 @@ void PlotObject::RemovePlot(const unsigned int &index)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::AddCurve(const Dataset2D &data)
 {
 	PlotCurve *newPlot = new PlotCurve(renderer, data);
@@ -466,11 +466,11 @@ void PlotObject::AddCurve(const Dataset2D &data)
 	newPlot->BindToYAxis(axisLeft);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatPlot
 //
-// Description:		Formats the plot actor.
+// Desc:		Formats the plot actor.
 //
 // Input Arguments:
 //		None
@@ -481,7 +481,7 @@ void PlotObject::AddCurve(const Dataset2D &data)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatPlot()
 {
 	UpdateAxesOffsets();
@@ -533,11 +533,11 @@ void PlotObject::FormatPlot()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatAxesBasics
 //
-// Description:		Formats each axis with orientation, color, etc.
+// Desc:		Formats each axis with orientation, color, etc.
 //
 // Input Arguments:
 //		None
@@ -548,7 +548,7 @@ void PlotObject::FormatPlot()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatAxesBasics()
 {
 	Axis::TickStyle tickStyle = Axis::TickStyleInside;
@@ -561,11 +561,11 @@ void PlotObject::FormatAxesBasics()
 	SetAxesColor(Color::ColorBlack);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetHorizontalAxisOffset
 //
-// Description:		Returns the number of pixels that a horizontal axis is
+// Desc:		Returns the number of pixels that a horizontal axis is
 //					to be offset from the edge of the plot area.
 //
 // Input Arguments:
@@ -577,7 +577,7 @@ void PlotObject::FormatAxesBasics()
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int PlotObject::GetHorizontalAxisOffset(const bool &withLabel) const
 {
 	if (withLabel)
@@ -586,11 +586,11 @@ unsigned int PlotObject::GetHorizontalAxisOffset(const bool &withLabel) const
 	return horizontalOffsetWithoutLabel;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetVerticalAxisOffset
 //
-// Description:		Returns the number of pixels that a vertical axis is
+// Desc:		Returns the number of pixels that a vertical axis is
 //					to be offset from the edge of the plot area.
 //
 // Input Arguments:
@@ -602,7 +602,7 @@ unsigned int PlotObject::GetHorizontalAxisOffset(const bool &withLabel) const
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
 {
 	if (withLabel)
@@ -611,11 +611,11 @@ unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
 	return verticalOffsetWithoutLabel;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		UpdateAxesOffsets
 //
-// Description:		Updates the offsets for each axis from the edge of the viewable area.
+// Desc:		Updates the offsets for each axis from the edge of the viewable area.
 //
 // Input Arguments:
 //		None
@@ -626,7 +626,7 @@ unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::UpdateAxesOffsets()
 {
 	if (axisBottom->GetLabel().IsEmpty())
@@ -653,11 +653,11 @@ void PlotObject::UpdateAxesOffsets()
 		axisRight->SetOffsetFromWindowEdge(verticalOffsetWithLabel);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatBottomBasics
 //
-// Description:		Formats the orientation, tick style and font for the bottom axis.
+// Desc:		Formats the orientation, tick style and font for the bottom axis.
 //
 // Input Arguments:
 //		tickStyle	= const Axis::TickStyle&
@@ -668,18 +668,18 @@ void PlotObject::UpdateAxesOffsets()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 {
 	axisBottom->SetOrientation(Axis::OrientationBottom);
 	axisBottom->SetTickStyle(tickStyle);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatTopBasics
 //
-// Description:		Formats the orientation, tick style and font for the top axis.
+// Desc:		Formats the orientation, tick style and font for the top axis.
 //
 // Input Arguments:
 //		tickStyle	= const Axis::TickStyle&
@@ -690,18 +690,18 @@ void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 {
 	axisTop->SetOrientation(Axis::OrientationTop);
 	axisTop->SetTickStyle(tickStyle);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatLeftBasics
 //
-// Description:		Formats the orientation, tick style and font for the left axis.
+// Desc:		Formats the orientation, tick style and font for the left axis.
 //
 // Input Arguments:
 //		tickStyle	= const Axis::TickStyle&
@@ -712,18 +712,18 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 {
 	axisLeft->SetOrientation(Axis::OrientationLeft);
 	axisLeft->SetTickStyle(tickStyle);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatRightBasics
 //
-// Description:		Formats the orientation, tick style and font for the right axis.
+// Desc:		Formats the orientation, tick style and font for the right axis.
 //
 // Input Arguments:
 //		tickStyle	= const Axis::TickStyle&
@@ -734,18 +734,18 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 {
 	axisRight->SetOrientation(Axis::OrientationRight);
 	axisRight->SetTickStyle(tickStyle);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetAxesColor
 //
-// Description:		Sets all of the axes to the specified color.
+// Desc:		Sets all of the axes to the specified color.
 //
 // Input Arguments:
 //		color	= const Color&
@@ -756,7 +756,7 @@ void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetAxesColor(const Color &color)
 {
 	axisBottom->SetColor(color);
@@ -765,11 +765,11 @@ void PlotObject::SetAxesColor(const Color &color)
 	axisRight->SetColor(color);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatTitle
 //
-// Description:		Formats the title object.
+// Desc:		Formats the title object.
 //
 // Input Arguments:
 //		None
@@ -780,7 +780,7 @@ void PlotObject::SetAxesColor(const Color &color)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatTitle()
 {
 	titleObject->SetCentered(true);
@@ -788,11 +788,11 @@ void PlotObject::FormatTitle()
 		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetOriginalAxisLimits
 //
-// Description:		Finds the range of each axis and sets the "original" values
+// Desc:		Finds the range of each axis and sets the "original" values
 //					(limits for if the axese were autoscaled).
 //
 // Input Arguments:
@@ -804,7 +804,7 @@ void PlotObject::FormatTitle()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetOriginalAxisLimits()
 {
 	leftUsed = false;
@@ -841,11 +841,11 @@ void PlotObject::SetOriginalAxisLimits()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetFirstValidValue
 //
-// Description:		Retrieves the first valid value from the specified array.
+// Desc:		Retrieves the first valid value from the specified array.
 //
 // Input Arguments:
 //		data	= const double*
@@ -857,7 +857,7 @@ void PlotObject::SetOriginalAxisLimits()
 // Return Value:
 //		double
 //
-//==========================================================================
+//=============================================================================
 double PlotObject::GetFirstValidValue(const double* data, const unsigned int &size) const
 {
 	assert(data);
@@ -872,11 +872,11 @@ double PlotObject::GetFirstValidValue(const double* data, const unsigned int &si
 	return data[0];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		MatchYAxes
 //
-// Description:		If one of the y-axes does not have any associated curves,
+// Desc:		If one of the y-axes does not have any associated curves,
 //					forces the limits to match the opposite y-axis.
 //
 // Input Arguments:
@@ -888,7 +888,7 @@ double PlotObject::GetFirstValidValue(const double* data, const unsigned int &si
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::MatchYAxes()
 {
 	// If one axis is unused, make it match the other
@@ -912,11 +912,11 @@ void PlotObject::MatchYAxes()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetAxisExtremes
 //
-// Description:		Parese the specified dataset and sets the associated mins
+// Desc:		Parese the specified dataset and sets the associated mins
 //					and maxes (original) equal to the extremum for the dataset.
 //
 // Input Arguments:
@@ -929,7 +929,7 @@ void PlotObject::MatchYAxes()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
 {
 	unsigned int i;
@@ -960,11 +960,11 @@ void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		ApplyRangeLimits
 //
-// Description:		Applies the limits and resolutions for each axis.
+// Desc:		Applies the limits and resolutions for each axis.
 //
 // Input Arguments:
 //		xMinor		= const double&
@@ -980,7 +980,7 @@ void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::ApplyRangeLimits(const double &xMinor, const double &xMajor,
 	const double &yLeftMinor, const double &yLeftMajor,
 	const double &yRightMinor, const double &yRightMajor)
@@ -1007,11 +1007,11 @@ void PlotObject::ApplyRangeLimits(const double &xMinor, const double &xMajor,
 	axisRight->SetMajorResolution(yRightMajor);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		ValidateRangeLimits
 //
-// Description:		Ensures the limit values are valid numbers.  If they are
+// Desc:		Ensures the limit values are valid numbers.  If they are
 //					not valid, axis limits are set to default values of +/- 1.
 //
 // Input Arguments:
@@ -1027,7 +1027,7 @@ void PlotObject::ApplyRangeLimits(const double &xMinor, const double &xMajor,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::ValidateRangeLimits(double &min, double &max,
 	const bool &autoScale, double &major, double &minor) const
 {
@@ -1040,11 +1040,11 @@ void PlotObject::ValidateRangeLimits(double &min, double &max,
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		ApplyRangeLimits
 //
-// Description:		Resets the axes' limits to their original values, if the
+// Desc:		Resets the axes' limits to their original values, if the
 //					axis is set to be auto-scaled.
 //
 // Input Arguments:
@@ -1056,7 +1056,7 @@ void PlotObject::ValidateRangeLimits(double &min, double &max,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::ResetOriginalLimits()
 {
 	if (autoScaleX)
@@ -1078,11 +1078,11 @@ void PlotObject::ResetOriginalLimits()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		ValidateLogarithmicLimits
 //
-// Description:		Checks that the minimum value for the axis is strictly
+// Desc:		Checks that the minimum value for the axis is strictly
 //					positive, if the scaling is logarithmic.
 //
 // Input Arguments:
@@ -1095,7 +1095,7 @@ void PlotObject::ResetOriginalLimits()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::ValidateLogarithmicLimits(Axis &axis, const double &min)
 {
 	if (axis.IsLogarithmic() && min <= 0.0)
@@ -1105,11 +1105,11 @@ void PlotObject::ValidateLogarithmicLimits(Axis &axis, const double &min)
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		HandleZeroRangeAxis
 //
-// Description:		Adjusts the specified min and max so they are not equal.
+// Desc:		Adjusts the specified min and max so they are not equal.
 //
 // Input Arguments:
 //		min	= double& (also output)
@@ -1122,7 +1122,7 @@ void PlotObject::ValidateLogarithmicLimits(Axis &axis, const double &min)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
 {
 	if (PlotMath::IsZero(min))
@@ -1137,11 +1137,11 @@ void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		CheckForZeroRange
 //
-// Description:		If the min and max for any axis is equal, it adjusts the
+// Desc:		If the min and max for any axis is equal, it adjusts the
 //					scaling so they are not equal.
 //
 // Input Arguments:
@@ -1153,7 +1153,7 @@ void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::CheckForZeroRange()
 {
 	if (PlotMath::IsZero(xMaxOriginal - xMinOriginal))
@@ -1166,11 +1166,11 @@ void PlotObject::CheckForZeroRange()
 		HandleZeroRangeAxis(yRightMinOriginal, yRightMaxOriginal);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		CheckAutoScaling
 //
-// Description:		Checks if each axis is auto-scaled, and if so, adjusts
+// Desc:		Checks if each axis is auto-scaled, and if so, adjusts
 //					the axis limits to the original values.
 //
 // Input Arguments:
@@ -1182,7 +1182,7 @@ void PlotObject::CheckForZeroRange()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::CheckAutoScaling()
 {
 	if (autoScaleX)
@@ -1207,11 +1207,11 @@ void PlotObject::CheckAutoScaling()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		UpdateLimitValues
 //
-// Description:		Updates the axes' limits so they are exactly the same as
+// Desc:		Updates the axes' limits so they are exactly the same as
 //					what is displayed on screen (after rounding, etc.).
 //
 // Input Arguments:
@@ -1223,7 +1223,7 @@ void PlotObject::CheckAutoScaling()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::UpdateLimitValues()
 {
 	axisBottom->Draw();
@@ -1239,11 +1239,11 @@ void PlotObject::UpdateLimitValues()
 	yRightMax = axisRight->GetMaximum();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		AutoScaleAxis
 //
-// Description:		Calculates the number of tick marks to use to span the range
+// Desc:		Calculates the number of tick marks to use to span the range
 //					and make the plot look nice.  Also responsible for ensuring
 //					accuracy of tick, grid line and label locations.
 //
@@ -1263,7 +1263,7 @@ void PlotObject::UpdateLimitValues()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::AutoScaleAxis(double &min, double &max, double &majorRes,
 	const int &maxTicks, const bool &logarithmic, const bool &forceLimits) const
 {
@@ -1273,11 +1273,11 @@ void PlotObject::AutoScaleAxis(double &min, double &max, double &majorRes,
 		AutoScaleLinearAxis(min, max, majorRes, maxTicks, forceLimits);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		AutoScaleLogAxis
 //
-// Description:		Determines best axis limits for log axes.
+// Desc:		Determines best axis limits for log axes.
 //
 // Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
@@ -1293,7 +1293,7 @@ void PlotObject::AutoScaleAxis(double &min, double &max, double &majorRes,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::AutoScaleLogAxis(double &min, double &max, double &majorRes,
 	const bool &forceLimits) const
 {
@@ -1314,11 +1314,11 @@ void PlotObject::AutoScaleLogAxis(double &min, double &max, double &majorRes,
 	majorRes = 10.0;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		AutoScaleLinearAxis
 //
-// Description:		Determines best axis limits for linear axes.
+// Desc:		Determines best axis limits for linear axes.
 //
 // Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
@@ -1335,7 +1335,7 @@ void PlotObject::AutoScaleLogAxis(double &min, double &max, double &majorRes,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::AutoScaleLinearAxis(double &min, double &max, double &majorRes,
 	const int &maxTicks, const bool &forceLimits) const
 {
@@ -1344,11 +1344,11 @@ void PlotObject::AutoScaleLinearAxis(double &min, double &max, double &majorRes,
 	RoundMinMax(min, max, majorRes, forceLimits);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		RoundMinMax
 //
-// Description:		Rounds the min and max to the appropriate precision.
+// Desc:		Rounds the min and max to the appropriate precision.
 //
 // Input Arguments:
 //		min			= double& specifying the minimum value for the axis (required for input and output)
@@ -1363,7 +1363,7 @@ void PlotObject::AutoScaleLinearAxis(double &min, double &max, double &majorRes,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing, const bool &forceLimits) const
 {
 	if (!forceLimits)
@@ -1396,11 +1396,11 @@ void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing
 		max = 0.0;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		ComputeMinorResolution
 //
-// Description:		Returns the optimal minor resolution for the axis.
+// Desc:		Returns the optimal minor resolution for the axis.
 //
 // Input Arguments:
 //		min				= const double&
@@ -1414,7 +1414,7 @@ void PlotObject::RoundMinMax(double &min, double &max, const double &tickSpacing
 // Return Value:
 //		double
 //
-//==========================================================================
+//=============================================================================
 double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 	const double &majorResolution, const double &axisLength) const
 {
@@ -1427,11 +1427,11 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 	return majorResolution / majorMinorRatio;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetXMin
 //
-// Description:		Sets the lower X limit.
+// Desc:		Sets the lower X limit.
 //
 // Input Arguments:
 //		xMin	= const double& describing desired minimum X limit
@@ -1442,7 +1442,7 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetXMin(const double &xMin)
 {
 	// If the both limits are at the original value, enable auto-scaling again
@@ -1453,11 +1453,11 @@ void PlotObject::SetXMin(const double &xMin)
 	this->xMin = xMin;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetXMax
 //
-// Description:		Sets the upper X limit.
+// Desc:		Sets the upper X limit.
 //
 // Input Arguments:
 //		xMax	= const double& describing desired maximum X limit
@@ -1468,7 +1468,7 @@ void PlotObject::SetXMin(const double &xMin)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetXMax(const double &xMax)
 {
 	// If both limits are at the original value, enable auto-scaling again
@@ -1479,11 +1479,11 @@ void PlotObject::SetXMax(const double &xMax)
 	this->xMax = xMax;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetLeftYMin
 //
-// Description:		Sets the lower Y limit.
+// Desc:		Sets the lower Y limit.
 //
 // Input Arguments:
 //		yMin	= const double& describing desired minimum Y limit
@@ -1494,7 +1494,7 @@ void PlotObject::SetXMax(const double &xMax)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetLeftYMin(const double &yMin)
 {
 	// If both limits are at the original value, enable auto-scaling again
@@ -1505,11 +1505,11 @@ void PlotObject::SetLeftYMin(const double &yMin)
 	yLeftMin = yMin;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetLeftYMax
 //
-// Description:		Sets the upper Y limit.
+// Desc:		Sets the upper Y limit.
 //
 // Input Arguments:
 //		yMax	= const double& describing desired maximum Y limit
@@ -1520,7 +1520,7 @@ void PlotObject::SetLeftYMin(const double &yMin)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetLeftYMax(const double &yMax)
 {
 	// If both limits are at the original value, enable auto-scaling again
@@ -1531,11 +1531,11 @@ void PlotObject::SetLeftYMax(const double &yMax)
 	yLeftMax = yMax;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetRightYMin
 //
-// Description:		Sets the lower Y limit.
+// Desc:		Sets the lower Y limit.
 //
 // Input Arguments:
 //		yMin	= const double& describing desired minimum Y limit
@@ -1546,7 +1546,7 @@ void PlotObject::SetLeftYMax(const double &yMax)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetRightYMin(const double &yMin)
 {
 	// If the both limits are at the original value, enable auto-scaling again
@@ -1557,11 +1557,11 @@ void PlotObject::SetRightYMin(const double &yMin)
 	yRightMin = yMin;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetRightYMax
 //
-// Description:		Sets the upper Y limit.
+// Desc:		Sets the upper Y limit.
 //
 // Input Arguments:
 //		yMax	= const double& describing desired maximum Y limit
@@ -1572,7 +1572,7 @@ void PlotObject::SetRightYMin(const double &yMin)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetRightYMax(const double &yMax)
 {
 	// If the both limits are at the original value, enable auto-scaling again
@@ -1583,11 +1583,11 @@ void PlotObject::SetRightYMax(const double &yMax)
 	yRightMax = yMax;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		ResetAutoScaling
 //
-// Description:		Resets auto-scaling for all axes.
+// Desc:		Resets auto-scaling for all axes.
 //
 // Input Arguments:
 //		None
@@ -1598,7 +1598,7 @@ void PlotObject::SetRightYMax(const double &yMax)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::ResetAutoScaling()
 {
 	autoScaleX = true;
@@ -1610,11 +1610,11 @@ void PlotObject::ResetAutoScaling()
 	yRightMajorResolution = 0.0;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetCurveProperties
 //
-// Description:		Sets properties for the specified curve.
+// Desc:		Sets properties for the specified curve.
 //
 // Input Arguments:
 //		index		= const unsigned int&
@@ -1630,7 +1630,7 @@ void PlotObject::ResetAutoScaling()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetCurveProperties(const unsigned int &index, const Color &color,
 	const bool &visible, const bool &rightAxis, const double &lineSize, const int &markerSize)
 {
@@ -1645,11 +1645,11 @@ void PlotObject::SetCurveProperties(const unsigned int &index, const Color &colo
 		plotList[index]->BindToYAxis(axisLeft);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetMajorGrid
 //
-// Description:		Resets major grid for all axes.
+// Desc:		Resets major grid for all axes.
 //
 // Input Arguments:
 //		None
@@ -1660,7 +1660,7 @@ void PlotObject::SetCurveProperties(const unsigned int &index, const Color &colo
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetMajorGrid(const bool &gridOn)
 {
 	axisBottom->SetMajorGrid(gridOn);
@@ -1671,11 +1671,11 @@ void PlotObject::SetMajorGrid(const bool &gridOn)
 	axisRight->SetMajorGrid(false);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetMinorGrid
 //
-// Description:		Resets minor grid for all axes.
+// Desc:		Resets minor grid for all axes.
 //
 // Input Arguments:
 //		None
@@ -1686,7 +1686,7 @@ void PlotObject::SetMajorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetMinorGrid(const bool &gridOn)
 {
 	axisBottom->SetMinorGrid(gridOn);
@@ -1697,11 +1697,11 @@ void PlotObject::SetMinorGrid(const bool &gridOn)
 	axisRight->SetMinorGrid(false);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetMajorGrid
 //
-// Description:		Returns status of major gridlines.
+// Desc:		Returns status of major gridlines.
 //
 // Input Arguments:
 //		None
@@ -1712,7 +1712,7 @@ void PlotObject::SetMinorGrid(const bool &gridOn)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 bool PlotObject::GetMajorGrid()
 {
 	if (axisBottom == nullptr)
@@ -1721,11 +1721,11 @@ bool PlotObject::GetMajorGrid()
 	return axisBottom->GetMajorGrid();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetMinorGrid
 //
-// Description:		Returns status of minor gridlines.
+// Desc:		Returns status of minor gridlines.
 //
 // Input Arguments:
 //		None
@@ -1736,7 +1736,7 @@ bool PlotObject::GetMajorGrid()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 bool PlotObject::GetMinorGrid()
 {
 	if (axisBottom == nullptr)
@@ -1745,11 +1745,11 @@ bool PlotObject::GetMinorGrid()
 	return axisBottom->GetMinorGrid();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetXLabel
 //
-// Description:		Sets the x-axis text.
+// Desc:		Sets the x-axis text.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1760,18 +1760,18 @@ bool PlotObject::GetMinorGrid()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetXLabel(wxString text)
 {
 	axisBottom->SetLabel(text);
 	needScissorUpdate = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetLeftYLabel
 //
-// Description:		Sets the left y-axis text.
+// Desc:		Sets the left y-axis text.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1782,18 +1782,18 @@ void PlotObject::SetXLabel(wxString text)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetLeftYLabel(wxString text)
 {
 	axisLeft->SetLabel(text);
 	needScissorUpdate = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetRightYLabel
 //
-// Description:		Sets the title text.
+// Desc:		Sets the title text.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1804,18 +1804,18 @@ void PlotObject::SetLeftYLabel(wxString text)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetRightYLabel(wxString text)
 {
 	axisRight->SetLabel(text);
 	needScissorUpdate = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetTitle
 //
-// Description:		Sets the title text.
+// Desc:		Sets the title text.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1826,18 +1826,18 @@ void PlotObject::SetRightYLabel(wxString text)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetTitle(wxString text)
 {
 	titleObject->SetText(text);
 	needScissorUpdate = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetGridColor
 //
-// Description:		Sets gridline color.
+// Desc:		Sets gridline color.
 //
 // Input Arguments:
 //		color	= const color&
@@ -1848,7 +1848,7 @@ void PlotObject::SetTitle(wxString text)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetGridColor(const Color &color)
 {
 	axisBottom->SetGridColor(color);
@@ -1857,11 +1857,11 @@ void PlotObject::SetGridColor(const Color &color)
 	axisRight->SetGridColor(color);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetGridColor
 //
-// Description:		Resets auto-scaling for all axes.
+// Desc:		Resets auto-scaling for all axes.
 //
 // Input Arguments:
 //		None
@@ -1872,17 +1872,17 @@ void PlotObject::SetGridColor(const Color &color)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Color PlotObject::GetGridColor() const
 {
 	return axisBottom->GetGridColor();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetXLogarithmic
 //
-// Description:		Sets the X axis to be scaled logarithmicly (or not).
+// Desc:		Sets the X axis to be scaled logarithmicly (or not).
 //
 // Input Arguments:
 //		log	= const bool&
@@ -1893,7 +1893,7 @@ Color PlotObject::GetGridColor() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetXLogarithmic(const bool &log)
 {
 	if (!axisBottom)
@@ -1902,11 +1902,11 @@ void PlotObject::SetXLogarithmic(const bool &log)
 	axisBottom->SetLogarithmicScale(log);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetLeftLogarithmic
 //
-// Description:		Sets the left Y axis to be scaled logarithmicly (or not).
+// Desc:		Sets the left Y axis to be scaled logarithmicly (or not).
 //
 // Input Arguments:
 //		log	= const bool&
@@ -1917,7 +1917,7 @@ void PlotObject::SetXLogarithmic(const bool &log)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetLeftLogarithmic(const bool &log)
 {
 	if (!axisLeft)
@@ -1926,11 +1926,11 @@ void PlotObject::SetLeftLogarithmic(const bool &log)
 	axisLeft->SetLogarithmicScale(log);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		SetRightLogarithmic
 //
-// Description:		Sets the right Y axis to be scaled logarithmicly (or not).
+// Desc:		Sets the right Y axis to be scaled logarithmicly (or not).
 //
 // Input Arguments:
 //		log	= const bool&
@@ -1941,7 +1941,7 @@ void PlotObject::SetLeftLogarithmic(const bool &log)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::SetRightLogarithmic(const bool &log)
 {
 	if (!axisRight)
@@ -1950,11 +1950,11 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 	axisRight->SetLogarithmicScale(log);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		FormatCurves
 //
-// Description:		Formats the curve objects.
+// Desc:		Formats the curve objects.
 //
 // Input Arguments:
 //		None
@@ -1965,7 +1965,7 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::FormatCurves()
 {
 	unsigned int i;
@@ -1976,11 +1976,11 @@ void PlotObject::FormatCurves()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetXLabel
 //
-// Description:		Returns the x label text.
+// Desc:		Returns the x label text.
 //
 // Input Arguments:
 //		None
@@ -1991,17 +1991,17 @@ void PlotObject::FormatCurves()
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString PlotObject::GetXLabel() const
 {
 	return axisBottom->GetLabel();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetXLabel
 //
-// Description:		Returns the left y label text.
+// Desc:		Returns the left y label text.
 //
 // Input Arguments:
 //		None
@@ -2012,17 +2012,17 @@ wxString PlotObject::GetXLabel() const
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString PlotObject::GetLeftYLabel() const
 {
 	return axisLeft->GetLabel();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetXLabel
 //
-// Description:		Returns the right y label text.
+// Desc:		Returns the right y label text.
 //
 // Input Arguments:
 //		None
@@ -2033,17 +2033,17 @@ wxString PlotObject::GetLeftYLabel() const
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString PlotObject::GetRightYLabel() const
 {
 	return axisRight->GetLabel();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetTitle
 //
-// Description:		Returns the title text.
+// Desc:		Returns the title text.
 //
 // Input Arguments:
 //		None
@@ -2054,17 +2054,17 @@ wxString PlotObject::GetRightYLabel() const
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString PlotObject::GetTitle() const
 {
 	return titleObject->GetText();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		GetTotalPointCount
 //
-// Description:		Returns the total number of points contained in the curves.
+// Desc:		Returns the total number of points contained in the curves.
 //
 // Input Arguments:
 //		None
@@ -2075,7 +2075,7 @@ wxString PlotObject::GetTitle() const
 // Return Value:
 //		unsigned long long
 //
-//==========================================================================
+//=============================================================================
 unsigned long long PlotObject::GetTotalPointCount() const
 {
 	unsigned long long count(0);
@@ -2086,11 +2086,11 @@ unsigned long long PlotObject::GetTotalPointCount() const
 	return count;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		ComputeTransformationMatrices
 //
-// Description:		Calculates the transformation matrices for plot curves
+// Desc:		Calculates the transformation matrices for plot curves
 //					associated with the right and left y-axes.
 //
 // Input Arguments:
@@ -2102,7 +2102,7 @@ unsigned long long PlotObject::GetTotalPointCount() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::ComputeTransformationMatrices()
 {
 	Matrix left(4,4), right(4,4);
@@ -2141,11 +2141,11 @@ void PlotObject::ComputeTransformationMatrices()
 	renderer.SetRightModelview(right);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotObject
 // Function:		UpdateScissorArea
 //
-// Description:		Updates the scissor buffer according to the size of the
+// Desc:		Updates the scissor buffer according to the size of the
 //					plot area.
 //
 // Input Arguments:
@@ -2157,7 +2157,7 @@ void PlotObject::ComputeTransformationMatrices()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotObject::UpdateScissorArea() const
 {
 	assert(!RenderWindow::GLHasError());

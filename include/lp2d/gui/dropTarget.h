@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  dropTarget.h
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
-//				 when the user drags-and-drops them onto the main window.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
+//        when the user drags-and-drops them onto the main window.
 
 #ifndef DROP_TARGET_H_
 #define DROP_TARGET_H_
@@ -31,9 +31,7 @@ class DropTarget : public wxDropTarget
 public:
 	// Constructor
 	DropTarget(GuiInterface &guiInterface);
-
-	// Destructor
-	virtual ~DropTarget();
+	~DropTarget() = default;
 
 	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);
 
@@ -42,10 +40,6 @@ private:
 
 	bool OnDropFiles(const wxArrayString &filenames);
 	bool OnDropText(const wxString& data);
-
-	char *buffer;
-
-	void ClearBuffer();
 };
 
 }// namespace LibPlot2D

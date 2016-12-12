@@ -1,11 +1,11 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  guiInterface.cpp
 // Date:  12/9/2016
@@ -51,11 +51,11 @@ GuiInterface::GuiInterface(wxFrame* owner) : owner(owner)
 {
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		LoadFiles
 //
-// Description:		Method for loading a multiple files.
+// Desc:		Method for loading a multiple files.
 //
 // Input Arguments:
 //		fileList	= const wxArrayString&
@@ -66,7 +66,7 @@ GuiInterface::GuiInterface(wxFrame* owner) : owner(owner)
 // Return Value:
 //		true for files successfully loaded, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 {
 	unsigned int i, j;
@@ -167,11 +167,11 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		LoadText
 //
-// Description:		Public method for loading a single object from text.
+// Desc:		Public method for loading a single object from text.
 //					This writes the text to a temporary file, then tries to
 //					open it using normal methods.
 //
@@ -184,7 +184,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 // Return Value:
 //		true for file successfully loaded, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool GuiInterface::LoadText(const wxString &textData)
 {
 	wxString tempFileName(GenerateTemporaryFileName());
@@ -215,11 +215,11 @@ bool GuiInterface::LoadText(const wxString &textData)
 	return fileLoaded;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		ReloadData
 //
-// Description:		Reloads the data from the last set of files loaded.
+// Desc:		Reloads the data from the last set of files loaded.
 //
 // Input Arguments:
 //		None
@@ -230,7 +230,7 @@ bool GuiInterface::LoadText(const wxString &textData)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::ReloadData()
 {
 	if (lastFilesLoaded.IsEmpty())
@@ -239,11 +239,11 @@ void GuiInterface::ReloadData()
 	LoadFiles(lastFilesLoaded);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GenerateTemporaryFileName
 //
-// Description:		Generates a random string of characters to use as a file
+// Desc:		Generates a random string of characters to use as a file
 //					name (always ends with .tmp).
 //
 // Input Arguments:
@@ -255,7 +255,7 @@ void GuiInterface::ReloadData()
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString GuiInterface::GenerateTemporaryFileName(const unsigned int &length) const
 {
 	wxString name;
@@ -283,11 +283,11 @@ wxString GuiInterface::GenerateTemporaryFileName(const unsigned int &length) con
 	return name;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		ClearAllCurves
 //
-// Description:		Removes all curves from the plot.
+// Desc:		Removes all curves from the plot.
 //
 // Input Arguments:
 //		None
@@ -298,18 +298,18 @@ wxString GuiInterface::GenerateTemporaryFileName(const unsigned int &length) con
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::ClearAllCurves()
 {
 	while (plotList.GetCount() > 0)
 		RemoveCurve(0);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		AddCurve
 //
-// Description:		Adds a new dataset to the plot, created by operating on
+// Desc:		Adds a new dataset to the plot, created by operating on
 //					existing datasets.
 //
 // Input Arguments:
@@ -321,7 +321,7 @@ void GuiInterface::ClearAllCurves()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::AddCurve(wxString mathString)
 {
 	// String will be empty if the user cancelled
@@ -330,7 +330,7 @@ void GuiInterface::AddCurve(wxString mathString)
 
 	// Parse string and determine what the new dataset should look like
 	ExpressionTree expression(&plotList);
-	Dataset2D *mathChannel = new Dataset2D;
+	std::unique_ptr<Dataset2D> mathChannel(std::make_unique<Dataset2D>());
 
 	double xAxisFactor;
 	GetXAxisScalingFactor(xAxisFactor);// No warning here:  it's only an issue for FFTs and filters; warning are generated then
@@ -339,24 +339,23 @@ void GuiInterface::AddCurve(wxString mathString)
 
 	if (!errors.IsEmpty())
 	{
-		wxMessageBox(_T("Could not solve expression:\n\n") + errors, _T("Error Solving Expression"), wxICON_ERROR, owner);
-		delete mathChannel;
-
+		wxMessageBox(_T("Could not solve expression:\n\n") + errors,
+			_T("Error Solving Expression"), wxICON_ERROR, owner);
 		DisplayMathChannelDialog(mathString);
 		return;
 	}
 
-	AddCurve(mathChannel, mathString.Upper());
+	AddCurve(std::move(mathChannel), mathString.Upper());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		AddCurve
 //
-// Description:		Adds an existing dataset to the plot.
+// Desc:		Adds an existing dataset to the plot.
 //
 // Input Arguments:
-//		data	= Dataset2D* to add
+//		data	= std::unique_ptr<Dataset2D> to add
 //		name	= wxString specifying the label for the curve
 //
 // Output Arguments:
@@ -365,10 +364,10 @@ void GuiInterface::AddCurve(wxString mathString)
 // Return Value:
 //		None
 //
-//==========================================================================
-void GuiInterface::AddCurve(Dataset2D *data, wxString name)
+//=============================================================================
+void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 {
-	plotList.Add(data);
+	plotList.Add(std::move(data));
 
 	grid->BeginBatch();
 	if (grid->GetNumberRows() == 0)
@@ -385,11 +384,11 @@ void GuiInterface::AddCurve(Dataset2D *data, wxString name)
 	renderer->UpdateDisplay();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		RemoveCurve
 //
-// Description:		Removes a curve from the plot.
+// Desc:		Removes a curve from the plot.
 //
 // Input Arguments:
 //		i	= const unsigned int& specifying curve to remove
@@ -400,7 +399,7 @@ void GuiInterface::AddCurve(Dataset2D *data, wxString name)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::RemoveCurve(const unsigned int &i)
 {
 	grid->DeleteRows(i + 1);
@@ -417,11 +416,11 @@ void GuiInterface::RemoveCurve(const unsigned int &i)
 	UpdateLegend();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		RemoveCurves
 //
-// Description:		Removes a set of curves from the plot.
+// Desc:		Removes a set of curves from the plot.
 //
 // Input Arguments:
 //		curves	= const wxArrayInt&
@@ -432,7 +431,7 @@ void GuiInterface::RemoveCurve(const unsigned int &i)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::RemoveCurves(const wxArrayInt& curves)
 {
 	// TODO:  Fix this
@@ -447,11 +446,11 @@ void GuiInterface::RemoveCurves(const wxArrayInt& curves)
 	renderer->UpdateDisplay();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		UpdateCursorValues
 //
-// Description:		Updates the values for the cursors and their differences
+// Desc:		Updates the values for the cursors and their differences
 //					in the options grid.
 //
 // Input Arguments:
@@ -468,7 +467,7 @@ void GuiInterface::RemoveCurves(const wxArrayInt& curves)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &rightVisible,
 		const double &leftValue, const double &rightValue)
 {
@@ -502,11 +501,11 @@ void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &right
 		grid->SetCellValue(0, PlotListGrid::ColDifference, wxString::Format("%f", rightValue - leftValue));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		UpdateSingleCursorValue
 //
-// Description:		Updates a single cursor value.
+// Desc:		Updates a single cursor value.
 //
 // Input Arguments:
 //		row			= const unsigned int& specifying the grid row
@@ -520,7 +519,7 @@ void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &right
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::UpdateSingleCursorValue(const unsigned int &row,
 	double value, const unsigned int &column, const bool &isVisible)
 {
@@ -551,11 +550,11 @@ void GuiInterface::UpdateSingleCursorValue(const unsigned int &row,
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GetDataFile
 //
-// Description:		Determines the correct DataFile object to use for the
+// Desc:		Determines the correct DataFile object to use for the
 //					specified file, and returns a pointer to an instance of that
 //					object.
 //
@@ -568,7 +567,7 @@ void GuiInterface::UpdateSingleCursorValue(const unsigned int &row,
 // Return Value:
 //		DataFile*
 //
-//==========================================================================
+//=============================================================================
 DataFile* GuiInterface::GetDataFile(const wxString &fileName)
 {
 	if (BaumullerFile::IsType(fileName))
@@ -585,11 +584,11 @@ DataFile* GuiInterface::GetDataFile(const wxString &fileName)
 	return new GenericFile(fileName);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		ExportData
 //
-// Description:		Exports the data to file.
+// Desc:		Exports the data to file.
 //
 // Input Arguments:
 //		None
@@ -600,7 +599,7 @@ DataFile* GuiInterface::GetDataFile(const wxString &fileName)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::ExportData()
 {
 	wxString wildcard(_T("Comma Separated (*.csv)|*.csv"));
@@ -695,11 +694,11 @@ void GuiInterface::ExportData()
 	outFile.close();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GenerateFRF
 //
-// Description:		Generates a frequency response function.
+// Desc:		Generates a frequency response function.
 //
 // Input Arguments:
 //		None
@@ -710,7 +709,7 @@ void GuiInterface::ExportData()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::GenerateFRF()
 {
 	double factor;
@@ -728,12 +727,12 @@ void GuiInterface::GenerateFRF()
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
-	Dataset2D *amplitude = new Dataset2D, *phase = nullptr, *coherence = nullptr;
+	std::unique_ptr<Dataset2D> amplitude(std::make_unique<Dataset2D>()), phase, coherence;
 
 	if (dialog.GetComputePhase())
-		phase = new Dataset2D;
+		phase = std::make_unique<Dataset2D>();
 	if (dialog.GetComputeCoherence())
-		coherence = new Dataset2D;
+		coherence = std::make_unique<Dataset2D>();
 
 	if (!PlotMath::XDataConsistentlySpaced(*plotList[dialog.GetInputIndex()]) ||
 		!PlotMath::XDataConsistentlySpaced(*plotList[dialog.GetOutputIndex()]))
@@ -742,17 +741,17 @@ void GuiInterface::GenerateFRF()
 
 	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
 		*plotList[dialog.GetOutputIndex()], dialog.GetNumberOfAverages(),
-		FastFourierTransform::WindowHann, dialog.GetModuloPhase(), *amplitude, phase, coherence);
+		FastFourierTransform::WindowHann, dialog.GetModuloPhase(), amplitude, phase, coherence);
 
-	AddFFTCurves(factor, amplitude, phase, coherence, wxString::Format("[%u] to [%u]",
+	AddFFTCurves(factor, std::move(amplitude), std::move(phase), std::move(coherence), wxString::Format("[%u] to [%u]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		CreateSignal
 //
-// Description:		Displays dialog for creating various signals.
+// Desc:		Displays dialog for creating various signals.
 //
 // Input Arguments:
 //		None
@@ -763,7 +762,7 @@ void GuiInterface::GenerateFRF()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::CreateSignal()
 {
 	double startTime(0.0);// [sec]
@@ -786,7 +785,8 @@ void GuiInterface::CreateSignal()
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
-	AddCurve(&dialog.GetSignal()->MultiplyXData(factor), dialog.GetSignalName());
+	dialog.GetSignal()->MultiplyXData(factor);
+	AddCurve(std::move(dialog.GetSignal()), dialog.GetSignalName());
 
 	// Set time units if it hasn't been done already
 	double dummy;
@@ -798,17 +798,17 @@ void GuiInterface::CreateSignal()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		AddFFTCurves
 //
-// Description:		Adds the FFT curves to the plot list.
+// Desc:		Adds the FFT curves to the plot list.
 //
 // Input Arguments:
 //		xFactor	= const double& scaling factor to convert X units to Hz
-//		amplitude	= Dataset2D*
-//		phase		= Dataset2D*
-//		coherence	= Dataset2D*
+//		amplitude	= std::unique_ptr<Dataset2D>
+//		phase		= std::unique_ptr<Dataset2D>
+//		coherence	= std::unique_ptr<Dataset2D>
 //		namePortion	= const wxString& identifying the input/output signals
 //
 // Output Arguments:
@@ -817,32 +817,35 @@ void GuiInterface::CreateSignal()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::AddFFTCurves(const double& xFactor,
-	Dataset2D *amplitude, Dataset2D *phase,
-	Dataset2D *coherence, const wxString &namePortion)
+	std::unique_ptr<Dataset2D> amplitude, std::unique_ptr<Dataset2D> phase,
+	std::unique_ptr<Dataset2D> coherence, const wxString &namePortion)
 {
-	AddCurve(&(amplitude->MultiplyXData(xFactor)), _T("FRF Amplitude, ") + namePortion + _T(", [dB]"));
+	amplitude->MultiplyXData(xFactor);
+	AddCurve(std::move(amplitude), _T("FRF Amplitude, ") + namePortion + _T(", [dB]"));
 	SetMarkerSize(grid->GetNumberRows() - 2, 0);
 
 	if (phase)
 	{
-		AddCurve(&(phase->MultiplyXData(xFactor)), _T("FRF Phase, ") + namePortion + _T(", [deg]"));
+		phase->MultiplyXData(xFactor);
+		AddCurve(std::move(phase), _T("FRF Phase, ") + namePortion + _T(", [deg]"));
 		SetMarkerSize(grid->GetNumberRows() - 2, 0);
 	}
 
 	if (coherence)
 	{
-		AddCurve(&(coherence->MultiplyXData(xFactor)), _T("FRF Coherence, ") + namePortion + _T(", [-]"));
+		coherence->MultiplyXData(xFactor);
+		AddCurve(std::move(coherence), _T("FRF Coherence, ") + namePortion + _T(", [-]"));
 		SetMarkerSize(grid->GetNumberRows() - 2, 0);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		SetTimeUnits
 //
-// Description:		Available for the user to clarify the time units when we
+// Desc:		Available for the user to clarify the time units when we
 //					are unable to determine them easily from the input file.
 //
 // Input Arguments:
@@ -854,7 +857,7 @@ void GuiInterface::AddFFTCurves(const double& xFactor,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::SetTimeUnits()
 {
 	double f;
@@ -889,11 +892,11 @@ void GuiInterface::SetTimeUnits()
 		wxMessageBox(_T("Could not understand units \"") + userUnits + _T("\"."), _T("Error Setting Units"), wxICON_ERROR, owner);
 	}
 }
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		ScaleXData
 //
-// Description:		Scales the X-data by the specified factor.
+// Desc:		Scales the X-data by the specified factor.
 //
 // Input Arguments:
 //		selectedRows	= const wxArrayInt&
@@ -904,7 +907,7 @@ void GuiInterface::SetTimeUnits()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 {
 	double factor(0.0);
@@ -925,9 +928,9 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 		unsigned int i;
 		for (i = 0; i < stopIndex; i++)
 		{
-			Dataset2D *scaledData = new Dataset2D(*plotList[i]);
+			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[i]));
 			scaledData->MultiplyXData(factor);
-			AddCurve(scaledData, grid->GetCellValue(i + 1, PlotListGrid::ColName));
+			AddCurve(std::move(scaledData), grid->GetCellValue(i + 1, PlotListGrid::ColName));
 
 			grid->SetCellBackgroundColour(i + stopIndex + 1, PlotListGrid::ColColor,
 				grid->GetCellBackgroundColour(i + 1, PlotListGrid::ColColor));
@@ -952,19 +955,19 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 		unsigned int i;
 		for (i = 0; i < selectedRows.Count(); i++)
 		{
-			Dataset2D *scaledData = new Dataset2D(*plotList[selectedRows[i] - 1]);
+			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
 			scaledData->MultiplyXData(factor);
-			AddCurve(scaledData, grid->GetCellValue(selectedRows[i], PlotListGrid::ColName)
+			AddCurve(std::move(scaledData), grid->GetCellValue(selectedRows[i], PlotListGrid::ColName)
 				+ wxString::Format(", X-scaled by %f", factor));
 		}
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		PlotDerivative
 //
-// Description:		Adds a curve showing the derivative of the selected grid
+// Desc:		Adds a curve showing the derivative of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -976,26 +979,26 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the derivative of dataset and add it to the plot
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		Dataset2D *newData = new Dataset2D(
-			DiscreteDerivative::ComputeTimeHistory(*plotList[selectedRows[i] - 1]));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
+			DiscreteDerivative::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
 
-		wxString name = _T("d/dt(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")");
-		AddCurve(newData, name);
+		wxString name(_T("d/dt(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		AddCurve(std::move(newData), name);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		PlotIntegral
 //
-// Description:		Adds a curve showing the integral of the selected grid
+// Desc:		Adds a curve showing the integral of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1007,26 +1010,26 @@ void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the integral of dataset and add it to the plot
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		Dataset2D *newData = new Dataset2D(
-			DiscreteIntegral::ComputeTimeHistory(*plotList[selectedRows[i] - 1]));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
+			DiscreteIntegral::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
 
-		wxString name = _T("integral(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")");
-		AddCurve(newData, name);
+		wxString name(_T("integral(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		AddCurve(std::move(newData), name);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		PlotRMS
 //
-// Description:		Adds a curve showing the RMS of the selected grid
+// Desc:		Adds a curve showing the RMS of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1038,26 +1041,26 @@ void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the RMS of dataset and add it to the plot
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		Dataset2D *newData = new Dataset2D(
-			RootMeanSquare::ComputeTimeHistory(*plotList[selectedRows[i] - 1]));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
+			RootMeanSquare::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
 
-		wxString name = _T("RMS(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")");
-		AddCurve(newData, name);
+		wxString name(_T("RMS(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		AddCurve(std::move(newData), name);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		PlotFFT
 //
-// Description:		Adds a curve showing the FFT of the selected grid
+// Desc:		Adds a curve showing the FFT of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1069,27 +1072,28 @@ void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 {
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		Dataset2D *newData(GetFFTData(plotList[selectedRows[i] - 1]));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
+			GetFFTData(plotList[selectedRows[i] - 1])));
 		if (!newData)
 			continue;
 
-		wxString name = _T("FFT(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")");
-		AddCurve(newData, name);
+		wxString name(_T("FFT(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		AddCurve(std::move(newData), name);
 		SetMarkerSize(grid->GetNumberRows() - 2, 0);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		BitMask
 //
-// Description:		Creates bit mask for the specified curve.
+// Desc:		Creates bit mask for the specified curve.
 //
 // Input Arguments:
 //		selectedRows	= const wxArrayInt&
@@ -1100,7 +1104,7 @@ void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 {
 	unsigned long bit;
@@ -1116,19 +1120,19 @@ void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		Dataset2D *newData = new Dataset2D(
-			PlotMath::ApplyBitMask(*plotList[selectedRows[i] - 1], bit));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
+			PlotMath::ApplyBitMask(*plotList[selectedRows[i] - 1], bit)));
 
-		wxString name = grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(", Bit ") + wxString::Format("%lu", bit);
-		AddCurve(newData, name);
+		wxString name(grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(", Bit ") + wxString::Format("%lu", bit));
+		AddCurve(std::move(newData), name);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		TimeShift
 //
-// Description:		Adds a new curve equivalent to the selected curve shifted
+// Desc:		Adds a new curve equivalent to the selected curve shifted
 //					by the specified amount.
 //
 // Input Arguments:
@@ -1140,7 +1144,7 @@ void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 {
 	double shift(0.0);
@@ -1156,21 +1160,21 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		Dataset2D *newData = new Dataset2D(*plotList[selectedRows[i] - 1]);
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
 
 		newData->XShift(shift);
 
-		wxString name = grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(", t = t0 + ");
+		wxString name(grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(", t = t0 + "));
 		name += shiftText;
-		AddCurve(newData, name);
+		AddCurve(std::move(newData), name);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		FilterCurves
 //
-// Description:		Displays a dialog allowing the user to specify the filter,
+// Desc:		Displays a dialog allowing the user to specify the filter,
 //					and adds the filtered curve to the plot.
 //
 // Input Arguments:
@@ -1182,7 +1186,7 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 {
 	FilterParameters filterParameters(DisplayFilterDialog());
@@ -1193,22 +1197,21 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		const Dataset2D *currentData = plotList[selectedRows[i] - 1];
-		Dataset2D *newData = new Dataset2D(*currentData);
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(plotList[selectedRows[i] - 1]));
 
-		ApplyFilter(filterParameters, *newData);
+		ApplyFilter(filterParameters, newData);
 
 		wxString name = FilterDialog::GetFilterNamePrefix(filterParameters)
 			+ _T(" (") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")");
-		AddCurve(newData, name);
+		AddCurve(std::move(newData), name);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		FitCurves
 //
-// Description:		Fits a curve to the dataset selected in the grid control.
+// Desc:		Fits a curve to the dataset selected in the grid control.
 //					User is asked to specify the order of the fit.
 //
 // Input Arguments:
@@ -1220,7 +1223,7 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 {
 	// Ask the user what order to use for the polynomial
@@ -1243,37 +1246,38 @@ void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
 		wxString name;
-		Dataset2D* newData(GetCurveFitData(order, plotList[selectedRows[i] - 1], name, selectedRows[i]));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
+			GetCurveFitData(order, plotList[selectedRows[i] - 1], name, selectedRows[i])));
 
-		AddCurve(newData, name);
+		AddCurve(std::move(newData), name);
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GetCurveFitData
 //
-// Description:		Fits a curve of the specified order to the specified data
+// Desc:		Fits a curve of the specified order to the specified data
 //					and returns a dataset containing the curve.
 //
 // Input Arguments:
 //		order	= const unsigned int&
-//		data	= const Dataset2D*
+//		data	= const std::unique_ptr<const Dataset2D>&
 //		row		= const unsigned int&
 //
 // Output Arguments:
 //		name	= wxString&
 //
 // Return Value:
-//		::Dataset2D*
+//		std::unique_ptr<Dataset2D>
 //
-//==========================================================================
-Dataset2D* GuiInterface::GetCurveFitData(const unsigned int &order,
-	const Dataset2D* data, wxString &name, const unsigned int& row) const
+//=============================================================================
+std::unique_ptr<Dataset2D> GuiInterface::GetCurveFitData(const unsigned int &order,
+	const std::unique_ptr<const Dataset2D>& data, wxString &name, const unsigned int& row) const
 {
 	CurveFit::PolynomialFit fitData = CurveFit::DoPolynomialFit(*data, order);
 
-	Dataset2D *newData = new Dataset2D(*data);
+	std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*data));
 	unsigned int i;
 	for (i = 0; i < newData->GetNumberOfPoints(); i++)
 		newData->GetYPointer()[i] = CurveFit::EvaluateFit(newData->GetXData(i), fitData);
@@ -1285,11 +1289,11 @@ Dataset2D* GuiInterface::GetCurveFitData(const unsigned int &order,
 	return newData;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GetCurveFitName
 //
-// Description:		Determines an appropriate name for a curve fit dataset.
+// Desc:		Determines an appropriate name for a curve fit dataset.
 //
 // Input Arguments:
 //		fitData	= const CurveFit::PolynomialFit&
@@ -1301,7 +1305,7 @@ Dataset2D* GuiInterface::GetCurveFitData(const unsigned int &order,
 // Return Value:
 //		wxString indicating the name for the fit
 //
-//==========================================================================
+//=============================================================================
 wxString GuiInterface::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
 	const unsigned int &row) const
 {
@@ -1332,11 +1336,11 @@ wxString GuiInterface::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
 	return name;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		DisplayMathChannelDialog
 //
-// Description:		Displays an input dialog that allows the user to enter a
+// Desc:		Displays an input dialog that allows the user to enter a
 //					math expression.  If an expression is entered, it attempts
 //					to add the channel.
 //
@@ -1349,7 +1353,7 @@ wxString GuiInterface::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::DisplayMathChannelDialog(wxString defaultInput)
 {
 	// Display input dialog in which user can specify the math desired
@@ -1361,11 +1365,11 @@ void GuiInterface::DisplayMathChannelDialog(wxString defaultInput)
 	AddCurve(::wxGetTextFromUser(message, _T("Specify Math Channel"), defaultInput, owner));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		DisplayAxisRangeDialog
 //
-// Description:		Displays an input dialog that allows the user to set the
+// Desc:		Displays an input dialog that allows the user to set the
 //					range for an axis.
 //
 // Input Arguments:
@@ -1377,7 +1381,7 @@ void GuiInterface::DisplayMathChannelDialog(wxString defaultInput)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 {
 	double min, max;
@@ -1411,11 +1415,11 @@ void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 	renderer->SaveCurrentZoom();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		DisplayFilterDialog
 //
-// Description:		Dispalys a dialog box allowing the user to specify a filter,
+// Desc:		Dispalys a dialog box allowing the user to specify a filter,
 //					returns the specified parameters.
 //
 // Input Arguments:
@@ -1427,7 +1431,7 @@ void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 // Return Value:
 //		FilterParameters describing the user-specified filter (order = 0 for cancelled dialog)
 //
-//==========================================================================
+//=============================================================================
 FilterParameters GuiInterface::DisplayFilterDialog()
 {
 	FilterDialog dialog(renderer);
@@ -1441,15 +1445,15 @@ FilterParameters GuiInterface::DisplayFilterDialog()
 	return dialog.GetFilterParameters();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		ApplyFilter
 //
-// Description:		Applies the specified filter to the specified dataset.
+// Desc:		Applies the specified filter to the specified dataset.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
-//		data		= Dataset2D&
+//		data		= const std::unique_ptr<Dataset2D>&
 //
 // Output Arguments:
 //		None
@@ -1457,43 +1461,43 @@ FilterParameters GuiInterface::DisplayFilterDialog()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::ApplyFilter(const FilterParameters &parameters,
-	Dataset2D &data)
+	const std::unique_ptr<Dataset2D>& data)
 {
 	double factor;
 	if (!GetXAxisScalingFactor(factor))
 		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
 			_T("Accuracy Warning"), wxICON_WARNING, owner);
 
-	if (!PlotMath::XDataConsistentlySpaced(data))
+	if (!PlotMath::XDataConsistentlySpaced(*data))
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
 			_T("Accuracy Warning"), wxICON_WARNING, owner);
 
-	Filter *filter = GetFilter(parameters, factor / data.GetAverageDeltaX(), data.GetYData(0));
+	Filter *filter = GetFilter(parameters, factor / data->GetAverageDeltaX(), data->GetYData(0));
 
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
-		data.GetYPointer()[i] = filter->Apply(data.GetYData(i));
+	for (i = 0; i < data->GetNumberOfPoints(); i++)
+		data->GetYPointer()[i] = filter->Apply(data->GetYData(i));
 
 	// For phaseless filter, re-apply the same filter backwards
 	if (parameters.phaseless)
 	{
-		data.Reverse();
-		filter->Initialize(data.GetYData(0));
-		for (i = 0; i < data.GetNumberOfPoints(); i++)
-			data.GetYPointer()[i] = filter->Apply(data.GetYData(i));
-		data.Reverse();
+		data->Reverse();
+		filter->Initialize(data->GetYData(0));
+		for (i = 0; i < data->GetNumberOfPoints(); i++)
+			data->GetYPointer()[i] = filter->Apply(data->GetYData(i));
+		data->Reverse();
 	}
 
 	delete filter;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GetFilter
 //
-// Description:		Returns a filter matching the specified parameters.
+// Desc:		Returns a filter matching the specified parameters.
 //
 // Input Arguments:
 //		parameters		= const FilterParameters&
@@ -1506,7 +1510,7 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 // Return Value:
 //		Filter*
 //
-//==========================================================================
+//=============================================================================
 Filter* GuiInterface::GetFilter(const FilterParameters &parameters,
 	const double &sampleRate, const double &initialValue) const
 {
@@ -1516,11 +1520,11 @@ Filter* GuiInterface::GetFilter(const FilterParameters &parameters,
 		initialValue);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		UpdateLegend
 //
-// Description:		Updates the contents of the legend actor.
+// Desc:		Updates the contents of the legend actor.
 //
 // Input Arguments:
 //		None
@@ -1531,7 +1535,7 @@ Filter* GuiInterface::GetFilter(const FilterParameters &parameters,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::UpdateLegend()
 {
 	double lineSize;
@@ -1555,11 +1559,11 @@ void GuiInterface::UpdateLegend()
 	renderer->UpdateLegend(entries);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		SetMarkerSize
 //
-// Description:		Sets the marker size for the specified curve.
+// Desc:		Sets the marker size for the specified curve.
 //
 // Input Arguments:
 //		curve	= const unsigned int&
@@ -1571,18 +1575,18 @@ void GuiInterface::UpdateLegend()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::SetMarkerSize(const unsigned int &curve, const int &size)
 {
 	grid->SetCellValue(curve + 1, PlotListGrid::ColMarkerSize, wxString::Format("%i", size));
 	UpdateCurveProperties(curve);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		UpdateCurveQuality
 //
-// Description:		Sets curve quality according to how many lines need to
+// Desc:		Sets curve quality according to how many lines need to
 //					be rendered.
 //
 // Input Arguments:
@@ -1594,7 +1598,7 @@ void GuiInterface::SetMarkerSize(const unsigned int &curve, const int &size)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::UpdateCurveQuality()
 {
 	//if (renderer->GetTotalPointCount() > highQualityCurvePointLimit)
@@ -1604,11 +1608,11 @@ void GuiInterface::UpdateCurveQuality()
 		PlotRenderer::QualityHighStatic | PlotRenderer::QualityHighWrite));*/// TODO:  Fix this after line rendering is improved
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		UnitStringToFactor
 //
-// Description:		Converts from a unit string to a factor value.
+// Desc:		Converts from a unit string to a factor value.
 //
 // Input Arguments:
 //		unit	= const wxString&
@@ -1619,7 +1623,7 @@ void GuiInterface::UpdateCurveQuality()
 // Return Value:
 //		bool, true if unit can be converted, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool GuiInterface::UnitStringToFactor(const wxString &unit, double &factor)
 {
 	// We'll recognize the following units:
@@ -1649,23 +1653,24 @@ bool GuiInterface::UnitStringToFactor(const wxString &unit, double &factor)
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GetFFTData
 //
-// Description:		Returns a dataset containing an FFT of the specified data.
+// Desc:		Returns a dataset containing an FFT of the specified data.
 //
 // Input Arguments:
-//		data	= const LibPlot2D::Dataset2D&
+//		data	= const std::unique_ptr<const Dataset2D>&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		LibPlot2D::Dataset2D* pointing to a dataset contining the new FFT data
+//		std::unique_ptr<Dataset2D>
 //
-//==========================================================================
-Dataset2D* GuiInterface::GetFFTData(const Dataset2D* data)
+//=============================================================================
+std::unique_ptr<Dataset2D> GuiInterface::GetFFTData(
+	const std::unique_ptr<const Dataset2D>& data)
 {
 	double factor;
 	if (!GetXAxisScalingFactor(factor))
@@ -1684,65 +1689,73 @@ Dataset2D* GuiInterface::GetFFTData(const Dataset2D* data)
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
 			_T("Accuracy Warning"), wxICON_WARNING, owner);
 
-	LibPlot2D::Dataset2D *newData;
+	std::unique_ptr<Dataset2D> newData(
+		std::move(FastFourierTransform::ComputeFFT([&dialog, &data, this]() -> const std::unique_ptr<const Dataset2D>&
+	{
+		if (dialog.GetUseZoomedData())
+			return this->GetXZoomedDataset(data);
+		else
+			return data;
+	}), dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(), dialog.GetSubtractMean()));
 
-	if (dialog.GetUseZoomedData())
-		newData = new LibPlot2D::Dataset2D(LibPlot2D::FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
+	
+		/*newData = new LibPlot2D::Dataset2D(LibPlot2D::FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
 			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
 			dialog.GetSubtractMean()));
 	else
 		newData = new LibPlot2D::Dataset2D(LibPlot2D::FastFourierTransform::ComputeFFT(*data,
 			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
-			dialog.GetSubtractMean()));
+			dialog.GetSubtractMean()));*/
 
 	newData->MultiplyXData(factor);
 
 	return newData;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GetXZoomedDataset
 //
-// Description:		Returns a dataset containing only the data within the
+// Desc:		Returns a dataset containing only the data within the
 //					current zoomed x-limits.
 //
 // Input Arguments:
-//		fullData	= const LibPlot2D::Dataset2D&
+//		fullData	= const std::unique_ptr<const Dataset2D>&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		LibPlot2D::Dataset2D
+//		std::unique_ptr<Dataset2D>
 //
-//==========================================================================
-Dataset2D GuiInterface::GetXZoomedDataset(const Dataset2D &fullData) const
+//=============================================================================
+std::unique_ptr<Dataset2D> GuiInterface::GetXZoomedDataset(
+	const std::unique_ptr<const Dataset2D>& fullData) const
 {
 	unsigned int i, startIndex(0), endIndex(0);
-	while (fullData.GetXData(startIndex) < renderer->GetXMin() &&
-		startIndex < fullData.GetNumberOfPoints())
+	while (fullData->GetXData(startIndex) < renderer->GetXMin() &&
+		startIndex < fullData->GetNumberOfPoints())
 		startIndex++;
 	endIndex = startIndex;
-	while (fullData.GetXData(endIndex) < renderer->GetXMax() &&
-		endIndex < fullData.GetNumberOfPoints())
+	while (fullData->GetXData(endIndex) < renderer->GetXMax() &&
+		endIndex < fullData->GetNumberOfPoints())
 		endIndex++;
 
-	LibPlot2D::Dataset2D data(endIndex - startIndex);
+	std::unique_ptr<Dataset2D> data(std::make_unique<Dataset2D>(endIndex - startIndex));
 	for (i = startIndex; i < endIndex; i++)
 	{
-		data.GetXPointer()[i - startIndex] = fullData.GetXData(i);
-		data.GetYPointer()[i - startIndex] = fullData.GetYData(i);
+		data->GetXPointer()[i - startIndex] = fullData->GetXData(i);
+		data->GetYPointer()[i - startIndex] = fullData->GetYData(i);
 	}
 
 	return data;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		ShowAppropriateXLabel
 //
-// Description:		Updates the x-axis label as necessary.
+// Desc:		Updates the x-axis label as necessary.
 //
 // Input Arguments:
 //		None
@@ -1753,7 +1766,7 @@ Dataset2D GuiInterface::GetXZoomedDataset(const Dataset2D &fullData) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::ShowAppropriateXLabel()
 {
 	// If the only visible curves are frequency plots, change the x-label
@@ -1780,11 +1793,11 @@ void GuiInterface::ShowAppropriateXLabel()
 		SetXDataLabel(currentFileFormat);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		GetXAxisScalingFactor
 //
-// Description:		Attempts to determine the scaling factor required to convert
+// Desc:		Attempts to determine the scaling factor required to convert
 //					the X-axis into seconds (assuming X-axis has units of time).
 //
 // Input Arguments:
@@ -1797,7 +1810,7 @@ void GuiInterface::ShowAppropriateXLabel()
 // Return Value:
 //		bool; true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool GuiInterface::GetXAxisScalingFactor(double &factor, wxString *label)
 {
 	if (XScalingFactorIsKnown(factor, label))
@@ -1812,11 +1825,11 @@ bool GuiInterface::GetXAxisScalingFactor(double &factor, wxString *label)
 	return UnitStringToFactor(unit, factor);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		XScalingFactorIsKnown
 //
-// Description:		If the x-axis scaling factor is known, determines its value.
+// Desc:		If the x-axis scaling factor is known, determines its value.
 //
 // Input Arguments:
 //		None
@@ -1828,7 +1841,7 @@ bool GuiInterface::GetXAxisScalingFactor(double &factor, wxString *label)
 // Return Value:
 //		bool, true if known, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool GuiInterface::XScalingFactorIsKnown(double &factor, wxString *label) const
 {
 	if (currentFileFormat == FormatBaumuller)
@@ -1849,11 +1862,11 @@ bool GuiInterface::XScalingFactorIsKnown(double &factor, wxString *label) const
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		ExtractUnitFromDescription
 //
-// Description:		Parses the description looking for a unit string.  This
+// Desc:		Parses the description looking for a unit string.  This
 //					will recognize the following as unit strings:
 //					X Series Name [unit]
 //					X Series Name (unit)
@@ -1868,7 +1881,7 @@ bool GuiInterface::XScalingFactorIsKnown(double &factor, wxString *label) const
 // Return Value:
 //		wxString containing the unit porition of the description
 //
-//==========================================================================
+//=============================================================================
 wxString GuiInterface::ExtractUnitFromDescription(const wxString &description)
 {
 	wxString unit;
@@ -1899,11 +1912,11 @@ wxString GuiInterface::ExtractUnitFromDescription(const wxString &description)
 	return unit;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		FindWrappedString
 //
-// Description:		Determines if the specified string contains a string wrapped
+// Desc:		Determines if the specified string contains a string wrapped
 //					with the specified characters.
 //
 // Input Arguments:
@@ -1917,7 +1930,7 @@ wxString GuiInterface::ExtractUnitFromDescription(const wxString &description)
 // Return Value:
 //		bool, true if a wrapped string is found, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 	const wxChar &open, const wxChar &close)
 {
@@ -1940,11 +1953,11 @@ bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		SetXDataLabel
 //
-// Description:		Sets the x-data labels to the specified string.
+// Desc:		Sets the x-data labels to the specified string.
 //
 // Input Arguments:
 //		label	= wxString
@@ -1955,18 +1968,18 @@ bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::SetXDataLabel(wxString label)
 {
 	grid->SetCellValue(0, PlotListGrid::ColName, label);
 	renderer->SetXLabel(label);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		SetXDataLabel
 //
-// Description:		Sets the x-data labels according to the opened file type.
+// Desc:		Sets the x-data labels according to the opened file type.
 //
 // Input Arguments:
 //		None
@@ -1977,7 +1990,7 @@ void GuiInterface::SetXDataLabel(wxString label)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::SetXDataLabel(const FileFormat &format)
 {
 	switch (format)
@@ -1994,11 +2007,11 @@ void GuiInterface::SetXDataLabel(const FileFormat &format)
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		UpdateCurveProperties
 //
-// Description:		Updates the specified curve properties.
+// Desc:		Updates the specified curve properties.
 //
 // Input Arguments:
 //		index	= const unsigned int&
@@ -2009,7 +2022,7 @@ void GuiInterface::SetXDataLabel(const FileFormat &format)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 {
 	Color color;
@@ -2019,11 +2032,11 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 		!grid->GetCellValue(index + 1, PlotListGrid::ColRightAxis).IsEmpty());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			GuiInterface
 // Function:		UpdateCurveProperties
 //
-// Description:		Updates the specified curve properties to match the arguments.
+// Desc:		Updates the specified curve properties to match the arguments.
 //
 // Input Arguments:
 //		index		= const unsigned int&
@@ -2037,7 +2050,7 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void GuiInterface::UpdateCurveProperties(const unsigned int &index,
 	const Color &color, const bool &visible, const bool &rightAxis)
 {

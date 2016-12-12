@@ -1,11 +1,11 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  guiInterface.h
 // Date:  12/9/2016
@@ -22,6 +22,9 @@
 #include "lp2d/parser/dataFile.h"
 #include "lp2d/renderer/plotRenderer.h"
 #include "lp2d/gui/plotListGrid.h"
+
+// Standard C++ headers
+#include <memory>
 
 // wxWidgets forward declarations
 class wxArrayString;
@@ -50,7 +53,7 @@ public:
 		const double &leftValue, const double &rightValue);
 
 	void AddCurve(wxString mathString);
-	void AddCurve(Dataset2D *data, wxString name);
+	void AddCurve(std::unique_ptr<Dataset2D> data, wxString name);
 	void RemoveCurve(const unsigned int &i);
 	void RemoveCurves(const wxArrayInt& curves);
 	void ClearAllCurves();
@@ -88,7 +91,8 @@ public:
 	void FilterCurves(const wxArrayInt& selectedRows);
 	void FitCurves(const wxArrayInt& selectedRows);
 
-	Dataset2D GetXZoomedDataset(const Dataset2D &fullData) const;
+	std::unique_ptr<Dataset2D> GetXZoomedDataset(
+		const std::unique_ptr<const Dataset2D>& fullData) const;
 
 	void SetXDataLabel(wxString label);
 	void SetXDataLabel(const FileFormat &format);
@@ -134,19 +138,24 @@ private:
 		const unsigned int &column, const bool &isVisible);
 
 	FilterParameters DisplayFilterDialog();
-	void ApplyFilter(const FilterParameters &parameters, Dataset2D &data);
+	void ApplyFilter(const FilterParameters &parameters,
+		const std::unique_ptr<Dataset2D>& data);
 
-	Dataset2D *GetCurveFitData(const unsigned int &order, const Dataset2D* data, wxString &name, const unsigned int& row) const;
-	wxString GetCurveFitName(const CurveFit::PolynomialFit &fitData, const unsigned int &row) const;
+	std::unique_ptr<Dataset2D> GetCurveFitData(const unsigned int &order,
+		const std::unique_ptr<const Dataset2D>& data, wxString &name,
+		const unsigned int& row) const;
+	wxString GetCurveFitName(const CurveFit::PolynomialFit &fitData,
+		const unsigned int &row) const;
 
-	Dataset2D* GetFFTData(const Dataset2D* data);
+	std::unique_ptr<Dataset2D> GetFFTData(
+		const std::unique_ptr<const Dataset2D>& data);
 
 	Filter* GetFilter(const FilterParameters &parameters,
 		const double &sampleRate, const double &initialValue) const;
 
-	void AddFFTCurves(const double& xFactor, Dataset2D *amplitude,
-		Dataset2D *phase, Dataset2D *coherence,
-		const wxString &namePortion);
+	void AddFFTCurves(const double& xFactor,
+		std::unique_ptr<Dataset2D> amplitude, std::unique_ptr<Dataset2D> phase,
+		std::unique_ptr<Dataset2D> coherence, const wxString &namePortion);
 
 	void AddMathChannel();
 

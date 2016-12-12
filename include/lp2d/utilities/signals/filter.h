@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  filter.h
-// Created:  5/16/2011
-// Author:  K. Loux
-// Description:  Class for digital filters.
+// Date:  5/16/2011
+// Auth:  K. Loux
+// Desc:  Class for digital filters.
 
 #ifndef FILTER_H_
 #define FILTER_H_

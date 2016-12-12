@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  baumullerFile.cpp
-// Created:  10/4/2012
-// Author:  K. Loux
-// Description:  File class for Baumuller files.
+// Date:  10/4/2012
+// Auth:  K. Loux
+// Desc:  File class for Baumuller files.
 
 // Local headers
 #include "lp2d/parser/baumullerFile.h"
@@ -18,11 +18,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			BaumullerFile
 // Function:		IsType
 //
-// Description:		Method for determining if the specified file is this
+// Desc:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:
@@ -34,7 +34,7 @@ namespace LibPlot2D
 // Return Value:
 //		bool, true if this object can process the specified file, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool BaumullerFile::IsType(const wxString &fileName)
 {
 	std::ifstream file(fileName.mb_str(), std::ios::in);
@@ -56,11 +56,11 @@ bool BaumullerFile::IsType(const wxString &fileName)
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			BaumullerFile
 // Function:		GetCurveInformation
 //
-// Description:		Parses the file and assembles descriptions for each column
+// Desc:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
 //					the number of header rows back to the calling function.
 //
@@ -75,7 +75,7 @@ bool BaumullerFile::IsType(const wxString &fileName)
 // Return Value:
 //		wxArrayString containing the descriptions
 //
-//==========================================================================
+//=============================================================================
 wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
@@ -106,11 +106,11 @@ wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 	return names;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			BaumullerFile
 // Function:		ConstructNames
 //
-// Description:		Generates names when the appropriate part of the file is
+// Desc:		Generates names when the appropriate part of the file is
 //					reached.
 //
 // Input Arguments:
@@ -123,7 +123,7 @@ wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 // Return Value:
 //		wxArrayString containing the descriptions
 //
-//==========================================================================
+//=============================================================================
 bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 	wxArrayString &names, wxArrayString &previousLines) const
 {
@@ -152,11 +152,11 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			BaumullerFile
 // Function:		DoTypeSpecificLoadTasks
 //
-// Description:		Sets flags to be used during initial loading operations
+// Desc:		Sets flags to be used during initial loading operations
 //					(like building curve names).
 //
 // Input Arguments:
@@ -168,17 +168,17 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void BaumullerFile::DoTypeSpecificLoadTasks()
 {
 	ignoreConsecutiveDelimiters = false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			BaumullerFile
 // Function:		DoTypeSpecificProcessTasks
 //
-// Description:		Sets flags to be used during data extraction operations.
+// Desc:		Sets flags to be used during data extraction operations.
 //
 // Input Arguments:
 //		None
@@ -189,7 +189,7 @@ void BaumullerFile::DoTypeSpecificLoadTasks()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void BaumullerFile::DoTypeSpecificProcessTasks()
 {
 	ignoreConsecutiveDelimiters = true;

@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  textRendering.cpp
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Derived from Primitive for creating text objects on a plot.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Derived from Primitive for creating text objects on a plot.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -24,11 +24,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		TextRendering
 //
-// Description:		Constructor for the TextRendering class.
+// Desc:		Constructor for the TextRendering class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow& reference to the object that owns this
@@ -39,7 +39,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindow),
 	font(renderWindow)
 {
@@ -53,11 +53,11 @@ TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindo
 	centered = false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		~TextRendering
 //
-// Description:		Destructor for the TextRendering class.
+// Desc:		Destructor for the TextRendering class.
 //
 // Input Arguments:
 //		None
@@ -68,16 +68,16 @@ TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindo
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 TextRendering::~TextRendering()
 {
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		Update
 //
-// Description:		Updates the GL buffers associated with this object.
+// Desc:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -88,7 +88,7 @@ TextRendering::~TextRendering()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void TextRendering::Update(const unsigned int& /*i*/)
 {
 	font.SetColor(color);
@@ -107,11 +107,11 @@ void TextRendering::Update(const unsigned int& /*i*/)
 	bufferInfo[0] = font.BuildText();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		GenerateGeometry
 //
-// Description:		Creates the OpenGL instructions to create this object in
+// Desc:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
 // Input Arguments:
@@ -123,7 +123,7 @@ void TextRendering::Update(const unsigned int& /*i*/)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void TextRendering::GenerateGeometry()
 {
 	if (font.IsOK() && bufferInfo[0].vertexCount > 0)
@@ -133,11 +133,11 @@ void TextRendering::GenerateGeometry()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		HasValidParameters
 //
-// Description:		Checks to see if the information about this object is
+// Desc:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
 // Input Arguments:
@@ -149,7 +149,7 @@ void TextRendering::GenerateGeometry()
 // Return Value:
 //		bool, true for OK to draw, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool TextRendering::HasValidParameters()
 {
 	// Don't draw if the angle is not a number
@@ -162,11 +162,11 @@ bool TextRendering::HasValidParameters()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		GetTextHeight
 //
-// Description:		Returns the height of the bounding box for the current
+// Desc:		Returns the height of the bounding box for the current
 //					text.
 //
 // Input Arguments:
@@ -178,7 +178,7 @@ bool TextRendering::HasValidParameters()
 // Return Value:
 //		double, height in pixels of the current text
 //
-//==========================================================================
+//=============================================================================
 double TextRendering::GetTextHeight()
 {
 	if (!font.IsOK())
@@ -189,11 +189,11 @@ double TextRendering::GetTextHeight()
 	return boundingBox.yUp - boundingBox.yDown;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		GetTextWidth
 //
-// Description:		Returns the width of the bounding box for the current
+// Desc:		Returns the width of the bounding box for the current
 //					text.
 //
 // Input Arguments:
@@ -205,7 +205,7 @@ double TextRendering::GetTextHeight()
 // Return Value:
 //		double, width in pixels of the current text
 //
-//==========================================================================
+//=============================================================================
 double TextRendering::GetTextWidth()
 {
 	if (!font.IsOK())
@@ -216,11 +216,11 @@ double TextRendering::GetTextWidth()
 	return boundingBox.xRight - boundingBox.xLeft;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextRendering
 // Function:		InitializeFonts
 //
-// Description:		Initializes the font object.
+// Desc:		Initializes the font object.
 //
 // Input Arguments:
 //		None
@@ -231,7 +231,7 @@ double TextRendering::GetTextWidth()
 // Return Value:
 //		double, width in pixels of the current text
 //
-//==========================================================================
+//=============================================================================
 void TextRendering::InitializeFonts(const std::string& fontFileName, const double& size)
 {
 	if (!font.SetFace(fontFileName))

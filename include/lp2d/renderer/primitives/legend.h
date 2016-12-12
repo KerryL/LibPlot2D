@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                            Copyright Kerry R. Loux 2015
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  legend.h
-// Created:  3/6/2015
-// Author:  K. Loux
-// Description:  Derived from Primitive, this class is used to draw plot legends.
+// Date:  3/6/2015
+// Auth:  K. Loux
+// Desc:  Derived from Primitive, this class is used to draw plot legends.
 
 #ifndef LEGEND_H_
 #define LEGEND_H_

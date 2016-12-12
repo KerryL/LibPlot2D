@@ -1,19 +1,19 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  line.h
-// Created:  4/2/2015
-// Author:  K. Loux
-// Description:  Object representing a line, drawn with triangles faded from line
-//               color to background color in order to make the lines prettier, be
-//               more consistent from platform to platofrm and to support sub-pixel
-//               widths.
+// Date:  4/2/2015
+// Auth:  K. Loux
+// Desc:  Object representing a line, drawn with triangles faded from line
+//        color to background color in order to make the lines prettier, be
+//        more consistent from platform to platofrm and to support sub-pixel
+//        widths.
 
 #ifndef LINE_H_
 #define LINE_H_

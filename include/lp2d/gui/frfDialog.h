@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  frfDialog.h
-// Created:  8/15/2012
-// Author:  K. Loux
-// Description:  Dialog for selection of frequency response function data.
+// Date:  8/15/2012
+// Auth:  K. Loux
+// Desc:  Dialog for selection of frequency response function data.
 
 #ifndef FRF_DIALOG_H_
 #define FRF_DIALOG_H_

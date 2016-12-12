@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  expressionTree.h
-// Created:  5/6/2011
-// Author:  K. Loux
-// Description:  Handles user-specified mathematical operations on datasets.
+// Date:  5/6/2011
+// Auth:  K. Loux
+// Desc:  Handles user-specified mathematical operations on datasets.
 
 #ifndef EXPRESSION_TREE_H_
 #define EXPRESSION_TREE_H_
@@ -19,6 +19,7 @@
 #include <queue>
 #include <stack>
 #include <string>
+#include <memory>
 
 // Local headers
 #include "lp2d/utilities/managedList.h"
@@ -44,7 +45,7 @@ public:
 
 private:
 	static const unsigned int printfPrecision;
-	const ManagedList<const Dataset2D> *list;
+	const ManagedList<std::unique_ptr<const Dataset2D>> *list;
 
 	double mXAxisFactor;
 

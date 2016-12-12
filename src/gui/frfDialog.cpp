@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  frfDialog.cpp
-// Created:  8/15/2012
-// Author:  K. Loux
-// Description:  Dialog for selection of frequency response function data.
+// Date:  8/15/2012
+// Auth:  K. Loux
+// Desc:  Dialog for selection of frequency response function data.
 
 // Standard C++ headers
 #include <algorithm>
@@ -21,11 +21,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		FRFDialog
 //
-// Description:		Constructor for FRFDialog class.
+// Desc:		Constructor for FRFDialog class.
 //
 // Input Arguments:
 //		parent		= wxWindow* that owns this object
@@ -37,18 +37,18 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 FRFDialog::FRFDialog(wxWindow *parent, const wxArrayString &descriptions)
 									 : wxDialog(parent, wxID_ANY, _T("Frequency Response Function"), wxDefaultPosition)
 {
 	CreateControls(descriptions);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		CreateControls
 //
-// Description:		Populates the dialog with controls.
+// Desc:		Populates the dialog with controls.
 //
 // Input Arguments:
 //		descriptions	= const wxArrayString& containing curve descriptions
@@ -59,7 +59,7 @@ FRFDialog::FRFDialog(wxWindow *parent, const wxArrayString &descriptions)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FRFDialog::CreateControls(const wxArrayString &descriptions)
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
@@ -78,11 +78,11 @@ void FRFDialog::CreateControls(const wxArrayString &descriptions)
 	Center();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		CreateSelectionControls
 //
-// Description:		Returns a sizer containing the selection controls.
+// Desc:		Returns a sizer containing the selection controls.
 //
 // Input Arguments:
 ///		descriptions	= const wxArrayString& containing curve descriptions
@@ -93,7 +93,7 @@ void FRFDialog::CreateControls(const wxArrayString &descriptions)
 // Return Value:
 //		wxSizer*
 //
-//==========================================================================
+//=============================================================================
 wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -115,11 +115,11 @@ wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 	return sizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		CreateTextBox
 //
-// Description:		Returns a sizer containing the text box control.
+// Desc:		Returns a sizer containing the text box control.
 //
 // Input Arguments:
 ///		None
@@ -130,7 +130,7 @@ wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 // Return Value:
 //		wxSizer*
 //
-//==========================================================================
+//=============================================================================
 wxSizer* FRFDialog::CreateTextBox()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -143,11 +143,11 @@ wxSizer* FRFDialog::CreateTextBox()
 	return sizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		CreateCheckBoxes
 //
-// Description:		Returns a sizer containing the check box controls.
+// Desc:		Returns a sizer containing the check box controls.
 //
 // Input Arguments:
 //		None
@@ -158,7 +158,7 @@ wxSizer* FRFDialog::CreateTextBox()
 // Return Value:
 //		wxSizer*
 //
-//==========================================================================
+//=============================================================================
 wxSizer *FRFDialog::CreateCheckBoxes()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
@@ -180,11 +180,11 @@ wxSizer *FRFDialog::CreateCheckBoxes()
 	return sizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		TransferDataFromWindow
 //
-// Description:		Validates selections (ensures there are selections).
+// Desc:		Validates selections (ensures there are selections).
 //
 // Input Arguments:
 //		None
@@ -195,7 +195,7 @@ wxSizer *FRFDialog::CreateCheckBoxes()
 // Return Value:
 //		bool, true if transfer is valid, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool FRFDialog::TransferDataFromWindow()
 {
 	if (inputList->GetSelection() == wxNOT_FOUND || outputList->GetSelection() == wxNOT_FOUND)
@@ -216,11 +216,11 @@ bool FRFDialog::TransferDataFromWindow()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		GetInputIndex
 //
-// Description:		Returns the input data index.
+// Desc:		Returns the input data index.
 //
 // Input Arguments:
 //		None
@@ -231,17 +231,17 @@ bool FRFDialog::TransferDataFromWindow()
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int FRFDialog::GetInputIndex() const
 {
 	return inputList->GetSelection();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		GetOutputIndex
 //
-// Description:		Returns the output data index.
+// Desc:		Returns the output data index.
 //
 // Input Arguments:
 //		None
@@ -252,17 +252,17 @@ unsigned int FRFDialog::GetInputIndex() const
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int FRFDialog::GetOutputIndex() const
 {
 	return outputList->GetSelection();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		GetNumberOfAverages
 //
-// Description:		Returns the number of averages specified by the user.
+// Desc:		Returns the number of averages specified by the user.
 //
 // Input Arguments:
 //		None
@@ -273,7 +273,7 @@ unsigned int FRFDialog::GetOutputIndex() const
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int FRFDialog::GetNumberOfAverages() const
 {
 	unsigned long value;
@@ -281,11 +281,11 @@ unsigned int FRFDialog::GetNumberOfAverages() const
 	return std::max<unsigned int>((unsigned int)value, 1);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		GetComputePhase
 //
-// Description:		Indicates whether or not the user selected phase computation.
+// Desc:		Indicates whether or not the user selected phase computation.
 //
 // Input Arguments:
 //		None
@@ -296,17 +296,17 @@ unsigned int FRFDialog::GetNumberOfAverages() const
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 bool FRFDialog::GetComputePhase() const
 {
 	return phaseCheckBox->GetValue();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		GetComputeCoherence
 //
-// Description:		Indicates whether or not the user selected coherence computation.
+// Desc:		Indicates whether or not the user selected coherence computation.
 //
 // Input Arguments:
 //		None
@@ -317,17 +317,17 @@ bool FRFDialog::GetComputePhase() const
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 bool FRFDialog::GetComputeCoherence() const
 {
 	return coherenceCheckBox->GetValue();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FRFDialog
 // Function:		GetModuloPhase
 //
-// Description:		Indicates whether or not the user selected to modulo phase data.
+// Desc:		Indicates whether or not the user selected to modulo phase data.
 //
 // Input Arguments:
 //		None
@@ -338,7 +338,7 @@ bool FRFDialog::GetComputeCoherence() const
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 bool FRFDialog::GetModuloPhase() const
 {
 	return moduloPhaseCheckBox->GetValue();

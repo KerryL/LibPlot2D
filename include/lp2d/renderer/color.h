@@ -1,18 +1,18 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  color.h
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Contains class declaration for the Color class.  This class contains
-//				 RGBA color definitions in the form of doubles for use with wxWidgets
-//				 as well as OpenGL.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Contains class declaration for the Color class.  This class contains
+//        RGBA color definitions in the form of doubles for use with wxWidgets
+//        as well as OpenGL.
 
 #ifndef COLOR_H_
 #define COLOR_H_

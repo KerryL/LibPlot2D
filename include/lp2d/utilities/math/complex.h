@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  complex.h
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Contains class declaration for complex number class.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Contains class declaration for complex number class.
 
 #ifndef COMPLEX_H_
 #define COMPLEX_H_

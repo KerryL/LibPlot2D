@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  rms.cpp
-// Created:  5/3/2011
-// Author:  K. Loux
-// Description:  Computes root-mean-square of data.
+// Date:  5/3/2011
+// Auth:  K. Loux
+// Desc:  Computes root-mean-square of data.
 
 // Standard C++ headers
 #include <cmath>
@@ -22,11 +22,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			RootMeanSquare
 // Function:		ComputeTimeHistory (static)
 //
-// Description:		Computes the root-mean-square time history for the given
+// Desc:		Computes the root-mean-square time history for the given
 //					signal.  Assumes y contains data and x is time.
 //
 // Input Arguments:
@@ -38,7 +38,7 @@ namespace LibPlot2D
 // Return Value:
 //		Dataset2D containing the requested time history
 //
-//==========================================================================
+//=============================================================================
 Dataset2D RootMeanSquare::ComputeTimeHistory(const Dataset2D &data)
 {
 	Dataset2D rms(data);

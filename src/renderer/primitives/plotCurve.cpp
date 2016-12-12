@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotCurve.cpp
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Derived from Primitive for creating data curves on a plot.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Derived from Primitive for creating data curves on a plot.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -26,11 +26,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		PlotCurve
 //
-// Description:		Constructor for the PlotCurve class.
+// Desc:		Constructor for the PlotCurve class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow* pointing to the object that owns this
@@ -42,7 +42,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 	: Primitive(renderWindow), data(data), line(renderWindow)
 {
@@ -58,11 +58,11 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 	bufferInfo.push_back(BufferInfo());// Add a second empty info block for the markers
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		PlotCurve
 //
-// Description:		Copy constructor for the PlotCurve class.
+// Desc:		Copy constructor for the PlotCurve class.
 //
 // Input Arguments:
 //		plotCurve	= const PlotCurve& to copy to this object
@@ -73,18 +73,18 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
 	data(plotCurve.data), line(renderWindow)
 {
 	*this = plotCurve;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		~PlotCurve
 //
-// Description:		Destructor for the PlotCurve class.
+// Desc:		Destructor for the PlotCurve class.
 //
 // Input Arguments:
 //		None
@@ -95,16 +95,16 @@ PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 PlotCurve::~PlotCurve()
 {
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		InitializeMarkerVertexBuffer
 //
-// Description:		Initializes the vertex buffer for storing the marker information.
+// Desc:		Initializes the vertex buffer for storing the marker information.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -115,7 +115,7 @@ PlotCurve::~PlotCurve()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotCurve::InitializeMarkerVertexBuffer()
 {
 	delete[] bufferInfo[1].vertexBuffer;
@@ -129,11 +129,11 @@ void PlotCurve::InitializeMarkerVertexBuffer()
 	bufferInfo[1].vertexCountModified = false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		Update
 //
-// Description:		Updates the GL buffers associated with this object.
+// Desc:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -144,7 +144,7 @@ void PlotCurve::InitializeMarkerVertexBuffer()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotCurve::Update(const unsigned int& i)
 {
 	if (i == 0)
@@ -231,11 +231,11 @@ void PlotCurve::Update(const unsigned int& i)
 	assert(!RenderWindow::GLHasError());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		GenerateGeometry
 //
-// Description:		Creates the OpenGL instructions to create this object in
+// Desc:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
 // Input Arguments:
@@ -247,7 +247,7 @@ void PlotCurve::Update(const unsigned int& i)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotCurve::GenerateGeometry()
 {
 	if (yAxis->GetOrientation() == Axis::OrientationLeft)
@@ -281,11 +281,11 @@ void PlotCurve::GenerateGeometry()
 	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewFixed);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		PointIsValid
 //
-// Description:		Checks to see if the specified point is a real, finite number.
+// Desc:		Checks to see if the specified point is a real, finite number.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -296,7 +296,7 @@ void PlotCurve::GenerateGeometry()
 // Return Value:
 //		bool, true for valid, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool PlotCurve::PointIsValid(const unsigned int &i) const
 {
 	assert(i < data.GetNumberOfPoints());
@@ -305,11 +305,11 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 		PlotMath::IsValid<double>(data.GetYData(i));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		HasValidParameters
 //
-// Description:		Checks to see if the information about this object is
+// Desc:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
 // Input Arguments:
@@ -321,7 +321,7 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 // Return Value:
 //		bool, true for OK to draw, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool PlotCurve::HasValidParameters()
 {
 	if (xAxis != nullptr && yAxis != nullptr && data.GetNumberOfPoints() > 1)
@@ -333,11 +333,11 @@ bool PlotCurve::HasValidParameters()
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		operator=
 //
-// Description:		Assignment operator for PlotCurve class.
+// Desc:		Assignment operator for PlotCurve class.
 //
 // Input Arguments:
 //		plotCurve	= const PlotCurve& to assign to this object
@@ -348,7 +348,7 @@ bool PlotCurve::HasValidParameters()
 // Return Value:
 //		PlotCurve&, reference to this object
 //
-//==========================================================================
+//=============================================================================
 PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 {
 	if (this == &plotCurve)
@@ -359,11 +359,11 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 	return *this;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		BuildMarkers
 //
-// Description:		Plots markers at all un-interpolated points.
+// Desc:		Plots markers at all un-interpolated points.
 //
 // Input Arguments:
 //		None
@@ -374,7 +374,7 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotCurve::BuildMarkers()
 {
 	float halfMarkerXSize = 2 * markerSize * xScale;
@@ -433,11 +433,11 @@ void PlotCurve::BuildMarkers()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		DoLogarithmicScale
 //
-// Description:		Handles scaling for arrays of logarithmic data.
+// Desc:		Handles scaling for arrays of logarithmic data.
 //
 // Input Arguments:
 //		value	= const double&
@@ -448,7 +448,7 @@ void PlotCurve::BuildMarkers()
 // Return Value:
 //		double*
 //
-//==========================================================================
+//=============================================================================
 double* PlotCurve::DoLogarithmicScale(const double* values, const unsigned int& count)
 {
 	double* scaledValues = new double[count];
@@ -459,11 +459,11 @@ double* PlotCurve::DoLogarithmicScale(const double* values, const unsigned int& 
 	return scaledValues;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		RangeIsSmall
 //
-// Description:		Determines if the range is small enough to warrant
+// Desc:		Determines if the range is small enough to warrant
 //					drawing the point markers.
 //
 // Input Arguments:
@@ -475,7 +475,7 @@ double* PlotCurve::DoLogarithmicScale(const double* values, const unsigned int& 
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 bool PlotCurve::RangeIsSmall() const
 {
 	if (data.GetNumberOfPoints() < 2)
@@ -497,11 +497,11 @@ bool PlotCurve::RangeIsSmall() const
 	return YRangeIsSmall() == RangeSizeSmall;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		XRangeIsSmall
 //
-// Description:		Determines if the x-range is small enough to warrant
+// Desc:		Determines if the x-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
 //					one where there are less than some number of pixels in the
 //					x-direction between points (on average).
@@ -515,7 +515,7 @@ bool PlotCurve::RangeIsSmall() const
 // Return Value:
 //		PlotCurve::RangeSize
 //
-//==========================================================================
+//=============================================================================
 PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
 	double period = data.GetXData(1) - data.GetXData(0);
@@ -536,11 +536,11 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 	return RangeSizeLarge;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		YRangeIsSmall
 //
-// Description:		Determines if the y-range is small enough to warrant
+// Desc:		Determines if the y-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
 //					one where there are less than some number of pixels in the
 //					y-direction between points (on average).
@@ -554,7 +554,7 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 // Return Value:
 //		PlotCurve::RangeSize
 //
-//==========================================================================
+//=============================================================================
 PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
 	double period = data.GetYData(1) - data.GetYData(0);
@@ -575,11 +575,11 @@ PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 	return RangeSizeLarge;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCurve
 // Function:		NeedsMarkersDrawn
 //
-// Description:		Determines if we should draw plot markers.
+// Desc:		Determines if we should draw plot markers.
 //
 // Input Arguments:
 //		None
@@ -590,7 +590,7 @@ PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 bool PlotCurve::NeedsMarkersDrawn() const
 {
 	return markerSize > 0 || (markerSize < 0 && RangeIsSmall());

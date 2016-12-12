@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  rangeLimitsDialog.h
-// Created:  5/12/2011
-// Author:  K. Loux
-// Description:  Dialog box for entering a minimum and maximum value for an axis.
+// Date:  5/12/2011
+// Auth:  K. Loux
+// Desc:  Dialog box for entering a minimum and maximum value for an axis.
 
 #ifndef RANGE_LIMITS_DIALOG_H_
 #define RANGE_LIMITS_DIALOG_H_

@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotRenderer.h
-// Created:  5/4/2011
-// Author:  K. Loux
-// Description:  Derived from RenderWindow, this class is used to display plots on
-//				 the screen.
+// Date:  5/4/2011
+// Auth:  K. Loux
+// Desc:  Derived from RenderWindow, this class is used to display plots on
+//        the screen.
 
 #ifndef PLOT_RENDERER_H_
 #define PLOT_RENDERER_H_

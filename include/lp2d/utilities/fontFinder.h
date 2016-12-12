@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  fontFinder.h
-// Created:  11/17/2011
-// Author:  K. Loux
-// Description:  Cross-platform methods for working with fonts.  Builds on wxWidgets
-//				 objects.
+// Date:  11/17/2011
+// Auth:  K. Loux
+// Desc:  Cross-platform methods for working with fonts.  Builds on wxWidgets
+//        objects.
 
 #ifndef FONT_FINDER_H_
 #define FONT_FINDER_H_

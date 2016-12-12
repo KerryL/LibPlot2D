@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  filter.cpp
-// Created:  5/16/2011
-// Author:  K. Loux
-// Description:  Base class (abstract) for digital filters.
+// Date:  5/16/2011
+// Auth:  K. Loux
+// Desc:  Base class (abstract) for digital filters.
 
 // Standard C++ headers
 #include <cstdlib>
@@ -25,11 +25,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		Filter
 //
-// Description:		Constructor for the Filter class.
+// Desc:		Constructor for the Filter class.
 //
 // Input Arguments:
 //		_sampleRate		= const double& specifying the sampling rate in Hz
@@ -40,7 +40,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 {
 	a = nullptr;
@@ -49,11 +49,11 @@ Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 	y = nullptr;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		Filter
 //
-// Description:		Constructor for the Filter class for arbitrary filters.
+// Desc:		Constructor for the Filter class for arbitrary filters.
 //					Passed arguments are assumed to be for a continuous time
 //					filter (s-domain), and will be translated into filter
 //					coefficients according to the specified sample rate.
@@ -72,7 +72,7 @@ Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
 	const std::vector<double> &denominator, const double &initialValue) : sampleRate(sampleRate)
 {
@@ -80,11 +80,11 @@ Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
 	Initialize(initialValue);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		Filter
 //
-// Description:		Copy constructor for the Filter class.
+// Desc:		Copy constructor for the Filter class.
 //
 // Input Arguments:
 //		f	= const Filter&
@@ -95,17 +95,17 @@ Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Filter::Filter(const Filter &f) : sampleRate(f.sampleRate)
 {
 	*this = f;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		~Filter
 //
-// Description:		Destructor for the Filter class.
+// Desc:		Destructor for the Filter class.
 //
 // Input Arguments:
 //		None
@@ -116,17 +116,17 @@ Filter::Filter(const Filter &f) : sampleRate(f.sampleRate)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Filter::~Filter()
 {
 	DeleteArrays();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		GenerateCoefficients
 //
-// Description:		Generates the discrete-time (z-domain) coefficients for
+// Desc:		Generates the discrete-time (z-domain) coefficients for
 //					a filter equivalent to the continuous-time (s-domain)
 //					arguments.  Uses bilinear transform:
 //					s = 2 * (1 - z^-1) / (T * (1 + z^-1)).
@@ -143,7 +143,7 @@ Filter::~Filter()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 	const std::vector<double> &denominator)
 {
@@ -162,11 +162,11 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 		b[i] = zDen[i + 1] / zDen[0];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		AssembleZExpression
 //
-// Description:		Assembles the z-domain expression equivalent to the s-domain
+// Desc:		Assembles the z-domain expression equivalent to the s-domain
 //					coefficients provided.
 //
 // Input Arguments:
@@ -180,7 +180,7 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 // Return Value:
 //		std::string
 //
-//==========================================================================
+//=============================================================================
 std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	const unsigned int &highestPower) const
 {
@@ -220,11 +220,11 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	return result;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		operator=
 //
-// Description:		Assignment operator.
+// Desc:		Assignment operator.
 //
 // Input Arguments:
 //		f	=	const Filter&
@@ -235,7 +235,7 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 // Return Value:
 //		Filter&, reference to this
 //
-//==========================================================================
+//=============================================================================
 Filter& Filter::operator=(const Filter &f)
 {
 	if (this == &f)
@@ -261,11 +261,11 @@ Filter& Filter::operator=(const Filter &f)
 	return *this;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		DeleteArrays
 //
-// Description:		Deletes dynamically allocated memory for this object.
+// Desc:		Deletes dynamically allocated memory for this object.
 //
 // Input Arguments:
 //		None
@@ -276,7 +276,7 @@ Filter& Filter::operator=(const Filter &f)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Filter::DeleteArrays()
 {
 	delete [] a;
@@ -285,11 +285,11 @@ void Filter::DeleteArrays()
 	delete [] u;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		Initialize
 //
-// Description:		Initializes the filter to the specified value.
+// Desc:		Initializes the filter to the specified value.
 //
 // Input Arguments:
 //		initialValue	= const double&
@@ -300,7 +300,7 @@ void Filter::DeleteArrays()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Filter::Initialize(const double &initialValue)
 {
 	unsigned int i;
@@ -311,11 +311,11 @@ void Filter::Initialize(const double &initialValue)
 		y[i] = initialValue * ComputeSteadyStateGain();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		Apply
 //
-// Description:		Applies the filter to the new input value.
+// Desc:		Applies the filter to the new input value.
 //
 // Input Arguments:
 //		_u	= const double&
@@ -326,7 +326,7 @@ void Filter::Initialize(const double &initialValue)
 // Return Value:
 //		double containing the filtered value
 //
-//==========================================================================
+//=============================================================================
 double Filter::Apply(const double &u)
 {
 	ShiftArray(this->u, inSize);
@@ -344,11 +344,11 @@ double Filter::Apply(const double &u)
 	return y[0];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		ShiftArray
 //
-// Description:		Shifts the array values by one index (value with highest
+// Desc:		Shifts the array values by one index (value with highest
 //					index is lost).
 //
 // Input Arguments:
@@ -361,7 +361,7 @@ double Filter::Apply(const double &u)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Filter::ShiftArray(double *s, const unsigned int &size)
 {
 	unsigned int i;
@@ -369,11 +369,11 @@ void Filter::ShiftArray(double *s, const unsigned int &size)
 		s[i] = s[i - 1];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		AllocateArrays
 //
-// Description:		Allocates the coefficient and input/output storage arrays.
+// Desc:		Allocates the coefficient and input/output storage arrays.
 //
 // Input Arguments:
 //		_inSize		= const unsigned int&
@@ -385,7 +385,7 @@ void Filter::ShiftArray(double *s, const unsigned int &size)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Filter::AllocateArrays(const unsigned int &inSize, const unsigned int &outSize)
 {
 	this->inSize = inSize;
@@ -397,11 +397,11 @@ void Filter::AllocateArrays(const unsigned int &inSize, const unsigned int &outS
 	y = new double[outSize];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		CoefficientsFromString
 //
-// Description:		Creates a vector of coefficients from highes power to lowest
+// Desc:		Creates a vector of coefficients from highes power to lowest
 //					power, based on a string representing the expression.
 //
 // Input Arguments:
@@ -413,7 +413,7 @@ void Filter::AllocateArrays(const unsigned int &inSize, const unsigned int &outS
 // Return Value:
 //		std::vector<double>
 //
-//==========================================================================
+//=============================================================================
 std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 {
 	ExpressionTree e;
@@ -439,11 +439,11 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 	return coefficients;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		CollectLikeTerms
 //
-// Description:		Collects all terms with the same exponent and adds the
+// Desc:		Collects all terms with the same exponent and adds the
 //					coefficients together.
 //
 // Input Arguments:
@@ -455,7 +455,7 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 // Return Value:
 //		std::vector<std::pair<int, double> >
 //
-//==========================================================================
+//=============================================================================
 std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::pair<int, double> > terms)
 {
 	unsigned int i, j;
@@ -475,11 +475,11 @@ std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::p
 	return terms;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		PadMissingTerms
 //
-// Description:		If a power between the maximum power and zero is missing,
+// Desc:		If a power between the maximum power and zero is missing,
 //					a zero-coefficient value for that power is inserted at
 //					the appropriate location in the vector.
 //
@@ -492,7 +492,7 @@ std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::p
 // Return Value:
 //		std::vector<std::pair<int, double> >
 //
-//==========================================================================
+//=============================================================================
 std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pair<int, double> > terms)
 {
 	std::sort(terms.begin(), terms.end(), std::greater<std::pair<int, double> >());// Sort in descending order of power
@@ -520,11 +520,11 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 	return terms;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		ComputeSteadyStateGain
 //
-// Description:		Returns the steady-state value resluting from a unity step
+// Desc:		Returns the steady-state value resluting from a unity step
 //					input.  Returns zero if the results of this analysis are
 //					not guaranteed valid - den must have these properties for
 //					Final Value Theorem to yield valid results:
@@ -545,7 +545,7 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 // Return Value:
 //		double
 //
-//==========================================================================
+//=============================================================================
 double Filter::ComputeSteadyStateGain(const std::string &num, const std::string &den)
 {
 	std::vector<double> numeratorCoefficients = CoefficientsFromString(num);
@@ -582,11 +582,11 @@ double Filter::ComputeSteadyStateGain(const std::string &num, const std::string 
 		denominatorCoefficients[denominatorCoefficients.size() - 1 - essesToCancel];
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Filter
 // Function:		ComputeSteadyStateGain
 //
-// Description:		Returns the steady-state value resluting from a unity step
+// Desc:		Returns the steady-state value resluting from a unity step
 //					input.  Returns zero if the results of this analysis are
 //					not guaranteed valid (i.e. if the steady-state gain is
 //					undefined).
@@ -600,7 +600,7 @@ double Filter::ComputeSteadyStateGain(const std::string &num, const std::string 
 // Return Value:
 //		double
 //
-//==========================================================================
+//=============================================================================
 double Filter::ComputeSteadyStateGain() const
 {
 	double numeratorSum(0.0);

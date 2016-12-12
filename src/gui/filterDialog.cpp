@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  filterDialog.cpp
-// Created:  4/20/2012
-// Author:  K. Loux
-// Description:  Dialog box for defining filter parameters.
+// Date:  4/20/2012
+// Auth:  K. Loux
+// Desc:  Dialog box for defining filter parameters.
 
 // Local headers
 #include "lp2d/gui/filterDialog.h"
@@ -26,11 +26,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		Constant declarations
 //
-// Description:		Contant declarations for FilterDialog class.
+// Desc:		Contant declarations for FilterDialog class.
 //
 // Input Arguments:
 //		None
@@ -41,16 +41,16 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 const unsigned int FilterDialog::defaultPrecision(2);
 const unsigned int FilterDialog::calculationPrecision(15);
 const unsigned int FilterDialog::maxFilterOrder(10000);
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		FilterDialog
 //
-// Description:		Constructor for FilterDialog class.
+// Desc:		Constructor for FilterDialog class.
 //
 // Input Arguments:
 //		parent		= wxWindow* that owns this object
@@ -62,7 +62,7 @@ const unsigned int FilterDialog::maxFilterOrder(10000);
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* parameters)
 	: wxDialog(parent, wxID_ANY, _T("Specify Filter"), wxDefaultPosition), initialized(false)
 {
@@ -92,11 +92,11 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* parameters)
 	UpdateTransferFunction();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		Event Table
 //
-// Description:		Specifies event handlers for dialog events.
+// Desc:		Specifies event handlers for dialog events.
 //
 // Input Arguments:
 //		None
@@ -107,7 +107,7 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* parameters)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 BEGIN_EVENT_TABLE(FilterDialog, wxDialog)
 	EVT_SPINCTRL(SpinID,			FilterDialog::OnSpinChange)
 	EVT_SPIN(SpinID,				FilterDialog::OnSpin)
@@ -117,11 +117,11 @@ BEGIN_EVENT_TABLE(FilterDialog, wxDialog)
 	EVT_TEXT(InputTextID,			FilterDialog::OnInputTextChange)
 END_EVENT_TABLE()
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		CreateControls
 //
-// Description:		Populates the dialog with controls.
+// Desc:		Populates the dialog with controls.
 //
 // Input Arguments:
 //		None
@@ -132,7 +132,7 @@ END_EVENT_TABLE()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::CreateControls()
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
@@ -160,11 +160,11 @@ void FilterDialog::CreateControls()
 	Center();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		CreateTextBoxes
 //
-// Description:		Creates the text boxes and returns a sizer containing them.
+// Desc:		Creates the text boxes and returns a sizer containing them.
 //
 // Input Arguments:
 //		None
@@ -175,7 +175,7 @@ void FilterDialog::CreateControls()
 // Return Value:
 //		wxSizer*
 //
-//==========================================================================
+//=============================================================================
 wxSizer* FilterDialog::CreateTextBoxes()
 {
 	wxFlexGridSizer *sizer = new wxFlexGridSizer(2, 5, 5);
@@ -204,11 +204,11 @@ wxSizer* FilterDialog::CreateTextBoxes()
 	return sizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		CreateCheckBoxes
 //
-// Description:		Creates the check boxes and returns a sizer containing them.
+// Desc:		Creates the check boxes and returns a sizer containing them.
 //
 // Input Arguments:
 //		None
@@ -219,7 +219,7 @@ wxSizer* FilterDialog::CreateTextBoxes()
 // Return Value:
 //		wxSizer*
 //
-//==========================================================================
+//=============================================================================
 wxSizer* FilterDialog::CreateCheckBoxes()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
@@ -238,11 +238,11 @@ wxSizer* FilterDialog::CreateCheckBoxes()
 	return sizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		CreateRadioButtons
 //
-// Description:		Creates the type-selection radio buttons.
+// Desc:		Creates the type-selection radio buttons.
 //
 // Input Arguments:
 //		None
@@ -253,7 +253,7 @@ wxSizer* FilterDialog::CreateCheckBoxes()
 // Return Value:
 //		wxSizer* containing the radio buttons
 //
-//==========================================================================
+//=============================================================================
 wxSizer* FilterDialog::CreateRadioButtons()
 {
 	wxBoxSizer *typeSizer = new wxBoxSizer(wxVERTICAL);
@@ -290,11 +290,11 @@ wxSizer* FilterDialog::CreateRadioButtons()
 	return typeSizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		CreateTransferFunctionControls
 //
-// Description:		Creates the text boxes for specifying the filter's transfer
+// Desc:		Creates the text boxes for specifying the filter's transfer
 //					function.
 //
 // Input Arguments:
@@ -306,7 +306,7 @@ wxSizer* FilterDialog::CreateRadioButtons()
 // Return Value:
 //		wxSizer* containing the buttons
 //
-//==========================================================================
+//=============================================================================
 wxSizer* FilterDialog::CreateTransferFunctionControls()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -329,11 +329,11 @@ wxSizer* FilterDialog::CreateTransferFunctionControls()
 	return sizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		OnSpinChange
 //
-// Description:		Processes spin control change events (order selection).
+// Desc:		Processes spin control change events (order selection).
 //
 // Input Arguments:
 //		event	= wxSpinEvent&
@@ -344,17 +344,17 @@ wxSizer* FilterDialog::CreateTransferFunctionControls()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::OnSpinChange(wxSpinEvent& WXUNUSED(event))
 {
 	HandleSpin();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		OnSpin
 //
-// Description:		Processes spin control change events (order selection).
+// Desc:		Processes spin control change events (order selection).
 //
 // Input Arguments:
 //		event	= wxSpinEvent&
@@ -365,17 +365,17 @@ void FilterDialog::OnSpinChange(wxSpinEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::OnSpin(wxSpinEvent& WXUNUSED(event))
 {
 	HandleSpin();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		HandleSpin
 //
-// Description:		Processes spin control change events (order selection).
+// Desc:		Processes spin control change events (order selection).
 //
 // Input Arguments:
 //		None
@@ -386,18 +386,18 @@ void FilterDialog::OnSpin(wxSpinEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::HandleSpin()
 {
 	UpdateEnabledControls();
 	UpdateTransferFunction();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		OnRadioChange
 //
-// Description:		Processes radio button change events (type selection).
+// Desc:		Processes radio button change events (type selection).
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -408,7 +408,7 @@ void FilterDialog::HandleSpin()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::OnRadioChange(wxCommandEvent& WXUNUSED(event))
 {
 	if (!initialized)
@@ -423,11 +423,11 @@ void FilterDialog::OnRadioChange(wxCommandEvent& WXUNUSED(event))
 	UpdateTransferFunction();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		OnButterworthChange
 //
-// Description:		Processes checkbox change events (butterworth selection).
+// Desc:		Processes checkbox change events (butterworth selection).
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -438,18 +438,18 @@ void FilterDialog::OnRadioChange(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::OnButterworthChange(wxCommandEvent& WXUNUSED(event))
 {
 	UpdateEnabledControls();
 	UpdateTransferFunction();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		OnInputTextChange
 //
-// Description:		Processes input text box change events.
+// Desc:		Processes input text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -460,18 +460,18 @@ void FilterDialog::OnButterworthChange(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::OnInputTextChange(wxCommandEvent& WXUNUSED(event))
 {
 	UpdateEnabledControls();
 	UpdateTransferFunction();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetType
 //
-// Description:		Returns the currently selected filter type.
+// Desc:		Returns the currently selected filter type.
 //
 // Input Arguments:
 //		None
@@ -482,7 +482,7 @@ void FilterDialog::OnInputTextChange(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		FilterParameters::Type
 //
-//==========================================================================
+//=============================================================================
 FilterParameters::Type FilterDialog::GetType() const
 {
 	if (!initialized)
@@ -505,11 +505,11 @@ FilterParameters::Type FilterDialog::GetType() const
 	return FilterParameters::TypeLowPass;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		TransferDataFromWindow
 //
-// Description:		Validates dialog contents prior to allowing OK to be executed.
+// Desc:		Validates dialog contents prior to allowing OK to be executed.
 //
 // Input Arguments:
 //		None
@@ -520,7 +520,7 @@ FilterParameters::Type FilterDialog::GetType() const
 // Return Value:
 //		bool, true if dialog contents are valid
 //
-//==========================================================================
+//=============================================================================
 bool FilterDialog::TransferDataFromWindow()
 {
 	wxString originalNumerator = numeratorBox->GetValue();
@@ -575,11 +575,11 @@ bool FilterDialog::TransferDataFromWindow()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		CutoffFrequencyIsValid
 //
-// Description:		Validates the cutoff frequency value.
+// Desc:		Validates the cutoff frequency value.
 //
 // Input Arguments:
 //		None
@@ -590,7 +590,7 @@ bool FilterDialog::TransferDataFromWindow()
 // Return Value:
 //		bool, true if dialog contents are valid
 //
-//==========================================================================
+//=============================================================================
 bool FilterDialog::CutoffFrequencyIsValid()
 {
 	if (!cutoffFrequencyBox->GetValue().ToDouble(&mParameters.cutoffFrequency))
@@ -607,11 +607,11 @@ bool FilterDialog::CutoffFrequencyIsValid()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		DampingRatioIsValid
 //
-// Description:		Validates the damping ratio value.
+// Desc:		Validates the damping ratio value.
 //
 // Input Arguments:
 //		None
@@ -622,7 +622,7 @@ bool FilterDialog::CutoffFrequencyIsValid()
 // Return Value:
 //		bool, true if dialog contents are valid
 //
-//==========================================================================
+//=============================================================================
 bool FilterDialog::DampingRatioIsValid()
 {
 	if (DampingRatioInputRequired())
@@ -642,11 +642,11 @@ bool FilterDialog::DampingRatioIsValid()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		WidthIsValid
 //
-// Description:		Validates the width value.
+// Desc:		Validates the width value.
 //
 // Input Arguments:
 //		None
@@ -657,7 +657,7 @@ bool FilterDialog::DampingRatioIsValid()
 // Return Value:
 //		bool, true if dialog contents are valid
 //
-//==========================================================================
+//=============================================================================
 bool FilterDialog::WidthIsValid()
 {
 	if (mParameters.type == FilterParameters::TypeBandStop ||
@@ -679,11 +679,11 @@ bool FilterDialog::WidthIsValid()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		ExpressionIsValid
 //
-// Description:		Validates the expression.
+// Desc:		Validates the expression.
 //
 // Input Arguments:
 //		expression	= const wxString&
@@ -694,7 +694,7 @@ bool FilterDialog::WidthIsValid()
 // Return Value:
 //		bool, true if dialog contents are valid
 //
-//==========================================================================
+//=============================================================================
 bool FilterDialog::ExpressionIsValid(const wxString &expression)
 {
 	if (mParameters.type != FilterParameters::TypeCustom)
@@ -712,11 +712,11 @@ bool FilterDialog::ExpressionIsValid(const wxString &expression)
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		UpdateTransferFunction
 //
-// Description:		Updates the transfer function to match user selections.
+// Desc:		Updates the transfer function to match user selections.
 //
 // Input Arguments:
 //		None
@@ -727,7 +727,7 @@ bool FilterDialog::ExpressionIsValid(const wxString &expression)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::UpdateTransferFunction()
 {
 	if (!initialized || customRadio->GetValue())
@@ -753,11 +753,11 @@ void FilterDialog::UpdateTransferFunction()
 	denominatorBox->ChangeValue(den);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		DetermineStringPrecision
 //
-// Description:		Determines the best number of digits to use to display the
+// Desc:		Determines the best number of digits to use to display the
 //					transfer function.  Returns stringPrecision if
 //					automaticStringPrecision is false.
 //
@@ -770,7 +770,7 @@ void FilterDialog::UpdateTransferFunction()
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int FilterDialog::DetermineStringPrecision() const
 {
 	if (!automaticStringPrecision)
@@ -789,11 +789,11 @@ unsigned int FilterDialog::DetermineStringPrecision() const
 	return std::max<unsigned int>(cutoffSigFig, std::max<unsigned int>(dampingSigFig, widthSigFig));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GenerateButterworthDenominator
 //
-// Description:		Generates the characteristic equation for the poles of a
+// Desc:		Generates the characteristic equation for the poles of a
 //					butterworth filter with the specified order and cutoff.
 //
 // Input Arguments:
@@ -806,7 +806,7 @@ unsigned int FilterDialog::DetermineStringPrecision() const
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GenerateButterworthDenominator(const unsigned int &order,
 	const double &cutoff) const
 {
@@ -820,11 +820,11 @@ wxString FilterDialog::GenerateButterworthDenominator(const unsigned int &order,
 	return GenerateExpressionFromComplexRoots(poles);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GenerateStandardDenominator
 //
-// Description:		Generates the characteristic equation for the poles of a
+// Desc:		Generates the characteristic equation for the poles of a
 //					standard-form filter with the specified order and cutoff.
 //
 // Input Arguments:
@@ -838,7 +838,7 @@ wxString FilterDialog::GenerateButterworthDenominator(const unsigned int &order,
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 	const double &cutoff, const double &dampingRatio) const
 {
@@ -869,11 +869,11 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GenerateExpressionFromComplexRoots
 //
-// Description:		Generates a string expression for the characteristic
+// Desc:		Generates a string expression for the characteristic
 //					equation with the specified complex roots.
 //
 // Input Arguments:
@@ -885,7 +885,7 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GenerateExpressionFromComplexRoots(
 	const std::vector<Complex> &roots) const
 {
@@ -925,11 +925,11 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetLowPassTF
 //
-// Description:		Populates the arguments with string descriptors for the
+// Desc:		Populates the arguments with string descriptors for the
 //					numerator and denominator of a low-pass filter as specified
 //					by the user.
 //
@@ -943,7 +943,7 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator) const
 {
 	double cutoff;
@@ -952,11 +952,11 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator) cons
 	GetLowPassTF(numerator, denominator, cutoff * 2.0 * M_PI, orderSpin->GetValue());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetHighPassTF
 //
-// Description:		Populates the arguments with string descriptors for the
+// Desc:		Populates the arguments with string descriptors for the
 //					numerator and denominator of a high-pass filter as specified
 //					by the user.
 //
@@ -970,7 +970,7 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator) cons
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator) const
 {
 	double cutoff;
@@ -979,11 +979,11 @@ void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator) con
 	GetHighPassTF(numerator, denominator, cutoff * 2.0 * M_PI, orderSpin->GetValue());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetLowPassTF
 //
-// Description:		Populates the arguments with string descriptors for the
+// Desc:		Populates the arguments with string descriptors for the
 //					numerator and denominator of a low-pass filter as specified
 //					by the user.
 //
@@ -998,7 +998,7 @@ void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator) con
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator,
 	const double &cutoff, const unsigned int &order) const
 {
@@ -1015,11 +1015,11 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator,
 		denominator = GenerateStandardDenominator(order, cutoff, damping);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetHighPassTF
 //
-// Description:		Populates the arguments with string descriptors for the
+// Desc:		Populates the arguments with string descriptors for the
 //					numerator and denominator of a high-pass filter as specified
 //					by the user.
 //
@@ -1034,7 +1034,7 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator,
 	const double &cutoff, const unsigned int &order) const
 {
@@ -1052,11 +1052,11 @@ void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator,
 		denominator = GenerateStandardDenominator(order, cutoff, damping);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetBandStopTF
 //
-// Description:		Populates the arguments with string descriptors for the
+// Desc:		Populates the arguments with string descriptors for the
 //					numerator and denominator of a band-stop filter as specified
 //					by the user.
 //
@@ -1070,7 +1070,7 @@ void FilterDialog::GetHighPassTF(wxString &numerator, wxString &denominator,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::GetBandStopTF(wxString &numerator, wxString &denominator) const
 {
 	double cutoff, width(0.0);
@@ -1091,11 +1091,11 @@ void FilterDialog::GetBandStopTF(wxString &numerator, wxString &denominator) con
 	denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetNotchTF
 //
-// Description:		Populates the arguments with string descriptors for the
+// Desc:		Populates the arguments with string descriptors for the
 //					numerator and denominator of a band-stop filter as specified
 //					by the user.
 //
@@ -1109,7 +1109,7 @@ void FilterDialog::GetBandStopTF(wxString &numerator, wxString &denominator) con
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::GetNotchTF(wxString &numerator, wxString &denominator) const
 {
 	double cutoff, width(0.0);
@@ -1124,11 +1124,11 @@ void FilterDialog::GetNotchTF(wxString &numerator, wxString &denominator) const
 	denominator = GenerateStandardDenominator(2, cutoff, width / cutoff * 0.5);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetBandPassTF
 //
-// Description:		Populates the arguments with string descriptors for the
+// Desc:		Populates the arguments with string descriptors for the
 //					numerator and denominator of a band-pass filter as specified
 //					by the user.
 //
@@ -1142,7 +1142,7 @@ void FilterDialog::GetNotchTF(wxString &numerator, wxString &denominator) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::GetBandPassTF(wxString &numerator, wxString &denominator) const
 {
 	double cutoff, width(0.0);
@@ -1163,11 +1163,11 @@ void FilterDialog::GetBandPassTF(wxString &numerator, wxString &denominator) con
 	denominator = _T("(") + highDen + _T(")*(") + lowDen + _T(")");
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		OnTransferFunctionChange
 //
-// Description:		Selects custom radio button if the transfer function boxes
+// Desc:		Selects custom radio button if the transfer function boxes
 //					change by user input.
 //
 // Input Arguments:
@@ -1179,7 +1179,7 @@ void FilterDialog::GetBandPassTF(wxString &numerator, wxString &denominator) con
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::OnTransferFunctionChange(wxCommandEvent& WXUNUSED(event))
 {
 	if (!initialized)
@@ -1189,11 +1189,11 @@ void FilterDialog::OnTransferFunctionChange(wxCommandEvent& WXUNUSED(event))
 	UpdateEnabledControls();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		UpdateEnabledControls
 //
-// Description:		Makes sure the proper controls are enabled/disabled.
+// Desc:		Makes sure the proper controls are enabled/disabled.
 //
 // Input Arguments:
 //		None
@@ -1204,7 +1204,7 @@ void FilterDialog::OnTransferFunctionChange(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::UpdateEnabledControls()
 {
 	if (!initialized)
@@ -1221,11 +1221,11 @@ void FilterDialog::UpdateEnabledControls()
 		notchRadio->GetValue());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetFilterNamePrefix
 //
-// Description:		Generates string describing specified filter.
+// Desc:		Generates string describing specified filter.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1236,7 +1236,7 @@ void FilterDialog::UpdateEnabledControls()
 // Return Value:
 //		wxString describing filter
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 {
 	wxString name;
@@ -1261,11 +1261,11 @@ wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 	return name;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetOrderString
 //
-// Description:		Returns a string representing the indicated order.
+// Desc:		Returns a string representing the indicated order.
 //
 // Input Arguments:
 //		order	= const unsigned int&
@@ -1276,7 +1276,7 @@ wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetOrderString(const unsigned int &order)
 {
 	wxString orderString(wxString::Format("%u", order));
@@ -1292,11 +1292,11 @@ wxString FilterDialog::GetOrderString(const unsigned int &order)
 	return orderString;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetHighPassName
 //
-// Description:		Returns a name for the specified filter parameters.
+// Desc:		Returns a name for the specified filter parameters.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1307,7 +1307,7 @@ wxString FilterDialog::GetOrderString(const unsigned int &order)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetHighPassName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("High-Pass"), parameters));
@@ -1316,11 +1316,11 @@ wxString FilterDialog::GetHighPassName(const FilterParameters &parameters)
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetLowPassName
 //
-// Description:		Returns a name for the specified filter parameters.
+// Desc:		Returns a name for the specified filter parameters.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1331,7 +1331,7 @@ wxString FilterDialog::GetHighPassName(const FilterParameters &parameters)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetLowPassName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("Low-Pass"), parameters));
@@ -1340,11 +1340,11 @@ wxString FilterDialog::GetLowPassName(const FilterParameters &parameters)
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetBandStopName
 //
-// Description:		Returns a name for the specified filter parameters.
+// Desc:		Returns a name for the specified filter parameters.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1355,7 +1355,7 @@ wxString FilterDialog::GetLowPassName(const FilterParameters &parameters)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetBandStopName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("Band-Stop"), parameters));
@@ -1364,11 +1364,11 @@ wxString FilterDialog::GetBandStopName(const FilterParameters &parameters)
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetNotchName
 //
-// Description:		Returns a name for the specified filter parameters.
+// Desc:		Returns a name for the specified filter parameters.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1379,7 +1379,7 @@ wxString FilterDialog::GetBandStopName(const FilterParameters &parameters)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetNotchName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("Notch"), parameters));
@@ -1388,11 +1388,11 @@ wxString FilterDialog::GetNotchName(const FilterParameters &parameters)
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetBandPassName
 //
-// Description:		Returns a name for the specified filter parameters.
+// Desc:		Returns a name for the specified filter parameters.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1403,7 +1403,7 @@ wxString FilterDialog::GetNotchName(const FilterParameters &parameters)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetBandPassName(const FilterParameters &parameters)
 {
 	wxString s(GetPrimaryName(_T("Band-Pass"), parameters));
@@ -1412,11 +1412,11 @@ wxString FilterDialog::GetBandPassName(const FilterParameters &parameters)
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetHighPassName
 //
-// Description:		Returns a name for the specified filter parameters.
+// Desc:		Returns a name for the specified filter parameters.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1427,17 +1427,17 @@ wxString FilterDialog::GetBandPassName(const FilterParameters &parameters)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetCustomName(const FilterParameters &parameters)
 {
 	return parameters.numerator + _T(" / ") + parameters.denominator;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		GetPrimaryName
 //
-// Description:		Returns the initial portion of the name for the filter.
+// Desc:		Returns the initial portion of the name for the filter.
 //
 // Input Arguments:
 //		name		= const wxString&
@@ -1449,7 +1449,7 @@ wxString FilterDialog::GetCustomName(const FilterParameters &parameters)
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(GetOrderString(parameters.order));
@@ -1459,11 +1459,11 @@ wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParamete
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		AddDampingName
 //
-// Description:		Adds damping to the name (if applicable).
+// Desc:		Adds damping to the name (if applicable).
 //
 // Input Arguments:
 //		name		= const wxString&
@@ -1475,7 +1475,7 @@ wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParamete
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::AddDampingName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(name);
@@ -1491,11 +1491,11 @@ wxString FilterDialog::AddDampingName(const wxString& name, const FilterParamete
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		AddWidthName
 //
-// Description:		Adds width and depth fields to the name.
+// Desc:		Adds width and depth fields to the name.
 //
 // Input Arguments:
 //		name		= const wxString&
@@ -1507,7 +1507,7 @@ wxString FilterDialog::AddDampingName(const wxString& name, const FilterParamete
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString FilterDialog::AddWidthName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(name);
@@ -1517,11 +1517,11 @@ wxString FilterDialog::AddWidthName(const wxString& name, const FilterParameters
 	return s;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		ComputeLogCutoffs
 //
-// Description:		Computes upper and lower cutoff frequencies for wide-band
+// Desc:		Computes upper and lower cutoff frequencies for wide-band
 //					filters given the center frequency and width.
 //
 // Input Arguments:
@@ -1535,7 +1535,7 @@ wxString FilterDialog::AddWidthName(const wxString& name, const FilterParameters
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void FilterDialog::ComputeLogCutoffs(const double &center, const double &width,
 	double &lowCutoff, double &highCutoff) const
 {
@@ -1545,11 +1545,11 @@ void FilterDialog::ComputeLogCutoffs(const double &center, const double &width,
 	lowCutoff = pow(10.0, 2.0 * log10(center) - log10(highCutoff));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		DampingRatioInputRequired
 //
-// Description:		According to selected options, determines if the damping
+// Desc:		According to selected options, determines if the damping
 //					ratio input box needs to be enabled.
 //
 // Input Arguments:
@@ -1561,7 +1561,7 @@ void FilterDialog::ComputeLogCutoffs(const double &center, const double &width,
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 bool FilterDialog::DampingRatioInputRequired()
 {
 	if ((butterworthCheckBox->IsEnabled() && butterworthCheckBox->GetValue()) ||
@@ -1580,11 +1580,11 @@ bool FilterDialog::DampingRatioInputRequired()
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			FilterDialog
 // Function:		OrderIsValid
 //
-// Description:		Determines if the order value is valid, according to the
+// Desc:		Determines if the order value is valid, according to the
 //					other options.
 //
 // Input Arguments:
@@ -1596,7 +1596,7 @@ bool FilterDialog::DampingRatioInputRequired()
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 /*bool FilterDialog::OrderIsValid()
 {
 	if (customRadio->GetValue() ||

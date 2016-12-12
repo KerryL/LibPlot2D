@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  customFileFormat.h
-// Created:  7/17/2012
-// Author:  K. Loux
-// Description:  Object for interpreting user-specified custom file formats from XML
-//				 file and reading them into Dataset2D objects.
+// Date:  7/17/2012
+// Auth:  K. Loux
+// Desc:  Object for interpreting user-specified custom file formats from XML
+//        file and reading them into Dataset2D objects.
 
 #ifndef CUSTOM_FILE_FORMAT_H_
 #define CUSTOM_FILE_FORMAT_H_

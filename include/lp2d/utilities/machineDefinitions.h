@@ -1,19 +1,19 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  machineDefinitions.h
-// Created:  4/15/2010
-// Author:  K. Loux
-// Description:  Collection of functions for converting built-in types on systems that
-//				 have different bits/byte (i.e. 32 vs. 64-bit).  This will require a
-//				 preprocessor definition and will generate an error of one of the
-//				 required definitions is not used.
+// Date:  4/15/2010
+// Auth:  K. Loux
+// Desc:  Collection of functions for converting built-in types on systems that
+//        have different bits/byte (i.e. 32 vs. 64-bit).  This will require a
+//        preprocessor definition and will generate an error of one of the
+//        required definitions is not used.
 
 #ifndef MACHINE_DEFS_H_
 #define MACHINE_DEFS_H_

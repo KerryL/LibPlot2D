@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  rms.h
-// Created:  5/3/2011
-// Author:  K. Loux
-// Description:  Computes root-mean-square of data.
+// Date:  5/3/2011
+// Auth:  K. Loux
+// Desc:  Computes root-mean-square of data.
 
 #ifndef RMS_H_
 #define RMS_H_

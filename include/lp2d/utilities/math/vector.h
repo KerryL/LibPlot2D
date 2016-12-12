@@ -1,16 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  vector.h
-// Created:  11/3/2007
-// Author:  K. Loux
-// Description:  Contains class declaration for Vector class.  Vector class is for three element vector.
+// Date:  11/3/2007
+// Auth:  K. Loux
+// Desc:  Contains class declaration for Vector class.  Vector class is for
+//        three element vector.
 
 #ifndef VECTOR_H_
 #define VECTOR_H_

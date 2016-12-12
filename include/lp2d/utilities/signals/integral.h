@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  integral.h
-// Created:  5/3/2011
-// Author:  K. Loux
-// Description:  Computes discrete-time integral of data.
+// Date:  5/3/2011
+// Auth:  K. Loux
+// Desc:  Computes discrete-time integral of data.
 
 #ifndef INTEGRAL_H_
 #define INTEGRAL_H_

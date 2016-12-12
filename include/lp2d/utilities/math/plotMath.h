@@ -1,18 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotMath.h
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Contains useful functions that don't fit better in another class.  Hopefully this
-//				 file will one day be absolved into a real class instead of just being a kludgy
-//				 collection of functions.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Collection of methods related to mathematical operations.
 
 #ifndef PLOT_MATH_H_
 #define PLOT_MATH_H_
@@ -79,11 +77,11 @@ namespace PlotMath
 }
 
 // Template methods must be defined here:
-//==========================================================================
+//=============================================================================
 // Namespace:		PlotMath
 // Function:		IsNaN
 //
-// Description:		Determines if the specified number is or is not a number.
+// Desc:		Determines if the specified number is or is not a number.
 //
 // Input Arguments:
 //		value	= const T& to check
@@ -94,18 +92,18 @@ namespace PlotMath
 // Return Value:
 //		bool, true if the argument is NOT a number
 //
-//==========================================================================
+//=============================================================================
 template<typename T>
 bool PlotMath::IsNaN(const T &value)
 {
 	return value != value;
 }
 
-//==========================================================================
+//=============================================================================
 // Namespace:		PlotMath
 // Function:		IsInf
 //
-// Description:		Determines if the specified number is infinite.
+// Desc:		Determines if the specified number is infinite.
 //
 // Input Arguments:
 //		value	= const T&
@@ -116,7 +114,7 @@ bool PlotMath::IsNaN(const T &value)
 // Return Value:
 //		bool, true if the argument is ininite
 //
-//==========================================================================
+//=============================================================================
 template<typename T>
 bool PlotMath::IsInf(const T &value)
 {
@@ -124,11 +122,11 @@ bool PlotMath::IsInf(const T &value)
 		value == std::numeric_limits<T>::infinity();
 }
 
-//==========================================================================
+//=============================================================================
 // Namespace:		PlotMath
 // Function:		IsValid
 //
-// Description:		Determines if the specified value is a valid number.
+// Desc:		Determines if the specified value is a valid number.
 //
 // Input Arguments:
 //		value	= const double&
@@ -139,7 +137,7 @@ bool PlotMath::IsInf(const T &value)
 // Return Value:
 //		bool, true if the argument is valid
 //
-//==========================================================================
+//=============================================================================
 template<typename T>
 bool PlotMath::IsValid(const T &value)
 {

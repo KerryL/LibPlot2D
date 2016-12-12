@@ -1,16 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  createSignalDialog.cpp
-// Created:  8/19/2013
-// Author:  K. Loux
-// Description:  Dialog for creating a variety of signals (not dependent on other curves).
+// Date:  8/19/2013
+// Auth:  K. Loux
+// Desc:  Dialog for creating a variety of signals (not dependent on other
+//        curves).
 
 // C++ standard headers
 #include <cstdlib>
@@ -27,11 +28,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		CreateSignalDialog
 //
-// Description:		Constructor for CreateSignalDialog class.
+// Desc:		Constructor for CreateSignalDialog class.
 //
 // Input Arguments:
 //		parent		= wxWindow*
@@ -45,7 +46,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime,
 	const double &duration, const double &sampleRate) : wxDialog(parent, wxID_ANY,
 	_T("Create Signal"), wxPoint(-1,-1))
@@ -64,11 +65,11 @@ CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime
 	CreateControls(startTime, duration, sampleRate);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		Event Table
 //
-// Description:		Event table for the CreateSignalDialog class.
+// Desc:		Event table for the CreateSignalDialog class.
 //
 // Input Arguments:
 //		None
@@ -79,7 +80,7 @@ CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 BEGIN_EVENT_TABLE(CreateSignalDialog, wxDialog)
 	EVT_COMBOBOX(wxID_ANY,			CreateSignalDialog::OnSignalTypeChangeEvent)
 	EVT_TEXT(idInitialValue,		CreateSignalDialog::OnAmplitudeChangeEvent)
@@ -90,11 +91,11 @@ BEGIN_EVENT_TABLE(CreateSignalDialog, wxDialog)
 	EVT_TEXT(idPhaseTime,			CreateSignalDialog::OnPhaseTimeChangeEvent)
 END_EVENT_TABLE()
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		GetSignalName
 //
-// Description:		Returns the user-specified name for the signal.
+// Desc:		Returns the user-specified name for the signal.
 //
 // Input Arguments:
 //		None
@@ -105,17 +106,17 @@ END_EVENT_TABLE()
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString CreateSignalDialog::GetSignalName() const
 {
 	return signalNameTextBox->GetValue();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		CreateControls
 //
-// Description:		Creates the controls and populates with default values.
+// Desc:		Creates the controls and populates with default values.
 //
 // Input Arguments:
 //		startTime	= const double&
@@ -128,7 +129,7 @@ wxString CreateSignalDialog::GetSignalName() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::CreateControls(const double &startTime, const double &duration,
 	const double &sampleRate)
 {
@@ -242,11 +243,11 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 	Center();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		GetSignalName
 //
-// Description:		Returns the name of the signal specified by the enumeration.
+// Desc:		Returns the name of the signal specified by the enumeration.
 //
 // Input Arguments:
 //		type	= const SignalType&
@@ -257,7 +258,7 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString CreateSignalDialog::GetSignalName(const SignalType &type)
 {
 	assert(type >= 0 && type < SignalCount);
@@ -282,11 +283,11 @@ wxString CreateSignalDialog::GetSignalName(const SignalType &type)
 	return _T("Unknown signal type");
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		TransferDataFromWindow
 //
-// Description:		Validates inputs to the dialog.
+// Desc:		Validates inputs to the dialog.
 //
 // Input Arguments:
 //		None
@@ -297,7 +298,7 @@ wxString CreateSignalDialog::GetSignalName(const SignalType &type)
 // Return Value:
 //		bool, true for all inputs valid, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CreateSignalDialog::TransferDataFromWindow()
 {
 	if (signalNameTextBox->GetValue().IsEmpty())
@@ -422,11 +423,11 @@ bool CreateSignalDialog::TransferDataFromWindow()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		CreateSignal
 //
-// Description:		Creates the signal dataset to the user specifications.
+// Desc:		Creates the signal dataset to the user specifications.
 //
 // Input Arguments:
 //		startTime	= const double&
@@ -439,13 +440,11 @@ bool CreateSignalDialog::TransferDataFromWindow()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::CreateSignal(const double &startTime, const double &duration,
 	const double &sampleRate)
 {
-	// Prevent memory leaks by preventing the dataset from being created more than once
-	delete dataset;
-	dataset = new Dataset2D(duration * sampleRate + 1);
+	dataset = std::make_unique<Dataset2D>(duration * sampleRate + 1);
 
 	double time;
 	unsigned int i;
@@ -457,11 +456,11 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		GetValue
 //
-// Description:		Computes the value at the specified time for the user-specified
+// Desc:		Computes the value at the specified time for the user-specified
 //					function.
 //
 // Input Arguments:
@@ -473,7 +472,7 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 // Return Value:
 //		double
 //
-//==========================================================================
+//=============================================================================
 double CreateSignalDialog::GetValue(const double &time)
 {
 	if (lastSelection == SignalStep)
@@ -597,11 +596,11 @@ double CreateSignalDialog::GetValue(const double &time)
 	return 0.0;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnSignalTypeChangeEvent
 //
-// Description:		Event handler for combo box selection events.
+// Desc:		Event handler for combo box selection events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -612,7 +611,7 @@ double CreateSignalDialog::GetValue(const double &time)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::OnSignalTypeChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	SignalType newType = (SignalType)signalTypeComboBox->GetSelection();
@@ -625,11 +624,11 @@ void CreateSignalDialog::OnSignalTypeChangeEvent(wxCommandEvent& WXUNUSED(event)
 	SetDefaultInputs();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnSignalTypeChangeEvent
 //
-// Description:		Event handler for combo box selection events.
+// Desc:		Event handler for combo box selection events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -640,7 +639,7 @@ void CreateSignalDialog::OnSignalTypeChangeEvent(wxCommandEvent& WXUNUSED(event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 {
 	// Prepare inputs for non-periodic functions
@@ -697,11 +696,11 @@ void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		SetDefaultInputs
 //
-// Description:		Sets default inputs depending on the specified signal type.
+// Desc:		Sets default inputs depending on the specified signal type.
 //
 // Input Arguments:
 //		None
@@ -712,7 +711,7 @@ void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::SetDefaultInputs()
 {
 	// Defaults for non-periodic functions
@@ -742,11 +741,11 @@ void CreateSignalDialog::SetDefaultInputs()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnAmplitudeChangeEvent
 //
-// Description:		Event handler for amplitude text box change events.
+// Desc:		Event handler for amplitude text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -757,7 +756,7 @@ void CreateSignalDialog::SetDefaultInputs()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::OnAmplitudeChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	if (lastSelection != SignalTriangle &&
@@ -768,11 +767,11 @@ void CreateSignalDialog::OnAmplitudeChangeEvent(wxCommandEvent& WXUNUSED(event))
 	keepAmplitude = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnSlopeChangeEvent
 //
-// Description:		Event handler for slope text box change events.
+// Desc:		Event handler for slope text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -783,7 +782,7 @@ void CreateSignalDialog::OnAmplitudeChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::OnSlopeChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	if (lastSelection != SignalTriangle &&
@@ -794,11 +793,11 @@ void CreateSignalDialog::OnSlopeChangeEvent(wxCommandEvent& WXUNUSED(event))
 	keepAmplitude = false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnFrequencyChangeEvent
 //
-// Description:		Event handler for frequency text box change events.
+// Desc:		Event handler for frequency text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -809,7 +808,7 @@ void CreateSignalDialog::OnSlopeChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::OnFrequencyChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	if (lastSelection == SignalStep || lastSelection == SignalRamp)
@@ -831,11 +830,11 @@ void CreateSignalDialog::OnFrequencyChangeEvent(wxCommandEvent& WXUNUSED(event))
 		UpdateAmplitude();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnPeriodChangeEvent
 //
-// Description:		Event handler for period text box change events.
+// Desc:		Event handler for period text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -846,7 +845,7 @@ void CreateSignalDialog::OnFrequencyChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::OnPeriodChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	// Don't execute until we've been fully created
@@ -864,11 +863,11 @@ void CreateSignalDialog::OnPeriodChangeEvent(wxCommandEvent& WXUNUSED(event))
 		UpdatePhaseAngle();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnPhaseAngleChangeEvent
 //
-// Description:		Event handler for phase angle text box change events.
+// Desc:		Event handler for phase angle text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -879,18 +878,18 @@ void CreateSignalDialog::OnPeriodChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::OnPhaseAngleChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	UpdatePhaseTime();
 	keepPhaseAngle = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		OnPhaseTimeChangeEvent
 //
-// Description:		Event handler for phase time text box change events.
+// Desc:		Event handler for phase time text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -901,18 +900,18 @@ void CreateSignalDialog::OnPhaseAngleChangeEvent(wxCommandEvent& WXUNUSED(event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::OnPhaseTimeChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
 	UpdatePhaseAngle();
 	keepPhaseAngle = false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		UpdatePhaseAngle
 //
-// Description:		Updates the phase angle based on frequency and phase time.
+// Desc:		Updates the phase angle based on frequency and phase time.
 //
 // Input Arguments:
 //		None
@@ -923,7 +922,7 @@ void CreateSignalDialog::OnPhaseTimeChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::UpdatePhaseAngle()
 {
 	// Don't execute until we've been fully created
@@ -938,11 +937,11 @@ void CreateSignalDialog::UpdatePhaseAngle()
 	phaseAngleTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(phase * 360.0 * frequency), phase * 360.0 * frequency));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		UpdatePhaseTime
 //
-// Description:		Updates the phase time based on frequency and phase angle.
+// Desc:		Updates the phase time based on frequency and phase angle.
 //
 // Input Arguments:
 //		None
@@ -953,7 +952,7 @@ void CreateSignalDialog::UpdatePhaseAngle()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::UpdatePhaseTime()
 {
 	// Don't execute until we've been fully created
@@ -968,11 +967,11 @@ void CreateSignalDialog::UpdatePhaseTime()
 	phaseTimeTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(phase / 360.0 / frequency), phase / 360.0 / frequency));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		UpdateAmplitude
 //
-// Description:		Updates the amplitude based on frequency and slope.
+// Desc:		Updates the amplitude based on frequency and slope.
 //
 // Input Arguments:
 //		None
@@ -983,7 +982,7 @@ void CreateSignalDialog::UpdatePhaseTime()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::UpdateAmplitude()
 {
 	// Don't execute until we've been fully created
@@ -1002,11 +1001,11 @@ void CreateSignalDialog::UpdateAmplitude()
 	initialValueTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(period * slope / factor), period * slope / factor));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CreateSignalDialog
 // Function:		UpdateSlope
 //
-// Description:		Updates the slope based on frequency and amplitude.
+// Desc:		Updates the slope based on frequency and amplitude.
 //
 // Input Arguments:
 //		None
@@ -1017,7 +1016,7 @@ void CreateSignalDialog::UpdateAmplitude()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CreateSignalDialog::UpdateSlope()
 {
 	// Don't execute until we've been fully created

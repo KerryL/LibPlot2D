@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  zoomBox.cpp
-// Created:  5/5/2011
-// Author:  K. Loux
-// Description:  Logic for drawing the zoom box as the user moves the mouse.
+// Date:  5/5/2011
+// Auth:  K. Loux
+// Desc:  Logic for drawing the zoom box as the user moves the mouse.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -22,11 +22,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			ZoomBox
 // Function:		ZoomBox
 //
-// Description:		Constructor for ZoomBox class.
+// Desc:		Constructor for ZoomBox class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow&
@@ -37,7 +37,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(renderWindow)
 {
 	// Initially, we don't want to draw this
@@ -52,11 +52,11 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(rend
 	color = Color::ColorBlack;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ZoomBox
 // Function:		Update
 //
-// Description:		Updates the GL buffers associated with this object.
+// Desc:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -67,7 +67,7 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(rend
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void ZoomBox::Update(const unsigned int& /*i*/)
 {
 	std::vector<std::pair<double, double> > points;
@@ -81,11 +81,11 @@ void ZoomBox::Update(const unsigned int& /*i*/)
 	bufferInfo[0] = box.GetBufferInfo();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ZoomBox
 // Function:		GenerateGeometry
 //
-// Description:		Generates OpenGL commands to draw the box.
+// Desc:		Generates OpenGL commands to draw the box.
 //
 // Input Arguments:
 //		None
@@ -96,7 +96,7 @@ void ZoomBox::Update(const unsigned int& /*i*/)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void ZoomBox::GenerateGeometry()
 {
 	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
@@ -104,11 +104,11 @@ void ZoomBox::GenerateGeometry()
 	glBindVertexArray(0);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ZoomBox
 // Function:		HasValidParameters
 //
-// Description:		Checks to see if we're OK to draw the box.
+// Desc:		Checks to see if we're OK to draw the box.
 //
 // Input Arguments:
 //		None
@@ -119,7 +119,7 @@ void ZoomBox::GenerateGeometry()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 bool ZoomBox::HasValidParameters()
 {
 	// Just make sure the box actually exists
@@ -130,11 +130,11 @@ bool ZoomBox::HasValidParameters()
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ZoomBox
 // Function:		SetAnchorCorner
 //
-// Description:		Sets the location of the box's fixed corner.
+// Desc:		Sets the location of the box's fixed corner.
 //
 // Input Arguments:
 //		xAnchor	= const unsigned int& (pixels)
@@ -146,7 +146,7 @@ bool ZoomBox::HasValidParameters()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor)
 {
 	this->xAnchor = xAnchor;
@@ -155,11 +155,11 @@ void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &y
 	modified = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			ZoomBox
 // Function:		SetFloatingCorner
 //
-// Description:		Sets the location of the box's floating corner.
+// Desc:		Sets the location of the box's floating corner.
 //
 // Input Arguments:
 //		xFloat	= const unsigned int& (pixels)
@@ -171,7 +171,7 @@ void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &y
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void ZoomBox::SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat)
 {
 	this->xFloat = xFloat;

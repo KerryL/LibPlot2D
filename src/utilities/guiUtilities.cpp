@@ -1,11 +1,11 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  guiUtilities.cpp
 // Date:  12/9/2016
@@ -18,11 +18,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Namespace:		GuiUtilities
 // Function:		GetFileNameFromUser
 //
-// Description:		Displays a dialog asking the user to specify a file name.
+// Desc:		Displays a dialog asking the user to specify a file name.
 //					Arguments allow this to be for opening or saving files,
 //					with different options for the wildcards.
 //
@@ -43,7 +43,7 @@ namespace LibPlot2D
 //		wxArrayString containing the paths and file names of the specified files,
 //		or and empty array if the user cancels
 //
-//==========================================================================
+//=============================================================================
 wxArrayString GuiUtilities::GetFileNameFromUser(wxWindow* parent,
 	wxString dialogTitle, wxString defaultDirectory, wxString defaultFileName,
 	wxString wildcard, long style)
@@ -67,11 +67,11 @@ wxArrayString GuiUtilities::GetFileNameFromUser(wxWindow* parent,
 	return pathsAndFileNames;
 }
 
-//==========================================================================
+//=============================================================================
 // Namespace:		GuiUtilities
 // Function:		ExtractFileNameFromPath
 //
-// Description:		Removes the path from the path and file name.
+// Desc:		Removes the path from the path and file name.
 //
 // Input Arguments:
 //		pathAndFileName	= const wxString&
@@ -82,7 +82,7 @@ wxArrayString GuiUtilities::GetFileNameFromUser(wxWindow* parent,
 // Return Value:
 //		wxString
 //
-//==========================================================================
+//=============================================================================
 wxString GuiUtilities::ExtractFileNameFromPath(const wxString &pathAndFileName)
 {
 	unsigned int start;

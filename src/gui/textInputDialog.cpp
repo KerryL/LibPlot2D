@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  textInputDialog.cpp
-// Created:  5/20/2013
-// Author:  K. Loux
-// Description:  Dialog box similar to ::wxGetTextFromUser() but allows differentiation between
-//				 canceling and returning an empty string.
+// Date:  5/20/2013
+// Auth:  K. Loux
+// Desc:  Dialog box similar to ::wxGetTextFromUser() but allows
+//        differentiation between canceling and returning an empty string.
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -22,11 +22,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			TextInputDialog
 // Function:		TextInputDialog
 //
-// Description:		Constructor for TextInputDialog class.
+// Desc:		Constructor for TextInputDialog class.
 //
 // Input Arguments:
 //		message		= const wxString&, propmt to display for user
@@ -40,18 +40,18 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 TextInputDialog::TextInputDialog(const wxString &message, const wxString &title,
 	const wxString &defaultText, wxWindow *parent) : wxDialog(parent, wxID_ANY, title)
 {
 	CreateControls(message, defaultText);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextInputDialog
 // Function:		~TextInputDialog
 //
-// Description:		Destructor for TextInputDialog class.
+// Desc:		Destructor for TextInputDialog class.
 //
 // Input Arguments:
 //		None
@@ -62,16 +62,16 @@ TextInputDialog::TextInputDialog(const wxString &message, const wxString &title,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 TextInputDialog::~TextInputDialog()
 {
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			TextInputDialog
 // Function:		CreateControls
 //
-// Description:		Constructor for TextInputDialog class.
+// Desc:		Constructor for TextInputDialog class.
 //
 // Input Arguments:
 //		message		= const wxString&, propmt to display for user
@@ -83,7 +83,7 @@ TextInputDialog::~TextInputDialog()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void TextInputDialog::CreateControls(const wxString &message, const wxString &defaultText)
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);

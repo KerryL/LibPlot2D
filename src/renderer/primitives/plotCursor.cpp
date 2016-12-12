@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotCursor.cpp
-// Created:  5/5/2011
-// Author:  K. Loux
-// Description:  Represents an oscilloscope cursor on-screen.
+// Date:  5/5/2011
+// Auth:  K. Loux
+// Desc:  Represents an oscilloscope cursor on-screen.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -23,11 +23,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCursor
 // Function:		PlotCursor
 //
-// Description:		Constructor for the PlotCursor class.
+// Desc:		Constructor for the PlotCursor class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow&
@@ -39,7 +39,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 	: Primitive(renderWindow), axis(axis), line(renderWindow)
 {
@@ -50,11 +50,11 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 	SetDrawOrder(2800);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCursor
 // Function:		Update
 //
-// Description:		Updates the GL buffers associated with this object.
+// Desc:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -65,7 +65,7 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotCursor::Update(const unsigned int& /*i*/)
 {
 	if (axis.IsHorizontal())
@@ -87,11 +87,11 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 	value = axis.PixelToValue(locationAlongAxis);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCursor
 // Function:		GenerateGeometry
 //
-// Description:		Generates OpenGL commands to draw the cursor.
+// Desc:		Generates OpenGL commands to draw the cursor.
 //
 // Input Arguments:
 //		None
@@ -102,7 +102,7 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotCursor::GenerateGeometry()
 {
 	if (bufferInfo.size() == 0)
@@ -113,11 +113,11 @@ void PlotCursor::GenerateGeometry()
 	glBindVertexArray(0);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCursor
 // Function:		HasValidParameters
 //
-// Description:		Checks to see if we're OK to draw the cursor.
+// Desc:		Checks to see if we're OK to draw the cursor.
 //
 // Input Arguments:
 //		None
@@ -128,7 +128,7 @@ void PlotCursor::GenerateGeometry()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 bool PlotCursor::HasValidParameters()
 {
 	// Make sure the value is within the axis limits
@@ -142,11 +142,11 @@ bool PlotCursor::HasValidParameters()
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCursor
 // Function:		IsUnder
 //
-// Description:		Checks to see if the cursor is located under the specified
+// Desc:		Checks to see if the cursor is located under the specified
 //					point.
 //
 // Input Arguments:
@@ -159,7 +159,7 @@ bool PlotCursor::HasValidParameters()
 // Return Value:
 //		True is the cursor is under the specified point, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool PlotCursor::IsUnder(const unsigned int &pixel)
 {
 	// Apparent line width for clicking
@@ -171,11 +171,11 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCursor
 // Function:		SetLocation
 //
-// Description:		Sets the x position where the cursor should appear on the plot.
+// Desc:		Sets the x position where the cursor should appear on the plot.
 //
 // Input Arguments:
 //		location	= const int& location to set
@@ -186,7 +186,7 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void PlotCursor::SetLocation(const int& location)
 {
 	locationAlongAxis = location;
@@ -194,11 +194,11 @@ void PlotCursor::SetLocation(const int& location)
 	modified = true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			PlotCursor
 // Function:		operator=
 //
-// Description:		Sets the x-value where the cursor should appear on the plot.
+// Desc:		Sets the x-value where the cursor should appear on the plot.
 //
 // Input Arguments:
 //		_value	= const double& value to set
@@ -209,7 +209,7 @@ void PlotCursor::SetLocation(const int& location)
 // Return Value:
 //		PlotCursor& reference to this object
 //
-//==========================================================================
+//=============================================================================
 PlotCursor& PlotCursor::operator=(const PlotCursor &target)
 {
 	if (&target == this)

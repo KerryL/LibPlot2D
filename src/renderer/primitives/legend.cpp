@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                            Copyright Kerry R. Loux 2015
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  legend.h
-// Created:  3/6/2015
-// Author:  K. Loux
-// Description:  Derived from Primitive, this class is used to draw plot legends.
+// Date:  3/6/2015
+// Auth:  K. Loux
+// Desc:  Derived from Primitive, this class is used to draw plot legends.
 
 // GLEW headers
 #include <GL/glew.h>
@@ -22,11 +22,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		Constant declarations
 //
-// Description:		Constant declarations for the Legend class.
+// Desc:		Constant declarations for the Legend class.
 //
 // Input Arguments:
 //		None
@@ -37,14 +37,14 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 const unsigned int Legend::entrySpacing(5);// [pixels]
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		Legend
 //
-// Description:		Constructor for the Legend class.
+// Desc:		Constructor for the Legend class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow& reference to the object that owns this
@@ -55,7 +55,7 @@ const unsigned int Legend::entrySpacing(5);// [pixels]
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
 	text(renderWindow), lines(renderWindow)
 {
@@ -76,11 +76,11 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
 	bufferInfo.push_back(BufferInfo());// Text
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		Update
 //
-// Description:		Updates the GL buffers associated with this object.
+// Desc:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -91,7 +91,7 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::Update(const unsigned int& i)
 {
 	// TODO:  Alternative approach is to only update if entries change
@@ -129,11 +129,11 @@ void Legend::Update(const unsigned int& i)
 	bufferInfo[i].vertexCountModified = false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		GenerateGeometry
 //
-// Description:		Creates the OpenGL instructions to create this object in
+// Desc:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
 // Input Arguments:
@@ -145,7 +145,7 @@ void Legend::Update(const unsigned int& i)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::GenerateGeometry()
 {
 	// Background, border, lines and markers first
@@ -167,11 +167,11 @@ void Legend::GenerateGeometry()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		HasValidParameters
 //
-// Description:		Checks to see if the information about this object is
+// Desc:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
 // Input Arguments:
@@ -183,7 +183,7 @@ void Legend::GenerateGeometry()
 // Return Value:
 //		bool, true for OK to draw, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool Legend::HasValidParameters()
 {
 	if (entries.size() == 0)
@@ -192,11 +192,11 @@ bool Legend::HasValidParameters()
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		GetCornerVertices
 //
-// Description:		Returns the four corner points in a vector.
+// Desc:		Returns the four corner points in a vector.
 //
 // Input Arguments:
 //		None
@@ -207,7 +207,7 @@ bool Legend::HasValidParameters()
 // Return Value:
 //		std::vector<std::pair<double, double> >
 //
-//==========================================================================
+//=============================================================================
 std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
 {
 	double x, y;
@@ -223,11 +223,11 @@ std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
 	return points;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		UpdateBoundingBox
 //
-// Description:		Updates the bounding box height and width variables.
+// Desc:		Updates the bounding box height and width variables.
 //
 // Input Arguments:
 //		None
@@ -238,7 +238,7 @@ std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::UpdateBoundingBox()
 {
 	Text::BoundingBox boundingBox;
@@ -255,11 +255,11 @@ void Legend::UpdateBoundingBox()
 	height = (textHeight + entrySpacing) * i + entrySpacing;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		SetFont
 //
-// Description:		Sets up the font object.
+// Desc:		Sets up the font object.
 //
 // Input Arguments:
 //		fontFileName	= const std::string&
@@ -271,7 +271,7 @@ void Legend::UpdateBoundingBox()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::SetFont(const std::string& fontFileName, const double& size)
 {
 	if (!text.SetFace(fontFileName))
@@ -288,11 +288,11 @@ void Legend::SetFont(const std::string& fontFileName, const double& size)
 	text.SetScale(1.0 / factor);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		IsUnder
 //
-// Description:		Determines if the specified point is under this object.
+// Desc:		Determines if the specified point is under this object.
 //
 // Input Arguments:
 //		x	= const unsigned int&
@@ -304,7 +304,7 @@ void Legend::SetFont(const std::string& fontFileName, const double& size)
 // Return Value:
 //		bool, true if this object is under the specified point
 //
-//==========================================================================
+//=============================================================================
 bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 {
 	if (!isVisible)
@@ -320,11 +320,11 @@ bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		GetAdjustedPosition
 //
-// Description:		Adjusts the position based on the position references.
+// Desc:		Adjusts the position based on the position references.
 //					The output is (x, y) of the lower LH corner of the legend
 //					w.r.t. the lower LH corner of the render window.
 //
@@ -338,7 +338,7 @@ bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::GetAdjustedPosition(double &x, double &y) const
 {
 	switch (windowRef)
@@ -431,11 +431,11 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		SetDeltaPosition
 //
-// Description:		Updates the position according to specified reference.
+// Desc:		Updates the position according to specified reference.
 //
 // Input Arguments:
 //		x	= double&
@@ -447,7 +447,7 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::SetDeltaPosition(const double &x, const double &y)
 {
 	switch (windowRef)
@@ -491,11 +491,11 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 	RequiresRedraw();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		GetXPos
 //
-// Description:		Gets the x-position w.r.t. the specified references.
+// Desc:		Gets the x-position w.r.t. the specified references.
 //
 // Input Arguments:
 //		legendRef	= const PositionReference&
@@ -507,7 +507,7 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 // Return Value:
 //		double
 //
-//==========================================================================
+//=============================================================================
 double Legend::GetXPos(const PositionReference& legendRef, const PositionReference& windowRef) const
 {
 	double x, y;
@@ -515,11 +515,11 @@ double Legend::GetXPos(const PositionReference& legendRef, const PositionReferen
 	return x;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		GetXPos
 //
-// Description:		Gets the y-position w.r.t. the specified references.
+// Desc:		Gets the y-position w.r.t. the specified references.
 //
 // Input Arguments:
 //		ref	= const PositionReference&
@@ -531,7 +531,7 @@ double Legend::GetXPos(const PositionReference& legendRef, const PositionReferen
 // Return Value:
 //		double
 //
-//==========================================================================
+//=============================================================================
 double Legend::GetYPos(const PositionReference& legendRef, const PositionReference& windowRef) const
 {
 	double x, y;
@@ -539,11 +539,11 @@ double Legend::GetYPos(const PositionReference& legendRef, const PositionReferen
 	return y;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		GetPosition
 //
-// Description:		Gets the position w.r.t. the specified references.  Read
+// Desc:		Gets the position w.r.t. the specified references.  Read
 //					this as position of specified legendRef w.r.t. specified
 //					windowRef.
 //
@@ -558,7 +558,7 @@ double Legend::GetYPos(const PositionReference& legendRef, const PositionReferen
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::GetPosition(const PositionReference& legendRef,
 	const PositionReference& windowRef, double &x, double &y) const
 {
@@ -755,11 +755,11 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		BuildBorderPoints
 //
-// Description:		Returns a vector containing pairs of border points.
+// Desc:		Returns a vector containing pairs of border points.
 //
 // Input Arguments:
 //		None
@@ -770,7 +770,7 @@ void Legend::GetPosition(const PositionReference& legendRef,
 // Return Value:
 //		std::vector<std::pair<double, double> >
 //
-//==========================================================================
+//=============================================================================
 std::vector<std::pair<double, double> > Legend::BuildBorderPoints() const
 {
 	std::vector<std::pair<double, double> > corners(GetCornerVertices());
@@ -779,11 +779,11 @@ std::vector<std::pair<double, double> > Legend::BuildBorderPoints() const
 	return corners;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		BuildBackground
 //
-// Description:		Builds the buffer required to draw the background.
+// Desc:		Builds the buffer required to draw the background.
 //
 // Input Arguments:
 //		None
@@ -794,7 +794,7 @@ std::vector<std::pair<double, double> > Legend::BuildBorderPoints() const
 // Return Value:
 //		Primitive::BufferInfo
 //
-//==========================================================================
+//=============================================================================
 Primitive::BufferInfo Legend::BuildBackground() const
 {
 	Primitive::BufferInfo buffer;
@@ -850,11 +850,11 @@ Primitive::BufferInfo Legend::BuildBackground() const
 	return buffer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		BuildMarkers
 //
-// Description:		Builds the buffers for rendering plot markers.
+// Desc:		Builds the buffers for rendering plot markers.
 //
 // Input Arguments:
 //		None
@@ -865,7 +865,7 @@ Primitive::BufferInfo Legend::BuildBackground() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::BuildMarkers()
 {
 	const unsigned int lineYOffset(entrySpacing);
@@ -938,11 +938,11 @@ void Legend::BuildMarkers()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		AssembleBuffers
 //
-// Description:		Combines the triangle buffers into a single BufferInfo
+// Desc:		Combines the triangle buffers into a single BufferInfo
 //					object.
 //
 // Input Arguments:
@@ -954,7 +954,7 @@ void Legend::BuildMarkers()
 // Return Value:
 //		Primitive::BufferInfo
 //
-//==========================================================================
+//=============================================================================
 Primitive::BufferInfo Legend::AssembleBuffers()
 {
 	Primitive::BufferInfo buffer;
@@ -1007,11 +1007,11 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 	return buffer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		BuildSampleLines
 //
-// Description:		Appends lines corresponding to the legend entries to the
+// Desc:		Appends lines corresponding to the legend entries to the
 //					buffer vector.
 //
 // Input Arguments:
@@ -1023,7 +1023,7 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::BuildSampleLines()
 {
 	const unsigned int lineYOffset(entrySpacing);
@@ -1048,11 +1048,11 @@ void Legend::BuildSampleLines()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		ConfigureVertexArray
 //
-// Description:		Handles configuration of OpenGL vertex array object.
+// Desc:		Handles configuration of OpenGL vertex array object.
 //
 // Input Arguments:
 //		bufferInfo	= Primitive::BufferInfo&
@@ -1063,7 +1063,7 @@ void Legend::BuildSampleLines()
 // Return Value:
 //		Primitive::BufferInfo
 //
-//==========================================================================
+//=============================================================================
 void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 {
 	bufferInfo.GetOpenGLIndices(true);
@@ -1089,11 +1089,11 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 	glBindVertexArray(0);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		BuildLabelStrings
 //
-// Description:		Generates text for each entry.
+// Desc:		Generates text for each entry.
 //
 // Input Arguments:
 //		None
@@ -1104,7 +1104,7 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::BuildLabelStrings()
 {
 	double x, y;
@@ -1120,11 +1120,11 @@ void Legend::BuildLabelStrings()
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			Legend
 // Function:		RequiresRedraw
 //
-// Description:		Sets flags indicating we want to re-perform OpenGL stuff.
+// Desc:		Sets flags indicating we want to re-perform OpenGL stuff.
 //
 // Input Arguments:
 //		None
@@ -1135,7 +1135,7 @@ void Legend::BuildLabelStrings()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void Legend::RequiresRedraw()
 {
 	modified = true;

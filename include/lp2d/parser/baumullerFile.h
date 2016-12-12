@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  baumullerFile.h
-// Created:  10/4/2012
-// Author:  K. Loux
-// Description:  File class for Baumuller files.
+// Date:  10/4/2012
+// Auth:  K. Loux
+// Desc:  File class for Baumuller files.
 
 #ifndef BAUMULLER_FILE_H_
 #define BAUMULLER_FILE_H_

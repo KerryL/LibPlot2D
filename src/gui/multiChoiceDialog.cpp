@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  multiChoiceDialog.cpp
-// Created:  8/2/2012
-// Author:  K. Loux
-// Description:  Multiple choice dialog box.  Intended to function exaclty as a wxMultiChoiceDialog,
-//				 but with a select all button.
+// Date:  8/2/2012
+// Auth:  K. Loux
+// Desc:  Multiple choice dialog box.  Intended to function exaclty as a
+//        wxMultiChoiceDialog, but with a select all button.
 
 // Standard C++ headers
 #include <algorithm>
@@ -25,11 +25,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		MultiChoiceDialog
 //
-// Description:		Constructor for MultiChoiceDialog class.
+// Desc:		Constructor for MultiChoiceDialog class.
 //
 // Input Arguments:
 //		parent	= wxWindow* pointing to the dialog's parent window
@@ -47,7 +47,7 @@ namespace LibPlot2D
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, const wxString& caption,
 		const wxArrayString& choices, long style, const wxPoint& pos,
 		wxArrayInt *defaultChoices, bool *removeExisting)
@@ -62,11 +62,11 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 	ApplyDefaults(defaultChoices, removeExisting);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		Event Table
 //
-// Description:		Event table for MultiChoiceDialog class.
+// Desc:		Event table for MultiChoiceDialog class.
 //
 // Input Arguments:
 //		None
@@ -77,18 +77,18 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 BEGIN_EVENT_TABLE(MultiChoiceDialog, wxDialog)
 	EVT_BUTTON(idSelectAll,	MultiChoiceDialog::OnSelectAllButton)
 	EVT_TEXT(idFilterText, MultiChoiceDialog::OnFilterTextChange)
 	EVT_CHECKLISTBOX(wxID_ANY, MultiChoiceDialog::OnCheckListBoxSelection)
 END_EVENT_TABLE()
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		CreateControls
 //
-// Description:		Generates controls for the dialog.
+// Desc:		Generates controls for the dialog.
 //
 // Input Arguments:
 //		message	= const wxString& containing user instructions
@@ -100,7 +100,7 @@ END_EVENT_TABLE()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayString& choices)
 {
 	wxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
@@ -136,11 +136,11 @@ void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayStr
 	choiceListBox->SetFocus();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		ComputeListBoxHeight
 //
-// Description:		Computes the ideal height of the list box based on the number
+// Desc:		Computes the ideal height of the list box based on the number
 //					of choices to display.
 //
 // Input Arguments:
@@ -152,7 +152,7 @@ void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayStr
 // Return Value:
 //		int
 //
-//==========================================================================
+//=============================================================================
 int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
 {
 	const double factor(0.6);
@@ -160,11 +160,11 @@ int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
 	return std::min(std::max(200, value), (int)(wxGetClientDisplayRect().GetHeight() * factor));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		CreateButtons
 //
-// Description:		Creates the buttons.
+// Desc:		Creates the buttons.
 //
 // Input Arguments:
 //		None
@@ -175,7 +175,7 @@ int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
 // Return Value:
 //		wxSizer*
 //
-//==========================================================================
+//=============================================================================
 wxSizer* MultiChoiceDialog::CreateButtons()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -191,11 +191,11 @@ wxSizer* MultiChoiceDialog::CreateButtons()
 	return sizer;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		OnSelectAllButton
 //
-// Description:		Event handler for Select All button clicks.
+// Desc:		Event handler for Select All button clicks.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -206,7 +206,7 @@ wxSizer* MultiChoiceDialog::CreateButtons()
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 {
 	bool allSelected(true);
@@ -223,11 +223,11 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 	SetAllChoices(!allSelected);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		OnFilterTextChange
 //
-// Description:		Event handler for text change in the filter text box.
+// Desc:		Event handler for text change in the filter text box.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -238,7 +238,7 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
 {
 	choiceListBox->Clear();
@@ -258,11 +258,11 @@ void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		OnCheckListBoxSelection
 //
-// Description:		Event handler for check list box selection changes.
+// Desc:		Event handler for check list box selection changes.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -273,17 +273,17 @@ void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void MultiChoiceDialog::OnCheckListBoxSelection(wxCommandEvent &event)
 {
 	UpdateSelectionList(event.GetInt());
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		UpdateSelectionList
 //
-// Description:		Updates the list of selected items making corrections for
+// Desc:		Updates the list of selected items making corrections for
 //					hidden items.
 //
 // Input Arguments:
@@ -295,7 +295,7 @@ void MultiChoiceDialog::OnCheckListBoxSelection(wxCommandEvent &event)
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
 {
 	if (choiceListBox->IsChecked(index) && !IsSelected(GetCorrectedIndex(index)))
@@ -304,11 +304,11 @@ void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
 		selections.Remove(GetCorrectedIndex(index));
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		GetCorrectedIndex
 //
-// Description:		Corrects the index based on which items are hidden.
+// Desc:		Corrects the index based on which items are hidden.
 //
 // Input Arguments:
 //		index	= cosnt unsigned int&
@@ -319,7 +319,7 @@ void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) const
 {
 	unsigned int i, trueIndex(0), fakeIndex(0);
@@ -337,11 +337,11 @@ unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) con
 	return i;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		SetAllChoices
 //
-// Description:		Sets all choices to the specified value.
+// Desc:		Sets all choices to the specified value.
 //
 // Input Arguments:
 //		selected	= const bool&
@@ -352,7 +352,7 @@ unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) con
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void MultiChoiceDialog::SetAllChoices(const bool &selected)
 {
 	unsigned int i;
@@ -363,11 +363,11 @@ void MultiChoiceDialog::SetAllChoices(const bool &selected)
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		RemoveExistingCurves
 //
-// Description:		Returns the value of the "Remove Existing Curves" checkbox.
+// Desc:		Returns the value of the "Remove Existing Curves" checkbox.
 //
 // Input Arguments:
 //		None
@@ -378,17 +378,17 @@ void MultiChoiceDialog::SetAllChoices(const bool &selected)
 // Return Value:
 //		bool
 //
-//==========================================================================
+//=============================================================================
 bool MultiChoiceDialog::RemoveExistingCurves() const
 {
 	return removeCheckBox->GetValue();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		ApplyDefaults
 //
-// Description:		Applies the specified defaults to the available user selections.
+// Desc:		Applies the specified defaults to the available user selections.
 //
 // Input Arguments:
 //		defaultChoices	= wxArrayInt*
@@ -400,7 +400,7 @@ bool MultiChoiceDialog::RemoveExistingCurves() const
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeExisting)
 {
 	unsigned int i;
@@ -421,11 +421,11 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 		removeCheckBox->SetValue(*removeExisting);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			MultiChoiceDialog
 // Function:		IsSelected
 //
-// Description:		Checks to see if the specified index is contained in the
+// Desc:		Checks to see if the specified index is contained in the
 //					list of selected items.
 //
 // Input Arguments:
@@ -437,7 +437,7 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 // Return Value:
 //		bool, true if selected, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool MultiChoiceDialog::IsSelected(const int &i) const
 {
 	unsigned int j;

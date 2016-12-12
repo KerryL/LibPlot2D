@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotCursor.h
-// Created:  5/5/2011
-// Author:  K. Loux
-// Description:  Represents an oscilloscope cursor on-screen.
+// Date:  5/5/2011
+// Auth:  K. Loux
+// Desc:  Represents an oscilloscope cursor on-screen.
 
 #ifndef PLOT_CURSOR_H_
 #define PLOT_CURSOR_H_

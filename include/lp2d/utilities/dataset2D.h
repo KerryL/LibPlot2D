@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  dataset2D.h
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Container for x and y-data series for plotting.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Container for x and y-data series for plotting.
 
 #ifndef DATASET_H_
 #define DATASET_H_
@@ -18,6 +18,7 @@
 // Standard C++ headers
 #include <cassert>
 #include <cstdlib>
+#include <memory>
 
 // wxWidgets forward declarations
 class wxString;
@@ -32,8 +33,6 @@ public:
 	Dataset2D(const Dataset2D& target);
 	Dataset2D(const unsigned int &numberOfPoints);
 
-	~Dataset2D();
-
 	// For exporting the data to a comma or tab delimited text file
 	void ExportDataToFile(wxString pathAndFileName) const;
 
@@ -45,10 +44,10 @@ public:
 
 	unsigned int GetNumberOfPoints() const { return numberOfPoints; }
 	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;
-	double *GetXPointer() { return xData; }
-	double *GetYPointer() { return yData; }
-	const double *GetXPointer() const { return xData; }
-	const double *GetYPointer() const { return yData; }
+	double *GetXPointer() { return xData.get(); }
+	double *GetYPointer() { return yData.get(); }
+	const double *GetXPointer() const { return xData.get(); }
+	const double *GetYPointer() const { return yData.get(); }
 	double GetXData(const unsigned int &i) const { assert(i < numberOfPoints); return xData[i]; }
 	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; }
 
@@ -117,7 +116,7 @@ public:
 
 private:
 	unsigned int numberOfPoints;
-	double *xData, *yData;
+	std::unique_ptr<double[]> xData, yData;
 
 	static void GetOverlappingOnSameTimebase(const Dataset2D &d1,
 		const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out);

@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  primitive.h
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Base class for creating 3D objects.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Base class for creating 3D objects.
 
 #ifndef PRIMITIVE_H_
 #define PRIMITIVE_H_

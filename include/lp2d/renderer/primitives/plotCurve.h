@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  plotCurve.h
-// Created:  5/2/2011
-// Author:  K. Loux
-// Description:  Derived from Primitive for creating plot curves objects.
+// Date:  5/2/2011
+// Auth:  K. Loux
+// Desc:  Derived from Primitive for creating plot curves objects.
 
 #ifndef PLOT_CURVE_H_
 #define PLOT_CURVE_H_

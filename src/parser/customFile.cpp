@@ -1,17 +1,17 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  customFile.cpp
-// Created:  10/4/2012
-// Author:  K. Loux
-// Description:  File class for custom (non-XML) files defined by the user using
-//				 an XML file.
+// Date:  10/4/2012
+// Auth:  K. Loux
+// Desc:  File class for custom (non-XML) files defined by the user using
+//        an XML file.
 
 // Local headers
 #include "lp2d/parser/customFile.h"
@@ -20,11 +20,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		IsType
 //
-// Description:		Method for determining if the specified file is this
+// Desc:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:
@@ -36,18 +36,18 @@ namespace LibPlot2D
 // Return Value:
 //		bool, true if this object can process the specified file, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomFile::IsType(const wxString &fileName)
 {
 	CustomFileFormat format(fileName);
 	return format.IsCustomFormat() && !format.IsXML();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		CreateDelimiterList
 //
-// Description:		Overload.  Creates the delimiter list.  If no delimiter
+// Desc:		Overload.  Creates the delimiter list.  If no delimiter
 //					is specified in the custom definition, this is the same
 //					as DataFile, otherwise we limit the delimiter list to
 //					contain only the delimiter specified.
@@ -61,7 +61,7 @@ bool CustomFile::IsType(const wxString &fileName)
 // Return Value:
 //		wxArrayString
 //
-//==========================================================================
+//=============================================================================
 wxArrayString CustomFile::CreateDelimiterList() const
 {
 	if (fileFormat.GetDelimiter().IsEmpty())
@@ -72,11 +72,11 @@ wxArrayString CustomFile::CreateDelimiterList() const
 	return delimiterList;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		GetRawDataSize
 //
-// Description:		Returns the size to use when allocating the raw data array.
+// Desc:		Returns the size to use when allocating the raw data array.
 //
 // Input Arguments:
 //		selectedCount	= const unsigned int& indicating number of curves the
@@ -88,7 +88,7 @@ wxArrayString CustomFile::CreateDelimiterList() const
 // Return Value:
 //		unsigned int
 //
-//==========================================================================
+//=============================================================================
 unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const
 {
 	if (fileFormat.IsAsynchronous())
@@ -97,11 +97,11 @@ unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const
 	return DataFile::GetRawDataSize(selectedCount);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		ExtractData
 //
-// Description:		Parses the file and reads data into vectors.  Only extracts
+// Desc:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.  Handles asynchronous
 //					and time-formatted data as special cases.
 //
@@ -117,7 +117,7 @@ unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	std::vector<double> *rawData, std::vector<double> &factors,
 	wxString &errorString) const
@@ -128,11 +128,11 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	return DataFile::ExtractData(file, choices, rawData, factors, errorString);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		AssembleDatasets
 //
-// Description:		Takes raw data in std::vector<double> format and populates
+// Desc:		Takes raw data in std::vector<double> format and populates
 //					this object's data member with it.  If the format is
 //					asynchronous, it handles that as a special case.
 //
@@ -146,7 +146,7 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CustomFile::AssembleDatasets(const std::vector<double> *rawData,
 	const unsigned int &dataSize)
 {
@@ -156,11 +156,11 @@ void CustomFile::AssembleDatasets(const std::vector<double> *rawData,
 		DataFile::AssembleDatasets(rawData, dataSize);
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		GetCurveInformation
 //
-// Description:		Parses the file and assembles descriptions for each column
+// Desc:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
 //					the number of header rows back to the calling function.
 //					If custom descriptions and scaling factors are specified,
@@ -177,7 +177,7 @@ void CustomFile::AssembleDatasets(const std::vector<double> *rawData,
 // Return Value:
 //		wxArrayString containing the descriptions
 //
-//==========================================================================
+//=============================================================================
 wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
@@ -191,11 +191,11 @@ wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 	return names;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		ExtractSpecialData
 //
-// Description:		Parses the file and reads data into vectors.  Only extracts
+// Desc:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.  This handles the
 //					special cases of asynchronous and time-formatted data.
 //
@@ -211,7 +211,7 @@ wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
 	std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const
 {
@@ -257,11 +257,11 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		ExtractAsynchronousData
 //
-// Description:		Extracts data from asynchronous data line.
+// Desc:		Extracts data from asynchronous data line.
 //
 // Input Arguments:
 //		timeZero	= double&
@@ -276,7 +276,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &parsedLine,
 	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
 	wxString& WXUNUSED(errorString)) const
@@ -314,11 +314,11 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		ExtractSynchronousData
 //
-// Description:		Extracts data from synchronous data line.
+// Desc:		Extracts data from synchronous data line.
 //
 // Input Arguments:
 //		timeZero	= double&
@@ -333,7 +333,7 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
 	std::vector<double> *rawData, std::vector<double> &factors, const wxArrayInt &choices,
 	wxString &errorString) const
@@ -365,11 +365,11 @@ bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &p
 	return true;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		AssembleAsynchronousDatasets
 //
-// Description:		Takes raw data in std::vector<double> format and populates
+// Desc:		Takes raw data in std::vector<double> format and populates
 //					this object's data member with it.  This handles the special
 //					case of asynchronous data.
 //
@@ -383,7 +383,7 @@ bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &p
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CustomFile::AssembleAsynchronousDatasets(const std::vector<double> *rawData,
 	const unsigned int &dataSize)
 {
@@ -401,11 +401,11 @@ void CustomFile::AssembleAsynchronousDatasets(const std::vector<double> *rawData
 	}
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			CustomFile
 // Function:		DoTypeSpecificLoadTasks
 //
-// Description:		Sets non-standard flags for this class.
+// Desc:		Sets non-standard flags for this class.
 //
 // Input Arguments:
 //		None
@@ -416,7 +416,7 @@ void CustomFile::AssembleAsynchronousDatasets(const std::vector<double> *rawData
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void CustomFile::DoTypeSpecificLoadTasks()
 {
 	ignoreConsecutiveDelimiters = !fileFormat.IsAsynchronous();

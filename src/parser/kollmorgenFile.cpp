@@ -1,16 +1,16 @@
-/*===================================================================================
+/*=============================================================================
                                     DataPlotter
                           Copyright Kerry R. Loux 2011-2016
 
                    This code is licensed under the GPLv2 License
                      (http://opensource.org/licenses/GPL-2.0).
 
-===================================================================================*/
+=============================================================================*/
 
 // File:  kollmorgenFile.cpp
-// Created:  10/4/2012
-// Author:  K. Loux
-// Description:  File class for Kollmorgen files.
+// Date:  10/4/2012
+// Auth:  K. Loux
+// Desc:  File class for Kollmorgen files.
 
 // Local headers
 #include "lp2d/parser/kollmorgenFile.h"
@@ -18,11 +18,11 @@
 namespace LibPlot2D
 {
 
-//==========================================================================
+//=============================================================================
 // Class:			KollmorgenFile
 // Function:		IsType
 //
-// Description:		Method for determining if the specified file is this
+// Desc:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:
@@ -34,7 +34,7 @@ namespace LibPlot2D
 // Return Value:
 //		bool, true if this object can process the specified file, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool KollmorgenFile::IsType(const wxString &testFile)
 {
 	std::ifstream file(testFile.mb_str(), std::ios::in);
@@ -60,11 +60,11 @@ bool KollmorgenFile::IsType(const wxString &testFile)
 	return false;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			KollmorgenFile
 // Function:		GetCurveInformation
 //
-// Description:		Parses the file and assembles descriptions for each column
+// Desc:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
 //					the number of header rows back to the calling function.
 //
@@ -79,7 +79,7 @@ bool KollmorgenFile::IsType(const wxString &testFile)
 // Return Value:
 //		wxArrayString containing the descriptions
 //
-//==========================================================================
+//=============================================================================
 wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
@@ -105,11 +105,11 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 	return names;
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			KollmorgenFile
 // Function:		DoTypeSpecificLoadTasks
 //
-// Description:		Finds and stores the sample rate for the file.
+// Desc:		Finds and stores the sample rate for the file.
 //
 // Input Arguments:
 //		None
@@ -120,7 +120,7 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 // Return Value:
 //		None
 //
-//==========================================================================
+//=============================================================================
 void KollmorgenFile::DoTypeSpecificLoadTasks()
 {
 	std::ifstream file(fileName.mb_str(), std::ios::in);
@@ -144,11 +144,11 @@ void KollmorgenFile::DoTypeSpecificLoadTasks()
 	file.close();
 }
 
-//==========================================================================
+//=============================================================================
 // Class:			KollmorgenFile
 // Function:		ExtractData
 //
-// Description:		Parses the file and reads data into vectors.  Only extracts
+// Desc:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.  Also creates time
 //					series based on timeStep.
 //
@@ -164,7 +164,7 @@ void KollmorgenFile::DoTypeSpecificLoadTasks()
 // Return Value:
 //		bool, true for success, false otherwise
 //
-//==========================================================================
+//=============================================================================
 bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	std::vector<double> *rawData, std::vector<double> &factors, wxString& errorString) const
 {
