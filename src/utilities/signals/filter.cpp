@@ -43,10 +43,6 @@ namespace LibPlot2D
 //=============================================================================
 Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 {
-	a = nullptr;
-	b = nullptr;
-	u = nullptr;
-	y = nullptr;
 }
 
 //=============================================================================
@@ -103,27 +99,6 @@ Filter::Filter(const Filter &f) : sampleRate(f.sampleRate)
 
 //=============================================================================
 // Class:			Filter
-// Function:		~Filter
-//
-// Description:		Destructor for the Filter class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Filter::~Filter()
-{
-	DeleteArrays();
-}
-
-//=============================================================================
-// Class:			Filter
 // Function:		GenerateCoefficients
 //
 // Description:		Generates the discrete-time (z-domain) coefficients for
@@ -153,7 +128,7 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 
 	std::vector<double> zNum = CoefficientsFromString(numString);
 	std::vector<double> zDen = CoefficientsFromString(denString);
-	AllocateArrays(zNum.size(), zDen.size());
+	ResizeArrays(zNum.size(), zDen.size());
 
 	unsigned int i;
 	for (i = 0; i < zNum.size(); i++)
@@ -241,48 +216,23 @@ Filter& Filter::operator=(const Filter &f)
 	if (this == &f)
 		return *this;
 
-	DeleteArrays();
-	AllocateArrays(f.inSize, f.outSize);
+	ResizeArrays(f.u.size(), f.y.size());
 
 	unsigned int i;
-	for (i = 0; i < inSize; i++)
+	for (i = 0; i < a.size(); i++)
 	{
 		a[i] = f.a[i];
 		u[i] = f.u[i];
 	}
 
-	for (i = 0; i < outSize; i++)
+	for (i = 0; i < y.size(); i++)
 	{
-		if (i < outSize - 1)
+		if (i < b.size())
 			b[i] = f.b[i];
 		y[i] = f.y[i];
 	}
 
 	return *this;
-}
-
-//=============================================================================
-// Class:			Filter
-// Function:		DeleteArrays
-//
-// Description:		Deletes dynamically allocated memory for this object.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-void Filter::DeleteArrays()
-{
-	delete [] a;
-	delete [] b;
-	delete [] y;
-	delete [] u;
 }
 
 //=============================================================================
@@ -304,10 +254,10 @@ void Filter::DeleteArrays()
 void Filter::Initialize(const double &initialValue)
 {
 	unsigned int i;
-	for (i = 0; i < inSize; i++)
+	for (i = 0; i < u.size(); i++)
 		u[i] = initialValue;
 
-	for (i = 0; i < outSize; i++)
+	for (i = 0; i < y.size(); i++)
 		y[i] = initialValue * ComputeSteadyStateGain();
 }
 
@@ -318,7 +268,7 @@ void Filter::Initialize(const double &initialValue)
 // Description:		Applies the filter to the new input value.
 //
 // Input Arguments:
-//		_u	= const double&
+//		u0	= const double&
 //
 // Output Arguments:
 //		None
@@ -327,18 +277,18 @@ void Filter::Initialize(const double &initialValue)
 //		double containing the filtered value
 //
 //=============================================================================
-double Filter::Apply(const double &u)
+double Filter::Apply(const double &u0)
 {
-	ShiftArray(this->u, inSize);
-	this->u[0] = u;
+	ShiftArray(u);
+	u[0] = u0;
 
-	ShiftArray(y, outSize);
+	ShiftArray(y);
 
 	y[0] = 0.0;
 	unsigned int i;
-	for (i = 0; i < inSize; i++)
+	for (i = 0; i < a.size(); i++)
 		y[0] += a[i] * this->u[i];
-	for (i = 1; i < outSize; i++)
+	for (i = 1; i < y.size(); i++)
 		y[0] -= b[i - 1] * y[i];
 
 	return y[0];
@@ -352,8 +302,7 @@ double Filter::Apply(const double &u)
 //					index is lost).
 //
 // Input Arguments:
-//		s		= double*
-//		size	= const unsigned int& indicating the size of the array
+//		s		= std::vector<double>&
 //
 // Output Arguments:
 //		None
@@ -362,16 +311,16 @@ double Filter::Apply(const double &u)
 //		None
 //
 //=============================================================================
-void Filter::ShiftArray(double *s, const unsigned int &size)
+void Filter::ShiftArray(std::vector<double>& s) const
 {
 	unsigned int i;
-	for (i = size - 1; i > 0; i--)
+	for (i = s.size() - 1; i > 0; i--)
 		s[i] = s[i - 1];
 }
 
 //=============================================================================
 // Class:			Filter
-// Function:		AllocateArrays
+// Function:		ResizeArrays
 //
 // Description:		Allocates the coefficient and input/output storage arrays.
 //
@@ -386,15 +335,12 @@ void Filter::ShiftArray(double *s, const unsigned int &size)
 //		None
 //
 //=============================================================================
-void Filter::AllocateArrays(const unsigned int &inSize, const unsigned int &outSize)
+void Filter::ResizeArrays(const unsigned int &inSize, const unsigned int &outSize)
 {
-	this->inSize = inSize;
-	this->outSize = outSize;
-
-	a = new double[inSize];
-	b = new double[outSize - 1];
-	u = new double[inSize];
-	y = new double[outSize];
+	a.resize(inSize);
+	b.resize(outSize - 1);
+	u.resize(inSize);
+	y.resize(outSize);
 }
 
 //=============================================================================
@@ -606,10 +552,10 @@ double Filter::ComputeSteadyStateGain() const
 	double numeratorSum(0.0);
 	double denominatorSum(1.0);
 	unsigned int i;
-	for (i = 0; i < inSize; i++)
+	for (i = 0; i < a.size(); i++)
 		numeratorSum += a[i];
-	for (i = 1; i < outSize; i++)
-		denominatorSum += b[i - 1];
+	for (i = 0; i < b.size(); i++)
+		denominatorSum += b[i];
 
 	return numeratorSum / denominatorSum;
 }

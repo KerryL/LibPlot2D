@@ -32,14 +32,11 @@ public:
 		const std::vector<double> &denominator, const double &initialValue = 0.0);
 	Filter(const Filter &f);
 
-	// Desctructor
-	virtual ~Filter();
-
 	// Resets all internal variables to initialize the filter to the specified value
 	void Initialize(const double &initialValue);
 
 	// Main method for filtering incoming data
-	double Apply(const double &u);
+	double Apply(const double &u0);
 
 	// Returns latest raw data
 	double GetRawValue() const { return u[0]; }
@@ -57,24 +54,20 @@ public:
 
 private:
 	// Filter coefficients
-	double *a;
-	double *b;
-	double *y;
-	double *u;
-
-	unsigned int outSize;
-	unsigned int inSize;
+	std::vector<double> a;
+	std::vector<double> b;
+	std::vector<double> y;
+	std::vector<double> u;
 
 	const double sampleRate;// [Hz]
 
-	void AllocateArrays(const unsigned int &inSize, const unsigned int &outSize);
-	void ShiftArray(double *s, const unsigned int &size);
-	void DeleteArrays();
+	void ResizeArrays(const unsigned int &inSize, const unsigned int &outSize);
+	void ShiftArray(std::vector<double>& s) const;
 
 	void GenerateCoefficients(const std::vector<double> &numerator, const std::vector<double> &denominator);
 	std::string AssembleZExpression(const std::vector<double>& coefficients, const unsigned int &highestPower) const;
-	static std::vector<std::pair<int, double> > CollectLikeTerms(std::vector<std::pair<int, double> > terms);
-	static std::vector<std::pair<int, double> > PadMissingTerms(std::vector<std::pair<int, double> > terms);
+	static std::vector<std::pair<int, double>> CollectLikeTerms(std::vector<std::pair<int, double>> terms);
+	static std::vector<std::pair<int, double>> PadMissingTerms(std::vector<std::pair<int, double>> terms);
 };
 
 }// namespace LibPlot2D

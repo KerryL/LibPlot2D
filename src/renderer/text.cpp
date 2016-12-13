@@ -415,7 +415,6 @@ Primitive::BufferInfo Text::BuildText()
 
 	Primitive::BufferInfo bufferInfo(BuildLocalText());
 	ConfigureVertexArray(bufferInfo);
-	bufferInfo.FreeDynamicMemory();
 
 	return bufferInfo;
 }
@@ -628,36 +627,17 @@ Primitive::BufferInfo Text::AssembleBuffers()
 	unsigned int i;
 	for (i = 0; i < bufferVector.size(); i++)
 	{
-		bufferInfo.indexCount += bufferVector[i].indexCount;
+		bufferInfo.indexBuffer.insert(bufferInfo.indexBuffer.end(),
+			bufferVector[i].indexBuffer.begin(),
+			bufferVector[i].indexBuffer.end());
+		bufferInfo.vertexBuffer.insert(bufferInfo.vertexBuffer.end(),
+			bufferVector[i].vertexBuffer.begin(),
+			bufferVector[i].vertexBuffer.end());
 		bufferInfo.vertexCount += bufferVector[i].vertexCount;
-	}
-
-	assert(sizeof(GLfloat) == sizeof(float));
-	assert(sizeof(GLuint) == sizeof(unsigned int));
-
-	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * 4];
-	bufferInfo.indexBuffer = new unsigned int[bufferInfo.indexCount];
-
-	unsigned int j, k(0);
-	for (i = 0; i < bufferVector.size(); i++)
-	{
-		for (j = 0; j < bufferVector[i].vertexCount; j++)
-		{
-			bufferInfo.indexBuffer[k] = bufferVector[i].indexBuffer[j];
-
-			bufferInfo.vertexBuffer[k * 4] = bufferVector[i].vertexBuffer[j * 4];
-			bufferInfo.vertexBuffer[k * 4 + 1] = bufferVector[i].vertexBuffer[j * 4 + 1];
-			bufferInfo.vertexBuffer[k * 4 + 2] = bufferVector[i].vertexBuffer[j * 4 + 2];
-			bufferInfo.vertexBuffer[k * 4 + 3] = bufferVector[i].vertexBuffer[j * 4 + 3];
-			k++;
-		}
-
-		bufferVector[i].FreeDynamicMemory();
 	}
 
 	ConfigureVertexArray(bufferInfo);
 	bufferVector.clear();
-	bufferInfo.FreeDynamicMemory();
 
 	return bufferInfo;
 }
@@ -688,9 +668,8 @@ Primitive::BufferInfo Text::BuildLocalText()
 
 	Primitive::BufferInfo bufferInfo;
 	bufferInfo.vertexCount = 6 * text.length();
-	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * 4];
-	bufferInfo.indexCount = bufferInfo.vertexCount;
-	bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
+	bufferInfo.vertexBuffer.resize(bufferInfo.vertexCount * 4);
+	bufferInfo.indexBuffer.resize(bufferInfo.vertexCount);
 
 	double xStart(x);
 
@@ -772,14 +751,14 @@ void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
-		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(vertexLocation);
 	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
-		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
+		bufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(indexLocation);
 	glVertexAttribIPointer(indexLocation, 1, GL_UNSIGNED_INT, 0, 0);

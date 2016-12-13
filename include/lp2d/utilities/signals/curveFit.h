@@ -15,6 +15,9 @@
 #ifndef CURVE_FIT_H_
 #define CURVE_FIT_H_
 
+// Standard C++ headers
+#include <vector>
+
 namespace LibPlot2D
 {
 
@@ -27,7 +30,7 @@ public:
 	struct PolynomialFit
 	{
 		unsigned int order;
-		double *coefficients;
+		std::vector<double> coefficients;
 
 		double rSquared;
 	};

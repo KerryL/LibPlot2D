@@ -156,7 +156,7 @@ void Legend::GenerateGeometry()
 	if (bufferInfo[0].vertexCount > 0)
 	{
 		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
-		Line::DoPrettyDraw(bufferInfo[0].indexCount);
+		Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
 	}
 
 	// Text last
@@ -800,11 +800,10 @@ Primitive::BufferInfo Legend::BuildBackground() const
 	Primitive::BufferInfo buffer;
 
 	buffer.vertexCount = 4;
-	buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (4 + renderWindow.GetVertexDimension())];
+	buffer.vertexBuffer.resize(buffer.vertexCount * (4 + renderWindow.GetVertexDimension()));
 	assert(renderWindow.GetVertexDimension() == 2);
 
-	buffer.indexCount = 6;
-	buffer.indexBuffer = new unsigned int[buffer.indexCount];
+	buffer.indexBuffer.resize(6);
 
 	std::vector<std::pair<double, double> > corners(GetCornerVertices());
 	buffer.vertexBuffer[0] = (float)corners[0].first;
@@ -888,11 +887,10 @@ void Legend::BuildMarkers()
 			continue;
 
 		buffer.vertexCount = 4;
-		buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (renderWindow.GetVertexDimension() + 4)];
+		buffer.vertexBuffer.resize(buffer.vertexCount * (renderWindow.GetVertexDimension() + 4));
 		assert(renderWindow.GetVertexDimension() == 2);
 
-		buffer.indexCount = 6;
-		buffer.indexBuffer = new unsigned int[buffer.indexCount];
+		buffer.indexBuffer.resize(6);
 
 		buffer.vertexBuffer[0] = x - halfSize;
 		buffer.vertexBuffer[1] = y - halfSize;
@@ -962,15 +960,14 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 	unsigned int i;
 	for (i = 0; i < bufferVector.size(); i++)
 	{
-		buffer.indexCount += bufferVector[i].indexCount;
+		buffer.indexBuffer.insert(buffer.indexBuffer.end(),
+			bufferVector[i].indexBuffer.begin(),
+			bufferVector[i].indexBuffer.end());
+		buffer.vertexBuffer.insert(buffer.vertexBuffer.end(),
+			bufferVector[i].vertexBuffer.begin(),
+			bufferVector[i].vertexBuffer.end());
 		buffer.vertexCount += bufferVector[i].vertexCount;
 	}
-
-	assert(sizeof(GLfloat) == sizeof(float));
-	assert(sizeof(GLuint) == sizeof(unsigned int));
-
-	buffer.vertexBuffer = new GLfloat[buffer.vertexCount * (renderWindow.GetVertexDimension() + 4)];
-	buffer.indexBuffer = new unsigned int[buffer.indexCount];
 
 	const unsigned int colorStart(buffer.vertexCount * renderWindow.GetVertexDimension());
 
@@ -991,18 +988,16 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 			k++;
 		}
 
-		for (j = 0; j < bufferVector[i].indexCount; j++)
+		for (j = 0; j < bufferVector[i].indexBuffer.size(); j++)
 			buffer.indexBuffer[m++] = bufferVector[i].indexBuffer[j] + indexShift;
 
 		indexShift += bufferVector[i].vertexCount;
 
-		bufferVector[i].FreeDynamicMemory();
 		bufferVector[i].FreeOpenGLObjects();
 	}
 
 	ConfigureVertexArray(buffer);
 	bufferVector.clear();
-	buffer.FreeDynamicMemory();
 
 	return buffer;
 }
@@ -1072,7 +1067,7 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer, GL_DYNAMIC_DRAW);
+		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
 	glVertexAttribPointer(renderWindow.GetPositionLocation(),
@@ -1083,8 +1078,8 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 		(void*)(sizeof(GLfloat) * bufferInfo.vertexCount * renderWindow.GetVertexDimension()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
-		bufferInfo.indexBuffer, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
+		bufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
 }

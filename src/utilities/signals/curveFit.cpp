@@ -49,7 +49,7 @@ namespace LibPlot2D
 CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const unsigned int &order)
 {
 	PolynomialFit fit;
-	fit.coefficients = new double[order + 1];
+	fit.coefficients.resize(order + 1);
 	fit.order = order;
 
 	Matrix A(data.GetNumberOfPoints(), order + 1);

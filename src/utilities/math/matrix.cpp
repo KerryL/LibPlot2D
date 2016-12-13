@@ -49,7 +49,6 @@ Matrix::Matrix()
 {
 	rows = 0;
 	columns = 0;
-	elements = nullptr;
 }
 
 //=============================================================================
@@ -146,32 +145,10 @@ Matrix::Matrix(const unsigned int &rows, const unsigned int &columns, double ele
 //=============================================================================
 Matrix::Matrix(const Matrix &matrix)
 {
-	elements = nullptr;
 	rows = 0;
 	columns = 0;
 
 	*this = matrix;
-}
-
-//=============================================================================
-// Class:			Matrix
-// Function:		~Matrix
-//
-// Description:		Destructor for the Matrix class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Matrix::~Matrix()
-{
-	FreeElements();
 }
 
 //=============================================================================
@@ -1153,31 +1130,6 @@ unsigned int Matrix::GetRank() const
 
 //=============================================================================
 // Class:			Matrix
-// Function:		FreeElements
-//
-// Description:		Frees memory associated with this object.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-void Matrix::FreeElements()
-{
-	unsigned int i;
-	for (i = 0; i < rows; i++)
-		delete [] elements[i];
-	delete [] elements;
-	elements = nullptr;
-}
-
-//=============================================================================
-// Class:			Matrix
 // Function:		AllocateElements
 //
 // Description:		Allocates memory for the elements according to the number
@@ -1195,10 +1147,10 @@ void Matrix::FreeElements()
 //=============================================================================
 void Matrix::AllocateElements()
 {
-	elements = new double*[rows];
+	elements.resize(rows);
 	unsigned int i;
 	for (i = 0; i < rows; i++)
-		elements[i] = new double[columns];
+		elements[i].resize(columns);
 }
 
 //=============================================================================
@@ -1221,8 +1173,6 @@ void Matrix::AllocateElements()
 //=============================================================================
 void Matrix::Resize(const unsigned int &rows, const unsigned int &columns)
 {
-	FreeElements();
-
 	this->rows = rows;
 	this->columns = columns;
 
@@ -1254,19 +1204,14 @@ void Matrix::Resize(const unsigned int &rows, const unsigned int &columns)
 bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) const
 {
 	InitializeSVDMatrices(U, V, W);
-	double *rv1 = new double[V.rows];
+	std::vector<double> rv1(V.rows);
 
-	double anorm = ReduceToBidiagonalForm(U, V, W, rv1);
+	double anorm(ReduceToBidiagonalForm(U, V, W, rv1));
 
 	AccumulateRightHandTransforms(U, V, rv1);
 	AccumulateLeftHandTransforms(U, V, W);
 	if (!DiagonalizeBidiagonalForm(U, V, W, rv1, anorm))
-	{
-		delete [] rv1;
 		return false;
-	}
-
-	delete [] rv1;
 
 	RemoveZeroSingularValues(U, W);
 	SortSingularValues(U, V, W);
@@ -1318,7 +1263,7 @@ void Matrix::InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const
 //		U	= Matrix&
 //		V	= Matrix&
 //		W	= Matrix&
-//		rv1	= double*
+//		rv1	= std::vector<double>& 
 //
 // Output Arguments:
 //		None
@@ -1327,7 +1272,7 @@ void Matrix::InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const
 //		double, value of anorm
 //
 //=============================================================================
-double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1) const
+double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vector<double>& rv1) const
 {
 	unsigned int i, j, k, l(0);
 	double anorm(0.0), f, g(0.0), h, s, scale(0.0);
@@ -1435,7 +1380,7 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *r
 // Input Arguments:
 //		U	= Matrix&
 //		V	= Matrix&
-//		rv1	= const double*
+//		rv1	= const std::vector<double>& 
 //
 // Output Arguments:
 //		None
@@ -1444,7 +1389,7 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *r
 //		None
 //
 //=============================================================================
-void Matrix::AccumulateRightHandTransforms(Matrix &U, Matrix &V, const double *rv1) const
+void Matrix::AccumulateRightHandTransforms(Matrix &U, Matrix &V, const std::vector<double>& rv1) const
 {
 	int i(V.rows - 1);
 	unsigned int j, l(i), k;
@@ -1547,7 +1492,7 @@ void Matrix::AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const
 //		U	= Matrix&
 //		V	= Matrix&
 //		W	= Matrix&
-//		rv1	= double*
+//		rv1	= std::vector<double>& 
 //		anorm	= const double&
 //
 // Output Arguments:
@@ -1557,7 +1502,8 @@ void Matrix::AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const
 //		bool, false if iteration limit was reached, true otherwise
 //
 //=============================================================================
-bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1, const double &anorm) const
+bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
+	std::vector<double>& rv1, const double &anorm) const
 {
 	int i, j, its, jj, k, l(0), nm(0);
 	double c, f, g, h, s, x, y, z;
@@ -1750,8 +1696,8 @@ void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
 {
 	unsigned int its(1), i, j, k;
 	double sw, s;
-	double *su = new double[U.rows];
-	double *sv = new double[V.rows];
+	std::vector<double> su(U.rows);
+	std::vector<double> sv(V.rows);
 
 	do
 	{
@@ -1820,9 +1766,6 @@ void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
 				V.elements[j][k] = -V.elements[j][k];
 		}
 	}
-
-	delete [] su;
-	delete [] sv;
 }
 
 //=============================================================================

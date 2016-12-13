@@ -70,7 +70,7 @@ public:
 	void BuildSegments(const std::vector<std::pair<double, double> > &points,
 		const UpdateMethod& update = UpdateImmediate);
 
-	Primitive::BufferInfo GetBufferInfo() const { return bufferInfo; }
+	const Primitive::BufferInfo& GetBufferInfo() const { return bufferInfo; }
 
 	static void DoUglyDraw(const unsigned int& vertexCount);
 	static void DoPrettyDraw(const unsigned int& indexCount);

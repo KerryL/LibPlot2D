@@ -1305,8 +1305,6 @@ std::unique_ptr<Dataset2D> GuiInterface::GetCurveFitData(const unsigned int &ord
 
 	name = GetCurveFitName(fitData, row);
 
-	delete [] fitData.coefficients;
-
 	return newData;
 }
 

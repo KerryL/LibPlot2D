@@ -15,6 +15,9 @@
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
+// Standard C++ headers
+#include <memory>
+
 // wxWidgets forward declarations
 class wxString;
 
@@ -32,9 +35,6 @@ public:
 	Matrix(const unsigned int &rows, const unsigned int &columns);
 	Matrix(const unsigned int &rows, const unsigned int &columns, double element1, ...);
 	Matrix(const Matrix &m);
-
-	// Destructor
-	~Matrix();
 
 	// Sets the values of all of the elements
 	void Set(double Element1, ...);
@@ -103,18 +103,17 @@ private:
 	unsigned int columns;
 
 	// The array of elements of this matrix
-	double **elements;
+	std::vector<std::vector<double>> elements;
 
-	void FreeElements();
 	void AllocateElements();
 
 	// Helper functions for SVD algorithm
 	double Pythag(const double& a, const double &b) const;
 	void InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const;
-	double ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1) const;
-	void AccumulateRightHandTransforms(Matrix &U, Matrix &V, const double *rv1) const;
+	double ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vector<double>& rv1) const;
+	void AccumulateRightHandTransforms(Matrix &U, Matrix &V, const std::vector<double>& rv1) const;
 	void AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const;
-	bool DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *rv1, const double &anorm) const;
+	bool DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vector<double>& rv1, const double &anorm) const;
 	void RemoveZeroSingularValues(Matrix &U, Matrix &W) const;
 	void SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const;
 

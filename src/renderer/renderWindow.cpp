@@ -1602,11 +1602,10 @@ GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderC
 		GLint infoLogLength;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
         
-		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetShaderInfoLog(shader, infoLogLength, nullptr, strInfoLog);
-		std::cerr << strInfoLog << std::endl;
+		std::unique_ptr<GLchar[]> strInfoLog = std::make_unique<GLchar[]>(infoLogLength + 1);
+		glGetShaderInfoLog(shader, infoLogLength, nullptr, strInfoLog.get());
+		std::cerr << strInfoLog.get() << std::endl;
 		assert(false);
-		delete[] strInfoLog;
 	}
 
 	return shader;
@@ -1643,11 +1642,10 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 		GLint infoLogLength;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
         
-		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetProgramInfoLog(program, infoLogLength, nullptr, strInfoLog);
-		std::cerr << strInfoLog << std::endl;
+		std::unique_ptr<GLchar[]> strInfoLog = std::make_unique<GLchar[]>(infoLogLength + 1);
+		glGetProgramInfoLog(program, infoLogLength, nullptr, strInfoLog.get());
+		std::cerr << strInfoLog.get() << std::endl;
 		assert(false);
-		delete[] strInfoLog;
 	}
 
 	for (i = 0; i < shaderList.size(); i++)

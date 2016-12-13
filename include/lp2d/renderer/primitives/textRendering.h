@@ -29,7 +29,7 @@ class TextRendering : public Primitive
 {
 public:
 	TextRendering(RenderWindow &renderWindow);
-	~TextRendering();
+	~TextRendering() = default;
 
 	// Set option methods
 	void SetAngle(const double& angle) { this->angle = angle; modified = true; }// [rad]

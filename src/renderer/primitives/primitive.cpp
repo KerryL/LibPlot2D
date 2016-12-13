@@ -101,16 +101,6 @@ Primitive::~Primitive()
 {
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
-
-	unsigned int i;
-	for (i = 0; i < bufferInfo.size(); i++)
-	{
-		bufferInfo[i].FreeOpenGLObjects();
-		delete[] bufferInfo[i].vertexBuffer;
-		bufferInfo[i].vertexBuffer = nullptr;
-		delete[] bufferInfo[i].indexBuffer;
-		bufferInfo[i].indexBuffer = nullptr;
-	}
 }
 
 //=============================================================================
@@ -301,33 +291,6 @@ void Primitive::DisableAlphaBlending()
 
 //=============================================================================
 // Class:			Primitive::BufferInfo
-// Function:		BufferInfo
-//
-// Description:		Constructor for the Primitive::BufferInfo struct.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Primitive::BufferInfo::BufferInfo()
-{
-	vertexBuffer = nullptr;
-	vertexCountModified = true;
-	vertexCount = 0;
-	indexBuffer = nullptr;
-	indexCount = 0;
-	glVertexBufferExists = false;
-	glIndexBufferExists = false;
-}
-
-//=============================================================================
-// Class:			Primitive::BufferInfo
 // Function:		GetOpenGLIndices
 //
 // Description:		Method for safely initializing this object.
@@ -392,31 +355,6 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 	}
 
 	assert(!RenderWindow::GLHasError());
-}
-
-//=============================================================================
-// Class:			Primitive::BufferInfo
-// Function:		FreeDynamicMemory
-//
-// Description:		Frees dynamic resources.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-void Primitive::BufferInfo::FreeDynamicMemory()
-{
-	delete[] vertexBuffer;
-	vertexBuffer = nullptr;
-
-	delete[] indexBuffer;
-	indexBuffer = nullptr;
 }
 
 }// namespace LibPlot2D

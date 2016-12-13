@@ -18,6 +18,7 @@
 // Standard C++ headers
 #include <cassert>
 #include <cstdlib>
+#include <vector>
 #include <memory>
 
 // wxWidgets forward declarations
@@ -29,7 +30,7 @@ namespace LibPlot2D
 class Dataset2D
 {
 public:
-	Dataset2D();
+	Dataset2D() = default;
 	Dataset2D(const Dataset2D& target);
 	Dataset2D(const unsigned int &numberOfPoints);
 
@@ -42,14 +43,14 @@ public:
 	double ComputeYMean() const;
 	double GetAverageDeltaX() const;
 
-	unsigned int GetNumberOfPoints() const { return numberOfPoints; }
+	unsigned int GetNumberOfPoints() const { return xData.size(); }
 	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;
-	double *GetXPointer() { return xData.get(); }
-	double *GetYPointer() { return yData.get(); }
-	const double *GetXPointer() const { return xData.get(); }
-	const double *GetYPointer() const { return yData.get(); }
-	double GetXData(const unsigned int &i) const { assert(i < numberOfPoints); return xData[i]; }
-	double GetYData(const unsigned int &i) const { assert(i < numberOfPoints); return yData[i]; }
+	double *GetXPointer() { return xData.data(); }
+	double *GetYPointer() { return yData.data(); }
+	const double *GetXPointer() const { return xData.data(); }
+	const double *GetYPointer() const { return yData.data(); }
+	double GetXData(const unsigned int &i) const { return xData[i]; }
+	double GetYData(const unsigned int &i) const { return yData[i]; }
 
 	Dataset2D& MultiplyXData(const double &target);
 	bool GetYAt(const double &x, double &y, bool *exactValue = nullptr) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
@@ -115,8 +116,7 @@ public:
 	static Dataset2D DoUnsyncrhonizedExponentiation(const Dataset2D &d1, const Dataset2D &d2);
 
 private:
-	unsigned int numberOfPoints;
-	std::unique_ptr<double[]> xData, yData;
+	std::vector<double> xData, yData;
 
 	static void GetOverlappingOnSameTimebase(const Dataset2D &d1,
 		const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out);

@@ -55,26 +55,6 @@ TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindo
 
 //=============================================================================
 // Class:			TextRendering
-// Function:		~TextRendering
-//
-// Description:		Destructor for the TextRendering class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-TextRendering::~TextRendering()
-{
-}
-
-//=============================================================================
-// Class:			TextRendering
 // Function:		Update
 //
 // Description:		Updates the GL buffers associated with this object.

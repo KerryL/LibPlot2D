@@ -33,17 +33,17 @@ public:
 	PlotCurve(RenderWindow &renderWindow, const Dataset2D& data);
 	PlotCurve(const PlotCurve &plotCurve);
 
-	virtual ~PlotCurve();
+	~PlotCurve() = default;
 
 	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
 	inline void SetMarkerSize(const double &size) { markerSize = size; modified = true; }
 	inline void SetPretty(const bool &pretty) { this->pretty = pretty; line.SetPretty(pretty); modified = true; }
 
 	// For setting up the plot
-	inline void BindToXAxis(Axis *xAxis) { this->xAxis = xAxis; modified = true; }
-	inline void BindToYAxis(Axis *yAxis) { this->yAxis = yAxis; modified = true; }
+	inline void BindToXAxis(Axis* xAxis) { this->xAxis = xAxis; modified = true; }
+	inline void BindToYAxis(Axis* yAxis) { this->yAxis = yAxis; modified = true; }
 
-	inline Axis *GetYAxis() { return yAxis; }
+	inline Axis* GetYAxis() { return yAxis; }
 
 	// Overloaded operators
 	PlotCurve& operator=(const PlotCurve &plotCurve);
@@ -88,7 +88,7 @@ private:
 	double yScale;
 
 	void InitializeMarkerVertexBuffer();
-	static double* DoLogarithmicScale(const double* values, const unsigned int& count);
+	static std::unique_ptr<double[]> DoLogarithmicScale(const double* values, const unsigned int& count);
 };
 
 }// namespace LibPlot2D

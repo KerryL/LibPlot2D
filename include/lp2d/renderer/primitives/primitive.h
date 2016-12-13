@@ -17,6 +17,7 @@
 
 // Standard C++ headers
 #include <vector>
+#include <memory>
 
 // Local headers
 #include "lp2d/renderer/color.h"
@@ -53,24 +54,21 @@ public:
 
 	struct BufferInfo
 	{
-		unsigned int vertexCount;
-		float* vertexBuffer;
-		unsigned int indexCount;
-		unsigned int* indexBuffer;
-		bool vertexCountModified;
+		unsigned int vertexCount = 0;
+		std::vector<float> vertexBuffer;
+		std::vector<unsigned int> indexBuffer;
+		bool vertexCountModified = true;
 
 		unsigned int vertexBufferIndex;
 		unsigned int vertexArrayIndex;
 		unsigned int indexBufferIndex;
 
-		BufferInfo();
 		void GetOpenGLIndices(const bool& needIndexObject = false);
 		void FreeOpenGLObjects();
-		void FreeDynamicMemory();
 
 	private:
-		bool glVertexBufferExists;
-		bool glIndexBufferExists;
+		bool glVertexBufferExists = false;
+		bool glIndexBufferExists = false;
 	};
 
 protected:

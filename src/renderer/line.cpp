@@ -364,12 +364,11 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 	bufferInfo.GetOpenGLIndices(triangleCount > 0);
 
 	bufferInfo.vertexCount = vertexCount;
-	bufferInfo.vertexBuffer = new GLfloat[bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	bufferInfo.vertexBuffer.resize(bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4));
 	assert(renderWindow.GetVertexDimension() == 2);
 
-	bufferInfo.indexCount = triangleCount * 3;
 	if (triangleCount > 0)
-		bufferInfo.indexBuffer = new GLuint[bufferInfo.indexCount];
+		bufferInfo.indexBuffer.resize(triangleCount * 3);
 
 	//bufferInfo.vertexCountModified = false;// TODO:  OGL4 Would be good to use this, but need a way to trigger update requests
 }
@@ -422,7 +421,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer, hint);
+		bufferInfo.vertexBuffer.data(), hint);
 
 	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
 	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -434,8 +433,6 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 	glLineWidth(2.0 * halfWidth);
 
 	glBindVertexArray(0);
-
-	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }
@@ -484,7 +481,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer, hint);
+		bufferInfo.vertexBuffer.data(), hint);
 
 	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
 	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -496,8 +493,6 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 	glLineWidth(2.0 * halfWidth);
 
 	glBindVertexArray(0);
-
-	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }
@@ -583,7 +578,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer, hint);
+		bufferInfo.vertexBuffer.data(), hint);
 
 	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
 	glVertexAttribPointer(renderWindow.GetPositionLocation(),
@@ -594,12 +589,10 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
-		bufferInfo.indexBuffer, hint);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
+		bufferInfo.indexBuffer.data(), hint);
 
 	glBindVertexArray(0);
-
-	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }
@@ -685,7 +678,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer, hint);
+		bufferInfo.vertexBuffer.data(), hint);
 
 	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
 	glVertexAttribPointer(renderWindow.GetPositionLocation(),
@@ -696,12 +689,10 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexCount,
-		bufferInfo.indexBuffer, hint);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
+		bufferInfo.indexBuffer.data(), hint);
 
 	glBindVertexArray(0);
-
-	bufferInfo.FreeDynamicMemory();
 
 	assert(!RenderWindow::GLHasError());
 }

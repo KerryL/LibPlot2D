@@ -82,26 +82,6 @@ PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
 
 //=============================================================================
 // Class:			PlotCurve
-// Function:		~PlotCurve
-//
-// Description:		Destructor for the PlotCurve class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-PlotCurve::~PlotCurve()
-{
-}
-
-//=============================================================================
-// Class:			PlotCurve
 // Function:		InitializeMarkerVertexBuffer
 //
 // Description:		Initializes the vertex buffer for storing the marker information.
@@ -118,12 +98,10 @@ PlotCurve::~PlotCurve()
 //=============================================================================
 void PlotCurve::InitializeMarkerVertexBuffer()
 {
-	delete[] bufferInfo[1].vertexBuffer;
-
 	bufferInfo[1].GetOpenGLIndices();
 
 	bufferInfo[1].vertexCount = data.GetNumberOfPoints() * 4;
-	bufferInfo[1].vertexBuffer = new float[bufferInfo[1].vertexCount * (renderWindow.GetVertexDimension() + 4)];
+	bufferInfo[1].vertexBuffer.resize(bufferInfo[1].vertexCount * (renderWindow.GetVertexDimension() + 4));
 	assert(renderWindow.GetVertexDimension() == 2);
 
 	bufferInfo[1].vertexCountModified = false;
@@ -174,26 +152,26 @@ void PlotCurve::Update(const unsigned int& i)
 			line.SetXScale(xScale);
 			line.SetYScale(yScale);
 
-			const double* xPointer;
-			const double* yPointer;
+			std::unique_ptr<const double[]> xLogPointer;
+			std::unique_ptr<const double[]> yLogPointer;
+			const double *xPointer, *yPointer;
 			if (xAxis->IsLogarithmic())
-				xPointer = DoLogarithmicScale(data.GetXPointer(), data.GetNumberOfPoints());
+			{
+				xLogPointer = DoLogarithmicScale(data.GetXPointer(), data.GetNumberOfPoints());
+				xPointer = xLogPointer.get();
+			}
 			else
 				xPointer = data.GetXPointer();
 
 			if (yAxis->IsLogarithmic())
-				yPointer = DoLogarithmicScale(data.GetYPointer(), data.GetNumberOfPoints());
+			{
+				yLogPointer = DoLogarithmicScale(data.GetYPointer(), data.GetNumberOfPoints());
+				yPointer = yLogPointer.get();
+			}
 			else
 				yPointer = data.GetYPointer();
 
 			line.Build(xPointer, yPointer, data.GetNumberOfPoints());
-
-			// Clean up dynamically allocated memory, if necessary
-			if (xAxis->IsLogarithmic())
-				delete[] xPointer;
-
-			if (yAxis->IsLogarithmic())
-				delete[] yPointer;
 		}
 		else
 			line.SetWidth(0.0);
@@ -212,7 +190,7 @@ void PlotCurve::Update(const unsigned int& i)
 		glBindBuffer(GL_ARRAY_BUFFER, bufferInfo[i].vertexBufferIndex);
 		glBufferData(GL_ARRAY_BUFFER,
 			sizeof(GLfloat) * bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4),
-			bufferInfo[i].vertexBuffer, GL_DYNAMIC_DRAW);
+			bufferInfo[i].vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 		glEnableVertexAttribArray(renderWindow.GetPositionLocation());
 		glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -222,8 +200,8 @@ void PlotCurve::Update(const unsigned int& i)
 			(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo[i].vertexCount));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].indexBufferIndex);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo[i].indexCount,
-			bufferInfo[i].indexBuffer, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo[i].indexBuffer.size(),
+			bufferInfo[i].indexBuffer.data(), GL_DYNAMIC_DRAW);
 
 		glBindVertexArray(0);
 	}
@@ -262,7 +240,7 @@ void PlotCurve::GenerateGeometry()
 		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
 
 		if (pretty)
-			Line::DoPrettyDraw(bufferInfo[0].indexCount);
+			Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
 		else
 			Line::DoUglyDraw(bufferInfo[0].vertexCount);
 	}
@@ -440,18 +418,20 @@ void PlotCurve::BuildMarkers()
 // Description:		Handles scaling for arrays of logarithmic data.
 //
 // Input Arguments:
-//		value	= const double&
+//		value	= const double*
+//		coutn	= const unsigned int&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		double*
+//		std::unique_ptr<double[]>
 //
 //=============================================================================
-double* PlotCurve::DoLogarithmicScale(const double* values, const unsigned int& count)
+std::unique_ptr<double[]> PlotCurve::DoLogarithmicScale(const double* values,
+	const unsigned int& count)
 {
-	double* scaledValues = new double[count];
+	std::unique_ptr<double[]> scaledValues(std::make_unique<double[]>(count));
 	unsigned int i;
 	for (i = 0; i < count; i++)
 		scaledValues[i] = PlotRenderer::DoLogarithmicScale(values[i]);

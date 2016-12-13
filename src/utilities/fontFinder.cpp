@@ -366,16 +366,16 @@ wxString FontFinder::CheckHeaderForName(std::ifstream &file, const size_t &offse
 		int nPos = file.tellg();
 		file.seekg(ttRecord.stringOffset + offset, std::ios_base::beg);
 
-		char *nameBuffer = new char[ttRecord.stringLength];
-		file.read(nameBuffer, ttRecord.stringLength);
-		name.assign(nameBuffer);
+		std::string nameBuffer;
+		nameBuffer.resize(ttRecord.stringLength);
+		file.read(&nameBuffer[0], ttRecord.stringLength);
+
 		// Apparent bug with setting the string length every time:
 		// When the string is empty, and we assign a length anyway, it is no
 		// longer emtpy, even though it contains no valid data.  As a workaround,
 		// we only assign the proper length if the string is not already empty
-		if (!name.IsEmpty())
-			name.resize(ttRecord.stringLength);
-		delete[] nameBuffer;
+		if (nameBuffer[0] != '\0')
+			name.assign(nameBuffer);
 
 		file.seekg(nPos, std::ios_base::beg);
 	}

@@ -29,6 +29,7 @@ class PlotCursor : public Primitive
 {
 public:
 	PlotCursor(RenderWindow &renderWindow, const Axis &axis);
+	~PlotCursor() = default;
 
 	void SetLocation(const int& location);
 	double GetValue() const { return value; }

@@ -167,17 +167,17 @@ void Axis::Update(const unsigned int& i)
 void Axis::GenerateGeometry()
 {
 	// Draw gridlines first
-	if ((majorGrid || minorGrid) && bufferInfo[1].indexCount > 0)
+	if ((majorGrid || minorGrid) && bufferInfo[1].indexBuffer.size() > 0)
 	{
 		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
-		Line::DoPrettyDraw(bufferInfo[1].indexCount);
+		Line::DoPrettyDraw(bufferInfo[1].indexBuffer.size());
 	}
 
 	// Axis and ticks next
 	if (bufferInfo[0].vertexCount > 0)
 	{
 		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
-		Line::DoPrettyDraw(bufferInfo[0].indexCount);
+		Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
 	}
 
 	if (valueText.IsOK() && bufferInfo[2].vertexCount > 0)
