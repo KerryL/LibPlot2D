@@ -138,7 +138,6 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 //
 // Input Arguments:
 //		rawData		= const std::vector<std::vector<double>>&
-//		dataSize	= const unsigned int& indicating the number of elements of the first argument
 //
 // Output Arguments:
 //		None
@@ -147,13 +146,13 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 //		None
 //
 //=============================================================================
-void CustomFile::AssembleDatasets(const std::vector<std::vector<double>>& rawData,
-	const unsigned int &dataSize)
+void CustomFile::AssembleDatasets(
+	const std::vector<std::vector<double>>& rawData)
 {
 	if (fileFormat.IsAsynchronous())
-		AssembleAsynchronousDatasets(rawData, dataSize);
+		AssembleAsynchronousDatasets(rawData);
 	else
-		DataFile::AssembleDatasets(rawData, dataSize);
+		DataFile::AssembleDatasets(rawData);
 }
 
 //=============================================================================
@@ -378,7 +377,6 @@ bool CustomFile::ExtractSynchronousData(double &timeZero,
 //
 // Input Arguments:
 //		rawData		= const std::vector<std::vector<double>>&
-//		dataSize	= const unsigned int& indicating the number of elements of the first argument
 //
 // Output Arguments:
 //		None
@@ -388,13 +386,12 @@ bool CustomFile::ExtractSynchronousData(double &timeZero,
 //
 //=============================================================================
 void CustomFile::AssembleAsynchronousDatasets(
-	const std::vector<std::vector<double>>& rawData,
-	const unsigned int &dataSize)
+	const std::vector<std::vector<double>>& rawData)
 {
-	assert(dataSize > 1 && rawData && dataSize % 2 == 0);
+	assert(rawData.size() % 2 == 0);
 
 	unsigned int i;
-	for (i = 0; i < dataSize; i += 2)
+	for (i = 0; i < rawData.size(); i += 2)
 	{
 		std::unique_ptr<Dataset2D> dataset(std::make_unique<Dataset2D>(rawData[i].size()));
 		TransferVectorToArray(rawData[i], dataset->GetXPointer());

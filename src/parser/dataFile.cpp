@@ -243,7 +243,7 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 		return false;
 	}
 
-	AssembleDatasets(rawData, GetRawDataSize(selectionInfo.selections.size()));
+	AssembleDatasets(rawData);
 
 	return true;
 }
@@ -276,7 +276,8 @@ wxString DataFile::DetermineBestDelimiter() const
 	std::ifstream file(fileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
+		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
+			_T("Error Reading File"), wxICON_ERROR);
 		return wxEmptyString;
 	}
 
@@ -711,7 +712,6 @@ bool DataFile::ArrayContainsValue(const int &value, const wxArrayInt &a) const
 //
 // Input Arguments:
 //		rawData		= const std::vector<std::vector<double>>
-//		dataSize	= const unsigned int& indicating the number of elements of the first argument
 //
 // Output Arguments:
 //		None
@@ -721,13 +721,10 @@ bool DataFile::ArrayContainsValue(const int &value, const wxArrayInt &a) const
 //
 //=============================================================================
 void DataFile::AssembleDatasets(
-	const std::vector<std::vector<double>>& rawData,
-	const unsigned int &dataSize)
+	const std::vector<std::vector<double>>& rawData)
 {
-	assert(dataSize > 1 && rawData);
-
 	unsigned int i;
-	for (i = 1; i < dataSize; i++)
+	for (i = 1; i < rawData.size(); i++)
 	{
 		std::unique_ptr<Dataset2D> dataset;
 		if (i == 1)

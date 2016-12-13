@@ -81,8 +81,7 @@ protected:
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		wxString &errorString) const;
-	virtual void AssembleDatasets(const std::vector<std::vector<double>>& rawData,
-		const unsigned int &dataSize);
+	virtual void AssembleDatasets(const std::vector<std::vector<double>>& rawData);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
 	virtual void DoTypeSpecificLoadTasks() {};
