@@ -117,20 +117,20 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 	wxDataObjectComposite *dataObject = static_cast<wxDataObjectComposite*>(m_dataObject);
 	size_t bufferSize = dataObject->GetDataSize(dataObject->GetReceivedFormat());
 
-	std::unique_ptr<char[]> buffer(new char[bufferSize]);
-	if (!dataObject->GetDataHere(dataObject->GetReceivedFormat(), buffer.get()))
+	std::vector<char> buffer(bufferSize);
+	if (!dataObject->GetDataHere(dataObject->GetReceivedFormat(), buffer.data()))
 		return wxDragNone;
 
 	if (dataObject->GetReceivedFormat().GetType() == wxDF_FILENAME)
 	{
 		wxFileDataObject fileData;
-		fileData.SetData(bufferSize, buffer.get());
+		fileData.SetData(bufferSize, buffer.data());
 		return OnDropFiles(fileData.GetFilenames()) ? def : wxDragNone;
 	}
 	else if (dataObject->GetReceivedFormat().GetType() == wxDF_TEXT)
 	{
 		wxTextDataObject textData;
-		textData.SetData(bufferSize, buffer.get());
+		textData.SetData(bufferSize, buffer.data());
 		return OnDropText(textData.GetText()) ? wxDragCopy : wxDragNone;
 	}
 

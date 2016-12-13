@@ -199,9 +199,10 @@ void PlotCurve::Update(const unsigned int& i)
 		glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 			(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo[i].vertexCount));
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].indexBufferIndex);
+		/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].indexBufferIndex);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo[i].indexBuffer.size(),
-			bufferInfo[i].indexBuffer.data(), GL_DYNAMIC_DRAW);
+			bufferInfo[i].indexBuffer.data(), GL_DYNAMIC_DRAW);*/
+		// TODO:  Why doesn't this work?  Similar code worked just fine before switching to std::vector
 
 		glBindVertexArray(0);
 	}
@@ -419,7 +420,7 @@ void PlotCurve::BuildMarkers()
 //
 // Input Arguments:
 //		value	= const double*
-//		coutn	= const unsigned int&
+//		count	= const unsigned int&
 //
 // Output Arguments:
 //		None
