@@ -139,7 +139,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 				curveName = files[i]->GetDescription(j + 1) + _T(" : ") + GuiUtilities::ExtractFileNameFromPath(fileList[i]);
 			else
 				curveName = files[i]->GetDescription(j + 1);
-			AddCurve(files[i]->GetDataset(j), curveName);
+			AddCurve(std::move(files[i]->GetDataset(j)), curveName);
 		}
 	}
 
@@ -741,7 +741,7 @@ void GuiInterface::GenerateFRF()
 
 	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
 		*plotList[dialog.GetOutputIndex()], dialog.GetNumberOfAverages(),
-		FastFourierTransform::WindowHann, dialog.GetModuloPhase(), amplitude, phase, coherence);
+		FastFourierTransform::WindowHann, dialog.GetModuloPhase(), *amplitude, phase.get(), coherence.get());
 
 	AddFFTCurves(factor, std::move(amplitude), std::move(phase), std::move(coherence), wxString::Format("[%u] to [%u]",
 		dialog.GetInputIndex(), dialog.GetOutputIndex()));
@@ -1078,8 +1078,8 @@ void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
-			GetFFTData(plotList[selectedRows[i] - 1])));
+		std::unique_ptr<Dataset2D> newData(
+			GetFFTData(plotList[selectedRows[i] - 1]));
 		if (!newData)
 			continue;
 
@@ -1197,7 +1197,7 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 	unsigned int i;
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
-		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(plotList[selectedRows[i] - 1]));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
 
 		ApplyFilter(filterParameters, newData);
 
@@ -1246,8 +1246,8 @@ void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 	for (i = 0; i < selectedRows.Count(); i++)
 	{
 		wxString name;
-		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
-			GetCurveFitData(order, plotList[selectedRows[i] - 1], name, selectedRows[i])));
+		std::unique_ptr<Dataset2D> newData(GetCurveFitData(
+			order, plotList[selectedRows[i] - 1], name, selectedRows[i]));
 
 		AddCurve(std::move(newData), name);
 	}
@@ -1689,23 +1689,15 @@ std::unique_ptr<Dataset2D> GuiInterface::GetFFTData(
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
 			_T("Accuracy Warning"), wxICON_WARNING, owner);
 
-	std::unique_ptr<Dataset2D> newData(
-		std::move(FastFourierTransform::ComputeFFT([&dialog, &data, this]() -> const std::unique_ptr<const Dataset2D>&
+	std::unique_ptr<Dataset2D> newData(std::move(
+		FastFourierTransform::ComputeFFT([&dialog, &data, this]()
 	{
 		if (dialog.GetUseZoomedData())
-			return this->GetXZoomedDataset(data);
+			return *this->GetXZoomedDataset(data);
 		else
-			return data;
-	}), dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(), dialog.GetSubtractMean()));
-
-	
-		/*newData = new LibPlot2D::Dataset2D(LibPlot2D::FastFourierTransform::ComputeFFT(GetXZoomedDataset(*data),
-			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
-			dialog.GetSubtractMean()));
-	else
-		newData = new LibPlot2D::Dataset2D(LibPlot2D::FastFourierTransform::ComputeFFT(*data,
-			dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
-			dialog.GetSubtractMean()));*/
+			return *data;
+	}(), dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
+		dialog.GetSubtractMean())));
 
 	newData->MultiplyXData(factor);
 

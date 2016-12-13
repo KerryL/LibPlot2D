@@ -45,7 +45,7 @@ public:
 
 private:
 	static const unsigned int printfPrecision;
-	const ManagedList<std::unique_ptr<const Dataset2D>> *list;
+	const ManagedList<const Dataset2D> *list;
 
 	double mXAxisFactor;
 

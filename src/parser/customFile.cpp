@@ -389,15 +389,14 @@ void CustomFile::AssembleAsynchronousDatasets(const std::vector<double> *rawData
 {
 	assert(dataSize > 1 && rawData && dataSize % 2 == 0);
 
-	Dataset2D *dataset;
 	unsigned int i;
 	for (i = 0; i < dataSize; i += 2)
 	{
-		dataset = new Dataset2D(rawData[i].size());
+		std::unique_ptr<Dataset2D> dataset(std::make_unique<Dataset2D>(rawData[i].size()));
 		TransferVectorToArray(rawData[i], dataset->GetXPointer());
 		TransferVectorToArray(rawData[i + 1], dataset->GetYPointer());
 		*dataset *= scales[i / 2];
-		data.push_back(dataset);
+		data.push_back(std::move(dataset));
 	}
 }
 

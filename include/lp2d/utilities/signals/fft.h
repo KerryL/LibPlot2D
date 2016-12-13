@@ -51,7 +51,7 @@ public:
 
 		\return The processed amplitude vs. frequency FFT information
 	*/
-	static std::unique_ptr<Dataset2D> ComputeFFT(const std::unique_ptr<const Dataset2D>& data);
+	static std::unique_ptr<Dataset2D> ComputeFFT(const Dataset2D& data);
 
 	/// Computes FFT of the specified dataset with specified options.
 	/*! Averaging is determined based on the length of the signal, the
@@ -67,7 +67,7 @@ public:
 
 		\sa GetNumberOfAverages
 	*/
-	static std::unique_ptr<Dataset2D> ComputeFFT(std::unique_ptr<Dataset2D> data, const FFTWindow &window,
+	static std::unique_ptr<Dataset2D> ComputeFFT(Dataset2D data, const FFTWindow &window,
 		unsigned int windowSize, const double &overlap, const bool &subtractMean);
 
 	/// Computes the Frequency Response Function for the specified signals.
@@ -89,11 +89,10 @@ public:
 
 		\sa ComputeOverlap
 	*/
-	static void ComputeFRF(const Dataset2D &input, const Dataset2D &output,
+	static void ComputeFRF(const Dataset2D& input, const Dataset2D& output,
 		unsigned int numberOfAverages, const FFTWindow &window,
-		const bool &moduloPhase, const std::unique_ptr<Dataset2D>& amplitude,
-		const std::unique_ptr<Dataset2D>& phase,
-		const std::unique_ptr<Dataset2D>& coherence);
+		const bool &moduloPhase,Dataset2D& amplitude,
+		Dataset2D* phase, Dataset2D* coherence);
 
 	/// Computes the coherence function for the specified signals.
 	/*!
@@ -102,9 +101,8 @@ public:
 
 		\return The processed coherence vs. frequency information <b>[unitless]</b>
 	*/
-	static Dataset2D ComputeCoherence(
-		const std::unique_ptr<const Dataset2D>& input,
-		const std::unique_ptr<const Dataset2D>& output);
+	static Dataset2D ComputeCoherence(const Dataset2D& input,
+		const Dataset2D& output);
 
 	/// Returns the number of averages to be used given the specified window parameters.
 	/*!

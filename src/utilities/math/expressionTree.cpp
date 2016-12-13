@@ -1027,7 +1027,7 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 	else if (function.CmpNoCase(_T("ddt")) == 0)
 		return DiscreteDerivative::ComputeTimeHistory(set);
 	else if (function.CmpNoCase(_T("fft")) == 0)
-		return FastFourierTransform::ComputeFFT(set).MultiplyXData(mXAxisFactor);
+		return FastFourierTransform::ComputeFFT(set)->MultiplyXData(mXAxisFactor);
 	else if (function.CmpNoCase(_T("log")) == 0)
 		return set.DoLog();
 	else if (function.CmpNoCase(_T("log10")) == 0)

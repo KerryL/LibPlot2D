@@ -34,7 +34,7 @@ namespace LibPlot2D
 //					all default options are used.
 //
 // Input Arguments:
-//		data	= std::unique_ptr<Dataset2D>& referring to the data of interest
+//		data	=const Dataset2D& referring to the data of interest
 //
 // Output Arguments:
 //		None
@@ -44,9 +44,9 @@ namespace LibPlot2D
 //
 //=============================================================================
 std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
-	const std::unique_ptr<const Dataset2D> &data)
+	const Dataset2D& data)
 {
-	return ComputeFFT(std::make_unique<Dataset2D>(data), WindowHann, 0, 0.0, true);
+	return ComputeFFT(data, WindowHann, 0, 0.0, true);
 }
 
 //=============================================================================
@@ -58,7 +58,7 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 //					contains all specifiable parameters.
 //
 // Input Arguments:
-//		data			= std::unique_ptr<Dataset2D> referring to the data of interest
+//		data			= Dataset2D referring to the data of interest
 //		window			= const FFTWindow&
 //		windowSize		= unsigned int, number of points in each sample;
 //						  zero uses max sample size
@@ -75,22 +75,22 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 //
 //=============================================================================
 std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
-	std::unique_ptr<Dataset2D> data, const FFTWindow &window,
+	Dataset2D data, const FFTWindow &window,
 	unsigned int windowSize, const double &overlap, const bool &subtractMean)
 {
-	double sampleRate = 1.0 / data->GetAverageDeltaX();// [Hz]
+	double sampleRate = 1.0 / data.GetAverageDeltaX();// [Hz]
 
 	if (subtractMean)
-		data->operator-(data->ComputeYMean());
+		data.operator-(data.ComputeYMean());
 
 	if (windowSize == 0)
-		windowSize = (unsigned int)pow(2, (double)GetMaxPowerOfTwo(data->GetNumberOfPoints()));
+		windowSize = (unsigned int)pow(2, (double)GetMaxPowerOfTwo(data.GetNumberOfPoints()));
 
 	Dataset2D rawFFT, fft;
-	unsigned int i, count = GetNumberOfAverages(windowSize, overlap, data->GetNumberOfPoints());
+	unsigned int i, count = GetNumberOfAverages(windowSize, overlap, data.GetNumberOfPoints());
 	for (i = 0; i < count; i++)
 	{
-		rawFFT = ComputeRawFFT(ChopSample(*data.get(), i, windowSize, overlap), window);
+		rawFFT = ComputeRawFFT(ChopSample(data, i, windowSize, overlap), window);
 		AddToAverage(fft, GetAmplitudeData(rawFFT, sampleRate), count);
 	}
 	fft = ConvertDoubleSidedToSingleSided(fft);
@@ -288,10 +288,11 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 // Return Value:
 //		None
 //
-//================================================================================
-void FastFourierTransform::ComputeFRF(const Dataset2D &input, const Dataset2D &output,
-	unsigned int numberOfAverages, const FFTWindow &window, const bool &moduloPhase,
-	std::unique_ptr<Dataset2D>& amplitude, std::unique_ptr<Dataset2D>& phase, std::unique_ptr<Dataset2D>& coherence)
+//==============================================================================
+void FastFourierTransform::ComputeFRF(const Dataset2D &input,
+	const Dataset2D &output, unsigned int numberOfAverages,
+	const FFTWindow &window, const bool &moduloPhase, Dataset2D& amplitude,
+	Dataset2D* phase, Dataset2D* coherence)
 {
 	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
 

@@ -36,7 +36,7 @@ public:
 	CreateSignalDialog(wxWindow *parent, const double &startTime, const double &duration,
 		const double &sampleRate);
 
-	std::unique_ptr<Dataset2D> GetSignal() const { return dataset; };
+	std::unique_ptr<Dataset2D>& GetSignal() { return dataset; };
 	wxString GetSignalName() const;
 
 private:

@@ -728,21 +728,21 @@ void DataFile::AssembleDatasets(const std::vector<double> *rawData, const unsign
 {
 	assert(dataSize > 1 && rawData);
 
-	Dataset2D *dataset;
 	unsigned int i;
 	for (i = 1; i < dataSize; i++)
 	{
+		std::unique_ptr<Dataset2D> dataset;
 		if (i == 1)
 		{
-			dataset = new Dataset2D(rawData[0].size());
+			dataset = std::make_unique<Dataset2D>(rawData[0].size());
 			TransferVectorToArray(rawData[0], dataset->GetXPointer());
 		}
 		else
-			dataset = new Dataset2D(*data[0]);
+			dataset = std::make_unique<Dataset2D>(*data[0]);
 
 		TransferVectorToArray(rawData[i], dataset->GetYPointer());
 		*dataset *= scales[i];
-		data.push_back(dataset);
+		data.push_back(std::move(dataset));
 	}
 }
 

@@ -51,7 +51,7 @@ public:
 
 	bool Load(const SelectionData &selectionInfo);
 
-	std::unique_ptr<Dataset2D> GetDataset(const unsigned int &i) const { return data[i]; }
+	std::unique_ptr<Dataset2D>& GetDataset(const unsigned int &i) { return data[i]; }
 	wxString GetDescription(const unsigned int &i) const { return selectedDescriptions[i]; }
 	wxArrayString GetAllDescriptions() const { return descriptions; }
 	unsigned int GetDataCount() { return data.size(); }

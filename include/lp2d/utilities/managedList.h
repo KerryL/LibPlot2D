@@ -26,11 +26,11 @@ namespace LibPlot2D
 {
 
 // Disable warning C4505 for this file
-// This warning occurs because some types (every T= is a different type) do not
+// This warning occurs because some types (every T is a different type) do not
 // use all of the overloaded methods in this object
-/*#ifdef __WXMSW__
+#ifdef __WXMSW__
 #pragma warning (disable:4505)
-#endif*/
+#endif
 
 template <class T>
 class ManagedList
@@ -51,17 +51,17 @@ public:
 
 	const std::unique_ptr<T>& operator[](const unsigned int &index) const;
 
-	typename std::vector<T*>::iterator begin() { return list.begin(); }
-	typename std::vector<T*>::const_iterator begin() const { return list.begin(); }
+	typename std::vector<std::unique_ptr<T>>::iterator begin() { return list.begin(); }
+	typename std::vector<std::unique_ptr<T>>::const_iterator begin() const { return list.begin(); }
 
-	typename std::vector<T*>::iterator end() { return list.end(); }
-	typename std::vector<T*>::const_iterator end() const { return list.end(); }
+	typename std::vector<std::unique_ptr<T>>::iterator end() { return list.end(); }
+	typename std::vector<std::unique_ptr<T>>::const_iterator end() const { return list.end(); }
 
-	typename std::vector<T*>::reverse_iterator rbegin() { return list.rbegin(); }
-	typename std::vector<T*>::const_reverse_iterator rbegin() const { return list.rbegin(); }
+	typename std::vector<std::unique_ptr<T>>::reverse_iterator rbegin() { return list.rbegin(); }
+	typename std::vector<std::unique_ptr<T>>::const_reverse_iterator rbegin() const { return list.rbegin(); }
 
-	typename std::vector<T*>::reverse_iterator rend() { return list.rend(); }
-	typename std::vector<T*>::const_reverse_iterator rend() const { return list.rend(); }
+	typename std::vector<std::unique_ptr<T>>::reverse_iterator rend() { return list.rend(); }
+	typename std::vector<std::unique_ptr<T>>::const_reverse_iterator rend() const { return list.rend(); }
 
 private:
 	std::vector<std::unique_ptr<T>> list;
@@ -111,8 +111,6 @@ template <class T>
 void ManagedList<T>::Remove(const unsigned int &index)
 {
 	assert(index < list.size());
-
-	delete list[index];
 	list.erase(list.begin() + index);
 }
 

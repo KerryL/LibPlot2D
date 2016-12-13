@@ -19,15 +19,15 @@
 #ifndef RENDER_WINDOW_H_
 #define RENDER_WINDOW_H_
 
-// wxWidgets headers
-#include <wx/wx.h>
-#include <wx/glcanvas.h>
-
 // Local headers
 #include "lp2d/utilities/managedList.h"
 #include "lp2d/utilities/math/vector.h"
 #include "lp2d/utilities/math/matrix.h"
 #include "lp2d/renderer/primitives/primitive.h"
+
+// wxWidgets headers
+#include <wx/wx.h>
+#include <wx/glcanvas.h>
 
 namespace LibPlot2D
 {
@@ -51,7 +51,7 @@ public:
 	void AutoSetFrustum();
 
 	// Adds actors to the primitives list
-	inline void AddActor(Primitive *toAdd) { primitiveList.Add(toAdd); modified = true; }
+	inline void AddActor(std::unique_ptr<Primitive> toAdd) { primitiveList.Add(std::move(toAdd)); modified = true; }
 
 	// Removes actors from the primitives list
 	bool RemoveActor(Primitive *toRemove);
@@ -137,8 +137,10 @@ private:
 
 	Color backgroundColor;
 
-	static bool AlphaSortPredicate(const Primitive* p1, const Primitive* p2);
-	static bool OrderSortPredicate(const Primitive* p1, const Primitive* p2);
+	static bool AlphaSortPredicate(const std::unique_ptr<Primitive>& p1,
+		const std::unique_ptr<Primitive>& p2);
+	static bool OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
+		const std::unique_ptr<Primitive>& p2);
 
 	bool needAlphaSort;
 	bool needOrderSort;

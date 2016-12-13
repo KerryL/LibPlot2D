@@ -460,7 +460,7 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 	unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 	{
-		if (toRemove == primitiveList[i])
+		if (toRemove == primitiveList[i].get())
 		{
 			primitiveList.Remove(i);
 			return true;
@@ -1163,7 +1163,7 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 	unsigned int i;
 	for (i = 0; i < primitiveList.GetCount(); i++)
 	{
-		if (primitiveList[i] == pickedObject)
+		if (primitiveList[i].get() == pickedObject)
 			return true;
 	}
 
@@ -1177,17 +1177,18 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 // Desc:		Predicate for sorting by alpha.
 //
 // Input Arguments:
-//		p1	= const Primitive*
-//		p2	= const Primitive*
+//		p1	= const std::unique_ptr<Primitive>&
+//		p2	= const std::unique_ptr<Primitive>&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		bool, true if ???
+//		bool, true if p1's alpha value is lower than that of p2
 //
 //=============================================================================
-bool RenderWindow::AlphaSortPredicate(const Primitive* p1, const Primitive* p2)
+bool RenderWindow::AlphaSortPredicate(const std::unique_ptr<Primitive>& p1,
+	const std::unique_ptr<Primitive>& p2)
 {
 	return p1->GetColor().GetAlpha() > p2->GetColor().GetAlpha();
 }
@@ -1199,17 +1200,18 @@ bool RenderWindow::AlphaSortPredicate(const Primitive* p1, const Primitive* p2)
 // Desc:		Predicate for sorting by draw order.
 //
 // Input Arguments:
-//		p1	= const Primitive*
-//		p2	= const Primitive*
+//		p1	= const std::unique_ptr<Primitive>&
+//		p2	= const std::unique_ptr<Primitive>&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		bool, true if ???
+//		bool, true if p1 should be drawn first
 //
 //=============================================================================
-bool RenderWindow::OrderSortPredicate(const Primitive* p1, const Primitive* p2)
+bool RenderWindow::OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
+	const std::unique_ptr<Primitive>& p2)
 {
 	return p1->GetDrawOrder() < p2->GetDrawOrder();
 }

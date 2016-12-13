@@ -138,27 +138,4 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDrag
 	return wxDragNone;
 }
 
-//=============================================================================
-// Class:			DropTarget
-// Function:		ClearBuffer
-//
-// Desc:		Safely deletes the buffer contents.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-void DropTarget::ClearBuffer()
-{
-	if (buffer)
-		delete[] buffer;
-	buffer = nullptr;
-}
-
 }// namespace LibPlot2D

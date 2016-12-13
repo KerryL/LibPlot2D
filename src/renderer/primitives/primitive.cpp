@@ -45,7 +45,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 	SetColor(Color::ColorBlack);
 	drawOrder = 1000;
 
-	renderWindow.AddActor(this);
+	renderWindow.AddActor(std::unique_ptr<Primitive>(this));
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
