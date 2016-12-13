@@ -1902,7 +1902,7 @@ bool RenderWindow::GLHasError()
 	if (e == GL_NO_ERROR)
 		return false;
 
-	wxString errorString = GetGLError(e);
+	//wxString errorString = GetGLError(e);
 
 	return true;
 }
