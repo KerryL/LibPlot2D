@@ -30,7 +30,7 @@ namespace LibPlot2D
 // Class:			Line
 // Function:		Constant declarations
 //
-// Desc:		Constant declarations for Line class.
+// Description:		Constant declarations for Line class.
 //
 // Input Arguments:
 //		None
@@ -48,7 +48,7 @@ const double Line::fadeDistance(0.05);
 // Class:			Line
 // Function:		Line
 //
-// Desc:		Constructor for Line class.
+// Description:		Constructor for Line class.
 //
 // Input Arguments:
 //		renderWindow	= const RenderWindow&
@@ -77,7 +77,7 @@ Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
 // Class:			Line
 // Function:		Build
 //
-// Desc:		Builds the specified line segment.
+// Description:		Builds the specified line segment.
 //
 // Input Arguments:
 //		x1	= const unsigned int&
@@ -104,7 +104,7 @@ void Line::Build(const unsigned int &x1, const unsigned int &y1,
 // Class:			Line
 // Function:		Build
 //
-// Desc:		Builds the specified line segment.
+// Description:		Builds the specified line segment.
 //
 // Input Arguments:
 //		x1	= const double&
@@ -138,7 +138,7 @@ void Line::Build(const double &x1, const double &y1,
 // Class:			Line
 // Function:		Build
 //
-// Desc:		Builds the specified line segments.
+// Description:		Builds the specified line segments.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<unsigned int, unsigned int> >&
@@ -168,7 +168,7 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 // Class:			Line
 // Function:		Build
 //
-// Desc:		Builds the specified line segments.
+// Description:		Builds the specified line segments.
 //
 // Input Arguments:
 //		points	= cosnt std::vector<std::pair<double, double> >&
@@ -196,7 +196,7 @@ void Line::Build(const std::vector<std::pair<double, double> > &points, const Up
 // Class:			Line
 // Function:		Build
 //
-// Desc:		Builds the specified line segments.
+// Description:		Builds the specified line segments.
 //
 // Input Arguments:
 //		x		= const double* const
@@ -228,7 +228,7 @@ void Line::Build(const double* const x, const double* const y,
 // Class:			Line
 // Function:		BuildSegments
 //
-// Desc:		Builds the specified disconnected line segments.
+// Description:		Builds the specified disconnected line segments.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >
@@ -258,7 +258,7 @@ void Line::BuildSegments(const std::vector<std::pair<double, double> > &points,
 // Class:			Line
 // Function:		ComputeOffsets
 //
-// Desc:		Computes the offsets for the outside vertices based on the
+// Description:		Computes the offsets for the outside vertices based on the
 //					line width and orientation.
 //
 // Input Arguments:
@@ -293,7 +293,7 @@ void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 // Class:			Line
 // Function:		ComputeOffsets
 //
-// Desc:		Computes the offsets for the outside vertices based on the
+// Description:		Computes the offsets for the outside vertices based on the
 //					line width and orientation.
 //
 // Input Arguments:
@@ -346,7 +346,7 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 // Class:			Line
 // Function:		AllocateBuffer
 //
-// Desc:		Allocated local vertex buffer;
+// Description:		Allocated local vertex buffer;
 //
 // Input Arguments:
 //		vertexCount		= const unsigned int&
@@ -378,7 +378,7 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Desc:		Draws a line using OpenGL lines.
+// Description:		Draws a line using OpenGL lines.
 //
 // Input Arguments:
 //		x1	= const double&
@@ -444,7 +444,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Desc:		Draws a line strip using OpenGL lines.
+// Description:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -506,7 +506,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 // Class:			Line
 // Function:		DoPrettyDraw
 //
-// Desc:		Draws a line strip using OpenGL triangles.
+// Description:		Draws a line strip using OpenGL triangles.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -608,7 +608,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 // Class:			Line
 // Function:		DoPrettySegmentDraw
 //
-// Desc:		Draws disconnected lines using OpenGL triangles.
+// Description:		Draws disconnected lines using OpenGL triangles.
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -710,7 +710,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 // Class:			Line
 // Function:		AssignVertexData
 //
-// Desc:		Assigns vertex data to the vertex buffer (pretty lines).
+// Description:		Assigns vertex data to the vertex buffer (pretty lines).
 //
 // Input Arguments:
 //		points	= const std::vector<std::pair<double, double> >&
@@ -786,7 +786,7 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double> >& point
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Desc:		Draws a line strip using OpenGL lines.
+// Description:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
 //		vertexCount	= const unsigned int&
@@ -812,7 +812,7 @@ void Line::DoUglyDraw(const unsigned int& vertexCount)
 // Class:			Line
 // Function:		DoUglyDraw
 //
-// Desc:		Draws a line strip using OpenGL lines.
+// Description:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
 //		vertexCount	= const unsigned int&
@@ -838,7 +838,7 @@ void Line::DoUglySegmentDraw(const unsigned int& vertexCount)
 // Class:			Line
 // Function:		DoPrettyDraw
 //
-// Desc:		Draws a line strip using OpenGL triangles.
+// Description:		Draws a line strip using OpenGL triangles.
 //
 // Input Arguments:
 //		indexCount	= const unsigned int&

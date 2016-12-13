@@ -25,7 +25,7 @@ namespace LibPlot2D
 // Class:			FRFDialog
 // Function:		FRFDialog
 //
-// Desc:		Constructor for FRFDialog class.
+// Description:		Constructor for FRFDialog class.
 //
 // Input Arguments:
 //		parent		= wxWindow* that owns this object
@@ -48,7 +48,7 @@ FRFDialog::FRFDialog(wxWindow *parent, const wxArrayString &descriptions)
 // Class:			FRFDialog
 // Function:		CreateControls
 //
-// Desc:		Populates the dialog with controls.
+// Description:		Populates the dialog with controls.
 //
 // Input Arguments:
 //		descriptions	= const wxArrayString& containing curve descriptions
@@ -82,7 +82,7 @@ void FRFDialog::CreateControls(const wxArrayString &descriptions)
 // Class:			FRFDialog
 // Function:		CreateSelectionControls
 //
-// Desc:		Returns a sizer containing the selection controls.
+// Description:		Returns a sizer containing the selection controls.
 //
 // Input Arguments:
 ///		descriptions	= const wxArrayString& containing curve descriptions
@@ -119,7 +119,7 @@ wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 // Class:			FRFDialog
 // Function:		CreateTextBox
 //
-// Desc:		Returns a sizer containing the text box control.
+// Description:		Returns a sizer containing the text box control.
 //
 // Input Arguments:
 ///		None
@@ -147,7 +147,7 @@ wxSizer* FRFDialog::CreateTextBox()
 // Class:			FRFDialog
 // Function:		CreateCheckBoxes
 //
-// Desc:		Returns a sizer containing the check box controls.
+// Description:		Returns a sizer containing the check box controls.
 //
 // Input Arguments:
 //		None
@@ -184,7 +184,7 @@ wxSizer *FRFDialog::CreateCheckBoxes()
 // Class:			FRFDialog
 // Function:		TransferDataFromWindow
 //
-// Desc:		Validates selections (ensures there are selections).
+// Description:		Validates selections (ensures there are selections).
 //
 // Input Arguments:
 //		None
@@ -220,7 +220,7 @@ bool FRFDialog::TransferDataFromWindow()
 // Class:			FRFDialog
 // Function:		GetInputIndex
 //
-// Desc:		Returns the input data index.
+// Description:		Returns the input data index.
 //
 // Input Arguments:
 //		None
@@ -241,7 +241,7 @@ unsigned int FRFDialog::GetInputIndex() const
 // Class:			FRFDialog
 // Function:		GetOutputIndex
 //
-// Desc:		Returns the output data index.
+// Description:		Returns the output data index.
 //
 // Input Arguments:
 //		None
@@ -262,7 +262,7 @@ unsigned int FRFDialog::GetOutputIndex() const
 // Class:			FRFDialog
 // Function:		GetNumberOfAverages
 //
-// Desc:		Returns the number of averages specified by the user.
+// Description:		Returns the number of averages specified by the user.
 //
 // Input Arguments:
 //		None
@@ -285,7 +285,7 @@ unsigned int FRFDialog::GetNumberOfAverages() const
 // Class:			FRFDialog
 // Function:		GetComputePhase
 //
-// Desc:		Indicates whether or not the user selected phase computation.
+// Description:		Indicates whether or not the user selected phase computation.
 //
 // Input Arguments:
 //		None
@@ -306,7 +306,7 @@ bool FRFDialog::GetComputePhase() const
 // Class:			FRFDialog
 // Function:		GetComputeCoherence
 //
-// Desc:		Indicates whether or not the user selected coherence computation.
+// Description:		Indicates whether or not the user selected coherence computation.
 //
 // Input Arguments:
 //		None
@@ -327,7 +327,7 @@ bool FRFDialog::GetComputeCoherence() const
 // Class:			FRFDialog
 // Function:		GetModuloPhase
 //
-// Desc:		Indicates whether or not the user selected to modulo phase data.
+// Description:		Indicates whether or not the user selected to modulo phase data.
 //
 // Input Arguments:
 //		None

@@ -26,7 +26,7 @@ namespace LibPlot2D
 // Class:			ZoomBox
 // Function:		ZoomBox
 //
-// Desc:		Constructor for ZoomBox class.
+// Description:		Constructor for ZoomBox class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow&
@@ -56,7 +56,7 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(rend
 // Class:			ZoomBox
 // Function:		Update
 //
-// Desc:		Updates the GL buffers associated with this object.
+// Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -85,7 +85,7 @@ void ZoomBox::Update(const unsigned int& /*i*/)
 // Class:			ZoomBox
 // Function:		GenerateGeometry
 //
-// Desc:		Generates OpenGL commands to draw the box.
+// Description:		Generates OpenGL commands to draw the box.
 //
 // Input Arguments:
 //		None
@@ -108,7 +108,7 @@ void ZoomBox::GenerateGeometry()
 // Class:			ZoomBox
 // Function:		HasValidParameters
 //
-// Desc:		Checks to see if we're OK to draw the box.
+// Description:		Checks to see if we're OK to draw the box.
 //
 // Input Arguments:
 //		None
@@ -134,7 +134,7 @@ bool ZoomBox::HasValidParameters()
 // Class:			ZoomBox
 // Function:		SetAnchorCorner
 //
-// Desc:		Sets the location of the box's fixed corner.
+// Description:		Sets the location of the box's fixed corner.
 //
 // Input Arguments:
 //		xAnchor	= const unsigned int& (pixels)
@@ -159,7 +159,7 @@ void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &y
 // Class:			ZoomBox
 // Function:		SetFloatingCorner
 //
-// Desc:		Sets the location of the box's floating corner.
+// Description:		Sets the location of the box's floating corner.
 //
 // Input Arguments:
 //		xFloat	= const unsigned int& (pixels)

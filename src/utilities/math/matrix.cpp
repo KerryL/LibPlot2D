@@ -32,7 +32,7 @@ namespace LibPlot2D
 // Class:			Matrix
 // Function:		Matrix
 //
-// Desc:		Constructor for the Matrix class.  Does not allocate any
+// Description:		Constructor for the Matrix class.  Does not allocate any
 //					memory.
 //
 // Input Arguments:
@@ -56,7 +56,7 @@ Matrix::Matrix()
 // Class:			Matrix
 // Function:		Matrix
 //
-// Desc:		Constructor for the Matrix class.  Allocates memory for
+// Description:		Constructor for the Matrix class.  Allocates memory for
 //					a matix of the specified size.
 //
 // Input Arguments:
@@ -83,7 +83,7 @@ Matrix::Matrix(const unsigned int &rows, const unsigned int &columns)
 // Class:			Matrix
 // Function:		Matrix
 //
-// Desc:		Constructor for the Matrix class.  Allocates memory for
+// Description:		Constructor for the Matrix class.  Allocates memory for
 //					a matix of the specified size and fills the matrix with
 //					the specified elements.
 //
@@ -132,7 +132,7 @@ Matrix::Matrix(const unsigned int &rows, const unsigned int &columns, double ele
 // Class:			Matrix
 // Function:		Matrix
 //
-// Desc:		Copy constructor for the Matrix class.  Performs deep copy.
+// Description:		Copy constructor for the Matrix class.  Performs deep copy.
 //
 // Input Arguments:
 //		matrix	= Matrix& to copy form
@@ -157,7 +157,7 @@ Matrix::Matrix(const Matrix &matrix)
 // Class:			Matrix
 // Function:		~Matrix
 //
-// Desc:		Destructor for the Matrix class.
+// Description:		Destructor for the Matrix class.
 //
 // Input Arguments:
 //		None
@@ -178,7 +178,7 @@ Matrix::~Matrix()
 // Class:			Matrix
 // Function:		SetElement
 //
-// Desc:		Changes the element at the specified location to the
+// Description:		Changes the element at the specified location to the
 //					specified value.
 //
 // Input Arguments:
@@ -204,7 +204,7 @@ void Matrix::SetElement(const unsigned int &row, const unsigned int &column, con
 // Class:			Matrix
 // Function:		Set
 //
-// Desc:		Sets the values of this matrix to the arguments passed
+// Description:		Sets the values of this matrix to the arguments passed
 //					to this function.
 //
 // Input Arguments:
@@ -247,7 +247,7 @@ void Matrix::Set(double element1, ...)
 // Class:			Matrix
 // Function:		GetElement
 //
-// Desc:		Returns the element at the specified location.
+// Description:		Returns the element at the specified location.
 //
 // Input Arguments:
 //		row		= const int& specifying the row
@@ -269,7 +269,7 @@ double Matrix::GetElement(const int &row, const int &column) const
 // Class:			Matrix
 // Function:		MakeIdentity
 //
-// Desc:		Makes this matrix an identity matrix.
+// Description:		Makes this matrix an identity matrix.
 //
 // Input Arguments:
 //		None
@@ -296,7 +296,7 @@ Matrix& Matrix::MakeIdentity()
 // Class:			Matrix
 // Function:		Zero
 //
-// Desc:		Sets all elements of this matrix to zero.
+// Description:		Sets all elements of this matrix to zero.
 //
 // Input Arguments:
 //		None
@@ -322,7 +322,7 @@ void Matrix::Zero()
 // Class:			Matrix
 // Function:		GetSubMatrix
 //
-// Desc:		Returns a sub-matrix made up of the specified portion of
+// Description:		Returns a sub-matrix made up of the specified portion of
 //					this matrix.
 //
 // Input Arguments:
@@ -359,7 +359,7 @@ Matrix Matrix::GetSubMatrix(const unsigned int &startRow, const unsigned int &st
 // Class:			Matrix
 // Function:		GetTranspose
 //
-// Desc:		Returns the transposes of this matrix.
+// Description:		Returns the transposes of this matrix.
 //
 // Input Arguments:
 //		None
@@ -390,7 +390,7 @@ Matrix Matrix::GetTranspose() const
 // Class:			Matrix
 // Function:		Transpose
 //
-// Desc:		Transposes this matrix in-place.
+// Description:		Transposes this matrix in-place.
 //
 // Input Arguments:
 //		None
@@ -412,7 +412,7 @@ Matrix& Matrix::Transpose()
 // Class:			Matrix
 // Function:		LeftDivide
 //
-// Desc:		Performs division from the left.  For example, to solve
+// Description:		Performs division from the left.  For example, to solve
 //					Ax=b for x, left divide x = A \ b, where this matrix is A.
 //					Same as A^-1 * b.
 //
@@ -447,7 +447,7 @@ bool Matrix::LeftDivide(const Matrix& b, Matrix &x) const
 // Class:			Matrix
 // Function:		operator *
 //
-// Desc:		Multiplication operator for the Matrix class.
+// Description:		Multiplication operator for the Matrix class.
 //
 // Input Arguments:
 //		v	= const Vector& to multiply by
@@ -477,7 +477,7 @@ const Vector Matrix::operator*(const Vector &v) const
 // Class:			Matrix
 // Function:		operator *=
 //
-// Desc:		Multiplication assignment operator for the Matrix class.
+// Description:		Multiplication assignment operator for the Matrix class.
 //
 // Input Arguments:
 //		m	= const Matrix& to multiply
@@ -515,7 +515,7 @@ Matrix& Matrix::operator*=(const Matrix &m)
 // Class:			Matrix
 // Function:		operator =
 //
-// Desc:		Assignment operator for the Matrix class.
+// Description:		Assignment operator for the Matrix class.
 //
 // Input Arguments:
 //		m	= const Matrix& to assign to this
@@ -549,7 +549,7 @@ Matrix& Matrix::operator=(const Matrix &m)
 // Class:			Matrix
 // Function:		operator +=
 //
-// Desc:		Addition assignment operator for the Matrix class.
+// Description:		Addition assignment operator for the Matrix class.
 //
 // Input Arguments:
 //		m	= const Matrix& to add
@@ -579,7 +579,7 @@ Matrix& Matrix::operator+=(const Matrix &m)
 // Class:			Matrix
 // Function:		operator -=
 //
-// Desc:		Subrtaction assignment operator for the Matrix class.
+// Description:		Subrtaction assignment operator for the Matrix class.
 //
 // Input Arguments:
 //		m	= const Matrix& to subtract
@@ -609,7 +609,7 @@ Matrix& Matrix::operator-=(const Matrix &m)
 // Class:			Matrix
 // Function:		operator *=
 //
-// Desc:		Element-wise multiplication assignment operator for the
+// Description:		Element-wise multiplication assignment operator for the
 //					Matrix class.
 //
 // Input Arguments:
@@ -638,7 +638,7 @@ Matrix& Matrix::operator*=(const double &n)
 // Class:			Matrix
 // Function:		operator /=
 //
-// Desc:		Element-wise division assignment operator for the
+// Description:		Element-wise division assignment operator for the
 //					Matrix class.
 //
 // Input Arguments:
@@ -667,7 +667,7 @@ Matrix& Matrix::operator/=(const double &n)
 // Class:			Matrix
 // Function:		Print
 //
-// Desc:		Prints the contents of this object to a wxString.
+// Description:		Prints the contents of this object to a wxString.
 //
 // Input Arguments:
 //		None
@@ -703,7 +703,7 @@ wxString Matrix::Print() const
 // Class:			Matrix
 // Function:		GetRowReduced
 //
-// Desc:		Performs row-reduction on copy of this until the matrix
+// Description:		Performs row-reduction on copy of this until the matrix
 //					is upper-triangular.
 //
 // Input Arguments:
@@ -758,7 +758,7 @@ Matrix Matrix::GetRowReduced() const
 // Class:			Matrix
 // Function:		SwapRows
 //
-// Desc:		Swaps the values in the specified rows.
+// Description:		Swaps the values in the specified rows.
 //
 // Input Arguments:
 //		r1	= const unsigned int&
@@ -789,7 +789,7 @@ Matrix& Matrix::SwapRows(const unsigned int &r1, const unsigned int &r2)
 // Class:			Matrix
 // Function:		ZeroRowByScalingAndAdding
 //
-// Desc:		Makes the element at (targtRow, pivotColumn) zero by scaling
+// Description:		Makes the element at (targtRow, pivotColumn) zero by scaling
 //					the target row and adding it to the pivot row.
 //
 // Input Arguments:
@@ -818,7 +818,7 @@ void Matrix::ZeroRowByScalingAndAdding(const unsigned int &pivotRow,
 // Class:			Matrix
 // Function:		operator+
 //
-// Desc:		Addition operator for the Matrix class.
+// Description:		Addition operator for the Matrix class.
 //
 // Input Arguments:
 //		m	= Matrix& to add
@@ -843,7 +843,7 @@ const Matrix Matrix::operator+(const Matrix &m) const
 // Class:			Matrix
 // Function:		operator-
 //
-// Desc:		Subtraction operator for the Matrix class.
+// Description:		Subtraction operator for the Matrix class.
 //
 // Input Arguments:
 //		m	= const Matrix& to subtract
@@ -868,7 +868,7 @@ const Matrix Matrix::operator-(const Matrix &m) const
 // Class:			Matrix
 // Function:		operator*
 //
-// Desc:		Multiplication operator for the Matrix class.
+// Description:		Multiplication operator for the Matrix class.
 //
 // Input Arguments:
 //		m	= const Matrix& to multiply by
@@ -893,7 +893,7 @@ const Matrix Matrix::operator*(const Matrix &m) const
 // Class:			Matrix
 // Function:		operator*
 //
-// Desc:		Element-wise multiplication operator for the Matrix class.
+// Description:		Element-wise multiplication operator for the Matrix class.
 //
 // Input Arguments:
 //		n	= const double& to multiply by
@@ -918,7 +918,7 @@ const Matrix Matrix::operator*(const double &n) const
 // Class:			Matrix
 // Function:		operator /
 //
-// Desc:		Element-wise division operator for the Matrix class.
+// Description:		Element-wise division operator for the Matrix class.
 //
 // Input Arguments:
 //		n	= const double& to divide by
@@ -943,7 +943,7 @@ const Matrix Matrix::operator/(const double &n) const
 // Class:			Matrix
 // Function:		operator()
 //
-// Desc:		Overload of the () operator for this object.  Permits accessing
+// Description:		Overload of the () operator for this object.  Permits accessing
 //					class data by using Matrix(row, column).  Non-const version.
 //
 // Input Arguments:
@@ -967,7 +967,7 @@ double &Matrix::operator()(const unsigned int &row, const unsigned int &column)
 // Class:			Matrix
 // Function:		operator()
 //
-// Desc:		Overload of the () operator for this object.  Permits accessing
+// Description:		Overload of the () operator for this object.  Permits accessing
 //					class data by using Matrix(Row, Column).  Const version.
 //
 // Input Arguments:
@@ -991,7 +991,7 @@ const double &Matrix::operator()(const unsigned int &row, const unsigned int &co
 // Class:			Matrix
 // Function:		GetInverse
 //
-// Desc:		Returns the inverse of this matrix.  If this matrix is badly
+// Description:		Returns the inverse of this matrix.  If this matrix is badly
 //					scaled or is rectangular, the psuedo-inverse is returned.
 //
 // Input Arguments:
@@ -1017,7 +1017,7 @@ Matrix Matrix::GetInverse() const
 // Class:			Matrix
 // Function:		GetPsuedoInverse
 //
-// Desc:		Returns the pseudo-inverse of this matrix.
+// Description:		Returns the pseudo-inverse of this matrix.
 //
 // Input Arguments:
 //		None
@@ -1050,7 +1050,7 @@ Matrix Matrix::GetPsuedoInverse() const
 // Class:			Matrix
 // Function:		GetDiagonalInverse
 //
-// Desc:		Returns the inverse of a diagonal matrix.  Calling this
+// Description:		Returns the inverse of a diagonal matrix.  Calling this
 //					on a non-diagonal matrix will return a result, but it
 //					will be meaningless.  There is no check to ensure this
 //					is only called on diagonal matrices.
@@ -1086,7 +1086,7 @@ Matrix Matrix::GetDiagonalInverse() const
 // Class:			Matrix
 // Function:		Pythag
 //
-// Desc:		Helper method for SVD calculation.
+// Description:		Helper method for SVD calculation.
 //
 // Input Arguments:
 //		None
@@ -1115,7 +1115,7 @@ double Matrix::Pythag(const double& a, const double &b) const
 // Class:			Matrix
 // Function:		GetRank
 //
-// Desc:		Returns the inverse of this matrix.  If this matrix is badly
+// Description:		Returns the inverse of this matrix.  If this matrix is badly
 //					scaled or is rectangular, the psuedo-inverse is returned.
 //
 // Input Arguments:
@@ -1155,7 +1155,7 @@ unsigned int Matrix::GetRank() const
 // Class:			Matrix
 // Function:		FreeElements
 //
-// Desc:		Frees memory associated with this object.
+// Description:		Frees memory associated with this object.
 //
 // Input Arguments:
 //		None
@@ -1180,7 +1180,7 @@ void Matrix::FreeElements()
 // Class:			Matrix
 // Function:		AllocateElements
 //
-// Desc:		Allocates memory for the elements according to the number
+// Description:		Allocates memory for the elements according to the number
 //					of rows and columns that make up this object.
 //
 // Input Arguments:
@@ -1205,7 +1205,7 @@ void Matrix::AllocateElements()
 // Class:			Matrix
 // Function:		Resize
 //
-// Desc:		Resizes the dynamic memory for this object to accommodate
+// Description:		Resizes the dynamic memory for this object to accommodate
 //					the specified size.
 //
 // Input Arguments:
@@ -1233,7 +1233,7 @@ void Matrix::Resize(const unsigned int &rows, const unsigned int &columns)
 // Class:			Matrix
 // Function:		GetSingularValueDecomposition
 //
-// Desc:		Computes singular value decomposition of this matrix.
+// Description:		Computes singular value decomposition of this matrix.
 //					This is the SVD algorithm from Numerical Recipies in C,
 //					modified for readability.  Note that minimal solution
 //					has dimensions U(rows, rows) and W(rows, columns), but
@@ -1278,7 +1278,7 @@ bool Matrix::GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) cons
 // Class:			Matrix
 // Function:		InitializeSVDMatrices
 //
-// Desc:		Part of SVD algorithm.  Initializes the matrices (sets sizes)
+// Description:		Part of SVD algorithm.  Initializes the matrices (sets sizes)
 //					and copies this matrix to U.
 //
 // Input Arguments:
@@ -1312,7 +1312,7 @@ void Matrix::InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const
 // Class:			Matrix
 // Function:		ReduceToBidiagonalForm
 //
-// Desc:		Part of SVD algorithm.  "Reduces matrix to bidiagonal form."
+// Description:		Part of SVD algorithm.  "Reduces matrix to bidiagonal form."
 //
 // Input Arguments:
 //		U	= Matrix&
@@ -1430,7 +1430,7 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *r
 // Class:			Matrix
 // Function:		AccumulateRightHandTransforms
 //
-// Desc:		Part of SVD algorithm.  "Accumulates right-hand transforms."
+// Description:		Part of SVD algorithm.  "Accumulates right-hand transforms."
 //
 // Input Arguments:
 //		U	= Matrix&
@@ -1485,7 +1485,7 @@ void Matrix::AccumulateRightHandTransforms(Matrix &U, Matrix &V, const double *r
 // Class:			Matrix
 // Function:		AccumulateLeftHandTransforms
 //
-// Desc:		Part of SVD algorithm.  "Accumulates left-hand transforms."
+// Description:		Part of SVD algorithm.  "Accumulates left-hand transforms."
 //
 // Input Arguments:
 //		U	= Matrix&
@@ -1541,7 +1541,7 @@ void Matrix::AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const
 // Class:			Matrix
 // Function:		DiagonalizeBidiagonalForm
 //
-// Desc:		Part of SVD algorithm.  "Diagonalizes the bidiagonal form."
+// Description:		Part of SVD algorithm.  "Diagonalizes the bidiagonal form."
 //
 // Input Arguments:
 //		U	= Matrix&
@@ -1699,7 +1699,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, double *
 // Class:			Matrix
 // Function:		RemoveZeroSingularValues
 //
-// Desc:		Part of SVD algorithm - removes very small singular values.
+// Description:		Part of SVD algorithm - removes very small singular values.
 //					Without this step, the results are OK, but this makes them
 //					much better.
 //
@@ -1731,7 +1731,7 @@ void Matrix::RemoveZeroSingularValues(Matrix &U, Matrix &W) const
 // Class:			Matrix
 // Function:		SortSingularValues
 //
-// Desc:		Part of SVD algorithm.  Sorts singular values (and corresponding
+// Description:		Part of SVD algorithm.  Sorts singular values (and corresponding
 //					columns of U and V) by decreasing magnitude.
 //
 // Input Arguments:
@@ -1829,7 +1829,7 @@ void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
 // Class:			Matrix
 // Function:		RemoveRow
 //
-// Desc:		Removes the specified row from the matrix.
+// Description:		Removes the specified row from the matrix.
 //
 // Input Arguments:
 //		None
@@ -1867,7 +1867,7 @@ Matrix& Matrix::RemoveRow(const unsigned int &row)
 // Class:			Matrix
 // Function:		RemoveColumn
 //
-// Desc:		Removes the specified column from the matrix.
+// Description:		Removes the specified column from the matrix.
 //
 // Input Arguments:
 //		None
@@ -1905,7 +1905,7 @@ Matrix& Matrix::RemoveColumn(const unsigned int &column)
 // Class:			Matrix
 // Function:		GetIdentity
 //
-// Desc:		Returns an identity matrix of the specified dimension.
+// Description:		Returns an identity matrix of the specified dimension.
 //
 // Input Arguments:
 //		None

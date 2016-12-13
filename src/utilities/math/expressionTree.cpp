@@ -29,7 +29,7 @@ namespace LibPlot2D
 // Class:			ExpressionTree
 // Function:		ExpressionTree
 //
-// Desc:		Constructor for ExpressionTree class.
+// Description:		Constructor for ExpressionTree class.
 //
 // Input Arguments:
 //		list		= const ManagedList<const Dataset2D>* reference to the
@@ -50,7 +50,7 @@ ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> *list) : list(
 // Class:			ExpressionTree
 // Function:		Constant Declarations
 //
-// Desc:		Constant declarations for ExpressionTree class.
+// Description:		Constant declarations for ExpressionTree class.
 //
 // Input Arguments:
 //		None
@@ -68,7 +68,7 @@ const unsigned int ExpressionTree::printfPrecision = 15;
 // Class:			ExpressionTree
 // Function:		Solve
 //
-// Desc:		Main solving method for the tree.
+// Description:		Main solving method for the tree.
 //
 // Input Arguments:
 //		expression	= wxString containing the expression to parse
@@ -105,7 +105,7 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData,
 // Class:			ExpressionTree
 // Function:		Solve
 //
-// Desc:		Main solving method for the tree.
+// Description:		Main solving method for the tree.
 //
 // Input Arguments:
 //		expression			= wxString containing the expression to parse
@@ -138,7 +138,7 @@ std::string ExpressionTree::Solve(std::string expression, std::string &solvedExp
 // Class:			ExpressionTree
 // Function:		GetSetFromList
 //
-// Desc:		Retrieves the proper set from the list.  Handles i=0
+// Description:		Retrieves the proper set from the list.  Handles i=0
 //					where 0 indicates time series instead of data.
 //
 // Input Arguments:
@@ -173,7 +173,7 @@ Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 // Class:			ExpressionTree
 // Function:		ParenthesesBalanced
 //
-// Desc:		Checks to see if the expression has balanced parentheses.
+// Description:		Checks to see if the expression has balanced parentheses.
 //
 // Input Arguments:
 //		expression	= const wxString&
@@ -214,7 +214,7 @@ bool ExpressionTree::ParenthesesBalanced(const wxString &expression) const
 // Class:			ExpressionTree
 // Function:		ParseExpression
 //
-// Desc:		Parses the expression and produces a queue of Reverse
+// Description:		Parses the expression and produces a queue of Reverse
 //					Polish Notation values and operations.  Implements the
 //					shunting-yard algorithm as described by Wikipedia.
 //
@@ -256,7 +256,7 @@ wxString ExpressionTree::ParseExpression(const wxString &expression)
 // Class:			ExpressionTree
 // Function:		ParseNext
 //
-// Desc:		Parses the expression and processes the next item.
+// Description:		Parses the expression and processes the next item.
 //
 // Input Arguments:
 //		expression	= const wxString&
@@ -311,7 +311,7 @@ wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOper
 // Class:			ExpressionTree
 // Function:		ProcessOperator
 //
-// Desc:		Processes the next operator in the expression, adding it
+// Description:		Processes the next operator in the expression, adding it
 //					to the appropriate stack.  This method enforces the order
 //					of operations.
 //
@@ -344,7 +344,7 @@ void ExpressionTree::ProcessOperator(std::stack<wxString> &operatorStack, const 
 // Class:			ExpressionTree
 // Function:		ProcessCloseParenthese
 //
-// Desc:		Adjusts the stacks in response to encountering a close
+// Description:		Adjusts the stacks in response to encountering a close
 //					parenthese.
 //
 // Input Arguments:
@@ -385,7 +385,7 @@ void ExpressionTree::ProcessCloseParenthese(std::stack<wxString> &operatorStack)
 // Class:			ExpressionTree
 // Function:		EvaluateExpression
 //
-// Desc:		Evaluates the expression in the queue using Reverse Polish
+// Description:		Evaluates the expression in the queue using Reverse Polish
 //					Notation.
 //
 // Input Arguments:
@@ -430,7 +430,7 @@ wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
 // Class:			ExpressionTree
 // Function:		EvaluateExpression
 //
-// Desc:		Evaluates the expression in the queue using Reverse Polish
+// Description:		Evaluates the expression in the queue using Reverse Polish
 //					Notation.
 //
 // Input Arguments:
@@ -477,7 +477,7 @@ std::string ExpressionTree::EvaluateExpression(std::string &results)
 // Class:			ExpressionTree
 // Function:		PopStackToQueue
 //
-// Desc:		Removes the top entry of the stack and puts it in the queue.
+// Description:		Removes the top entry of the stack and puts it in the queue.
 //
 // Input Arguments:
 //		stack	= std::stack<wxString>& to be popped
@@ -499,7 +499,7 @@ void ExpressionTree::PopStackToQueue(std::stack<wxString> &stack)
 // Class:			ExpressionTree
 // Function:		EmptyStackToQueue
 //
-// Desc:		Empties the contents of the stack into the queue.
+// Description:		Empties the contents of the stack into the queue.
 //
 // Input Arguments:
 //		stack	= std::stack<wxString>& to be emptied
@@ -527,7 +527,7 @@ bool ExpressionTree::EmptyStackToQueue(std::stack<wxString> &stack)
 // Class:			ExpressionTree
 // Function:		NextIsNumber
 //
-// Desc:		Determines if the next portion of the expression is a number.
+// Description:		Determines if the next portion of the expression is a number.
 //					Some cleverness is required to tell the difference between
 //					a minus sign and a negative sign (minus sign would return false).
 //
@@ -578,7 +578,7 @@ bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop, const b
 // Class:			ExpressionTree
 // Function:		NextIsS
 //
-// Desc:		Determines if the next portion of the expression is
+// Description:		Determines if the next portion of the expression is
 //					complex frequency (s) or discrete time (z).
 //
 // Input Arguments:
@@ -612,7 +612,7 @@ bool ExpressionTree::NextIsS(const wxString &s, unsigned int *stop)
 // Class:			ExpressionTree
 // Function:		NextIsDataset
 //
-// Desc:		Determines if the next portion of the expression is a dataset.
+// Description:		Determines if the next portion of the expression is a dataset.
 //
 // Input Arguments:
 //		s				= const wxString& containing the expression
@@ -657,7 +657,7 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const 
 // Class:			ExpressionTree
 // Function:		NextIsFunction
 //
-// Desc:		Determines if the next portion of the expression is a function.
+// Description:		Determines if the next portion of the expression is a function.
 //
 // Input Arguments:
 //		s		= const wxString& containing the expression
@@ -710,7 +710,7 @@ bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop)
 // Class:			ExpressionTree
 // Function:		NextIsOperator
 //
-// Desc:		Determines if the next portion of the expression is an operator.
+// Description:		Determines if the next portion of the expression is an operator.
 //
 // Input Arguments:
 //		s		= const wxString& containing the expression
@@ -746,7 +746,7 @@ bool ExpressionTree::NextIsOperator(const wxString &s, unsigned int *stop)
 // Class:			ExpressionTree
 // Function:		OperatorShift
 //
-// Desc:		Determines if the new operator requires a shift in
+// Description:		Determines if the new operator requires a shift in
 //					operator placement.
 //
 // Input Arguments:
@@ -783,7 +783,7 @@ bool ExpressionTree::OperatorShift(const wxString &stackString, const wxString &
 // Class:			ExpressionTree
 // Function:		GetPrecedence
 //
-// Desc:		Determines the precedence of the specified operator
+// Description:		Determines the precedence of the specified operator
 //					(higher values are performed first)
 //
 // Input Arguments:
@@ -818,7 +818,7 @@ unsigned int ExpressionTree::GetPrecedence(const wxString &s) const
 // Class:			ExpressionTree
 // Function:		IsLeftAssociative
 //
-// Desc:		Determines if the specified operator is left or right
+// Description:		Determines if the specified operator is left or right
 //					associative.
 //
 // Input Arguments:
@@ -847,7 +847,7 @@ bool ExpressionTree::IsLeftAssociative(const wxChar &c) const
 // Class:			ExpressionTree
 // Function:		PushToStack
 //
-// Desc:		Pushes the specified value onto the stack.
+// Description:		Pushes the specified value onto the stack.
 //
 // Input Arguments:
 //		value			= const double&
@@ -872,7 +872,7 @@ void ExpressionTree::PushToStack(const double &value, std::stack<double> &double
 // Class:			ExpressionTree
 // Function:		PushToStack
 //
-// Desc:		Pushes the specified dataset onto the stack.
+// Description:		Pushes the specified dataset onto the stack.
 //
 // Input Arguments:
 //		dataset			= const Dataset2D&
@@ -897,7 +897,7 @@ void ExpressionTree::PushToStack(const Dataset2D &dataset, std::stack<Dataset2D>
 // Class:			ExpressionTree
 // Function:		PushToStack
 //
-// Desc:		Pushes the specified dataset onto the stack.
+// Description:		Pushes the specified dataset onto the stack.
 //
 // Input Arguments:
 //		s				= const wxString&
@@ -922,7 +922,7 @@ void ExpressionTree::PushToStack(const wxString &s, std::stack<wxString> &string
 // Class:			ExpressionTree
 // Function:		PopFromStack
 //
-// Desc:		Pops the next value from the top of the appropriate stack.
+// Description:		Pops the next value from the top of the appropriate stack.
 //
 // Input Arguments:
 //		doubleStack		= std::stack<double>&
@@ -965,7 +965,7 @@ bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<Da
 // Class:			ExpressionTree
 // Function:		PopFromStack
 //
-// Desc:		Pops the next value from the top of the appropriate stack.
+// Description:		Pops the next value from the top of the appropriate stack.
 //
 // Input Arguments:
 //		doubleStack		= std::stack<double>&
@@ -1006,7 +1006,7 @@ bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<wx
 // Class:			ExpressionTree
 // Function:		ApplyFunction
 //
-// Desc:		Applies the specified function to the specified dataset.
+// Description:		Applies the specified function to the specified dataset.
 //
 // Input Arguments:
 //		function	= const wxString& describing the function to apply
@@ -1061,7 +1061,7 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 // Class:			ExpressionTree
 // Function:		ApplyFunction
 //
-// Desc:		Applies the specified function to the specified dataset.
+// Description:		Applies the specified function to the specified dataset.
 //
 // Input Arguments:
 //		function	= const wxString& describing the function to apply
@@ -1107,7 +1107,7 @@ double ExpressionTree::ApplyFunction(const wxString &function, const double &val
 // Class:			ExpressionTree
 // Function:		FunctionRequiresDataset
 //
-// Desc:		Determines if the specified function requires a dataset to
+// Description:		Determines if the specified function requires a dataset to
 //					operate on, or if it can also operate on values.
 //
 // Input Arguments:
@@ -1135,7 +1135,7 @@ bool ExpressionTree::FunctionRequiresDataset(const wxString &function) const
 // Class:			ExpressionTree
 // Function:		ApplyOperation
 //
-// Desc:		Applies the specified operation to the specified operands.
+// Description:		Applies the specified operation to the specified operands.
 //
 // Input Arguments:
 //		operation	= const wxString& describing the function to apply
@@ -1171,7 +1171,7 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 // Class:			ExpressionTree
 // Function:		ApplyOperation
 //
-// Desc:		Applies the specified operation to the specified operands.
+// Description:		Applies the specified operation to the specified operands.
 //
 // Input Arguments:
 //		operation	= const wxString& describing the function to apply
@@ -1206,7 +1206,7 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 // Class:			ExpressionTree
 // Function:		ApplyOperation
 //
-// Desc:		Applies the specified operation to the specified operands.
+// Description:		Applies the specified operation to the specified operands.
 //
 // Input Arguments:
 //		operation	= const wxString& describing the function to apply
@@ -1244,7 +1244,7 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 // Class:			ExpressionTree
 // Function:		ApplyOperation
 //
-// Desc:		Applies the specified operation to the specified operands.
+// Description:		Applies the specified operation to the specified operands.
 //
 // Input Arguments:
 //		operation	= const wxString& describing the function to apply
@@ -1282,7 +1282,7 @@ double ExpressionTree::ApplyOperation(const wxString &operation,
 // Class:			ExpressionTree
 // Function:		ApplyOperation
 //
-// Desc:		Applies the specified operation to the specified operands.
+// Description:		Applies the specified operation to the specified operands.
 //
 // Input Arguments:
 //		operation	= const wxString& describing the function to apply
@@ -1315,7 +1315,7 @@ wxString ExpressionTree::ApplyOperation(const wxString &operation,
 // Class:			ExpressionTree
 // Function:		ApplyOperation
 //
-// Desc:		Applies the specified operation to the specified operands.
+// Description:		Applies the specified operation to the specified operands.
 //
 // Input Arguments:
 //		operation	= const wxString& describing the function to apply
@@ -1347,7 +1347,7 @@ wxString ExpressionTree::ApplyOperation(const wxString &operation,
 // Class:			ExpressionTree
 // Function:		ApplyOperation
 //
-// Desc:		Applies the specified operation to the specified operands.
+// Description:		Applies the specified operation to the specified operands.
 //
 // Input Arguments:
 //		operation	= const wxString& describing the function to apply
@@ -1383,7 +1383,7 @@ wxString ExpressionTree::ApplyOperation(const wxString &operation,
 // Class:			ExpressionTree
 // Function:		EvaluateFunction
 //
-// Desc:		Evaluates the function specified.
+// Description:		Evaluates the function specified.
 //
 // Input Arguments:
 //		function		= const wxString& describing the function to apply
@@ -1432,7 +1432,7 @@ bool ExpressionTree::EvaluateFunction(const wxString &function, std::stack<doubl
 // Class:			ExpressionTree
 // Function:		EvaluateOperator
 //
-// Desc:		Evaluates the operator specified.
+// Description:		Evaluates the operator specified.
 //
 // Input Arguments:
 //		operator		= const wxString& describing the function to apply
@@ -1487,7 +1487,7 @@ bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<doub
 // Class:			ExpressionTree
 // Function:		EvaluateUnaryOperator
 //
-// Desc:		Evaluates the operator specified.  The only unary operator
+// Description:		Evaluates the operator specified.  The only unary operator
 //					we recognize is minus (negation).
 //
 // Input Arguments:
@@ -1526,7 +1526,7 @@ bool ExpressionTree::EvaluateUnaryOperator(const wxString &operation, std::stack
 // Class:			ExpressionTree
 // Function:		EvaluateOperator
 //
-// Desc:		Evaluates the operator specified.
+// Description:		Evaluates the operator specified.
 //
 // Input Arguments:
 //		operator		= const wxString& describing the function to apply
@@ -1568,7 +1568,7 @@ bool ExpressionTree::EvaluateOperator(const wxString &operation, std::stack<doub
 // Class:			ExpressionTree
 // Function:		EvaluateUnaryOperator
 //
-// Desc:		Evaluates the operator specified.  The only unary operator
+// Description:		Evaluates the operator specified.  The only unary operator
 //					we recognize is minus (negation).
 //
 // Input Arguments:
@@ -1607,7 +1607,7 @@ bool ExpressionTree::EvaluateUnaryOperator(const wxString &operation, std::stack
 // Class:			ExpressionTree
 // Function:		EvaluateNumber
 //
-// Desc:		Evaluates the number specified.
+// Description:		Evaluates the number specified.
 //
 // Input Arguments:
 //		number			= const wxString& describing the function to apply
@@ -1642,7 +1642,7 @@ bool ExpressionTree::EvaluateNumber(const wxString &number, std::stack<double> &
 // Class:			ExpressionTree
 // Function:		EvaluateDataset
 //
-// Desc:		Evaluates the dataset specified.
+// Description:		Evaluates the dataset specified.
 //
 // Input Arguments:
 //		dataset			= const wxString& describing the function to apply
@@ -1691,7 +1691,7 @@ bool ExpressionTree::EvaluateDataset(const wxString &dataset, std::stack<Dataset
 // Class:			ExpressionTree
 // Function:		SetOperatorValid
 //
-// Desc:		Verifies if the specified operator is valid for dataset operations.
+// Description:		Verifies if the specified operator is valid for dataset operations.
 //
 // Input Arguments:
 //		operation			= const wxString&
@@ -1726,7 +1726,7 @@ bool ExpressionTree::SetOperatorValid(const wxString &operation, const bool &lef
 // Class:			ExpressionTree
 // Function:		EvaluateNext
 //
-// Desc:		Determines how to evaluate the specified term and takes
+// Description:		Determines how to evaluate the specified term and takes
 //					appropriate action.
 //
 // Input Arguments:
@@ -1763,7 +1763,7 @@ bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doub
 // Class:			ExpressionTree
 // Function:		EvaluateNext
 //
-// Desc:		Determines how to evaluate the specified term and takes
+// Description:		Determines how to evaluate the specified term and takes
 //					appropriate action.
 //
 // Input Arguments:
@@ -1801,7 +1801,7 @@ bool ExpressionTree::EvaluateNext(const wxString &next, std::stack<double> &doub
 // Class:			ExpressionTree
 // Function:		BeginningMatchesNoCase
 //
-// Desc:		Determines if the target string matches the beginning of
+// Description:		Determines if the target string matches the beginning of
 //					string s.  Populates the length argument if provided and
 //					if a match is found.
 //
@@ -1835,7 +1835,7 @@ bool ExpressionTree::BeginningMatchesNoCase(const wxString &s, const wxString &t
 // Class:			ExpressionTree
 // Function:		StringAdd
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const wxString&
@@ -1858,7 +1858,7 @@ wxString ExpressionTree::StringAdd(const wxString &first, const double &second) 
 // Class:			ExpressionTree
 // Function:		StringAdd
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const double&
@@ -1881,7 +1881,7 @@ wxString ExpressionTree::StringAdd(const double &first, const wxString &second) 
 // Class:			ExpressionTree
 // Function:		StringSubtract
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const wxString&
@@ -1904,7 +1904,7 @@ wxString ExpressionTree::StringSubtract(const wxString &first, const double &sec
 // Class:			ExpressionTree
 // Function:		StringSubtract
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const double&
@@ -1927,7 +1927,7 @@ wxString ExpressionTree::StringSubtract(const double &first, const wxString &sec
 // Class:			ExpressionTree
 // Function:		StringMultiply
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const wxString&
@@ -1955,7 +1955,7 @@ wxString ExpressionTree::StringMultiply(const wxString &first, const double &sec
 // Class:			ExpressionTree
 // Function:		StringMultiply
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const wxString&
@@ -1991,7 +1991,7 @@ wxString ExpressionTree::StringMultiply(const wxString &first, const wxString &s
 // Class:			ExpressionTree
 // Function:		StringMultiply
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const double&
@@ -2013,7 +2013,7 @@ wxString ExpressionTree::StringMultiply(const double &first, const wxString &sec
 // Class:			ExpressionTree
 // Function:		StringDivide
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //
 // Input Arguments:
 //		first	= const double&
@@ -2035,7 +2035,7 @@ wxString ExpressionTree::StringDivide(const double &first, const wxString &secon
 // Class:			ExpressionTree
 // Function:		StringPower
 //
-// Desc:		Performs arithmatic on the arguments, returns a string.
+// Description:		Performs arithmatic on the arguments, returns a string.
 //					For positive powers, expand and do the multiplication.
 //					For negative powers (i.e. z-domain stuff), add them to the
 //					string.  Assumes exponent is an integer.
@@ -2068,7 +2068,7 @@ wxString ExpressionTree::StringPower(const double &first, const wxString &second
 // Class:			ExpressionTree
 // Function:		BreakApartTerms
 //
-// Desc:		Breaks apart all the terms in the string expression.  Be
+// Description:		Breaks apart all the terms in the string expression.  Be
 //					wary of negative signs preceded by another operator!
 //
 // Input Arguments:
@@ -2109,7 +2109,7 @@ wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 // Class:			ExpressionTree
 // Function:		FindEndOfNextTerm
 //
-// Desc:		Finds the end of the next term in the string.
+// Description:		Finds the end of the next term in the string.
 //
 // Input Arguments:
 //		s		= const wxString&
@@ -2153,7 +2153,7 @@ unsigned int ExpressionTree::FindEndOfNextTerm(const wxString &s, const unsigned
 // Class:			ExpressionTree
 // Function:		FindPowersAndCoefficients
 //
-// Desc:		Breaks a (previously separated) set of terms into a coefficient
+// Description:		Breaks a (previously separated) set of terms into a coefficient
 //					and a power of the algebraic variable.
 //
 // Input Arguments:
@@ -2208,7 +2208,7 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 // Class:			ExpressionTree
 // Function:		GetTermPower
 //
-// Desc:		Returns the value of the power for the specified term
+// Description:		Returns the value of the power for the specified term
 //					(power of s or z).
 //
 // Input Arguments:
@@ -2246,7 +2246,7 @@ int ExpressionTree::GetTermPower(const wxString &s, unsigned int &start, unsigne
 // Class:			ExpressionTree
 // Function:		AddToExpressionString
 //
-// Desc:		Adds the next term to the string.  Handles signed terms,
+// Description:		Adds the next term to the string.  Handles signed terms,
 //					cleans up for terms with coefficient == 1.0, etc.
 //
 // Input Arguments:

@@ -39,7 +39,7 @@ namespace LibPlot2D
 // Class:			RenderWindow
 // Function:		Constant declarations
 //
-// Desc:		Constant declarations for RenderWindow class.
+// Description:		Constant declarations for RenderWindow class.
 //
 // Input Arguments:
 //		None
@@ -62,7 +62,7 @@ const double RenderWindow::exactPixelShift(0.375);
 // Class:			RenderWindow
 // Function:		defaultVertexShader
 //
-// Desc:		Default vertex shader.
+// Description:		Default vertex shader.
 //
 // Input Arguments:
 //		0	= position
@@ -96,7 +96,7 @@ const std::string RenderWindow::defaultVertexShader(
 // Class:			RenderWindow
 // Function:		defaultFragmentShader
 //
-// Desc:		Default fragment shader.
+// Description:		Default fragment shader.
 //
 // Input Arguments:
 //		None
@@ -125,7 +125,7 @@ const std::string RenderWindow::defaultFragmentShader(
 // Class:			RenderWindow
 // Function:		RenderWindow
 //
-// Desc:		Constructor for RenderWindow class.  Initializes the
+// Description:		Constructor for RenderWindow class.  Initializes the
 //					renderer and sets up the canvas.
 //
 // Input Arguments:
@@ -180,7 +180,7 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 // Class:			RenderWindow
 // Function:		~RenderWindow
 //
-// Desc:		Destructor for RenderWindow class.  Deletes objects in
+// Description:		Destructor for RenderWindow class.  Deletes objects in
 //					the scene and other dynamic variables.
 //
 // Input Arguments:
@@ -205,7 +205,7 @@ RenderWindow::~RenderWindow()
 // Class:			RenderWindow
 // Function:		Event Table
 //
-// Desc:		Event Table for the RENDER_WINDOW class.
+// Description:		Event Table for the RENDER_WINDOW class.
 //
 // Input Arguments:
 //		None
@@ -235,7 +235,7 @@ END_EVENT_TABLE()
 // Class:			RenderWindow
 // Function:		GetContext
 //
-// Desc:		Gets (or creates, if it doesn't yet exist) the GL context.
+// Description:		Gets (or creates, if it doesn't yet exist) the GL context.
 //
 // Input Arguments:
 //		None
@@ -259,7 +259,7 @@ wxGLContext* RenderWindow::GetContext()
 // Class:			RenderWindow
 // Function:		Render
 //
-// Desc:		Updates the scene with all of this object's options and
+// Description:		Updates the scene with all of this object's options and
 //					re-draws the image.
 //
 // Input Arguments:
@@ -343,7 +343,7 @@ void RenderWindow::Render()
 // Class:			RenderWindow
 // Function:		OnPaint
 //
-// Desc:		Event handler for the paint event.  Obtains the device
+// Description:		Event handler for the paint event.  Obtains the device
 //					context and re-renders the scene.
 //
 // Input Arguments:
@@ -365,7 +365,7 @@ void RenderWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
 // Class:			RenderWindow
 // Function:		OnSize
 //
-// Desc:		Event handler for the window re-size event.
+// Description:		Event handler for the window re-size event.
 //
 // Input Arguments:
 //		event	= wxSizeEvent& (unused)
@@ -387,7 +387,7 @@ void RenderWindow::OnSize(wxSizeEvent& WXUNUSED(event))
 // Class:			RenderWindow
 // Function:		DoResize
 //
-// Desc:		Handles actions required to update the screen after resizing.
+// Description:		Handles actions required to update the screen after resizing.
 //
 // Input Arguments:
 //		None
@@ -417,7 +417,7 @@ void RenderWindow::DoResize()
 // Class:			RenderWindow
 // Function:		OnEnterWindow
 //
-// Desc:		Event handler for the enter window event.
+// Description:		Event handler for the enter window event.
 //
 // Input Arguments:
 //		event	= wxEraseEvent&
@@ -439,7 +439,7 @@ void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		RemoveActor
 //
-// Desc:		Removes the specified actor from the display list, if it
+// Description:		Removes the specified actor from the display list, if it
 //					is in the list.
 //
 // Input Arguments:
@@ -474,7 +474,7 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 // Class:			RenderWindow
 // Function:		Initialize
 //
-// Desc:		Sets up the renderer's parameters.  Called on startup
+// Description:		Sets up the renderer's parameters.  Called on startup
 //					and any time an option changes (wireframe vs. polygon, etc.)
 //
 // Input Arguments:
@@ -530,7 +530,7 @@ void RenderWindow::Initialize()
 // Class:			RenderWindow
 // Function:		OnMouseWheelEvent
 //
-// Desc:		Event handler for the mouse wheel event.
+// Description:		Event handler for the mouse wheel event.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -551,7 +551,7 @@ void RenderWindow::OnMouseWheelEvent(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		OnMouseMoveEvent
 //
-// Desc:		Event handler for the mouse move event.  Only used to
+// Description:		Event handler for the mouse move event.  Only used to
 //					capture drag events for rotating, panning, or dollying
 //					the scene.
 //
@@ -599,7 +599,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		PerformInteraction
 //
-// Desc:		Performs the specified interaction.
+// Description:		Performs the specified interaction.
 //					NOTE:  Modifying the modelview matrix moves the scene
 //					relative to the eyepoint in the scene's coordinate system!
 //
@@ -643,7 +643,7 @@ void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent 
 // Class:			RenderWindow
 // Function:		StoreMousePosition
 //
-// Desc:		Stores the current mouse position to a class member.
+// Description:		Stores the current mouse position to a class member.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -665,7 +665,7 @@ void RenderWindow::StoreMousePosition(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		OnMouseUpEvent
 //
-// Desc:		Event handler for a button becoming "unclicked."
+// Description:		Event handler for a button becoming "unclicked."
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -686,7 +686,7 @@ void RenderWindow::OnMouseUpEvent(wxMouseEvent& WXUNUSED(event))
 // Class:			RenderWindow
 // Function:		DoRotate
 //
-// Desc:		Performs the rotate event.  Read through comments below
+// Description:		Performs the rotate event.  Read through comments below
 //					for more information.
 //
 // Input Arguments:
@@ -740,7 +740,7 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		DoWheelDolly
 //
-// Desc:		Performs a dolly event triggered by a mouse wheel roll.
+// Description:		Performs a dolly event triggered by a mouse wheel roll.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -771,7 +771,7 @@ void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		DoDragDolly
 //
-// Desc:		Performs a dolly event triggered by mouse movement.
+// Description:		Performs a dolly event triggered by mouse movement.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -801,7 +801,7 @@ void RenderWindow::DoDragDolly(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		DoPan
 //
-// Desc:		Performs a pan event.
+// Description:		Performs a pan event.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -852,7 +852,7 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 // Class:			RenderWindow
 // Function:		SetCameraView
 //
-// Desc:		Sets the camera view as specified.
+// Description:		Sets the camera view as specified.
 //
 // Input Arguments:
 //		position	= const Vector& specifying the camera position
@@ -896,7 +896,7 @@ void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt,
 // Class:			RenderWindow
 // Function:		UpdateModelviewMatrix
 //
-// Desc:		Makes the openGL calls to update the modelview matrix.
+// Description:		Makes the openGL calls to update the modelview matrix.
 //
 // Input Arguments:
 //		None
@@ -929,7 +929,7 @@ void RenderWindow::UpdateModelviewMatrix()
 // Class:			RenderWindow
 // Function:		TransformToView
 //
-// Desc:		Returns a vector equivalent to the specified vector
+// Description:		Returns a vector equivalent to the specified vector
 //					(assumed to be in model coordinates) in view coordinates.
 //
 // Input Arguments:
@@ -951,7 +951,7 @@ Vector RenderWindow::TransformToView(const Vector &modelVector) const
 // Class:			RenderWindow
 // Function:		TransformToModel
 //
-// Desc:		Returns a vector equivalent to the specified vector
+// Description:		Returns a vector equivalent to the specified vector
 //					(assumed to be in view coordinates) in model coordinates.
 //
 // Input Arguments:
@@ -973,7 +973,7 @@ Vector RenderWindow::TransformToModel(const Vector &viewVector) const
 // Class:			RenderWindow
 // Function:		GetCameraPosition
 //
-// Desc:		Extracts the camera position from the modelview matrix.
+// Description:		Extracts the camera position from the modelview matrix.
 //
 // Input Arguments:
 //		None
@@ -995,7 +995,7 @@ Vector RenderWindow::GetCameraPosition() const
 // Class:			RenderWindow
 // Function:		AutoSetFrustum
 //
-// Desc:		Updates the view frustum to correctly match the viewport size.
+// Description:		Updates the view frustum to correctly match the viewport size.
 //
 // Input Arguments:
 //		None
@@ -1023,7 +1023,7 @@ void RenderWindow::AutoSetFrustum()
 // Class:			RenderWindow
 // Function:		GetGLError
 //
-// Desc:		Returns a string describing any openGL errors.
+// Description:		Returns a string describing any openGL errors.
 //
 // Input Arguments:
 //		None
@@ -1046,7 +1046,7 @@ wxString RenderWindow::GetGLError()
 // Class:			RenderWindow
 // Function:		GetGLError
 //
-// Desc:		Returns a string describing any openGL errors.
+// Description:		Returns a string describing any openGL errors.
 //
 // Input Arguments:
 //		e	= const GLint&
@@ -1082,7 +1082,7 @@ wxString RenderWindow::GetGLError(const GLint& e)
 // Class:			RenderWindow
 // Function:		WriteImageToFile
 //
-// Desc:		Writes the contents of the render window to file.  Various
+// Description:		Writes the contents of the render window to file.  Various
 //					different file types are supported, specified by the file
 //					extension.
 //
@@ -1107,7 +1107,7 @@ bool RenderWindow::WriteImageToFile(wxString pathAndFileName) const
 // Class:			RenderWindow
 // Function:		GetImage
 //
-// Desc:		Returns an image object representing the contents of the
+// Description:		Returns an image object representing the contents of the
 //					window.
 //
 // Input Arguments:
@@ -1141,7 +1141,7 @@ wxImage RenderWindow::GetImage() const
 // Class:			RenderWindow
 // Function:		IsThisRendererSelected
 //
-// Desc:		Writes the contents of the render window to file.  Various
+// Description:		Writes the contents of the render window to file.  Various
 //					different file types are supported, specified by the file
 //					extension.
 //
@@ -1174,7 +1174,7 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 // Class:			RenderWindow
 // Function:		AlphaSortPredicate
 //
-// Desc:		Predicate for sorting by alpha.
+// Description:		Predicate for sorting by alpha.
 //
 // Input Arguments:
 //		p1	= const std::unique_ptr<Primitive>&
@@ -1197,7 +1197,7 @@ bool RenderWindow::AlphaSortPredicate(const std::unique_ptr<Primitive>& p1,
 // Class:			RenderWindow
 // Function:		OrderSortPredicate
 //
-// Desc:		Predicate for sorting by draw order.
+// Description:		Predicate for sorting by draw order.
 //
 // Input Arguments:
 //		p1	= const std::unique_ptr<Primitive>&
@@ -1220,7 +1220,7 @@ bool RenderWindow::OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
 // Class:			RenderWindow
 // Function:		ConvertMatrixToGL
 //
-// Desc:		Converts from Matrix type to a row-appended vector that
+// Description:		Converts from Matrix type to a row-appended vector that
 //					represents the matrix.  Converts to array as required by
 //					OpenGL.
 //
@@ -1248,7 +1248,7 @@ void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, float gl[])
 // Class:			RenderWindow
 // Function:		ConvertGLToMatrix
 //
-// Desc:		Converts from OpenGL array to Matrix type.  Size of matrix
+// Description:		Converts from OpenGL array to Matrix type.  Size of matrix
 //					must be set before this call.
 //
 // Input Arguments:
@@ -1275,7 +1275,7 @@ void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const float gl[])
 // Class:			RenderWindow
 // Function:		Initialize2D
 //
-// Desc:		Configures openGL for drawing 2D scenes.
+// Description:		Configures openGL for drawing 2D scenes.
 //
 // Input Arguments:
 //		None
@@ -1314,7 +1314,7 @@ void RenderWindow::Initialize2D()
 // Class:			RenderWindow
 // Function:		Initialize3D
 //
-// Desc:		Configures openGL for drawing 3D scenes.
+// Description:		Configures openGL for drawing 3D scenes.
 //
 // Input Arguments:
 //		None
@@ -1344,7 +1344,7 @@ void RenderWindow::Initialize3D()
 // Class:			RenderWindow
 // Function:		Generate2DProjectionMatrix
 //
-// Desc:		Returns projection matrix for 2D scenes.
+// Description:		Returns projection matrix for 2D scenes.
 //
 // Input Arguments:
 //		None
@@ -1375,7 +1375,7 @@ Matrix RenderWindow::Generate2DProjectionMatrix() const
 // Class:			RenderWindow
 // Function:		Generate3DProjectionMatrix
 //
-// Desc:		Returns projection matrix for 3D scenes.
+// Description:		Returns projection matrix for 3D scenes.
 //
 // Input Arguments:
 //		None
@@ -1424,7 +1424,7 @@ Matrix RenderWindow::Generate3DProjectionMatrix() const
 // Class:			RenderWindow
 // Function:		SetViewOrthogonal
 //
-// Desc:		Switches between perspective and orthogonal projections
+// Description:		Switches between perspective and orthogonal projections
 //					while maintaining nominal scale.
 //
 // Input Arguments:
@@ -1462,7 +1462,7 @@ void RenderWindow::SetViewOrthogonal(const bool &viewOrthogonal)
 // Class:			RenderWindow
 // Function:		Determine2DInteraction
 //
-// Desc:		Determines type of 2D interaction (if any).
+// Description:		Determines type of 2D interaction (if any).
 //
 // Input Arguments:
 //		event		= wxMouseEvent&
@@ -1494,7 +1494,7 @@ bool RenderWindow::Determine2DInteraction(const wxMouseEvent &event, Interaction
 // Class:			RenderWindow
 // Function:		Determine3DInteraction
 //
-// Desc:		Determines type of 3D interaction (if any).
+// Description:		Determines type of 3D interaction (if any).
 //
 // Input Arguments:
 //		event		= wxMouseEvent&
@@ -1531,7 +1531,7 @@ bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, Interaction
 // Class:			RenderWindow
 // Function:		CreateDefaultVertexShader
 //
-// Desc:		Builds the default vertex shader and returns its index.
+// Description:		Builds the default vertex shader and returns its index.
 //
 // Input Arguments:
 //		None
@@ -1552,7 +1552,7 @@ GLuint RenderWindow::CreateDefaultVertexShader()
 // Class:			RenderWindow
 // Function:		CreateDefaultFragmentShader
 //
-// Desc:		Builds the default fragment shader and returns its index.
+// Description:		Builds the default fragment shader and returns its index.
 //
 // Input Arguments:
 //		None
@@ -1573,7 +1573,7 @@ GLuint RenderWindow::CreateDefaultFragmentShader()
 // Class:			RenderWindow
 // Function:		CreateShader
 //
-// Desc:		Compiles the specified shader.
+// Description:		Compiles the specified shader.
 //
 // Input Arguments:
 //		type			= const GLenum&
@@ -1616,7 +1616,7 @@ GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderC
 // Class:			RenderWindow
 // Function:		CreateProgram
 //
-// Desc:		Builds the default program.
+// Description:		Builds the default program.
 //
 // Input Arguments:
 //		shaderList	= const std::vector<GLuint>&
@@ -1663,7 +1663,7 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 // Class:			RenderWindow
 // Function:		BuildShaders
 //
-// Desc:		Builds the default shaders and sets the indices to the
+// Description:		Builds the default shaders and sets the indices to the
 //					matrices we need to track.
 //
 // Input Arguments:
@@ -1700,7 +1700,7 @@ void RenderWindow::BuildShaders()
 // Class:			RenderWindow
 // Function:		Translate
 //
-// Desc:		Applies the specified translation to the specified matrix.
+// Description:		Applies the specified translation to the specified matrix.
 //
 // Input Arguments:
 //		m	= Matrix&
@@ -1728,7 +1728,7 @@ void RenderWindow::Translate(Matrix& m, const double& x, const double& y, const 
 // Class:			RenderWindow
 // Function:		Rotate
 //
-// Desc:		Applies the specified rotation to the specified matrix.
+// Description:		Applies the specified rotation to the specified matrix.
 //
 // Input Arguments:
 //		m		= Matrix&
@@ -1766,7 +1766,7 @@ void RenderWindow::Rotate(Matrix& m, const double& angle,
 // Class:			RenderWindow
 // Function:		Scale
 //
-// Desc:		Applies the specified scaling to the specified matrix.
+// Description:		Applies the specified scaling to the specified matrix.
 //
 // Input Arguments:
 //		m		= Matrix&
@@ -1796,7 +1796,7 @@ void RenderWindow::Scale(Matrix& m, const double& x, const double& y, const doub
 // Class:			RenderWindow
 // Function:		UseDefaultProgram
 //
-// Desc:		Loads the default OpenGL program.
+// Description:		Loads the default OpenGL program.
 //
 // Input Arguments:
 //		None
@@ -1817,7 +1817,7 @@ void RenderWindow::UseDefaultProgram() const
 // Class:			RenderWindow
 // Function:		ShiftForExactPixelization
 //
-// Desc:		Applies shift trick to enabled exact pixelization.
+// Description:		Applies shift trick to enabled exact pixelization.
 //
 // Input Arguments:
 //		None
@@ -1838,7 +1838,7 @@ void RenderWindow::ShiftForExactPixelization()
 // Class:			RenderWindow
 // Function:		AddShader
 //
-// Desc:		Adds a shader to our list of managed shaders.
+// Description:		Adds a shader to our list of managed shaders.
 //
 // Input Arguments:
 //		shader	= const ShaderInfo&
@@ -1860,7 +1860,7 @@ void RenderWindow::AddShader(const ShaderInfo& shader)
 // Class:			RenderWindow
 // Function:		SendUniformMatrix
 //
-// Desc:		Loads uniform matrix to openGL.
+// Description:		Loads uniform matrix to openGL.
 //
 // Input Arguments:
 //		shader	= const ShaderInfo&
@@ -1884,7 +1884,7 @@ void RenderWindow::SendUniformMatrix(const Matrix& m, const GLuint& location)
 // Class:			RenderWindow
 // Function:		GLHasError
 //
-// Desc:		Returns true if OpenGL has any errors.  Intended as a
+// Description:		Returns true if OpenGL has any errors.  Intended as a
 //					useful place to break on OpenGL errors.  Allows checking
 //					error codes.
 //

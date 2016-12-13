@@ -32,7 +32,7 @@ namespace LibPlot2D
 // Class:			CreateSignalDialog
 // Function:		CreateSignalDialog
 //
-// Desc:		Constructor for CreateSignalDialog class.
+// Description:		Constructor for CreateSignalDialog class.
 //
 // Input Arguments:
 //		parent		= wxWindow*
@@ -69,7 +69,7 @@ CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime
 // Class:			CreateSignalDialog
 // Function:		Event Table
 //
-// Desc:		Event table for the CreateSignalDialog class.
+// Description:		Event table for the CreateSignalDialog class.
 //
 // Input Arguments:
 //		None
@@ -95,7 +95,7 @@ END_EVENT_TABLE()
 // Class:			CreateSignalDialog
 // Function:		GetSignalName
 //
-// Desc:		Returns the user-specified name for the signal.
+// Description:		Returns the user-specified name for the signal.
 //
 // Input Arguments:
 //		None
@@ -116,7 +116,7 @@ wxString CreateSignalDialog::GetSignalName() const
 // Class:			CreateSignalDialog
 // Function:		CreateControls
 //
-// Desc:		Creates the controls and populates with default values.
+// Description:		Creates the controls and populates with default values.
 //
 // Input Arguments:
 //		startTime	= const double&
@@ -247,7 +247,7 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 // Class:			CreateSignalDialog
 // Function:		GetSignalName
 //
-// Desc:		Returns the name of the signal specified by the enumeration.
+// Description:		Returns the name of the signal specified by the enumeration.
 //
 // Input Arguments:
 //		type	= const SignalType&
@@ -287,7 +287,7 @@ wxString CreateSignalDialog::GetSignalName(const SignalType &type)
 // Class:			CreateSignalDialog
 // Function:		TransferDataFromWindow
 //
-// Desc:		Validates inputs to the dialog.
+// Description:		Validates inputs to the dialog.
 //
 // Input Arguments:
 //		None
@@ -427,7 +427,7 @@ bool CreateSignalDialog::TransferDataFromWindow()
 // Class:			CreateSignalDialog
 // Function:		CreateSignal
 //
-// Desc:		Creates the signal dataset to the user specifications.
+// Description:		Creates the signal dataset to the user specifications.
 //
 // Input Arguments:
 //		startTime	= const double&
@@ -460,7 +460,7 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 // Class:			CreateSignalDialog
 // Function:		GetValue
 //
-// Desc:		Computes the value at the specified time for the user-specified
+// Description:		Computes the value at the specified time for the user-specified
 //					function.
 //
 // Input Arguments:
@@ -600,7 +600,7 @@ double CreateSignalDialog::GetValue(const double &time)
 // Class:			CreateSignalDialog
 // Function:		OnSignalTypeChangeEvent
 //
-// Desc:		Event handler for combo box selection events.
+// Description:		Event handler for combo box selection events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -628,7 +628,7 @@ void CreateSignalDialog::OnSignalTypeChangeEvent(wxCommandEvent& WXUNUSED(event)
 // Class:			CreateSignalDialog
 // Function:		OnSignalTypeChangeEvent
 //
-// Desc:		Event handler for combo box selection events.
+// Description:		Event handler for combo box selection events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -700,7 +700,7 @@ void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 // Class:			CreateSignalDialog
 // Function:		SetDefaultInputs
 //
-// Desc:		Sets default inputs depending on the specified signal type.
+// Description:		Sets default inputs depending on the specified signal type.
 //
 // Input Arguments:
 //		None
@@ -745,7 +745,7 @@ void CreateSignalDialog::SetDefaultInputs()
 // Class:			CreateSignalDialog
 // Function:		OnAmplitudeChangeEvent
 //
-// Desc:		Event handler for amplitude text box change events.
+// Description:		Event handler for amplitude text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -771,7 +771,7 @@ void CreateSignalDialog::OnAmplitudeChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			CreateSignalDialog
 // Function:		OnSlopeChangeEvent
 //
-// Desc:		Event handler for slope text box change events.
+// Description:		Event handler for slope text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -797,7 +797,7 @@ void CreateSignalDialog::OnSlopeChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			CreateSignalDialog
 // Function:		OnFrequencyChangeEvent
 //
-// Desc:		Event handler for frequency text box change events.
+// Description:		Event handler for frequency text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -834,7 +834,7 @@ void CreateSignalDialog::OnFrequencyChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			CreateSignalDialog
 // Function:		OnPeriodChangeEvent
 //
-// Desc:		Event handler for period text box change events.
+// Description:		Event handler for period text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -867,7 +867,7 @@ void CreateSignalDialog::OnPeriodChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			CreateSignalDialog
 // Function:		OnPhaseAngleChangeEvent
 //
-// Desc:		Event handler for phase angle text box change events.
+// Description:		Event handler for phase angle text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -889,7 +889,7 @@ void CreateSignalDialog::OnPhaseAngleChangeEvent(wxCommandEvent& WXUNUSED(event)
 // Class:			CreateSignalDialog
 // Function:		OnPhaseTimeChangeEvent
 //
-// Desc:		Event handler for phase time text box change events.
+// Description:		Event handler for phase time text box change events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -911,7 +911,7 @@ void CreateSignalDialog::OnPhaseTimeChangeEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			CreateSignalDialog
 // Function:		UpdatePhaseAngle
 //
-// Desc:		Updates the phase angle based on frequency and phase time.
+// Description:		Updates the phase angle based on frequency and phase time.
 //
 // Input Arguments:
 //		None
@@ -941,7 +941,7 @@ void CreateSignalDialog::UpdatePhaseAngle()
 // Class:			CreateSignalDialog
 // Function:		UpdatePhaseTime
 //
-// Desc:		Updates the phase time based on frequency and phase angle.
+// Description:		Updates the phase time based on frequency and phase angle.
 //
 // Input Arguments:
 //		None
@@ -971,7 +971,7 @@ void CreateSignalDialog::UpdatePhaseTime()
 // Class:			CreateSignalDialog
 // Function:		UpdateAmplitude
 //
-// Desc:		Updates the amplitude based on frequency and slope.
+// Description:		Updates the amplitude based on frequency and slope.
 //
 // Input Arguments:
 //		None
@@ -1005,7 +1005,7 @@ void CreateSignalDialog::UpdateAmplitude()
 // Class:			CreateSignalDialog
 // Function:		UpdateSlope
 //
-// Desc:		Updates the slope based on frequency and amplitude.
+// Description:		Updates the slope based on frequency and amplitude.
 //
 // Input Arguments:
 //		None

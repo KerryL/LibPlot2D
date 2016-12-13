@@ -31,7 +31,7 @@ namespace LibPlot2D
 // Class:			Dataset2D
 // Function:		Dataset2D
 //
-// Desc:		Constructor for the Dataset class.
+// Description:		Constructor for the Dataset class.
 //
 // Input Arguments:
 //		None
@@ -53,7 +53,7 @@ Dataset2D::Dataset2D()
 // Class:			Dataset2D
 // Function:		Dataset2D
 //
-// Desc:		Constructor for the Dataset class.
+// Description:		Constructor for the Dataset class.
 //
 // Input Arguments:
 //		target	= const Dataset2D& top copy into this object
@@ -74,7 +74,7 @@ Dataset2D::Dataset2D(const Dataset2D& target)
 // Class:			Dataset2D
 // Function:		Dataset2D
 //
-// Desc:		Constructor for the Dataset class.
+// Description:		Constructor for the Dataset class.
 //
 // Input Arguments:
 //		numberOfPoints = const unsigned int &
@@ -95,7 +95,7 @@ Dataset2D::Dataset2D(const unsigned int &numberOfPoints)
 // Class:			Dataset2D
 // Function:		Reverse
 //
-// Desc:		Reverses the order of the Y-data.  X-data remains unchanged.
+// Description:		Reverses the order of the Y-data.  X-data remains unchanged.
 //
 // Input Arguments:
 //		None
@@ -121,7 +121,7 @@ void Dataset2D::Reverse()
 // Class:			Dataset2D
 // Function:		Resize
 //
-// Desc:		Resizes the arrays.  Deletes all existing data before
+// Description:		Resizes the arrays.  Deletes all existing data before
 //					resizing.
 //
 // Input Arguments:
@@ -146,7 +146,7 @@ void Dataset2D::Resize(const unsigned int &numberOfPoints)
 // Class:			Dataset2D
 // Function:		ExportDataToFile
 //
-// Desc:		Exports the data for this object to a comma or tab-delimited
+// Description:		Exports the data for this object to a comma or tab-delimited
 //					text file.
 //
 // Input Arguments:
@@ -186,7 +186,7 @@ void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 // Class:			Dataset2D
 // Function:		GetYAt
 //
-// Desc:		Retrieves the Y-value at the specified X-value.  Interpolates
+// Description:		Retrieves the Y-value at the specified X-value.  Interpolates
 //					if the X-value is not exactly on a point.  Returns true if
 //					it interpolated.
 //
@@ -237,7 +237,7 @@ bool Dataset2D::GetYAt(const double &x, double &y, bool *exactValue) const
 // Class:			Dataset2D
 // Function:		XShift
 //
-// Desc:		Shifts the data's time series by the specified amount.
+// Description:		Shifts the data's time series by the specified amount.
 //
 // Input Arguments:
 //		shift	= const double& to add to this object's X-data
@@ -262,7 +262,7 @@ Dataset2D& Dataset2D::XShift(const double &shift)
 // Class:			Dataset2D
 // Function:		operator=
 //
-// Desc:		Overloaded assignment operator.
+// Description:		Overloaded assignment operator.
 //
 // Input Arguments:
 //		target	= const Dataset2D& to assign to this
@@ -297,7 +297,7 @@ Dataset2D& Dataset2D::operator=(const Dataset2D &target)
 // Class:			Dataset2D
 // Function:		operator+=
 //
-// Desc:		Overloaded operator (+=).
+// Description:		Overloaded operator (+=).
 //
 // Input Arguments:
 //		target	= const Dataset2D& to add to this
@@ -324,7 +324,7 @@ Dataset2D& Dataset2D::operator+=(const Dataset2D &target)
 // Class:			Dataset2D
 // Function:		operator-=
 //
-// Desc:		Overloaded operator (-=).
+// Description:		Overloaded operator (-=).
 //
 // Input Arguments:
 //		target	= const Dataset2D& to subtract from this
@@ -351,7 +351,7 @@ Dataset2D& Dataset2D::operator-=(const Dataset2D &target)
 // Class:			Dataset2D
 // Function:		operator*=
 //
-// Desc:		Overloaded operator (*=).
+// Description:		Overloaded operator (*=).
 //
 // Input Arguments:
 //		target	= const Dataset2D& to multiply by this
@@ -378,7 +378,7 @@ Dataset2D& Dataset2D::operator*=(const Dataset2D &target)
 // Class:			Dataset2D
 // Function:		operator/=
 //
-// Desc:		Overloaded operator (/=).
+// Description:		Overloaded operator (/=).
 //
 // Input Arguments:
 //		target	= const Dataset2D& divide into this
@@ -405,7 +405,7 @@ Dataset2D& Dataset2D::operator/=(const Dataset2D &target)
 // Class:			Dataset2D
 // Function:		operator+
 //
-// Desc:		Overloaded operator (+).
+// Description:		Overloaded operator (+).
 //
 // Input Arguments:
 //		target	= const Dataset2D& to add to this
@@ -429,7 +429,7 @@ const Dataset2D Dataset2D::operator+(const Dataset2D &target) const
 // Class:			Dataset2D
 // Function:		operator-
 //
-// Desc:		Overloaded operator (-).
+// Description:		Overloaded operator (-).
 //
 // Input Arguments:
 //		target	= const Dataset2D& to subtract from this
@@ -453,7 +453,7 @@ const Dataset2D Dataset2D::operator-(const Dataset2D &target) const
 // Class:			Dataset2D
 // Function:		operator*
 //
-// Desc:		Overloaded operator (*).
+// Description:		Overloaded operator (*).
 //
 // Input Arguments:
 //		target	= const Dataset2D& to multiply with this
@@ -477,7 +477,7 @@ const Dataset2D Dataset2D::operator*(const Dataset2D &target) const
 // Class:			Dataset2D
 // Function:		operator/
 //
-// Desc:		Overloaded operator (/).
+// Description:		Overloaded operator (/).
 //
 // Input Arguments:
 //		target	= const Dataset2D& to divide into this
@@ -501,7 +501,7 @@ const Dataset2D Dataset2D::operator/(const Dataset2D &target) const
 // Class:			Dataset2D
 // Function:		operator+=
 //
-// Desc:		Overloaded operator (+=).
+// Description:		Overloaded operator (+=).
 //
 // Input Arguments:
 //		target	= const double& to add to this
@@ -526,7 +526,7 @@ Dataset2D& Dataset2D::operator+=(const double &target)
 // Class:			Dataset2D
 // Function:		operator-=
 //
-// Desc:		Overloaded operator (-=).
+// Description:		Overloaded operator (-=).
 //
 // Input Arguments:
 //		target	= const double& to subract from this
@@ -551,7 +551,7 @@ Dataset2D& Dataset2D::operator-=(const double &target)
 // Class:			Dataset2D
 // Function:		operator*=
 //
-// Desc:		Overloaded operator (*=).
+// Description:		Overloaded operator (*=).
 //
 // Input Arguments:
 //		target	= const double& to multiply with this
@@ -576,7 +576,7 @@ Dataset2D& Dataset2D::operator*=(const double &target)
 // Class:			Dataset2D
 // Function:		operator/=
 //
-// Desc:		Overloaded operator (/=).
+// Description:		Overloaded operator (/=).
 //
 // Input Arguments:
 //		target	= const double& to divide into this
@@ -601,7 +601,7 @@ Dataset2D& Dataset2D::operator/=(const double &target)
 // Class:			Dataset2D
 // Function:		operator+
 //
-// Desc:		Overloaded operator (+).
+// Description:		Overloaded operator (+).
 //
 // Input Arguments:
 //		target	= const double& to add to this
@@ -625,7 +625,7 @@ const Dataset2D Dataset2D::operator+(const double &target) const
 // Class:			Dataset2D
 // Function:		operator-
 //
-// Desc:		Overloaded operator (-).
+// Description:		Overloaded operator (-).
 //
 // Input Arguments:
 //		target	= const double& to subtract from this
@@ -649,7 +649,7 @@ const Dataset2D Dataset2D::operator-(const double &target) const
 // Class:			Dataset2D
 // Function:		operator*
 //
-// Desc:		Overloaded operator (*).
+// Description:		Overloaded operator (*).
 //
 // Input Arguments:
 //		target	= const double& to multiply with this
@@ -673,7 +673,7 @@ const Dataset2D Dataset2D::operator*(const double &target) const
 // Class:			Dataset2D
 // Function:		operator/
 //
-// Desc:		Overloaded operator (/).
+// Description:		Overloaded operator (/).
 //
 // Input Arguments:
 //		target	= const double& to divide into this
@@ -697,7 +697,7 @@ const Dataset2D Dataset2D::operator/(const double &target) const
 // Class:			Dataset2D
 // Function:		operator%
 //
-// Desc:		Overloaded operator (%).
+// Description:		Overloaded operator (%).
 //
 // Input Arguments:
 //		target	= const double& to divide into this
@@ -722,7 +722,7 @@ const Dataset2D Dataset2D::operator%(const double &target) const
 // Class:			Dataset2D
 // Function:		MultiplyXData
 //
-// Desc:		Multiplies specified value with X vector.
+// Description:		Multiplies specified value with X vector.
 //
 // Input Arguments:
 //		target	= const double& to multiply with this
@@ -747,7 +747,7 @@ Dataset2D& Dataset2D::MultiplyXData(const double &target)
 // Class:			Dataset2D
 // Function:		ToPower
 //
-// Desc:		Raises each element to the specified power.
+// Description:		Raises each element to the specified power.
 //
 // Input Arguments:
 //		target	= const double& indicating the power
@@ -772,7 +772,7 @@ Dataset2D& Dataset2D::ToPower(const double &target)
 // Class:			Dataset2D
 // Function:		ToPower
 //
-// Desc:		Element-wise application of ToPower method.
+// Description:		Element-wise application of ToPower method.
 //
 // Input Arguments:
 //		target	= const Dataset2D& indicating the power
@@ -798,7 +798,7 @@ Dataset2D& Dataset2D::ToPower(const Dataset2D &target)
 // Class:			Dataset2D
 // Function:		ToPower
 //
-// Desc:		Element-wise application of ToPower method.
+// Description:		Element-wise application of ToPower method.
 //
 // Input Arguments:
 //		target	= const Dataset2D& indicating the power
@@ -820,7 +820,7 @@ const Dataset2D Dataset2D::ToPower(const Dataset2D &target) const
 // Class:			Dataset2D
 // Function:		MultiplyXData
 //
-// Desc:		Multiplies specified value with X vector.
+// Description:		Multiplies specified value with X vector.
 //
 // Input Arguments:
 //		target	= const double& to multiply with this
@@ -842,7 +842,7 @@ const Dataset2D Dataset2D::ToPower(const double &target) const
 // Class:			Dataset2D
 // Function:		GetNumberOfZoomedPoints
 //
-// Desc:		Returns the number of data points within the zoomed area.
+// Description:		Returns the number of data points within the zoomed area.
 //					Assumes that the x-data is increasing only.
 //
 // Input Arguments:
@@ -872,7 +872,7 @@ unsigned int Dataset2D::GetNumberOfZoomedPoints(const double &min, const double 
 // Class:			Dataset2D
 // Function:		DoLog
 //
-// Desc:		Applies the log function to each Y-value in the dataset.
+// Description:		Applies the log function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -897,7 +897,7 @@ Dataset2D& Dataset2D::DoLog()
 // Class:			Dataset2D
 // Function:		DoLog10
 //
-// Desc:		Applies the log10 function to each Y-value in the dataset.
+// Description:		Applies the log10 function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -922,7 +922,7 @@ Dataset2D& Dataset2D::DoLog10()
 // Class:			Dataset2D
 // Function:		DoExp
 //
-// Desc:		Applies the exp function to each Y-value in the dataset.
+// Description:		Applies the exp function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -947,7 +947,7 @@ Dataset2D& Dataset2D::DoExp()
 // Class:			Dataset2D
 // Function:		DoAbs
 //
-// Desc:		Applies the abs function to each Y-value in the dataset.
+// Description:		Applies the abs function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -972,7 +972,7 @@ Dataset2D& Dataset2D::DoAbs()
 // Class:			Dataset2D
 // Function:		DoSin
 //
-// Desc:		Applies the sin function to each Y-value in the dataset.
+// Description:		Applies the sin function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -997,7 +997,7 @@ Dataset2D& Dataset2D::DoSin()
 // Class:			Dataset2D
 // Function:		DoCos
 //
-// Desc:		Applies the cos function to each Y-value in the dataset.
+// Description:		Applies the cos function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1022,7 +1022,7 @@ Dataset2D& Dataset2D::DoCos()
 // Class:			Dataset2D
 // Function:		DoTan
 //
-// Desc:		Applies the tan function to each Y-value in the dataset.
+// Description:		Applies the tan function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1047,7 +1047,7 @@ Dataset2D& Dataset2D::DoTan()
 // Class:			Dataset2D
 // Function:		DoArcSin
 //
-// Desc:		Applies the asin function to each Y-value in the dataset.
+// Description:		Applies the asin function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1072,7 +1072,7 @@ Dataset2D& Dataset2D::DoArcSin()
 // Class:			Dataset2D
 // Function:		DoArcCos
 //
-// Desc:		Applies the acos function to each Y-value in the dataset.
+// Description:		Applies the acos function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1097,7 +1097,7 @@ Dataset2D& Dataset2D::DoArcCos()
 // Class:			Dataset2D
 // Function:		DoArcTan
 //
-// Desc:		Applies the atan function to each Y-value in the dataset.
+// Description:		Applies the atan function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1122,7 +1122,7 @@ Dataset2D& Dataset2D::DoArcTan()
 // Class:			Dataset2D
 // Function:		DoLog
 //
-// Desc:		Applies the log function to each Y-value in the dataset.
+// Description:		Applies the log function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1144,7 +1144,7 @@ const Dataset2D Dataset2D::DoLog() const
 // Class:			Dataset2D
 // Function:		DoLog10
 //
-// Desc:		Applies the log10 function to each Y-value in the dataset.
+// Description:		Applies the log10 function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1166,7 +1166,7 @@ const Dataset2D Dataset2D::DoLog10() const
 // Class:			Dataset2D
 // Function:		DoExp
 //
-// Desc:		Applies the exp function to each Y-value in the dataset.
+// Description:		Applies the exp function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1188,7 +1188,7 @@ const Dataset2D Dataset2D::DoExp() const
 // Class:			Dataset2D
 // Function:		DoAbs
 //
-// Desc:		Applies the abs function to each Y-value in the dataset.
+// Description:		Applies the abs function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1210,7 +1210,7 @@ const Dataset2D Dataset2D::DoAbs() const
 // Class:			Dataset2D
 // Function:		DoSin
 //
-// Desc:		Applies the sin function to each Y-value in the dataset.
+// Description:		Applies the sin function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1232,7 +1232,7 @@ const Dataset2D Dataset2D::DoSin() const
 // Class:			Dataset2D
 // Function:		DoCos
 //
-// Desc:		Applies the cos function to each Y-value in the dataset.
+// Description:		Applies the cos function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1254,7 +1254,7 @@ const Dataset2D Dataset2D::DoCos() const
 // Class:			Dataset2D
 // Function:		DoTan
 //
-// Desc:		Applies the tan function to each Y-value in the dataset.
+// Description:		Applies the tan function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1276,7 +1276,7 @@ const Dataset2D Dataset2D::DoTan() const
 // Class:			Dataset2D
 // Function:		DoArcSin
 //
-// Desc:		Applies the asin function to each Y-value in the dataset.
+// Description:		Applies the asin function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1298,7 +1298,7 @@ const Dataset2D Dataset2D::DoArcSin() const
 // Class:			Dataset2D
 // Function:		DoArcCos
 //
-// Desc:		Applies the acos function to each Y-value in the dataset.
+// Description:		Applies the acos function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1320,7 +1320,7 @@ const Dataset2D Dataset2D::DoArcCos() const
 // Class:			Dataset2D
 // Function:		DoArcTan
 //
-// Desc:		Applies the atan function to each Y-value in the dataset.
+// Description:		Applies the atan function to each Y-value in the dataset.
 //
 // Input Arguments:
 //		None
@@ -1342,7 +1342,7 @@ const Dataset2D Dataset2D::DoArcTan() const
 // Class:			Dataset2D
 // Function:		ApplyPower
 //
-// Desc:		Raises the specified value to the power equal to the y-value
+// Description:		Raises the specified value to the power equal to the y-value
 //					of the dataset.
 //
 // Input Arguments:
@@ -1367,7 +1367,7 @@ Dataset2D& Dataset2D::ApplyPower(const double &target)
 // Class:			Dataset2D
 // Function:		ApplyPower
 //
-// Desc:		Raises the specified value to the power equal to the y-value
+// Description:		Raises the specified value to the power equal to the y-value
 //					of the dataset.
 //
 // Input Arguments:
@@ -1390,7 +1390,7 @@ const Dataset2D Dataset2D::ApplyPower(const double &target) const
 // Class:			Dataset2D
 // Function:		ComputeYMean
 //
-// Desc:		Computes the average of the Y-data.
+// Description:		Computes the average of the Y-data.
 //
 // Input Arguments:
 //		None
@@ -1416,7 +1416,7 @@ double Dataset2D::ComputeYMean() const
 // Class:			Dataset2D
 // Function:		GetAverageDeltaX
 //
-// Desc:		Computes the average spacing of the X-values.
+// Description:		Computes the average spacing of the X-values.
 //
 // Input Arguments:
 //		None
@@ -1442,7 +1442,7 @@ double Dataset2D::GetAverageDeltaX() const
 // Class:			Dataset2D
 // Function:		DoUnsyncrhonizedAdd
 //
-// Desc:		Returns a datset representing the sum of the arguments,
+// Description:		Returns a datset representing the sum of the arguments,
 //					but only over the range where the arguments inersect.
 //
 // Input Arguments:
@@ -1467,7 +1467,7 @@ Dataset2D Dataset2D::DoUnsyncrhonizedAdd(const Dataset2D &d1, const Dataset2D &d
 // Class:			Dataset2D
 // Function:		DoUnsyncrhonizedSubtract
 //
-// Desc:		Returns a datset representing the difference of the arguments,
+// Description:		Returns a datset representing the difference of the arguments,
 //					but only over the range where the arguments inersect.
 //
 // Input Arguments:
@@ -1492,7 +1492,7 @@ Dataset2D Dataset2D::DoUnsyncrhonizedSubtract(const Dataset2D &d1, const Dataset
 // Class:			Dataset2D
 // Function:		DoUnsyncrhonizedMultiply
 //
-// Desc:		Returns a datset representing the product of the arguments,
+// Description:		Returns a datset representing the product of the arguments,
 //					but only over the range where the arguments inersect.
 //
 // Input Arguments:
@@ -1517,7 +1517,7 @@ Dataset2D Dataset2D::DoUnsyncrhonizedMultiply(const Dataset2D &d1, const Dataset
 // Class:			Dataset2D
 // Function:		DoUnsyncrhonizedDivide
 //
-// Desc:		Returns a datset representing the quotient of the arguments,
+// Description:		Returns a datset representing the quotient of the arguments,
 //					but only over the range where the arguments inersect.
 //
 // Input Arguments:
@@ -1542,7 +1542,7 @@ Dataset2D Dataset2D::DoUnsyncrhonizedDivide(const Dataset2D &d1, const Dataset2D
 // Class:			Dataset2D
 // Function:		DoUnsyncrhonizedExponentiation
 //
-// Desc:		Returns a datset representing the power of the arguments,
+// Description:		Returns a datset representing the power of the arguments,
 //					but only over the range where the arguments inersect.
 //
 // Input Arguments:
@@ -1567,7 +1567,7 @@ Dataset2D Dataset2D::DoUnsyncrhonizedExponentiation(const Dataset2D &d1, const D
 // Class:			Dataset2D
 // Function:		GetOverlappingOnSameTimebase
 //
-// Desc:		Modifies the output datasets so they contain the information
+// Description:		Modifies the output datasets so they contain the information
 //					in the original datasets, but only for the overlapping portion.
 //					The first dataset is used as the master clock, so the second (d2)
 //					is resampled as necessary to ensure that both output datasets

@@ -26,7 +26,7 @@ namespace LibPlot2D
 // Class:			Primitive
 // Function:		Primitive
 //
-// Desc:		Constructor for the Primitive class.
+// Description:		Constructor for the Primitive class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow& pointing to the object that owns this
@@ -59,7 +59,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 // Class:			Primitive
 // Function:		Primitive
 //
-// Desc:		Copy constructor for the Primitive class.
+// Description:		Copy constructor for the Primitive class.
 //
 // Input Arguments:
 //		primitive	= const Primitive& to copy to this object
@@ -85,7 +85,7 @@ Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.render
 // Class:			Primitive
 // Function:		~Primitive
 //
-// Desc:		Destructor for the Primitive class.
+// Description:		Destructor for the Primitive class.
 //
 // Input Arguments:
 //		None
@@ -117,7 +117,7 @@ Primitive::~Primitive()
 // Class:			Primitive
 // Function:		Draw
 //
-// Desc:		Calls two mandatory overloads that 1) check to see if the
+// Description:		Calls two mandatory overloads that 1) check to see if the
 //					information describing this object is valid, and if so, 2)
 //					calls the GenerateGeometry() method to create the object.
 //
@@ -155,7 +155,7 @@ void Primitive::Draw()
 // Class:			Primitive
 // Function:		SetVisibility
 //
-// Desc:		Sets the visibility flag for this object.
+// Description:		Sets the visibility flag for this object.
 //
 // Input Arguments:
 //		isVisible	= const bool&
@@ -177,7 +177,7 @@ void Primitive::SetVisibility(const bool &isVisible)
 // Class:			Primitive
 // Function:		SetColor
 //
-// Desc:		Sets the color of this object.
+// Description:		Sets the color of this object.
 //
 // Input Arguments:
 //		color	= const Color&
@@ -200,7 +200,7 @@ void Primitive::SetColor(const Color &color)
 // Class:			Primitive
 // Function:		SetDrawOrder
 //
-// Desc:		Sets the draw order for the object.
+// Description:		Sets the draw order for the object.
 //
 // Input Arguments:
 //		drawOrder	= const unsigned int&
@@ -222,7 +222,7 @@ void Primitive::SetDrawOrder(const unsigned int& drawOrder)
 // Class:			Primitive
 // Function:		operator=
 //
-// Desc:		Assignment operator for Primitive class.
+// Description:		Assignment operator for Primitive class.
 //
 // Input Arguments:
 //		Primitive	= const Primitive& to assign to this object
@@ -256,7 +256,7 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 // Class:			Primitive
 // Function:		EnableAlphaBlending
 //
-// Desc:		Assignment operator for Primitive class.
+// Description:		Assignment operator for Primitive class.
 //
 // Input Arguments:
 //		Primitive	= const Primitive& to assign to this object
@@ -281,7 +281,7 @@ void Primitive::EnableAlphaBlending()
 // Class:			Primitive
 // Function:		DisableAlphaBlending
 //
-// Desc:		Assignment operator for Primitive class.
+// Description:		Assignment operator for Primitive class.
 //
 // Input Arguments:
 //		Primitive	= const Primitive& to assign to this object
@@ -303,7 +303,7 @@ void Primitive::DisableAlphaBlending()
 // Class:			Primitive::BufferInfo
 // Function:		BufferInfo
 //
-// Desc:		Constructor for the Primitive::BufferInfo struct.
+// Description:		Constructor for the Primitive::BufferInfo struct.
 //
 // Input Arguments:
 //		None
@@ -330,7 +330,7 @@ Primitive::BufferInfo::BufferInfo()
 // Class:			Primitive::BufferInfo
 // Function:		GetOpenGLIndices
 //
-// Desc:		Method for safely initializing this object.
+// Description:		Method for safely initializing this object.
 //
 // Input Arguments:
 //		needIndexObject	= const bool&
@@ -364,7 +364,7 @@ void Primitive::BufferInfo::GetOpenGLIndices(const bool& needIndexObject)
 // Class:			Primitive::BufferInfo
 // Function:		FreeOpenGLObjects
 //
-// Desc:		Frees OpenGL resources.
+// Description:		Frees OpenGL resources.
 //
 // Input Arguments:
 //		None
@@ -398,7 +398,7 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 // Class:			Primitive::BufferInfo
 // Function:		FreeDynamicMemory
 //
-// Desc:		Frees dynamic resources.
+// Description:		Frees dynamic resources.
 //
 // Input Arguments:
 //		None

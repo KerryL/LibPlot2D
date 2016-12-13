@@ -22,7 +22,7 @@ namespace LibPlot2D
 // Class:			GenericFile
 // Function:		IsType
 //
-// Desc:		Method for determining if the specified file is this
+// Description:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:

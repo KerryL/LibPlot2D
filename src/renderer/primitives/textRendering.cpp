@@ -28,7 +28,7 @@ namespace LibPlot2D
 // Class:			TextRendering
 // Function:		TextRendering
 //
-// Desc:		Constructor for the TextRendering class.
+// Description:		Constructor for the TextRendering class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow& reference to the object that owns this
@@ -57,7 +57,7 @@ TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindo
 // Class:			TextRendering
 // Function:		~TextRendering
 //
-// Desc:		Destructor for the TextRendering class.
+// Description:		Destructor for the TextRendering class.
 //
 // Input Arguments:
 //		None
@@ -77,7 +77,7 @@ TextRendering::~TextRendering()
 // Class:			TextRendering
 // Function:		Update
 //
-// Desc:		Updates the GL buffers associated with this object.
+// Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -111,7 +111,7 @@ void TextRendering::Update(const unsigned int& /*i*/)
 // Class:			TextRendering
 // Function:		GenerateGeometry
 //
-// Desc:		Creates the OpenGL instructions to create this object in
+// Description:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
 // Input Arguments:
@@ -137,7 +137,7 @@ void TextRendering::GenerateGeometry()
 // Class:			TextRendering
 // Function:		HasValidParameters
 //
-// Desc:		Checks to see if the information about this object is
+// Description:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
 // Input Arguments:
@@ -166,7 +166,7 @@ bool TextRendering::HasValidParameters()
 // Class:			TextRendering
 // Function:		GetTextHeight
 //
-// Desc:		Returns the height of the bounding box for the current
+// Description:		Returns the height of the bounding box for the current
 //					text.
 //
 // Input Arguments:
@@ -193,7 +193,7 @@ double TextRendering::GetTextHeight()
 // Class:			TextRendering
 // Function:		GetTextWidth
 //
-// Desc:		Returns the width of the bounding box for the current
+// Description:		Returns the width of the bounding box for the current
 //					text.
 //
 // Input Arguments:
@@ -220,7 +220,7 @@ double TextRendering::GetTextWidth()
 // Class:			TextRendering
 // Function:		InitializeFonts
 //
-// Desc:		Initializes the font object.
+// Description:		Initializes the font object.
 //
 // Input Arguments:
 //		None

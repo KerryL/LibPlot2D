@@ -30,7 +30,7 @@ namespace LibPlot2D
 // Class:			Axis
 // Function:		Axis
 //
-// Desc:		Constructor for the Axis class.
+// Description:		Constructor for the Axis class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow& reference to the object that owns this
@@ -80,7 +80,7 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(rend
 // Class:			Axis
 // Function:		~Axis
 //
-// Desc:		Destructor for the Axis class.
+// Description:		Destructor for the Axis class.
 //
 // Input Arguments:
 //		None
@@ -100,7 +100,7 @@ Axis::~Axis()
 // Class:			Axis
 // Function:		Update
 //
-// Desc:		Updates the GL buffers associated with this object.
+// Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -151,7 +151,7 @@ void Axis::Update(const unsigned int& i)
 // Class:			Axis
 // Function:		GenerateGeometry
 //
-// Desc:		Creates the OpenGL instructions to create this object in
+// Description:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
 // Input Arguments:
@@ -199,7 +199,7 @@ void Axis::GenerateGeometry()
 // Class:			Axis
 // Function:		DrawFullAxis
 //
-// Desc:		Draws the axis, grid lines and tick marks.
+// Description:		Draws the axis, grid lines and tick marks.
 //
 // Input Arguments:
 //		None
@@ -242,7 +242,7 @@ void Axis::DrawFullAxis()
 // Class:			Axis
 // Function:		ComputeMainAxisLocation
 //
-// Desc:		Calculates the location of the main axis.
+// Description:		Calculates the location of the main axis.
 //
 // Input Arguments:
 //		None
@@ -270,7 +270,7 @@ int Axis::ComputeMainAxisLocation() const
 // Class:			Axis
 // Function:		ComputeGridAndTickCounts
 //
-// Desc:		Calculates the number of tick marks and (optionally) grid lines.
+// Description:		Calculates the number of tick marks and (optionally) grid lines.
 //
 // Input Arguments:
 //		None
@@ -316,7 +316,7 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 // Class:			Axis
 // Function:		DrawMainAxis
 //
-// Desc:		Draws the line representing the main axis.
+// Description:		Draws the line representing the main axis.
 //
 // Input Arguments:
 //		mainAxisLocation	= const int& indicating the offset for the axis
@@ -348,7 +348,7 @@ void Axis::DrawMainAxis(const int &mainAxisLocation)
 // Class:			Axis
 // Function:		InitializeTickParameters
 //
-// Desc:		Initializes the parameters used for drawing tick marks.
+// Description:		Initializes the parameters used for drawing tick marks.
 //
 // Input Arguments:
 //		None
@@ -386,7 +386,7 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 // Class:			Axis
 // Function:		DrawHorizontalGrid
 //
-// Desc:		Draws grid lines for horizontal axes.
+// Description:		Draws grid lines for horizontal axes.
 //
 // Input Arguments:
 //		count	= const unsigned int&
@@ -423,7 +423,7 @@ void Axis::DrawHorizontalGrid(const unsigned int &count)
 // Class:			Axis
 // Function:		DrawHorizontalTicks
 //
-// Desc:		Draws tick marks for horizontal axes.
+// Description:		Draws tick marks for horizontal axes.
 //
 // Input Arguments:
 //		count				= const unsigned int&
@@ -459,7 +459,7 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 // Class:			Axis
 // Function:		DrawVerticalGrid
 //
-// Desc:		Draws grid lines for vertical axes.
+// Description:		Draws grid lines for vertical axes.
 //
 // Input Arguments:
 //		count	= const unsigned int&
@@ -496,7 +496,7 @@ void Axis::DrawVerticalGrid(const unsigned int &count)
 // Class:			Axis
 // Function:		DrawVerticalTicks
 //
-// Desc:		Draws tick marks for vertical axes.
+// Description:		Draws tick marks for vertical axes.
 //
 // Input Arguments:
 //		count				= const unsigned int&
@@ -532,7 +532,7 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 // Class:			Axis
 // Function:		GetNextLogValue
 //
-// Desc:		Updates the value argument to indicate the next value for
+// Description:		Updates the value argument to indicate the next value for
 //					drawing log grid lines.
 //
 // Input Arguments:
@@ -571,7 +571,7 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 // Class:			Axis
 // Function:		DrawAxisLabel
 //
-// Desc:		Draws the label text for the axis.
+// Description:		Draws the label text for the axis.
 //
 // Input Arguments:
 //		None
@@ -615,7 +615,7 @@ void Axis::DrawAxisLabel()
 // Class:			Axis
 // Function:		GetAxisLabelTranslation
 //
-// Desc:		Determines the translation required for drawing the label.
+// Description:		Determines the translation required for drawing the label.
 //
 // Input Arguments:
 //		offset		= const double&
@@ -654,7 +654,7 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 // Class:			Axis
 // Function:		DrawTickLabels
 //
-// Desc:		Draws the numeric labels for each axis tick.  This also
+// Description:		Draws the numeric labels for each axis tick.  This also
 //					determines the precision for each tick label.  The goal
 //					is to provide just enough precision so that adjacent tick
 //					marks are distinguishable, and then add just a hair more.
@@ -704,7 +704,7 @@ void Axis::DrawTickLabels()
 // Class:			Axis
 // Function:		GetPrecision
 //
-// Desc:		Determines appropriate precision to use for axis resolution.
+// Description:		Determines appropriate precision to use for axis resolution.
 //					Ideal precision is determined by the minimum number of digits
 //					to differentiate one tick mark from the next, plus two.
 //
@@ -730,7 +730,7 @@ unsigned int Axis::GetPrecision() const
 // Class:			Axis
 // Function:		GetNextTickValue
 //
-// Desc:		Computes value to display at the next tick mark.
+// Description:		Computes value to display at the next tick mark.
 //
 // Input Arguments:
 //		first	= const bool&
@@ -763,7 +763,7 @@ double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigne
 // Class:			Axis
 // Function:		ComputeTranslations
 //
-// Desc:		Computes the translations required for the specified bounding box.
+// Description:		Computes the translations required for the specified bounding box.
 //
 // Input Arguments:
 //		value			= const double&
@@ -807,7 +807,7 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 // Class:			Axis
 // Function:		IsHorizontal
 //
-// Desc:		Checks to see if this object has horizontal orientation.
+// Description:		Checks to see if this object has horizontal orientation.
 //
 // Input Arguments:
 //		None
@@ -831,7 +831,7 @@ bool Axis::IsHorizontal() const
 // Class:			Axis
 // Function:		HasValidParameters
 //
-// Desc:		Checks to see if the information about this object is
+// Description:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
 // Input Arguments:
@@ -861,7 +861,7 @@ bool Axis::HasValidParameters()
 // Class:			Axis
 // Function:		ValueToPixel
 //
-// Desc:		Computes the pixel location along the axis that corresponds
+// Description:		Computes the pixel location along the axis that corresponds
 //					to the specified plot-units value.
 //
 // Input Arguments:
@@ -908,7 +908,7 @@ double Axis::ValueToPixel(const double &value) const
 // Class:			Axis
 // Function:		PixelToValue
 //
-// Desc:		Computes the value (in plot-units) corresponding to the
+// Description:		Computes the value (in plot-units) corresponding to the
 //					specified on-screen pixel location.
 //
 // Input Arguments:
@@ -945,7 +945,7 @@ double Axis::PixelToValue(const int &pixel) const
 // Class:			Axis
 // Function:		GetNextGridValue
 //
-// Desc:		Computes value to display at the next grid line.
+// Description:		Computes value to display at the next grid line.
 //
 // Input Arguments:
 //		tick	= const unsigned int&
@@ -970,7 +970,7 @@ double Axis::GetNextGridValue(const unsigned int &tick) const
 // Class:			Axis
 // Function:		GetAxisLength
 //
-// Desc:		Returns the length of the axis in pixels.
+// Description:		Returns the length of the axis in pixels.
 //
 // Input Arguments:
 //		None
@@ -1002,7 +1002,7 @@ unsigned int Axis::GetAxisLength() const
 // Class:			Axis
 // Function:		InitializeFonts
 //
-// Desc:		Initializes the font objects.
+// Description:		Initializes the font objects.
 //
 // Input Arguments:
 //		fontFileName	= const std::string&

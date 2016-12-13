@@ -30,7 +30,7 @@ namespace LibPlot2D
 // Class:			PlotCurve
 // Function:		PlotCurve
 //
-// Desc:		Constructor for the PlotCurve class.
+// Description:		Constructor for the PlotCurve class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow* pointing to the object that owns this
@@ -62,7 +62,7 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 // Class:			PlotCurve
 // Function:		PlotCurve
 //
-// Desc:		Copy constructor for the PlotCurve class.
+// Description:		Copy constructor for the PlotCurve class.
 //
 // Input Arguments:
 //		plotCurve	= const PlotCurve& to copy to this object
@@ -84,7 +84,7 @@ PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
 // Class:			PlotCurve
 // Function:		~PlotCurve
 //
-// Desc:		Destructor for the PlotCurve class.
+// Description:		Destructor for the PlotCurve class.
 //
 // Input Arguments:
 //		None
@@ -104,7 +104,7 @@ PlotCurve::~PlotCurve()
 // Class:			PlotCurve
 // Function:		InitializeMarkerVertexBuffer
 //
-// Desc:		Initializes the vertex buffer for storing the marker information.
+// Description:		Initializes the vertex buffer for storing the marker information.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -133,7 +133,7 @@ void PlotCurve::InitializeMarkerVertexBuffer()
 // Class:			PlotCurve
 // Function:		Update
 //
-// Desc:		Updates the GL buffers associated with this object.
+// Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -235,7 +235,7 @@ void PlotCurve::Update(const unsigned int& i)
 // Class:			PlotCurve
 // Function:		GenerateGeometry
 //
-// Desc:		Creates the OpenGL instructions to create this object in
+// Description:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
 // Input Arguments:
@@ -285,7 +285,7 @@ void PlotCurve::GenerateGeometry()
 // Class:			PlotCurve
 // Function:		PointIsValid
 //
-// Desc:		Checks to see if the specified point is a real, finite number.
+// Description:		Checks to see if the specified point is a real, finite number.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -309,7 +309,7 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 // Class:			PlotCurve
 // Function:		HasValidParameters
 //
-// Desc:		Checks to see if the information about this object is
+// Description:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
 // Input Arguments:
@@ -337,7 +337,7 @@ bool PlotCurve::HasValidParameters()
 // Class:			PlotCurve
 // Function:		operator=
 //
-// Desc:		Assignment operator for PlotCurve class.
+// Description:		Assignment operator for PlotCurve class.
 //
 // Input Arguments:
 //		plotCurve	= const PlotCurve& to assign to this object
@@ -363,7 +363,7 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 // Class:			PlotCurve
 // Function:		BuildMarkers
 //
-// Desc:		Plots markers at all un-interpolated points.
+// Description:		Plots markers at all un-interpolated points.
 //
 // Input Arguments:
 //		None
@@ -437,7 +437,7 @@ void PlotCurve::BuildMarkers()
 // Class:			PlotCurve
 // Function:		DoLogarithmicScale
 //
-// Desc:		Handles scaling for arrays of logarithmic data.
+// Description:		Handles scaling for arrays of logarithmic data.
 //
 // Input Arguments:
 //		value	= const double&
@@ -463,7 +463,7 @@ double* PlotCurve::DoLogarithmicScale(const double* values, const unsigned int& 
 // Class:			PlotCurve
 // Function:		RangeIsSmall
 //
-// Desc:		Determines if the range is small enough to warrant
+// Description:		Determines if the range is small enough to warrant
 //					drawing the point markers.
 //
 // Input Arguments:
@@ -501,7 +501,7 @@ bool PlotCurve::RangeIsSmall() const
 // Class:			PlotCurve
 // Function:		XRangeIsSmall
 //
-// Desc:		Determines if the x-range is small enough to warrant
+// Description:		Determines if the x-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
 //					one where there are less than some number of pixels in the
 //					x-direction between points (on average).
@@ -540,7 +540,7 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 // Class:			PlotCurve
 // Function:		YRangeIsSmall
 //
-// Desc:		Determines if the y-range is small enough to warrant
+// Description:		Determines if the y-range is small enough to warrant
 //					drawing the point markers.  A "small enough range" is
 //					one where there are less than some number of pixels in the
 //					y-direction between points (on average).
@@ -579,7 +579,7 @@ PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 // Class:			PlotCurve
 // Function:		NeedsMarkersDrawn
 //
-// Desc:		Determines if we should draw plot markers.
+// Description:		Determines if we should draw plot markers.
 //
 // Input Arguments:
 //		None

@@ -35,7 +35,7 @@ namespace LibPlot2D
 // Namespace:		PlotMath
 // Function:		IsZero
 //
-// Desc:		Returns true if a number is small enough to regard as zero.
+// Description:		Returns true if a number is small enough to regard as zero.
 //
 // Input Arguments:
 //		n	= const double& to be checked for being close to zero
@@ -59,7 +59,7 @@ bool PlotMath::IsZero(const double &n, const double &eps)
 // Namespace:		PlotMath
 // Function:		IsZero
 //
-// Desc:		Returns true if a number is small enough to regard as zero.
+// Description:		Returns true if a number is small enough to regard as zero.
 //					This function checks the magnitude of the Vector.
 //
 // Input Arguments:
@@ -85,7 +85,7 @@ bool PlotMath::IsZero(const Vector &v, const double &eps)
 // Namespace:		PlotMath
 // Function:		Clamp
 //
-// Desc:		Ensures the specified value is between the limits.  In the
+// Description:		Ensures the specified value is between the limits.  In the
 //					event that the value is out of the specified bounds, the
 //					value that is returned is equal to the limit that the value
 //					has exceeded.
@@ -119,7 +119,7 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit, const doub
 // Namespace:		PlotMath
 // Function:		RangeToPlusMinusPi
 //
-// Desc:		Adds or subtracts 2 * pi to the specified angle until the
+// Description:		Adds or subtracts 2 * pi to the specified angle until the
 //					angle is between -pi and pi.
 //
 // Input Arguments:
@@ -141,7 +141,7 @@ double PlotMath::RangeToPlusMinusPi(const double &angle)
 // Namespace:		PlotMath
 // Function:		RangeToPlusMinus180
 //
-// Desc:		Adds or subtracts 180 to the specified angle until the
+// Description:		Adds or subtracts 180 to the specified angle until the
 //					angle is between -180 and 180.
 //
 // Input Arguments:
@@ -163,7 +163,7 @@ double PlotMath::RangeToPlusMinus180(const double &angle)
 // Namespace:		PlotMath
 // Function:		Unwrap
 //
-// Desc:		Minimizes the jump between adjacent points by adding/subtracting
+// Description:		Minimizes the jump between adjacent points by adding/subtracting
 //					multiples of 2 * pi.
 //
 // Input Arguments:
@@ -193,7 +193,7 @@ void PlotMath::Unwrap(Dataset2D &data)
 // Namespace:		PlotMath
 // Function:		Sign
 //
-// Desc:		Returns 1.0 for positive, -1.0 for negative and 0.0 for zero.
+// Description:		Returns 1.0 for positive, -1.0 for negative and 0.0 for zero.
 //
 // Input Arguments:
 //		value		= const double&
@@ -219,7 +219,7 @@ double PlotMath::Sign(const double &value)
 // Namespace:		PlotMath
 // Function:		ApplyBitMask
 //
-// Desc:		Extracts a single bit from values of the specified dataset.
+// Description:		Extracts a single bit from values of the specified dataset.
 //
 // Input Arguments:
 //		data	= const Dataset2D&
@@ -245,7 +245,7 @@ Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data, const unsigned int &bit)
 // Namespace:		PlotMath
 // Function:		ApplyBitMask
 //
-// Desc:		Extracts a single bit from the value.
+// Description:		Extracts a single bit from the value.
 //
 // Input Arguments:
 //		value	= const unsigned int&
@@ -267,7 +267,7 @@ unsigned int PlotMath::ApplyBitMask(const unsigned &value, const unsigned int &b
 // Namespace:		PlotMath
 // Function:		XDataConsistentlySpaced
 //
-// Desc:		Checks to see if the X-data has consistent deltas.
+// Description:		Checks to see if the X-data has consistent deltas.
 //
 // Input Arguments:
 //		data				= const Dataset2D&
@@ -314,7 +314,7 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 // Namespace:		PlotMath
 // Function:		GetAverageXSpacing
 //
-// Desc:		Finds the average period of the data in the set.
+// Description:		Finds the average period of the data in the set.
 //
 // Input Arguments:
 //		data	= const Dataset2D&
@@ -335,7 +335,7 @@ double PlotMath::GetAverageXSpacing(const Dataset2D &data)
 // Namespace:		PlotMath
 // Function:		GetPrecision
 //
-// Desc:		Determines the best number of digits after the decimal place
+// Description:		Determines the best number of digits after the decimal place
 //					for a string representation of the specified value (for
 //					use with printf-style %0.*f formatting.
 //
@@ -384,7 +384,7 @@ unsigned int PlotMath::GetPrecision(const double &value,
 // Namespace:		PlotMath
 // Function:		CountSignificantDigits
 //
-// Desc:		Returns the number of significant digits in the string.
+// Description:		Returns the number of significant digits in the string.
 //
 // Input Arguments:
 //		valueString	= const wxString&
@@ -433,7 +433,7 @@ unsigned int PlotMath::CountSignificantDigits(const wxString &valueString)
 // Namespace:		PlotMath
 // Function:		sprintf
 //
-// Desc:		Cross-platform friendly sprintf(_s) macro.  Calls sprintf_s
+// Description:		Cross-platform friendly sprintf(_s) macro.  Calls sprintf_s
 //					under MSW, sprintf otherwise.
 //
 // Input Arguments:
@@ -470,7 +470,7 @@ void PlotMath::sprintf(char *dest, const unsigned int&, const char *format, ...)
 // Namespace:		PlotMath
 // Function:		GetPrecision
 //
-// Desc:		Returns the required precision (digits past zero) to
+// Description:		Returns the required precision (digits past zero) to
 //					distinguish between adjacent graduations.
 //
 // Input Arguments:

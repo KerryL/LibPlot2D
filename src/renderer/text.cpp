@@ -33,7 +33,7 @@ namespace LibPlot2D
 // Class:			Text
 // Function:		Constant declarations
 //
-// Desc:		Constant declarations for Text class.
+// Description:		Constant declarations for Text class.
 //
 // Input Arguments:
 //		None
@@ -58,7 +58,7 @@ unsigned int Text::ftReferenceCount(0);
 // Class:			Text
 // Function:		vertexShader
 //
-// Desc:		Text vertex shader.
+// Description:		Text vertex shader.
 //
 // Input Arguments:
 //		0	= vertex
@@ -95,7 +95,7 @@ const std::string Text::vertexShader(
 // Class:			Text
 // Function:		fragmentShader
 //
-// Desc:		Text fragment shader.
+// Description:		Text fragment shader.
 //
 // Input Arguments:
 //		0	= texCoords
@@ -129,7 +129,7 @@ const std::string Text::fragmentShader(
 // Class:			Text
 // Function:		Text
 //
-// Desc:		Constructor for Text object.
+// Description:		Constructor for Text object.
 //
 // Input Arguments:
 //		renderer	= RenderWindow&
@@ -160,7 +160,7 @@ Text::Text(RenderWindow& renderer) : renderer(renderer)
 // Class:			Text
 // Function:		~Text
 //
-// Desc:		Destructor for Text object.
+// Description:		Destructor for Text object.
 //
 // Input Arguments:
 //		None
@@ -184,7 +184,7 @@ Text::~Text()
 // Class:			Text
 // Function:		Initialize
 //
-// Desc:		Initializes the Freetype back-end of this object.  Must
+// Description:		Initializes the Freetype back-end of this object.  Must
 //					be called prior to any other post-creation method.
 //
 // Input Arguments:
@@ -215,7 +215,7 @@ void Text::Initialize()
 // Class:			Text
 // Function:		Initialize
 //
-// Desc:		Initializes the Freetype back-end of this object.  Must
+// Description:		Initializes the Freetype back-end of this object.  Must
 //					be called prior to any other post-creation method.
 //
 // Input Arguments:
@@ -241,7 +241,7 @@ bool Text::SetFace(const std::string& fontFileName)
 // Class:			Text
 // Function:		SetSize
 //
-// Desc:		Sets the width and height to use for the font.  Width is
+// Description:		Sets the width and height to use for the font.  Width is
 //					calculated to maintain proper aspect ratio.
 //
 // Input Arguments:
@@ -263,7 +263,7 @@ void Text::SetSize(const double& height)
 // Class:			Text
 // Function:		SetSize
 //
-// Desc:		Sets the width and height to use for the font.
+// Description:		Sets the width and height to use for the font.
 //
 // Input Arguments:
 //		width	= const double&
@@ -286,7 +286,7 @@ void Text::SetSize(const double& width, const double& height)
 // Class:			Text
 // Function:		GenerateGlyphs
 //
-// Desc:		Generates the set of glyphs.
+// Description:		Generates the set of glyphs.
 //
 // Input Arguments:
 //		None
@@ -369,7 +369,7 @@ bool Text::GenerateGlyphs()
 // Class:			Text
 // Function:		FreeFTResources
 //
-// Desc:		Frees previously allocated Freetype resources (with
+// Description:		Frees previously allocated Freetype resources (with
 //					reference counting).
 //
 // Input Arguments:
@@ -396,7 +396,7 @@ void Text::FreeFTResources()
 // Class:			Text
 // Function:		BuildText
 //
-// Desc:		Generates the vertex buffer information for this object.
+// Description:		Generates the vertex buffer information for this object.
 //
 // Input Arguments:
 //		None
@@ -424,7 +424,7 @@ Primitive::BufferInfo Text::BuildText()
 // Class:			Text
 // Function:		BuildText
 //
-// Desc:		Generates the vertex buffer information for this object.
+// Description:		Generates the vertex buffer information for this object.
 //
 // Input Arguments:
 //		None
@@ -464,7 +464,7 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 // Class:			Text
 // Function:		GetBoundingBox
 //
-// Desc:		Returns the bounding box for the specified text string
+// Description:		Returns the bounding box for the specified text string
 //					given this object's font and size settings.
 //
 // Input Arguments:
@@ -510,7 +510,7 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 // Class:			Text
 // Function:		DoInternalInitialization
 //
-// Desc:		Performs necessary static-state initialization.
+// Description:		Performs necessary static-state initialization.
 //
 // Input Arguments:
 //		None
@@ -561,7 +561,7 @@ void Text::DoInternalInitialization()
 // Class:			Text
 // Function:		SetOrientation
 //
-// Desc:		Alters the modelview matrix according to the text rotation angle.
+// Description:		Alters the modelview matrix according to the text rotation angle.
 //
 // Input Arguments:
 //		angle	= const double& [rad]
@@ -583,7 +583,7 @@ void Text::SetOrientation(const double& angle)
 // Class:			Text
 // Function:		AppendText
 //
-// Desc:		Appends text to the render buffer.  Use this instead of
+// Description:		Appends text to the render buffer.  Use this instead of
 //					SetText() when multiple text values must be rendered with
 //					different positions, scales, etc.  Text will be rendered
 //					with current settings (i.e. this must be the last call
@@ -609,7 +609,7 @@ void Text::AppendText(const std::string& text)
 // Class:			Text
 // Function:		AssembleBuffers
 //
-// Desc:		Assembles
+// Description:		Assembles
 //
 // Input Arguments:
 //		None
@@ -666,7 +666,7 @@ Primitive::BufferInfo Text::AssembleBuffers()
 // Class:			Text
 // Function:		BuildLocalText
 //
-// Desc:		Allocates buffers and populates local (CPU-side) memory
+// Description:		Allocates buffers and populates local (CPU-side) memory
 //					to render text.
 //
 // Input Arguments:
@@ -753,7 +753,7 @@ Primitive::BufferInfo Text::BuildLocalText()
 // Class:			Text
 // Function:		ConfigureVertexArray
 //
-// Desc:		Handles configuration of OpenGL vertex array object.
+// Description:		Handles configuration of OpenGL vertex array object.
 //
 // Input Arguments:
 //		bufferInfo	= Primitive::BufferInfo&

@@ -25,7 +25,7 @@ namespace LibPlot2D
 // Class:			FFTDialog
 // Function:		FFTDialog
 //
-// Desc:		Constructor for FFTDialog class.
+// Description:		Constructor for FFTDialog class.
 //
 // Input Arguments:
 //		parent			= wxWindow* that owns this object
@@ -53,7 +53,7 @@ FFTDialog::FFTDialog(wxWindow *parent, const unsigned int &dataPoints,
 // Class:			FFTDialog
 // Function:		Event Table
 //
-// Desc:		Event table for FFTDialog class.
+// Description:		Event table for FFTDialog class.
 //
 // Input Arguments:
 //		None
@@ -75,7 +75,7 @@ END_EVENT_TABLE()
 // Class:			FFTDialog
 // Function:		CreateControls
 //
-// Desc:		Creates the dialog controls.
+// Description:		Creates the dialog controls.
 //
 // Input Arguments:
 //		None
@@ -110,7 +110,7 @@ void FFTDialog::CreateControls()
 // Class:			FFTDialog
 // Function:		CreateInputControls
 //
-// Desc:		Creates the main input controls.
+// Description:		Creates the main input controls.
 //
 // Input Arguments:
 //		None
@@ -163,7 +163,7 @@ wxSizer* FFTDialog::CreateInputControls()
 // Class:			FFTDialog
 // Function:		CreateOutputControls
 //
-// Desc:		Creates the output controls.
+// Description:		Creates the output controls.
 //
 // Input Arguments:
 //		None
@@ -206,7 +206,7 @@ wxSizer* FFTDialog::CreateOutputControls()
 // Class:			FFTDialog
 // Function:		ConfigureControls
 //
-// Desc:		Configures (populates) the controls with available options.
+// Description:		Configures (populates) the controls with available options.
 //
 // Input Arguments:
 //		None
@@ -233,7 +233,7 @@ void FFTDialog::ConfigureControls()
 // Class:			FFTDialog
 // Function:		SetCheckBoxDefaults
 //
-// Desc:		Configures the zoom check box (decides whether or not it
+// Description:		Configures the zoom check box (decides whether or not it
 //					is enabled).
 //
 // Input Arguments:
@@ -266,7 +266,7 @@ void FFTDialog::SetCheckBoxDefaults()
 // Class:			FFTDialog
 // Function:		GetWindowList
 //
-// Desc:		Generates the list of available FFT windows.
+// Description:		Generates the list of available FFT windows.
 //
 // Input Arguments:
 //		None
@@ -293,7 +293,7 @@ wxArrayString FFTDialog::GetWindowList() const
 // Class:			FFTDialog
 // Function:		OnCheckBoxEvent
 //
-// Desc:		Event handler for check box events.
+// Description:		Event handler for check box events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -314,7 +314,7 @@ void FFTDialog::OnCheckBoxEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			FFTDialog
 // Function:		OnComboBoxEvent
 //
-// Desc:		Event handler for combo box events.
+// Description:		Event handler for combo box events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -335,7 +335,7 @@ void FFTDialog::OnComboBoxEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			FFTDialog
 // Function:		OnTextBoxEvent
 //
-// Desc:		Event handler for text box events.
+// Description:		Event handler for text box events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -356,7 +356,7 @@ void FFTDialog::OnTextBoxEvent(wxCommandEvent& WXUNUSED(event))
 // Class:			FFTDialog
 // Function:		TransferDataFromWindow
 //
-// Desc:		Validates the options specified by the user.
+// Description:		Validates the options specified by the user.
 //
 // Input Arguments:
 //		None
@@ -384,7 +384,7 @@ bool FFTDialog::TransferDataFromWindow()
 // Class:			FFTDialog
 // Function:		GetFFTWindow
 //
-// Desc:		Returns the selected FFT window.
+// Description:		Returns the selected FFT window.
 //
 // Input Arguments:
 //		None
@@ -405,7 +405,7 @@ FastFourierTransform::FFTWindow FFTDialog::GetFFTWindow() const
 // Class:			FFTDialog
 // Function:		GetWindowSize
 //
-// Desc:		Returns the specified window size.
+// Description:		Returns the specified window size.
 //
 // Input Arguments:
 //		None
@@ -429,7 +429,7 @@ unsigned int FFTDialog::GetWindowSize() const
 // Class:			FFTDialog
 // Function:		GetOverlap
 //
-// Desc:		Returns the specified overlap.
+// Description:		Returns the specified overlap.
 //
 // Input Arguments:
 //		None
@@ -453,7 +453,7 @@ double FFTDialog::GetOverlap() const
 // Class:			FFTDialog
 // Function:		GetUseZoomedData
 //
-// Desc:		Indicates whether the user specified the use of the zoomed
+// Description:		Indicates whether the user specified the use of the zoomed
 //					portion or the full data set.
 //
 // Input Arguments:
@@ -475,7 +475,7 @@ bool FFTDialog::GetUseZoomedData() const
 // Class:			FFTDialog
 // Function:		GetSubtractMean
 //
-// Desc:		Indicates whether the user specified that the data's mean
+// Description:		Indicates whether the user specified that the data's mean
 //					should be subtracted prior to evaluating the FFT.
 //
 // Input Arguments:
@@ -497,7 +497,7 @@ bool FFTDialog::GetSubtractMean() const
 // Class:			FFTDialog
 // Function:		UpdateOutputControls
 //
-// Desc:		Updates the output controls.
+// Description:		Updates the output controls.
 //
 // Input Arguments:
 //		None
@@ -524,7 +524,7 @@ void FFTDialog::UpdateOutputControls()
 // Class:			FFTDialog
 // Function:		GetPointCount
 //
-// Desc:		Returns the number of points available for analysis.
+// Description:		Returns the number of points available for analysis.
 //
 // Input Arguments:
 //		None

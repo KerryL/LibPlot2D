@@ -32,7 +32,7 @@ namespace LibPlot2D
 // Class:			FontFinder
 // Function:		GetFontFileName
 //
-// Desc:		Searches the local hard drive (intelligently) and returns
+// Description:		Searches the local hard drive (intelligently) and returns
 //					the path and file name for a preferred font.
 //
 // Input Arguments:
@@ -81,7 +81,7 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 // Class:			FontFinder
 // Function:		GetPreferredFontFileName
 //
-// Desc:		Returns the file name for a best match for a font on the
+// Description:		Returns the file name for a best match for a font on the
 //					system when given a list of acceptable fonts.
 //
 // Input Arguments:
@@ -135,7 +135,7 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 // Class:			FontFinder
 // Function:		GetFontFaceName
 //
-// Desc:		Returns the best match for a font on the system when given
+// Description:		Returns the best match for a font on the system when given
 //					a list of acceptable fonts.
 //
 // Input Arguments:
@@ -184,7 +184,7 @@ bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &p
 // Class:			FontFinder
 // Function:		GetFontName
 //
-// Desc:		Returns name of the font for the specified .ttf file.
+// Description:		Returns name of the font for the specified .ttf file.
 //
 // Input Arguments:
 //		fontFile	= const wxString& specifying the file location
@@ -232,7 +232,7 @@ bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 // Class:			FontFinder
 // Function:		ReadOffsetTable
 //
-// Desc:		Reads the offset table from file.
+// Description:		Reads the offset table from file.
 //
 // Input Arguments:
 //		file	= std::ifstream& to read from
@@ -261,7 +261,7 @@ FontFinder::TT_OFFSET_TABLE FontFinder::ReadOffsetTable(std::ifstream &file)
 // Class:			FontFinder
 // Function:		GetNameTable
 //
-// Desc:		Finds and outputs the name table from the file.
+// Description:		Finds and outputs the name table from the file.
 //
 // Input Arguments:
 //		file		= std::ifstream& to read from
@@ -305,7 +305,7 @@ bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offset
 // Class:			FontFinder
 // Function:		GetNameTableHeader
 //
-// Desc:		Gets the header for the name table from file.
+// Description:		Gets the header for the name table from file.
 //
 // Input Arguments:
 //		file	= std::ifstream& to read from
@@ -335,7 +335,7 @@ FontFinder::TT_NAME_TABLE_HEADER FontFinder::GetNameTableHeader(std::ifstream &f
 // Class:			FontFinder
 // Function:		CheckHeaderForName
 //
-// Desc:		Checks the table record (in the ifstream) for a font name.
+// Description:		Checks the table record (in the ifstream) for a font name.
 //
 // Input Arguments:
 //		file	= std::ifstream& to read from

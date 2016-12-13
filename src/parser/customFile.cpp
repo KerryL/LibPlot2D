@@ -24,7 +24,7 @@ namespace LibPlot2D
 // Class:			CustomFile
 // Function:		IsType
 //
-// Desc:		Method for determining if the specified file is this
+// Description:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:
@@ -47,7 +47,7 @@ bool CustomFile::IsType(const wxString &fileName)
 // Class:			CustomFile
 // Function:		CreateDelimiterList
 //
-// Desc:		Overload.  Creates the delimiter list.  If no delimiter
+// Description:		Overload.  Creates the delimiter list.  If no delimiter
 //					is specified in the custom definition, this is the same
 //					as DataFile, otherwise we limit the delimiter list to
 //					contain only the delimiter specified.
@@ -76,7 +76,7 @@ wxArrayString CustomFile::CreateDelimiterList() const
 // Class:			CustomFile
 // Function:		GetRawDataSize
 //
-// Desc:		Returns the size to use when allocating the raw data array.
+// Description:		Returns the size to use when allocating the raw data array.
 //
 // Input Arguments:
 //		selectedCount	= const unsigned int& indicating number of curves the
@@ -101,7 +101,7 @@ unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const
 // Class:			CustomFile
 // Function:		ExtractData
 //
-// Desc:		Parses the file and reads data into vectors.  Only extracts
+// Description:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.  Handles asynchronous
 //					and time-formatted data as special cases.
 //
@@ -132,7 +132,7 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 // Class:			CustomFile
 // Function:		AssembleDatasets
 //
-// Desc:		Takes raw data in std::vector<double> format and populates
+// Description:		Takes raw data in std::vector<double> format and populates
 //					this object's data member with it.  If the format is
 //					asynchronous, it handles that as a special case.
 //
@@ -160,7 +160,7 @@ void CustomFile::AssembleDatasets(const std::vector<double> *rawData,
 // Class:			CustomFile
 // Function:		GetCurveInformation
 //
-// Desc:		Parses the file and assembles descriptions for each column
+// Description:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
 //					the number of header rows back to the calling function.
 //					If custom descriptions and scaling factors are specified,
@@ -195,7 +195,7 @@ wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 // Class:			CustomFile
 // Function:		ExtractSpecialData
 //
-// Desc:		Parses the file and reads data into vectors.  Only extracts
+// Description:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.  This handles the
 //					special cases of asynchronous and time-formatted data.
 //
@@ -261,7 +261,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file, const wxArrayInt &choic
 // Class:			CustomFile
 // Function:		ExtractAsynchronousData
 //
-// Desc:		Extracts data from asynchronous data line.
+// Description:		Extracts data from asynchronous data line.
 //
 // Input Arguments:
 //		timeZero	= double&
@@ -318,7 +318,7 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero, const wxArrayString &
 // Class:			CustomFile
 // Function:		ExtractSynchronousData
 //
-// Desc:		Extracts data from synchronous data line.
+// Description:		Extracts data from synchronous data line.
 //
 // Input Arguments:
 //		timeZero	= double&
@@ -369,7 +369,7 @@ bool CustomFile::ExtractSynchronousData(double &timeZero, const wxArrayString &p
 // Class:			CustomFile
 // Function:		AssembleAsynchronousDatasets
 //
-// Desc:		Takes raw data in std::vector<double> format and populates
+// Description:		Takes raw data in std::vector<double> format and populates
 //					this object's data member with it.  This handles the special
 //					case of asynchronous data.
 //
@@ -404,7 +404,7 @@ void CustomFile::AssembleAsynchronousDatasets(const std::vector<double> *rawData
 // Class:			CustomFile
 // Function:		DoTypeSpecificLoadTasks
 //
-// Desc:		Sets non-standard flags for this class.
+// Description:		Sets non-standard flags for this class.
 //
 // Input Arguments:
 //		None

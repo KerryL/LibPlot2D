@@ -22,7 +22,7 @@ namespace LibPlot2D
 // Class:			BaumullerFile
 // Function:		IsType
 //
-// Desc:		Method for determining if the specified file is this
+// Description:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:
@@ -60,7 +60,7 @@ bool BaumullerFile::IsType(const wxString &fileName)
 // Class:			BaumullerFile
 // Function:		GetCurveInformation
 //
-// Desc:		Parses the file and assembles descriptions for each column
+// Description:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
 //					the number of header rows back to the calling function.
 //
@@ -110,7 +110,7 @@ wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 // Class:			BaumullerFile
 // Function:		ConstructNames
 //
-// Desc:		Generates names when the appropriate part of the file is
+// Description:		Generates names when the appropriate part of the file is
 //					reached.
 //
 // Input Arguments:
@@ -156,7 +156,7 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 // Class:			BaumullerFile
 // Function:		DoTypeSpecificLoadTasks
 //
-// Desc:		Sets flags to be used during initial loading operations
+// Description:		Sets flags to be used during initial loading operations
 //					(like building curve names).
 //
 // Input Arguments:
@@ -178,7 +178,7 @@ void BaumullerFile::DoTypeSpecificLoadTasks()
 // Class:			BaumullerFile
 // Function:		DoTypeSpecificProcessTasks
 //
-// Desc:		Sets flags to be used during data extraction operations.
+// Description:		Sets flags to be used during data extraction operations.
 //
 // Input Arguments:
 //		None

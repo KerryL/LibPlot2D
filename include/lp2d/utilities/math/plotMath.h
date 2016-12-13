@@ -81,7 +81,7 @@ namespace PlotMath
 // Namespace:		PlotMath
 // Function:		IsNaN
 //
-// Desc:		Determines if the specified number is or is not a number.
+// Description:		Determines if the specified number is or is not a number.
 //
 // Input Arguments:
 //		value	= const T& to check
@@ -103,7 +103,7 @@ bool PlotMath::IsNaN(const T &value)
 // Namespace:		PlotMath
 // Function:		IsInf
 //
-// Desc:		Determines if the specified number is infinite.
+// Description:		Determines if the specified number is infinite.
 //
 // Input Arguments:
 //		value	= const T&
@@ -126,7 +126,7 @@ bool PlotMath::IsInf(const T &value)
 // Namespace:		PlotMath
 // Function:		IsValid
 //
-// Desc:		Determines if the specified value is a valid number.
+// Description:		Determines if the specified value is a valid number.
 //
 // Input Arguments:
 //		value	= const double&

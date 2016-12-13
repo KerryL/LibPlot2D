@@ -26,7 +26,7 @@ namespace LibPlot2D
 // Class:			Legend
 // Function:		Constant declarations
 //
-// Desc:		Constant declarations for the Legend class.
+// Description:		Constant declarations for the Legend class.
 //
 // Input Arguments:
 //		None
@@ -44,7 +44,7 @@ const unsigned int Legend::entrySpacing(5);// [pixels]
 // Class:			Legend
 // Function:		Legend
 //
-// Desc:		Constructor for the Legend class.
+// Description:		Constructor for the Legend class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow& reference to the object that owns this
@@ -80,7 +80,7 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
 // Class:			Legend
 // Function:		Update
 //
-// Desc:		Updates the GL buffers associated with this object.
+// Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -133,7 +133,7 @@ void Legend::Update(const unsigned int& i)
 // Class:			Legend
 // Function:		GenerateGeometry
 //
-// Desc:		Creates the OpenGL instructions to create this object in
+// Description:		Creates the OpenGL instructions to create this object in
 //					the scene.
 //
 // Input Arguments:
@@ -171,7 +171,7 @@ void Legend::GenerateGeometry()
 // Class:			Legend
 // Function:		HasValidParameters
 //
-// Desc:		Checks to see if the information about this object is
+// Description:		Checks to see if the information about this object is
 //					valid and complete (gives permission to create the object).
 //
 // Input Arguments:
@@ -196,7 +196,7 @@ bool Legend::HasValidParameters()
 // Class:			Legend
 // Function:		GetCornerVertices
 //
-// Desc:		Returns the four corner points in a vector.
+// Description:		Returns the four corner points in a vector.
 //
 // Input Arguments:
 //		None
@@ -227,7 +227,7 @@ std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
 // Class:			Legend
 // Function:		UpdateBoundingBox
 //
-// Desc:		Updates the bounding box height and width variables.
+// Description:		Updates the bounding box height and width variables.
 //
 // Input Arguments:
 //		None
@@ -259,7 +259,7 @@ void Legend::UpdateBoundingBox()
 // Class:			Legend
 // Function:		SetFont
 //
-// Desc:		Sets up the font object.
+// Description:		Sets up the font object.
 //
 // Input Arguments:
 //		fontFileName	= const std::string&
@@ -292,7 +292,7 @@ void Legend::SetFont(const std::string& fontFileName, const double& size)
 // Class:			Legend
 // Function:		IsUnder
 //
-// Desc:		Determines if the specified point is under this object.
+// Description:		Determines if the specified point is under this object.
 //
 // Input Arguments:
 //		x	= const unsigned int&
@@ -324,7 +324,7 @@ bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 // Class:			Legend
 // Function:		GetAdjustedPosition
 //
-// Desc:		Adjusts the position based on the position references.
+// Description:		Adjusts the position based on the position references.
 //					The output is (x, y) of the lower LH corner of the legend
 //					w.r.t. the lower LH corner of the render window.
 //
@@ -435,7 +435,7 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 // Class:			Legend
 // Function:		SetDeltaPosition
 //
-// Desc:		Updates the position according to specified reference.
+// Description:		Updates the position according to specified reference.
 //
 // Input Arguments:
 //		x	= double&
@@ -495,7 +495,7 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 // Class:			Legend
 // Function:		GetXPos
 //
-// Desc:		Gets the x-position w.r.t. the specified references.
+// Description:		Gets the x-position w.r.t. the specified references.
 //
 // Input Arguments:
 //		legendRef	= const PositionReference&
@@ -519,7 +519,7 @@ double Legend::GetXPos(const PositionReference& legendRef, const PositionReferen
 // Class:			Legend
 // Function:		GetXPos
 //
-// Desc:		Gets the y-position w.r.t. the specified references.
+// Description:		Gets the y-position w.r.t. the specified references.
 //
 // Input Arguments:
 //		ref	= const PositionReference&
@@ -543,7 +543,7 @@ double Legend::GetYPos(const PositionReference& legendRef, const PositionReferen
 // Class:			Legend
 // Function:		GetPosition
 //
-// Desc:		Gets the position w.r.t. the specified references.  Read
+// Description:		Gets the position w.r.t. the specified references.  Read
 //					this as position of specified legendRef w.r.t. specified
 //					windowRef.
 //
@@ -759,7 +759,7 @@ void Legend::GetPosition(const PositionReference& legendRef,
 // Class:			Legend
 // Function:		BuildBorderPoints
 //
-// Desc:		Returns a vector containing pairs of border points.
+// Description:		Returns a vector containing pairs of border points.
 //
 // Input Arguments:
 //		None
@@ -783,7 +783,7 @@ std::vector<std::pair<double, double> > Legend::BuildBorderPoints() const
 // Class:			Legend
 // Function:		BuildBackground
 //
-// Desc:		Builds the buffer required to draw the background.
+// Description:		Builds the buffer required to draw the background.
 //
 // Input Arguments:
 //		None
@@ -854,7 +854,7 @@ Primitive::BufferInfo Legend::BuildBackground() const
 // Class:			Legend
 // Function:		BuildMarkers
 //
-// Desc:		Builds the buffers for rendering plot markers.
+// Description:		Builds the buffers for rendering plot markers.
 //
 // Input Arguments:
 //		None
@@ -942,7 +942,7 @@ void Legend::BuildMarkers()
 // Class:			Legend
 // Function:		AssembleBuffers
 //
-// Desc:		Combines the triangle buffers into a single BufferInfo
+// Description:		Combines the triangle buffers into a single BufferInfo
 //					object.
 //
 // Input Arguments:
@@ -1011,7 +1011,7 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 // Class:			Legend
 // Function:		BuildSampleLines
 //
-// Desc:		Appends lines corresponding to the legend entries to the
+// Description:		Appends lines corresponding to the legend entries to the
 //					buffer vector.
 //
 // Input Arguments:
@@ -1052,7 +1052,7 @@ void Legend::BuildSampleLines()
 // Class:			Legend
 // Function:		ConfigureVertexArray
 //
-// Desc:		Handles configuration of OpenGL vertex array object.
+// Description:		Handles configuration of OpenGL vertex array object.
 //
 // Input Arguments:
 //		bufferInfo	= Primitive::BufferInfo&
@@ -1093,7 +1093,7 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 // Class:			Legend
 // Function:		BuildLabelStrings
 //
-// Desc:		Generates text for each entry.
+// Description:		Generates text for each entry.
 //
 // Input Arguments:
 //		None
@@ -1124,7 +1124,7 @@ void Legend::BuildLabelStrings()
 // Class:			Legend
 // Function:		RequiresRedraw
 //
-// Desc:		Sets flags indicating we want to re-perform OpenGL stuff.
+// Description:		Sets flags indicating we want to re-perform OpenGL stuff.
 //
 // Input Arguments:
 //		None

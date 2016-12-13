@@ -29,7 +29,7 @@ namespace LibPlot2D
 // Class:			FastFourierTransform
 // Function:		ComputeFFT (static)
 //
-// Desc:		Computes the fast fourier transform for the given signal.
+// Description:		Computes the fast fourier transform for the given signal.
 //					Assumes y contains data and x is time.  Quick version -
 //					all default options are used.
 //
@@ -53,7 +53,7 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 // Class:			FastFourierTransform
 // Function:		ComputeFFT (static)
 //
-// Desc:		Computes the fast fourier transform for the given signal.
+// Description:		Computes the fast fourier transform for the given signal.
 //					Assumes y contains data and x is time.  This overload
 //					contains all specifiable parameters.
 //
@@ -103,7 +103,7 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 // Class:			FastFourierTransform
 // Function:		GetMaxPowerOfTwo (static)
 //
-// Desc:		Returns the max allowable window size given the number of
+// Description:		Returns the max allowable window size given the number of
 //					data points.
 //
 // Input Arguments:
@@ -125,7 +125,7 @@ unsigned int FastFourierTransform::GetMaxPowerOfTwo(const unsigned int &sampleSi
 // Class:			FastFourierTransform
 // Function:		ChopSample (static)
 //
-// Desc:		Chops the specified sample from the data.
+// Description:		Chops the specified sample from the data.
 //
 // Input Arguments:
 //		data		= const Dataset2D&
@@ -167,7 +167,7 @@ Dataset2D FastFourierTransform::ChopSample(const Dataset2D &data, const unsigned
 // Class:			FastFourierTransform
 // Function:		AddToAverage (static)
 //
-// Desc:		Adds the data to the average.  Initializes the average
+// Description:		Adds the data to the average.  Initializes the average
 //					if it is empty.
 //
 // Input Arguments:
@@ -203,7 +203,7 @@ void FastFourierTransform::AddToAverage(Dataset2D &average, const Dataset2D &dat
 // Class:			FastFourierTransform
 // Function:		InitializeRawFFTDataset (static)
 //
-// Desc:		Initializes the raw FFT dataset for future processing.
+// Description:		Initializes the raw FFT dataset for future processing.
 //					Applies the specified window.
 //
 // Input Arguments:
@@ -237,7 +237,7 @@ void FastFourierTransform::InitializeRawFFTDataset(Dataset2D &rawFFT,
 // Class:			FastFourierTransform
 // Function:		ComputeRawFFT (static)
 //
-// Desc:		Computes the raw (complex) FFT data for the specified
+// Description:		Computes the raw (complex) FFT data for the specified
 //					time-domain data.  It is expected that the data has size
 //					equal to the number of points to use for the FFT (it is
 //					one FFT sample).
@@ -271,7 +271,7 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 // Class:			FastFourierTransform
 // Function:		ComputeFRF (static)
 //
-// Desc:		Computes frequency response function between input and output data.
+// Description:		Computes frequency response function between input and output data.
 //
 // Input Arguments:
 //		input				= const Dataset2D&
@@ -329,7 +329,7 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input,
 // Class:			FastFourierTransform
 // Function:		ComputeCrossPowerSpectrum (static)
 //
-// Desc:		Computes the cross power spectrum of the specified raw
+// Description:		Computes the cross power spectrum of the specified raw
 //					FFT data sets.
 //
 // Input Arguments:
@@ -362,7 +362,7 @@ Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &fftIn
 // Class:			FastFourierTransform
 // Function:		ComputePowerSpectrum (static)
 //
-// Desc:		Computes the power spectrum of the specified raw FFT data.
+// Description:		Computes the power spectrum of the specified raw FFT data.
 //
 // Input Arguments:
 //		fft		= const Dataset2D&
@@ -383,7 +383,7 @@ Dataset2D FastFourierTransform::ComputePowerSpectrum(const Dataset2D &fft)
 // Class:			FastFourierTransform
 // Function:		ComputeCoherence (static)
 //
-// Desc:		Computes the coherence function for the specified input/output.
+// Description:		Computes the coherence function for the specified input/output.
 //
 // Input Arguments:
 //		input	= const Dataset2D&
@@ -423,7 +423,7 @@ Dataset2D FastFourierTransform::ComputeCoherence(const Dataset2D& input, const D
 // Class:			FastFourierTransform
 // Function:		ZeroDataset (static)
 //
-// Desc:		Zeros out the data in the dataset.
+// Description:		Zeros out the data in the dataset.
 //
 // Input Arguments:
 //		data	= Dataset2D&
@@ -444,7 +444,7 @@ void FastFourierTransform::ZeroDataset(Dataset2D &data)
 // Class:			FastFourierTransform
 // Function:		GenerateConstantDataset (static)
 //
-// Desc:		Generates a dataset with constant x- and y-values.
+// Description:		Generates a dataset with constant x- and y-values.
 //
 // Input Arguments:
 //		xValue	= const double&
@@ -476,7 +476,7 @@ Dataset2D FastFourierTransform::GenerateConstantDataset(const double &xValue, co
 // Class:			FastFourierTransform
 // Function:		DoBitReversal (static)
 //
-// Desc:		Performs bit reversal on processing dataset.  It is assumed
+// Description:		Performs bit reversal on processing dataset.  It is assumed
 //					that the set has already been padded/chopped.
 //
 // Input Arguments:
@@ -524,7 +524,7 @@ void FastFourierTransform::DoBitReversal(Dataset2D &set)
 // Class:			FastFourierTransform
 // Function:		DoFFT (static)
 //
-// Desc:		Performs the calculation to get raw FFT data.
+// Description:		Performs the calculation to get raw FFT data.
 //
 // Input Arguments:
 //		powerOfTwo	= const unsigned int&
@@ -578,7 +578,7 @@ void FastFourierTransform::DoFFT(Dataset2D &temp)
 // Class:			FastFourierTransform
 // Function:		ConvertDoubleSidedToSingleSided (static)
 //
-// Desc:		Converts double-sided data to single-sided.  Discards
+// Description:		Converts double-sided data to single-sided.  Discards
 //					negative frequency portion of data and scales amplitudes
 //					as necessary.
 //
@@ -629,7 +629,7 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 // Class:			FastFourierTransform
 // Function:		ConvertAmplitudeToDecibels (static)
 //
-// Desc:		Converts from amplitude (linear) to decibels (logarithmic).
+// Description:		Converts from amplitude (linear) to decibels (logarithmic).
 //					This MUST be done AFTER converting to single-sided spectrum.
 //
 // Input Arguments:
@@ -661,7 +661,7 @@ void FastFourierTransform::ConvertAmplitudeToDecibels(Dataset2D &fft)
 // Class:			FastFourierTransform
 // Function:		PopulateFrequencyData (static)
 //
-// Desc:		Populates the X-data of the specified dataset with frequency
+// Description:		Populates the X-data of the specified dataset with frequency
 //					data appropriate for the sample rate.
 //
 // Input Arguments:
@@ -685,7 +685,7 @@ void FastFourierTransform::PopulateFrequencyData(Dataset2D &data, const double &
 // Class:			FastFourierTransform
 // Function:		GetAmplitudeData (static)
 //
-// Desc:		Calculates the amplitude data from raw FFT data (containing
+// Description:		Calculates the amplitude data from raw FFT data (containing
 //					real and imaginary data components).
 //
 // Input Arguments:
@@ -716,7 +716,7 @@ Dataset2D FastFourierTransform::GetAmplitudeData(const Dataset2D &rawFFT, const 
 // Class:			FastFourierTransform
 // Function:		GetPhaseData (static)
 //
-// Desc:		Calculates the phase data from raw FFT data (containing
+// Description:		Calculates the phase data from raw FFT data (containing
 //					real and imaginary data components).
 //
 // Input Arguments:
@@ -753,7 +753,7 @@ Dataset2D FastFourierTransform::GetPhaseData(const Dataset2D &rawFFT, const doub
 // Class:			FastFourierTransform
 // Function:		ComplexAdd (static)
 //
-// Desc:		Performs element-wise complex addition of the
+// Description:		Performs element-wise complex addition of the
 //					specified datasets.
 //
 // Input Arguments:
@@ -787,7 +787,7 @@ Dataset2D FastFourierTransform::ComplexAdd(const Dataset2D &a, const Dataset2D &
 // Class:			FastFourierTransform
 // Function:		ComplexMultiply (static)
 //
-// Desc:		Performs element-wise complex multiplication of the
+// Description:		Performs element-wise complex multiplication of the
 //					specified datasets.
 //
 // Input Arguments:
@@ -821,7 +821,7 @@ Dataset2D FastFourierTransform::ComplexMultiply(const Dataset2D &a, const Datase
 // Class:			FastFourierTransform
 // Function:		ComplexDivide (static)
 //
-// Desc:		Performs element-wise complex division of the specified
+// Description:		Performs element-wise complex division of the specified
 //					datasets.
 //
 // Input Arguments:
@@ -857,7 +857,7 @@ Dataset2D FastFourierTransform::ComplexDivide(const Dataset2D &a, const Dataset2
 // Class:			FastFourierTransform
 // Function:		ComplexMagnitude (static)
 //
-// Desc:		Computes the magnitude of each complex element.
+// Description:		Computes the magnitude of each complex element.
 //
 // Input Arguments:
 //		a	= const Dataset2D&
@@ -888,7 +888,7 @@ Dataset2D FastFourierTransform::ComplexMagnitude(const Dataset2D &a)
 // Class:			FastFourierTransform
 // Function:		ComplexPower (static)
 //
-// Desc:		Raises each complex element to the specified power.
+// Description:		Raises each complex element to the specified power.
 //
 // Input Arguments:
 //		a		= const Dataset2D&
@@ -927,7 +927,7 @@ Dataset2D FastFourierTransform::ComplexPower(const Dataset2D &a, const double &p
 // Class:			FastFourierTransform
 // Function:		ApplyWindow (static)
 //
-// Desc:		Applies the specified window type to the data.  The data
+// Description:		Applies the specified window type to the data.  The data
 //					must have size equal to the number of points in the FFT.
 //
 // Input Arguments:
@@ -963,7 +963,7 @@ void FastFourierTransform::ApplyWindow(Dataset2D &data, const FFTWindow &window)
 // Class:			FastFourierTransform
 // Function:		ApplyHannWindow (static)
 //
-// Desc:		Applies a Hann window to the data.  Note that there is a
+// Description:		Applies a Hann window to the data.  Note that there is a
 //					missing factor of 0.5 - this cancels when divided by the
 //					coherent gain of 0.5.
 //
@@ -989,7 +989,7 @@ void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 // Class:			FastFourierTransform
 // Function:		ApplyHammingWindow (static)
 //
-// Desc:		Applies a Hamming window to the data.  Scales by coherent
+// Description:		Applies a Hamming window to the data.  Scales by coherent
 //					gain of 0.54.
 //
 // Input Arguments:
@@ -1014,7 +1014,7 @@ void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 // Class:			FastFourierTransform
 // Function:		ApplyFlatTopWindow (static)
 //
-// Desc:		Applies a flat top window to the data.  Scales by coherent
+// Description:		Applies a flat top window to the data.  Scales by coherent
 //					gain of 0.22.  NOTE:  Scaling removed, as apparently it was
 //					incorrect.  Can not find any references explaining this.
 //
@@ -1043,7 +1043,7 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 // Class:			FastFourierTransform
 // Function:		ApplyForceWindow (static)
 //
-// Desc:		Applies a force window to the data.
+// Description:		Applies a force window to the data.
 //
 // Input Arguments:
 //		data	= Dataset2D&
@@ -1063,7 +1063,7 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 // Class:			FastFourierTransform
 // Function:		ApplyExponentialWindow (static)
 //
-// Desc:		Applies an exponential window to the data.  Denominator of
+// Description:		Applies an exponential window to the data.  Denominator of
 //					exponent is chosen based on sample length to reduce
 //					amplitude to 2% of original value at the end of the window.
 //
@@ -1089,7 +1089,7 @@ void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 // Class:			FastFourierTransform
 // Function:		GetWindowName (static)
 //
-// Desc:		Returns a string describing the specified window.
+// Description:		Returns a string describing the specified window.
 //
 // Input Arguments:
 //		window	= const FFTWindow&
@@ -1124,7 +1124,7 @@ std::string FastFourierTransform::GetWindowName(const FFTWindow &window)
 // Class:			FastFourierTransform
 // Function:		GetNumberOfAverages (static)
 //
-// Desc:		Determines the number of samples to be averaged, given the
+// Description:		Determines the number of samples to be averaged, given the
 //					specified parameters.
 //
 // Input Arguments:
@@ -1152,7 +1152,7 @@ unsigned int FastFourierTransform::GetNumberOfAverages(const unsigned int window
 // Class:			FastFourierTransform
 // Function:		ComputeOverlap (static)
 //
-// Desc:		Computes the required overlap (and updates other parameters).
+// Description:		Computes the required overlap (and updates other parameters).
 //					Keeps the overlap <= 50%.
 //
 // Input Arguments:
@@ -1196,7 +1196,7 @@ double FastFourierTransform::ComputeOverlap(unsigned int &windowSize,
 // Class:			FastFourierTransform
 // Function:		ComputeRequiredOverlapPoints (static)
 //
-// Desc:		Computes the required overlap points for the specified
+// Description:		Computes the required overlap points for the specified
 //					parameters.
 //
 // Input Arguments:

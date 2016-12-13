@@ -22,7 +22,7 @@ namespace LibPlot2D
 // Namespace:		GuiUtilities
 // Function:		GetFileNameFromUser
 //
-// Desc:		Displays a dialog asking the user to specify a file name.
+// Description:		Displays a dialog asking the user to specify a file name.
 //					Arguments allow this to be for opening or saving files,
 //					with different options for the wildcards.
 //
@@ -71,7 +71,7 @@ wxArrayString GuiUtilities::GetFileNameFromUser(wxWindow* parent,
 // Namespace:		GuiUtilities
 // Function:		ExtractFileNameFromPath
 //
-// Desc:		Removes the path from the path and file name.
+// Description:		Removes the path from the path and file name.
 //
 // Input Arguments:
 //		pathAndFileName	= const wxString&

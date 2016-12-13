@@ -29,7 +29,7 @@ namespace LibPlot2D
 // Class:			MultiChoiceDialog
 // Function:		MultiChoiceDialog
 //
-// Desc:		Constructor for MultiChoiceDialog class.
+// Description:		Constructor for MultiChoiceDialog class.
 //
 // Input Arguments:
 //		parent	= wxWindow* pointing to the dialog's parent window
@@ -66,7 +66,7 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 // Class:			MultiChoiceDialog
 // Function:		Event Table
 //
-// Desc:		Event table for MultiChoiceDialog class.
+// Description:		Event table for MultiChoiceDialog class.
 //
 // Input Arguments:
 //		None
@@ -88,7 +88,7 @@ END_EVENT_TABLE()
 // Class:			MultiChoiceDialog
 // Function:		CreateControls
 //
-// Desc:		Generates controls for the dialog.
+// Description:		Generates controls for the dialog.
 //
 // Input Arguments:
 //		message	= const wxString& containing user instructions
@@ -140,7 +140,7 @@ void MultiChoiceDialog::CreateControls(const wxString& message, const wxArrayStr
 // Class:			MultiChoiceDialog
 // Function:		ComputeListBoxHeight
 //
-// Desc:		Computes the ideal height of the list box based on the number
+// Description:		Computes the ideal height of the list box based on the number
 //					of choices to display.
 //
 // Input Arguments:
@@ -164,7 +164,7 @@ int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
 // Class:			MultiChoiceDialog
 // Function:		CreateButtons
 //
-// Desc:		Creates the buttons.
+// Description:		Creates the buttons.
 //
 // Input Arguments:
 //		None
@@ -195,7 +195,7 @@ wxSizer* MultiChoiceDialog::CreateButtons()
 // Class:			MultiChoiceDialog
 // Function:		OnSelectAllButton
 //
-// Desc:		Event handler for Select All button clicks.
+// Description:		Event handler for Select All button clicks.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -227,7 +227,7 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 // Class:			MultiChoiceDialog
 // Function:		OnFilterTextChange
 //
-// Desc:		Event handler for text change in the filter text box.
+// Description:		Event handler for text change in the filter text box.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -262,7 +262,7 @@ void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
 // Class:			MultiChoiceDialog
 // Function:		OnCheckListBoxSelection
 //
-// Desc:		Event handler for check list box selection changes.
+// Description:		Event handler for check list box selection changes.
 //
 // Input Arguments:
 //		event	= wxCommandEvent& (unused)
@@ -283,7 +283,7 @@ void MultiChoiceDialog::OnCheckListBoxSelection(wxCommandEvent &event)
 // Class:			MultiChoiceDialog
 // Function:		UpdateSelectionList
 //
-// Desc:		Updates the list of selected items making corrections for
+// Description:		Updates the list of selected items making corrections for
 //					hidden items.
 //
 // Input Arguments:
@@ -308,7 +308,7 @@ void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
 // Class:			MultiChoiceDialog
 // Function:		GetCorrectedIndex
 //
-// Desc:		Corrects the index based on which items are hidden.
+// Description:		Corrects the index based on which items are hidden.
 //
 // Input Arguments:
 //		index	= cosnt unsigned int&
@@ -341,7 +341,7 @@ unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) con
 // Class:			MultiChoiceDialog
 // Function:		SetAllChoices
 //
-// Desc:		Sets all choices to the specified value.
+// Description:		Sets all choices to the specified value.
 //
 // Input Arguments:
 //		selected	= const bool&
@@ -367,7 +367,7 @@ void MultiChoiceDialog::SetAllChoices(const bool &selected)
 // Class:			MultiChoiceDialog
 // Function:		RemoveExistingCurves
 //
-// Desc:		Returns the value of the "Remove Existing Curves" checkbox.
+// Description:		Returns the value of the "Remove Existing Curves" checkbox.
 //
 // Input Arguments:
 //		None
@@ -388,7 +388,7 @@ bool MultiChoiceDialog::RemoveExistingCurves() const
 // Class:			MultiChoiceDialog
 // Function:		ApplyDefaults
 //
-// Desc:		Applies the specified defaults to the available user selections.
+// Description:		Applies the specified defaults to the available user selections.
 //
 // Input Arguments:
 //		defaultChoices	= wxArrayInt*
@@ -425,7 +425,7 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 // Class:			MultiChoiceDialog
 // Function:		IsSelected
 //
-// Desc:		Checks to see if the specified index is contained in the
+// Description:		Checks to see if the specified index is contained in the
 //					list of selected items.
 //
 // Input Arguments:

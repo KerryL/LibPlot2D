@@ -22,7 +22,7 @@ namespace LibPlot2D
 // Class:			RangeLimitsDialog
 // Function:		RangeLimitsDialog
 //
-// Desc:		Constructor for RangeLimitsDialog class.
+// Description:		Constructor for RangeLimitsDialog class.
 //
 // Input Arguments:
 //		parent	= wxWindow* that owns this object
@@ -77,7 +77,7 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 // Class:			RangeLimitsDialog
 // Function:		Event Table
 //
-// Desc:		Specifies event handlers for dialog events.
+// Description:		Specifies event handlers for dialog events.
 //
 // Input Arguments:
 //		None
@@ -97,7 +97,7 @@ END_EVENT_TABLE()
 // Class:			RangeLimitsDialog
 // Function:		GetMinimum
 //
-// Desc:		Returns the value entered in the minimum box.
+// Description:		Returns the value entered in the minimum box.
 //
 // Input Arguments:
 //		None
@@ -122,7 +122,7 @@ double RangeLimitsDialog::GetMinimum() const
 // Class:			RangeLimitsDialog
 // Function:		GetMaximum
 //
-// Desc:		Returns the value entered in the maximum box.
+// Description:		Returns the value entered in the maximum box.
 //
 // Input Arguments:
 //		None
@@ -147,7 +147,7 @@ double RangeLimitsDialog::GetMaximum() const
 // Class:			RangeLimitsDialog
 // Function:		OnOKButton
 //
-// Desc:		Validates min and max values when the user chooses OK.
+// Description:		Validates min and max values when the user chooses OK.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&

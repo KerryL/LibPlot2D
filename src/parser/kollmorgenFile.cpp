@@ -22,7 +22,7 @@ namespace LibPlot2D
 // Class:			KollmorgenFile
 // Function:		IsType
 //
-// Desc:		Method for determining if the specified file is this
+// Description:		Method for determining if the specified file is this
 //					type of file.
 //
 // Input Arguments:
@@ -64,7 +64,7 @@ bool KollmorgenFile::IsType(const wxString &testFile)
 // Class:			KollmorgenFile
 // Function:		GetCurveInformation
 //
-// Desc:		Parses the file and assembles descriptions for each column
+// Description:		Parses the file and assembles descriptions for each column
 //					based on the contents of the header rows.  Also reports
 //					the number of header rows back to the calling function.
 //
@@ -109,7 +109,7 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 // Class:			KollmorgenFile
 // Function:		DoTypeSpecificLoadTasks
 //
-// Desc:		Finds and stores the sample rate for the file.
+// Description:		Finds and stores the sample rate for the file.
 //
 // Input Arguments:
 //		None
@@ -148,7 +148,7 @@ void KollmorgenFile::DoTypeSpecificLoadTasks()
 // Class:			KollmorgenFile
 // Function:		ExtractData
 //
-// Desc:		Parses the file and reads data into vectors.  Only extracts
+// Description:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.  Also creates time
 //					series based on timeStep.
 //

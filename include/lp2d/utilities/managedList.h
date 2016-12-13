@@ -51,6 +51,9 @@ public:
 
 	const std::unique_ptr<T>& operator[](const unsigned int &index) const;
 
+	const std::unique_ptr<T>& Back() const { return list.back(); }
+	std::unique_ptr<T>& Back() { return list.back(); }
+
 	typename std::vector<std::unique_ptr<T>>::iterator begin() { return list.begin(); }
 	typename std::vector<std::unique_ptr<T>>::const_iterator begin() const { return list.begin(); }
 
@@ -71,7 +74,7 @@ private:
 // Class:			ManagedList
 // Function:		Add
 //
-// Desc:		Adds objects to the list.  Performs the necessary memory
+// Description:		Adds objects to the list.  Performs the necessary memory
 //					allocating and transferring routines.
 //
 // Input Arguments:
@@ -95,7 +98,7 @@ unsigned int ManagedList<T>::Add(std::unique_ptr<T> toAdd)
 // Class:			ManagedList
 // Function:		Remove
 //
-// Desc:		Removes the object at the specified index from the list
+// Description:		Removes the object at the specified index from the list
 //
 // Input Arguments:
 //		index	= const unsigned int& specifying the object to remove
@@ -118,7 +121,7 @@ void ManagedList<T>::Remove(const unsigned int &index)
 // Class:			ManagedList
 // Function:		operator[]
 //
-// Desc:		Returns a pointer to the object with the specified index.
+// Description:		Returns a pointer to the object with the specified index.
 //
 // Input Arguments:
 //		index	= const int& specifying which object we want to retrieve
@@ -143,7 +146,7 @@ const std::unique_ptr<T>& ManagedList<T>::operator[](const unsigned int &index) 
 // Class:			ManagedList
 // Function:		ReorderObjects
 //
-// Desc:		Re-organizes all of the objects in the list according to
+// Description:		Re-organizes all of the objects in the list according to
 //					the specified order.
 //
 // Input Arguments:
@@ -175,7 +178,7 @@ void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 // Class:			ManagedList
 // Function:		Clear
 //
-// Desc:		Removes all items in the list.
+// Description:		Removes all items in the list.
 //
 // Input Arguments:
 //		None

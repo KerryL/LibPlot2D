@@ -23,7 +23,7 @@ namespace LibPlot2D
 // Class:			DiscreteIntegral
 // Function:		ComputeTimeHistory (static)
 //
-// Desc:		Computes the discrete-time integral time history for the
+// Description:		Computes the discrete-time integral time history for the
 //					given signal.  Assumes y contains data and x is time.
 //
 // Input Arguments:

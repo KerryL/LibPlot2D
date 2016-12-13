@@ -28,7 +28,7 @@ namespace LibPlot2D
 // Class:			Complex
 // Function:		Complex
 //
-// Desc:		Constructor for the Complex class.
+// Description:		Constructor for the Complex class.
 //
 // Input Arguments:
 //		None
@@ -48,7 +48,7 @@ Complex::Complex()
 // Class:			Complex
 // Function:		Complex
 //
-// Desc:		Constructor for the Complex class.
+// Description:		Constructor for the Complex class.
 //
 // Input Arguments:
 //		real		= const double& real component of the complex number
@@ -69,7 +69,7 @@ Complex::Complex(const double &real, const double &imaginary) : real(real), imag
 // Class:			Complex
 // Function:		~Complex
 //
-// Desc:		Destructor for the Complex class.
+// Description:		Destructor for the Complex class.
 //
 // Input Arguments:
 //		None
@@ -89,7 +89,7 @@ Complex::~Complex()
 // Class:			Complex
 // Function:		Constant Definitions
 //
-// Desc:		Defines class level constants for the Complex class.
+// Description:		Defines class level constants for the Complex class.
 //
 // Input Arguments:
 //		None
@@ -107,7 +107,7 @@ const Complex Complex::i(0.0, 1.0);
 // Class:			friend of Complex
 // Function:		operator <<
 //
-// Desc:		Writes the value of Target to a stream.
+// Description:		Writes the value of Target to a stream.
 //
 // Input Arguments:
 //		writeOut	= ostream& to write out to
@@ -131,7 +131,7 @@ std::ostream &operator << (std::ostream &writeOut, const Complex &complex)
 // Class:			Complex
 // Function:		Print
 //
-// Desc:		Prints this object to a string.
+// Description:		Prints this object to a string.
 //
 // Input Arguments:
 //		None
@@ -159,7 +159,7 @@ wxString Complex::Print() const
 // Class:			Complex
 // Function:		operator +
 //
-// Desc:		Addition operator for the Complex class.
+// Description:		Addition operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to add to this
@@ -186,7 +186,7 @@ const Complex Complex::operator + (const Complex &complex) const
 // Class:			Complex
 // Function:		operator -
 //
-// Desc:		Subraction operator for the Complex class.
+// Description:		Subraction operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to subtract from this
@@ -213,7 +213,7 @@ const Complex Complex::operator - (const Complex &complex) const
 // Class:			Complex
 // Function:		operator *
 //
-// Desc:		Multiplication operator for the Complex class.
+// Description:		Multiplication operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to multiply with this
@@ -240,7 +240,7 @@ const Complex Complex::operator * (const Complex &complex) const
 // Class:			Complex
 // Function:		operator /
 //
-// Desc:		Division operator for the Complex class.
+// Description:		Division operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to divide by this
@@ -267,7 +267,7 @@ const Complex Complex::operator / (const Complex &complex) const
 // Class:			Complex
 // Function:		ToPower
 //
-// Desc:		Raises this object to the specified power.
+// Description:		Raises this object to the specified power.
 //
 // Input Arguments:
 //		Power	= const double& specifiying the power to which this will be raised
@@ -300,7 +300,7 @@ Complex& Complex::ToPower(const double &power)
 // Class:			Complex
 // Function:		ToPower
 //
-// Desc:		Raises this object to the specified power (const version).
+// Description:		Raises this object to the specified power (const version).
 //
 // Input Arguments:
 //		power	= const double& specifiying the power to which this will be raised
@@ -324,7 +324,7 @@ const Complex Complex::ToPower(const double &power) const
 // Class:			Complex
 // Function:		ToPower
 //
-// Desc:		Raises this object to the specified complex power.
+// Description:		Raises this object to the specified complex power.
 //
 // Input Arguments:
 //		power	= const Complex& specifiying the power to which this will be raised
@@ -356,7 +356,7 @@ Complex& Complex::ToPower(const Complex &power)
 // Class:			Complex
 // Function:		ToPower
 //
-// Desc:		Raises this object to the specified complex power (const version).
+// Description:		Raises this object to the specified complex power (const version).
 //
 // Input Arguments:
 //		power	= const Complex& specifiying the power to which this will be raised
@@ -379,7 +379,7 @@ const Complex Complex::ToPower(const Complex &power) const
 // Class:			Complex
 // Function:		operator +=
 //
-// Desc:		Addition assignment operator for the Complex class.
+// Description:		Addition assignment operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to add to this
@@ -406,7 +406,7 @@ Complex& Complex::operator += (const Complex &complex)
 // Class:			Complex
 // Function:		operator -=
 //
-// Desc:		Subraction assignment operator for the Complex class.
+// Description:		Subraction assignment operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to subtract from this
@@ -433,7 +433,7 @@ Complex& Complex::operator -= (const Complex &complex)
 // Class:			Complex
 // Function:		operator *=
 //
-// Desc:		Multiplication assignment operator for the Complex class.
+// Description:		Multiplication assignment operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to multiply by this
@@ -464,7 +464,7 @@ Complex& Complex::operator *= (const Complex &complex)
 // Class:			Complex
 // Function:		operator /=
 //
-// Desc:		Division assignment operator for the Complex class.
+// Description:		Division assignment operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to divide by this
@@ -495,7 +495,7 @@ Complex& Complex::operator /= (const Complex &complex)
 // Class:			Complex
 // Function:		operator ==
 //
-// Desc:		Equal to comparison operator for the Complex class.
+// Description:		Equal to comparison operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to compare to this
@@ -520,7 +520,7 @@ bool Complex::operator == (const Complex &complex) const
 // Class:			Complex
 // Function:		operator !=
 //
-// Desc:		Not equal to comparison operator for the Complex class.
+// Description:		Not equal to comparison operator for the Complex class.
 //
 // Input Arguments:
 //		complex	= const Complex& to compare to this
@@ -541,7 +541,7 @@ bool Complex::operator != (const Complex &complex) const
 // Class:			Complex
 // Function:		GetConjugate
 //
-// Desc:		Returns the complex conjugate of this object.
+// Description:		Returns the complex conjugate of this object.
 //
 // Input Arguments:
 //		None
@@ -571,7 +571,7 @@ const Complex Complex::GetConjugate() const
 // Class:			Complex
 // Function:		GetPolarLength
 //
-// Desc:		Converts to polar coordinates, returns the length (r).
+// Description:		Converts to polar coordinates, returns the length (r).
 //
 // Input Arguments:
 //		None
@@ -592,7 +592,7 @@ double Complex::GetPolarLength() const
 // Class:			Complex
 // Function:		GetPolarAngle
 //
-// Desc:		Converts to polar coordinates, returns the angle (theta).
+// Description:		Converts to polar coordinates, returns the angle (theta).
 //
 // Input Arguments:
 //		None
@@ -613,7 +613,7 @@ double Complex::GetPolarAngle() const
 // Class:			Complex
 // Function:		operator +
 //
-// Desc:		Addition operator for the Complex class.
+// Description:		Addition operator for the Complex class.
 //
 // Input Arguments:
 //		value	= const double& to add to this
@@ -642,7 +642,7 @@ const Complex Complex::operator + (const double &value) const
 // Class:			Complex
 // Function:		operator -
 //
-// Desc:		Subtraction operator for the Complex class.
+// Description:		Subtraction operator for the Complex class.
 //
 // Input Arguments:
 //		value	= const double& to subtract from this
@@ -671,7 +671,7 @@ const Complex Complex::operator - (const double &value) const
 // Class:			Complex
 // Function:		operator *
 //
-// Desc:		Multiplication operator for the Complex class.
+// Description:		Multiplication operator for the Complex class.
 //
 // Input Arguments:
 //		value	= const double& to multiply by this
@@ -698,7 +698,7 @@ const Complex Complex::operator * (const double &value) const
 // Class:			Complex
 // Function:		operator /
 //
-// Desc:		Division operator for the Complex class.
+// Description:		Division operator for the Complex class.
 //
 // Input Arguments:
 //		value	= const double& to divide by this

@@ -29,7 +29,7 @@ namespace LibPlot2D
 // Class:			CustomFileFormat
 // Function:		Constant Declarations
 //
-// Desc:		Constant declarations for the CustomFileFormat class.
+// Description:		Constant declarations for the CustomFileFormat class.
 //
 // Input Arguments:
 //		None
@@ -49,7 +49,7 @@ const unsigned long CustomFileFormat::customFormatsVersion = 1;
 // Class:			CustomFileFormat
 // Function:		CustomFileFormat
 //
-// Desc:		Constructor for CustomFileFormat class.
+// Description:		Constructor for CustomFileFormat class.
 //
 // Input Arguments:
 //		pathAndFileName	= const wxString&
@@ -96,7 +96,7 @@ CustomFileFormat::CustomFileFormat(const wxString &pathAndFileName) : pathAndFil
 // Class:			CustomFileFormat
 // Function:		ReadFormatTag
 //
-// Desc:		Reads format tag (and children).
+// Description:		Reads format tag (and children).
 //
 // Input Arguments:
 //		formatNode	= wxXmlNode&
@@ -149,7 +149,7 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 // Class:			CustomFileFormat
 // Function:		ReadIdentifierTag
 //
-// Desc:		Reads identifier tag and populates id argument with contents.
+// Description:		Reads identifier tag and populates id argument with contents.
 //
 // Input Arguments:
 //		idNode	= wxXmlNode&
@@ -200,7 +200,7 @@ bool CustomFileFormat::ReadIdentifierTag(wxXmlNode &idNode, Identifier &id)
 // Class:			CustomFileFormat
 // Function:		ReadChannelTag
 //
-// Desc:		Reads channel tag and pushes channel info into vector.
+// Description:		Reads channel tag and pushes channel info into vector.
 //
 // Input Arguments:
 //		channelNode	= wxXmlNode&
@@ -245,7 +245,7 @@ bool CustomFileFormat::ReadChannelTag(wxXmlNode &channelNode)
 // Class:			CustomFileFormat
 // Function:		ReadAdditionalXMLProperties
 //
-// Desc:		Reads XML-type specific format properties.
+// Description:		Reads XML-type specific format properties.
 //
 // Input Arguments:
 //		formatNode	= wxXmlNode&
@@ -289,7 +289,7 @@ bool CustomFileFormat::ReadAdditionalXMLProperties(wxXmlNode &formatNode)
 // Class:			CustomFileFormat
 // Function:		IsFormat
 //
-// Desc:		Determines if the specified file matches the identifier.
+// Description:		Determines if the specified file matches the identifier.
 //
 // Input Arguments:
 //		pathAndFileName	= const wxString&
@@ -344,7 +344,7 @@ bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifie
 // Class:			CustomFileFormat
 // Function:		MatchNextLine
 //
-// Desc:		Determines if the next line matches the specified identifier.
+// Description:		Determines if the next line matches the specified identifier.
 //
 // Input Arguments:
 //		inFile	= std::ifstream&
@@ -366,7 +366,7 @@ bool CustomFileFormat::MatchNextLine(std::ifstream &inFile, const Identifier &id
 // Class:			CustomFileFormat
 // Function:		MatchNextLine
 //
-// Desc:		Determines if the next line matches the specified text.
+// Description:		Determines if the next line matches the specified text.
 //
 // Input Arguments:
 //		inFile		= std::ifstream&
@@ -406,7 +406,7 @@ bool CustomFileFormat::MatchNextLine(std::ifstream &inFile, const wxString &text
 // Class:			CustomFileFormat
 // Function:		ClearData
 //
-// Desc:		Clears out data (for returning on loading error, for example).
+// Description:		Clears out data (for returning on loading error, for example).
 //
 // Input Arguments:
 //		None
@@ -432,7 +432,7 @@ void CustomFileFormat::ClearData()
 // Class:			CustomFileFormat
 // Function:		ProcessChannelNames
 //
-// Desc:		Converts "normal" channel names into user-specified
+// Description:		Converts "normal" channel names into user-specified
 //					custom names and adjust scaling as specified by the user.
 //
 // Input Arguments:
@@ -485,7 +485,7 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 // Class:			CustomFileFormat
 // Function:		CheckRootAndVersion
 //
-// Desc:		Checks root node and XML version.
+// Description:		Checks root node and XML version.
 //
 // Input Arguments:
 //		document	= const wxXmlDocument&, previously opened XML document
@@ -536,7 +536,7 @@ bool CustomFileFormat::CheckRootAndVersion(const wxXmlDocument &document) const
 // Class:			CustomFileFormat
 // Function:		ProcessLocationID
 //
-// Desc:		Processes specified ID location tag.
+// Description:		Processes specified ID location tag.
 //
 // Input Arguments:
 //		value	= const wxString& specified in the XML file
@@ -586,7 +586,7 @@ bool CustomFileFormat::ProcessLocationID(const wxString &value, Identifier &id) 
 // Class:			CustomFileFormat
 // Function:		MatchSpecifiedLine
 //
-// Desc:		Attempts to match the file to the specified line text.
+// Description:		Attempts to match the file to the specified line text.
 //
 // Input Arguments:
 //		inFile	= std::ifstream&
@@ -623,7 +623,7 @@ bool CustomFileFormat::MatchSpecifiedLine(std::ifstream &inFile, const Identifie
 // Class:			CustomFileFormat
 // Function:		ProcessFormatChildren
 //
-// Desc:		Processes the child nodes of the format node.
+// Description:		Processes the child nodes of the format node.
 //
 // Input Arguments:
 //		formatChild	= wxXmlNode* pointing to the format node (parent)
@@ -663,7 +663,7 @@ bool CustomFileFormat::ProcessFormatChildren(wxXmlNode *formatChild, Identifier 
 // Class:			CustomFileFormat
 // Function:		ReadCodeOrColumn
 //
-// Desc:		Reads the information pertaining to CODE or COLUMN tags.
+// Description:		Reads the information pertaining to CODE or COLUMN tags.
 //
 // Input Arguments:
 //		channelNode	= wxXmlNode& containing CODE or COLUMN tags
@@ -687,7 +687,7 @@ bool CustomFileFormat::ReadCodeOrColumn(wxXmlNode &channelNode, Channel &channel
 // Class:			CustomFileFormat
 // Function:		ReadCode
 //
-// Desc:		Reads the information pertaining to CODE tags.
+// Description:		Reads the information pertaining to CODE tags.
 //
 // Input Arguments:
 //		channelNode	= wxXmlNode& containing CODE or COLUMN tags
@@ -734,7 +734,7 @@ bool CustomFileFormat::ReadCode(wxXmlNode &channelNode, Channel &channel) const
 // Class:			CustomFileFormat
 // Function:		ReadColumn
 //
-// Desc:		Reads the information pertaining to COLUMN tags.
+// Description:		Reads the information pertaining to COLUMN tags.
 //
 // Input Arguments:
 //		channelNode	= wxXmlNode& containing CODE or COLUMN tags

@@ -47,7 +47,7 @@ namespace LibPlot2D
 // Class:			PlotRenderer
 // Function:		Constant declarations
 //
-// Desc:		Constant declarations for the PlotRenderer class.
+// Description:		Constant declarations for the PlotRenderer class.
 //
 // Input Arguments:
 //		None
@@ -66,7 +66,7 @@ const unsigned int PlotRenderer::maxYTicks(10);
 // Class:			PlotRenderer
 // Function:		defaultVertexShader
 //
-// Desc:		Default vertex shader.
+// Description:		Default vertex shader.
 //
 // Input Arguments:
 //		0	= position
@@ -100,7 +100,7 @@ const std::string PlotRenderer::defaultVertexShader(
 // Class:			PlotRenderer
 // Function:		PlotRenderer
 //
-// Desc:		Constructor for PlotRenderer class.
+// Description:		Constructor for PlotRenderer class.
 //
 // Input Arguments:
 //		guiInterface	= GuiInterface&
@@ -144,7 +144,7 @@ PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent,
 // Class:			PlotRenderer
 // Function:		Event Tables
 //
-// Desc:		Event table for the PlotRenderer class.
+// Description:		Event table for the PlotRenderer class.
 //
 // Input Arguments:
 //		None
@@ -222,7 +222,7 @@ END_EVENT_TABLE()
 // Class:			PlotRenderer
 // Function:		UpdateDisplay
 //
-// Desc:		Updates the displayed plots to match the current data.
+// Description:		Updates the displayed plots to match the current data.
 //
 // Input Arguments:
 //		None
@@ -260,7 +260,7 @@ void PlotRenderer::UpdateDisplay()
 // Class:			PlotRenderer
 // Function:		CreateActors
 //
-// Desc:		Creates the actors for this plot.
+// Description:		Creates the actors for this plot.
 //
 // Input Arguments:
 //		None
@@ -300,7 +300,7 @@ void PlotRenderer::CreateActors()
 // Class:			PlotRenderer
 // Function:		OnSize
 //
-// Desc:		Handles EVT_SIZE events for this class.  Required to make
+// Description:		Handles EVT_SIZE events for this class.  Required to make
 //					the plot size update with the window.
 //
 // Input Arguments:
@@ -336,7 +336,7 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 // Class:			PlotRenderer
 // Function:		OnMouseWheelEvent
 //
-// Desc:		Event handler for the mouse wheel event.
+// Description:		Event handler for the mouse wheel event.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -388,7 +388,7 @@ void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnMouseMoveEvent
 //
-// Desc:		Event handler for the mouse move event.  Only used to
+// Description:		Event handler for the mouse move event.  Only used to
 //					capture drag events for rotating, panning, or dollying
 //					the scene.
 //
@@ -448,7 +448,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnRightButtonUpEvent
 //
-// Desc:		Handles end of zoom-by-box events.
+// Description:		Handles end of zoom-by-box events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -479,7 +479,7 @@ void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnMiddleButtonUpEvent
 //
-// Desc:		Undoes the zoom level (if available).
+// Description:		Undoes the zoom level (if available).
 //
 // Input Arguments:
 //		event	= wxMouseEvent& (unused)
@@ -500,7 +500,7 @@ void PlotRenderer::OnMiddleButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ZoomChanged
 //
-// Desc:		Determines if the zoom level is different from the previous
+// Description:		Determines if the zoom level is different from the previous
 //					zoom level.
 //
 // Input Arguments:
@@ -538,7 +538,7 @@ bool PlotRenderer::ZoomChanged() const
 // Class:			PlotRenderer
 // Function:		SaveCurrentZoom
 //
-// Desc:		Saves the current zoom level.
+// Description:		Saves the current zoom level.
 //
 // Input Arguments:
 //		None
@@ -574,7 +574,7 @@ void PlotRenderer::SaveCurrentZoom()
 // Class:			PlotRenderer
 // Function:		UndoZoom
 //
-// Desc:		Reverts to the previous zoom level.
+// Description:		Reverts to the previous zoom level.
 //
 // Input Arguments:
 //		None
@@ -611,7 +611,7 @@ void PlotRenderer::UndoZoom()
 // Class:			PlotRenderer
 // Function:		ClearZoomStack
 //
-// Desc:		Empties the zoom stack.
+// Description:		Empties the zoom stack.
 //
 // Input Arguments:
 //		None
@@ -633,7 +633,7 @@ void PlotRenderer::ClearZoomStack()
 // Class:			PlotRenderer
 // Function:		GetMajorGridOn
 //
-// Desc:		Returns status of the major grid lines.
+// Description:		Returns status of the major grid lines.
 //
 // Input Arguments:
 //		None
@@ -654,7 +654,7 @@ bool PlotRenderer::GetMajorGridOn() const
 // Class:			PlotRenderer
 // Function:		GetMinorGridOn
 //
-// Desc:		Returns status of the minor grid lines.
+// Description:		Returns status of the minor grid lines.
 //
 // Input Arguments:
 //		None
@@ -675,7 +675,7 @@ bool PlotRenderer::GetMinorGridOn() const
 // Class:			PlotRenderer
 // Function:		SetMajorGridOn
 //
-// Desc:		Turns on plot major grid.
+// Description:		Turns on plot major grid.
 //
 // Input Arguments:
 //		None
@@ -697,7 +697,7 @@ void PlotRenderer::SetMajorGridOn()
 // Class:			PlotRenderer
 // Function:		SetMinorGridOn
 //
-// Desc:		Turns on plot minor grid.
+// Description:		Turns on plot minor grid.
 //
 // Input Arguments:
 //		None
@@ -719,7 +719,7 @@ void PlotRenderer::SetMinorGridOn()
 // Class:			PlotRenderer
 // Function:		SetMajorGridOff
 //
-// Desc:		Turns off plot major grid.
+// Description:		Turns off plot major grid.
 //
 // Input Arguments:
 //		None
@@ -741,7 +741,7 @@ void PlotRenderer::SetMajorGridOff()
 // Class:			PlotRenderer
 // Function:		SetMinorGridOff
 //
-// Desc:		Turns off plot minor grid.
+// Description:		Turns off plot minor grid.
 //
 // Input Arguments:
 //		None
@@ -763,7 +763,7 @@ void PlotRenderer::SetMinorGridOff()
 // Class:			PlotRenderer
 // Function:		SetCurveQuality
 //
-// Desc:		Updates the internal curve quality flag.
+// Description:		Updates the internal curve quality flag.
 //
 // Input Arguments:
 //		curveQuality	= const CurveQuality&
@@ -785,7 +785,7 @@ void PlotRenderer::SetCurveQuality(const CurveQuality& curveQuality)
 // Class:			PlotRenderer
 // Function:		LegendIsVisible
 //
-// Desc:		Returns the status of the legend visibility.
+// Description:		Returns the status of the legend visibility.
 //
 // Input Arguments:
 //		None
@@ -808,7 +808,7 @@ bool PlotRenderer::LegendIsVisible() const
 // Class:			PlotRenderer
 // Function:		SetLegendOn
 //
-// Desc:		Sets the legend to visible.
+// Description:		Sets the legend to visible.
 //
 // Input Arguments:
 //		None
@@ -831,7 +831,7 @@ void PlotRenderer::SetLegendOn()
 // Class:			PlotRenderer
 // Function:		SetLegendOff
 //
-// Desc:		Sets the legend to invisible.
+// Description:		Sets the legend to invisible.
 //
 // Input Arguments:
 //		None
@@ -854,7 +854,7 @@ void PlotRenderer::SetLegendOff()
 // Class:			PlotRenderer
 // Function:		UpdateLegend
 //
-// Desc:		Updates the contents of the legend.
+// Description:		Updates the contents of the legend.
 //
 // Input Arguments:
 //		entries	= const std::vector<Legend::LegendEntryInfo>
@@ -876,7 +876,7 @@ void PlotRenderer::UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entr
 // Class:			PlotRenderer
 // Function:		GetBottomMajorGrid
 //
-// Desc:		Returns the status of the bottom major grid.
+// Description:		Returns the status of the bottom major grid.
 //
 // Input Arguments:
 //		None
@@ -897,7 +897,7 @@ bool PlotRenderer::GetBottomMajorGrid() const
 // Class:			PlotRenderer
 // Function:		GetBottomMinorGrid
 //
-// Desc:		Returns the status of the bottom minor grid.
+// Description:		Returns the status of the bottom minor grid.
 //
 // Input Arguments:
 //		None
@@ -918,7 +918,7 @@ bool PlotRenderer::GetBottomMinorGrid() const
 // Class:			PlotRenderer
 // Function:		GetLeftMajorGrid
 //
-// Desc:		Returns the status of the left major grid.
+// Description:		Returns the status of the left major grid.
 //
 // Input Arguments:
 //		None
@@ -939,7 +939,7 @@ bool PlotRenderer::GetLeftMajorGrid() const
 // Class:			PlotRenderer
 // Function:		GetLeftMinorGrid
 //
-// Desc:		Returns the status of the left minor grid.
+// Description:		Returns the status of the left minor grid.
 //
 // Input Arguments:
 //		None
@@ -960,7 +960,7 @@ bool PlotRenderer::GetLeftMinorGrid() const
 // Class:			PlotRenderer
 // Function:		GetRightMajorGrid
 //
-// Desc:		Returns the status of the right major grid.
+// Description:		Returns the status of the right major grid.
 //
 // Input Arguments:
 //		None
@@ -981,7 +981,7 @@ bool PlotRenderer::GetRightMajorGrid() const
 // Class:			PlotRenderer
 // Function:		GetRightMinorGrid
 //
-// Desc:		Returns the status of the right minor grid.
+// Description:		Returns the status of the right minor grid.
 //
 // Input Arguments:
 //		None
@@ -1002,7 +1002,7 @@ bool PlotRenderer::GetRightMinorGrid() const
 // Class:			PlotRenderer
 // Function:		SetBottomMajorGrid
 //
-// Desc:		Sets the status of the bottom axis' major grid.
+// Description:		Sets the status of the bottom axis' major grid.
 //
 // Input Arguments:
 //		None
@@ -1024,7 +1024,7 @@ void PlotRenderer::SetBottomMajorGrid(const bool &grid)
 // Class:			PlotRenderer
 // Function:		SetBottomMinorGrid
 //
-// Desc:		Sets the status of the bottom axis' minor grid.
+// Description:		Sets the status of the bottom axis' minor grid.
 //
 // Input Arguments:
 //		None
@@ -1046,7 +1046,7 @@ void PlotRenderer::SetBottomMinorGrid(const bool &grid)
 // Class:			PlotRenderer
 // Function:		SetLeftMajorGrid
 //
-// Desc:		Sets the status of the left axis' major grid.
+// Description:		Sets the status of the left axis' major grid.
 //
 // Input Arguments:
 //		None
@@ -1068,7 +1068,7 @@ void PlotRenderer::SetLeftMajorGrid(const bool &grid)
 // Class:			PlotRenderer
 // Function:		SetLeftMinorGrid
 //
-// Desc:		Sets the status of the left axis' minor grid.
+// Description:		Sets the status of the left axis' minor grid.
 //
 // Input Arguments:
 //		None
@@ -1090,7 +1090,7 @@ void PlotRenderer::SetLeftMinorGrid(const bool &grid)
 // Class:			PlotRenderer
 // Function:		SetRightMajorGrid
 //
-// Desc:		Sets the status of the right axis' major grid.
+// Description:		Sets the status of the right axis' major grid.
 //
 // Input Arguments:
 //		None
@@ -1112,7 +1112,7 @@ void PlotRenderer::SetRightMajorGrid(const bool &grid)
 // Class:			PlotRenderer
 // Function:		SetRightMinorGrid
 //
-// Desc:		Sets the status of the right axis' minor grid.
+// Description:		Sets the status of the right axis' minor grid.
 //
 // Input Arguments:
 //		None
@@ -1135,7 +1135,7 @@ void PlotRenderer::SetRightMinorGrid(const bool &grid)
 // Class:			PlotRenderer
 // Function:		SetBottomMajorResolution
 //
-// Desc:		Sets the bottom axis' major resolution.
+// Description:		Sets the bottom axis' major resolution.
 //
 // Input Arguments:
 //		resolution	= const double&
@@ -1158,7 +1158,7 @@ void PlotRenderer::SetBottomMajorResolution(const double &resolution)
 // Class:			PlotRenderer
 // Function:		SetLeftMajorResolution
 //
-// Desc:		Sets the left axis' major resolution.
+// Description:		Sets the left axis' major resolution.
 //
 // Input Arguments:
 //		resolution	= const double&
@@ -1181,7 +1181,7 @@ void PlotRenderer::SetLeftMajorResolution(const double &resolution)
 // Class:			PlotRenderer
 // Function:		SetRightMajorResolution
 //
-// Desc:		Sets the right axis' major resolution.
+// Description:		Sets the right axis' major resolution.
 //
 // Input Arguments:
 //		resolution	= const double&
@@ -1203,7 +1203,7 @@ void PlotRenderer::SetRightMajorResolution(const double &resolution)
 // Class:			PlotRenderer
 // Function:		GetBottomMajorResolution
 //
-// Desc:		Returns the bottom axis' major resolution.
+// Description:		Returns the bottom axis' major resolution.
 //
 // Input Arguments:
 //		None
@@ -1224,7 +1224,7 @@ double PlotRenderer::GetBottomMajorResolution() const
 // Class:			PlotRenderer
 // Function:		GetBottomMajorResolution
 //
-// Desc:		Returns the left axis' major resolution.
+// Description:		Returns the left axis' major resolution.
 //
 // Input Arguments:
 //		None
@@ -1245,7 +1245,7 @@ double PlotRenderer::GetLeftMajorResolution() const
 // Class:			PlotRenderer
 // Function:		GetBottomMajorResolution
 //
-// Desc:		Returns the right axis' major resolution.
+// Description:		Returns the right axis' major resolution.
 //
 // Input Arguments:
 //		None
@@ -1266,7 +1266,7 @@ double PlotRenderer::GetRightMajorResolution() const
 // Class:			PlotRenderer
 // Function:		SetCurveProperties
 //
-// Desc:		Sets properties for the specified curve object.
+// Description:		Sets properties for the specified curve object.
 //
 // Input Arguments:
 //		index		= const unsigned int& specifying the curve
@@ -1297,7 +1297,7 @@ void PlotRenderer::SetCurveProperties(const unsigned int &index, const Color &co
 // Class:			PlotRenderer
 // Function:		SetXLimits
 //
-// Desc:		Sets the axis limits for the X axis.
+// Description:		Sets the axis limits for the X axis.
 //
 // Input Arguments:
 //		min	= const double&
@@ -1330,7 +1330,7 @@ void PlotRenderer::SetXLimits(const double &min, const double &max)
 // Class:			PlotRenderer
 // Function:		SetLeftYLimits
 //
-// Desc:		Sets the axis limits for the left Y axis.
+// Description:		Sets the axis limits for the left Y axis.
 //
 // Input Arguments:
 //		min	= const double&
@@ -1363,7 +1363,7 @@ void PlotRenderer::SetLeftYLimits(const double &min, const double &max)
 // Class:			PlotRenderer
 // Function:		SetRightYLimits
 //
-// Desc:		Sets the axis limits for the right Y axis.
+// Description:		Sets the axis limits for the right Y axis.
 //
 // Input Arguments:
 //		min	= const double&
@@ -1396,7 +1396,7 @@ void PlotRenderer::SetRightYLimits(const double &min, const double &max)
 // Class:			PlotRenderer
 // Function:		AddCurve
 //
-// Desc:		Sets properties for the specified curve object.
+// Description:		Sets properties for the specified curve object.
 //
 // Input Arguments:
 //		data	= const Dataset2D& to be plotted
@@ -1417,7 +1417,7 @@ void PlotRenderer::AddCurve(const Dataset2D &data)
 // Class:			PlotRenderer
 // Function:		RemoveAllCurves
 //
-// Desc:		Removes all curves from the plot.
+// Description:		Removes all curves from the plot.
 //
 // Input Arguments:
 //		None
@@ -1441,7 +1441,7 @@ void PlotRenderer::RemoveAllCurves()
 // Class:			PlotRenderer
 // Function:		RemoveCurve
 //
-// Desc:		Removes all curves from the plot.
+// Description:		Removes all curves from the plot.
 //
 // Input Arguments:
 //		index	= const unsigned int& specifying the curve to be removed
@@ -1465,7 +1465,7 @@ void PlotRenderer::RemoveCurve(const unsigned int& index)
 // Class:			PlotRenderer
 // Function:		AutoScale
 //
-// Desc:		Enables auto-scaling of the axes.
+// Description:		Enables auto-scaling of the axes.
 //
 // Input Arguments:
 //		None
@@ -1488,7 +1488,7 @@ void PlotRenderer::AutoScale()
 // Class:			PlotRenderer
 // Function:		AutoScaleBottom
 //
-// Desc:		Enables auto-scaling of the bottom axis.
+// Description:		Enables auto-scaling of the bottom axis.
 //
 // Input Arguments:
 //		None
@@ -1511,7 +1511,7 @@ void PlotRenderer::AutoScaleBottom()
 // Class:			PlotRenderer
 // Function:		AutoScaleLeft
 //
-// Desc:		Enables auto-scaling of the left axis.
+// Description:		Enables auto-scaling of the left axis.
 //
 // Input Arguments:
 //		None
@@ -1534,7 +1534,7 @@ void PlotRenderer::AutoScaleLeft()
 // Class:			PlotRenderer
 // Function:		AutoScaleRight
 //
-// Desc:		Enables auto-scaling of the right axis.
+// Description:		Enables auto-scaling of the right axis.
 //
 // Input Arguments:
 //		None
@@ -1557,7 +1557,7 @@ void PlotRenderer::AutoScaleRight()
 // Class:			PlotRenderer
 // Function:		SetXLabel
 //
-// Desc:		Sets the text for the x-axis label.
+// Description:		Sets the text for the x-axis label.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1597,7 +1597,7 @@ void PlotRenderer::SetXLabel(wxString text)
 // Class:			PlotRenderer
 // Function:		SetLeftYLabel
 //
-// Desc:		Sets the text for the y-axis label.
+// Description:		Sets the text for the y-axis label.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1634,7 +1634,7 @@ void PlotRenderer::SetLeftYLabel(wxString text)
 // Class:			PlotRenderer
 // Function:		SetRightYLabel
 //
-// Desc:		Sets the text for the y-axis label.
+// Description:		Sets the text for the y-axis label.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1671,7 +1671,7 @@ void PlotRenderer::SetRightYLabel(wxString text)
 // Class:			PlotRenderer
 // Function:		SetTitle
 //
-// Desc:		Sets the plot title text.
+// Description:		Sets the plot title text.
 //
 // Input Arguments:
 //		text	= wxString
@@ -1711,7 +1711,7 @@ void PlotRenderer::SetTitle(wxString text)
 // Class:			PlotRenderer
 // Function:		OnMouseLeaveWindowEvent
 //
-// Desc:		Cleans up some zoom box and cursor items.
+// Description:		Cleans up some zoom box and cursor items.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -1740,7 +1740,7 @@ void PlotRenderer::OnMouseLeaveWindowEvent(wxMouseEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		OnDoubleClickEvent
 //
-// Desc:		Handles double click events.  Allows user to change axis
+// Description:		Handles double click events.  Allows user to change axis
 //					limits or create a cursor.
 //
 // Input Arguments:
@@ -1774,7 +1774,7 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnMouseLeftDownEvent
 //
-// Desc:		Checks to see if the user is dragging a cursor.
+// Description:		Checks to see if the user is dragging a cursor.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -1801,7 +1801,7 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnLeftButtonUpEvent
 //
-// Desc:		Makes sure we stop dragging when we stop clicking.
+// Description:		Makes sure we stop dragging when we stop clicking.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -1836,7 +1836,7 @@ void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		UpdateLegendAnchor
 //
-// Desc:		Updates the anchor depending on legend position.
+// Description:		Updates the anchor depending on legend position.
 //
 // Input Arguments:
 //		None
@@ -1894,7 +1894,7 @@ void PlotRenderer::UpdateLegendAnchor()
 // Class:			PlotRenderer
 // Function:		GetLeftCursorVisible
 //
-// Desc:		Returns status of left cursor visibility flag.
+// Description:		Returns status of left cursor visibility flag.
 //
 // Input Arguments:
 //		None
@@ -1915,7 +1915,7 @@ bool PlotRenderer::GetLeftCursorVisible() const
 // Class:			PlotRenderer
 // Function:		GetRightCursorVisible
 //
-// Desc:		Returns status of right cursor visibility flag.
+// Description:		Returns status of right cursor visibility flag.
 //
 // Input Arguments:
 //		None
@@ -1936,7 +1936,7 @@ bool PlotRenderer::GetRightCursorVisible() const
 // Class:			PlotRenderer
 // Function:		GetLeftCursorValue
 //
-// Desc:		Returns x-value of left cursor.
+// Description:		Returns x-value of left cursor.
 //
 // Input Arguments:
 //		None
@@ -1957,7 +1957,7 @@ double PlotRenderer::GetLeftCursorValue() const
 // Class:			PlotRenderer
 // Function:		GetRightCursorValue
 //
-// Desc:		Makes sure we stop dragging when we stop clicking.
+// Description:		Makes sure we stop dragging when we stop clicking.
 //
 // Input Arguments:
 //		None
@@ -1978,7 +1978,7 @@ double PlotRenderer::GetRightCursorValue() const
 // Class:			PlotRenderer
 // Function:		UpdateCursors
 //
-// Desc:		Updates the cursor calculations.
+// Description:		Updates the cursor calculations.
 //
 // Input Arguments:
 //		None
@@ -2007,7 +2007,7 @@ void PlotRenderer::UpdateCursors()
 // Class:			PlotRenderer
 // Function:		GetXMin
 //
-// Desc:		Returns the minimum value of the X-axis.
+// Description:		Returns the minimum value of the X-axis.
 //
 // Input Arguments:
 //		None
@@ -2028,7 +2028,7 @@ double PlotRenderer::GetXMin() const
 // Class:			PlotRenderer
 // Function:		GetXMax
 //
-// Desc:		Returns the maximum value of the X-axis.
+// Description:		Returns the maximum value of the X-axis.
 //
 // Input Arguments:
 //		None
@@ -2049,7 +2049,7 @@ double PlotRenderer::GetXMax() const
 // Class:			PlotRenderer
 // Function:		GetLeftYMin
 //
-// Desc:		Returns the minimum value of the left y-axis.
+// Description:		Returns the minimum value of the left y-axis.
 //
 // Input Arguments:
 //		None
@@ -2070,7 +2070,7 @@ double PlotRenderer::GetLeftYMin() const
 // Class:			PlotRenderer
 // Function:		GetLeftYMax
 //
-// Desc:		Returns the maximum value of the left y-axis.
+// Description:		Returns the maximum value of the left y-axis.
 //
 // Input Arguments:
 //		None
@@ -2091,7 +2091,7 @@ double PlotRenderer::GetLeftYMax() const
 // Class:			PlotRenderer
 // Function:		GetRightYMin
 //
-// Desc:		Returns the minimum value of the right y-axis.
+// Description:		Returns the minimum value of the right y-axis.
 //
 // Input Arguments:
 //		None
@@ -2112,7 +2112,7 @@ double PlotRenderer::GetRightYMin() const
 // Class:			PlotRenderer
 // Function:		GetRightYMax
 //
-// Desc:		Returns the maximum value of the right y-axis.
+// Description:		Returns the maximum value of the right y-axis.
 //
 // Input Arguments:
 //		None
@@ -2133,7 +2133,7 @@ double PlotRenderer::GetRightYMax() const
 // Class:			PlotRenderer
 // Function:		GetGridColor
 //
-// Desc:		Returns the color of the gridlines for this plot.
+// Description:		Returns the color of the gridlines for this plot.
 //
 // Input Arguments:
 //		None
@@ -2154,7 +2154,7 @@ Color PlotRenderer::GetGridColor() const
 // Class:			PlotRenderer
 // Function:		SetGridColor
 //
-// Desc:		Sets the color of the gridlines for this plot.
+// Description:		Sets the color of the gridlines for this plot.
 //
 // Input Arguments:
 //		color	= const Color&
@@ -2175,7 +2175,7 @@ void PlotRenderer::SetGridColor(const Color &color)
 // Class:			PlotRenderer
 // Function:		GetXLogarithmic
 //
-// Desc:		Returns a boolean indicating whether or not the X axis
+// Description:		Returns a boolean indicating whether or not the X axis
 //					is scaled logarithmicly.
 //
 // Input Arguments:
@@ -2200,7 +2200,7 @@ bool PlotRenderer::GetXLogarithmic() const
 // Class:			PlotRenderer
 // Function:		GetLeftLogarithmic
 //
-// Desc:		Returns a boolean indicating whether or not the left Y axis
+// Description:		Returns a boolean indicating whether or not the left Y axis
 //					is scaled logarithmicly.
 //
 // Input Arguments:
@@ -2225,7 +2225,7 @@ bool PlotRenderer::GetLeftLogarithmic() const
 // Class:			PlotRenderer
 // Function:		GetRightLogarithmic
 //
-// Desc:		Returns a boolean indicating whether or not the right Y axis
+// Description:		Returns a boolean indicating whether or not the right Y axis
 //					is scaled logarithmicly.
 //
 // Input Arguments:
@@ -2250,7 +2250,7 @@ bool PlotRenderer::GetRightLogarithmic() const
 // Class:			PlotRenderer
 // Function:		SetXLogarithmic
 //
-// Desc:		Sets the X axis to be logarithmic or standard scaling.
+// Description:		Sets the X axis to be logarithmic or standard scaling.
 //
 // Input Arguments:
 //		log	= const bool&
@@ -2273,7 +2273,7 @@ void PlotRenderer::SetXLogarithmic(const bool &log)
 // Class:			PlotRenderer
 // Function:		SetLeftLogarithmic
 //
-// Desc:		Sets the left Y axis to be logarithmic or standard scaling.
+// Description:		Sets the left Y axis to be logarithmic or standard scaling.
 //
 // Input Arguments:
 //		log	= const bool&
@@ -2296,7 +2296,7 @@ void PlotRenderer::SetLeftLogarithmic(const bool &log)
 // Class:			PlotRenderer
 // Function:		SetRightLogarithmic
 //
-// Desc:		Sets the right Y axis to be logarithmic or standard scaling.
+// Description:		Sets the right Y axis to be logarithmic or standard scaling.
 //
 // Input Arguments:
 //		log	= const bool&
@@ -2319,7 +2319,7 @@ void PlotRenderer::SetRightLogarithmic(const bool &log)
 // Class:			PlotRenderer
 // Function:		GetXAxisZoomed
 //
-// Desc:		Determines if the x-axis is zoomed (not autoscaled) and
+// Description:		Determines if the x-axis is zoomed (not autoscaled) and
 //					returns the result.
 //
 // Input Arguments:
@@ -2344,7 +2344,7 @@ bool PlotRenderer::GetXAxisZoomed() const
 // Class:			PlotRenderer
 // Function:		ProcessZoom
 //
-// Desc:		Handles mouse-drag zoom events.
+// Description:		Handles mouse-drag zoom events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2390,7 +2390,7 @@ void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		ProcessZoomWithBox
 //
-// Desc:		Handles mouse-drag zoom box events.
+// Description:		Handles mouse-drag zoom box events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2429,7 +2429,7 @@ void PlotRenderer::ProcessZoomWithBox(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		ProcessPan
 //
-// Desc:		Handles mouse-drag pan events.
+// Description:		Handles mouse-drag pan events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2452,7 +2452,7 @@ void PlotRenderer::ProcessPan(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		PanBottomXAxis
 //
-// Desc:		Pans the bottom x-axis in resposne to mouse moves.
+// Description:		Pans the bottom x-axis in resposne to mouse moves.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2488,7 +2488,7 @@ void PlotRenderer::PanBottomXAxis(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		PanLeftYAxis
 //
-// Desc:		Pans the left y-axis in resposne to mouse moves.
+// Description:		Pans the left y-axis in resposne to mouse moves.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2524,7 +2524,7 @@ void PlotRenderer::PanLeftYAxis(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		PanRightYAxis
 //
-// Desc:		Pans the right y-axis in resposne to mouse moves.
+// Description:		Pans the right y-axis in resposne to mouse moves.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2560,7 +2560,7 @@ void PlotRenderer::PanRightYAxis(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		ProcessPlotAreaDoubleClick
 //
-// Desc:		Processes double click events occurring within the plot area.
+// Description:		Processes double click events occurring within the plot area.
 //
 // Input Arguments:
 //		x	= const unsigned int&, location of click along x-axis
@@ -2601,7 +2601,7 @@ void PlotRenderer::ProcessPlotAreaDoubleClick(const unsigned int &x)
 // Class:			PlotRenderer
 // Function:		ProcessOffPlotDoubleClick
 //
-// Desc:		Process double click events that occured outside the plot area.
+// Description:		Process double click events that occured outside the plot area.
 //
 // Input Arguments:
 //		x	= const unsigned int&, location of click along x-axis
@@ -2640,7 +2640,7 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 // Class:			PlotRenderer
 // Function:		ProcessRightClick
 //
-// Desc:		Processes right click events.
+// Description:		Processes right click events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2683,7 +2683,7 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		ProcessZoomBoxEnd
 //
-// Desc:		Completes zoom and cleans up box after user releases zoom box.
+// Description:		Completes zoom and cleans up box after user releases zoom box.
 //
 // Input Arguments:
 //		None
@@ -2736,7 +2736,7 @@ void PlotRenderer::ProcessZoomBoxEnd()
 // Class:			PlotRenderer
 // Function:		ComputePrettyLimits
 //
-// Desc:		Computes new limits given the specified range to ensure
+// Description:		Computes new limits given the specified range to ensure
 //					pretty tick spacing.
 //
 // Input Arguments:
@@ -2771,7 +2771,7 @@ void PlotRenderer::ComputePrettyLimits(double &min, double &max, const unsigned 
 // Class:			PlotRenderer
 // Function:		ForcePointWithinPlotArea
 //
-// Desc:		If the specified point is not within the plot area, it
+// Description:		If the specified point is not within the plot area, it
 //					modifies the coordinates such that it is.
 //
 // Input Arguments:
@@ -2802,7 +2802,7 @@ void PlotRenderer::ForcePointWithinPlotArea(unsigned int &x, unsigned int &y)
 // Class:			PlotRenderer
 // Function:		GetXLabel
 //
-// Desc:		Return the value of the label text.
+// Description:		Return the value of the label text.
 //
 // Input Arguments:
 //		None
@@ -2823,7 +2823,7 @@ wxString PlotRenderer::GetXLabel() const
 // Class:			PlotRenderer
 // Function:		GetLeftYLabel
 //
-// Desc:		Return the value of the label text.
+// Description:		Return the value of the label text.
 //
 // Input Arguments:
 //		None
@@ -2844,7 +2844,7 @@ wxString PlotRenderer::GetLeftYLabel() const
 // Class:			PlotRenderer
 // Function:		GetRightYLabel
 //
-// Desc:		Return the value of the label text.
+// Description:		Return the value of the label text.
 //
 // Input Arguments:
 //		None
@@ -2865,7 +2865,7 @@ wxString PlotRenderer::GetRightYLabel() const
 // Class:			PlotRenderer
 // Function:		GetTitle
 //
-// Desc:		Return the value of the label text.
+// Description:		Return the value of the label text.
 //
 // Input Arguments:
 //		None
@@ -2886,7 +2886,7 @@ wxString PlotRenderer::GetTitle() const
 // Class:			PlotRenderer
 // Function:		ComputeTickSpacing
 //
-// Desc:		Computes the ideal tick spacing based on the specified range.
+// Description:		Computes the ideal tick spacing based on the specified range.
 //
 // Input Arguments:
 //		min		= const
@@ -2948,7 +2948,7 @@ double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
 // Class:			PlotRenderer
 // Function:		GetImage
 //
-// Desc:		Returns a copy of the current image.
+// Description:		Returns a copy of the current image.
 //
 // Input Arguments:
 //		None
@@ -2975,7 +2975,7 @@ wxImage PlotRenderer::GetImage() const
 // Class:			PlotRenderer
 // Function:		GetTotalPointCount
 //
-// Desc:		Returns total number of points stored in plot curves.
+// Description:		Returns total number of points stored in plot curves.
 //
 // Input Arguments:
 //		None
@@ -2996,7 +2996,7 @@ unsigned long long PlotRenderer::GetTotalPointCount() const
 // Class:			PlotRenderer
 // Function:		LoadModelviewUniform
 //
-// Desc:		Loads the specified modelview matrix to the openGL uniform.
+// Description:		Loads the specified modelview matrix to the openGL uniform.
 //
 // Input Arguments:
 //		mv	= const Modelview&
@@ -3034,7 +3034,7 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 // Class:			PlotRenderer
 // Function:		ContextWriteImageFile
 //
-// Desc:		Calls the object of interest's write image file method.
+// Description:		Calls the object of interest's write image file method.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3063,7 +3063,7 @@ void PlotRenderer::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextExportData
 //
-// Desc:		Exports the data to file.
+// Description:		Exports the data to file.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3084,7 +3084,7 @@ void PlotRenderer::ContextExportData(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		CreatePlotContextMenu
 //
-// Desc:		Displays a context menu for the plot.
+// Description:		Displays a context menu for the plot.
 //
 // Input Arguments:
 //		position	= const wxPoint& specifying the position to display the menu
@@ -3138,7 +3138,7 @@ void PlotRenderer::CreatePlotContextMenu(const wxPoint &position, const PlotCont
 // Class:			PlotRenderer
 // Function:		CreatePlotAreaContextMenu
 //
-// Desc:		Displays a context menu for the specified plot axis.
+// Description:		Displays a context menu for the specified plot axis.
 //
 // Input Arguments:
 //		None
@@ -3186,7 +3186,7 @@ std::unique_ptr<wxMenu> PlotRenderer::CreatePlotAreaContextMenu() const
 // Class:			PlotRenderer
 // Function:		CreateAxisContextMenu
 //
-// Desc:		Displays a context menu for the specified plot axis.
+// Description:		Displays a context menu for the specified plot axis.
 //
 // Input Arguments:
 //		baseEventId	= const unsigned int&
@@ -3218,7 +3218,7 @@ std::unique_ptr<wxMenu> PlotRenderer::CreateAxisContextMenu(const unsigned int &
 // Class:			PlotRenderer
 // Function:		ContextCopy
 //
-// Desc:		Handles context menu copy command events.
+// Description:		Handles context menu copy command events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3239,7 +3239,7 @@ void PlotRenderer::ContextCopy(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextPaste
 //
-// Desc:		Handles context menu paste command events.
+// Description:		Handles context menu paste command events.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3260,7 +3260,7 @@ void PlotRenderer::ContextPaste(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextToggleMajorGridlines
 //
-// Desc:		Toggles major gridlines for the entire plot on and off.
+// Description:		Toggles major gridlines for the entire plot on and off.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3286,7 +3286,7 @@ void PlotRenderer::ContextToggleMajorGridlines(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextToggleMinorGridlines
 //
-// Desc:		Toggles minor gridlines for the entire plot on and off.
+// Description:		Toggles minor gridlines for the entire plot on and off.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3312,7 +3312,7 @@ void PlotRenderer::ContextToggleMinorGridlines(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextToggleLegend
 //
-// Desc:		Toggles legend visibility on and off.
+// Description:		Toggles legend visibility on and off.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3338,7 +3338,7 @@ void PlotRenderer::ContextToggleLegend(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextAutoScale
 //
-// Desc:		Autoscales the plot.
+// Description:		Autoscales the plot.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3360,7 +3360,7 @@ void PlotRenderer::ContextAutoScale(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		GetCurrentAxisRange
 //
-// Desc:		Returns the range for the specified axis.
+// Description:		Returns the range for the specified axis.
 //
 // Input Arguments:
 //		axis	= const PlotContext&
@@ -3405,7 +3405,7 @@ bool PlotRenderer::GetCurrentAxisRange(const PlotContext &axis, double &min, dou
 // Class:			PlotRenderer
 // Function:		SetNewAxisRange
 //
-// Desc:		Returns the range for the specified axis.
+// Description:		Returns the range for the specified axis.
 //
 // Input Arguments:
 //		axis	= const PlotContext&
@@ -3447,7 +3447,7 @@ void PlotRenderer::SetNewAxisRange(const PlotContext &axis, const double &min, c
 // Class:			PlotRenderer
 // Function:		ContextToggleMajorGridlinesBottom
 //
-// Desc:		Toggles major gridlines for the bottom axis.
+// Description:		Toggles major gridlines for the bottom axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3468,7 +3468,7 @@ void PlotRenderer::ContextToggleMajorGridlinesBottom(wxCommandEvent& WXUNUSED(ev
 // Class:			PlotRenderer
 // Function:		ContextToggleMinorGridlinesBottom
 //
-// Desc:		Toggles major gridlines for the bottom axis.
+// Description:		Toggles major gridlines for the bottom axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3489,7 +3489,7 @@ void PlotRenderer::ContextToggleMinorGridlinesBottom(wxCommandEvent& WXUNUSED(ev
 // Class:			PlotRenderer
 // Function:		ContextAutoScaleBottom
 //
-// Desc:		Auto-scales the bottom axis.
+// Description:		Auto-scales the bottom axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3510,7 +3510,7 @@ void PlotRenderer::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetRangeBottom
 //
-// Desc:		Dispalys a dialog box for setting the axis range.
+// Description:		Dispalys a dialog box for setting the axis range.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3531,7 +3531,7 @@ void PlotRenderer::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetMajorResolutionBottom
 //
-// Desc:		Dispalys a dialog box for setting the axis major resolution.
+// Description:		Dispalys a dialog box for setting the axis major resolution.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3563,7 +3563,7 @@ void PlotRenderer::ContextSetMajorResolutionBottom(wxCommandEvent& WXUNUSED(even
 // Class:			PlotRenderer
 // Function:		ContextToggleMajorGridlinesLeft
 //
-// Desc:		Toggles major gridlines for the left axis.
+// Description:		Toggles major gridlines for the left axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3584,7 +3584,7 @@ void PlotRenderer::ContextToggleMajorGridlinesLeft(wxCommandEvent& WXUNUSED(even
 // Class:			PlotRenderer
 // Function:		ContextToggleMinorGridlinesLeft
 //
-// Desc:		Toggles major gridlines for the left axis.
+// Description:		Toggles major gridlines for the left axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3605,7 +3605,7 @@ void PlotRenderer::ContextToggleMinorGridlinesLeft(wxCommandEvent& WXUNUSED(even
 // Class:			PlotRenderer
 // Function:		ContextAutoScaleLeft
 //
-// Desc:		Toggles gridlines for the bottom axis.
+// Description:		Toggles gridlines for the bottom axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3626,7 +3626,7 @@ void PlotRenderer::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetRangeLeft
 //
-// Desc:		Dispalys a dialog box for setting the axis range.
+// Description:		Dispalys a dialog box for setting the axis range.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3647,7 +3647,7 @@ void PlotRenderer::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetMajorResolutionLeft
 //
-// Desc:		Dispalys a dialog box for setting the axis major resolution.
+// Description:		Dispalys a dialog box for setting the axis major resolution.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3679,7 +3679,7 @@ void PlotRenderer::ContextSetMajorResolutionLeft(wxCommandEvent& WXUNUSED(event)
 // Class:			PlotRenderer
 // Function:		ContextToggleMajorGridlinesRight
 //
-// Desc:		Toggles major gridlines for the right axis.
+// Description:		Toggles major gridlines for the right axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3700,7 +3700,7 @@ void PlotRenderer::ContextToggleMajorGridlinesRight(wxCommandEvent& WXUNUSED(eve
 // Class:			PlotRenderer
 // Function:		ContextToggleMinorGridlinesRight
 //
-// Desc:		Toggles minor gridlines for the right axis.
+// Description:		Toggles minor gridlines for the right axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3721,7 +3721,7 @@ void PlotRenderer::ContextToggleMinorGridlinesRight(wxCommandEvent& WXUNUSED(eve
 // Class:			PlotRenderer
 // Function:		ContextAutoScaleRight
 //
-// Desc:		Toggles gridlines for the bottom axis.
+// Description:		Toggles gridlines for the bottom axis.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3742,7 +3742,7 @@ void PlotRenderer::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetRangeRight
 //
-// Desc:		Dispalys a dialog box for setting the axis range.
+// Description:		Dispalys a dialog box for setting the axis range.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3763,7 +3763,7 @@ void PlotRenderer::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetMajorResolutionRight
 //
-// Desc:		Dispalys a dialog box for setting the axis major resolution.
+// Description:		Dispalys a dialog box for setting the axis major resolution.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3795,7 +3795,7 @@ void PlotRenderer::ContextSetMajorResolutionRight(wxCommandEvent& WXUNUSED(event
 // Class:			PlotRenderer
 // Function:		ContextPlotBGColor
 //
-// Desc:		Displays a dialog allowing the user to specify the plot's
+// Description:		Displays a dialog allowing the user to specify the plot's
 //					background color.
 //
 // Input Arguments:
@@ -3829,7 +3829,7 @@ void PlotRenderer::ContextPlotBGColor(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextGridColor
 //
-// Desc:		Dispalys a dialog box allowing the user to specify the
+// Description:		Dispalys a dialog box allowing the user to specify the
 //					gridline color.
 //
 // Input Arguments:
@@ -3863,7 +3863,7 @@ void PlotRenderer::ContextGridColor(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetLogarithmicBottom
 //
-// Desc:		Event handler for right Y-axis context menu Set Logarithmic event.
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3885,7 +3885,7 @@ void PlotRenderer::ContextSetLogarithmicBottom(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetLogarithmicLeft
 //
-// Desc:		Event handler for right Y-axis context menu Set Logarithmic event.
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3907,7 +3907,7 @@ void PlotRenderer::ContextSetLogarithmicLeft(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextSetLogarithmicRight
 //
-// Desc:		Event handler for right Y-axis context menu Set Logarithmic event.
+// Description:		Event handler for right Y-axis context menu Set Logarithmic event.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3929,7 +3929,7 @@ void PlotRenderer::ContextSetLogarithmicRight(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextEditBottomLabel
 //
-// Desc:		Displays a message box asking the user to specify the text
+// Description:		Displays a message box asking the user to specify the text
 //					for the label.
 //
 // Input Arguments:
@@ -3953,7 +3953,7 @@ void PlotRenderer::ContextEditBottomLabel(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextEditLeftLabel
 //
-// Desc:		Displays a message box asking the user to specify the text
+// Description:		Displays a message box asking the user to specify the text
 //					for the label.
 //
 // Input Arguments:
@@ -3977,7 +3977,7 @@ void PlotRenderer::ContextEditLeftLabel(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextEditRightLabel
 //
-// Desc:		Displays a message box asking the user to specify the text
+// Description:		Displays a message box asking the user to specify the text
 //					for the label.
 //
 // Input Arguments:
@@ -4001,7 +4001,7 @@ void PlotRenderer::ContextEditRightLabel(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		DoCopy
 //
-// Desc:		Handles "copy to clipboard" actions.
+// Description:		Handles "copy to clipboard" actions.
 //
 // Input Arguments:
 //		None
@@ -4027,7 +4027,7 @@ void PlotRenderer::DoCopy()
 // Class:			PlotRenderer
 // Function:		DoPaste
 //
-// Desc:		Handles "paste from clipboard" actions.
+// Description:		Handles "paste from clipboard" actions.
 //
 // Input Arguments:
 //		None

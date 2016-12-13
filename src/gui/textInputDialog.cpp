@@ -26,7 +26,7 @@ namespace LibPlot2D
 // Class:			TextInputDialog
 // Function:		TextInputDialog
 //
-// Desc:		Constructor for TextInputDialog class.
+// Description:		Constructor for TextInputDialog class.
 //
 // Input Arguments:
 //		message		= const wxString&, propmt to display for user
@@ -51,7 +51,7 @@ TextInputDialog::TextInputDialog(const wxString &message, const wxString &title,
 // Class:			TextInputDialog
 // Function:		~TextInputDialog
 //
-// Desc:		Destructor for TextInputDialog class.
+// Description:		Destructor for TextInputDialog class.
 //
 // Input Arguments:
 //		None
@@ -71,7 +71,7 @@ TextInputDialog::~TextInputDialog()
 // Class:			TextInputDialog
 // Function:		CreateControls
 //
-// Desc:		Constructor for TextInputDialog class.
+// Description:		Constructor for TextInputDialog class.
 //
 // Input Arguments:
 //		message		= const wxString&, propmt to display for user

@@ -24,7 +24,7 @@ namespace LibPlot2D
 // Class:			DropTarget
 // Function:		DropTarget
 //
-// Desc:		Constructor for DropTarget class.
+// Description:		Constructor for DropTarget class.
 //
 // Input Arguments:
 //		guiInterface	= &GuiInterface, reference to main application window
@@ -50,7 +50,7 @@ DropTarget::DropTarget(GuiInterface &guiInterface) : guiInterface(guiInterface)
 // Class:			DropTarget
 // Function:		OnDropFiles
 //
-// Desc:		Handles dragging and dropping of files.
+// Description:		Handles dragging and dropping of files.
 //
 // Input Arguments:
 //		filenames	= const &wxArrayString containing the list of filenames
@@ -73,7 +73,7 @@ bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 // Class:			DropTarget
 // Function:		OnDropText
 //
-// Desc:		Handles dragging and dropping text.
+// Description:		Handles dragging and dropping text.
 //
 // Input Arguments:
 //		data	= const &wxString containing the text being dropped
@@ -95,7 +95,7 @@ bool DropTarget::OnDropText(const wxString& data)
 // Class:			DropTarget
 // Function:		OnData
 //
-// Desc:		Overloaded virtual method from wxTextDropTarget.
+// Description:		Overloaded virtual method from wxTextDropTarget.
 //
 // Input Arguments:
 //		x		= wxCoord (unused)

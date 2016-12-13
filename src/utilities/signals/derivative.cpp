@@ -23,7 +23,7 @@ namespace LibPlot2D
 // Class:			DiscreteDerivative
 // Function:		ComputeTimeHistory (static)
 //
-// Desc:		Computes the discrete-time derivative time history for
+// Description:		Computes the discrete-time derivative time history for
 //					the given signal.  Assumes y contains data and x is time.
 //
 // Input Arguments:

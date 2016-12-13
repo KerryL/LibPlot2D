@@ -26,7 +26,7 @@ namespace LibPlot2D
 // Class:			RootMeanSquare
 // Function:		ComputeTimeHistory (static)
 //
-// Desc:		Computes the root-mean-square time history for the given
+// Description:		Computes the root-mean-square time history for the given
 //					signal.  Assumes y contains data and x is time.
 //
 // Input Arguments:

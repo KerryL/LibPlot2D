@@ -27,7 +27,7 @@ namespace LibPlot2D
 // Class:			PlotCursor
 // Function:		PlotCursor
 //
-// Desc:		Constructor for the PlotCursor class.
+// Description:		Constructor for the PlotCursor class.
 //
 // Input Arguments:
 //		renderWindow	= RenderWindow&
@@ -54,7 +54,7 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 // Class:			PlotCursor
 // Function:		Update
 //
-// Desc:		Updates the GL buffers associated with this object.
+// Description:		Updates the GL buffers associated with this object.
 //
 // Input Arguments:
 //		i	= const unsigned int&
@@ -91,7 +91,7 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 // Class:			PlotCursor
 // Function:		GenerateGeometry
 //
-// Desc:		Generates OpenGL commands to draw the cursor.
+// Description:		Generates OpenGL commands to draw the cursor.
 //
 // Input Arguments:
 //		None
@@ -117,7 +117,7 @@ void PlotCursor::GenerateGeometry()
 // Class:			PlotCursor
 // Function:		HasValidParameters
 //
-// Desc:		Checks to see if we're OK to draw the cursor.
+// Description:		Checks to see if we're OK to draw the cursor.
 //
 // Input Arguments:
 //		None
@@ -146,7 +146,7 @@ bool PlotCursor::HasValidParameters()
 // Class:			PlotCursor
 // Function:		IsUnder
 //
-// Desc:		Checks to see if the cursor is located under the specified
+// Description:		Checks to see if the cursor is located under the specified
 //					point.
 //
 // Input Arguments:
@@ -175,7 +175,7 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 // Class:			PlotCursor
 // Function:		SetLocation
 //
-// Desc:		Sets the x position where the cursor should appear on the plot.
+// Description:		Sets the x position where the cursor should appear on the plot.
 //
 // Input Arguments:
 //		location	= const int& location to set
@@ -198,7 +198,7 @@ void PlotCursor::SetLocation(const int& location)
 // Class:			PlotCursor
 // Function:		operator=
 //
-// Desc:		Sets the x-value where the cursor should appear on the plot.
+// Description:		Sets the x-value where the cursor should appear on the plot.
 //
 // Input Arguments:
 //		_value	= const double& value to set

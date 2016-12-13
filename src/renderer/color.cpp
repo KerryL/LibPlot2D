@@ -32,7 +32,7 @@ namespace LibPlot2D
 // Class:			Color
 // Function:		Color
 //
-// Desc:		Constructor for the Color class (default).
+// Description:		Constructor for the Color class (default).
 //
 // Input Arguments:
 //		None
@@ -57,7 +57,7 @@ Color::Color()
 // Class:			Color
 // Function:		Color
 //
-// Desc:		Constructor for the Color class.  Sets the class contents
+// Description:		Constructor for the Color class.  Sets the class contents
 //					as specified by the arguments.
 //
 // Input Arguments:
@@ -83,7 +83,7 @@ Color::Color(const double &red, const double &green, const double &blue, const d
 // Class:			Color
 // Function:		Color
 //
-// Desc:		Constructor for the Color class.  Sets the class contents
+// Description:		Constructor for the Color class.  Sets the class contents
 //					as specified by the specified wxColor.
 //
 // Input Arguments:
@@ -106,7 +106,7 @@ Color::Color(const wxColor &c)
 // Class:			Color
 // Function:		Constant Declarations
 //
-// Desc:		Constants for the Color class.
+// Description:		Constants for the Color class.
 //
 // Input Arguments:
 //		None
@@ -142,7 +142,7 @@ const Color Color::ColorGray(0.5, 0.5, 0.5);
 // Class:			Color
 // Function:		GetHue
 //
-// Desc:		Returns the hue for the color.
+// Description:		Returns the hue for the color.
 //
 // Input Arguments:
 //		None
@@ -174,7 +174,7 @@ double Color::GetHue() const
 // Class:			Color
 // Function:		GetSaturation
 //
-// Desc:		Returns the saturation for the color.
+// Description:		Returns the saturation for the color.
 //
 // Input Arguments:
 //		None
@@ -199,7 +199,7 @@ double Color::GetSaturation() const
 // Class:			Color
 // Function:		GetLightness
 //
-// Desc:		Returns the lightness for the color (uses Rec. 601 NTSC).
+// Description:		Returns the lightness for the color (uses Rec. 601 NTSC).
 //
 // Input Arguments:
 //		None
@@ -220,7 +220,7 @@ double Color::GetLightness() const
 // Class:			Color
 // Function:		GetChroma
 //
-// Desc:		Returns the chroma for the color.
+// Description:		Returns the chroma for the color.
 //
 // Input Arguments:
 //		None
@@ -241,7 +241,7 @@ double Color::GetChroma() const
 // Class:			Color
 // Function:		SetHSL
 //
-// Desc:		Sets the HSLA values for this color.
+// Description:		Sets the HSLA values for this color.
 //
 // Input Arguments:
 //		hue		= const double& (0 to 1, indication 0 to 360 deg)
@@ -311,7 +311,7 @@ void Color::SetHSL(const double &hue, const double &sat, const double &lum, cons
 // Class:			Color
 // Function:		Set
 //
-// Desc:		Sets the RGBA values for this color.
+// Description:		Sets the RGBA values for this color.
 //
 // Input Arguments:
 //		red		= const double& specifying the amount of red in this color (0.0 - 1.0)
@@ -340,7 +340,7 @@ void Color::Set(const double &red, const double &green, const double &blue, cons
 // Class:			Color
 // Function:		Set
 //
-// Desc:		Sets the RGBA values for this color.  Overload taking
+// Description:		Sets the RGBA values for this color.  Overload taking
 //					wxColor argument.
 //
 // Input Arguments:
@@ -368,7 +368,7 @@ void Color::Set(const wxColor &color)
 // Class:			Color
 // Function:		SetAlpha
 //
-// Desc:		Sets the alpha value for this object.
+// Description:		Sets the alpha value for this object.
 //
 // Input Arguments:
 //		alpha = const double&
@@ -390,7 +390,7 @@ void Color::SetAlpha(const double &alpha)
 // Class:			Color
 // Function:		ToWxColor
 //
-// Desc:		Returns a wxColor object that matches this object's color.
+// Description:		Returns a wxColor object that matches this object's color.
 //
 // Input Arguments:
 //		None
@@ -414,7 +414,7 @@ wxColor Color::ToWxColor() const
 // Class:			Color
 // Function:		ValidateColor
 //
-// Desc:		Forces all components of the color to be between 0 and 1
+// Description:		Forces all components of the color to be between 0 and 1
 //					if they are not already.
 //
 // Input Arguments:
@@ -454,7 +454,7 @@ void Color::ValidateColor()
 // Class:			Color
 // Function:		GetColorHSL
 //
-// Desc:		Returns a color matching the specified RGBA value.
+// Description:		Returns a color matching the specified RGBA value.
 //
 // Input Arguments:
 //		hue		= const double&
@@ -480,7 +480,7 @@ Color Color::GetColorHSL(const double &hue, const double &sat, const double &lum
 // Class:			Color
 // Function:		GetColor
 //
-// Desc:		Returns a color matching the specified RGBA value.
+// Description:		Returns a color matching the specified RGBA value.
 //
 // Input Arguments:
 //		red		= const double&

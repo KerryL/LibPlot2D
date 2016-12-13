@@ -56,6 +56,7 @@ public:
 	void AddCurve(std::unique_ptr<Dataset2D> data, wxString name);
 	void RemoveCurve(const unsigned int &i);
 	void RemoveCurves(const wxArrayInt& curves);
+	void RemoveSelectedCurves();
 	void ClearAllCurves();
 
 	void SetApplicationTitle(const wxString& title) { applicationTitle = title; }

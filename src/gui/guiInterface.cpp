@@ -55,7 +55,7 @@ GuiInterface::GuiInterface(wxFrame* owner) : owner(owner)
 // Class:			GuiInterface
 // Function:		LoadFiles
 //
-// Desc:		Method for loading a multiple files.
+// Description:		Method for loading a multiple files.
 //
 // Input Arguments:
 //		fileList	= const wxArrayString&
@@ -171,7 +171,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 // Class:			GuiInterface
 // Function:		LoadText
 //
-// Desc:		Public method for loading a single object from text.
+// Description:		Public method for loading a single object from text.
 //					This writes the text to a temporary file, then tries to
 //					open it using normal methods.
 //
@@ -219,7 +219,7 @@ bool GuiInterface::LoadText(const wxString &textData)
 // Class:			GuiInterface
 // Function:		ReloadData
 //
-// Desc:		Reloads the data from the last set of files loaded.
+// Description:		Reloads the data from the last set of files loaded.
 //
 // Input Arguments:
 //		None
@@ -243,7 +243,7 @@ void GuiInterface::ReloadData()
 // Class:			GuiInterface
 // Function:		GenerateTemporaryFileName
 //
-// Desc:		Generates a random string of characters to use as a file
+// Description:		Generates a random string of characters to use as a file
 //					name (always ends with .tmp).
 //
 // Input Arguments:
@@ -287,7 +287,7 @@ wxString GuiInterface::GenerateTemporaryFileName(const unsigned int &length) con
 // Class:			GuiInterface
 // Function:		ClearAllCurves
 //
-// Desc:		Removes all curves from the plot.
+// Description:		Removes all curves from the plot.
 //
 // Input Arguments:
 //		None
@@ -309,7 +309,7 @@ void GuiInterface::ClearAllCurves()
 // Class:			GuiInterface
 // Function:		AddCurve
 //
-// Desc:		Adds a new dataset to the plot, created by operating on
+// Description:		Adds a new dataset to the plot, created by operating on
 //					existing datasets.
 //
 // Input Arguments:
@@ -352,7 +352,7 @@ void GuiInterface::AddCurve(wxString mathString)
 // Class:			GuiInterface
 // Function:		AddCurve
 //
-// Desc:		Adds an existing dataset to the plot.
+// Description:		Adds an existing dataset to the plot.
 //
 // Input Arguments:
 //		data	= std::unique_ptr<Dataset2D> to add
@@ -377,7 +377,7 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 
 	grid->Scroll(-1, grid->GetNumberRows());
 
-	renderer->AddCurve(*data);
+	renderer->AddCurve(*plotList.Back());
 	UpdateCurveProperties(index - 1, grid->GetNextColor(index), true, false);
 
 	UpdateCurveQuality();
@@ -388,7 +388,7 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 // Class:			GuiInterface
 // Function:		RemoveCurve
 //
-// Desc:		Removes a curve from the plot.
+// Description:		Removes a curve from the plot.
 //
 // Input Arguments:
 //		i	= const unsigned int& specifying curve to remove
@@ -420,7 +420,7 @@ void GuiInterface::RemoveCurve(const unsigned int &i)
 // Class:			GuiInterface
 // Function:		RemoveCurves
 //
-// Desc:		Removes a set of curves from the plot.
+// Description:		Removes a set of curves from the plot.
 //
 // Input Arguments:
 //		curves	= const wxArrayInt&
@@ -448,9 +448,30 @@ void GuiInterface::RemoveCurves(const wxArrayInt& curves)
 
 //=============================================================================
 // Class:			GuiInterface
+// Function:		RemoveSelectedCurves
+//
+// Description:		Removes the selected curves from the plot list.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void GuiInterface::RemoveSelectedCurves()
+{
+	RemoveCurves(grid->GetSelectedRows());
+}
+
+//=============================================================================
+// Class:			GuiInterface
 // Function:		UpdateCursorValues
 //
-// Desc:		Updates the values for the cursors and their differences
+// Description:		Updates the values for the cursors and their differences
 //					in the options grid.
 //
 // Input Arguments:
@@ -505,7 +526,7 @@ void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &right
 // Class:			GuiInterface
 // Function:		UpdateSingleCursorValue
 //
-// Desc:		Updates a single cursor value.
+// Description:		Updates a single cursor value.
 //
 // Input Arguments:
 //		row			= const unsigned int& specifying the grid row
@@ -554,7 +575,7 @@ void GuiInterface::UpdateSingleCursorValue(const unsigned int &row,
 // Class:			GuiInterface
 // Function:		GetDataFile
 //
-// Desc:		Determines the correct DataFile object to use for the
+// Description:		Determines the correct DataFile object to use for the
 //					specified file, and returns a pointer to an instance of that
 //					object.
 //
@@ -588,7 +609,7 @@ DataFile* GuiInterface::GetDataFile(const wxString &fileName)
 // Class:			GuiInterface
 // Function:		ExportData
 //
-// Desc:		Exports the data to file.
+// Description:		Exports the data to file.
 //
 // Input Arguments:
 //		None
@@ -698,7 +719,7 @@ void GuiInterface::ExportData()
 // Class:			GuiInterface
 // Function:		GenerateFRF
 //
-// Desc:		Generates a frequency response function.
+// Description:		Generates a frequency response function.
 //
 // Input Arguments:
 //		None
@@ -751,7 +772,7 @@ void GuiInterface::GenerateFRF()
 // Class:			GuiInterface
 // Function:		CreateSignal
 //
-// Desc:		Displays dialog for creating various signals.
+// Description:		Displays dialog for creating various signals.
 //
 // Input Arguments:
 //		None
@@ -802,7 +823,7 @@ void GuiInterface::CreateSignal()
 // Class:			GuiInterface
 // Function:		AddFFTCurves
 //
-// Desc:		Adds the FFT curves to the plot list.
+// Description:		Adds the FFT curves to the plot list.
 //
 // Input Arguments:
 //		xFactor	= const double& scaling factor to convert X units to Hz
@@ -845,7 +866,7 @@ void GuiInterface::AddFFTCurves(const double& xFactor,
 // Class:			GuiInterface
 // Function:		SetTimeUnits
 //
-// Desc:		Available for the user to clarify the time units when we
+// Description:		Available for the user to clarify the time units when we
 //					are unable to determine them easily from the input file.
 //
 // Input Arguments:
@@ -896,7 +917,7 @@ void GuiInterface::SetTimeUnits()
 // Class:			GuiInterface
 // Function:		ScaleXData
 //
-// Desc:		Scales the X-data by the specified factor.
+// Description:		Scales the X-data by the specified factor.
 //
 // Input Arguments:
 //		selectedRows	= const wxArrayInt&
@@ -967,7 +988,7 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotDerivative
 //
-// Desc:		Adds a curve showing the derivative of the selected grid
+// Description:		Adds a curve showing the derivative of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -998,7 +1019,7 @@ void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotIntegral
 //
-// Desc:		Adds a curve showing the integral of the selected grid
+// Description:		Adds a curve showing the integral of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1029,7 +1050,7 @@ void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotRMS
 //
-// Desc:		Adds a curve showing the RMS of the selected grid
+// Description:		Adds a curve showing the RMS of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1060,7 +1081,7 @@ void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotFFT
 //
-// Desc:		Adds a curve showing the FFT of the selected grid
+// Description:		Adds a curve showing the FFT of the selected grid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1093,7 +1114,7 @@ void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		BitMask
 //
-// Desc:		Creates bit mask for the specified curve.
+// Description:		Creates bit mask for the specified curve.
 //
 // Input Arguments:
 //		selectedRows	= const wxArrayInt&
@@ -1132,7 +1153,7 @@ void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		TimeShift
 //
-// Desc:		Adds a new curve equivalent to the selected curve shifted
+// Description:		Adds a new curve equivalent to the selected curve shifted
 //					by the specified amount.
 //
 // Input Arguments:
@@ -1174,7 +1195,7 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		FilterCurves
 //
-// Desc:		Displays a dialog allowing the user to specify the filter,
+// Description:		Displays a dialog allowing the user to specify the filter,
 //					and adds the filtered curve to the plot.
 //
 // Input Arguments:
@@ -1211,7 +1232,7 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		FitCurves
 //
-// Desc:		Fits a curve to the dataset selected in the grid control.
+// Description:		Fits a curve to the dataset selected in the grid control.
 //					User is asked to specify the order of the fit.
 //
 // Input Arguments:
@@ -1257,7 +1278,7 @@ void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		GetCurveFitData
 //
-// Desc:		Fits a curve of the specified order to the specified data
+// Description:		Fits a curve of the specified order to the specified data
 //					and returns a dataset containing the curve.
 //
 // Input Arguments:
@@ -1293,7 +1314,7 @@ std::unique_ptr<Dataset2D> GuiInterface::GetCurveFitData(const unsigned int &ord
 // Class:			GuiInterface
 // Function:		GetCurveFitName
 //
-// Desc:		Determines an appropriate name for a curve fit dataset.
+// Description:		Determines an appropriate name for a curve fit dataset.
 //
 // Input Arguments:
 //		fitData	= const CurveFit::PolynomialFit&
@@ -1340,7 +1361,7 @@ wxString GuiInterface::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
 // Class:			GuiInterface
 // Function:		DisplayMathChannelDialog
 //
-// Desc:		Displays an input dialog that allows the user to enter a
+// Description:		Displays an input dialog that allows the user to enter a
 //					math expression.  If an expression is entered, it attempts
 //					to add the channel.
 //
@@ -1369,7 +1390,7 @@ void GuiInterface::DisplayMathChannelDialog(wxString defaultInput)
 // Class:			GuiInterface
 // Function:		DisplayAxisRangeDialog
 //
-// Desc:		Displays an input dialog that allows the user to set the
+// Description:		Displays an input dialog that allows the user to set the
 //					range for an axis.
 //
 // Input Arguments:
@@ -1419,7 +1440,7 @@ void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 // Class:			GuiInterface
 // Function:		DisplayFilterDialog
 //
-// Desc:		Dispalys a dialog box allowing the user to specify a filter,
+// Description:		Dispalys a dialog box allowing the user to specify a filter,
 //					returns the specified parameters.
 //
 // Input Arguments:
@@ -1449,7 +1470,7 @@ FilterParameters GuiInterface::DisplayFilterDialog()
 // Class:			GuiInterface
 // Function:		ApplyFilter
 //
-// Desc:		Applies the specified filter to the specified dataset.
+// Description:		Applies the specified filter to the specified dataset.
 //
 // Input Arguments:
 //		parameters	= const FilterParameters&
@@ -1497,7 +1518,7 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 // Class:			GuiInterface
 // Function:		GetFilter
 //
-// Desc:		Returns a filter matching the specified parameters.
+// Description:		Returns a filter matching the specified parameters.
 //
 // Input Arguments:
 //		parameters		= const FilterParameters&
@@ -1524,7 +1545,7 @@ Filter* GuiInterface::GetFilter(const FilterParameters &parameters,
 // Class:			GuiInterface
 // Function:		UpdateLegend
 //
-// Desc:		Updates the contents of the legend actor.
+// Description:		Updates the contents of the legend actor.
 //
 // Input Arguments:
 //		None
@@ -1563,7 +1584,7 @@ void GuiInterface::UpdateLegend()
 // Class:			GuiInterface
 // Function:		SetMarkerSize
 //
-// Desc:		Sets the marker size for the specified curve.
+// Description:		Sets the marker size for the specified curve.
 //
 // Input Arguments:
 //		curve	= const unsigned int&
@@ -1586,7 +1607,7 @@ void GuiInterface::SetMarkerSize(const unsigned int &curve, const int &size)
 // Class:			GuiInterface
 // Function:		UpdateCurveQuality
 //
-// Desc:		Sets curve quality according to how many lines need to
+// Description:		Sets curve quality according to how many lines need to
 //					be rendered.
 //
 // Input Arguments:
@@ -1612,7 +1633,7 @@ void GuiInterface::UpdateCurveQuality()
 // Class:			GuiInterface
 // Function:		UnitStringToFactor
 //
-// Desc:		Converts from a unit string to a factor value.
+// Description:		Converts from a unit string to a factor value.
 //
 // Input Arguments:
 //		unit	= const wxString&
@@ -1657,7 +1678,7 @@ bool GuiInterface::UnitStringToFactor(const wxString &unit, double &factor)
 // Class:			GuiInterface
 // Function:		GetFFTData
 //
-// Desc:		Returns a dataset containing an FFT of the specified data.
+// Description:		Returns a dataset containing an FFT of the specified data.
 //
 // Input Arguments:
 //		data	= const std::unique_ptr<const Dataset2D>&
@@ -1708,7 +1729,7 @@ std::unique_ptr<Dataset2D> GuiInterface::GetFFTData(
 // Class:			GuiInterface
 // Function:		GetXZoomedDataset
 //
-// Desc:		Returns a dataset containing only the data within the
+// Description:		Returns a dataset containing only the data within the
 //					current zoomed x-limits.
 //
 // Input Arguments:
@@ -1747,7 +1768,7 @@ std::unique_ptr<Dataset2D> GuiInterface::GetXZoomedDataset(
 // Class:			GuiInterface
 // Function:		ShowAppropriateXLabel
 //
-// Desc:		Updates the x-axis label as necessary.
+// Description:		Updates the x-axis label as necessary.
 //
 // Input Arguments:
 //		None
@@ -1789,7 +1810,7 @@ void GuiInterface::ShowAppropriateXLabel()
 // Class:			GuiInterface
 // Function:		GetXAxisScalingFactor
 //
-// Desc:		Attempts to determine the scaling factor required to convert
+// Description:		Attempts to determine the scaling factor required to convert
 //					the X-axis into seconds (assuming X-axis has units of time).
 //
 // Input Arguments:
@@ -1821,7 +1842,7 @@ bool GuiInterface::GetXAxisScalingFactor(double &factor, wxString *label)
 // Class:			GuiInterface
 // Function:		XScalingFactorIsKnown
 //
-// Desc:		If the x-axis scaling factor is known, determines its value.
+// Description:		If the x-axis scaling factor is known, determines its value.
 //
 // Input Arguments:
 //		None
@@ -1858,7 +1879,7 @@ bool GuiInterface::XScalingFactorIsKnown(double &factor, wxString *label) const
 // Class:			GuiInterface
 // Function:		ExtractUnitFromDescription
 //
-// Desc:		Parses the description looking for a unit string.  This
+// Description:		Parses the description looking for a unit string.  This
 //					will recognize the following as unit strings:
 //					X Series Name [unit]
 //					X Series Name (unit)
@@ -1908,7 +1929,7 @@ wxString GuiInterface::ExtractUnitFromDescription(const wxString &description)
 // Class:			GuiInterface
 // Function:		FindWrappedString
 //
-// Desc:		Determines if the specified string contains a string wrapped
+// Description:		Determines if the specified string contains a string wrapped
 //					with the specified characters.
 //
 // Input Arguments:
@@ -1949,7 +1970,7 @@ bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 // Class:			GuiInterface
 // Function:		SetXDataLabel
 //
-// Desc:		Sets the x-data labels to the specified string.
+// Description:		Sets the x-data labels to the specified string.
 //
 // Input Arguments:
 //		label	= wxString
@@ -1971,7 +1992,7 @@ void GuiInterface::SetXDataLabel(wxString label)
 // Class:			GuiInterface
 // Function:		SetXDataLabel
 //
-// Desc:		Sets the x-data labels according to the opened file type.
+// Description:		Sets the x-data labels according to the opened file type.
 //
 // Input Arguments:
 //		None
@@ -2003,7 +2024,7 @@ void GuiInterface::SetXDataLabel(const FileFormat &format)
 // Class:			GuiInterface
 // Function:		UpdateCurveProperties
 //
-// Desc:		Updates the specified curve properties.
+// Description:		Updates the specified curve properties.
 //
 // Input Arguments:
 //		index	= const unsigned int&
@@ -2028,7 +2049,7 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 // Class:			GuiInterface
 // Function:		UpdateCurveProperties
 //
-// Desc:		Updates the specified curve properties to match the arguments.
+// Description:		Updates the specified curve properties to match the arguments.
 //
 // Input Arguments:
 //		index		= const unsigned int&

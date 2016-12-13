@@ -29,7 +29,7 @@ namespace LibPlot2D
 // Class:			Filter
 // Function:		Filter
 //
-// Desc:		Constructor for the Filter class.
+// Description:		Constructor for the Filter class.
 //
 // Input Arguments:
 //		_sampleRate		= const double& specifying the sampling rate in Hz
@@ -53,7 +53,7 @@ Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 // Class:			Filter
 // Function:		Filter
 //
-// Desc:		Constructor for the Filter class for arbitrary filters.
+// Description:		Constructor for the Filter class for arbitrary filters.
 //					Passed arguments are assumed to be for a continuous time
 //					filter (s-domain), and will be translated into filter
 //					coefficients according to the specified sample rate.
@@ -84,7 +84,7 @@ Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
 // Class:			Filter
 // Function:		Filter
 //
-// Desc:		Copy constructor for the Filter class.
+// Description:		Copy constructor for the Filter class.
 //
 // Input Arguments:
 //		f	= const Filter&
@@ -105,7 +105,7 @@ Filter::Filter(const Filter &f) : sampleRate(f.sampleRate)
 // Class:			Filter
 // Function:		~Filter
 //
-// Desc:		Destructor for the Filter class.
+// Description:		Destructor for the Filter class.
 //
 // Input Arguments:
 //		None
@@ -126,7 +126,7 @@ Filter::~Filter()
 // Class:			Filter
 // Function:		GenerateCoefficients
 //
-// Desc:		Generates the discrete-time (z-domain) coefficients for
+// Description:		Generates the discrete-time (z-domain) coefficients for
 //					a filter equivalent to the continuous-time (s-domain)
 //					arguments.  Uses bilinear transform:
 //					s = 2 * (1 - z^-1) / (T * (1 + z^-1)).
@@ -166,7 +166,7 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 // Class:			Filter
 // Function:		AssembleZExpression
 //
-// Desc:		Assembles the z-domain expression equivalent to the s-domain
+// Description:		Assembles the z-domain expression equivalent to the s-domain
 //					coefficients provided.
 //
 // Input Arguments:
@@ -224,7 +224,7 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 // Class:			Filter
 // Function:		operator=
 //
-// Desc:		Assignment operator.
+// Description:		Assignment operator.
 //
 // Input Arguments:
 //		f	=	const Filter&
@@ -265,7 +265,7 @@ Filter& Filter::operator=(const Filter &f)
 // Class:			Filter
 // Function:		DeleteArrays
 //
-// Desc:		Deletes dynamically allocated memory for this object.
+// Description:		Deletes dynamically allocated memory for this object.
 //
 // Input Arguments:
 //		None
@@ -289,7 +289,7 @@ void Filter::DeleteArrays()
 // Class:			Filter
 // Function:		Initialize
 //
-// Desc:		Initializes the filter to the specified value.
+// Description:		Initializes the filter to the specified value.
 //
 // Input Arguments:
 //		initialValue	= const double&
@@ -315,7 +315,7 @@ void Filter::Initialize(const double &initialValue)
 // Class:			Filter
 // Function:		Apply
 //
-// Desc:		Applies the filter to the new input value.
+// Description:		Applies the filter to the new input value.
 //
 // Input Arguments:
 //		_u	= const double&
@@ -348,7 +348,7 @@ double Filter::Apply(const double &u)
 // Class:			Filter
 // Function:		ShiftArray
 //
-// Desc:		Shifts the array values by one index (value with highest
+// Description:		Shifts the array values by one index (value with highest
 //					index is lost).
 //
 // Input Arguments:
@@ -373,7 +373,7 @@ void Filter::ShiftArray(double *s, const unsigned int &size)
 // Class:			Filter
 // Function:		AllocateArrays
 //
-// Desc:		Allocates the coefficient and input/output storage arrays.
+// Description:		Allocates the coefficient and input/output storage arrays.
 //
 // Input Arguments:
 //		_inSize		= const unsigned int&
@@ -401,7 +401,7 @@ void Filter::AllocateArrays(const unsigned int &inSize, const unsigned int &outS
 // Class:			Filter
 // Function:		CoefficientsFromString
 //
-// Desc:		Creates a vector of coefficients from highes power to lowest
+// Description:		Creates a vector of coefficients from highes power to lowest
 //					power, based on a string representing the expression.
 //
 // Input Arguments:
@@ -443,7 +443,7 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 // Class:			Filter
 // Function:		CollectLikeTerms
 //
-// Desc:		Collects all terms with the same exponent and adds the
+// Description:		Collects all terms with the same exponent and adds the
 //					coefficients together.
 //
 // Input Arguments:
@@ -479,7 +479,7 @@ std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::p
 // Class:			Filter
 // Function:		PadMissingTerms
 //
-// Desc:		If a power between the maximum power and zero is missing,
+// Description:		If a power between the maximum power and zero is missing,
 //					a zero-coefficient value for that power is inserted at
 //					the appropriate location in the vector.
 //
@@ -524,7 +524,7 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 // Class:			Filter
 // Function:		ComputeSteadyStateGain
 //
-// Desc:		Returns the steady-state value resluting from a unity step
+// Description:		Returns the steady-state value resluting from a unity step
 //					input.  Returns zero if the results of this analysis are
 //					not guaranteed valid - den must have these properties for
 //					Final Value Theorem to yield valid results:
@@ -586,7 +586,7 @@ double Filter::ComputeSteadyStateGain(const std::string &num, const std::string 
 // Class:			Filter
 // Function:		ComputeSteadyStateGain
 //
-// Desc:		Returns the steady-state value resluting from a unity step
+// Description:		Returns the steady-state value resluting from a unity step
 //					input.  Returns zero if the results of this analysis are
 //					not guaranteed valid (i.e. if the steady-state gain is
 //					undefined).

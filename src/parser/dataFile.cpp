@@ -28,7 +28,7 @@ namespace LibPlot2D
 // Class:			DataFile
 // Function:		DataFile
 //
-// Desc:		Constructor for DataFile class.  Assigns arguments and
+// Description:		Constructor for DataFile class.  Assigns arguments and
 //					default values.
 //
 // Input Arguments:
@@ -56,7 +56,7 @@ DataFile::DataFile(const wxString& fileName) : fileName(fileName)
 // Class:			DataFile
 // Function:		~DataFile
 //
-// Desc:		Destructor for DataFile class.
+// Description:		Destructor for DataFile class.
 //
 // Input Arguments:
 //		None
@@ -76,7 +76,7 @@ DataFile::~DataFile()
 // Class:			DataFile
 // Function:		Initialize
 //
-// Desc:		Initializes with type-specific class.
+// Description:		Initializes with type-specific class.
 //
 // Input Arguments:
 //		None
@@ -99,7 +99,7 @@ void DataFile::Initialize()
 // Class:			DataFile
 // Function:		GetSelectionsFromUser
 //
-// Desc:		Reads header info from the file and asks the user to
+// Description:		Reads header info from the file and asks the user to
 //					specify curves to plot.
 //
 // Input Arguments:
@@ -147,7 +147,7 @@ void DataFile::GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *par
 // Class:			DataFile
 // Function:		AdjustForSkippedColumns
 //
-// Desc:		Adjusts the indices to account for columns that were not
+// Description:		Adjusts the indices to account for columns that were not
 //					displayed as allowable selections.  Index 0 is first data
 //					column (not time column).
 //
@@ -176,7 +176,7 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 // Class:			DataFile
 // Function:		AdjustForSkippedColumns
 //
-// Desc:		Adjusts the indices to account for columns that were not
+// Description:		Adjusts the indices to account for columns that were not
 //					displayed as allowable selections.  Index 0 is first data
 //					column (not time column).
 //
@@ -208,7 +208,7 @@ unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
 // Class:			DataFile
 // Function:		Load
 //
-// Desc:		Performs the actions necessary to load the file contents
+// Description:		Performs the actions necessary to load the file contents
 //					into datasets.
 //
 // Input Arguments:
@@ -256,7 +256,7 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 // Class:			DataFile
 // Function:		DetermineBestDelimiter
 //
-// Desc:		Tries each delimiter in the list until finding the best
+// Description:		Tries each delimiter in the list until finding the best
 //					one for this file.
 //
 // Input Arguments:
@@ -312,7 +312,7 @@ wxString DataFile::DetermineBestDelimiter() const
 // Class:			DataFile
 // Function:		CreateDelimiterList
 //
-// Desc:		Populates the list of delimiters to try when parsing this file.
+// Description:		Populates the list of delimiters to try when parsing this file.
 //
 // Input Arguments:
 //		None
@@ -348,7 +348,7 @@ wxArrayString DataFile::CreateDelimiterList() const
 // Class:			DataFile
 // Function:		GetCurveInformation
 //
-// Desc:		Parses the file and assembles information for each column
+// Description:		Parses the file and assembles information for each column
 //					based on the contents of the header rows.
 //
 // Input Arguments:
@@ -403,7 +403,7 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 // Class:			DataFile
 // Function:		ParseLineIntoColumns
 //
-// Desc:		Parses the specified line into pieces based on encountering
+// Description:		Parses the specified line into pieces based on encountering
 //					the specified delimiting character (or characters).
 //
 // Input Arguments:
@@ -462,7 +462,7 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 // Class:			DataFile
 // Function:		GenerateNames
 //
-// Desc:		Creates the first part of the plot name for generic files.
+// Description:		Creates the first part of the plot name for generic files.
 //
 // Input Arguments:
 //		previousLines	= const wxArrayString&
@@ -521,7 +521,7 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 // Class:			DataFile
 // Function:		GenerateDummyNames
 //
-// Desc:		Generates plot names for cases where no information was
+// Description:		Generates plot names for cases where no information was
 //					provided by the data file.
 //
 // Input Arguments:
@@ -558,7 +558,7 @@ wxArrayString DataFile::GenerateDummyNames(const wxArrayString &currentLine,
 // Class:			DataFile
 // Function:		RemoveUnwantedDescriptions
 //
-// Desc:		Returns the size to use when allocating the raw data array.
+// Description:		Returns the size to use when allocating the raw data array.
 //
 // Input Arguments:
 //		selectedCount	= const unsigned int& indicating number of curves the
@@ -593,7 +593,7 @@ wxArrayString DataFile::RemoveUnwantedDescriptions(const wxArrayString &names,
 // Class:			DataFile
 // Function:		GetRawDataSize
 //
-// Desc:		Returns the size to use when allocating the raw data array.
+// Description:		Returns the size to use when allocating the raw data array.
 //
 // Input Arguments:
 //		selectedCount	= const unsigned int& indicating number of curves the
@@ -615,7 +615,7 @@ unsigned int DataFile::GetRawDataSize(const unsigned int &selectedCount) const
 // Class:			DataFile
 // Function:		ExtractData
 //
-// Desc:		Parses the file and reads data into vectors.  Only extracts
+// Description:		Parses the file and reads data into vectors.  Only extracts
 //					the data the user selected for display.
 //
 // Input Arguments:
@@ -680,7 +680,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 // Class:			DataFile
 // Function:		ArrayContainsValue
 //
-// Desc:		Determines whether or not the specified value is contained in
+// Description:		Determines whether or not the specified value is contained in
 //					the specified array.
 //
 // Input Arguments:
@@ -710,7 +710,7 @@ bool DataFile::ArrayContainsValue(const int &value, const wxArrayInt &a) const
 // Class:			DataFile
 // Function:		AssembleDatasets
 //
-// Desc:		Takes raw data in std::vector<double> format and populates
+// Description:		Takes raw data in std::vector<double> format and populates
 //					this object's data member with it.
 //
 // Input Arguments:
@@ -750,7 +750,7 @@ void DataFile::AssembleDatasets(const std::vector<double> *rawData, const unsign
 // Class:			DataFile
 // Function:		TransferVectorToArray
 //
-// Desc:		Takes data in a std::vector<double> and moves it into a
+// Description:		Takes data in a std::vector<double> and moves it into a
 //					(previously allocated) double array.
 //
 // Input Arguments:
@@ -776,7 +776,7 @@ void DataFile::TransferVectorToArray(const std::vector<double> &source,
 // Class:			DataFile
 // Function:		SkipLines
 //
-// Desc:		Reads and discards the specified number of lines from
+// Description:		Reads and discards the specified number of lines from
 //					the file.
 //
 // Input Arguments:
@@ -802,7 +802,7 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 // Class:			DataFile
 // Function:		IsDataRow
 //
-// Desc:		Checks to see if the input array could be a valid data row.
+// Description:		Checks to see if the input array could be a valid data row.
 //
 // Input Arguments:
 //		list	= const wxArrayString&
@@ -838,7 +838,7 @@ bool DataFile::IsDataRow(const wxArrayString &list) const
 // Class:			DataFile
 // Function:		GetTimeValue
 //
-// Desc:		Converts the time string with the given format into the
+// Description:		Converts the time string with the given format into the
 //					specified units.  Converts to seconds first, then applies
 //					a scaling factor.
 //					Will recognize (case insensitive) H as hour, m as minute,
@@ -897,7 +897,7 @@ double DataFile::GetTimeValue(const wxString &timeString,
 // Class:			DataFile
 // Function:		GetTimeScalingFactor
 //
-// Desc:		Returns the proper scaling factor for the specified
+// Description:		Returns the proper scaling factor for the specified
 //					format code.
 //
 // Input Arguments:
@@ -930,7 +930,7 @@ double DataFile::GetTimeScalingFactor(const wxString &format) const
 // Class:			DataFile
 // Function:		DescriptionsMatch
 //
-// Desc:		Determines if the list of descriptions in this file match
+// Description:		Determines if the list of descriptions in this file match
 //					the descriptions given in the specified file.
 //
 // Input Arguments:
@@ -952,7 +952,7 @@ bool DataFile::DescriptionsMatch(const DataFile &file) const
 // Class:			DataFile
 // Function:		DescriptionsMatch
 //
-// Desc:		Determines if the list of descriptions in this file match
+// Description:		Determines if the list of descriptions in this file match
 //					the descriptions given in the specified file.
 //
 // Input Arguments:
@@ -984,7 +984,7 @@ bool DataFile::DescriptionsMatch(const wxArrayString &descriptions) const
 // Class:			DataFile::SelectionData
 // Function:		SelectionData
 //
-// Desc:		Constructor for DataFile::SelectionData struct.
+// Description:		Constructor for DataFile::SelectionData struct.
 //
 // Input Arguments:
 //		None

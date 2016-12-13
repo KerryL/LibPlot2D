@@ -27,7 +27,7 @@ namespace LibPlot2D
 // Class:			CurveFit
 // Function:		DoPolynomialFit
 //
-// Desc:		Generates coefficients for a best fit (least squares) curve
+// Description:		Generates coefficients for a best fit (least squares) curve
 //					of the specified order.  After calling this function, the
 //					programmer is responsible for freeing memory associated with
 //					the array of coefficients.
@@ -89,7 +89,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 // Class:			CurveFit
 // Function:		DoMatrixTest
 //
-// Desc:		Tests SVD algorithm based on example in Wikipedia article.
+// Description:		Tests SVD algorithm based on example in Wikipedia article.
 //
 // Input Arguments:
 //		None
@@ -133,7 +133,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 // Class:			CurveFit
 // Function:		ComputeRSquared
 //
-// Desc:		Computes the coefficient of determination value for the
+// Description:		Computes the coefficient of determination value for the
 //					specified fit.
 //
 // Input Arguments:
@@ -175,7 +175,7 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 // Class:			CurveFit
 // Function:		EvaluateFit
 //
-// Desc:		Returns the calculated y-value at the specified x-value
+// Description:		Returns the calculated y-value at the specified x-value
 //					for the specified fit.
 //
 // Input Arguments:
