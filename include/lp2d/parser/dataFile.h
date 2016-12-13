@@ -79,9 +79,9 @@ protected:
 
 	virtual wxArrayString CreateDelimiterList() const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors,
+		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		wxString &errorString) const;
-	virtual void AssembleDatasets(const std::vector<double> *rawData,
+	virtual void AssembleDatasets(const std::vector<std::vector<double>>& rawData,
 		const unsigned int &dataSize);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;

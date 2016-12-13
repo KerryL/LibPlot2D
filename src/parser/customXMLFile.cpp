@@ -83,7 +83,7 @@ wxArrayString CustomXMLFile::CreateDelimiterList() const
 //		factors	= std::vector<double>& containing the list of scaling factors
 //
 // Output Arguments:
-//		rawData	= std::vector<double>* containing the data
+//		rawData	= std::vector<std::vector<double>>& containing the data
 //		errorString	= wxString&
 //
 // Return Value:
@@ -91,7 +91,7 @@ wxArrayString CustomXMLFile::CreateDelimiterList() const
 //
 //=============================================================================
 bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt &choices,
-	std::vector<double> *rawData, std::vector<double> &factors, wxString &errorString) const
+	std::vector<std::vector<double>>& rawData, std::vector<double> &factors, wxString &errorString) const
 {
 	if (!ExtractXData(rawData, factors, errorString))
 		return false;
@@ -139,15 +139,15 @@ bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt 
 //		factors		= std::vector<double>& containing the list of scaling factors
 //
 // Output Arguments:
-//		rawData		= std::vector<double>* containing the data
+//		rawData		= std::vector<std::vector<double>>& containing the data
 //		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //=============================================================================
-bool CustomXMLFile::ExtractXData(std::vector<double> *rawData, std::vector<double> &factors,
-	wxString& errorString) const
+bool CustomXMLFile::ExtractXData(std::vector<std::vector<double>>& rawData,
+	std::vector<double> &factors, wxString& errorString) const
 {
 	wxXmlDocument document(fileName);
 	wxXmlNode *node = FollowNodePath(document, fileFormat.GetXMLXDataNode());
@@ -181,15 +181,16 @@ bool CustomXMLFile::ExtractXData(std::vector<double> *rawData, std::vector<doubl
 //		set			= const unsigned int&
 //
 // Output Arguments:
-//		rawData		= std::vector<double>* containing the data
+//		rawData		= std::vector<std::vector<double>>&containing the data
 //		errorString	= wxString&
 //
 // Return Value:
 //		bool, true for success, false otherwise
 //
 //=============================================================================
-bool CustomXMLFile::ExtractYData(wxXmlNode *channel, std::vector<double> *rawData,
-	std::vector<double> &factors, const unsigned int &set, wxString& errorString) const
+bool CustomXMLFile::ExtractYData(wxXmlNode *channel,
+	std::vector<std::vector<double>>&rawData, std::vector<double> &factors,
+	const unsigned int &set, wxString& errorString) const
 {
 	channel = FollowNodePath(channel, fileFormat.GetXMLYDataNode());
 	if (!channel)

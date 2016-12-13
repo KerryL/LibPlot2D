@@ -39,7 +39,7 @@ protected:
 
 	wxArrayString CreateDelimiterList() const override;
 	bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors,
+		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		wxString &errorString) const override;
 	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const override;
@@ -51,9 +51,9 @@ protected:
 	bool DataStringToVector(const wxString &data, std::vector<double> &dataVector,
 		const double &factor, wxString& errorString) const;
 
-	bool ExtractXData(std::vector<double> *rawData, std::vector<double> &factors,
+	bool ExtractXData(std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		wxString& errorString) const;
-	bool ExtractYData(wxXmlNode *channel, std::vector<double> *rawData,
+	bool ExtractYData(wxXmlNode *channel, std::vector<std::vector<double>>& rawData,
 		std::vector<double> &factors, const unsigned int &set, wxString& errorString) const;
 };
 

@@ -234,20 +234,16 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 	SkipLines(file, headerLines);
 	DoTypeSpecificProcessTasks();
 
-	std::vector<double> *rawData = new std::vector<double>[GetRawDataSize(selectionInfo.selections.size())];
+	std::vector<std::vector<double>> rawData(GetRawDataSize(selectionInfo.selections.size()));
 	wxString errorString;
 	if (!ExtractData(file, selectionInfo.selections, rawData, scales, errorString))
 	{
-		file.close();
-		delete [] rawData;
 		wxMessageBox(_T("Error during data extraction:\n") + errorString,
 			_T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}
-	file.close();
 
 	AssembleDatasets(rawData, GetRawDataSize(selectionInfo.selections.size()));
-	delete [] rawData;
 
 	return true;
 }
@@ -624,7 +620,7 @@ unsigned int DataFile::GetRawDataSize(const unsigned int &selectedCount) const
 //		factors		= std::vector<double>& containing the list of scaling factors
 //
 // Output Arguments:
-//		rawData		= std::vector<double>* containing the data
+//		rawData		= std::vector<std::vector<double>> containing the data
 //		errorString	= wxString&
 //
 // Return Value:
@@ -632,7 +628,7 @@ unsigned int DataFile::GetRawDataSize(const unsigned int &selectedCount) const
 //
 //=============================================================================
 bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
-	std::vector<double> *rawData, std::vector<double> &factors,
+	std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 	wxString &errorString) const
 {
 	std::string nextLine;
@@ -714,7 +710,7 @@ bool DataFile::ArrayContainsValue(const int &value, const wxArrayInt &a) const
 //					this object's data member with it.
 //
 // Input Arguments:
-//		rawData		= const std::vector<double>*
+//		rawData		= const std::vector<std::vector<double>>
 //		dataSize	= const unsigned int& indicating the number of elements of the first argument
 //
 // Output Arguments:
@@ -724,7 +720,9 @@ bool DataFile::ArrayContainsValue(const int &value, const wxArrayInt &a) const
 //		None
 //
 //=============================================================================
-void DataFile::AssembleDatasets(const std::vector<double> *rawData, const unsigned int &dataSize)
+void DataFile::AssembleDatasets(
+	const std::vector<std::vector<double>>& rawData,
+	const unsigned int &dataSize)
 {
 	assert(dataSize > 1 && rawData);
 

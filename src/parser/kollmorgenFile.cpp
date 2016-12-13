@@ -158,7 +158,7 @@ void KollmorgenFile::DoTypeSpecificLoadTasks()
 //		factors	= std::vector<double>& containing the list of scaling factors
 //
 // Output Arguments:
-//		rawData	= std::vector<double>* containing the data
+//		rawData	= std::vector<std::vector<double>>& containing the data
 //		errorString	= wxString&
 //
 // Return Value:
@@ -166,7 +166,7 @@ void KollmorgenFile::DoTypeSpecificLoadTasks()
 //
 //=============================================================================
 bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
-	std::vector<double> *rawData, std::vector<double> &factors, wxString& errorString) const
+	std::vector<std::vector<double>>& rawData, std::vector<double> &factors, wxString& errorString) const
 {
 	std::string nextLine;
 	wxArrayString parsed;

@@ -35,7 +35,7 @@ protected:
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const override;
 	void DoTypeSpecificLoadTasks() override;
 	bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors,
+		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		wxString &errorString) const override;
 
 private:

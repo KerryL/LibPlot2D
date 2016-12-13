@@ -37,9 +37,9 @@ protected:
 
 	wxArrayString CreateDelimiterList() const override;
 	bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors,
+		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		wxString &errorString) const override;
-	void AssembleDatasets(const std::vector<double> *rawData,
+	void AssembleDatasets(const std::vector<std::vector<double>>& rawData,
 		const unsigned int &dataSize) override;
 	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors,
@@ -49,16 +49,16 @@ protected:
 		const unsigned int &selectedCount) const override;
 
 	bool ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<double> *rawData, std::vector<double> &factors,
+		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		wxString &errorString) const;
 	bool ExtractAsynchronousData(double &timeZero,
-		const wxArrayString &parsedLine, std::vector<double> *rawData,
+		const wxArrayString &parsedLine, std::vector<std::vector<double>>& rawData,
 		std::vector<double> &factors, const wxArrayInt &choices,
 		wxString &errorString) const;
 	bool ExtractSynchronousData(double &timeZero, const wxArrayString &parsedLine,
-		std::vector<double> *rawData, std::vector<double> &factors,
+		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		const wxArrayInt &choices, wxString &errorString) const;
-	void AssembleAsynchronousDatasets(const std::vector<double> *rawData,
+	void AssembleAsynchronousDatasets(const std::vector<std::vector<double>>& rawData,
 		const unsigned int &dataSize);
 };
 
