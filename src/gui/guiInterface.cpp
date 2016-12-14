@@ -47,6 +47,22 @@
 namespace LibPlot2D
 {
 
+//=============================================================================
+// Class:			GuiInterface
+// Function:		GuiInterface
+//
+// Description:		Constructor for GuiInterface class.
+//
+// Input Arguments:
+//		owner	= wxFrame*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
 GuiInterface::GuiInterface(wxFrame* owner) : owner(owner)
 {
 }
