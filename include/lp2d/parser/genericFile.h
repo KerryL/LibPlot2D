@@ -25,7 +25,7 @@ class GenericFile : public DataFile
 {
 public:
 	// Constructor
-	GenericFile(const wxString& fileName) : DataFile(fileName) {}
+	explicit GenericFile(const wxString& fileName) : DataFile(fileName) {}
 	~GenericFile() = default;
 
 	static bool IsType(const wxString &fileName);

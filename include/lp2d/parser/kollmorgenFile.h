@@ -25,7 +25,7 @@ class KollmorgenFile final : public DataFile
 {
 public:
 	// Constructor
-	KollmorgenFile(const wxString& fileName)
+	explicit KollmorgenFile(const wxString& fileName)
 		: DataFile(fileName) {}
 
 	~KollmorgenFile() = default;

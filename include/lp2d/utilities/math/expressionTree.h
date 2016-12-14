@@ -34,7 +34,7 @@ namespace LibPlot2D
 class ExpressionTree
 {
 public:
-	ExpressionTree(const ManagedList<const Dataset2D>* list = nullptr);
+	explicit ExpressionTree(const ManagedList<const Dataset2D>* list = nullptr);
 
 	// Main solver method
 	wxString Solve(wxString expression, Dataset2D &solvedData, const double &xAxisFactor);

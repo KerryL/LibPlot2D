@@ -33,7 +33,7 @@ class CustomFileFormat
 {
 public:
 	// Constructor
-	CustomFileFormat(const wxString &pathAndFileName);
+	explicit CustomFileFormat(const wxString &pathAndFileName);
 
 	bool IsCustomFormat() const { return !formatName.IsEmpty(); }
 	bool IsAsynchronous() const { return asynchronous; }

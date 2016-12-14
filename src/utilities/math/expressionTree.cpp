@@ -1199,7 +1199,7 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 		return first.ApplyPower(second);
 
 	assert(false);
-	return 0.0;
+	return Dataset2D();
 }
 
 //=============================================================================
@@ -1237,7 +1237,7 @@ Dataset2D ExpressionTree::ApplyOperation(const wxString &operation,
 		return second.ToPower(first);
 
 	assert(false);
-	return 0.0;
+	return Dataset2D();
 }
 
 //=============================================================================

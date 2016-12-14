@@ -31,7 +31,7 @@ class Dataset2D
 {
 public:
 	Dataset2D() = default;
-	Dataset2D(const unsigned int &numberOfPoints);
+	explicit Dataset2D(const unsigned int &numberOfPoints);
 
 	// For exporting the data to a comma or tab delimited text file
 	void ExportDataToFile(wxString pathAndFileName) const;

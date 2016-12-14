@@ -29,7 +29,7 @@ namespace LibPlot2D
 class Axis : public Primitive
 {
 public:
-	Axis(RenderWindow &renderWindow);
+	explicit Axis(RenderWindow &renderWindow);
 	~Axis() = default;
 
 	// Enumeration for the axis orientations

@@ -34,7 +34,7 @@ class Legend : public Primitive
 {
 public:
 	// Constructor
-	Legend(RenderWindow &renderWindow);
+	explicit Legend(RenderWindow &renderWindow);
 
 	// Destructor
 	virtual ~Legend() = default;

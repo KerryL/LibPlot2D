@@ -30,7 +30,7 @@ class DropTarget : public wxDropTarget
 {
 public:
 	// Constructor
-	DropTarget(GuiInterface &guiInterface);
+	explicit DropTarget(GuiInterface &guiInterface);
 	~DropTarget() = default;
 
 	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);

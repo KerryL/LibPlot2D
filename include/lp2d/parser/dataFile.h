@@ -33,7 +33,7 @@ class DataFile
 {
 public:
 	// Constructor
-	DataFile(const wxString& fileName);
+	explicit DataFile(const wxString& fileName);
 
 	// Destructor
 	virtual ~DataFile() = default;

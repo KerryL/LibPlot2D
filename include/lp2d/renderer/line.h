@@ -36,7 +36,7 @@ class RenderWindow;
 class Line
 {
 public:
-	Line(const RenderWindow& renderWindow);
+	explicit Line(const RenderWindow& renderWindow);
 	virtual ~Line() = default;
 
 	inline void SetPretty(const bool &pretty) { this->pretty = pretty; }

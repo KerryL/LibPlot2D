@@ -31,8 +31,9 @@ class RenderWindow;
 class Primitive
 {
 public:
-	Primitive(RenderWindow &renderWindow);
-	Primitive(const Primitive &primitive);
+	explicit Primitive(RenderWindow& renderWindow);
+	Primitive(const Primitive& primitive);
+	Primitive(Primitive&& primitive);
 
 	virtual ~Primitive();
 
@@ -50,7 +51,8 @@ public:
 	inline unsigned int GetDrawOrder() const { return drawOrder; }
 
 	// Overloaded operators
-	Primitive& operator=(const Primitive &primitive);
+	Primitive& operator=(const Primitive& primitive);
+	Primitive& operator=(Primitive&& primitive);
 
 	struct BufferInfo
 	{

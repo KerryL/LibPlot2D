@@ -40,7 +40,7 @@ class Filter;
 class GuiInterface
 {
 public:
-	GuiInterface(wxFrame* owner);
+	explicit GuiInterface(wxFrame* owner);
 
 	bool LoadFiles(const wxArrayString &filenames);
 	bool LoadText(const wxString& data);

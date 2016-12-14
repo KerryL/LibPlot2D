@@ -25,7 +25,7 @@ namespace LibPlot2D
 class ZoomBox : public Primitive
 {
 public:
-	ZoomBox(RenderWindow &renderWindow);
+	explicit ZoomBox(RenderWindow &renderWindow);
 	~ZoomBox() = default;
 
 	void SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor);

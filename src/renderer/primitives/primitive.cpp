@@ -74,11 +74,27 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
 {
 	*this = primitive;
+}
 
-	modified = true;
-
-	renderWindow.SetNeedAlphaSort();
-	renderWindow.SetNeedOrderSort();
+//=============================================================================
+// Class:			Primitive
+// Function:		Primitive
+//
+// Description:		Move constructor for the Primitive class.
+//
+// Input Arguments:
+//		primitive	= Primitive&& to copy to this object
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+Primitive::Primitive(Primitive&& primitive) : renderWindow(primitive.renderWindow)
+{
+	*this = std::move(primitive);
 }
 
 //=============================================================================
@@ -233,11 +249,46 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	// Perform the assignment
 	isVisible	= primitive.isVisible;
 	color		= primitive.color;
-	modified	= primitive.modified;
+	modified	= true;
 	drawOrder	= primitive.drawOrder;
 
-	// TODO:  OGL4 Need to go over handling of openGL stuff here
-	assert(false);
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
+
+	return *this;
+}
+
+//=============================================================================
+// Class:			Primitive
+// Function:		operator=
+//
+// Description:		Move assignment operator for Primitive class.
+//
+// Input Arguments:
+//		Primitive	= Primitive&& to assign to this object
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Primitive&, reference to this object
+//
+//=============================================================================
+Primitive& Primitive::operator=(Primitive &&primitive)
+{
+	// Check for self-assignment
+	if (this == &primitive)
+		return *this;
+
+	// Perform the assignment
+	isVisible	= std::move(primitive.isVisible);
+	color		= std::move(primitive.color);
+	modified	= true;
+	drawOrder	= std::move(primitive.drawOrder);
+	bufferInfo	= std::move(primitive.bufferInfo);
+
+	renderWindow.SetNeedAlphaSort();
+	renderWindow.SetNeedOrderSort();
 
 	return *this;
 }

@@ -28,7 +28,7 @@ namespace LibPlot2D
 class TextRendering : public Primitive
 {
 public:
-	TextRendering(RenderWindow &renderWindow);
+	explicit TextRendering(RenderWindow &renderWindow);
 	~TextRendering() = default;
 
 	// Set option methods

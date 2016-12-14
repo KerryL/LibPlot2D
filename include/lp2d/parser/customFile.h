@@ -27,7 +27,7 @@ class CustomFile : public DataFile
 {
 public:
 	// Constructor
-	CustomFile(const wxString& fileName) : DataFile(fileName),
+	explicit CustomFile(const wxString& fileName) : DataFile(fileName),
 		fileFormat(fileName) {}
 	~CustomFile() = default;
 

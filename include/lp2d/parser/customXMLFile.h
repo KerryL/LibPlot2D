@@ -29,7 +29,7 @@ class CustomXMLFile : public DataFile
 {
 public:
 	// Constructor
-	CustomXMLFile(const wxString& fileName) : DataFile(fileName),
+	explicit CustomXMLFile(const wxString& fileName) : DataFile(fileName),
 		fileFormat(fileName) {}
 	~CustomXMLFile() = default;
 

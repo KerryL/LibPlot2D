@@ -33,7 +33,7 @@ namespace LibPlot2D
 class Text
 {
 public:
-	Text(RenderWindow& renderer);
+	explicit Text(RenderWindow& renderer);
 	~Text();
 
 	// Enforce rule of 5

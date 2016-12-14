@@ -29,7 +29,7 @@ class Color
 public:
 	Color();
 	Color(const double &red, const double &green, const double &blue, const double &alpha = 1.0);
-	Color(const wxColor &c);
+	explicit Color(const wxColor &c);
 
 	inline double GetRed() const { return red; }
 	inline double GetGreen() const { return green; }

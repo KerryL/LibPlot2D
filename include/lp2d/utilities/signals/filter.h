@@ -27,7 +27,7 @@ class Filter
 public:
 	// Constructor
 	// NOTE:  Constructor MUST initialize the filter parameters a and b, and the input/output vectors y and u
-	Filter(const double &sampleRate);
+	explicit Filter(const double &sampleRate);
 	Filter(const double &sampleRate, const std::vector<double> &numerator,
 		const std::vector<double> &denominator, const double &initialValue = 0.0);
 
