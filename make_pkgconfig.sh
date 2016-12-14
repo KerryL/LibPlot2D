@@ -20,6 +20,10 @@ else
 	libName="libPlot2D_d"
 fi
 
+# It seems that pkg-config does not support backtick execution.  Would be nicer
+# to have backticks executed by make instead of by this script, but I haven't
+# found a solution yet.
+
 echo prefix=/usr> $outputFile
 echo exec_prefix=/usr>> $outputFile
 echo libdir=$libDir>> $outputFile
@@ -31,6 +35,6 @@ echo Description: Lightweight 2D plotting library.>> $outputFile
 echo Version: $version>> $outputFile
 echo Requires: freetype2,glew,gl>> $outputFile
 echo Requires.private: >> $outputFile
-echo Libs: -L\${libdir} -l$libName \`wx-config --version=3.1 $debug_flag --libs all\`>> $outputFile
+echo Libs: -L\${libdir} -l$libName `wx-config --version=3.1 $debug_flag --libs all`>> $outputFile
 echo Libs.private: >> $outputFile
-echo Cflags: -I\${includedir} \`wx-config --version=3.1 $debug_flag --cppflags\` -std=c++14>> $outputFile
+echo Cflags: -I\${includedir} `wx-config --version=3.1 $debug_flag --cppflags` -std=c++14>> $outputFile
