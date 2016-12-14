@@ -423,7 +423,7 @@ void GuiInterface::RemoveCurve(const unsigned int &i)
 // Description:		Removes a set of curves from the plot.
 //
 // Input Arguments:
-//		curves	= const wxArrayInt&
+//		curves	= wxArrayInt
 //
 // Output Arguments:
 //		None
@@ -432,16 +432,21 @@ void GuiInterface::RemoveCurve(const unsigned int &i)
 //		None
 //
 //=============================================================================
-void GuiInterface::RemoveCurves(const wxArrayInt& curves)
+void GuiInterface::RemoveCurves(wxArrayInt curves)
 {
-	// TODO:  Fix this
-	// Workaround for now
-	int i;
-	for (i = grid->GetNumberRows() - 1; i > 0; i--)
+	curves.Sort([](int* a, int* b)
 	{
-		if (grid->IsInSelection(i, 0))
-			RemoveCurve(i - 1);
-	}
+		if (*a < *b)
+			return 1;
+		else if (*b < *a)
+			return -1;
+		return 0;
+	});
+
+	unsigned int i;
+	for (i = 0; i < curves.Count(); ++i)
+		// minus 1 because we remove based on curve index, not row index
+		RemoveCurve(curves[i] - 1);
 
 	renderer->UpdateDisplay();
 }
