@@ -156,7 +156,7 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 {
 	std::vector<std::pair<double, double> > dPoints(points.size());
 	unsigned int i;
-	for (i = 0; i < points.size(); i++)
+	for (i = 0; i < points.size(); ++i)
 	{
 		dPoints[i].first = static_cast<double>(points[i].first);
 		dPoints[i].second = static_cast<double>(points[i].second);
@@ -216,7 +216,7 @@ void Line::Build(const double* const x, const double* const y,
 {
 	std::vector<std::pair<double, double> > dPoints(count);
 	unsigned int i;
-	for (i = 0; i < dPoints.size(); i++)
+	for (i = 0; i < dPoints.size(); ++i)
 	{
 		dPoints[i].first = x[i];
 		dPoints[i].second = y[i];
@@ -462,7 +462,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 	const unsigned int dimension(renderWindow.GetVertexDimension());
 	const unsigned int start(points.size() * dimension);
 	unsigned int i;
-	for (i = 0; i < points.size(); i++)
+	for (i = 0; i < points.size(); ++i)
 	{
 		bufferInfo.vertexBuffer[i * dimension] = (float)points[i].first;
 		bufferInfo.vertexBuffer[i * dimension + 1] = (float)points[i].second;
@@ -543,7 +543,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 	AssignVertexData(points, StyleContinuous);
 
 	unsigned int i;
-	for (i = 0; i < points.size() - 1; i++)
+	for (i = 0; i < points.size() - 1; ++i)
 	{
 		bufferInfo.indexBuffer[i * 18] = i * 4;
 		bufferInfo.indexBuffer[i * 18 + 1] = i * 4 + 1;
@@ -643,7 +643,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 	AssignVertexData(points, StyleSegments);
 
 	unsigned int i;
-	for (i = 0; i < points.size() / 2; i++)
+	for (i = 0; i < points.size() / 2; ++i)
 	{
 		bufferInfo.indexBuffer[i * 18] = i * 8;
 		bufferInfo.indexBuffer[i * 18 + 1] = i * 8 + 1;
@@ -721,7 +721,7 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double> >& point
 	const unsigned int dimension(renderWindow.GetVertexDimension());
 	const unsigned int colorStart(dimension * 4 * points.size());
 	unsigned int i;
-	for (i = 0; i < points.size(); i++)
+	for (i = 0; i < points.size(); ++i)
 	{
 		if (i == 0 || (style == StyleSegments && i % 2 == 0))
 			ComputeOffsets(points[i].first, points[i].second, points[i + 1].first,

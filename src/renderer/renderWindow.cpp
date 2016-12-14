@@ -326,7 +326,7 @@ void RenderWindow::Render()
 	// NOTE:  Any primitive that uses it's own program should re-load the default program
 	// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
 	unsigned int i;
-	for (i = 0; i < primitiveList.GetCount(); i++)
+	for (i = 0; i < primitiveList.GetCount(); ++i)
 		primitiveList[i]->Draw();
 
 	glFlush();
@@ -458,7 +458,7 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 		return false;
 
 	unsigned int i;
-	for (i = 0; i < primitiveList.GetCount(); i++)
+	for (i = 0; i < primitiveList.GetCount(); ++i)
 	{
 		if (toRemove == primitiveList[i].get())
 		{
@@ -508,7 +508,7 @@ void RenderWindow::Initialize()
 
 	float glMatrix[16];
 	GLuint i;
-	for (i = shaders.size(); i > 0; i--)
+	for (i = shaders.size(); i > 0; --i)
 	{
 		if (shaders[i - 1].needsModelview || shaders[i - 1].needsProjection)
 			glUseProgram(shaders[i - 1].programId);
@@ -914,7 +914,7 @@ void RenderWindow::UpdateModelviewMatrix()
 	ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
 
 	unsigned int i;
-	for (i = shaders.size(); i > 0; i--)
+	for (i = shaders.size(); i > 0; --i)
 	{
 		if (shaders[i - 1].needsModelview)
 		{
@@ -1161,7 +1161,7 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 	// Iterate through the list of primitives in the scene
 	// If one of them has the same address as our argument, return true
 	unsigned int i;
-	for (i = 0; i < primitiveList.GetCount(); i++)
+	for (i = 0; i < primitiveList.GetCount(); ++i)
 	{
 		if (primitiveList[i].get() == pickedObject)
 			return true;
@@ -1237,9 +1237,9 @@ bool RenderWindow::OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
 void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, float gl[])
 {
 	unsigned int i, j;
-	for (i = 0; i < matrix.GetNumberOfRows(); i++)
+	for (i = 0; i < matrix.GetNumberOfRows(); ++i)
 	{
-		for (j = 0; j < matrix.GetNumberOfColumns(); j++)
+		for (j = 0; j < matrix.GetNumberOfColumns(); ++j)
 			gl[i * matrix.GetNumberOfColumns() + j] = matrix(j, i);
 	}
 }
@@ -1264,9 +1264,9 @@ void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, float gl[])
 void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const float gl[])
 {
 	unsigned int i, j;
-	for (i = 0; i < matrix.GetNumberOfRows(); i++)
+	for (i = 0; i < matrix.GetNumberOfRows(); ++i)
 	{
-		for (j = 0; j < matrix.GetNumberOfColumns(); j++)
+		for (j = 0; j < matrix.GetNumberOfColumns(); ++j)
 			matrix(j, i) = gl[i * matrix.GetNumberOfColumns() + j];
 	}
 }
@@ -1631,7 +1631,7 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 {
 	GLuint program = glCreateProgram();
 	size_t i;
-	for (i = 0; i < shaderList.size(); i++)
+	for (i = 0; i < shaderList.size(); ++i)
 		glAttachShader(program, shaderList[i]);
 
 	glLinkProgram(program);
@@ -1648,7 +1648,7 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 		assert(false);
 	}
 
-	for (i = 0; i < shaderList.size(); i++)
+	for (i = 0; i < shaderList.size(); ++i)
 	{
 		glDetachShader(program, shaderList[i]);
 		glDeleteShader(shaderList[i]);
@@ -1751,9 +1751,9 @@ void RenderWindow::Rotate(Matrix& m, const double& angle,
 	rotation4.MakeIdentity();
 
 	unsigned int r, c;
-	for (r = 0; r < 3; r++)
+	for (r = 0; r < 3; ++r)
 	{
-		for (c = 0; c < 3; c++)
+		for (c = 0; c < 3; ++c)
 			rotation4(r, c) = rotation3(r, c);
 	}
 

@@ -13,7 +13,7 @@
 // Desc:  Dialog for creating a variety of signals (not dependent on other
 //        curves).
 
-// C++ standard headers
+// Standard C++ headers
 #include <cstdlib>
 #include <climits>
 
@@ -173,7 +173,7 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 
 	wxArrayString signalList;
 	unsigned int i;
-	for (i = 0; i < SignalCount; i++)
+	for (i = 0; i < SignalCount; ++i)
 		signalList.Add(GetSignalName((SignalType)i));
 
 	wxStaticText *typeLabel = new wxStaticText(this, wxID_ANY, _T("Signal Type"));
@@ -448,7 +448,7 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 
 	double time;
 	unsigned int i;
-	for (i = 0; i < dataset->GetNumberOfPoints(); i++)
+	for (i = 0; i < dataset->GetNumberOfPoints(); ++i)
 	{
 		time = startTime + (double)i / sampleRate;
 		dataset->GetXPointer()[i] = time;

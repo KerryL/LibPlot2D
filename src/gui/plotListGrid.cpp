@@ -107,7 +107,7 @@ void PlotListGrid::Build()
 	EnableDragRowSize(false);
 
 	unsigned int i;
-	for (i = 1; i < ColCount; i++)// Skip the name column
+	for (i = 1; i < ColCount; ++i)// Skip the name column
 		AutoSizeColLabelSize(i);
 
 	EndBatch();
@@ -201,7 +201,7 @@ unsigned int PlotListGrid::AddDataRow(const wxString &name)
 	SetCellEditor(index, ColMarkerSize, new wxGridCellNumberEditor(-1, maxMarkerSize));
 
 	unsigned int i;
-	for (i = 1; i < ColCount; i++)
+	for (i = 1; i < ColCount; ++i)
 			SetReadOnly(index, i, true);
 	SetReadOnly(index, ColLineSize, false);
 	SetReadOnly(index, ColMarkerSize, false);
@@ -713,7 +713,7 @@ void PlotListGrid::AddTimeRow()
 	guiInterface.SetXDataLabel(guiInterface.GetCurrentFileFormat());
 
 	unsigned int i;
-	for (i = 0; i < ColCount; i++)
+	for (i = 0; i < ColCount; ++i)
 		SetReadOnly(0, i, true);
 }
 
@@ -788,7 +788,7 @@ Color PlotListGrid::GetNextColor(const unsigned int &index) const
 bool PlotListGrid::ItemIsInArray(const wxArrayInt& a, const int& item)
 {
 	unsigned int i;
-	for (i = 0; i < a.Count(); i++)
+	for (i = 0; i < a.Count(); ++i)
 	{
 		if (a[i] == item)
 			return true;

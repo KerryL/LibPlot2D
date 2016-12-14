@@ -65,7 +65,7 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 
 	unsigned int i;
 	wxString nameFromFile;
-	for (i = 0; i < fontFiles.GetCount(); i++)
+	for (i = 0; i < fontFiles.GetCount(); ++i)
 	{
 		if (GetFontName(fontFiles[i], nameFromFile))
 		{
@@ -104,9 +104,9 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 
 	// See if any of the installed fonts matches our list of preferred fonts
 	unsigned int i, j;
-	for (i = 0; i < preferredFonts.GetCount(); i++)
+	for (i = 0; i < preferredFonts.GetCount(); ++i)
 	{
-		for (j = 0; j < fontList.GetCount(); j++)
+		for (j = 0; j < fontList.GetCount(); ++j)
 		{
 			// If the system font matches
 			if (preferredFonts[i].CmpNoCase(fontList[j]) == 0)
@@ -120,7 +120,7 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 	}
 
 	// We didn't find our preferred fonts, now let's just go down the list until we find ANY font file
-	for (i = 0; i < fontList.GetCount(); i++)
+	for (i = 0; i < fontList.GetCount(); ++i)
 	{
 		fontFile = GetFontFileName(fontList[i]);
 		if (!fontFile.IsEmpty())
@@ -159,9 +159,9 @@ bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &p
 	// See if any of them are in our preferred fonts list
 	// Assume list is organized with most desired fonts first
 	unsigned int i, j;
-	for (i = 0; i < preferredFonts.GetCount(); i++)
+	for (i = 0; i < preferredFonts.GetCount(); ++i)
 	{
-		for (j = 0; j < fontList.GetCount(); j++)
+		for (j = 0; j < fontList.GetCount(); ++j)
 		{
 			if (preferredFonts[i].CmpNoCase(fontList[j]) == 0)
 			{
@@ -218,7 +218,7 @@ bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 	TT_NAME_TABLE_HEADER ttNTHeader = GetNameTableHeader(fontStream, tblDir.offset);
 
 	unsigned int i;
-	for (i = 0; i < ttNTHeader.nrCount; i++)
+	for (i = 0; i < ttNTHeader.nrCount; ++i)
 	{
 		fontName = CheckHeaderForName(fontStream, tblDir.offset + ttNTHeader.storageOffset);
 		if (!fontName.IsEmpty())
@@ -281,7 +281,7 @@ bool FontFinder::GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offset
 	wxString tableName("name");
 
 	int i;
-	for (i = 0; i < offsetTable.numOfTables; i++)
+	for (i = 0; i < offsetTable.numOfTables; ++i)
 	{
 		file.read((char*)&table, sizeof(TT_TABLE_DIRECTORY));
 

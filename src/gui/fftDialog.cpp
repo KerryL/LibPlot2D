@@ -224,7 +224,7 @@ void FFTDialog::ConfigureControls()
 	windowSizeCombo->Clear();
 
 	unsigned int i;
-	for (i = 1; i <= maxPower; i++)
+	for (i = 1; i <= maxPower; ++i)
 		windowSizeCombo->Append(wxString::Format("%u", (unsigned int)pow(2, (double)i)));
 	windowSizeCombo->SetSelection(windowSizeCombo->GetCount() - 1);
 }
@@ -283,7 +283,7 @@ wxArrayString FFTDialog::GetWindowList() const
 	wxArrayString list;
 
 	unsigned int i;
-	for (i = 0; i < FastFourierTransform::WindowCount; i++)
+	for (i = 0; i < FastFourierTransform::WindowCount; ++i)
 		list.Add(FastFourierTransform::GetWindowName((FastFourierTransform::FFTWindow)i));
 
 	return list;

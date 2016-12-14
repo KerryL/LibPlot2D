@@ -244,7 +244,7 @@ void Legend::UpdateBoundingBox()
 	Text::BoundingBox boundingBox;
 	unsigned int maxStringWidth(0);
 	unsigned int i;
-	for (i = 0; i < entries.size(); i++)
+	for (i = 0; i < entries.size(); ++i)
 	{
 		boundingBox = text.GetBoundingBox(entries[i].text.ToStdString());
 		if (boundingBox.xRight > (int)maxStringWidth)
@@ -878,7 +878,7 @@ void Legend::BuildMarkers()
 	y += height + lineYOffset;
 
 	unsigned int i;
-	for (i = 0; i < entries.size(); i++)
+	for (i = 0; i < entries.size(); ++i)
 	{
 		halfSize = entries[i].markerSize * 2.0;// This relationship comes from PlotCurve class
 		y -= entrySpacing + textHeight;
@@ -958,7 +958,7 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 	Primitive::BufferInfo buffer;
 
 	unsigned int i;
-	for (i = 0; i < bufferVector.size(); i++)
+	for (i = 0; i < bufferVector.size(); ++i)
 	{
 		buffer.indexBuffer.insert(buffer.indexBuffer.end(),
 			bufferVector[i].indexBuffer.begin(),
@@ -972,11 +972,11 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 	const unsigned int colorStart(buffer.vertexCount * renderWindow.GetVertexDimension());
 
 	unsigned int j, k(0), m(0), indexShift(0), bufferColorStart;
-	for (i = 0; i < bufferVector.size(); i++)
+	for (i = 0; i < bufferVector.size(); ++i)
 	{
 		bufferColorStart = bufferVector[i].vertexCount * renderWindow.GetVertexDimension();
 
-		for (j = 0; j < bufferVector[i].vertexCount; j++)
+		for (j = 0; j < bufferVector[i].vertexCount; ++j)
 		{
 			buffer.vertexBuffer[k * 2] = bufferVector[i].vertexBuffer[j * 2];
 			buffer.vertexBuffer[k * 2 + 1] = bufferVector[i].vertexBuffer[j * 2 + 1];
@@ -985,10 +985,10 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 			buffer.vertexBuffer[colorStart + k * 4 + 1] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 1];
 			buffer.vertexBuffer[colorStart + k * 4 + 2] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 2];
 			buffer.vertexBuffer[colorStart + k * 4 + 3] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 3];
-			k++;
+			++k;
 		}
 
-		for (j = 0; j < bufferVector[i].indexBuffer.size(); j++)
+		for (j = 0; j < bufferVector[i].indexBuffer.size(); ++j)
 			buffer.indexBuffer[m++] = bufferVector[i].indexBuffer[j] + indexShift;
 
 		indexShift += bufferVector[i].vertexCount;
@@ -1029,7 +1029,7 @@ void Legend::BuildSampleLines()
 	y += height + lineYOffset;
 
 	unsigned int i;
-	for (i = 0; i < entries.size(); i++)
+	for (i = 0; i < entries.size(); ++i)
 	{
 		lines.SetLineColor(entries[i].color);
 		lines.SetBackgroundColorForAlphaFade();
@@ -1107,7 +1107,7 @@ void Legend::BuildLabelStrings()
 	y += height;
 	
 	unsigned int i;
-	for (i = 0; i < entries.size(); i++)
+	for (i = 0; i < entries.size(); ++i)
 	{
 		y -= entrySpacing + textHeight;
 		text.SetPosition(x + 2 * entrySpacing + sampleLength, y);
@@ -1135,7 +1135,7 @@ void Legend::RequiresRedraw()
 {
 	modified = true;
 	unsigned int i;
-	for (i = 0; i < bufferInfo.size(); i++)
+	for (i = 0; i < bufferInfo.size(); ++i)
 		bufferInfo[i].vertexCountModified = true;
 }
 

@@ -208,7 +208,7 @@ void Text::Initialize()
 			isOK = false;
 	}
 
-	ftReferenceCount++;
+	++ftReferenceCount;
 }
 
 //=============================================================================
@@ -311,7 +311,7 @@ bool Text::GenerateGlyphs()
 
 	// First loop determines max required image size
 	const unsigned int glyphCount(128);
-	for (c = 0; c < glyphCount; c++)
+	for (c = 0; c < glyphCount; ++c)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			return false;
@@ -334,7 +334,7 @@ bool Text::GenerateGlyphs()
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
 
 	// Second loop actually builds and stores the textures
-	for (c = 0; c < glyphCount; c++)
+	for (c = 0; c < glyphCount; ++c)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			return false;
@@ -387,7 +387,7 @@ void Text::FreeFTResources()
 	FT_Done_Face(face);
 
 	assert(ftReferenceCount > 0);
-	ftReferenceCount--;
+	--ftReferenceCount;
 	if (ftReferenceCount == 0)
 		FT_Done_FreeType(ft);
 }
@@ -487,7 +487,7 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 	b.yDown = 0;
 
 	std::string::const_iterator c;
-	for (c = s.begin(); c != s.end(); c++)
+	for (c = s.begin(); c != s.end(); ++c)
 	{
 		Glyph g = glyphs.find(*c)->second;
 
@@ -625,7 +625,7 @@ Primitive::BufferInfo Text::AssembleBuffers()
 	Primitive::BufferInfo bufferInfo;
 
 	unsigned int i;
-	for (i = 0; i < bufferVector.size(); i++)
+	for (i = 0; i < bufferVector.size(); ++i)
 	{
 		bufferInfo.indexBuffer.insert(bufferInfo.indexBuffer.end(),
 			bufferVector[i].indexBuffer.begin(),
@@ -675,7 +675,7 @@ Primitive::BufferInfo Text::BuildLocalText()
 
 	unsigned int i(0), texI(0);
 	std::string::const_iterator c;
-	for (c = text.begin(); c != text.end(); c++)
+	for (c = text.begin(); c != text.end(); ++c)
 	{
 		Glyph g = glyphs[*c];
 

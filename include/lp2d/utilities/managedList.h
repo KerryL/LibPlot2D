@@ -170,7 +170,7 @@ void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 	std::vector<T*> swap = list;
 
 	unsigned int i;
-	for (i = 0; i < list.size(); i++)
+	for (i = 0; i < list.size(); ++i)
 		list[i] = swap[order[i]];
 }
 

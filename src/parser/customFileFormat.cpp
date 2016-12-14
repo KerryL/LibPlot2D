@@ -450,9 +450,9 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 	assert(scales.size() == names.size());
 
 	unsigned int i, j;//, location;
-	for (i = 0; i < names.size(); i++)
+	for (i = 0; i < names.size(); ++i)
 	{
-		for (j = 0; j < channels.size(); j++)
+		for (j = 0; j < channels.size(); ++j)
 		{
 			if (channels[j].code.IsEmpty())
 			{

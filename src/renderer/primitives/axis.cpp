@@ -402,7 +402,7 @@ void Axis::DrawHorizontalGrid(const unsigned int &count)
 {
 	unsigned int grid;
 	double location;
-	for (grid = 0; grid < count; grid++)
+	for (grid = 0; grid < count; ++grid)
 	{
 		if (minorGrid)
 			location = ValueToPixel(GetNextGridValue(grid + 1));
@@ -443,7 +443,7 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 
 	unsigned int tick;
 	double location;
-	for (tick = 0; tick < count; tick++)
+	for (tick = 0; tick < count; ++tick)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
@@ -475,7 +475,7 @@ void Axis::DrawVerticalGrid(const unsigned int &count)
 {
 	unsigned int grid;
 	double location;
-	for (grid = 0; grid < count; grid++)
+	for (grid = 0; grid < count; ++grid)
 	{
 		if (minorGrid)
 			location = ValueToPixel(GetNextGridValue(grid + 1));
@@ -516,7 +516,7 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 
 	unsigned int tick;
 	double location;
-	for (tick = 0; tick < count; tick++)
+	for (tick = 0; tick < count; ++tick)
 	{
 		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
@@ -553,7 +553,7 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 		value = pow(10.0, floor(log10(minimum)));
 		int scale(1);
 		while (value * scale <= minimum)
-			scale++;
+			++scale;
 		value *= scale;
 	}
 	else
@@ -684,7 +684,7 @@ void Axis::DrawTickLabels()
 	double valueOffsetFromEdge = offsetFromWindowEdge * 0.8;
 	unsigned int tick, numberOfTicks;
 	ComputeGridAndTickCounts(numberOfTicks);
-	for (tick = 0; tick < numberOfTicks + 2; tick++)
+	for (tick = 0; tick < numberOfTicks + 2; ++tick)
 	{
 		value = std::min(GetNextTickValue(tick == 0, tick == numberOfTicks + 1, tick), maximum);
 		valueLabel.Printf("%0.*f", precision, value);

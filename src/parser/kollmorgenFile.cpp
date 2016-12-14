@@ -176,7 +176,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 
 	while (!file.eof())
 	{
-		lineNumber++;
+		++lineNumber;
 		std::getline(file, nextLine);
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		parsed.Insert(wxString::Format("%f", time), 0);
@@ -189,7 +189,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		}
 
 		set = 0;
-		for (i = 0; i < parsed.size(); i++)
+		for (i = 0; i < parsed.size(); ++i)
 		{
 			if (!parsed[i].ToDouble(&tempDouble))
 			{
@@ -201,7 +201,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 			{
 				rawData[set].push_back(tempDouble);
 				factors[set] = factors[i];// Update scales for cases where user didn't select a column
-				set++;
+				++set;
 			}
 		}
 		time += timeStep;

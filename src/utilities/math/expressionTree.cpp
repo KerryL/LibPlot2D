@@ -160,7 +160,7 @@ Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 	{
 		Dataset2D set(*(*list)[0]);
 		unsigned int j;
-		for (j = 0; j < set.GetNumberOfPoints(); j++)
+		for (j = 0; j < set.GetNumberOfPoints(); ++j)
 			set.GetYPointer()[j] = set.GetXData(j);
 
 		return set;
@@ -192,7 +192,7 @@ bool ExpressionTree::ParenthesesBalanced(const wxString &expression) const
 
 	while (location != wxNOT_FOUND)
 	{
-		leftCount++;
+		++leftCount;
 		location = expression.find(_T("("), location + 1);
 	}
 
@@ -200,7 +200,7 @@ bool ExpressionTree::ParenthesesBalanced(const wxString &expression) const
 
 	while (location != wxNOT_FOUND)
 	{
-		rightCount++;
+		++rightCount;
 		location = expression.find(_T(")"), location + 1);
 	}
 
@@ -235,7 +235,7 @@ wxString ExpressionTree::ParseExpression(const wxString &expression)
 	bool lastWasOperator(true);
 	wxString errorString;
 
-	for (i = 0; i < expression.Len(); i++)
+	for (i = 0; i < expression.Len(); ++i)
 	{
 		if (expression.Mid(i, 1).Trim().IsEmpty())
 			continue;
@@ -554,7 +554,7 @@ bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop, const b
 		(s[0] == '-' && lastWasOperator && NextIsNumber(s.Mid(1), nullptr, false)))
 	{
 		unsigned int i;
-		for (i = 1; i < s.Len(); i++)
+		for (i = 1; i < s.Len(); ++i)
 		{
 			if (s[i] == '.')
 			{
@@ -639,7 +639,7 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const 
 			return false;
 
 		unsigned int i;
-		for (i = 1 + (unsigned int)lastWasOperator; i < close; i++)
+		for (i = 1 + (unsigned int)lastWasOperator; i < close; ++i)
 		{
 			if (int(s[i]) < '0' || int(s[i]) > '9')
 				return false;
@@ -1945,7 +1945,7 @@ wxString ExpressionTree::StringMultiply(const wxString &first, const double &sec
 	std::vector<std::pair<int, double> > terms(FindPowersAndCoefficients(BreakApartTerms(first)));
 	unsigned int i;
 	wxString expression;
-	for (i = 0; i < terms.size(); i++)
+	for (i = 0; i < terms.size(); ++i)
 		AddToExpressionString(expression, terms[i].second * second, terms[i].first);
 
 	return expression;
@@ -1974,14 +1974,14 @@ wxString ExpressionTree::StringMultiply(const wxString &first, const wxString &s
 	std::vector<std::pair<int, double> > secondTerms(FindPowersAndCoefficients(BreakApartTerms(second)));
 	std::vector<std::pair<int, double> > terms;
 	unsigned int i, j;
-	for (i = 0; i < firstTerms.size(); i++)
+	for (i = 0; i < firstTerms.size(); ++i)
 	{
-		for (j = 0; j < secondTerms.size(); j++)
+		for (j = 0; j < secondTerms.size(); ++j)
 			terms.push_back(std::pair<int, double>(firstTerms[i].first + secondTerms[j].first, firstTerms[i].second * secondTerms[j].second));
 	}
 
 	wxString expression;
-	for (i = 0; i < terms.size(); i++)
+	for (i = 0; i < terms.size(); ++i)
 		AddToExpressionString(expression, terms[i].second, terms[i].first);
 
 	return expression;
@@ -2058,7 +2058,7 @@ wxString ExpressionTree::StringPower(const double &first, const wxString &second
 
 	wxString result(second);
 	unsigned int i;
-	for (i = 1; i < (unsigned int)first; i++)
+	for (i = 1; i < (unsigned int)first; ++i)
 		result = StringMultiply(result, second);
 
 	return result;
@@ -2172,7 +2172,7 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 	unsigned int i, start, end;
 	int count;
 	double temp, coefficient;
-	for (i = 0; i < terms.Count(); i++)
+	for (i = 0; i < terms.Count(); ++i)
 	{
 		count = 0;
 		start = 0;
@@ -2188,9 +2188,9 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 				if (terms[i][0] == '-' && coefficient == 1.0)
 				{
 					coefficient = -1.0;
-					start++;
+					++start;
 					if (end != (unsigned int)wxNOT_FOUND)
-						end++;
+						++end;
 				}
 
 				count += GetTermPower(terms[i].Mid(start), start, end);

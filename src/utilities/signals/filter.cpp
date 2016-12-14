@@ -131,9 +131,9 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 	ResizeArrays(zNum.size(), zDen.size());
 
 	unsigned int i;
-	for (i = 0; i < zNum.size(); i++)
+	for (i = 0; i < zNum.size(); ++i)
 		a[i] = zNum[i] / zDen[0];
-	for (i = 0; i < zDen.size() - 1; i++)
+	for (i = 0; i < zDen.size() - 1; ++i)
 		b[i] = zDen[i + 1] / zDen[0];
 }
 
@@ -167,7 +167,7 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	std::string result;
 
 	unsigned int i;
-	for (i = 0; i < coefficients.size(); i++)
+	for (i = 0; i < coefficients.size(); ++i)
 	{
 		if (PlotMath::IsZero(coefficients[i]))
 			continue;
@@ -219,13 +219,13 @@ Filter& Filter::operator=(const Filter &f)
 	ResizeArrays(f.u.size(), f.y.size());
 
 	unsigned int i;
-	for (i = 0; i < a.size(); i++)
+	for (i = 0; i < a.size(); ++i)
 	{
 		a[i] = f.a[i];
 		u[i] = f.u[i];
 	}
 
-	for (i = 0; i < y.size(); i++)
+	for (i = 0; i < y.size(); ++i)
 	{
 		if (i < b.size())
 			b[i] = f.b[i];
@@ -254,10 +254,10 @@ Filter& Filter::operator=(const Filter &f)
 void Filter::Initialize(const double &initialValue)
 {
 	unsigned int i;
-	for (i = 0; i < u.size(); i++)
+	for (i = 0; i < u.size(); ++i)
 		u[i] = initialValue;
 
-	for (i = 0; i < y.size(); i++)
+	for (i = 0; i < y.size(); ++i)
 		y[i] = initialValue * ComputeSteadyStateGain();
 }
 
@@ -286,9 +286,9 @@ double Filter::Apply(const double &u0)
 
 	y[0] = 0.0;
 	unsigned int i;
-	for (i = 0; i < a.size(); i++)
+	for (i = 0; i < a.size(); ++i)
 		y[0] += a[i] * this->u[i];
-	for (i = 1; i < y.size(); i++)
+	for (i = 1; i < y.size(); ++i)
 		y[0] -= b[i - 1] * y[i];
 
 	return y[0];
@@ -314,7 +314,7 @@ double Filter::Apply(const double &u0)
 void Filter::ShiftArray(std::vector<double>& s) const
 {
 	unsigned int i;
-	for (i = s.size() - 1; i > 0; i--)
+	for (i = s.size() - 1; i > 0; --i)
 		s[i] = s[i - 1];
 }
 
@@ -379,7 +379,7 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 
 	std::vector<double> coefficients;
 	unsigned int i;
-	for (i = 0; i < terms.size(); i++)
+	for (i = 0; i < terms.size(); ++i)
 		coefficients.push_back(terms[terms.size() - 1 - i].second);
 
 	return coefficients;
@@ -405,15 +405,15 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::pair<int, double> > terms)
 {
 	unsigned int i, j;
-	for (i = 0; i < terms.size(); i++)
+	for (i = 0; i < terms.size(); ++i)
 	{
-		for (j = i + 1; j < terms.size(); j++)
+		for (j = i + 1; j < terms.size(); ++j)
 		{
 			if (terms[i].first == terms[j].first)
 			{
 				terms[i].second += terms[j].second;
 				terms.erase(terms.begin() + j);
-				j--;
+				--j;
 			}
 		}
 	}
@@ -446,21 +446,21 @@ std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pa
 	int i, expectedPower(terms[0].first - 1);
 	while (expectedPower < -1)
 	{
-		expectedPower++;
+		++expectedPower;
 		terms.insert(terms.begin(), std::make_pair(expectedPower + 1, 0.0));
 	}
 
-	for (i = 1; i < (int)terms.size(); i++)
+	for (i = 1; i < (int)terms.size(); ++i)
 	{
 		if (terms[i].first != expectedPower)
 			terms.insert(terms.begin() + i, std::make_pair(expectedPower, 0.0));
-		expectedPower--;
+		--expectedPower;
 	}
 
 	while (expectedPower >= 0)
 	{
 		terms.insert(terms.end(), std::make_pair(expectedPower, 0.0));
-		expectedPower--;
+		--expectedPower;
 	}
 
 	return terms;
@@ -499,18 +499,18 @@ double Filter::ComputeSteadyStateGain(const std::string &num, const std::string 
 
 	unsigned int numEndZeros(0), denEndZeros(0);
 	int i;
-	for (i = numeratorCoefficients.size() - 1; i >= 0; i--)
+	for (i = numeratorCoefficients.size() - 1; i >= 0; --i)
 	{
 		if (PlotMath::IsZero(numeratorCoefficients[i]))
-			numEndZeros++;
+			++numEndZeros;
 		else
 			break;
 	}
 
-	for (i = denominatorCoefficients.size() - 1; i >= 0; i--)
+	for (i = denominatorCoefficients.size() - 1; i >= 0; --i)
 	{
 		if (PlotMath::IsZero(denominatorCoefficients[i]))
-			denEndZeros++;
+			++denEndZeros;
 		else
 			break;
 	}
@@ -552,9 +552,9 @@ double Filter::ComputeSteadyStateGain() const
 	double numeratorSum(0.0);
 	double denominatorSum(1.0);
 	unsigned int i;
-	for (i = 0; i < a.size(); i++)
+	for (i = 0; i < a.size(); ++i)
 		numeratorSum += a[i];
-	for (i = 0; i < b.size(); i++)
+	for (i = 0; i < b.size(); ++i)
 		denominatorSum += b[i];
 
 	return numeratorSum / denominatorSum;

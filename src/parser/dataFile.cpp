@@ -165,7 +165,7 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 {
 	wxArrayInt trueIndices;
 	unsigned int i;
-	for (i = 0; i < selections.size(); i++)
+	for (i = 0; i < selections.size(); ++i)
 		trueIndices.Add(AdjustForSkippedColumns(selections[i]));
 
 	assert(selections.size() == trueIndices.size());
@@ -193,10 +193,10 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
 {
 	unsigned int j, adjustment(0);
-	for (j = 0; j < nonNumericColumns.size(); j++)
+	for (j = 0; j < nonNumericColumns.size(); ++j)
 	{
 		if (nonNumericColumns[j] - 1 <= (int)i)
-			adjustment++;
+			++adjustment;
 		else
 			break;
 	}
@@ -283,7 +283,7 @@ wxString DataFile::DetermineBestDelimiter() const
 
 	while (std::getline(file, nextLine))
 	{
-		for (i = 0; i < delimiterList.size(); i++)// Try all delimiters until we find one that works
+		for (i = 0; i < delimiterList.size(); ++i)// Try all delimiters until we find one that works
 		{
 			delimitedLine = ParseLineIntoColumns(nextLine, delimiterList[i]);
 			if (delimitedLine.size() > 1)
@@ -437,7 +437,7 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 		// results in consecutive delimiters that should NOT be treated as one
 		if (end == start && ignoreConsecutiveDelimiters)
 		{
-			start++;
+			++start;
 			continue;
 		}
 
@@ -479,14 +479,14 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 	int line;
 	wxArrayString delimitedPreviousLine, names;
 	double value;
-	for (line = previousLines.size() - 1; line >= 0; line--)
+	for (line = previousLines.size() - 1; line >= 0; --line)
 	{
 		delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
 		if (delimitedPreviousLine.size() != currentLine.size())
 			break;
 
 		bool prependText(true);
-		for (i = 0; i < delimitedPreviousLine.size(); i++)
+		for (i = 0; i < delimitedPreviousLine.size(); ++i)
 		{
 			prependText = !delimitedPreviousLine[i].ToDouble(&value);
 			if (!prependText)
@@ -495,7 +495,7 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 
 		if (prependText)
 		{
-			for (i = 0; i < delimitedPreviousLine.size(); i++)
+			for (i = 0; i < delimitedPreviousLine.size(); ++i)
 			{
 				if (!currentLine[i].ToDouble(&value))
 				{
@@ -537,7 +537,7 @@ wxArrayString DataFile::GenerateDummyNames(const wxArrayString &currentLine,
 	unsigned int i;
 	double value;
 	wxArrayString names;
-	for (i = 0; i < currentLine.size(); i++)
+	for (i = 0; i < currentLine.size(); ++i)
 	{
 		if (!currentLine[i].ToDouble(&value))
 		{
@@ -577,7 +577,7 @@ wxArrayString DataFile::RemoveUnwantedDescriptions(const wxArrayString &names,
 	wxArrayString selectedNames;
 	selectedNames.Add(names[0]);
 	unsigned int i;
-	for (i = 1; i < names.size(); i++)
+	for (i = 1; i < names.size(); ++i)
 	{
 		if (ArrayContainsValue(AdjustForSkippedColumns(i - 1), choices))
 			selectedNames.Add(names[i]);
@@ -640,7 +640,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	std::vector<double> newFactors(choices.size() + 1, 1.0);
 	while (std::getline(file, nextLine))
 	{
-		lineNumber++;
+		++lineNumber;
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		if (parsed.size() < curveCount)
 		{
@@ -651,7 +651,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		}
 
 		set = 0;
-		for (i = 0; i < parsed.size(); i++)
+		for (i = 0; i < parsed.size(); ++i)
 		{
 			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
 			{
@@ -664,7 +664,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 
 				rawData[set].push_back(tempDouble);
 				newFactors[set] = factors[i];// Update scales for cases where user didn't select a column
-				set++;
+				++set;
 			}
 		}
 	}
@@ -694,7 +694,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 bool DataFile::ArrayContainsValue(const int &value, const wxArrayInt &a) const
 {
 	unsigned int i;
-	for (i = 0; i < a.size(); i++)
+	for (i = 0; i < a.size(); ++i)
 	{
 		if (a[i] == value)
 			return true;
@@ -724,7 +724,7 @@ void DataFile::AssembleDatasets(
 	const std::vector<std::vector<double>>& rawData)
 {
 	unsigned int i;
-	for (i = 1; i < rawData.size(); i++)
+	for (i = 1; i < rawData.size(); ++i)
 	{
 		std::unique_ptr<Dataset2D> dataset;
 		if (i == 1)
@@ -763,7 +763,7 @@ void DataFile::TransferVectorToArray(const std::vector<double> &source,
 	double *destination) const
 {
 	unsigned int i;
-	for (i = 0; i < source.size(); i++)
+	for (i = 0; i < source.size(); ++i)
 		destination[i] = source[i];
 }
 
@@ -789,7 +789,7 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 {
 	std::string nextLine;
 	unsigned int i;
-	for (i = 0; i < count; i++)
+	for (i = 0; i < count; ++i)
 		std::getline(file, nextLine);
 }
 
@@ -820,7 +820,7 @@ bool DataFile::IsDataRow(const wxArrayString &list) const
 	// TODO:  Check that first column time format is OK?
 
 	unsigned int j;
-	for (j = 1; j < list.size(); j++)
+	for (j = 1; j < list.size(); ++j)
 	{
 		if (!list[j].IsEmpty() && list[j].ToDouble(&value))
 			return true;
@@ -966,7 +966,7 @@ bool DataFile::DescriptionsMatch(const wxArrayString &descriptions) const
 		return false;
 
 	unsigned int i;
-	for (i = 0; i < descriptions.Count(); i++)
+	for (i = 0; i < descriptions.Count(); ++i)
 	{
 		if (this->descriptions[i].compare(descriptions[i]) != 0)
 			return false;

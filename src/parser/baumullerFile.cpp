@@ -131,9 +131,9 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 	if (delimitedLine.size() > 1 && delimitedLine[0].Cmp(_T("Par.number:")) == 0)
 	{
 		unsigned int i, j;
-		for (i = 0; i < 3; i++)
+		for (i = 0; i < 3; ++i)
 		{
-			for (j = 0; j < delimitedLine.Count() - 1; j++)
+			for (j = 0; j < delimitedLine.Count() - 1; ++j)
 			{
 				if (i == 0)
 					names.Add(delimitedLine[j]);

@@ -78,7 +78,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 	SelectionMap::const_iterator it;
 	DataFile::SelectionData selectionInfo;
 	bool atLeastOneFileLoaded(false);
-	for (i = 0; i < fileList.Count(); i++)
+	for (i = 0; i < fileList.Count(); ++i)
 	{
 		files[i] = GetDataFile(fileList[i]);
 		files[i]->Initialize();
@@ -103,7 +103,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 				files[i]->GetSelectionsFromUser(selectionInfo, owner);
 				if (selectionInfo.selections.Count() < 1)
 				{
-					for (j = 0; j <= i; j++)
+					for (j = 0; j <= i; ++j)
 						delete files[j];
 					return false;
 				}
@@ -119,7 +119,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 
 	if (!atLeastOneFileLoaded)
 	{
-		for (i = 0; i < files.size(); i++)
+		for (i = 0; i < files.size(); ++i)
 			delete files[i];
 		return false;
 	}
@@ -128,12 +128,12 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 		ClearAllCurves();
 
 	wxString curveName;
-	for (i = 0; i < fileList.Count(); i++)
+	for (i = 0; i < fileList.Count(); ++i)
 	{
 		if (!loaded[i])
 			continue;
 
-		for (j = 0; j < files[i]->GetDataCount(); j++)
+		for (j = 0; j < files[i]->GetDataCount(); ++j)
 		{
 			if (fileList.Count() > 1)
 				curveName = files[i]->GetDescription(j + 1) + _T(" : ") + GuiUtilities::ExtractFileNameFromPath(fileList[i]);
@@ -161,7 +161,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 	lastSelectionInfo = selectionInfo;
 	lastDescriptions = files[files.size() - 1]->GetAllDescriptions();
 
-	for (i = 0; i < files.size(); i++)
+	for (i = 0; i < files.size(); ++i)
 		delete files[i];
 
 	return true;
@@ -260,7 +260,7 @@ wxString GuiInterface::GenerateTemporaryFileName(const unsigned int &length) con
 {
 	wxString name;
 	unsigned int i;
-	for (i = 0; i < length; i++)
+	for (i = 0; i < length; ++i)
 		name.Append((char)((rand() % 52) + 65));
 
 	// Remove illegal characters
@@ -505,7 +505,7 @@ void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &right
 	// For each curve, update the cursor values
 	int i;
 	bool showXDifference(false);
-	for (i = 1; i < grid->GetNumberRows(); i++)
+	for (i = 1; i < grid->GetNumberRows(); ++i)
 	{
 		UpdateSingleCursorValue(i, leftValue, PlotListGrid::ColLeftCursor, leftVisible);
 		UpdateSingleCursorValue(i, rightValue, PlotListGrid::ColRightCursor, rightVisible);
@@ -660,7 +660,7 @@ void GuiInterface::ExportData()
 
 	unsigned int i, j(0);
 	wxString temp;
-	for (i = 1; i < plotList.GetCount() + 1; i++)
+	for (i = 1; i < plotList.GetCount() + 1; ++i)
 	{
 		if (grid->GetCellValue(i, PlotListGrid::ColName).Contains(_T("FFT")) ||
 			grid->GetCellValue(i, PlotListGrid::ColName).Contains(_T("FRF")))
@@ -698,7 +698,7 @@ void GuiInterface::ExportData()
 	while (!done)
 	{
 		done = true;
-		for (i = 0; i < plotList.GetCount(); i++)
+		for (i = 0; i < plotList.GetCount(); ++i)
 		{
 			if (j < plotList[i]->GetNumberOfPoints())
 				outFile << plotList[i]->GetXData(j) << delimiter << plotList[i]->GetYData(j);
@@ -714,7 +714,7 @@ void GuiInterface::ExportData()
 				done = false;
 		}
 
-		j++;
+		++j;
 	}
 
 	outFile.close();
@@ -746,7 +746,7 @@ void GuiInterface::GenerateFRF()
 
 	wxArrayString descriptions;
 	int i;
-	for (i = 1; i < grid->GetNumberRows(); i++)
+	for (i = 1; i < grid->GetNumberRows(); ++i)
 		descriptions.Add(grid->GetCellValue(i, 0));
 
 	FRFDialog dialog(owner, descriptions);
@@ -952,7 +952,7 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 	{
 		unsigned int stopIndex(plotList.GetCount());
 		unsigned int i;
-		for (i = 0; i < stopIndex; i++)
+		for (i = 0; i < stopIndex; ++i)
 		{
 			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[i]));
 			scaledData->MultiplyXData(factor);
@@ -972,14 +972,14 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 			UpdateCurveProperties(i + stopIndex);
 		}
 
-		for (i = stopIndex; i > 0; i--)
+		for (i = stopIndex; i > 0; --i)
 			RemoveCurve(i - 1);
 	}
 	// If applied to any other row, apply only to that row (by duplicating curve)
 	else
 	{
 		unsigned int i;
-		for (i = 0; i < selectedRows.Count(); i++)
+		for (i = 0; i < selectedRows.Count(); ++i)
 		{
 			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
 			scaledData->MultiplyXData(factor);
@@ -1010,7 +1010,7 @@ void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the derivative of dataset and add it to the plot
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			DiscreteDerivative::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
@@ -1041,7 +1041,7 @@ void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the integral of dataset and add it to the plot
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			DiscreteIntegral::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
@@ -1072,7 +1072,7 @@ void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the RMS of dataset and add it to the plot
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			RootMeanSquare::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
@@ -1102,7 +1102,7 @@ void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 {
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		std::unique_ptr<Dataset2D> newData(
 			GetFFTData(plotList[selectedRows[i] - 1]));
@@ -1144,7 +1144,7 @@ void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 	}
 
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			PlotMath::ApplyBitMask(*plotList[selectedRows[i] - 1], bit)));
@@ -1184,7 +1184,7 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 
 	// Create new dataset containing the RMS of dataset and add it to the plot
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
 
@@ -1221,7 +1221,7 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 
 	// Create new dataset containing the FFT of dataset and add it to the plot
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
 
@@ -1269,7 +1269,7 @@ void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 	}
 
 	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); i++)
+	for (i = 0; i < selectedRows.Count(); ++i)
 	{
 		wxString name;
 		std::unique_ptr<Dataset2D> newData(GetCurveFitData(
@@ -1305,7 +1305,7 @@ std::unique_ptr<Dataset2D> GuiInterface::GetCurveFitData(const unsigned int &ord
 
 	std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*data));
 	unsigned int i;
-	for (i = 0; i < newData->GetNumberOfPoints(); i++)
+	for (i = 0; i < newData->GetNumberOfPoints(); ++i)
 		newData->GetYPointer()[i] = CurveFit::EvaluateFit(newData->GetXData(i), fitData);
 
 	name = GetCurveFitName(fitData, row);
@@ -1338,7 +1338,7 @@ wxString GuiInterface::GetCurveFitName(const CurveFit::PolynomialFit &fitData,
 	name.Printf("Fit [%i] (R^2 = %0.2f): ", row, fitData.rSquared);
 
 	unsigned int i;
-	for (i = 0; i <= fitData.order; i++)
+	for (i = 0; i <= fitData.order; ++i)
 	{
 		if (i == 0)
 			termString.Printf("%1.2e", fitData.coefficients[i]);
@@ -1501,7 +1501,7 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 	Filter *filter = GetFilter(parameters, factor / data->GetAverageDeltaX(), data->GetYData(0));
 
 	unsigned int i;
-	for (i = 0; i < data->GetNumberOfPoints(); i++)
+	for (i = 0; i < data->GetNumberOfPoints(); ++i)
 		data->GetYPointer()[i] = filter->Apply(data->GetYData(i));
 
 	// For phaseless filter, re-apply the same filter backwards
@@ -1509,7 +1509,7 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 	{
 		data->Reverse();
 		filter->Initialize(data->GetYData(0));
-		for (i = 0; i < data->GetNumberOfPoints(); i++)
+		for (i = 0; i < data->GetNumberOfPoints(); ++i)
 			data->GetYPointer()[i] = filter->Apply(data->GetYData(i));
 		data->Reverse();
 	}
@@ -1567,7 +1567,7 @@ void GuiInterface::UpdateLegend()
 	std::vector<LibPlot2D::Legend::LegendEntryInfo> entries;
 	LibPlot2D::Legend::LegendEntryInfo info;
 	int i;
-	for (i = 1; i < grid->GetNumberRows(); i++)
+	for (i = 1; i < grid->GetNumberRows(); ++i)
 	{
 		if (grid->GetCellValue(i, PlotListGrid::ColVisible).IsEmpty())
 			continue;
@@ -1751,14 +1751,14 @@ std::unique_ptr<Dataset2D> GuiInterface::GetXZoomedDataset(
 	unsigned int i, startIndex(0), endIndex(0);
 	while (fullData->GetXData(startIndex) < renderer->GetXMin() &&
 		startIndex < fullData->GetNumberOfPoints())
-		startIndex++;
+		++startIndex;
 	endIndex = startIndex;
 	while (fullData->GetXData(endIndex) < renderer->GetXMax() &&
 		endIndex < fullData->GetNumberOfPoints())
-		endIndex++;
+		++endIndex;
 
 	std::unique_ptr<Dataset2D> data(std::make_unique<Dataset2D>(endIndex - startIndex));
-	for (i = startIndex; i < endIndex; i++)
+	for (i = startIndex; i < endIndex; ++i)
 	{
 		data->GetXPointer()[i - startIndex] = fullData->GetXData(i);
 		data->GetYPointer()[i - startIndex] = fullData->GetYData(i);
@@ -1788,7 +1788,7 @@ void GuiInterface::ShowAppropriateXLabel()
 	// If the only visible curves are frequency plots, change the x-label
 	int i;
 	bool showFrequencyLabel(false);
-	for (i = 1; i < grid->GetNumberRows(); i++)
+	for (i = 1; i < grid->GetNumberRows(); ++i)
 	{
 		if (grid->GetCellValue(i, PlotListGrid::ColVisible).Cmp(_T("1")) == 0)
 		{
@@ -1915,7 +1915,7 @@ wxString GuiInterface::ExtractUnitFromDescription(const wxString &description)
 
 	int location;
 	unsigned int i;
-	for (i = 0; i < delimiters.size(); i++)
+	for (i = 0; i < delimiters.size(); ++i)
 	{
 		location = description.Find(delimiters[i].mb_str());
 		if (location != wxNOT_FOUND && location < (int)description.Len() - 1)
@@ -1956,7 +1956,7 @@ bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 	if (s.Last() == close)
 	{
 		int i;
-		for (i = s.Len() - 2; i >= 0; i--)
+		for (i = s.Len() - 2; i >= 0; --i)
 		{
 			if (s.at(i) == open)
 			{

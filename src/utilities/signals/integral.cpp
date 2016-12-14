@@ -46,7 +46,7 @@ Dataset2D DiscreteIntegral::ComputeTimeHistory(const Dataset2D &data)
 	integral.GetYPointer()[0] = 0.0;
 
 	unsigned int i;
-	for (i = 1; i < data.GetNumberOfPoints(); i++)
+	for (i = 1; i < data.GetNumberOfPoints(); ++i)
 		integral.GetYPointer()[i] = integral.GetYData(i - 1) +
 			(data.GetXData(i) - data.GetXData(i - 1)) * 0.5
 			* (data.GetYData(i) + data.GetYData(i - 1));

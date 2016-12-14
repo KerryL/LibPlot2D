@@ -117,7 +117,7 @@ bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt 
 			}
 
 			if (ExtractYData(node, rawData, factors, set, errorString))
-				set++;
+				++set;
 			else
 			{
 				return false;
@@ -323,7 +323,7 @@ wxXmlNode* CustomXMLFile::FollowNodePath(wxXmlNode *node, const wxString &path) 
 	{
 		if (node->GetName() == nodeStrings[i])
 		{
-			i++;
+			++i;
 			if (i < nodeStrings.Count())
 				node = node->GetChildren();
 		}
@@ -394,7 +394,7 @@ bool CustomXMLFile::DataStringToVector(const wxString &data,
 	unsigned int i;
 	double value;
 	wxArrayString parsed(ParseLineIntoColumns(data, fileFormat.GetDelimiter()));
-	for (i = 0; i < parsed.Count(); i++)
+	for (i = 0; i < parsed.Count(); ++i)
 	{
 		if (!parsed[i].ToDouble(&value))
 		{

@@ -223,7 +223,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file,
 
 	while (std::getline(file, nextLine))
 	{
-		lineNumber++;
+		++lineNumber;
 		parsed = ParseLineIntoColumns(nextLine, delimiter);
 		if (parsed.size() < curveCount && parsed.size() > 0)
 		{
@@ -297,19 +297,19 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero,
 	}
 
 	unsigned int i;
-	for (i = 1; i < parsedLine.size(); i++)
+	for (i = 1; i < parsedLine.size(); ++i)
 	{
 		if (!ArrayContainsValue(i - 1, choices))
 			continue;
 
 		if (!parsedLine[i].ToDouble(&value))
 		{
-			set++;
+			++set;
 			continue;
 		}
 		rawData[set * 2].push_back((time - timeZero) * factors[0]);
 		rawData[set * 2 + 1].push_back(value * factors[i]);
-		set++;
+		++set;
 	}
 
 	return true;
@@ -342,7 +342,7 @@ bool CustomFile::ExtractSynchronousData(double &timeZero,
 {
 	double time, value;
 	unsigned int i, set(0);
-	for (i = 0; i < parsedLine.size(); i++)
+	for (i = 0; i < parsedLine.size(); ++i)
 	{
 		if (i == 0 && !fileFormat.GetTimeFormat().IsEmpty())
 		{
@@ -360,7 +360,7 @@ bool CustomFile::ExtractSynchronousData(double &timeZero,
 		if (i == 0 || ArrayContainsValue(i - 1, choices))
 		{
 			rawData[set].push_back(value * factors[i]);
-			set++;
+			++set;
 		}
 	}
 

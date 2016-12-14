@@ -373,7 +373,7 @@ void PlotCurve::BuildMarkers()
 
 	float x, y;
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
 		x = static_cast<float>(xScaleFunction(data.GetXData(i)));
 		y = static_cast<float>(yScaleFunction(data.GetYData(i)));
@@ -434,7 +434,7 @@ std::unique_ptr<double[]> PlotCurve::DoLogarithmicScale(const double* values,
 {
 	std::unique_ptr<double[]> scaledValues(std::make_unique<double[]>(count));
 	unsigned int i;
-	for (i = 0; i < count; i++)
+	for (i = 0; i < count; ++i)
 		scaledValues[i] = PlotRenderer::DoLogarithmicScale(values[i]);
 
 	return scaledValues;

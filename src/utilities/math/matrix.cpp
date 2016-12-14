@@ -115,9 +115,9 @@ Matrix::Matrix(const unsigned int &rows, const unsigned int &columns, double ele
 	// NOTE:  There is no check to make sure the correct number of elements was
 	// passed!  This could result in runtime crash or wrong calculations!
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 		{
 			if (i != 0 || j != 0)// Already assigned element [0][0]
 				elements[i][j] = va_arg(argumentList, double);
@@ -208,9 +208,9 @@ void Matrix::Set(double element1, ...)
 	// NOTE:  There is no check to make sure the correct number of elements was
 	// passed!  This could result in runtime crash or wrong calculations!
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 		{
 			if (i != 0 || j != 0)// Already assigned element [0][0]
 				elements[i][j] = va_arg(argumentList, double);
@@ -263,7 +263,7 @@ Matrix& Matrix::MakeIdentity()
 	Zero();
 
 	unsigned int i;
-	for (i = 0; i < GetMinimumDimension(); i++)
+	for (i = 0; i < GetMinimumDimension(); ++i)
 		elements[i][i] = 1.0;
 
 	return *this;
@@ -288,9 +288,9 @@ Matrix& Matrix::MakeIdentity()
 void Matrix::Zero()
 {
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 			elements[i][j] = 0.0;
 	}
 }
@@ -323,9 +323,9 @@ Matrix Matrix::GetSubMatrix(const unsigned int &startRow, const unsigned int &st
 	Matrix subMatrix(subRows, subColumns);
 
 	unsigned int i, j;
-	for (i = 0; i < subRows; i++)
+	for (i = 0; i < subRows; ++i)
 	{
-		for (j = 0; j < subColumns; j++)
+		for (j = 0; j < subColumns; ++j)
 			subMatrix.elements[i][j] = elements[i + startRow][j + startColumn];
 	}
 
@@ -354,9 +354,9 @@ Matrix Matrix::GetTranspose() const
 
 	// Go across each row and down each column swapping the values
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 			transpose.elements[j][i] = elements[i][j];
 	}
 
@@ -473,12 +473,12 @@ Matrix& Matrix::operator*=(const Matrix &m)
 	Matrix result(rows, m.columns);
 
 	unsigned int counter, i, j;
-	for (i = 0; i < result.rows; i++)
+	for (i = 0; i < result.rows; ++i)
 	{
-		for (j = 0; j < result.columns; j++)
+		for (j = 0; j < result.columns; ++j)
 		{
 			result.elements[i][j] = 0.0;
-			for (counter = 0; counter < columns; counter++)
+			for (counter = 0; counter < columns; ++counter)
 				result.elements[i][j] += elements[i][counter] * m.elements[counter][j];
 		}
 	}
@@ -513,9 +513,9 @@ Matrix& Matrix::operator=(const Matrix &m)
 	Resize(m.rows, m.columns);
 
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 			elements[i][j] = m.elements[i][j];
 	}
 
@@ -543,9 +543,9 @@ Matrix& Matrix::operator+=(const Matrix &m)
 	assert(columns == m.columns && rows == m.rows);
 
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 			elements[i][j] += m.elements[i][j];
 	}
 
@@ -573,9 +573,9 @@ Matrix& Matrix::operator-=(const Matrix &m)
 	assert(columns == m.columns && rows == m.rows);
 
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 			elements[i][j] -= m.elements[i][j];
 	}
 
@@ -602,9 +602,9 @@ Matrix& Matrix::operator-=(const Matrix &m)
 Matrix& Matrix::operator*=(const double &n)
 {
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 			elements[i][j] *= n;
 	}
 
@@ -631,9 +631,9 @@ Matrix& Matrix::operator*=(const double &n)
 Matrix& Matrix::operator/=(const double &n)
 {
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 			elements[i][j] /= n;
 	}
 
@@ -661,9 +661,9 @@ wxString Matrix::Print() const
 	wxString temp, intermediate;
 
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 		{
 			intermediate.Printf("%7.3f\t", elements[i][j]);
 			temp.Append(intermediate);
@@ -698,11 +698,11 @@ Matrix Matrix::GetRowReduced() const
 	unsigned int curRow, pivotCol(0), pivotRow;
 	Matrix reduced(*this);
 
-	for (pivotRow = 0; pivotRow < GetMinimumDimension(); pivotRow++)
+	for (pivotRow = 0; pivotRow < GetMinimumDimension(); ++pivotRow)
 	{
 		if (!PlotMath::IsZero(reduced.elements[pivotRow][pivotCol]))
 		{
-			for (curRow = pivotRow + 1; curRow < rows; curRow++)
+			for (curRow = pivotRow + 1; curRow < rows; ++curRow)
 			{
 				if (!PlotMath::IsZero(reduced.elements[curRow][pivotCol]))
 					reduced.ZeroRowByScalingAndAdding(pivotRow, pivotCol, curRow);
@@ -710,20 +710,20 @@ Matrix Matrix::GetRowReduced() const
 		}
 		else
 		{
-			for (curRow = pivotRow + 1; curRow < rows; curRow++)
+			for (curRow = pivotRow + 1; curRow < rows; ++curRow)
 			{
 				if (!PlotMath::IsZero(reduced.elements[curRow][pivotCol]))
 				{
 					reduced.SwapRows(pivotRow, curRow);
-					pivotCol--;
+					--pivotCol;
 					break;
 				}
 			}
 
-			pivotRow--;
+			--pivotRow;
 		}
 
-		pivotCol++;
+		++pivotCol;
 		if (pivotCol >= columns)
 			break;
 	}
@@ -752,7 +752,7 @@ Matrix& Matrix::SwapRows(const unsigned int &r1, const unsigned int &r2)
 {
 	double swap;
 	unsigned int i;
-	for (i = 0; i < columns; i++)
+	for (i = 0; i < columns; ++i)
 	{
 		swap = elements[r1][i];
 		elements[r1][i] = elements[r2][i];
@@ -787,7 +787,7 @@ void Matrix::ZeroRowByScalingAndAdding(const unsigned int &pivotRow,
 	double factor = elements[pivotRow][pivotColumn] / elements[targetRow][pivotColumn];
 
 	unsigned int i;
-	for (i = pivotColumn; i < columns; i++)
+	for (i = pivotColumn; i < columns; ++i)
 		elements[targetRow][i] = elements[targetRow][i] * factor - elements[pivotRow][i];
 }
 
@@ -1048,7 +1048,7 @@ Matrix Matrix::GetDiagonalInverse() const
 
 	// Invert the components of W along the diagonal
 	unsigned int i;
-	for (i = 0; i < inverse.GetMinimumDimension(); i++)
+	for (i = 0; i < inverse.GetMinimumDimension(); ++i)
 	{
 		if (PlotMath::IsZero(elements[i][i]))
 			inverse.elements[i][i] = 0.0;
@@ -1111,15 +1111,15 @@ unsigned int Matrix::GetRank() const
 	Matrix reduced = GetRowReduced();
 
 	unsigned int rank(0), curRow, curCol;
-	for (curRow = 0; curRow < rows; curRow++)
+	for (curRow = 0; curRow < rows; ++curRow)
 	{
-		for (curCol = 0; curCol < columns; curCol++)
+		for (curCol = 0; curCol < columns; ++curCol)
 		{
 			if (!PlotMath::IsZero(elements[curRow][curCol]))
 			{
 				// Row contained a non-zero element - increment the rank
 				// and stop looking at the other elements in this row
-				rank++;
+				++rank;
 				break;
 			}
 		}
@@ -1149,7 +1149,7 @@ void Matrix::AllocateElements()
 {
 	elements.resize(rows);
 	unsigned int i;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 		elements[i].resize(columns);
 }
 
@@ -1246,9 +1246,9 @@ void Matrix::InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const
 	V.Resize(columns, columns);
 
 	unsigned int i, j;
-	for (i = 0; i < U.rows; i++)
+	for (i = 0; i < U.rows; ++i)
 	{
-		for (j = 0; j < V.rows; j++)
+		for (j = 0; j < V.rows; ++j)
 			U.elements[i][j] = elements[i][j];
 	}
 }
@@ -1277,7 +1277,7 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vect
 	unsigned int i, j, k, l(0);
 	double anorm(0.0), f, g(0.0), h, s, scale(0.0);
 
-	for (i = 0; i < V.rows; i++)
+	for (i = 0; i < V.rows; ++i)
 	{
 		l = i + 2;
 		rv1[i] = scale * g;
@@ -1286,7 +1286,7 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vect
 		s = 0.0;
 		if (i < U.rows)
 		{
-			for (k = i; k < U.rows; k++)
+			for (k = i; k < U.rows; ++k)
 				scale += fabs(U.elements[k][i]);
 
 			if (scale != 0.0)
@@ -1306,16 +1306,16 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vect
 				h = f * g - s;
 				U.elements[i][i] = f - g;
 
-				for (j = l - 1; j < V.rows; j++)
+				for (j = l - 1; j < V.rows; ++j)
 				{
 					s = 0.0;
-					for (k = i; k < U.rows; k++)
+					for (k = i; k < U.rows; ++k)
 						s += U.elements[k][i] * U.elements[k][j];
 					f = s / h;
-					for (k = i; k < U.rows; k++)
+					for (k = i; k < U.rows; ++k)
 						U.elements[k][j] += f * U.elements[k][i];
 				}
-				for (k = i; k < U.rows; k++)
+				for (k = i; k < U.rows; ++k)
 					U.elements[k][i] *= scale;
 			}
 		}
@@ -1327,12 +1327,12 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vect
 
 		if (i < U.rows && i != V.rows - 1)
 		{
-			for (k = l - 1; k < V.rows; k++)
+			for (k = l - 1; k < V.rows; ++k)
 				scale += fabs(U.elements[i][k]);
 
 			if (scale != 0.0)
 			{
-				for (k = l - 1; k < V.rows; k++)
+				for (k = l - 1; k < V.rows; ++k)
 				{
 					U.elements[i][k] /= scale;
 					s += U.elements[i][k] * U.elements[i][k];
@@ -1347,10 +1347,10 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vect
 				h = f * g - s;
 				U.elements[i][l - 1] = f - g;
 
-				for (k = l - 1; k < V.rows; k++)
+				for (k = l - 1; k < V.rows; ++k)
 					rv1[k] = U.elements[i][k] / h;
 
-				for (j = l - 1; j < U.rows; j++)
+				for (j = l - 1; j < U.rows; ++j)
 				{
 					s = 0.0;
 					for (k = l - 1; k < V.rows; k++)
@@ -1359,7 +1359,7 @@ double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vect
 						U.elements[j][k] += s * rv1[k];
 				}
 
-				for (k = l - 1; k < V.rows; k++)
+				for (k = l - 1; k < V.rows; ++k)
 					U.elements[i][k] *= scale;
 			}
 		}
@@ -1396,25 +1396,25 @@ void Matrix::AccumulateRightHandTransforms(Matrix &U, Matrix &V, const std::vect
 	double g(rv1[i]), s;
 	V.elements[i][i] = 1.0;
 
-	for (i = V.rows - 2; i >= 0; i--)
+	for (i = V.rows - 2; i >= 0; --i)
 	{
 		if (g != 0.0)
 		{
-			for (j = l; j < V.rows; j++)
+			for (j = l; j < V.rows; ++j)
 				V.elements[j][i] = (U.elements[i][j] / U.elements[i][l]) / g;
 
-			for (j = l; j < V.rows; j++)
+			for (j = l; j < V.rows; ++j)
 			{
 				s = 0.0;
-				for (k = l; k < V.rows; k++)
+				for (k = l; k < V.rows; ++k)
 					s += U.elements[i][k] * V.elements[k][j];
 
-				for (k = l; k < V.rows; k++)
+				for (k = l; k < V.rows; ++k)
 					V.elements[k][j] += s * V.elements[k][i];
 			}
 		}
 
-		for (j = l; j < V.rows; j++)
+		for (j = l; j < V.rows; ++j)
 		{
 			V.elements[i][j] = 0.0;
 			V.elements[j][i] = 0.0;
@@ -1449,36 +1449,36 @@ void Matrix::AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const
 	int i;
 	unsigned int j, l, k;
 	double f, g, s;
-	for (i = GetMinimumDimension() - 1; i >= 0; i--)
+	for (i = GetMinimumDimension() - 1; i >= 0; --i)
 	{
 		l = i + 1;
 		g = W.elements[i][i];
-		for (j = l; j < V.rows; j++)
+		for (j = l; j < V.rows; ++j)
 			U.elements[i][j] = 0.0;
 
 		if (g != 0.0)
 		{
 			g = 1.0 / g;
-			for (j = l; j < V.rows; j++)
+			for (j = l; j < V.rows; ++j)
 			{
 				s = 0.0;
-				for (k = l; k < U.rows; k++)
+				for (k = l; k < U.rows; ++k)
 					s += U.elements[k][i] * U.elements[k][j];
 
 				f = (s / U.elements[i][i]) * g;
-				for (k = i; k < U.rows; k++)
+				for (k = i; k < U.rows; ++k)
 					U.elements[k][j] += f * U.elements[k][i];
 			}
 
-			for (j = i; j < U.rows; j++)
+			for (j = i; j < U.rows; ++j)
 				U.elements[j][i] *= g;
 		}
 		else
 		{
-			for (j = i; j < U.rows; j++)
+			for (j = i; j < U.rows; ++j)
 				U.elements[j][i] = 0.0;
 		}
-		U.elements[i][i]++;
+		++U.elements[i][i];
 	}
 }
 
@@ -1511,12 +1511,12 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 	bool finished;
 	double eps = 1.0e-6;
 	int its_limit = 30;
-	for (k = V.rows - 1; k >= 0; k--)
+	for (k = V.rows - 1; k >= 0; --k)
 	{
-		for (its = 0; its < its_limit; its++)
+		for (its = 0; its < its_limit; ++its)
 		{
 			finished = false;
-			for (l = k; l >= 0; l--)
+			for (l = k; l >= 0; --l)
 			{
 				nm = l - 1;
 				if (l == 0 || fabs(rv1[l]) <= eps * anorm)
@@ -1533,7 +1533,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 			{
 				c = 0.0;
 				s = 1.0;
-				for (i = l; i <= k; i++)
+				for (i = l; i <= k; ++i)
 				{
 					f = s * rv1[i];
 					rv1[i] = c * rv1[i];
@@ -1547,7 +1547,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 					h = 1.0 / h;
 					c = g * h;
 					s = -f * h;
-					for (j = 0; j < (int)U.rows; j++)
+					for (j = 0; j < (int)U.rows; ++j)
 					{
 						y = U.elements[j][nm];
 						z = U.elements[j][i];
@@ -1563,7 +1563,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 				if (z < 0.0)
 				{
 					W.elements[k][k] = -z;
-					for (j = 0; j < (int)V.rows; j++)
+					for (j = 0; j < (int)V.rows; ++j)
 						V.elements[j][k] = -V.elements[j][k];
 				}
 				break;
@@ -1586,7 +1586,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 
 			c = 1.0;
 			s = 1.0;
-			for (j = l; j <= nm; j++)
+			for (j = l; j <= nm; ++j)
 			{
 				i = j + 1;
 				g = rv1[i];
@@ -1602,7 +1602,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 				h = y * s;
 				y *= c;
 
-				for (jj = 0; jj < (int)V.rows; jj++)
+				for (jj = 0; jj < (int)V.rows; ++jj)
 				{
 					x = V.elements[jj][j];
 					z = V.elements[jj][i];
@@ -1623,7 +1623,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 				f = c * g + s * y;
 				x = c * y - s * g;
 
-				for (jj = 0; jj < (int)U.rows; jj++)
+				for (jj = 0; jj < (int)U.rows; ++jj)
 				{
 					y = U.elements[jj][j];
 					z = U.elements[jj][i];
@@ -1663,7 +1663,7 @@ bool Matrix::DiagonalizeBidiagonalForm(Matrix &U, Matrix &V, Matrix &W,
 void Matrix::RemoveZeroSingularValues(Matrix &U, Matrix &W) const
 {
 	unsigned int i;
-	for (i = 0; i < GetMinimumDimension(); i++)
+	for (i = 0; i < GetMinimumDimension(); ++i)
 	{
 		if (PlotMath::IsZero(W.elements[i][i]))
 		{
@@ -1702,29 +1702,29 @@ void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
 	do
 	{
 		its *= 3;
-		its++;
+		++its;
 	} while (its <= V.rows);
 
 	do
 	{
 		its /= 3;
-		for (i = its; i < V.rows; i++)
+		for (i = its; i < V.rows; ++i)
 		{
 			sw = W.elements[i][i];
-			for (k = 0; k < U.rows; k++)
+			for (k = 0; k < U.rows; ++k)
 				su[k] = U.elements[k][i];
 
-			for (k = 0; k < V.rows; k++)
+			for (k = 0; k < V.rows; ++k)
 				sv[k] = V.elements[k][i];
 
 			j = i;
 			while (W.elements[j - its][j - its] < sw)
 			{
 				W.elements[j][j] = W.elements[j - its][j - its];
-				for (k = 0; k < U.rows; k++)
+				for (k = 0; k < U.rows; ++k)
 					U.elements[k][j] = U.elements[k][j - its];
 
-				for (k = 0; k < V.rows; k++)
+				for (k = 0; k < V.rows; ++k)
 					V.elements[k][j] = V.elements[k][j - its];
 
 				j -= its;
@@ -1734,35 +1734,35 @@ void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
 
 			W.elements[j][j] = sw;
 
-			for (k = 0; k < U.rows; k++)
+			for (k = 0; k < U.rows; ++k)
 				U.elements[k][j] = su[k];
 
-			for (k = 0; k < V.rows; k++)
+			for (k = 0; k < V.rows; ++k)
 				V.elements[k][j] = sv[k];
 		}
 	} while (its > 1);
 
-	for (k = 0; k < V.rows; k++)
+	for (k = 0; k < V.rows; ++k)
 	{
 		s = 0.0;
-		for (i = 0; i < U.rows; i++)
+		for (i = 0; i < U.rows; ++i)
 		{
 			if (U.elements[i][k] < 0.0)
-				s++;
+				++s;
 		}
 
-		for (j = 0; j < V.rows; j++)
+		for (j = 0; j < V.rows; ++j)
 		{
 			if (V.elements[j][k] < 0.0)
-				s++;
+				++s;
 		}
 
 		if (s > (U.rows + V.rows) / 2)
 		{
-			for (i = 0; i < U.rows; i++)
+			for (i = 0; i < U.rows; ++i)
 				U.elements[i][k] = -U.elements[i][k];
 
-			for (j = 0; j < V.rows; j++)
+			for (j = 0; j < V.rows; ++j)
 				V.elements[j][k] = -V.elements[j][k];
 		}
 	}
@@ -1792,9 +1792,9 @@ Matrix& Matrix::RemoveRow(const unsigned int &row)
 	Resize(rows - 1, columns);
 
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 		{
 			if (i < row)
 				elements[i][j] = original.elements[i][j];
@@ -1830,9 +1830,9 @@ Matrix& Matrix::RemoveColumn(const unsigned int &column)
 	Resize(rows, columns - 1);
 
 	unsigned int i, j;
-	for (i = 0; i < rows; i++)
+	for (i = 0; i < rows; ++i)
 	{
-		for (j = 0; j < columns; j++)
+		for (j = 0; j < columns; ++j)
 		{
 			if (j < column)
 				elements[i][j] = original.elements[i][j];

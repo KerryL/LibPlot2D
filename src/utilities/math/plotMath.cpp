@@ -180,7 +180,7 @@ void PlotMath::Unwrap(Dataset2D &data)
 {
 	double threshold(pi);
 	unsigned int i;
-	for (i = 1; i < data.GetNumberOfPoints(); i++)
+	for (i = 1; i < data.GetNumberOfPoints(); ++i)
 	{
 		if (data.GetYData(i) - data.GetYData(i - 1) > threshold)
 			data.GetYPointer()[i] -= 2 * pi;
@@ -236,7 +236,7 @@ Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data, const unsigned int &bit)
 {
 	Dataset2D set(data);
 	unsigned int i;
-	for (i = 0; i < set.GetNumberOfPoints(); i++)
+	for (i = 0; i < set.GetNumberOfPoints(); ++i)
 		set.GetYPointer()[i] = ApplyBitMask((unsigned int)set.GetYPointer()[i], bit);
 	return set;
 }
@@ -290,7 +290,7 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 	minSpacing = data.GetAverageDeltaX();
 	maxSpacing = minSpacing;
 
-	for (i = 2; i < data.GetNumberOfPoints(); i++)
+	for (i = 2; i < data.GetNumberOfPoints(); ++i)
 	{
 		spacing = data.GetXData(i) - data.GetXData(i - 1);
 		if (spacing < minSpacing)
@@ -366,10 +366,10 @@ unsigned int PlotMath::GetPrecision(const double &value,
 
 	std::string number(s);
 	unsigned int i;
-	for (i = number.size() - 1; i > 0; i--)
+	for (i = number.size() - 1; i > 0; --i)
 	{
 		if (s[i] == '0')
-			precision--;
+			--precision;
 		else
 			break;
 	}
@@ -404,20 +404,20 @@ unsigned int PlotMath::CountSignificantDigits(const wxString &valueString)
 
 	wxString trimmedValueString = wxString::Format("%+0.15f", value);
 	unsigned int firstDigit, lastDigit;
-	for (firstDigit = 1; firstDigit < trimmedValueString.Len(); firstDigit++)
+	for (firstDigit = 1; firstDigit < trimmedValueString.Len(); ++firstDigit)
 	{
 		if (trimmedValueString[firstDigit] != '0' && trimmedValueString[firstDigit] != '.')
 			break;
 	}
 
-	for (lastDigit = trimmedValueString.Len() - 1; lastDigit > firstDigit; lastDigit--)
+	for (lastDigit = trimmedValueString.Len() - 1; lastDigit > firstDigit; --lastDigit)
 	{
 		if (trimmedValueString[lastDigit] != '0' && trimmedValueString[lastDigit] != '.')
 			break;
 	}
 
 	unsigned int i;
-	for (i = firstDigit + 1; i < lastDigit - 1; i++)
+	for (i = firstDigit + 1; i < lastDigit - 1; ++i)
 	{
 		if (trimmedValueString[i] == '.')
 		{

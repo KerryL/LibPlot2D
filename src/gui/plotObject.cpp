@@ -811,7 +811,7 @@ void PlotObject::SetOriginalAxisLimits()
 	rightUsed = false;
 	unsigned int i;
 	Axis *yAxis;
-	for (i = 0; i < (unsigned int)dataList.size(); i++)
+	for (i = 0; i < (unsigned int)dataList.size(); ++i)
 	{
 		if (!plotList[i]->GetIsVisible())
 			continue;
@@ -863,7 +863,7 @@ double PlotObject::GetFirstValidValue(const double* data, const unsigned int &si
 	assert(data);
 
 	unsigned int i;
-	for (i = 0; i < size; i++)
+	for (i = 0; i < size; ++i)
 	{
 		if (PlotMath::IsValid(data[i]))
 			return data[i];
@@ -933,7 +933,7 @@ void PlotObject::MatchYAxes()
 void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
 {
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
 		if (PlotMath::IsValid<double>(data.GetXData(i)))
 		{
@@ -1969,7 +1969,7 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 void PlotObject::FormatCurves()
 {
 	unsigned int i;
-	for (i = 0; i < (unsigned int)plotList.size(); i++)
+	for (i = 0; i < (unsigned int)plotList.size(); ++i)
 	{
 		plotList[i]->SetModified();
 		plotList[i]->SetPretty(pretty);
@@ -2080,7 +2080,7 @@ unsigned long long PlotObject::GetTotalPointCount() const
 {
 	unsigned long long count(0);
 	unsigned int i;
-	for (i = 0; i < dataList.size(); i++)
+	for (i = 0; i < dataList.size(); ++i)
 		count += dataList[i]->GetNumberOfPoints();
 
 	return count;

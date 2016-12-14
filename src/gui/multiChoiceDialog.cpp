@@ -56,7 +56,7 @@ MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, 
 	descriptions = choices;
 	shown.resize(choices.Count());
 	unsigned int i;
-	for (i = 0; i < choices.Count(); i++)
+	for (i = 0; i < choices.Count(); ++i)
 		shown[i] = true;
 	CreateControls(message, choices);
 	ApplyDefaults(defaultChoices, removeExisting);
@@ -211,7 +211,7 @@ void MultiChoiceDialog::OnSelectAllButton(wxCommandEvent& WXUNUSED(event))
 {
 	bool allSelected(true);
 	unsigned int i;
-	for (i = 0; i < choiceListBox->GetCount(); i++)
+	for (i = 0; i < choiceListBox->GetCount(); ++i)
 	{
 		if (!choiceListBox->IsChecked(i))
 		{
@@ -244,7 +244,7 @@ void MultiChoiceDialog::OnFilterTextChange(wxCommandEvent& WXUNUSED(event))
 	choiceListBox->Clear();
 	wxString filter(filterText->GetValue().Lower());
 	unsigned int i;
-	for (i = 0; i < shown.size(); i++)
+	for (i = 0; i < shown.size(); ++i)
 	{
 		if (filter.IsEmpty() || descriptions[i].Lower().Contains(filter))
 		{
@@ -323,15 +323,15 @@ void MultiChoiceDialog::UpdateSelectionList(const unsigned int &index)
 unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) const
 {
 	unsigned int i, trueIndex(0), fakeIndex(0);
-	for (i = 0; i < shown.size(); i++)
+	for (i = 0; i < shown.size(); ++i)
 	{
 		if (shown[i])
 		{
 			if (index == fakeIndex)
 				break;
-			fakeIndex++;
+			++fakeIndex;
 		}
-		trueIndex++;
+		++trueIndex;
 	}
 
 	return i;
@@ -356,7 +356,7 @@ unsigned int MultiChoiceDialog::GetCorrectedIndex(const unsigned int &index) con
 void MultiChoiceDialog::SetAllChoices(const bool &selected)
 {
 	unsigned int i;
-	for (i = 0; i < choiceListBox->GetCount(); i++)
+	for (i = 0; i < choiceListBox->GetCount(); ++i)
 	{
 		choiceListBox->Check(i, selected);
 		UpdateSelectionList(i);
@@ -407,13 +407,13 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 	if (defaultChoices && defaultChoices->size() > 0)
 	{
 		selections = *defaultChoices;
-		for (i = 0; i < choiceListBox->GetCount(); i++)
+		for (i = 0; i < choiceListBox->GetCount(); ++i)
 		{
 			choiceListBox->Check(i, false);
 			shown[i] = true;
 		}
 
-		for (i = 0; i < defaultChoices->Count(); i++)
+		for (i = 0; i < defaultChoices->Count(); ++i)
 			choiceListBox->Check((*defaultChoices)[i], true);
 	}
 
@@ -441,7 +441,7 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 bool MultiChoiceDialog::IsSelected(const int &i) const
 {
 	unsigned int j;
-	for (j = 0; j < selections.GetCount(); j++)
+	for (j = 0; j < selections.GetCount(); ++j)
 	{
 		if (selections[j] == i)
 			return true;

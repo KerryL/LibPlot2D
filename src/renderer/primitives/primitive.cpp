@@ -127,7 +127,7 @@ void Primitive::Draw()
 		return;
 
 	unsigned int i;
-	for (i = 0; i < bufferInfo.size(); i++)
+	for (i = 0; i < bufferInfo.size(); ++i)
 	{
 		if (bufferInfo[i].vertexCountModified || modified)
 			Update(i);

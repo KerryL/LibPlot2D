@@ -812,7 +812,7 @@ wxString FilterDialog::GenerateButterworthDenominator(const unsigned int &order,
 {
 	std::vector<Complex> poles;
 	unsigned int i;
-	for (i = 0; i < order; i++)
+	for (i = 0; i < order; ++i)
 		poles.push_back(Complex(cutoff, 0.0)
 			* Complex(exp(1.0), 0.0).ToPower(
 			Complex(0.0, (2.0 * (i + 1.0) + order - 1.0) * M_PI / (2.0 * order))));
@@ -892,14 +892,14 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 	std::vector<Complex> terms(roots.size() + 1, Complex(0.0, 0.0));
 	terms[0].real = 1.0;
 	unsigned int i, j;
-	for (i = 0; i < roots.size(); i++)// from MATLAB's poly.m
+	for (i = 0; i < roots.size(); ++i)// from MATLAB's poly.m
 	{
-		for (j = i + 1; j > 0; j--)
+		for (j = i + 1; j > 0; --j)
 			terms[j] -= roots[i] * terms[j - 1];
 	}
 
 	wxString s, coefficient;
-	for (i = 0; i < terms.size(); i++)
+	for (i = 0; i < terms.size(); ++i)
 	{
 		// TODO:  Check to ensure imaginary part is zero?  I think this is guaranteed through the above math?
 		if (!PlotMath::IsZero(terms[i].real))

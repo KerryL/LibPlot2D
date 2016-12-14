@@ -88,7 +88,7 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 
 	Dataset2D rawFFT, fft;
 	unsigned int i, count = GetNumberOfAverages(windowSize, overlap, data.GetNumberOfPoints());
-	for (i = 0; i < count; i++)
+	for (i = 0; i < count; ++i)
 	{
 		rawFFT = ComputeRawFFT(ChopSample(data, i, windowSize, overlap), window);
 		AddToAverage(fft, GetAmplitudeData(rawFFT, sampleRate), count);
@@ -154,7 +154,7 @@ Dataset2D FastFourierTransform::ChopSample(const Dataset2D &data, const unsigned
 
 	Dataset2D chopped(windowSize);
 	unsigned int i;
-	for (i = 0; i < windowSize; i++)
+	for (i = 0; i < windowSize; ++i)
 	{
 		chopped.GetXPointer()[i] = data.GetXData(start + i);
 		chopped.GetYPointer()[i] = data.GetYData(start + i);
@@ -188,14 +188,14 @@ void FastFourierTransform::AddToAverage(Dataset2D &average, const Dataset2D &dat
 	if (average.GetNumberOfPoints() == 0)
 	{
 		average.Resize(data.GetNumberOfPoints());
-		for (i = 0; i < average.GetNumberOfPoints(); i++)
+		for (i = 0; i < average.GetNumberOfPoints(); ++i)
 		{
 			average.GetXPointer()[i] = data.GetXData(i);
 			average.GetYPointer()[i] = 0.0;
 		}
 	}
 
-	for (i = 0; i < average.GetNumberOfPoints(); i++)
+	for (i = 0; i < average.GetNumberOfPoints(); ++i)
 		average.GetYPointer()[i] += data.GetYData(i) / double(count);
 }
 
@@ -224,7 +224,7 @@ void FastFourierTransform::InitializeRawFFTDataset(Dataset2D &rawFFT,
 	rawFFT.Resize(data.GetNumberOfPoints());
 
 	unsigned int i;
-	for (i = 0; i < rawFFT.GetNumberOfPoints(); i++)
+	for (i = 0; i < rawFFT.GetNumberOfPoints(); ++i)
 	{
 		rawFFT.GetXPointer()[i] = data.GetYData(i);
 		rawFFT.GetYPointer()[i] = 0.0;
@@ -302,7 +302,7 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input,
 	Dataset2D fftIn, fftOut, crossPower(windowSize), power(windowSize), size(GenerateConstantDataset(numberOfAverages, 0.0, windowSize));
 	ZeroDataset(crossPower);
 	ZeroDataset(power);
-	for (i = 0; i < numberOfAverages; i++)
+	for (i = 0; i < numberOfAverages; ++i)
 	{
 		fftIn = ComputeRawFFT(ChopSample(input, i, windowSize, overlap), window);
 		fftOut = ComputeRawFFT(ChopSample(output, i, windowSize, overlap), window);
@@ -349,7 +349,7 @@ Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &fftIn
 
 	Dataset2D size(fftIn.GetNumberOfPoints());
 	unsigned int i;
-	for (i = 0; i < size.GetNumberOfPoints(); i++)
+	for (i = 0; i < size.GetNumberOfPoints(); ++i)
 	{
 		size.GetXPointer()[i] = size.GetNumberOfPoints() * size.GetNumberOfPoints();
 		size.GetYPointer()[i] = 0.0;
@@ -463,7 +463,7 @@ Dataset2D FastFourierTransform::GenerateConstantDataset(const double &xValue, co
 	Dataset2D data(size);
 
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
 		data.GetXPointer()[i] = xValue;
 		data.GetYPointer()[i] = yValue;
@@ -497,7 +497,7 @@ void FastFourierTransform::DoBitReversal(Dataset2D &set)
 	double tempX, tempY;
 
 	j = 0;
-	for (i = 0; i < set.GetNumberOfPoints() - 1; i++)
+	for (i = 0; i < set.GetNumberOfPoints() - 1; ++i)
 	{
 		if (i < j)
 		{
@@ -546,13 +546,13 @@ void FastFourierTransform::DoFFT(Dataset2D &temp)
 	c1 = -1.0;
 	c2 = 0.0;
 	l2 = 1;
-	for (l = 0; l < powerOfTwo; l++)
+	for (l = 0; l < powerOfTwo; ++l)
 	{
 		l1 = l2;
 		l2 <<= 1;
 		u1 = 1.0;
 		u2 = 0.0;
-		for (j = 0; j < l1; j++)
+		for (j = 0; j < l1; ++j)
 		{
 			for (i = j; i < temp.GetNumberOfPoints(); i += l2)
 			{
@@ -605,7 +605,7 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 		halfSpectrum.GetXPointer()[0] = fullSpectrum.GetXData(0);
 		halfSpectrum.GetYPointer()[0] = fullSpectrum.GetYData(0);// No factor of 2 for DC point
 
-		for (i = 1; i < halfSpectrum.GetNumberOfPoints(); i++)
+		for (i = 1; i < halfSpectrum.GetNumberOfPoints(); ++i)
 		{
 			halfSpectrum.GetXPointer()[i] = fullSpectrum.GetXData(i);
 			halfSpectrum.GetYPointer()[i] = fullSpectrum.GetYData(i) * 2.0;
@@ -615,7 +615,7 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 	{
 		halfSpectrum.Resize(fullSpectrum.GetNumberOfPoints() / 2);
 
-		for (i = 0; i < halfSpectrum.GetNumberOfPoints(); i++)
+		for (i = 0; i < halfSpectrum.GetNumberOfPoints(); ++i)
 		{
 			halfSpectrum.GetXPointer()[i] = fullSpectrum.GetXData(i + 1);
 			halfSpectrum.GetYPointer()[i] = fullSpectrum.GetYData(i + 1);
@@ -647,13 +647,13 @@ void FastFourierTransform::ConvertAmplitudeToDecibels(Dataset2D &fft)
 	unsigned int i;
 	double referenceAmplitude(0.0);
 
-	for (i = 0; i < fft.GetNumberOfPoints(); i++)
+	for (i = 0; i < fft.GetNumberOfPoints(); ++i)
 	{
 		if (fft.GetYData(i) > referenceAmplitude)
 			referenceAmplitude = fft.GetYData(i);
 	}
 
-	for (i = 0; i < fft.GetNumberOfPoints(); i++)
+	for (i = 0; i < fft.GetNumberOfPoints(); ++i)
 		fft.GetYPointer()[i] = 20.0 * log10(fft.GetYData(i) / referenceAmplitude);
 }
 
@@ -677,7 +677,7 @@ void FastFourierTransform::ConvertAmplitudeToDecibels(Dataset2D &fft)
 void FastFourierTransform::PopulateFrequencyData(Dataset2D &data, const double &sampleRate)
 {
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetXPointer()[i] = (double)i * sampleRate / (double)data.GetNumberOfPoints();
 }
 
@@ -705,7 +705,7 @@ Dataset2D FastFourierTransform::GetAmplitudeData(const Dataset2D &rawFFT, const 
 	PopulateFrequencyData(data, sampleRate);
 
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetYPointer()[i] = sqrt(rawFFT.GetXData(i) * rawFFT.GetXData(i)
 		+ rawFFT.GetYData(i) * rawFFT.GetYData(i)) / (double)rawFFT.GetNumberOfPoints();
 
@@ -738,7 +738,7 @@ Dataset2D FastFourierTransform::GetPhaseData(const Dataset2D &rawFFT, const doub
 	PopulateFrequencyData(data, sampleRate);
 
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetYPointer()[i] = atan2(rawFFT.GetYData(i), rawFFT.GetXData(i));
 
 	if (!moduloPhase)
@@ -774,7 +774,7 @@ Dataset2D FastFourierTransform::ComplexAdd(const Dataset2D &a, const Dataset2D &
 	Dataset2D result(a.GetNumberOfPoints());
 
 	unsigned int i;
-	for (i = 0; i < a.GetNumberOfPoints(); i++)
+	for (i = 0; i < a.GetNumberOfPoints(); ++i)
 	{
 		result.GetXPointer()[i] = a.GetXData(i) + b.GetXData(i);
 		result.GetYPointer()[i] = a.GetYData(i) + b.GetYData(i);
@@ -808,7 +808,7 @@ Dataset2D FastFourierTransform::ComplexMultiply(const Dataset2D &a, const Datase
 	Dataset2D result(a.GetNumberOfPoints());
 
 	unsigned int i;
-	for (i = 0; i < a.GetNumberOfPoints(); i++)
+	for (i = 0; i < a.GetNumberOfPoints(); ++i)
 	{
 		result.GetXPointer()[i] = a.GetXData(i) * b.GetXData(i) - a.GetYData(i) * b.GetYData(i);
 		result.GetYPointer()[i] = a.GetYData(i) * b.GetXData(i) + a.GetXData(i) * b.GetYData(i);
@@ -843,7 +843,7 @@ Dataset2D FastFourierTransform::ComplexDivide(const Dataset2D &a, const Dataset2
 
 	unsigned int i;
 	double denominator;
-	for (i = 0; i < a.GetNumberOfPoints(); i++)
+	for (i = 0; i < a.GetNumberOfPoints(); ++i)
 	{
 		denominator = b.GetXData(i) * b.GetXData(i) + b.GetYData(i) * b.GetYData(i);
 		result.GetXPointer()[i] = (a.GetXData(i) * b.GetXData(i) + a.GetYData(i) * b.GetYData(i)) / denominator;
@@ -874,7 +874,7 @@ Dataset2D FastFourierTransform::ComplexMagnitude(const Dataset2D &a)
 	Dataset2D result(a.GetNumberOfPoints());
 
 	unsigned int i;
-	for (i = 0; i < result.GetNumberOfPoints(); i++)
+	for (i = 0; i < result.GetNumberOfPoints(); ++i)
 	{
 		result.GetXPointer()[i] = sqrt(a.GetXData(i) * a.GetXData(i)
 			+ a.GetYData(i) * a.GetYData(i));
@@ -908,7 +908,7 @@ Dataset2D FastFourierTransform::ComplexPower(const Dataset2D &a, const double &p
 	double magnitude, angle;
 
 	unsigned int i;
-	for (i = 0; i < a.GetNumberOfPoints(); i++)
+	for (i = 0; i < a.GetNumberOfPoints(); ++i)
 	{
 		magnitude = sqrt(a.GetXData(i) * a.GetXData(i) + a.GetYData(i) * a.GetYData(i));
 		angle = atan2(a.GetYData(i), a.GetXData(i));
@@ -980,7 +980,7 @@ void FastFourierTransform::ApplyWindow(Dataset2D &data, const FFTWindow &window)
 void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 {
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetXPointer()[i] *= 1.0
 		- cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1));
 }
@@ -1005,7 +1005,7 @@ void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 {
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetXPointer()[i] *= (0.54 - 0.46
 		* cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))) / 0.54;
 }
@@ -1031,7 +1031,7 @@ void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 {
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetXPointer()[i] *= 1.0
 		- 1.93 * cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
 		+ 1.29 * cos(4.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
@@ -1081,7 +1081,7 @@ void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 {
 	unsigned int i;
 	double tau(-((double)data.GetNumberOfPoints() - 1.0) / log(0.02));
-	for (i = 0; i < data.GetNumberOfPoints(); i++)
+	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetXPointer()[i] *= exp(-(double)i / tau);
 }
 

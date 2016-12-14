@@ -30,7 +30,7 @@ wxString ArrayStringCompare::GenerateSingleString(const wxArrayString &a) const
 {
 	wxString s;
 	unsigned int i;
-	for (i = 0; i < a.Count(); i++)
+	for (i = 0; i < a.Count(); ++i)
 		s += a[i];
 
 	return s;
