@@ -15,14 +15,14 @@
 #ifndef FILTER_DIALOG_H_
 #define FILTER_DIALOG_H_
 
+// Local headers
+#include "lp2d/utilities/math/complex.h"
+
 // Standard C++ headers
 #include <vector>
 
 // wxWidgets headers
 #include <wx/wx.h>
-
-// Local headers
-#include "lp2d/utilities/math/complex.h"
 
 // wxWidgets forward declarations
 class wxSpinCtrl;

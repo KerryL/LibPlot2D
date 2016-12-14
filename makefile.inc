@@ -7,7 +7,7 @@
 # DO NOT include the -I prefix to these paths - it will
 # be added automatically
 INCDIRS_TEMP = \
-	$(CURDIR)/src 
+	$(CURDIR)/include 
 
 INCDIRS = $(addprefix -I,$(INCDIRS_TEMP))
 
@@ -42,7 +42,7 @@ AR = ar rcs
 RANLIB = ranlib
 
 # Compiler flags
-CFLAGS = -Wall -Wextra $(INCDIRS) `pkg-config --cflags glew, freetype2` -DwxUSE_GUI=1 -D_DATAPLOTTER_64_BIT_ -Wno-unused-local-typedefs -std=c++0x
+CFLAGS = -Wall -Wextra $(INCDIRS) `pkg-config --cflags glew, freetype2` -Wno-unused-local-typedefs -std=c++14
 CFLAGS_RELEASE = $(CFLAGS) -O2 `wx-config --version=3.1 --debug=no --cppflags`
 CFLAGS_DEBUG = $(CFLAGS) -g `wx-config --version=3.1 --debug=yes --cppflags`
 
@@ -60,7 +60,7 @@ OBJDIR_RELEASE = $(OBJDIR)release/
 BINDIR = $(CURDIR)/bin/
 
 # Library output directory
-LIBOUTDIR = $(CURDIR)/.lib/
+LIBOUTDIR = $(CURDIR)/lib/
 
 # Method for creating directories
 MKDIR = mkdir -p

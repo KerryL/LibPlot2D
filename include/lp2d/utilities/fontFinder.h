@@ -56,9 +56,9 @@ private:
 	struct TT_TABLE_DIRECTORY
 	{
 		char tag[4];
-		DP_ULONG checkSum;
-		DP_ULONG offset;
-		DP_ULONG length;
+		uint32_t checkSum;
+		uint32_t offset;
+		uint32_t length;
 	};
 
 	// Header of names table
@@ -86,7 +86,7 @@ private:
 			(x << 8);
 	}
 
-	inline static void SwapEndian(DP_ULONG& x)
+	inline static void SwapEndian(uint32_t& x)
 	{
 		x = (x >> 24) |
 			((x << 8) & 0x00FF0000) |

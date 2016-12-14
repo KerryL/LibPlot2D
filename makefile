@@ -3,9 +3,9 @@
 # Include the common definitions
 include makefile.inc
 
-# Name of the executable to compile and link
-TARGET = libPlot2d.lib
-TARGET_DEBUG = libPlot2d_debug.lib
+# Name of the binary
+TARGET = Plot2d
+TARGET_DEBUG = Plot2d_d
 
 # Directories in which to search for source files
 DIRS = \
@@ -37,12 +37,14 @@ all: $(TARGET)
 debug: $(TARGET_DEBUG)
 
 $(TARGET): $(OBJS_RELEASE) version_release
-	$(MKDIR) $(BINDIR)
-	$(CC) $(ALL_OBJS_RELEASE) $(LDFLAGS_RELEASE) -L$(LIBOUTDIR) $(addprefix -l,$(PSLIB)) -o $(BINDIR)$@
+	$(MKDIR) $(LIBOUTDIR)
+	$(AR) $(LIBOUTDIR)lib$@.a $(ALL_OBJS_RELEASE)
+	$(RANLIB) $(LIBOUTDIR)lib$@.a
 
 $(TARGET_DEBUG): $(OBJS_DEBUG) version_debug
-	$(MKDIR) $(BINDIR)
-	$(CC) $(ALL_OBJS_DEBUG) $(LDFLAGS_DEBUG) -L$(LIBOUTDIR) $(addprefix -l,$(PSLIB)) -o $(BINDIR)$@
+	$(MKDIR) $(LIBOUTDIR)
+	$(AR) $(LIBOUTDIR)lib$@.a $(ALL_OBJS_DEBUG)
+	$(RANLIB) $(LIBOUTDIR)lib$@.a
 
 $(OBJDIR_RELEASE)%.o: %.cpp
 	$(MKDIR) $(dir $@)
@@ -64,5 +66,6 @@ version_release:
 
 clean:
 	$(RM) -r $(OBJDIR)
-	$(RM) $(BINDIR)$(TARGET)
+	$(RM) $(LIBOUTDIR)$(TARGET)
+	$(RM) $(LIBOUTDIR)$(TARGET_DEBUG)
 	$(RM) $(VERSION_FILE)

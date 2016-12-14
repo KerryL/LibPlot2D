@@ -25,7 +25,7 @@
 #include "lp2d/parser/customFile.h"
 #include "lp2d/parser/customXMLFile.h"
 #include "lp2d/parser/genericFile.h"
-#include "lp2d/parser/KollmorgenFile.h"
+#include "lp2d/parser/kollmorgenFile.h"
 #include "lp2d/utilities/arrayStringCompare.h"
 #include "lp2d/utilities/math/expressionTree.h"
 #include "lp2d/utilities/math/plotMath.h"

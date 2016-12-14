@@ -23,14 +23,6 @@
 
 // NOTE:  See wxPlatformInfo for run-time determination of OS address width
 
-#ifdef LIBPLOT2D_32_BIT_
-#define DP_ULONG unsigned long
-#elif LIBPLOT2D_64_BIT_
-#define DP_ULONG unsigned int
-#else
-#error "Must define preprocessor flags LIBPLOT2D_32_BIT_ or LIBPLOT2D_64_BIT_"
-#endif// TODO:  Is this necessary?  At the very least, can we deduce with preprocessor?
-
 namespace LibPlot2D
 {
 

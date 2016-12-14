@@ -15,6 +15,17 @@
 #ifndef COMPLEX_H_
 #define COMPLEX_H_
 
+// X11 (and possibly others) define Complex - we don't want that.
+#ifdef Complex
+#undef Complex
+#endif// Complex
+
+// Standard C++ headers
+#include <ostream>
+
+// wxWidgets forward declarations
+class wxString;
+
 namespace LibPlot2D
 {
 
