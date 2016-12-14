@@ -29,26 +29,6 @@ namespace LibPlot2D
 // Description:		Constructor for the Vector class.
 //
 // Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Vector::Vector()
-{
-}
-
-//=============================================================================
-// Class:			Vector
-// Function:		Vector
-//
-// Description:		Constructor for the Vector class.
-//
-// Input Arguments:
 //		x	= const double& specifying first component of the vector
 //		y	= const double& specifying second component of the vector
 //		z	= const double& specifying third component of the vector
@@ -62,28 +42,6 @@ Vector::Vector()
 //=============================================================================
 Vector::Vector(const double &x, const double &y, const double &z) : x(x), y(y), z(z)
 {
-}
-
-//=============================================================================
-// Class:			Vector
-// Function:		Vector
-//
-// Description:		Copy constructor for the Vector class.
-//
-// Input Arguments:
-//		v	= const Vector& to be copied
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Vector::Vector(const Vector &v)
-{
-	// Copy from the argument to this
-	*this = v;
 }
 
 //=============================================================================

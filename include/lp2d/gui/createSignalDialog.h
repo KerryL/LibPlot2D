@@ -39,6 +39,7 @@ public:
 	~CreateSignalDialog() = default;
 
 	std::unique_ptr<Dataset2D>& GetSignal() { return dataset; }
+
 	wxString GetSignalName() const;
 
 private:

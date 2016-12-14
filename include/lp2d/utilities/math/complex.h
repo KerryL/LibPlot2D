@@ -46,20 +46,20 @@ public:
 	double GetPolarAngle() const;
 
 	// Operators
-	const Complex operator + (const Complex &complex) const;
-	const Complex operator - (const Complex &complex) const;
-	const Complex operator * (const Complex &complex) const;
-	const Complex operator / (const Complex &complex) const;
-	Complex& operator += (const Complex &complex);
-	Complex& operator -= (const Complex &complex);
-	Complex& operator *= (const Complex &complex);
-	Complex& operator /= (const Complex &complex);
-	bool operator == (const Complex &complex) const;
-	bool operator != (const Complex &complex) const;
-	const Complex operator + (const double &value) const;
-	const Complex operator - (const double &value) const;
-	const Complex operator * (const double &value) const;
-	const Complex operator / (const double &value) const;
+	const Complex operator+(const Complex &complex) const;
+	const Complex operator-(const Complex &complex) const;
+	const Complex operator*(const Complex &complex) const;
+	const Complex operator/(const Complex &complex) const;
+	Complex& operator+=(const Complex &complex);
+	Complex& operator-=(const Complex &complex);
+	Complex& operator*=(const Complex &complex);
+	Complex& operator/=(const Complex &complex);
+	bool operator==(const Complex &complex) const;
+	bool operator!=(const Complex &complex) const;
+	const Complex operator+(const double &value) const;
+	const Complex operator-(const double &value) const;
+	const Complex operator*(const double &value) const;
+	const Complex operator/(const double &value) const;
 
 	// Raises this object to the specified power
 	Complex& ToPower(const double &power);
@@ -68,7 +68,7 @@ public:
 	const Complex ToPower(const Complex &power) const;
 
 	// For streaming the value
-	friend std::ostream &operator << (std::ostream &writeOut, const Complex &complex);
+	friend std::ostream &operator<<(std::ostream &writeOut, const Complex &complex);
 
 	// The actual data contents of this class
 	double real;

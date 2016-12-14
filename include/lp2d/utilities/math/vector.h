@@ -33,9 +33,8 @@ class Vector
 {
 public:
 	// Constructors
-	Vector();
+	Vector() = default;
 	Vector(const double &x, const double &y, const double &z);
-	Vector(const Vector &v);
 
 	// Main class data
 	double x, y, z;

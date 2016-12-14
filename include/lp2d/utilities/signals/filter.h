@@ -30,7 +30,6 @@ public:
 	Filter(const double &sampleRate);
 	Filter(const double &sampleRate, const std::vector<double> &numerator,
 		const std::vector<double> &denominator, const double &initialValue = 0.0);
-	Filter(const Filter &f);
 
 	// Resets all internal variables to initialize the filter to the specified value
 	void Initialize(const double &initialValue);
@@ -43,9 +42,6 @@ public:
 
 	// Returns latest filtered data
 	double GetFilteredValue() const { return y[0]; }
-
-	// Assignment operator (avoids MSVC Warning C4512)
-	Filter& operator=(const Filter &f);
 
 	static std::vector<double> CoefficientsFromString(const std::string &s);
 

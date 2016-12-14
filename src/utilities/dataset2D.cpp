@@ -35,27 +35,6 @@ namespace LibPlot2D
 // Description:		Constructor for the Dataset class.
 //
 // Input Arguments:
-//		target	= const Dataset2D& top copy into this object
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Dataset2D::Dataset2D(const Dataset2D& target)
-{
-	*this = target;
-}
-
-//=============================================================================
-// Class:			Dataset2D
-// Function:		Dataset2D
-//
-// Description:		Constructor for the Dataset class.
-//
-// Input Arguments:
 //		numberOfPoints = const unsigned int &
 //
 // Output Arguments:
@@ -226,41 +205,6 @@ Dataset2D& Dataset2D::XShift(const double &shift)
 	unsigned int i;
 	for (i = 0; i < xData.size(); ++i)
 		xData[i] += shift;
-
-	return *this;
-}
-
-//=============================================================================
-// Class:			Dataset2D
-// Function:		operator=
-//
-// Description:		Overloaded assignment operator.
-//
-// Input Arguments:
-//		target	= const Dataset2D& to assign to this
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		Dataset2D& reference to this object
-//
-//=============================================================================
-Dataset2D& Dataset2D::operator=(const Dataset2D &target)
-{
-	// Check for self assignment
-	if (this == &target)
-		return *this;
-
-	Resize(target.xData.size());
-
-	// Do the copy
-	unsigned int i;
-	for (i = 0; i < xData.size(); ++i)
-	{
-		xData[i] = target.xData[i];
-		yData[i] = target.yData[i];
-	}
 
 	return *this;
 }

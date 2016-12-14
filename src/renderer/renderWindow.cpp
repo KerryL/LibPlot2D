@@ -219,15 +219,15 @@ END_EVENT_TABLE()
 //		None
 //
 // Return Value:
-//		std::unique_ptr<wxGLContext>&
+//		wxGLContext*
 //
 //=============================================================================
-std::unique_ptr<wxGLContext>& RenderWindow::GetContext()
+wxGLContext* RenderWindow::GetContext()
 {
 	if (!context)
 		context = std::make_unique<wxGLContext>(this);
 
-	return context;
+	return context.get();
 }
 
 //=============================================================================

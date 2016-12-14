@@ -32,35 +32,12 @@ namespace LibPlot2D
 // Class:			Matrix
 // Function:		Matrix
 //
-// Description:		Constructor for the Matrix class.  Does not allocate any
-//					memory.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Matrix::Matrix()
-{
-	rows = 0;
-	columns = 0;
-}
-
-//=============================================================================
-// Class:			Matrix
-// Function:		Matrix
-//
 // Description:		Constructor for the Matrix class.  Allocates memory for
 //					a matix of the specified size.
 //
 // Input Arguments:
-//		_rows		= const unsigned int& specifying the vertical size of the matrix
-//		_columns	= const unsigned int& specifying the horizontal size of the matrix
+//		rows	= const unsigned int& specifying the vertical size of the matrix
+//		columns	= const unsigned int& specifying the horizontal size of the matrix
 //
 // Output Arguments:
 //		None
@@ -87,8 +64,8 @@ Matrix::Matrix(const unsigned int &rows, const unsigned int &columns)
 //					the specified elements.
 //
 // Input Arguments:
-//		_rows		= const unsigned int& specifying the vertical size of the matrix
-//		_columns	= const unsigned int& specifying the horizontal size of the matrix
+//		rows		= const unsigned int& specifying the vertical size of the matrix
+//		columns		= const unsigned int& specifying the horizontal size of the matrix
 //		element1	= double specifying the first element of the matrix
 //		...			= doubles specifying the rest of the elements
 //
@@ -125,30 +102,6 @@ Matrix::Matrix(const unsigned int &rows, const unsigned int &columns, double ele
 	}
 
 	va_end(argumentList);
-}
-
-//=============================================================================
-// Class:			Matrix
-// Function:		Matrix
-//
-// Description:		Copy constructor for the Matrix class.  Performs deep copy.
-//
-// Input Arguments:
-//		matrix	= Matrix& to copy form
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Matrix::Matrix(const Matrix &matrix)
-{
-	rows = 0;
-	columns = 0;
-
-	*this = matrix;
 }
 
 //=============================================================================
@@ -484,40 +437,6 @@ Matrix& Matrix::operator*=(const Matrix &m)
 	}
 
 	*this = result;
-
-	return *this;
-}
-
-//=============================================================================
-// Class:			Matrix
-// Function:		operator =
-//
-// Description:		Assignment operator for the Matrix class.
-//
-// Input Arguments:
-//		m	= const Matrix& to assign to this
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		Matrix& result of the assignment
-//
-//=============================================================================
-Matrix& Matrix::operator=(const Matrix &m)
-{
-	// Check for self assignment
-	if (this == &m)
-		return *this;
-
-	Resize(m.rows, m.columns);
-
-	unsigned int i, j;
-	for (i = 0; i < rows; ++i)
-	{
-		for (j = 0; j < columns; ++j)
-			elements[i][j] = m.elements[i][j];
-	}
 
 	return *this;
 }

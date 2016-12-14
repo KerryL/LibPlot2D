@@ -124,7 +124,7 @@ public:
 
 private:
 	std::unique_ptr<wxGLContext> context;
-	std::unique_ptr<wxGLContext>& GetContext();
+	wxGLContext* GetContext();
 
 	static const double exactPixelShift;
 

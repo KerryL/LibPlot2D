@@ -36,6 +36,12 @@ public:
 	Text(RenderWindow& renderer);
 	~Text();
 
+	// Enforce rule of 5
+	Text(const Text&) = delete;
+	Text(Text&&) = delete;
+	Text& operator=(const Text&) = delete;
+	Text& operator=(Text&&) = delete;
+
 	void SetSize(const double& height);
 	void SetSize(const double& width, const double& height);
 

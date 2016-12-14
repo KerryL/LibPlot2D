@@ -31,10 +31,9 @@ class Matrix
 {
 public:
 	// Constructors
-	Matrix();
+	Matrix() = default;
 	Matrix(const unsigned int &rows, const unsigned int &columns);
 	Matrix(const unsigned int &rows, const unsigned int &columns, double element1, ...);
-	Matrix(const Matrix &m);
 
 	// Sets the values of all of the elements
 	void Set(double Element1, ...);
@@ -69,20 +68,19 @@ public:
 	wxString Print() const;
 
 	// Operators
-	Matrix& operator += (const Matrix &m);
-	Matrix& operator -= (const Matrix &m);
-	Matrix& operator *= (const Matrix &m);
-	Matrix& operator *= (const double &n);
-	Matrix& operator /= (const double &n);
-	Matrix& operator = (const Matrix &m);
-	double &operator () (const unsigned int &row, const unsigned int &column);
-	const Matrix operator + (const Matrix &m) const;
-	const Matrix operator - (const Matrix &m) const;
-	const Matrix operator * (const Matrix &m) const;
-	const Matrix operator * (const double &n) const;
-	const Vector operator * (const Vector &v) const;
-	const Matrix operator / (const double &target) const;
-	const double &operator () (const unsigned int &row, const unsigned int &column) const;
+	Matrix& operator+=(const Matrix &m);
+	Matrix& operator-=(const Matrix &m);
+	Matrix& operator*=(const Matrix &m);
+	Matrix& operator*=(const double &n);
+	Matrix& operator/=(const double &n);
+	double &operator()(const unsigned int &row, const unsigned int &column);
+	const Matrix operator+(const Matrix &m) const;
+	const Matrix operator-(const Matrix &m) const;
+	const Matrix operator*(const Matrix &m) const;
+	const Matrix operator*(const double &n) const;
+	const Vector operator*(const Vector &v) const;
+	const Matrix operator/(const double &target) const;
+	const double &operator()(const unsigned int &row, const unsigned int &column) const;
 
 	// Common matrix operations ------------------------------------
 	bool GetSingularValueDecomposition(Matrix &U, Matrix &V, Matrix &W) const;
@@ -99,8 +97,8 @@ public:
 	unsigned int GetRank() const;
 
 private:
-	unsigned int rows;
-	unsigned int columns;
+	unsigned int rows = 0;
+	unsigned int columns = 0;
 
 	// The array of elements of this matrix
 	std::vector<std::vector<double>> elements;

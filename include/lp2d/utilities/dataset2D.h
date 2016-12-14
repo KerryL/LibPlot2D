@@ -31,7 +31,6 @@ class Dataset2D
 {
 public:
 	Dataset2D() = default;
-	Dataset2D(const Dataset2D& target);
 	Dataset2D(const unsigned int &numberOfPoints);
 
 	// For exporting the data to a comma or tab delimited text file
@@ -58,8 +57,6 @@ public:
 	Dataset2D& XShift(const double &shift);
 
 	// Overloaded operators
-	Dataset2D& operator=(const Dataset2D &target);
-
 	Dataset2D& operator+=(const Dataset2D &target);
 	Dataset2D& operator-=(const Dataset2D &target);
 	Dataset2D& operator*=(const Dataset2D &target);

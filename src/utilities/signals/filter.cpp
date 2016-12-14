@@ -78,27 +78,6 @@ Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
 
 //=============================================================================
 // Class:			Filter
-// Function:		Filter
-//
-// Description:		Copy constructor for the Filter class.
-//
-// Input Arguments:
-//		f	= const Filter&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Filter::Filter(const Filter &f) : sampleRate(f.sampleRate)
-{
-	*this = f;
-}
-
-//=============================================================================
-// Class:			Filter
 // Function:		GenerateCoefficients
 //
 // Description:		Generates the discrete-time (z-domain) coefficients for
@@ -193,46 +172,6 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	}
 
 	return result;
-}
-
-//=============================================================================
-// Class:			Filter
-// Function:		operator=
-//
-// Description:		Assignment operator.
-//
-// Input Arguments:
-//		f	=	const Filter&
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		Filter&, reference to this
-//
-//=============================================================================
-Filter& Filter::operator=(const Filter &f)
-{
-	if (this == &f)
-		return *this;
-
-	ResizeArrays(f.u.size(), f.y.size());
-
-	unsigned int i;
-	for (i = 0; i < a.size(); ++i)
-	{
-		a[i] = f.a[i];
-		u[i] = f.u[i];
-	}
-
-	for (i = 0; i < y.size(); ++i)
-	{
-		if (i < b.size())
-			b[i] = f.b[i];
-		y[i] = f.y[i];
-	}
-
-	return *this;
 }
 
 //=============================================================================
