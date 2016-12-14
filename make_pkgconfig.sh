@@ -14,10 +14,10 @@ version=$(git describe --tags --abbrev=0)
 
 if [ "$debug" -eq "0" ] ; then
 	debug_flag="--debug=no"
-	libName="libPlot2D"
+	libName="Plot2d"
 else
 	debug_flag="--debug=yes"
-	libName="libPlot2D_d"
+	libName="Plot2d_d"
 fi
 
 # It seems that pkg-config does not support backtick execution.  Would be nicer
