@@ -31,7 +31,7 @@ OBJS_RELEASE = $(filter-out $(VERSION_FILE_OBJ_RELEASE),$(TEMP_OBJS_RELEASE))
 ALL_OBJS_DEBUG = $(OBJS_DEBUG) $(VERSION_FILE_OBJ_DEBUG)
 ALL_OBJS_RELEASE = $(OBJS_RELEASE) $(VERSION_FILE_OBJ_RELEASE)
 
-.PHONY: all debug clean version
+.PHONY: all debug clean version install
 
 all: $(TARGET)
 debug: $(TARGET_DEBUG)
@@ -53,6 +53,10 @@ $(OBJDIR_RELEASE)%.o: %.cpp
 $(OBJDIR_DEBUG)%.o: %.cpp
 	$(MKDIR) $(dir $@)
 	$(CC) $(CFLAGS_DEBUG) -c $< -o $@
+
+install:
+	./make_pkgconfig.sh $(CURDIR)/include $(CURDIR)/$(LIBOUTDIR) $(PKG_CONFIG_FILE)
+	$(MV) $(PKG_CONFIG_FILE) $(PKG_CONFIG_LOCATION)
 
 version_debug:
 	./getGitHash.sh

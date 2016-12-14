@@ -34,6 +34,10 @@ LIBS = $(addprefix -l,$(LIBS_TEMP))
 # libraries).
 PSLIB = 
 
+# Location to store pkg-config files
+PKG_CONFIG_LOCATION = /usr/lib/pkgconfig
+PKG_CONFIG_FILE = lp2d.pc
+
 # Compiler to use
 CC = g++
 
@@ -67,3 +71,6 @@ MKDIR = mkdir -p
 
 # Method for removing files
 RM = rm -f
+
+# Method for copying files
+CP = cp
