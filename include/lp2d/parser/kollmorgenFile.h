@@ -28,6 +28,8 @@ public:
 	KollmorgenFile(const wxString& fileName)
 		: DataFile(fileName) {}
 
+	~KollmorgenFile() = default;
+
 	static bool IsType(const wxString &fileName);
 
 protected:

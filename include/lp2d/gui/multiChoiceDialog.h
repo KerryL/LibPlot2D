@@ -33,7 +33,9 @@ public:
 		const wxArrayString& choices, long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
 		wxArrayInt *defaultChoices = nullptr, bool *removeExisting = nullptr);
 
-	virtual wxArrayInt GetSelections() const { return selections; };
+	~MultiChoiceDialog() = default;
+
+	virtual wxArrayInt GetSelections() const { return selections; }
 
 	bool RemoveExistingCurves() const;
 

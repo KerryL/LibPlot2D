@@ -26,6 +26,7 @@ class ZoomBox : public Primitive
 {
 public:
 	ZoomBox(RenderWindow &renderWindow);
+	~ZoomBox() = default;
 
 	void SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor);
 	void SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat);

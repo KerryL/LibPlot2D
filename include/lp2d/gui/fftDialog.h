@@ -31,6 +31,8 @@ public:
 	FFTDialog(wxWindow *parent, const unsigned int &dataPoints,
 		const unsigned int &zoomDataPoints, const double &sampleTime);
 
+	~FFTDialog() = default;
+
 	FastFourierTransform::FFTWindow GetFFTWindow() const;
 	unsigned int GetWindowSize() const;
 	double GetOverlap() const;

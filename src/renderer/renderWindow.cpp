@@ -178,31 +178,6 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
 
 //=============================================================================
 // Class:			RenderWindow
-// Function:		~RenderWindow
-//
-// Description:		Destructor for RenderWindow class.  Deletes objects in
-//					the scene and other dynamic variables.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-RenderWindow::~RenderWindow()
-{
-	primitiveList.Clear();
-
-	delete GetContext();
-	context = nullptr;
-}
-
-//=============================================================================
-// Class:			RenderWindow
 // Function:		Event Table
 //
 // Description:		Event Table for the RENDER_WINDOW class.
@@ -244,13 +219,13 @@ END_EVENT_TABLE()
 //		None
 //
 // Return Value:
-//		wxGLContext*
+//		std::unique_ptr<wxGLContext>&
 //
 //=============================================================================
-wxGLContext* RenderWindow::GetContext()
+std::unique_ptr<wxGLContext>& RenderWindow::GetContext()
 {
 	if (!context)
-		context = new wxGLContext(this);
+		context = std::make_unique<wxGLContext>(this);
 
 	return context;
 }

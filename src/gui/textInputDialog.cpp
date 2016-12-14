@@ -49,26 +49,6 @@ TextInputDialog::TextInputDialog(const wxString &message, const wxString &title,
 
 //=============================================================================
 // Class:			TextInputDialog
-// Function:		~TextInputDialog
-//
-// Description:		Destructor for TextInputDialog class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-TextInputDialog::~TextInputDialog()
-{
-}
-
-//=============================================================================
-// Class:			TextInputDialog
 // Function:		CreateControls
 //
 // Description:		Constructor for TextInputDialog class.

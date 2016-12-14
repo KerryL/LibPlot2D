@@ -29,6 +29,7 @@ public:
 	// Constructor
 	CustomFile(const wxString& fileName) : DataFile(fileName),
 		fileFormat(fileName) {}
+	~CustomFile() = default;
 
 	static bool IsType(const wxString &fileName);
 

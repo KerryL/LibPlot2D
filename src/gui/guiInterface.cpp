@@ -71,7 +71,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 {
 	unsigned int i, j;
 	std::vector<bool> loaded(fileList.size());
-	std::vector<DataFile*> files(fileList.size());
+	std::vector<std::unique_ptr<DataFile>> files(fileList.size());
 	typedef std::map<wxArrayString, DataFile::SelectionData,
 		ArrayStringCompare> SelectionMap;
 	SelectionMap selectionInfoMap;
@@ -102,11 +102,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 			{
 				files[i]->GetSelectionsFromUser(selectionInfo, owner);
 				if (selectionInfo.selections.Count() < 1)
-				{
-					for (j = 0; j <= i; ++j)
-						delete files[j];
 					return false;
-				}
 				selectionInfoMap[files[i]->GetAllDescriptions()] = selectionInfo;
 			}
 		}
@@ -118,11 +114,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 	}
 
 	if (!atLeastOneFileLoaded)
-	{
-		for (i = 0; i < files.size(); ++i)
-			delete files[i];
 		return false;
-	}
 
 	if (selectionInfo.removeExisting)
 		ClearAllCurves();
@@ -160,9 +152,6 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 		lastFilesLoaded = fileList;
 	lastSelectionInfo = selectionInfo;
 	lastDescriptions = files[files.size() - 1]->GetAllDescriptions();
-
-	for (i = 0; i < files.size(); ++i)
-		delete files[i];
 
 	return true;
 }
@@ -591,23 +580,23 @@ void GuiInterface::UpdateSingleCursorValue(const unsigned int &row,
 //		None
 //
 // Return Value:
-//		DataFile*
+//		std::unique_ptr<DataFile>
 //
 //=============================================================================
-DataFile* GuiInterface::GetDataFile(const wxString &fileName)
+std::unique_ptr<DataFile> GuiInterface::GetDataFile(const wxString &fileName)
 {
 	if (BaumullerFile::IsType(fileName))
-		return new BaumullerFile(fileName);
+		return std::make_unique<BaumullerFile>(fileName);
 	else if (KollmorgenFile::IsType(fileName))
-		return new KollmorgenFile(fileName);
+		return std::make_unique<KollmorgenFile>(fileName);
 	else if (CustomFile::IsType(fileName))
-		return new CustomFile(fileName);
+		return std::make_unique<CustomFile>(fileName);
 	else if (CustomXMLFile::IsType(fileName))
-		return new CustomXMLFile(fileName);
+		return std::make_unique<CustomXMLFile>(fileName);
 
 	// Don't even check - if we can't open it with any other types,
 	// always try to open it with a generic type
-	return new GenericFile(fileName);
+	return std::make_unique<GenericFile>(fileName);
 }
 
 //=============================================================================
@@ -1498,7 +1487,8 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
 			_T("Accuracy Warning"), wxICON_WARNING, owner);
 
-	Filter *filter = GetFilter(parameters, factor / data->GetAverageDeltaX(), data->GetYData(0));
+	std::unique_ptr<Filter> filter(GetFilter(
+		parameters, factor / data->GetAverageDeltaX(), data->GetYData(0)));
 
 	unsigned int i;
 	for (i = 0; i < data->GetNumberOfPoints(); ++i)
@@ -1513,8 +1503,6 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 			data->GetYPointer()[i] = filter->Apply(data->GetYData(i));
 		data->Reverse();
 	}
-
-	delete filter;
 }
 
 //=============================================================================
@@ -1532,13 +1520,13 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 //		None
 //
 // Return Value:
-//		Filter*
+//		std::unique_ptr<Filter>
 //
 //=============================================================================
-Filter* GuiInterface::GetFilter(const FilterParameters &parameters,
+std::unique_ptr<Filter> GuiInterface::GetFilter(const FilterParameters &parameters,
 	const double &sampleRate, const double &initialValue) const
 {
-	return new Filter(sampleRate,
+	return std::make_unique<Filter>(sampleRate,
 		Filter::CoefficientsFromString(std::string(parameters.numerator.mb_str())),
 		Filter::CoefficientsFromString(std::string(parameters.denominator.mb_str())),
 		initialValue);

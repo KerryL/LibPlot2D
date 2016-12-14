@@ -78,26 +78,6 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(rend
 
 //=============================================================================
 // Class:			Axis
-// Function:		~Axis
-//
-// Description:		Destructor for the Axis class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Axis::~Axis()
-{
-}
-
-//=============================================================================
-// Class:			Axis
 // Function:		Update
 //
 // Description:		Updates the GL buffers associated with this object.

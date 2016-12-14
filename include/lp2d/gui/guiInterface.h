@@ -128,7 +128,7 @@ private:
 	DataFile::SelectionData lastSelectionInfo;
 	wxArrayString lastDescriptions;
 
-	DataFile* GetDataFile(const wxString &fileName);
+	std::unique_ptr<DataFile> GetDataFile(const wxString &fileName);
 
 	FileFormat currentFileFormat = FormatGeneric;
 	wxString genericXAxisLabel;
@@ -151,7 +151,7 @@ private:
 	std::unique_ptr<Dataset2D> GetFFTData(
 		const std::unique_ptr<const Dataset2D>& data);
 
-	Filter* GetFilter(const FilterParameters &parameters,
+	std::unique_ptr<Filter> GetFilter(const FilterParameters &parameters,
 		const double &sampleRate, const double &initialValue) const;
 
 	void AddFFTCurves(const double& xFactor,

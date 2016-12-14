@@ -62,7 +62,9 @@ public:
 	// Constructor
 	FilterDialog(wxWindow *parent, const FilterParameters* parameters = nullptr);
 
-	const FilterParameters& GetFilterParameters() const { return mParameters; };
+	~FilterDialog() = default;
+
+	const FilterParameters& GetFilterParameters() const { return mParameters; }
 	static wxString GetFilterNamePrefix(const FilterParameters &parameters);
 
 private:

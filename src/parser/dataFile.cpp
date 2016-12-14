@@ -54,26 +54,6 @@ DataFile::DataFile(const wxString& fileName) : fileName(fileName)
 
 //=============================================================================
 // Class:			DataFile
-// Function:		~DataFile
-//
-// Description:		Destructor for DataFile class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-DataFile::~DataFile()
-{
-}
-
-//=============================================================================
-// Class:			DataFile
 // Function:		Initialize
 //
 // Description:		Initializes with type-specific class.

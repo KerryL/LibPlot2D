@@ -30,7 +30,7 @@ class Axis : public Primitive
 {
 public:
 	Axis(RenderWindow &renderWindow);
-	~Axis();
+	~Axis() = default;
 
 	// Enumeration for the axis orientations
 	enum AxisOrientation

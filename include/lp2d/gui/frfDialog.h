@@ -27,6 +27,8 @@ public:
 	// Constructors
 	FRFDialog(wxWindow *parent, const wxArrayString &descriptions);
 
+	~FRFDialog() = default;
+
 	unsigned int GetInputIndex() const;
 	unsigned int GetOutputIndex() const;
 	unsigned int GetNumberOfAverages() const;

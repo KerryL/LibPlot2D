@@ -39,6 +39,8 @@ public:
 	PlotListGrid(GuiInterface& guiInterface, wxWindow* parent,
 		wxWindowID id = wxID_ANY);
 
+	~PlotListGrid() = default;
+
 	Color GetNextColor(const unsigned int& index) const;
 
 	void AddTimeRow();

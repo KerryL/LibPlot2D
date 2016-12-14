@@ -15,6 +15,9 @@
 #ifndef DATA_FILE_H_
 #define DATA_FILE_H_
 
+// Local headers
+#include "lp2d/utilities/dataset2D.h"
+
 // wxWidgets headers
 #include <wx/wx.h>
 
@@ -26,9 +29,6 @@
 namespace LibPlot2D
 {
 
-// Local forward declarations
-class Dataset2D;
-
 class DataFile
 {
 public:
@@ -36,7 +36,7 @@ public:
 	DataFile(const wxString& fileName);
 
 	// Destructor
-	virtual ~DataFile();
+	virtual ~DataFile() = default;
 
 	void Initialize();
 
@@ -84,8 +84,8 @@ protected:
 	virtual void AssembleDatasets(const std::vector<std::vector<double>>& rawData);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
-	virtual void DoTypeSpecificLoadTasks() {};
-	virtual void DoTypeSpecificProcessTasks() {};
+	virtual void DoTypeSpecificLoadTasks() {}
+	virtual void DoTypeSpecificProcessTasks() {}
 	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
 
 	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter) const;

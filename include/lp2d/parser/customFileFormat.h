@@ -43,7 +43,7 @@ public:
 	wxString GetTimeFormat() const { return timeFormat; }
 	wxString GetEndIdentifier() const { return endIdentifier; }
 
-	bool IsXML() const { return isXML; };
+	bool IsXML() const { return isXML; }
 
 	wxString GetXMLXDataNode() const { return xDataNode; }
 	wxString GetXMLXDataKey() const { return xDataKey; }

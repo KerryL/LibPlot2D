@@ -41,7 +41,7 @@ public:
 	// Private data accessors
 	unsigned int Add(std::unique_ptr<T> toAdd);
 	virtual void Remove(const unsigned int &index);
-	inline unsigned int GetCount() const { return list.size(); };
+	inline unsigned int GetCount() const { return list.size(); }
 
 	// Removes all objects from the list
 	virtual void Clear();

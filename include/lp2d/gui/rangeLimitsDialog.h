@@ -27,6 +27,8 @@ public:
 	// Constructor
 	RangeLimitsDialog(wxWindow *parent, const double &min, const double &max);
 
+	~RangeLimitsDialog() = default;
+
 	double GetMinimum() const;
 	double GetMaximum() const;
 

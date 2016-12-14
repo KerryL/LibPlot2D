@@ -33,11 +33,8 @@ class Complex
 {
 public:
 	// Constructor
-	Complex();
+	Complex() = default;
 	Complex(const double &real, const double &imaginary);
-
-	// Destructor
-	~Complex();
 
 	// Prints the value to a string
 	wxString Print() const;

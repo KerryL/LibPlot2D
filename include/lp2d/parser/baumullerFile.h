@@ -26,6 +26,7 @@ class BaumullerFile final : public DataFile
 public:
 	// Constructor
 	BaumullerFile(const wxString& fileName) : DataFile(fileName) {}
+	~BaumullerFile() = default;
 
 	static bool IsType(const wxString &fileName);
 

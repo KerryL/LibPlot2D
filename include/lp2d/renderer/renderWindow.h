@@ -29,6 +29,9 @@
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 
+// Standard C++ headers
+#include <memory>
+
 namespace LibPlot2D
 {
 
@@ -37,7 +40,7 @@ class RenderWindow : public wxGLCanvas
 public:
 	RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
 		const wxPoint& position, const wxSize& size, long style = 0);
-	virtual ~RenderWindow();
+	~RenderWindow() = default;
 
 	void Initialize();
 	void SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection);
@@ -69,7 +72,7 @@ public:
 	virtual void SetBackgroundColor(const Color& backgroundColor) { this->backgroundColor = backgroundColor; modified = true; }
 	inline Color GetBackgroundColor() { return backgroundColor; }
 
-	inline bool GetWireFrame() const { return wireFrame; };
+	inline bool GetWireFrame() const { return wireFrame; }
 	inline bool GetViewOrthogonal() const { return viewOrthogonal; }
 	inline bool GetView3D() const { return view3D; }
 
@@ -120,8 +123,8 @@ public:
 	static void SendUniformMatrix(const Matrix& m, const GLuint& location);
 
 private:
-	wxGLContext *context;
-	wxGLContext* GetContext();
+	std::unique_ptr<wxGLContext> context;
+	std::unique_ptr<wxGLContext>& GetContext();
 
 	static const double exactPixelShift;
 

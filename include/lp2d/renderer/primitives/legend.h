@@ -37,7 +37,7 @@ public:
 	Legend(RenderWindow &renderWindow);
 
 	// Destructor
-	virtual ~Legend() {}
+	virtual ~Legend() = default;
 
 	// Set option methods
 	void SetFont(const std::string& fontFileName, const double& size);

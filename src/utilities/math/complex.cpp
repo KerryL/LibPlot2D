@@ -31,26 +31,6 @@ namespace LibPlot2D
 // Description:		Constructor for the Complex class.
 //
 // Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Complex::Complex()
-{
-}
-
-//=============================================================================
-// Class:			Complex
-// Function:		Complex
-//
-// Description:		Constructor for the Complex class.
-//
-// Input Arguments:
 //		real		= const double& real component of the complex number
 //		imaginary	= const double& imaginary component of the complex number
 //
@@ -62,26 +42,6 @@ Complex::Complex()
 //
 //=============================================================================
 Complex::Complex(const double &real, const double &imaginary) : real(real), imaginary(imaginary)
-{
-}
-
-//=============================================================================
-// Class:			Complex
-// Function:		~Complex
-//
-// Description:		Destructor for the Complex class.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Complex::~Complex()
 {
 }
 
@@ -157,7 +117,7 @@ wxString Complex::Print() const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator +
+// Function:		operator+
 //
 // Description:		Addition operator for the Complex class.
 //
@@ -171,7 +131,7 @@ wxString Complex::Print() const
 //		const Complex result of the addition
 //
 //=============================================================================
-const Complex Complex::operator + (const Complex &complex) const
+const Complex Complex::operator+(const Complex &complex) const
 {
 	// Make a copy of this object
 	Complex temp = *this;
@@ -184,7 +144,7 @@ const Complex Complex::operator + (const Complex &complex) const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator -
+// Function:		operator-
 //
 // Description:		Subraction operator for the Complex class.
 //
@@ -198,7 +158,7 @@ const Complex Complex::operator + (const Complex &complex) const
 //		const Complex result of the subtraction
 //
 //=============================================================================
-const Complex Complex::operator - (const Complex &complex) const
+const Complex Complex::operator-(const Complex &complex) const
 {
 	// Make a copy of this object
 	Complex temp = *this;
@@ -211,7 +171,7 @@ const Complex Complex::operator - (const Complex &complex) const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator *
+// Function:		operator*
 //
 // Description:		Multiplication operator for the Complex class.
 //
@@ -225,7 +185,7 @@ const Complex Complex::operator - (const Complex &complex) const
 //		const Complex result of the multiplication
 //
 //=============================================================================
-const Complex Complex::operator * (const Complex &complex) const
+const Complex Complex::operator*(const Complex &complex) const
 {
 	// Make a copy of this object
 	Complex temp = *this;
@@ -238,7 +198,7 @@ const Complex Complex::operator * (const Complex &complex) const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator /
+// Function:		operator/
 //
 // Description:		Division operator for the Complex class.
 //
@@ -252,7 +212,7 @@ const Complex Complex::operator * (const Complex &complex) const
 //		const Complex result of the division
 //
 //=============================================================================
-const Complex Complex::operator / (const Complex &complex) const
+const Complex Complex::operator/(const Complex &complex) const
 {
 	// Make a copy of this object
 	Complex temp = *this;
@@ -377,7 +337,7 @@ const Complex Complex::ToPower(const Complex &power) const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator +=
+// Function:		operator+=
 //
 // Description:		Addition assignment operator for the Complex class.
 //
@@ -391,7 +351,7 @@ const Complex Complex::ToPower(const Complex &power) const
 //		Complex& result of the addition
 //
 //=============================================================================
-Complex& Complex::operator += (const Complex &complex)
+Complex& Complex::operator+=(const Complex &complex)
 {
 	// Add the real components
 	real += complex.real;
@@ -404,7 +364,7 @@ Complex& Complex::operator += (const Complex &complex)
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator -=
+// Function:		operator-=
 //
 // Description:		Subraction assignment operator for the Complex class.
 //
@@ -418,7 +378,7 @@ Complex& Complex::operator += (const Complex &complex)
 //		Complex& result of the subtraction
 //
 //=============================================================================
-Complex& Complex::operator -= (const Complex &complex)
+Complex& Complex::operator-=(const Complex &complex)
 {
 	// Subtract the real components
 	real -= complex.real;
@@ -445,7 +405,7 @@ Complex& Complex::operator -= (const Complex &complex)
 //		Complex& result of the multiplication
 //
 //=============================================================================
-Complex& Complex::operator *= (const Complex &complex)
+Complex& Complex::operator*=(const Complex &complex)
 {
 	double temp = real;
 
@@ -462,7 +422,7 @@ Complex& Complex::operator *= (const Complex &complex)
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator /=
+// Function:		operator/=
 //
 // Description:		Division assignment operator for the Complex class.
 //
@@ -476,7 +436,7 @@ Complex& Complex::operator *= (const Complex &complex)
 //		Complex& result of the division
 //
 //=============================================================================
-Complex& Complex::operator /= (const Complex &complex)
+Complex& Complex::operator/=(const Complex &complex)
 {
 	double temp = real;
 
@@ -493,7 +453,7 @@ Complex& Complex::operator /= (const Complex &complex)
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator ==
+// Function:		operator==
 //
 // Description:		Equal to comparison operator for the Complex class.
 //
@@ -507,7 +467,7 @@ Complex& Complex::operator /= (const Complex &complex)
 //		bool, true for equal to, false for not equal to
 //
 //=============================================================================
-bool Complex::operator == (const Complex &complex) const
+bool Complex::operator==(const Complex &complex) const
 {
 	// Check to see if both the real and imaginary components are equal
 	if (real == complex.real && imaginary == complex.imaginary)
@@ -532,7 +492,7 @@ bool Complex::operator == (const Complex &complex) const
 //		bool, false for equal to, true for not equal to
 //
 //=============================================================================
-bool Complex::operator != (const Complex &complex) const
+bool Complex::operator!=(const Complex &complex) const
 {
 	return !(*this == complex);
 }
@@ -611,7 +571,7 @@ double Complex::GetPolarAngle() const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator +
+// Function:		operator+
 //
 // Description:		Addition operator for the Complex class.
 //
@@ -625,7 +585,7 @@ double Complex::GetPolarAngle() const
 //		const Complex result of the addition
 //
 //=============================================================================
-const Complex Complex::operator + (const double &value) const
+const Complex Complex::operator+(const double &value) const
 {
 	Complex temp;
 
@@ -640,7 +600,7 @@ const Complex Complex::operator + (const double &value) const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator -
+// Function:		operator-
 //
 // Description:		Subtraction operator for the Complex class.
 //
@@ -654,7 +614,7 @@ const Complex Complex::operator + (const double &value) const
 //		const Complex result of the subtraction
 //
 //=============================================================================
-const Complex Complex::operator - (const double &value) const
+const Complex Complex::operator-(const double &value) const
 {
 	Complex temp;
 
@@ -669,7 +629,7 @@ const Complex Complex::operator - (const double &value) const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator *
+// Function:		operator*
 //
 // Description:		Multiplication operator for the Complex class.
 //
@@ -683,7 +643,7 @@ const Complex Complex::operator - (const double &value) const
 //		const Complex result of the multiplication
 //
 //=============================================================================
-const Complex Complex::operator * (const double &value) const
+const Complex Complex::operator*(const double &value) const
 {
 	Complex temp;
 
@@ -696,7 +656,7 @@ const Complex Complex::operator * (const double &value) const
 
 //=============================================================================
 // Class:			Complex
-// Function:		operator /
+// Function:		operator/
 //
 // Description:		Division operator for the Complex class.
 //
@@ -710,7 +670,7 @@ const Complex Complex::operator * (const double &value) const
 //		const Complex result of the division
 //
 //=============================================================================
-const Complex Complex::operator / (const double &value) const
+const Complex Complex::operator/(const double &value) const
 {
 	Complex temp;
 

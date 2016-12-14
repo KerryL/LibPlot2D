@@ -31,6 +31,7 @@ public:
 	// Constructor
 	CustomXMLFile(const wxString& fileName) : DataFile(fileName),
 		fileFormat(fileName) {}
+	~CustomXMLFile() = default;
 
 	static bool IsType(const wxString &fileName);
 
