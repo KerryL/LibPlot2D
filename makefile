@@ -55,7 +55,7 @@ $(OBJDIR_DEBUG)%.o: %.cpp
 	$(CC) $(CFLAGS_DEBUG) -c $< -o $@
 
 install:
-	./make_pkgconfig.sh $(CURDIR)/include $(CURDIR)/$(LIBOUTDIR) $(PKG_CONFIG_FILE)
+	./make_pkgconfig.sh $(CURDIR)/include $(LIBOUTDIR) $(PKG_CONFIG_FILE)
 	$(MV) $(PKG_CONFIG_FILE) $(PKG_CONFIG_LOCATION)
 
 version_debug:

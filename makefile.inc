@@ -72,5 +72,5 @@ MKDIR = mkdir -p
 # Method for removing files
 RM = rm -f
 
-# Method for copying files
-CP = cp
+# Method for moving files
+MV = mv

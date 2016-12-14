@@ -12,16 +12,16 @@ outputFile="$3"
 version=$(git describe --tags --abbrev=0)
 
 echo prefix=/usr> $outputFile
-echo exec_prefix=/usr> $outputFile
-echo libdir=$libDir> $outputFile
-echo includedir=$incDir> $outputFile
+echo exec_prefix=/usr>> $outputFile
+echo libdir=$libDir>> $outputFile
+echo includedir=$incDir>> $outputFile
 echo>> $outputFile
-echo Name: LibPlot2D> $outputFile
-echo URL: https://github.com/KerryL/LibPlot2D> $outputFile
-echo Description: Lightweight 2D plotting library.> $outputFile
-echo Version: $version> $outputFile
-echo Requires: freetype2 >= 2.4,glew,gl> $outputFile
-echo Requires.private: > $outputFile
-echo Libs: -L${libdir} -llibPlot2D `wx-config --version=3.1 --debug-no --libs all`> $outputFile
-echo Libs.private: > $outputFile
-echo Cflags: -I{includedir} `wx-config --version=3.1 --debug=no --cppflags`> $outputFile
+echo Name: LibPlot2D>> $outputFile
+echo URL: https://github.com/KerryL/LibPlot2D>> $outputFile
+echo Description: Lightweight 2D plotting library.>> $outputFile
+echo Version: $version>> $outputFile
+echo Requires: freetype2 >= 2.4,glew,gl>> $outputFile
+echo Requires.private: >> $outputFile
+echo Libs: -L${libdir} -llibPlot2D `wx-config --version=3.1 --debug=no --libs all`>> $outputFile
+echo Libs.private: >> $outputFile
+echo Cflags: -I{includedir} `wx-config --version=3.1 --debug=no --cppflags`>> $outputFile
