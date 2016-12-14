@@ -36,7 +36,7 @@ PSLIB =
 
 # Location to store pkg-config files
 PKG_CONFIG_LOCATION = /usr/lib/pkgconfig
-PKG_CONFIG_FILE = lp2d.pc
+PKG_CONFIG_FILE = lp2d
 
 # Compiler to use
 CC = g++

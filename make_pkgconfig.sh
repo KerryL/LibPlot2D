@@ -12,7 +12,7 @@ debug="$4"
 # Get the version from the most recent git tag
 version=$(git describe --tags --abbrev=0)
 
-if [ "$debug" -eq "0" ] then
+if [ "$debug" -eq "0" ] ; then
 	debug_flag="--debug=no"
 else
 	debug_flag="--debug=yes"
@@ -27,8 +27,8 @@ echo Name: LibPlot2D>> $outputFile
 echo URL: https://github.com/KerryL/LibPlot2D>> $outputFile
 echo Description: Lightweight 2D plotting library.>> $outputFile
 echo Version: $version>> $outputFile
-echo Requires: freetype2 >= 2.4,glew,gl>> $outputFile
+echo Requires: freetype2,glew,gl>> $outputFile
 echo Requires.private: >> $outputFile
 echo Libs: -L${libdir} -llibPlot2D `wx-config --version=3.1 $debug_flag --libs all`>> $outputFile
 echo Libs.private: >> $outputFile
-echo Cflags: -I\{includedir\} `wx-config --version=3.1 $debug_flag --cppflags` -std=c++14>> $outputFile
+echo Cflags: -I${includedir} `wx-config --version=3.1 $debug_flag --cppflags` -std=c++14>> $outputFile
