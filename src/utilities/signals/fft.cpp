@@ -644,17 +644,11 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 //=============================================================================
 void FastFourierTransform::ConvertAmplitudeToDecibels(Dataset2D &fft)
 {
-	unsigned int i;
-	double referenceAmplitude(0.0);
+	double referenceAmplitude(
+		*std::max_element(fft.GetY().cbegin(), fft.GetY().cend()));
 
-	for (i = 0; i < fft.GetNumberOfPoints(); ++i)
-	{
-		if (fft.GetY()[i] > referenceAmplitude)
-			referenceAmplitude = fft.GetY()[i];
-	}
-
-	for (i = 0; i < fft.GetNumberOfPoints(); ++i)
-		fft.GetY()[i] = 20.0 * log10(fft.GetY()[i] / referenceAmplitude);
+	for (auto& y : fft.GetY())
+		y = 20.0 * log10(y / referenceAmplitude);
 }
 
 //=============================================================================
@@ -674,7 +668,8 @@ void FastFourierTransform::ConvertAmplitudeToDecibels(Dataset2D &fft)
 //		None
 //
 //=============================================================================
-void FastFourierTransform::PopulateFrequencyData(Dataset2D &data, const double &sampleRate)
+void FastFourierTransform::PopulateFrequencyData(Dataset2D &data,
+	const double &sampleRate)
 {
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
@@ -981,8 +976,9 @@ void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 {
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
-		data.GetX()[i] *= 1.0
-		- cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1));
+		data.GetX()[i] *= 1.0 - cos(
+			2.0 * PlotMath::pi * static_cast<double>(i)
+			/ double(data.GetNumberOfPoints() - 1));
 }
 
 //=============================================================================
@@ -1007,7 +1003,8 @@ void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= (0.54 - 0.46
-		* cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))) / 0.54;
+		* cos(2.0 * PlotMath::pi * static_cast<double>(i)
+			/ double(data.GetNumberOfPoints() - 1))) / 0.54;
 }
 
 //=============================================================================
@@ -1033,10 +1030,14 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= 1.0
-		- 1.93 * cos(2.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
-		+ 1.29 * cos(4.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
-		- 0.388 * cos(6.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1))
-		+ 0.032 * cos(8.0 * PlotMath::pi * (double)i / double(data.GetNumberOfPoints() - 1));
+		- 1.93 * cos(2.0 * PlotMath::pi * static_cast<double>(i)
+			/ double(data.GetNumberOfPoints() - 1))
+		+ 1.29 * cos(4.0 * PlotMath::pi * static_cast<double>(i)
+			/ double(data.GetNumberOfPoints() - 1))
+		- 0.388 * cos(6.0 * PlotMath::pi * static_cast<double>(i)
+			/ double(data.GetNumberOfPoints() - 1))
+		+ 0.032 * cos(8.0 * PlotMath::pi * static_cast<double>(i)
+			/ double(data.GetNumberOfPoints() - 1));
 }
 
 //=============================================================================
@@ -1082,7 +1083,7 @@ void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 	unsigned int i;
 	double tau(-((double)data.GetNumberOfPoints() - 1.0) / log(0.02));
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
-		data.GetX()[i] *= exp(-(double)i / tau);
+		data.GetX()[i] *= exp(-static_cast<double>(i) / tau);
 }
 
 //=============================================================================

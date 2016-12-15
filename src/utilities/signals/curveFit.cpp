@@ -14,6 +14,7 @@
 
 // Standard C++ headers
 #include <cmath>
+#include <numeric>
 
 // Local headers
 #include "lp2d/utilities/signals/curveFit.h"
@@ -151,15 +152,13 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 {
 	// Determine the mean of the sampled data
-	double yBar(0.0);
-	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); ++i)
-		yBar += data.GetY()[i];
-	yBar /= (double)data.GetNumberOfPoints();
+	double yBar(std::accumulate(data.GetY().cbegin(), data.GetY().cend(), 0.0)
+		/ static_cast<double>(data.GetNumberOfPoints()));
 
 	// Determine ssTotal (total sum of squares) and ssResidual (residual sum of squares)
 	double ssTotal(0.0), ssResidual(0.0);
 	double fitValue;
+	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
 		ssTotal += (data.GetY()[i] - yBar) * (data.GetY()[i] - yBar);

@@ -159,10 +159,7 @@ Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 	if (i == 0)
 	{
 		Dataset2D set(*(*list)[0]);
-		unsigned int j;
-		for (j = 0; j < set.GetNumberOfPoints(); ++j)
-			set.GetY()[j] = set.GetX()[j];
-
+		std::copy(set.GetX().cbegin(), set.GetX().cend(), set.GetY().begin());
 		return set;
 	}
 

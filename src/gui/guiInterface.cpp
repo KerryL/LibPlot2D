@@ -1496,17 +1496,16 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 	std::unique_ptr<Filter> filter(GetFilter(
 		parameters, factor / data->GetAverageDeltaX(), data->GetY()[0]));
 
-	unsigned int i;
-	for (i = 0; i < data->GetNumberOfPoints(); ++i)
-		data->GetY()[i] = filter->Apply(data->GetY()[i]);
+	for (auto &y : data->GetY())
+		y = filter->Apply(y);
 
 	// For phaseless filter, re-apply the same filter backwards
 	if (parameters.phaseless)
 	{
 		data->Reverse();
 		filter->Initialize(data->GetY()[0]);
-		for (i = 0; i < data->GetNumberOfPoints(); ++i)
-			data->GetY()[i] = filter->Apply(data->GetY()[0]);
+		for (auto &y : data->GetY())
+			y = filter->Apply(y);
 		data->Reverse();
 	}
 }

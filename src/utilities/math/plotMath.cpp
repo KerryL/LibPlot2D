@@ -235,9 +235,8 @@ double PlotMath::Sign(const double &value)
 Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data, const unsigned int &bit)
 {
 	Dataset2D set(data);
-	unsigned int i;
-	for (i = 0; i < set.GetNumberOfPoints(); ++i)
-		set.GetY()[i] = ApplyBitMask((unsigned int)set.GetY()[i], bit);
+	for (auto& y : set.GetY())
+		y = ApplyBitMask(static_cast<unsigned int>(y), bit);
 	return set;
 }
 
