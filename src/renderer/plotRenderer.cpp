@@ -1729,9 +1729,13 @@ void PlotRenderer::OnMouseLeaveWindowEvent(wxMouseEvent& WXUNUSED(event))
 	if (zoomBox->GetIsVisible())
 		zoomBox->SetVisibility(false);
 
-	draggingLegend = false;
+	// TODO:  Why were these lines added?  Removed them due to bug:
+	// Drag legend, move cursor off of screen (holding left button down), move
+	// cursor back onto screen, now we're dragging plot (expected to still drag
+	// legend).  Good reason to leave below lines?
+	/*draggingLegend = false;
 	draggingLeftCursor = false;
-	draggingRightCursor = false;
+	draggingRightCursor = false;*/
 
 	UpdateDisplay();
 }
