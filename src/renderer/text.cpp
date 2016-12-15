@@ -213,7 +213,7 @@ void Text::Initialize()
 
 //=============================================================================
 // Class:			Text
-// Function:		Initialize
+// Function:		SetFace
 //
 // Description:		Initializes the Freetype back-end of this object.  Must
 //					be called prior to any other post-creation method.

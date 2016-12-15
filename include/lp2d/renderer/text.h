@@ -18,6 +18,7 @@
 // Standard C++ headers
 #include <string>
 #include <map>
+#include <limits>
 
 // Freetype headers
 #include <ft2build.h>
@@ -109,7 +110,7 @@ private:
 	};
 
 	std::map<char, Glyph> glyphs;
-	unsigned int textureId;
+	unsigned int textureId = std::numeric_limits<unsigned int>::max();
 
 	void DoInternalInitialization();
 	bool GenerateGlyphs();

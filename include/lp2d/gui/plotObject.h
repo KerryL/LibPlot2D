@@ -151,8 +151,12 @@ private:
 
 	// The minimums and maximums for the axis
 	double xMin, xMax, yLeftMin, yLeftMax, yRightMin, yRightMax;
-	double xMinOriginal, xMaxOriginal, yLeftMinOriginal, yLeftMaxOriginal,
-		yRightMinOriginal, yRightMaxOriginal;
+	double xMinOriginal = 0.0;
+	double xMaxOriginal = 0.0;
+	double yLeftMinOriginal = 0.0;
+	double yLeftMaxOriginal = 0.0;
+	double yRightMinOriginal = 0.0;
+	double yRightMaxOriginal = 0.0;
 
 	bool autoScaleX;
 	bool autoScaleLeftY;

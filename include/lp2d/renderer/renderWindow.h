@@ -54,22 +54,30 @@ public:
 	void AutoSetFrustum();
 
 	// Adds actors to the primitives list
-	inline void AddActor(std::unique_ptr<Primitive> toAdd) { primitiveList.Add(std::move(toAdd)); modified = true; }
+	inline void AddActor(std::unique_ptr<Primitive> toAdd)
+	{ primitiveList.Add(std::move(toAdd)); modified = true; }
 
 	// Removes actors from the primitives list
 	bool RemoveActor(Primitive *toRemove);
 
 	// Private data accessors
-	inline void SetWireFrame(const bool& wireFrame) { this->wireFrame = wireFrame; modified = true; }
+	inline void SetWireFrame(const bool& wireFrame)
+	{ this->wireFrame = wireFrame; modified = true; }
 	void SetViewOrthogonal(const bool& viewOrthogonal);
 
-	inline void SetTopMinusBottom(const double& topMinusBottom) { this->topMinusBottom = topMinusBottom; modified = true; }
-	inline void SetAspectRatio(const double& aspectRatio) { this->aspectRatio = aspectRatio; modified = true; }
-	inline void SetNearClip(const double& nearClip) { this->nearClip = nearClip; modified = true; }
-	inline void SetFarClip(const double& farClip) { this->farClip = farClip; modified = true; }
-	inline void SetView3D(const bool& view3D) { this->view3D = view3D; modified = true; }
+	inline void SetTopMinusBottom(const double& topMinusBottom)
+	{ this->topMinusBottom = topMinusBottom; modified = true; }
+	inline void SetAspectRatio(const double& aspectRatio)
+	{ this->aspectRatio = aspectRatio; modified = true; }
+	inline void SetNearClip(const double& nearClip)
+	{ this->nearClip = nearClip; modified = true; }
+	inline void SetFarClip(const double& farClip)
+	{ this->farClip = farClip; modified = true; }
+	inline void SetView3D(const bool& view3D)
+	{ this->view3D = view3D; modified = true; }
 
-	virtual void SetBackgroundColor(const Color& backgroundColor) { this->backgroundColor = backgroundColor; modified = true; }
+	virtual void SetBackgroundColor(const Color& backgroundColor)
+	{ this->backgroundColor = backgroundColor; modified = true; }
 	inline Color GetBackgroundColor() { return backgroundColor; }
 
 	inline bool GetWireFrame() const { return wireFrame; }
@@ -104,9 +112,12 @@ public:
 
 	virtual unsigned int GetVertexDimension() const { return 4; }
 
-	static void Translate(Matrix& m, const double& x, const double& y, const double& z);
-	static void Rotate(Matrix& m, const double& angle, const double& x, const double& y, const double& z);
-	static void Scale(Matrix& m, const double& x, const double& y, const double& z);
+	static void Translate(Matrix& m, const double& x, const double& y,
+		const double& z);
+	static void Rotate(Matrix& m, const double& angle, const double& x,
+		const double& y, const double& z);
+	static void Scale(Matrix& m, const double& x, const double& y,
+		const double& z);
 
 	struct ShaderInfo
 	{
@@ -129,14 +140,14 @@ private:
 	static const double exactPixelShift;
 
 	// Flags describing the options for this object's functionality
-	bool wireFrame;
-	bool viewOrthogonal;
+	bool wireFrame = false;
+	bool viewOrthogonal = false;
 
 	// The parameters that describe the viewing frustum
-	double topMinusBottom;// in model-space units
+	double topMinusBottom = 100.0;// in model-space units
 	double aspectRatio;
-	double nearClip;
-	double farClip;
+	double nearClip = 1.0;
+	double farClip = 500.0;
 
 	Color backgroundColor;
 
@@ -145,8 +156,8 @@ private:
 	static bool OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
 		const std::unique_ptr<Primitive>& p2);
 
-	bool needAlphaSort;
-	bool needOrderSort;
+	bool needAlphaSort = true;
+	bool needOrderSort = true;
 
 	// Event handlers-----------------------------------------------------
 	// Interactor events
@@ -203,12 +214,12 @@ private:
 
 	void DoResize();
 
-	bool glewInitialized;
+	bool glewInitialized = false;
 
 protected:
-	bool view3D;
-	bool modified;
-	bool sizeUpdateRequired;
+	bool view3D = true;
+	bool modified = true;
+	bool sizeUpdateRequired = true;
 
 	ManagedList<Primitive> primitiveList;
 
@@ -219,7 +230,7 @@ protected:
 	bool Determine3DInteraction(const wxMouseEvent &event, InteractionType &interaction) const;
 
 	// Flag indicating whether or not we should select a new focal point for the interactions
-	bool isInteracting;
+	bool isInteracting = false;
 
 	static void ConvertMatrixToGL(const Matrix& matrix, float gl[]);
 	static void ConvertGLToMatrix(Matrix& matrix, const float gl[]);
@@ -230,7 +241,7 @@ protected:
 	Matrix Generate2DProjectionMatrix() const;
 	Matrix Generate3DProjectionMatrix() const;
 
-	bool modelviewModified;
+	bool modelviewModified = true;
 	Matrix modelviewMatrix;
 	Matrix projectionMatrix;
 

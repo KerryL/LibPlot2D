@@ -147,33 +147,14 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes
     const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
 	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
 {
-	context = nullptr;
-	glewInitialized = false;
-
-	wireFrame = false;
-	view3D = true;
-	viewOrthogonal = false;
-
-	// Make some assumptions to compute the horizontal viewing range
-	topMinusBottom = 100.0;
-	nearClip = 1.0;
-	farClip = 500.0;
-
 	AutoSetFrustum();
 
 	modelviewMatrix.Resize(4, 4);
 	projectionMatrix.Resize(4, 4);
 
 	SetCameraView(Vector(1.0, 0.0, 0.0), Vector(0.0, 0.0, 0.0), Vector(0.0, 0.0, 1.0));
-	isInteracting = false;
 
 	SetBackgroundStyle(wxBG_STYLE_CUSTOM);// To avoid flashing under MSW
-
-	modified = true;
-	sizeUpdateRequired = true;
-	modelviewModified = true;
-	needAlphaSort = true;
-	needOrderSort = true;
 }
 
 //=============================================================================

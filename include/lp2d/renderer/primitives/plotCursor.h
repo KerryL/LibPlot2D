@@ -53,7 +53,7 @@ private:
 	Line line;
 
 	// Current value where this object meets the axis
-	double value;
+	double value = -1.0;
 	int locationAlongAxis;
 };
 

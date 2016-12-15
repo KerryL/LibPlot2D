@@ -157,11 +157,14 @@ bool PlotCursor::HasValidParameters()
 //		None
 //
 // Return Value:
-//		True is the cursor is under the specified point, false otherwise
+//		true is the cursor is under the specified point, false otherwise
 //
 //=============================================================================
 bool PlotCursor::IsUnder(const unsigned int &pixel)
 {
+	if (!isVisible)
+		return false;
+
 	// Apparent line width for clicking
 	int width = 2;// [pixels]
 
