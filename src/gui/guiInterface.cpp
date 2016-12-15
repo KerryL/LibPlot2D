@@ -454,10 +454,9 @@ void GuiInterface::RemoveCurves(wxArrayInt curves)
 		return 0;
 	});
 
-	unsigned int i;
-	for (i = 0; i < curves.Count(); ++i)
+	for (const auto& curve : curves)
 		// minus 1 because we remove based on curve index, not row index
-		RemoveCurve(curves[i] - 1);
+		RemoveCurve(curve - 1);
 
 	renderer->UpdateDisplay();
 }
@@ -980,12 +979,11 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 	// If applied to any other row, apply only to that row (by duplicating curve)
 	else
 	{
-		unsigned int i;
-		for (i = 0; i < selectedRows.Count(); ++i)
+		for (const auto& row : selectedRows)
 		{
-			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
+			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[row - 1]));
 			scaledData->MultiplyXData(factor);
-			AddCurve(std::move(scaledData), grid->GetCellValue(selectedRows[i], PlotListGrid::ColName)
+			AddCurve(std::move(scaledData), grid->GetCellValue(row, PlotListGrid::ColName)
 				+ wxString::Format(", X-scaled by %f", factor));
 		}
 	}
@@ -1011,13 +1009,12 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the derivative of dataset and add it to the plot
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
-			DiscreteDerivative::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
+			DiscreteDerivative::ComputeTimeHistory(*plotList[row - 1])));
 
-		wxString name(_T("d/dt(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		wxString name(_T("d/dt(") + grid->GetCellValue(row, PlotListGrid::ColName) + _T(")"));
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1042,13 +1039,12 @@ void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the integral of dataset and add it to the plot
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
-			DiscreteIntegral::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
+			DiscreteIntegral::ComputeTimeHistory(*plotList[row - 1])));
 
-		wxString name(_T("integral(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		wxString name(_T("integral(") + grid->GetCellValue(row, PlotListGrid::ColName) + _T(")"));
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1073,13 +1069,12 @@ void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 {
 	// Create new dataset containing the RMS of dataset and add it to the plot
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
-			RootMeanSquare::ComputeTimeHistory(*plotList[selectedRows[i] - 1])));
+			RootMeanSquare::ComputeTimeHistory(*plotList[row - 1])));
 
-		wxString name(_T("RMS(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		wxString name(_T("RMS(") + grid->GetCellValue(row, PlotListGrid::ColName) + _T(")"));
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1103,15 +1098,13 @@ void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 //=============================================================================
 void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 {
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
-		std::unique_ptr<Dataset2D> newData(
-			GetFFTData(plotList[selectedRows[i] - 1]));
+		std::unique_ptr<Dataset2D> newData(GetFFTData(plotList[row - 1]));
 		if (!newData)
 			continue;
 
-		wxString name(_T("FFT(") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")"));
+		wxString name(_T("FFT(") + grid->GetCellValue(row, PlotListGrid::ColName) + _T(")"));
 		AddCurve(std::move(newData), name);
 		SetMarkerSize(grid->GetNumberRows() - 2, 0);
 	}
@@ -1136,22 +1129,24 @@ void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 {
 	unsigned long bit;
-	wxString bitString = wxGetTextFromUser(_T("Specify the bit to plot:"), _T("Bit Seleciton"), _T("0"), owner);
+	wxString bitString = wxGetTextFromUser(_T("Specify the bit to plot:"),
+		_T("Bit Seleciton"), _T("0"), owner);
 	if (bitString.IsEmpty())
 		return;
 	else if (!bitString.ToULong(&bit))
 	{
-		wxMessageBox(_T("Bit value must be a positive integer."), _T("Bit Selection Error"), wxICON_ERROR, owner);
+		wxMessageBox(_T("Bit value must be a positive integer."),
+			_T("Bit Selection Error"), wxICON_ERROR, owner);
 		return;
 	}
 
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
-			PlotMath::ApplyBitMask(*plotList[selectedRows[i] - 1], bit)));
+			PlotMath::ApplyBitMask(*plotList[row - 1], bit)));
 
-		wxString name(grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(", Bit ") + wxString::Format("%lu", bit));
+		wxString name(grid->GetCellValue(row, PlotListGrid::ColName)
+			+ _T(", Bit ") + wxString::Format("%lu", bit));
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1185,14 +1180,14 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 		return;
 
 	// Create new dataset containing the RMS of dataset and add it to the plot
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
-		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
-
+		std::unique_ptr<Dataset2D> newData(
+			std::make_unique<Dataset2D>(*plotList[row - 1]));
 		newData->XShift(shift);
 
-		wxString name(grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(", t = t0 + "));
+		wxString name(grid->GetCellValue(row, PlotListGrid::ColName)
+			+ _T(", t = t0 + "));
 		name += shiftText;
 		AddCurve(std::move(newData), name);
 	}
@@ -1222,15 +1217,14 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 		return;
 
 	// Create new dataset containing the FFT of dataset and add it to the plot
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
-		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*plotList[selectedRows[i] - 1]));
+		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*plotList[row - 1]));
 
 		ApplyFilter(filterParameters, newData);
 
 		wxString name = FilterDialog::GetFilterNamePrefix(filterParameters)
-			+ _T(" (") + grid->GetCellValue(selectedRows[i], PlotListGrid::ColName) + _T(")");
+			+ _T(" (") + grid->GetCellValue(row, PlotListGrid::ColName) + _T(")");
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1270,12 +1264,11 @@ void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 		return;
 	}
 
-	unsigned int i;
-	for (i = 0; i < selectedRows.Count(); ++i)
+	for (const auto& row : selectedRows)
 	{
 		wxString name;
 		std::unique_ptr<Dataset2D> newData(GetCurveFitData(
-			order, plotList[selectedRows[i] - 1], name, selectedRows[i]));
+			order, plotList[row - 1], name, row));
 
 		AddCurve(std::move(newData), name);
 	}
@@ -1915,10 +1908,9 @@ wxString GuiInterface::ExtractUnitFromDescription(const wxString &description)
 	delimiters.Add(_T(":"));
 
 	int location;
-	unsigned int i;
-	for (i = 0; i < delimiters.size(); ++i)
+	for (const auto& delimiter : delimiters)
 	{
-		location = description.Find(delimiters[i].mb_str());
+		location = description.Find(delimiter.mb_str());
 		if (location != wxNOT_FOUND && location < (int)description.Len() - 1)
 		{
 			unit = description.Mid(location + 1);

@@ -1940,13 +1940,14 @@ wxString ExpressionTree::StringSubtract(const double &first, const wxString &sec
 //		wxString
 //
 //=============================================================================
-wxString ExpressionTree::StringMultiply(const wxString &first, const double &second) const
+wxString ExpressionTree::StringMultiply(const wxString &first,
+	const double &second) const
 {
-	std::vector<std::pair<int, double> > terms(FindPowersAndCoefficients(BreakApartTerms(first)));
-	unsigned int i;
+	std::vector<std::pair<int, double> > terms(FindPowersAndCoefficients(
+		BreakApartTerms(first)));
 	wxString expression;
-	for (i = 0; i < terms.size(); ++i)
-		AddToExpressionString(expression, terms[i].second * second, terms[i].first);
+	for (const auto& term : terms)
+		AddToExpressionString(expression, term.second * second, term.first);
 
 	return expression;
 }
@@ -1968,21 +1969,25 @@ wxString ExpressionTree::StringMultiply(const wxString &first, const double &sec
 //		wxString
 //
 //=============================================================================
-wxString ExpressionTree::StringMultiply(const wxString &first, const wxString &second) const
+wxString ExpressionTree::StringMultiply(const wxString &first,
+	const wxString &second) const
 {
-	std::vector<std::pair<int, double> > firstTerms(FindPowersAndCoefficients(BreakApartTerms(first)));
-	std::vector<std::pair<int, double> > secondTerms(FindPowersAndCoefficients(BreakApartTerms(second)));
+	std::vector<std::pair<int, double> > firstTerms(
+		FindPowersAndCoefficients(BreakApartTerms(first)));
+	std::vector<std::pair<int, double> > secondTerms(
+		FindPowersAndCoefficients(BreakApartTerms(second)));
 	std::vector<std::pair<int, double> > terms;
-	unsigned int i, j;
-	for (i = 0; i < firstTerms.size(); ++i)
+	for (const auto& firstTerm : firstTerms)
 	{
-		for (j = 0; j < secondTerms.size(); ++j)
-			terms.push_back(std::pair<int, double>(firstTerms[i].first + secondTerms[j].first, firstTerms[i].second * secondTerms[j].second));
+		for (const auto& secondTerm : secondTerms)
+			terms.push_back(std::pair<int, double>(
+				firstTerm.first + secondTerm.first,
+				firstTerm.second * secondTerm.second));
 	}
 
 	wxString expression;
-	for (i = 0; i < terms.size(); ++i)
-		AddToExpressionString(expression, terms[i].second, terms[i].first);
+	for (const auto& term : terms)
+		AddToExpressionString(expression, term.second, term.first);
 
 	return expression;
 }
@@ -2169,10 +2174,10 @@ unsigned int ExpressionTree::FindEndOfNextTerm(const wxString &s, const unsigned
 std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(const wxArrayString &terms)
 {
 	std::vector<std::pair<int, double> > processedTerms;
-	unsigned int i, start, end;
+	unsigned int start, end;
 	int count;
 	double temp, coefficient;
-	for (i = 0; i < terms.Count(); ++i)
+	for (const auto& term : terms)
 	{
 		count = 0;
 		start = 0;
@@ -2180,12 +2185,12 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 		coefficient = 1.0;
 		while (end != (unsigned int)wxNOT_FOUND)
 		{
-			end = terms[i].Mid(start).Find('*');
-			if (terms[i].Mid(start, end).ToDouble(&temp))
+			end = term.Mid(start).Find('*');
+			if (term.Mid(start, end).ToDouble(&temp))
 				coefficient = temp;
 			else
 			{
-				if (terms[i][0] == '-' && coefficient == 1.0)
+				if (term[0] == '-' && coefficient == 1.0)
 				{
 					coefficient = -1.0;
 					++start;
@@ -2193,7 +2198,7 @@ std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(c
 						++end;
 				}
 
-				count += GetTermPower(terms[i].Mid(start), start, end);
+				count += GetTermPower(term.Mid(start), start, end);
 			}
 			start += end + 1;
 		}

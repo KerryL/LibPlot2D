@@ -29,9 +29,8 @@ bool ArrayStringCompare::operator()(const wxArrayString &a1, const wxArrayString
 wxString ArrayStringCompare::GenerateSingleString(const wxArrayString &a) const
 {
 	wxString s;
-	unsigned int i;
-	for (i = 0; i < a.Count(); ++i)
-		s += a[i];
+	for (const auto& v : a)
+		s += v;
 
 	return s;
 }

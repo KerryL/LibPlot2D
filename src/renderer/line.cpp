@@ -151,7 +151,8 @@ void Line::Build(const double &x1, const double &y1,
 //		None
 //
 //=============================================================================
-void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &points,
+void Line::Build(
+	const std::vector<std::pair<unsigned int, unsigned int> > &points,
 	const UpdateMethod& update)
 {
 	std::vector<std::pair<double, double> > dPoints(points.size());
@@ -161,6 +162,7 @@ void Line::Build(const std::vector<std::pair<unsigned int, unsigned int> > &poin
 		dPoints[i].first = static_cast<double>(points[i].first);
 		dPoints[i].second = static_cast<double>(points[i].second);
 	}
+	
 	Build(dPoints, update);
 }
 

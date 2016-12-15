@@ -449,33 +449,33 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 {
 	assert(scales.size() == names.size());
 
-	unsigned int i, j;//, location;
+	unsigned int i;//, location
 	for (i = 0; i < names.size(); ++i)
 	{
-		for (j = 0; j < channels.size(); ++j)
+		for (const auto& channel : channels)
 		{
-			if (channels[j].code.IsEmpty())
+			if (channel.code.IsEmpty())
 			{
-				if (i == (unsigned int)channels[j].column)
+				if (i == (unsigned int)channel.column)
 				{
-					names[i] = channels[j].name;
-					if (!channels[j].units.IsEmpty())
-						names[i].Append(_T(", [") + channels[j].units + _T("]"));
-					scales[i] = channels[j].scale;
+					names[i] = channel.name;
+					if (!channel.units.IsEmpty())
+						names[i].Append(_T(", [") + channel.units + _T("]"));
+					scales[i] = channel.scale;
 				}
 			}
-			else if (names[i].Contains(channels[j].code))
+			else if (names[i].Contains(channel.code))
 			{
-				/*location = names[i].Find(channels[j].code);
-				names[i] = names[i].Mid(0, location) + _T(", ") + channels[j].name;*/
-				if (channels[j].discardCode)
+				/*location = names[i].Find(channel.code);
+				names[i] = names[i].Mid(0, location) + _T(", ") + channel.name;*/
+				if (channel.discardCode)
 					names[i].Empty();
 				else
 					names[i].Append(_T(", "));
-				names[i].Append(channels[j].name);
-				if (!channels[j].units.IsEmpty())
-					names[i].Append(_T(", [") + channels[j].units + _T("]"));
-				scales[i] = channels[j].scale;
+				names[i].Append(channel.name);
+				if (!channel.units.IsEmpty())
+					names[i].Append(_T(", [") + channel.units + _T("]"));
+				scales[i] = channel.scale;
 			}
 		}
 	}

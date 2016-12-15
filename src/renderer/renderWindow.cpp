@@ -281,9 +281,8 @@ void RenderWindow::Render()
 
 	// NOTE:  Any primitive that uses it's own program should re-load the default program
 	// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
-	unsigned int i;
-	for (i = 0; i < primitiveList.GetCount(); ++i)
-		primitiveList[i]->Draw();
+	for (auto& p : primitiveList)
+		p->Draw();
 
 	glFlush();
 	SwapBuffers();
@@ -1116,10 +1115,9 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 {
 	// Iterate through the list of primitives in the scene
 	// If one of them has the same address as our argument, return true
-	unsigned int i;
-	for (i = 0; i < primitiveList.GetCount(); ++i)
+	for (const auto& p : primitiveList)
 	{
-		if (primitiveList[i].get() == pickedObject)
+		if (p.get() == pickedObject)
 			return true;
 	}
 
@@ -1586,9 +1584,8 @@ GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderC
 GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 {
 	GLuint program = glCreateProgram();
-	size_t i;
-	for (i = 0; i < shaderList.size(); ++i)
-		glAttachShader(program, shaderList[i]);
+	for (const auto& shader : shaderList)
+		glAttachShader(program, shader);
 
 	glLinkProgram(program);
 	GLint status;
@@ -1604,10 +1601,10 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 		assert(false);
 	}
 
-	for (i = 0; i < shaderList.size(); ++i)
+	for (const auto& shader : shaderList)
 	{
-		glDetachShader(program, shaderList[i]);
-		glDeleteShader(shaderList[i]);
+		glDetachShader(program, shader);
+		glDeleteShader(shader);
 	}
 
 	return program;

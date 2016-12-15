@@ -48,16 +48,15 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message, const wxString& caption,
-		const wxArrayString& choices, long style, const wxPoint& pos,
-		wxArrayInt *defaultChoices, bool *removeExisting)
-		: wxDialog(parent, wxID_ANY, caption, pos, wxDefaultSize, style)
+MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message,
+	const wxString& caption, const wxArrayString& choices, long style,
+	const wxPoint& pos, wxArrayInt *defaultChoices, bool *removeExisting)
+	: wxDialog(parent, wxID_ANY, caption, pos, wxDefaultSize, style)
 {
 	descriptions = choices;
 	shown.resize(choices.Count());
-	unsigned int i;
-	for (i = 0; i < choices.Count(); ++i)
-		shown[i] = true;
+	for (auto&& s : shown)
+		s = true;
 	CreateControls(message, choices);
 	ApplyDefaults(defaultChoices, removeExisting);
 }
@@ -413,8 +412,8 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 			shown[i] = true;
 		}
 
-		for (i = 0; i < defaultChoices->Count(); ++i)
-			choiceListBox->Check((*defaultChoices)[i], true);
+		for (const auto& choice : *defaultChoices)
+			choiceListBox->Check(choice, true);
 	}
 
 	if (removeExisting)
@@ -440,10 +439,9 @@ void MultiChoiceDialog::ApplyDefaults(wxArrayInt *defaultChoices, bool *removeEx
 //=============================================================================
 bool MultiChoiceDialog::IsSelected(const int &i) const
 {
-	unsigned int j;
-	for (j = 0; j < selections.GetCount(); ++j)
+	for (const auto& selection : selections)
 	{
-		if (selections[j] == i)
+		if (selection == i)
 			return true;
 	}
 

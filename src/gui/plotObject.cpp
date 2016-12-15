@@ -1968,11 +1968,10 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 //=============================================================================
 void PlotObject::FormatCurves()
 {
-	unsigned int i;
-	for (i = 0; i < (unsigned int)plotList.size(); ++i)
+	for (auto& plot : plotList)
 	{
-		plotList[i]->SetModified();
-		plotList[i]->SetPretty(pretty);
+		plot->SetModified();
+		plot->SetPretty(pretty);
 	}
 }
 
@@ -2079,9 +2078,8 @@ wxString PlotObject::GetTitle() const
 unsigned long long PlotObject::GetTotalPointCount() const
 {
 	unsigned long long count(0);
-	unsigned int i;
-	for (i = 0; i < dataList.size(); ++i)
-		count += dataList[i]->GetNumberOfPoints();
+	for (const auto& data : dataList)
+		count += data->GetNumberOfPoints();
 
 	return count;
 }

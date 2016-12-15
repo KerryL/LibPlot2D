@@ -192,12 +192,12 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 //=============================================================================
 void Filter::Initialize(const double &initialValue)
 {
-	unsigned int i;
-	for (i = 0; i < u.size(); ++i)
-		u[i] = initialValue;
+	for (auto& v : u)
+		v = initialValue;
 
-	for (i = 0; i < y.size(); ++i)
-		y[i] = initialValue * ComputeSteadyStateGain();
+	double ssGain(ComputeSteadyStateGain());
+	for (auto& v : y)
+		v = initialValue * ssGain;
 }
 
 //=============================================================================
@@ -490,11 +490,10 @@ double Filter::ComputeSteadyStateGain() const
 {
 	double numeratorSum(0.0);
 	double denominatorSum(1.0);
-	unsigned int i;
-	for (i = 0; i < a.size(); ++i)
-		numeratorSum += a[i];
-	for (i = 0; i < b.size(); ++i)
-		denominatorSum += b[i];
+	for (const auto& v : a)
+		numeratorSum += v;
+	for (const auto& v : b)
+		denominatorSum += v;
 
 	return numeratorSum / denominatorSum;
 }

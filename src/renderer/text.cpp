@@ -486,10 +486,9 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 	b.yUp = 0;
 	b.yDown = 0;
 
-	std::string::const_iterator c;
-	for (c = s.begin(); c != s.end(); ++c)
+	for (const auto& c : s)
 	{
-		Glyph g = glyphs.find(*c)->second;
+		Glyph g = glyphs.find(c)->second;
 
 		//b.xLeft += 0;
 		b.xRight += g.advance >> 6;
@@ -624,16 +623,15 @@ Primitive::BufferInfo Text::AssembleBuffers()
 {
 	Primitive::BufferInfo bufferInfo;
 
-	unsigned int i;
-	for (i = 0; i < bufferVector.size(); ++i)
+	for (const auto& buffer : bufferVector)
 	{
 		bufferInfo.indexBuffer.insert(bufferInfo.indexBuffer.end(),
-			bufferVector[i].indexBuffer.begin(),
-			bufferVector[i].indexBuffer.end());
+			buffer.indexBuffer.begin(),
+			buffer.indexBuffer.end());
 		bufferInfo.vertexBuffer.insert(bufferInfo.vertexBuffer.end(),
-			bufferVector[i].vertexBuffer.begin(),
-			bufferVector[i].vertexBuffer.end());
-		bufferInfo.vertexCount += bufferVector[i].vertexCount;
+			buffer.vertexBuffer.begin(),
+			buffer.vertexBuffer.end());
+		bufferInfo.vertexCount += buffer.vertexCount;
 	}
 
 	ConfigureVertexArray(bufferInfo);
@@ -674,10 +672,9 @@ Primitive::BufferInfo Text::BuildLocalText()
 	double xStart(x);
 
 	unsigned int i(0), texI(0);
-	std::string::const_iterator c;
-	for (c = text.begin(); c != text.end(); ++c)
+	for (const auto &c : text)
 	{
-		Glyph g = glyphs[*c];
+		Glyph g = glyphs[c];
 
 		GLfloat xpos = xStart + g.xBearing * scale;
 		GLfloat ypos = y - (g.ySize - g.yBearing) * scale;

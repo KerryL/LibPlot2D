@@ -787,10 +787,9 @@ Color PlotListGrid::GetNextColor(const unsigned int &index) const
 //=============================================================================
 bool PlotListGrid::ItemIsInArray(const wxArrayInt& a, const int& item)
 {
-	unsigned int i;
-	for (i = 0; i < a.Count(); ++i)
+	for (const auto& i : a)
 	{
-		if (a[i] == item)
+		if (i == item)
 			return true;
 	}
 

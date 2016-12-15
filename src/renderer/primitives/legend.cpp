@@ -243,16 +243,15 @@ void Legend::UpdateBoundingBox()
 {
 	Text::BoundingBox boundingBox;
 	unsigned int maxStringWidth(0);
-	unsigned int i;
-	for (i = 0; i < entries.size(); ++i)
+	for (const auto& entry : entries)
 	{
-		boundingBox = text.GetBoundingBox(entries[i].text.ToStdString());
+		boundingBox = text.GetBoundingBox(entry.text.ToStdString());
 		if (boundingBox.xRight > (int)maxStringWidth)
 			maxStringWidth = boundingBox.xRight;
 	}
 	
 	width = 3 * entrySpacing + sampleLength + maxStringWidth;
-	height = (textHeight + entrySpacing) * i + entrySpacing;
+	height = (textHeight + entrySpacing) * entries.size() + entrySpacing;
 }
 
 //=============================================================================
@@ -877,10 +876,9 @@ void Legend::BuildMarkers()
 	x += entrySpacing + 0.5 * sampleLength;
 	y += height + lineYOffset;
 
-	unsigned int i;
-	for (i = 0; i < entries.size(); ++i)
+	for (const auto& entry : entries)
 	{
-		halfSize = entries[i].markerSize * 2.0;// This relationship comes from PlotCurve class
+		halfSize = entry.markerSize * 2.0;// This relationship comes from PlotCurve class
 		y -= entrySpacing + textHeight;
 
 		if (halfSize <= 0.0)
@@ -904,25 +902,25 @@ void Legend::BuildMarkers()
 		buffer.vertexBuffer[6] = x + halfSize;
 		buffer.vertexBuffer[7] = y - halfSize;
 
-		buffer.vertexBuffer[8] = entries[i].color.GetRed();
-		buffer.vertexBuffer[9] = entries[i].color.GetGreen();
-		buffer.vertexBuffer[10] = entries[i].color.GetBlue();
-		buffer.vertexBuffer[11] = entries[i].color.GetAlpha();
+		buffer.vertexBuffer[8] = entry.color.GetRed();
+		buffer.vertexBuffer[9] = entry.color.GetGreen();
+		buffer.vertexBuffer[10] = entry.color.GetBlue();
+		buffer.vertexBuffer[11] = entry.color.GetAlpha();
 
-		buffer.vertexBuffer[12] = entries[i].color.GetRed();
-		buffer.vertexBuffer[13] = entries[i].color.GetGreen();
-		buffer.vertexBuffer[14] = entries[i].color.GetBlue();
-		buffer.vertexBuffer[15] = entries[i].color.GetAlpha();
+		buffer.vertexBuffer[12] = entry.color.GetRed();
+		buffer.vertexBuffer[13] = entry.color.GetGreen();
+		buffer.vertexBuffer[14] = entry.color.GetBlue();
+		buffer.vertexBuffer[15] = entry.color.GetAlpha();
 
-		buffer.vertexBuffer[16] = entries[i].color.GetRed();
-		buffer.vertexBuffer[17] = entries[i].color.GetGreen();
-		buffer.vertexBuffer[18] = entries[i].color.GetBlue();
-		buffer.vertexBuffer[19] = entries[i].color.GetAlpha();
+		buffer.vertexBuffer[16] = entry.color.GetRed();
+		buffer.vertexBuffer[17] = entry.color.GetGreen();
+		buffer.vertexBuffer[18] = entry.color.GetBlue();
+		buffer.vertexBuffer[19] = entry.color.GetAlpha();
 
-		buffer.vertexBuffer[20] = entries[i].color.GetRed();
-		buffer.vertexBuffer[21] = entries[i].color.GetGreen();
-		buffer.vertexBuffer[22] = entries[i].color.GetBlue();
-		buffer.vertexBuffer[23] = entries[i].color.GetAlpha();
+		buffer.vertexBuffer[20] = entry.color.GetRed();
+		buffer.vertexBuffer[21] = entry.color.GetGreen();
+		buffer.vertexBuffer[22] = entry.color.GetBlue();
+		buffer.vertexBuffer[23] = entry.color.GetAlpha();
 
 		buffer.indexBuffer[0] = 0;
 		buffer.indexBuffer[1] = 1;
@@ -957,43 +955,40 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 {
 	Primitive::BufferInfo buffer;
 
-	unsigned int i;
-	for (i = 0; i < bufferVector.size(); ++i)
+	for (const auto& b : bufferVector)
 	{
 		buffer.indexBuffer.insert(buffer.indexBuffer.end(),
-			bufferVector[i].indexBuffer.begin(),
-			bufferVector[i].indexBuffer.end());
+			b.indexBuffer.begin(), b.indexBuffer.end());
 		buffer.vertexBuffer.insert(buffer.vertexBuffer.end(),
-			bufferVector[i].vertexBuffer.begin(),
-			bufferVector[i].vertexBuffer.end());
-		buffer.vertexCount += bufferVector[i].vertexCount;
+			b.vertexBuffer.begin(), b.vertexBuffer.end());
+		buffer.vertexCount += b.vertexCount;
 	}
 
 	const unsigned int colorStart(buffer.vertexCount * renderWindow.GetVertexDimension());
 
 	unsigned int j, k(0), m(0), indexShift(0), bufferColorStart;
-	for (i = 0; i < bufferVector.size(); ++i)
+	for (auto& b : bufferVector)
 	{
-		bufferColorStart = bufferVector[i].vertexCount * renderWindow.GetVertexDimension();
+		bufferColorStart = b.vertexCount * renderWindow.GetVertexDimension();
 
-		for (j = 0; j < bufferVector[i].vertexCount; ++j)
+		for (j = 0; j < b.vertexCount; ++j)
 		{
-			buffer.vertexBuffer[k * 2] = bufferVector[i].vertexBuffer[j * 2];
-			buffer.vertexBuffer[k * 2 + 1] = bufferVector[i].vertexBuffer[j * 2 + 1];
+			buffer.vertexBuffer[k * 2] = b.vertexBuffer[j * 2];
+			buffer.vertexBuffer[k * 2 + 1] = b.vertexBuffer[j * 2 + 1];
 
-			buffer.vertexBuffer[colorStart + k * 4] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4];
-			buffer.vertexBuffer[colorStart + k * 4 + 1] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 1];
-			buffer.vertexBuffer[colorStart + k * 4 + 2] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 2];
-			buffer.vertexBuffer[colorStart + k * 4 + 3] = bufferVector[i].vertexBuffer[bufferColorStart + j * 4 + 3];
+			buffer.vertexBuffer[colorStart + k * 4] = b.vertexBuffer[bufferColorStart + j * 4];
+			buffer.vertexBuffer[colorStart + k * 4 + 1] = b.vertexBuffer[bufferColorStart + j * 4 + 1];
+			buffer.vertexBuffer[colorStart + k * 4 + 2] = b.vertexBuffer[bufferColorStart + j * 4 + 2];
+			buffer.vertexBuffer[colorStart + k * 4 + 3] = b.vertexBuffer[bufferColorStart + j * 4 + 3];
 			++k;
 		}
 
-		for (j = 0; j < bufferVector[i].indexBuffer.size(); ++j)
-			buffer.indexBuffer[m++] = bufferVector[i].indexBuffer[j] + indexShift;
+		for (const auto& ib : b.indexBuffer)
+			buffer.indexBuffer[m++] = ib + indexShift;
 
-		indexShift += bufferVector[i].vertexCount;
+		indexShift += b.vertexCount;
 
-		bufferVector[i].FreeOpenGLObjects();
+		b.FreeOpenGLObjects();
 	}
 
 	ConfigureVertexArray(buffer);
@@ -1028,12 +1023,11 @@ void Legend::BuildSampleLines()
 
 	y += height + lineYOffset;
 
-	unsigned int i;
-	for (i = 0; i < entries.size(); ++i)
+	for (const auto& entry : entries)
 	{
-		lines.SetLineColor(entries[i].color);
+		lines.SetLineColor(entry.color);
 		lines.SetBackgroundColorForAlphaFade();
-		lines.SetWidth(entries[i].lineSize);
+		lines.SetWidth(entry.lineSize);
 
 		y -= entrySpacing + textHeight;
 
@@ -1106,12 +1100,11 @@ void Legend::BuildLabelStrings()
 	GetAdjustedPosition(x, y);
 	y += height;
 	
-	unsigned int i;
-	for (i = 0; i < entries.size(); ++i)
+	for (const auto& entry : entries)
 	{
 		y -= entrySpacing + textHeight;
 		text.SetPosition(x + 2 * entrySpacing + sampleLength, y);
-		text.AppendText(entries[i].text.ToStdString());
+		text.AppendText(entry.text.ToStdString());
 	}
 }
 
@@ -1134,9 +1127,8 @@ void Legend::BuildLabelStrings()
 void Legend::RequiresRedraw()
 {
 	modified = true;
-	unsigned int i;
-	for (i = 0; i < bufferInfo.size(); ++i)
-		bufferInfo[i].vertexCountModified = true;
+	for (auto& buffer : bufferInfo)
+		buffer.vertexCountModified = true;
 }
 
 }// namespace LibPlot2D

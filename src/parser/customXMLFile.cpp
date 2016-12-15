@@ -391,12 +391,11 @@ wxArrayString CustomXMLFile::SeparateNodes(const wxString &nodePath) const
 bool CustomXMLFile::DataStringToVector(const wxString &data,
 	std::vector<double> &dataVector, const double &factor, wxString& errorString) const
 {
-	unsigned int i;
 	double value;
 	wxArrayString parsed(ParseLineIntoColumns(data, fileFormat.GetDelimiter()));
-	for (i = 0; i < parsed.Count(); ++i)
+	for (const auto& entry : parsed)
 	{
-		if (!parsed[i].ToDouble(&value))
+		if (!entry.ToDouble(&value))
 		{
 			errorString = _T("Error processing XML Data");
 			return false;

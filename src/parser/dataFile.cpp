@@ -144,9 +144,8 @@ void DataFile::GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *par
 wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 {
 	wxArrayInt trueIndices;
-	unsigned int i;
-	for (i = 0; i < selections.size(); ++i)
-		trueIndices.Add(AdjustForSkippedColumns(selections[i]));
+	for (const auto& selection : selections)
+		trueIndices.Add(AdjustForSkippedColumns(selection));
 
 	assert(selections.size() == trueIndices.size());
 	return trueIndices;
@@ -172,10 +171,10 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 //=============================================================================
 unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
 {
-	unsigned int j, adjustment(0);
-	for (j = 0; j < nonNumericColumns.size(); ++j)
+	unsigned int adjustment(0);
+	for (const auto& col : nonNumericColumns)
 	{
-		if (nonNumericColumns[j] - 1 <= (int)i)
+		if (col - 1 <= (int)i)
 			++adjustment;
 		else
 			break;
@@ -249,7 +248,7 @@ wxString DataFile::DetermineBestDelimiter() const
 {
 	std::string nextLine;
 	wxArrayString delimitedLine, delimiterList(CreateDelimiterList());
-	unsigned int i, columnCount(0);
+	unsigned int columnCount(0);
 
 	if (delimiterList.size() == 1)
 		return delimiterList[0];
@@ -263,9 +262,9 @@ wxString DataFile::DetermineBestDelimiter() const
 
 	while (std::getline(file, nextLine))
 	{
-		for (i = 0; i < delimiterList.size(); ++i)// Try all delimiters until we find one that works
+		for (const auto& delimiter : delimiterList)// Try all delimiters until we find one that works
 		{
-			delimitedLine = ParseLineIntoColumns(nextLine, delimiterList[i]);
+			delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
 			if (delimitedLine.size() > 1)
 			{
 				// TODO:  This check could be more robust (what if header rows contain numberic label?)
@@ -273,7 +272,7 @@ wxString DataFile::DetermineBestDelimiter() const
 					&& columnCount == delimitedLine.size())// Number of number columns == number of text columns
 				{
 					file.close();
-					return delimiterList[i];
+					return delimiter;
 				}
 				else
 					columnCount = delimitedLine.size();
@@ -455,26 +454,26 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 	const wxArrayString &currentLine, wxArrayInt &nonNumericColumns) const
 {
-	unsigned int i;
 	int line;
-	wxArrayString delimitedPreviousLine, names;
+	wxArrayString names;
 	double value;
 	for (line = previousLines.size() - 1; line >= 0; --line)
 	{
-		delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
+		wxArrayString delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
 		if (delimitedPreviousLine.size() != currentLine.size())
 			break;
 
 		bool prependText(true);
-		for (i = 0; i < delimitedPreviousLine.size(); ++i)
+		for (const auto& entry : delimitedPreviousLine)
 		{
-			prependText = !delimitedPreviousLine[i].ToDouble(&value);
+			prependText = !entry.ToDouble(&value);
 			if (!prependText)
 				break;
 		}
 
 		if (prependText)
 		{
+			unsigned int i;
 			for (i = 0; i < delimitedPreviousLine.size(); ++i)
 			{
 				if (!currentLine[i].ToDouble(&value))
@@ -673,10 +672,9 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 //=============================================================================
 bool DataFile::ArrayContainsValue(const int &value, const wxArrayInt &a) const
 {
-	unsigned int i;
-	for (i = 0; i < a.size(); ++i)
+	for (const auto& entry : a)
 	{
-		if (a[i] == value)
+		if (entry == value)
 			return true;
 	}
 

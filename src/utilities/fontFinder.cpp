@@ -63,14 +63,13 @@ wxString FontFinder::GetFontFileName(const wxString &fontName)
 	wxArrayString fontFiles;
 	wxDir::GetAllFiles(fontDirectory, &fontFiles, _T("*.ttf"), wxDIR_FILES | wxDIR_DIRS);
 
-	unsigned int i;
 	wxString nameFromFile;
-	for (i = 0; i < fontFiles.GetCount(); ++i)
+	for (const auto& fontFile : fontFiles)
 	{
-		if (GetFontName(fontFiles[i], nameFromFile))
+		if (GetFontName(fontFile, nameFromFile))
 		{
 			if (fontName.CmpNoCase(nameFromFile) == 0)
-				return fontFiles[i];
+				return fontFile;
 		}
 	}
 
@@ -103,16 +102,15 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 	wxArrayString fontList = wxFontEnumerator::GetFacenames(encoding, fixedWidth);
 
 	// See if any of the installed fonts matches our list of preferred fonts
-	unsigned int i, j;
-	for (i = 0; i < preferredFonts.GetCount(); ++i)
+	for (const auto& preferredFont : preferredFonts)
 	{
-		for (j = 0; j < fontList.GetCount(); ++j)
+		for (const auto& font : fontList)
 		{
 			// If the system font matches
-			if (preferredFonts[i].CmpNoCase(fontList[j]) == 0)
+			if (preferredFont.CmpNoCase(font) == 0)
 			{
 				// See if we can find the file for this font
-				fontFile = GetFontFileName(fontList[j]);
+				fontFile = GetFontFileName(font);
 				if (!fontFile.IsEmpty())
 					return true;
 			}
@@ -120,9 +118,9 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 	}
 
 	// We didn't find our preferred fonts, now let's just go down the list until we find ANY font file
-	for (i = 0; i < fontList.GetCount(); ++i)
+	for (const auto& font : fontList)
 	{
-		fontFile = GetFontFileName(fontList[i]);
+		fontFile = GetFontFileName(font);
 		if (!fontFile.IsEmpty())
 			return true;
 	}
@@ -158,14 +156,13 @@ bool FontFinder::GetFontFaceName(wxFontEncoding encoding, const wxArrayString &p
 
 	// See if any of them are in our preferred fonts list
 	// Assume list is organized with most desired fonts first
-	unsigned int i, j;
-	for (i = 0; i < preferredFonts.GetCount(); ++i)
+	for (const auto& preferredFont : preferredFonts)
 	{
-		for (j = 0; j < fontList.GetCount(); ++j)
+		for (const auto& font : fontList)
 		{
-			if (preferredFonts[i].CmpNoCase(fontList[j]) == 0)
+			if (preferredFont.CmpNoCase(font) == 0)
 			{
-				fontName = fontList[j];
+				fontName = font;
 				return true;
 			}
 		}
