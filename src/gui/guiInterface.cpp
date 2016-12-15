@@ -96,7 +96,13 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 	bool atLeastOneFileLoaded(false);
 	for (i = 0; i < fileList.Count(); ++i)
 	{
-		files[i] = GetDataFile(fileList[i]);
+		files[i] = fileTypeManager.GetDataFile(fileList[i]);
+		if (!files[i])
+		{
+			// TODO:  Error message?
+			continue;
+		}
+
 		files[i]->Initialize();
 		it = selectionInfoMap.find(files[i]->GetAllDescriptions());
 		if (it == selectionInfoMap.end())
@@ -583,36 +589,27 @@ void GuiInterface::UpdateSingleCursorValue(const unsigned int &row,
 
 //=============================================================================
 // Class:			GuiInterface
-// Function:		GetDataFile
+// Function:		ExportData
 //
-// Description:		Determines the correct DataFile object to use for the
-//					specified file, and returns a pointer to an instance of that
-//					object.
+// Description:		Exports the data to file.
 //
 // Input Arguments:
-//		fileName	= const wxString&
+//		None
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		std::unique_ptr<DataFile>
+//		None
 //
 //=============================================================================
-std::unique_ptr<DataFile> GuiInterface::GetDataFile(const wxString &fileName)
+void GuiInterface::RegisterAllBuiltInFileTypes()
 {
-	if (BaumullerFile::IsType(fileName))
-		return std::make_unique<BaumullerFile>(fileName);
-	else if (KollmorgenFile::IsType(fileName))
-		return std::make_unique<KollmorgenFile>(fileName);
-	else if (CustomFile::IsType(fileName))
-		return std::make_unique<CustomFile>(fileName);
-	else if (CustomXMLFile::IsType(fileName))
-		return std::make_unique<CustomXMLFile>(fileName);
-
-	// Don't even check - if we can't open it with any other types,
-	// always try to open it with a generic type
-	return std::make_unique<GenericFile>(fileName);
+	RegisterFileType<BaumullerFile>();
+	RegisterFileType<KollmorgenFile>();
+	RegisterFileType<CustomFile>();
+	RegisterFileType<CustomXMLFile>();
+	RegisterFileType<GenericFile>();
 }
 
 //=============================================================================

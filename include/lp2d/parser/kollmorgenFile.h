@@ -42,6 +42,9 @@ protected:
 
 private:
 	double timeStep;// [sec]
+
+	friend std::unique_ptr<DataFile>
+		DataFile::Create<KollmorgenFile>(const wxString&);
 };
 
 }// namespace LibPlot2D

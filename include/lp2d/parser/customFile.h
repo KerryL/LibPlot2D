@@ -29,6 +29,7 @@ public:
 	// Constructor
 	explicit CustomFile(const wxString& fileName) : DataFile(fileName),
 		fileFormat(fileName) {}
+
 	~CustomFile() = default;
 
 	static bool IsType(const wxString &fileName);
@@ -59,6 +60,9 @@ protected:
 		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 		const wxArrayInt &choices, wxString &errorString) const;
 	void AssembleAsynchronousDatasets(const std::vector<std::vector<double>>& rawData);
+
+	friend std::unique_ptr<DataFile>
+		DataFile::Create<CustomFile>(const wxString&);
 };
 
 }// namespace LibPlot2D

@@ -26,9 +26,13 @@ class GenericFile : public DataFile
 public:
 	// Constructor
 	explicit GenericFile(const wxString& fileName) : DataFile(fileName) {}
+
 	~GenericFile() = default;
 
 	static bool IsType(const wxString &fileName);
+
+	friend std::unique_ptr<DataFile>
+		DataFile::Create<GenericFile>(const wxString&);
 };
 
 }// namespace LibPlot2D

@@ -31,6 +31,7 @@ public:
 	// Constructor
 	explicit CustomXMLFile(const wxString& fileName) : DataFile(fileName),
 		fileFormat(fileName) {}
+
 	~CustomXMLFile() = default;
 
 	static bool IsType(const wxString &fileName);
@@ -56,6 +57,9 @@ protected:
 		wxString& errorString) const;
 	bool ExtractYData(wxXmlNode *channel, std::vector<std::vector<double>>& rawData,
 		std::vector<double> &factors, const unsigned int &set, wxString& errorString) const;
+
+	friend std::unique_ptr<DataFile>
+		DataFile::Create<CustomXMLFile>(const wxString&);
 };
 
 }// namespace LibPlot2D

@@ -29,14 +29,32 @@
 namespace LibPlot2D
 {
 
+/// Base class for data input files.  Classes derived from this must define a
+/// method that has type `FileTypeManager::TypeCheckFunction`.  This method
+/// must determine if the class is a good match for the file (i.e. can the
+/// class open the specified file).  Derived classes must also declare
+/// `std::unique_ptr<DataFile>
+/// DataFile::Create<DerivedClassType>(const wxString&)` to be a friend.
+///
+/// Note that in order to use GuiInterface::RegisterFileType(), the name
+///	chosen for the static method described above must be IsType().  Other names
+/// may be used only if types are registered by calling
+/// FileTypeManager::RegisterFileType() directly.
+///
+/// Also note that it is a requirement of base classes (in order for their
+/// types to be registerable with FileTypeManager) that their constructors take
+///	a single `const wxString&` argument.
+///
+/// \see FileTypeManager
+/// \see GuiInterface
 class DataFile
 {
 public:
-	// Constructor
-	explicit DataFile(const wxString& fileName);
-
 	// Destructor
 	virtual ~DataFile() = default;
+
+	template<typename T>
+	static std::unique_ptr<DataFile> Create(const wxString& fileName);
 
 	void Initialize();
 
@@ -59,10 +77,10 @@ public:
 	bool DescriptionsMatch(const DataFile &file) const;
 	bool DescriptionsMatch(const wxArrayString &descriptions) const;
 
-	// Classes derived from this should have this method:
-	//static bool IsType(const wxString& testFile);
-
 protected:
+	// Constructor
+	explicit DataFile(const wxString& fileName);
+
 	const wxString fileName;
 
 	std::vector<std::unique_ptr<Dataset2D>> data;
@@ -108,6 +126,14 @@ protected:
 	wxArrayInt AdjustForSkippedColumns(const wxArrayInt& selections) const;
 	unsigned int AdjustForSkippedColumns(const unsigned int &i) const;
 };
+
+template<typename T>
+std::unique_ptr<DataFile> DataFile::Create(const wxString& fileName)
+{
+	static_assert(std::is_base_of<DataFile, T>::value,
+		"T must be a descendant of DataFile");
+	return std::make_unique<T>(fileName);
+}
 
 }// namespace LibPlot2D
 

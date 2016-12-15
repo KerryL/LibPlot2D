@@ -201,6 +201,9 @@
     <ClInclude Include="..\include\lp2d\libPlot2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\lp2d\parser\fileTypeManager.h">
+      <Filter>Header Files\parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gui\createSignalDialog.cpp">
@@ -340,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="..\src\gitHash.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\parser\fileTypeManager.cpp">
+      <Filter>Source Files\parser</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

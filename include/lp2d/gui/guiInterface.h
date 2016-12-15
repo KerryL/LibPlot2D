@@ -22,9 +22,11 @@
 #include "lp2d/parser/dataFile.h"
 #include "lp2d/renderer/plotRenderer.h"
 #include "lp2d/gui/plotListGrid.h"
+#include "lp2d/parser/fileTypeManager.h"
 
 // Standard C++ headers
 #include <memory>
+#include <type_traits>
 
 // wxWidgets forward declarations
 class wxArrayString;
@@ -68,6 +70,10 @@ public:
 		FormatFrequency,
 		FormatGeneric
 	};
+
+	template<typename T>
+	void RegisterFileType();
+	void RegisterAllBuiltInFileTypes();
 
 	FileFormat GetCurrentFileFormat() const { return currentFileFormat; }
 
@@ -128,7 +134,7 @@ private:
 	DataFile::SelectionData lastSelectionInfo;
 	wxArrayString lastDescriptions;
 
-	std::unique_ptr<DataFile> GetDataFile(const wxString &fileName);
+	FileTypeManager fileTypeManager;
 
 	FileFormat currentFileFormat = FormatGeneric;
 	wxString genericXAxisLabel;
@@ -173,6 +179,15 @@ private:
 		const Color &color, const bool &visible,
 		const bool &rightAxis);
 };
+
+
+template<typename T>
+void GuiInterface::RegisterFileType()
+{
+	static_assert(std::is_base_of<DataFile, T>::value,
+		"T must be a descendant of DataFile");
+	fileTypeManager.RegisterFileType(T::IsType, DataFile::Create<T>);
+}
 
 }// namespace LibPlot2D
 

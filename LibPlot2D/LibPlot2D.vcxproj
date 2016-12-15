@@ -28,6 +28,7 @@
     <ClInclude Include="..\include\lp2d\parser\customFileFormat.h" />
     <ClInclude Include="..\include\lp2d\parser\customXMLFile.h" />
     <ClInclude Include="..\include\lp2d\parser\dataFile.h" />
+    <ClInclude Include="..\include\lp2d\parser\fileTypeManager.h" />
     <ClInclude Include="..\include\lp2d\parser\genericFile.h" />
     <ClInclude Include="..\include\lp2d\parser\kollmorgenFile.h" />
     <ClInclude Include="..\include\lp2d\renderer\color.h" />
@@ -78,6 +79,7 @@
     <ClCompile Include="..\src\parser\customFileFormat.cpp" />
     <ClCompile Include="..\src\parser\customXMLFile.cpp" />
     <ClCompile Include="..\src\parser\dataFile.cpp" />
+    <ClCompile Include="..\src\parser\fileTypeManager.cpp" />
     <ClCompile Include="..\src\parser\genericFile.cpp" />
     <ClCompile Include="..\src\parser\kollmorgenFile.cpp" />
     <ClCompile Include="..\src\renderer\color.cpp" />

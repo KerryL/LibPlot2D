@@ -26,6 +26,7 @@ class BaumullerFile final : public DataFile
 public:
 	// Constructor
 	explicit BaumullerFile(const wxString& fileName) : DataFile(fileName) {}
+
 	~BaumullerFile() = default;
 
 	static bool IsType(const wxString &fileName);
@@ -39,6 +40,9 @@ protected:
 
 	bool ConstructNames(std::string &nextLine, std::ifstream &file,
 		wxArrayString &names, wxArrayString &previousLines) const;
+
+	friend std::unique_ptr<DataFile>
+		DataFile::Create<BaumullerFile>(const wxString&);
 };
 
 }// namespace LibPlot2D
