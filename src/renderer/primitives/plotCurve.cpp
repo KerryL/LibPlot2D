@@ -502,7 +502,7 @@ bool PlotCurve::RangeIsSmall() const
 //=============================================================================
 PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
-	double period(data.GetX()[1] - data.GetX()[0]);
+	double period(fabs(data.GetX()[1] - data.GetX()[0]));
 	if (period == 0.0)
 		return RangeSizeUndetermined;
 
