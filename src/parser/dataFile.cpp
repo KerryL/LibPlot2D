@@ -708,41 +708,15 @@ void DataFile::AssembleDatasets(
 		if (i == 1)
 		{
 			dataset = std::make_unique<Dataset2D>(rawData[0].size());
-			TransferVectorToArray(rawData[0], dataset->GetXPointer());
+			std::copy(rawData[0].begin(), rawData[0].end(), dataset->GetX().begin());
 		}
 		else
 			dataset = std::make_unique<Dataset2D>(*data[0]);
 
-		TransferVectorToArray(rawData[i], dataset->GetYPointer());
+		std::copy(rawData[i].begin(), rawData[i].end(), dataset->GetY().begin());
 		*dataset *= scales[i];
 		data.push_back(std::move(dataset));
 	}
-}
-
-//=============================================================================
-// Class:			DataFile
-// Function:		TransferVectorToArray
-//
-// Description:		Takes data in a std::vector<double> and moves it into a
-//					(previously allocated) double array.
-//
-// Input Arguments:
-//		source		= const std::vector<double>
-//		destination	= double*
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-void DataFile::TransferVectorToArray(const std::vector<double> &source,
-	double *destination) const
-{
-	unsigned int i;
-	for (i = 0; i < source.size(); ++i)
-		destination[i] = source[i];
 }
 
 //=============================================================================

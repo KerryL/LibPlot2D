@@ -182,10 +182,10 @@ void PlotMath::Unwrap(Dataset2D &data)
 	unsigned int i;
 	for (i = 1; i < data.GetNumberOfPoints(); ++i)
 	{
-		if (data.GetYData(i) - data.GetYData(i - 1) > threshold)
-			data.GetYPointer()[i] -= 2 * pi;
-		if (data.GetYData(i) - data.GetYData(i - 1) < -threshold)
-			data.GetYPointer()[i] += 2 * pi;
+		if (data.GetY()[i] - data.GetY()[i - 1] > threshold)
+			data.GetY()[i] -= 2 * pi;
+		if (data.GetY()[i] - data.GetY()[i - 1] < -threshold)
+			data.GetY()[i] += 2 * pi;
 	}
 }
 
@@ -237,7 +237,7 @@ Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data, const unsigned int &bit)
 	Dataset2D set(data);
 	unsigned int i;
 	for (i = 0; i < set.GetNumberOfPoints(); ++i)
-		set.GetYPointer()[i] = ApplyBitMask((unsigned int)set.GetYPointer()[i], bit);
+		set.GetY()[i] = ApplyBitMask((unsigned int)set.GetY()[i], bit);
 	return set;
 }
 
@@ -292,7 +292,7 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 
 	for (i = 2; i < data.GetNumberOfPoints(); ++i)
 	{
-		spacing = data.GetXData(i) - data.GetXData(i - 1);
+		spacing = data.GetX()[i] - data.GetX()[i - 1];
 		if (spacing < minSpacing)
 			minSpacing = spacing;
 		if (spacing > maxSpacing)
@@ -328,7 +328,7 @@ bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tole
 //=============================================================================
 double PlotMath::GetAverageXSpacing(const Dataset2D &data)
 {
-	return data.GetXData(data.GetNumberOfPoints() - 1) / (data.GetNumberOfPoints() - 1.0);
+	return data.GetX().back() / (data.GetNumberOfPoints() - 1.0);
 }
 
 //=============================================================================

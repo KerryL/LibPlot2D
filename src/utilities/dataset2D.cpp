@@ -701,7 +701,7 @@ Dataset2D& Dataset2D::ToPower(const Dataset2D &target)
 
 	unsigned int i;
 	for (i = 0; i < yData.size(); ++i)
-		yData[i] = pow(yData[i], target.GetYData(i));
+		yData[i] = pow(yData[i], target.GetY()[i]);
 	return *this;
 }
 
@@ -1485,17 +1485,17 @@ void Dataset2D::GetOverlappingOnSameTimebase(const Dataset2D &d1,
 	const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out)
 {
 	unsigned int start(0);
-	if (d1.GetXData(start) < d2.GetXData(0))
+	if (d1.GetX()[start] < d2.GetX()[0])
 	{
-		while (d1.GetXData(start) < d2.GetXData(0))
+		while (d1.GetX()[start] < d2.GetX()[0])
 			++start;
 	}
 
 	unsigned int end1(d1.GetNumberOfPoints() - 1);
 	const unsigned int end2(d2.GetNumberOfPoints() - 1);
-	if (d1.GetXData(end1) > d2.GetXData(end2))
+	if (d1.GetX()[end1] > d2.GetX()[end2])
 	{
-		while (d2.GetXData(end2) < d1.GetXData(end1))
+		while (d2.GetX()[end2] < d1.GetX()[end1])
 			--end1;
 	}
 
@@ -1506,11 +1506,11 @@ void Dataset2D::GetOverlappingOnSameTimebase(const Dataset2D &d1,
 	unsigned int i;
 	for (i = 0; i < end1 - start; ++i)
 	{
-		x = d1.GetXData(start + i);
-		d1Out.GetXPointer()[i] = x;
-		d2Out.GetXPointer()[i] = x;
-		d1.GetYAt(x, d1Out.GetYPointer()[i]);
-		d2.GetYAt(x, d2Out.GetYPointer()[i]);
+		x = d1.GetX()[start + i];
+		d1Out.GetX()[i] = x;
+		d2Out.GetX()[i] = x;
+		d1.GetYAt(x, d1Out.GetY()[i]);
+		d2.GetYAt(x, d2Out.GetY()[i]);
 	}
 }
 

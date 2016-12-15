@@ -43,13 +43,13 @@ Dataset2D DiscreteIntegral::ComputeTimeHistory(const Dataset2D &data)
 	if (data.GetNumberOfPoints() < 2)
 		return integral;
 
-	integral.GetYPointer()[0] = 0.0;
+	integral.GetY()[0] = 0.0;
 
 	unsigned int i;
 	for (i = 1; i < data.GetNumberOfPoints(); ++i)
-		integral.GetYPointer()[i] = integral.GetYData(i - 1) +
-			(data.GetXData(i) - data.GetXData(i - 1)) * 0.5
-			* (data.GetYData(i) + data.GetYData(i - 1));
+		integral.GetY()[i] = integral.GetY()[i - 1] +
+			(data.GetX()[i] - data.GetX()[i - 1]) * 0.5
+			* (data.GetY()[i] + data.GetY()[i - 1]);
 
 	return integral;
 }

@@ -152,26 +152,31 @@ void PlotCurve::Update(const unsigned int& i)
 			line.SetXScale(xScale);
 			line.SetYScale(yScale);
 
-			std::unique_ptr<const double[]> xLogPointer;
-			std::unique_ptr<const double[]> yLogPointer;
-			const double *xPointer, *yPointer;
-			if (xAxis->IsLogarithmic())
+			std::vector<double> xLogData;
+			std::vector<double> yLogData;
+			const std::vector<double>& xRef([this, &xLogData]()
 			{
-				xLogPointer = DoLogarithmicScale(data.GetXPointer(), data.GetNumberOfPoints());
-				xPointer = xLogPointer.get();
-			}
-			else
-				xPointer = data.GetXPointer();
+				if (this->xAxis->IsLogarithmic())
+				{
+					xLogData = std::move(DoLogarithmicScale(this->data.GetX()));
+					return xLogData;
+				}
+				else
+					return data.GetX();
+			}());
 
-			if (yAxis->IsLogarithmic())
+			const std::vector<double>& yRef([this, &yLogData]()
 			{
-				yLogPointer = DoLogarithmicScale(data.GetYPointer(), data.GetNumberOfPoints());
-				yPointer = yLogPointer.get();
-			}
-			else
-				yPointer = data.GetYPointer();
+				if (yAxis->IsLogarithmic())
+				{
+					yLogData = std::move(DoLogarithmicScale(data.GetY()));
+					return yLogData;
+				}
+				else
+					return data.GetY();
+			}());
 
-			line.Build(xPointer, yPointer, data.GetNumberOfPoints());
+			line.Build(xRef, yRef);
 		}
 		else
 			line.SetWidth(0.0);
@@ -280,8 +285,8 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 {
 	assert(i < data.GetNumberOfPoints());
 
-	return PlotMath::IsValid<double>(data.GetXData(i)) &&
-		PlotMath::IsValid<double>(data.GetYData(i));
+	return PlotMath::IsValid<double>(data.GetX()[i]) &&
+		PlotMath::IsValid<double>(data.GetY()[i]);
 }
 
 //=============================================================================
@@ -375,8 +380,8 @@ void PlotCurve::BuildMarkers()
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
-		x = static_cast<float>(xScaleFunction(data.GetXData(i)));
-		y = static_cast<float>(yScaleFunction(data.GetYData(i)));
+		x = static_cast<float>(xScaleFunction(data.GetX()[i]));
+		y = static_cast<float>(yScaleFunction(data.GetY()[i]));
 
 		bufferInfo[1].vertexBuffer[i * 4 * dimension] = x + halfMarkerXSize;
 		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = y + halfMarkerYSize;
@@ -419,23 +424,21 @@ void PlotCurve::BuildMarkers()
 // Description:		Handles scaling for arrays of logarithmic data.
 //
 // Input Arguments:
-//		value	= const double*
-//		count	= const unsigned int&
+//		value	= const std::vector<double>&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		std::unique_ptr<double[]>
+//		std::vector<double>
 //
 //=============================================================================
-std::unique_ptr<double[]> PlotCurve::DoLogarithmicScale(const double* values,
-	const unsigned int& count)
+std::vector<double> PlotCurve::DoLogarithmicScale(
+	const std::vector<double>& values)
 {
-	std::unique_ptr<double[]> scaledValues(std::make_unique<double[]>(count));
-	unsigned int i;
-	for (i = 0; i < count; ++i)
-		scaledValues[i] = PlotRenderer::DoLogarithmicScale(values[i]);
+	std::vector<double> scaledValues(values);
+	for (auto& v : scaledValues)
+		v = PlotRenderer::DoLogarithmicScale(v);
 
 	return scaledValues;
 }
@@ -499,7 +502,7 @@ bool PlotCurve::RangeIsSmall() const
 //=============================================================================
 PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
-	double period = data.GetXData(1) - data.GetXData(0);
+	double period(data.GetX()[1] - data.GetX()[0]);
 	if (period == 0.0)
 		return RangeSizeUndetermined;
 
@@ -538,7 +541,7 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 //=============================================================================
 PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
-	double period = data.GetYData(1) - data.GetYData(0);
+	double period(data.GetY()[1] - data.GetY()[0]);
 	if (period == 0.0)
 		return RangeSizeUndetermined;
 

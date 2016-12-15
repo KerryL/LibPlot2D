@@ -394,8 +394,8 @@ void CustomFile::AssembleAsynchronousDatasets(
 	for (i = 0; i < rawData.size(); i += 2)
 	{
 		std::unique_ptr<Dataset2D> dataset(std::make_unique<Dataset2D>(rawData[i].size()));
-		TransferVectorToArray(rawData[i], dataset->GetXPointer());
-		TransferVectorToArray(rawData[i + 1], dataset->GetYPointer());
+		std::copy(rawData[i].begin(), rawData[i].end(), dataset->GetX().begin());
+		std::copy(rawData[i + 1].begin(), rawData[i + 1].end(), dataset->GetY().begin());
 		*dataset *= scales[i / 2];
 		data.push_back(std::move(dataset));
 	}

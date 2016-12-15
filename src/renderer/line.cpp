@@ -183,7 +183,8 @@ void Line::Build(
 //		None
 //
 //=============================================================================
-void Line::Build(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update)
+void Line::Build(const std::vector<std::pair<double, double> > &points,
+	const UpdateMethod& update)
 {
 	if (points.size() < 2)
 		return;
@@ -201,9 +202,8 @@ void Line::Build(const std::vector<std::pair<double, double> > &points, const Up
 // Description:		Builds the specified line segments.
 //
 // Input Arguments:
-//		x		= const double* const
-//		y		= const double* const
-//		count	= const unsigned int&
+//		x		= const std::vector<double>&
+//		y		= const std::vector<double>&
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
@@ -213,10 +213,12 @@ void Line::Build(const std::vector<std::pair<double, double> > &points, const Up
 //		None
 //
 //=============================================================================
-void Line::Build(const double* const x, const double* const y,
-	const unsigned int& count, const UpdateMethod& update)
+void Line::Build(const std::vector<double>& x,
+	const std::vector<double>& y, const UpdateMethod& update)
 {
-	std::vector<std::pair<double, double> > dPoints(count);
+	assert(x.size() == y.size());
+
+	std::vector<std::pair<double, double> > dPoints(x.size());
 	unsigned int i;
 	for (i = 0; i < dPoints.size(); ++i)
 	{

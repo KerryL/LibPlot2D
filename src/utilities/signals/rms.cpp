@@ -48,8 +48,8 @@ Dataset2D RootMeanSquare::ComputeTimeHistory(const Dataset2D &data)
 
 	unsigned int i;
 	for (i = 1; i < data.GetNumberOfPoints(); ++i)
-		rms.GetYPointer()[i] = sqrt((rms.GetYPointer()[i - 1] * rms.GetYPointer()[i - 1] * i
-			+ data.GetYData(i) * data.GetYData(i)) / (i + 1.0));
+		rms.GetY()[i] = sqrt((rms.GetY()[i - 1] * rms.GetY()[i - 1] * i
+			+ data.GetY()[i] * data.GetY()[i]) / (i + 1.0));
 
 	return rms;
 }

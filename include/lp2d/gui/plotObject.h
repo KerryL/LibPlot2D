@@ -219,7 +219,7 @@ private:
 	void GetAxisExtremes(const Dataset2D &data, Axis *yAxis);
 	void ResetOriginalLimits();
 	void MatchYAxes();
-	double GetFirstValidValue(const double* data, const unsigned int &size) const;
+	double GetFirstValidValue(const std::vector<double>& data) const;
 
 	void UpdateScissorArea() const;
 };

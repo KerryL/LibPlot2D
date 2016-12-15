@@ -451,8 +451,8 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 	for (i = 0; i < dataset->GetNumberOfPoints(); ++i)
 	{
 		time = startTime + (double)i / sampleRate;
-		dataset->GetXPointer()[i] = time;
-		dataset->GetYPointer()[i] = GetValue(time);
+		dataset->GetX()[i] = time;
+		dataset->GetY()[i] = GetValue(time);
 	}
 }
 

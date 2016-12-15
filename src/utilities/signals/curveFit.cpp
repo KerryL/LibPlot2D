@@ -57,19 +57,19 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data, const u
 
 	// Here we scale by the maximum X value to give the A matrix a better condition number
 	unsigned int i, j;
-	double maxX(data.GetXData(0));
+	double maxX(data.GetX()[0]);
 	for (i = 1; i < data.GetNumberOfPoints(); ++i)
 	{
-		if (data.GetXData(i) > maxX)
-			maxX = data.GetXData(i);
+		if (data.GetX()[i] > maxX)
+			maxX = data.GetX()[i];
 	}
 
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
-		b(i,0) = data.GetYData(i);
+		b(i,0) = data.GetY()[i];
 		A(i,0) = 1.0;
 		for (j = 0; j < order; ++j)
-			A(i,j+1) = data.GetXData(i) * A(i,j) / maxX;
+			A(i,j+1) = data.GetX()[i] * A(i,j) / maxX;
 	}
 
 	Matrix coefficients;
@@ -154,7 +154,7 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 	double yBar(0.0);
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
-		yBar += data.GetYData(i);
+		yBar += data.GetY()[i];
 	yBar /= (double)data.GetNumberOfPoints();
 
 	// Determine ssTotal (total sum of squares) and ssResidual (residual sum of squares)
@@ -162,9 +162,9 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 	double fitValue;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
-		ssTotal += (data.GetYData(i) - yBar) * (data.GetYData(i) - yBar);
-		fitValue = EvaluateFit(data.GetXData(i), fit);
-		ssResidual += (data.GetYData(i) - fitValue) * (data.GetYData(i) - fitValue);
+		ssTotal += (data.GetY()[i] - yBar) * (data.GetY()[i] - yBar);
+		fitValue = EvaluateFit(data.GetX()[i], fit);
+		ssResidual += (data.GetY()[i] - fitValue) * (data.GetY()[i] - fitValue);
 	}
 
 	// Assign the R^2 value

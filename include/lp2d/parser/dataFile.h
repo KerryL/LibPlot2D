@@ -118,7 +118,6 @@ protected:
 	bool IsDataRow(const wxArrayString &list) const;
 
 	bool ArrayContainsValue(const int &value, const wxArrayInt &a) const;
-	void TransferVectorToArray(const std::vector<double> &source, double *destination) const;
 	wxArrayString RemoveUnwantedDescriptions(const wxArrayString &names, const wxArrayInt &choices) const;
 
 	static void SkipLines(std::ifstream &file, const unsigned int &count);

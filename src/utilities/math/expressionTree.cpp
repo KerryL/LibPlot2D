@@ -161,7 +161,7 @@ Dataset2D ExpressionTree::GetSetFromList(const unsigned int &i) const
 		Dataset2D set(*(*list)[0]);
 		unsigned int j;
 		for (j = 0; j < set.GetNumberOfPoints(); ++j)
-			set.GetYPointer()[j] = set.GetXData(j);
+			set.GetY()[j] = set.GetX()[j];
 
 		return set;
 	}

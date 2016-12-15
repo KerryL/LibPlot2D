@@ -88,7 +88,8 @@ private:
 	double yScale;
 
 	void InitializeMarkerVertexBuffer();
-	static std::unique_ptr<double[]> DoLogarithmicScale(const double* values, const unsigned int& count);
+	static std::vector<double> DoLogarithmicScale(
+		const std::vector<double>& values);
 };
 
 }// namespace LibPlot2D

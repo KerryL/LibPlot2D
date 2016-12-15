@@ -44,12 +44,11 @@ public:
 
 	unsigned int GetNumberOfPoints() const { return xData.size(); }
 	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;
-	double *GetXPointer() { return xData.data(); }
-	double *GetYPointer() { return yData.data(); }
-	const double *GetXPointer() const { return xData.data(); }
-	const double *GetYPointer() const { return yData.data(); }
-	double GetXData(const unsigned int &i) const { return xData[i]; }
-	double GetYData(const unsigned int &i) const { return yData[i]; }
+
+	const std::vector<double>& GetX() const { return xData; };
+	const std::vector<double>& GetY() const { return yData; };
+	std::vector<double>& GetX() { return xData; };
+	std::vector<double>& GetY() { return yData; };
 
 	Dataset2D& MultiplyXData(const double &target);
 	bool GetYAt(const double &x, double &y, bool *exactValue = nullptr) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)

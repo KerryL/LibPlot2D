@@ -45,10 +45,10 @@ Dataset2D DiscreteDerivative::ComputeTimeHistory(const Dataset2D &data)
 
 	unsigned int i;
 	for (i = 1; i < data.GetNumberOfPoints(); ++i)
-		derivative.GetYPointer()[i] = (data.GetYData(i) - data.GetYData(i - 1))
-			/ (data.GetXData(i) - data.GetXData(i - 1));
+		derivative.GetY()[i] = (data.GetY()[i] - data.GetY()[i - 1])
+			/ (data.GetX()[i] - data.GetX()[i - 1]);
 
-	derivative.GetYPointer()[0] = derivative.GetYData(1);
+	derivative.GetY()[0] = derivative.GetY()[1];
 
 	return derivative;
 }

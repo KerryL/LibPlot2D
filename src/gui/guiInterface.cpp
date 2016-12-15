@@ -702,7 +702,7 @@ void GuiInterface::ExportData()
 		for (i = 0; i < plotList.GetCount(); ++i)
 		{
 			if (j < plotList[i]->GetNumberOfPoints())
-				outFile << plotList[i]->GetXData(j) << delimiter << plotList[i]->GetYData(j);
+				outFile << plotList[i]->GetX()[j] << delimiter << plotList[i]->GetY()[j];
 			else
 				outFile << delimiter;
 
@@ -803,8 +803,8 @@ void GuiInterface::CreateSignal()
 
 		// Use first curve to pull time and frequency information
 		sampleRate = 1.0 / PlotMath::GetAverageXSpacing(*plotList[0]) * factor;
-		startTime = plotList[0]->GetXData(0) / factor;
-		duration = plotList[0]->GetXData(plotList[0]->GetNumberOfPoints() - 1) / factor - startTime;
+		startTime = plotList[0]->GetX()[0] / factor;
+		duration = plotList[0]->GetX().back() / factor - startTime;
 	}
 
 	CreateSignalDialog dialog(owner, startTime, duration, sampleRate);
@@ -1301,7 +1301,7 @@ std::unique_ptr<Dataset2D> GuiInterface::GetCurveFitData(const unsigned int &ord
 	std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(*data));
 	unsigned int i;
 	for (i = 0; i < newData->GetNumberOfPoints(); ++i)
-		newData->GetYPointer()[i] = CurveFit::EvaluateFit(newData->GetXData(i), fitData);
+		newData->GetY()[i] = CurveFit::EvaluateFit(newData->GetX()[i], fitData);
 
 	name = GetCurveFitName(fitData, row);
 
@@ -1494,19 +1494,19 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 			_T("Accuracy Warning"), wxICON_WARNING, owner);
 
 	std::unique_ptr<Filter> filter(GetFilter(
-		parameters, factor / data->GetAverageDeltaX(), data->GetYData(0)));
+		parameters, factor / data->GetAverageDeltaX(), data->GetY()[0]));
 
 	unsigned int i;
 	for (i = 0; i < data->GetNumberOfPoints(); ++i)
-		data->GetYPointer()[i] = filter->Apply(data->GetYData(i));
+		data->GetY()[i] = filter->Apply(data->GetY()[i]);
 
 	// For phaseless filter, re-apply the same filter backwards
 	if (parameters.phaseless)
 	{
 		data->Reverse();
-		filter->Initialize(data->GetYData(0));
+		filter->Initialize(data->GetY()[0]);
 		for (i = 0; i < data->GetNumberOfPoints(); ++i)
-			data->GetYPointer()[i] = filter->Apply(data->GetYData(i));
+			data->GetY()[i] = filter->Apply(data->GetY()[0]);
 		data->Reverse();
 	}
 }
@@ -1743,19 +1743,19 @@ std::unique_ptr<Dataset2D> GuiInterface::GetXZoomedDataset(
 	const std::unique_ptr<const Dataset2D>& fullData) const
 {
 	unsigned int i, startIndex(0), endIndex(0);
-	while (fullData->GetXData(startIndex) < renderer->GetXMin() &&
+	while (fullData->GetX()[startIndex] < renderer->GetXMin() &&
 		startIndex < fullData->GetNumberOfPoints())
 		++startIndex;
 	endIndex = startIndex;
-	while (fullData->GetXData(endIndex) < renderer->GetXMax() &&
+	while (fullData->GetX()[endIndex] < renderer->GetXMax() &&
 		endIndex < fullData->GetNumberOfPoints())
 		++endIndex;
 
 	std::unique_ptr<Dataset2D> data(std::make_unique<Dataset2D>(endIndex - startIndex));
 	for (i = startIndex; i < endIndex; ++i)
 	{
-		data->GetXPointer()[i - startIndex] = fullData->GetXData(i);
-		data->GetYPointer()[i - startIndex] = fullData->GetYData(i);
+		data->GetX()[i - startIndex] = fullData->GetX()[i];
+		data->GetY()[i - startIndex] = fullData->GetY()[i];
 	}
 
 	return data;

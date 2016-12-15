@@ -57,15 +57,17 @@ public:
 	};
 
 	// Geometry is constructed in Build() call, so all options need to be set prior
-	void Build(const unsigned int &x1, const unsigned int &y1, const unsigned int &x2,
-		const unsigned int &y2, const UpdateMethod& update = UpdateImmediate);
-	void Build(const double &x1, const double &y1, const double &x2, const double &y2,
+	void Build(const unsigned int &x1, const unsigned int &y1,
+		const unsigned int &x2, const unsigned int &y2,
 		const UpdateMethod& update = UpdateImmediate);
+	void Build(const double &x1, const double &y1, const double &x2,
+		const double &y2, const UpdateMethod& update = UpdateImmediate);
 	void Build(const std::vector<std::pair<unsigned int, unsigned int> > &points,
 		const UpdateMethod& update = UpdateImmediate);
 	void Build(const std::vector<std::pair<double, double> > &points,
 		const UpdateMethod& update = UpdateImmediate);
-	void Build(const double* const x, const double* const y, const unsigned int& count,
+	void Build(const std::vector<double>& x,
+		const std::vector<double>& y,
 		const UpdateMethod& update = UpdateImmediate);
 	void BuildSegments(const std::vector<std::pair<double, double> > &points,
 		const UpdateMethod& update = UpdateImmediate);

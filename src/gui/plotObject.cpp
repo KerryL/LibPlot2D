@@ -817,8 +817,7 @@ void PlotObject::SetOriginalAxisLimits()
 			continue;
 		if (!leftUsed && !rightUsed)
 		{
-			xMinOriginal = GetFirstValidValue(dataList[i]->GetXPointer(),
-				dataList[i]->GetNumberOfPoints());
+			xMinOriginal = GetFirstValidValue(dataList[i]->GetX());
 			xMaxOriginal = xMinOriginal;
 		}
 
@@ -826,15 +825,13 @@ void PlotObject::SetOriginalAxisLimits()
 		if (yAxis == axisLeft && !leftUsed)
 		{
 			leftUsed = true;
-			yLeftMinOriginal = GetFirstValidValue(dataList[i]->GetYPointer(),
-				dataList[i]->GetNumberOfPoints());
+			yLeftMinOriginal = GetFirstValidValue(dataList[i]->GetY());
 			yLeftMaxOriginal = yLeftMinOriginal;
 		}
 		else if (yAxis == axisRight && !rightUsed)
 		{
 			rightUsed = true;
-			yRightMinOriginal = GetFirstValidValue(dataList[i]->GetYPointer(),
-				dataList[i]->GetNumberOfPoints());
+			yRightMinOriginal = GetFirstValidValue(dataList[i]->GetY());
 			yRightMaxOriginal = yRightMinOriginal;
 		}
 		GetAxisExtremes(*dataList[i], yAxis);
@@ -848,8 +845,7 @@ void PlotObject::SetOriginalAxisLimits()
 // Description:		Retrieves the first valid value from the specified array.
 //
 // Input Arguments:
-//		data	= const double*
-//		size	= const unsigned int&
+//		data	= const std::vector<double>&
 //
 // Output Arguments:
 //		None
@@ -858,15 +854,12 @@ void PlotObject::SetOriginalAxisLimits()
 //		double
 //
 //=============================================================================
-double PlotObject::GetFirstValidValue(const double* data, const unsigned int &size) const
+double PlotObject::GetFirstValidValue(const std::vector<double>& data) const
 {
-	assert(data);
-
-	unsigned int i;
-	for (i = 0; i < size; ++i)
+	for (const auto& value : data)
 	{
-		if (PlotMath::IsValid(data[i]))
-			return data[i];
+		if (PlotMath::IsValid(value))
+			return value;
 	}
 
 	return data[0];
@@ -935,27 +928,27 @@ void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
-		if (PlotMath::IsValid<double>(data.GetXData(i)))
+		if (PlotMath::IsValid<double>(data.GetX()[i]))
 		{
-			if (data.GetXData(i) > xMaxOriginal)
-				xMaxOriginal = data.GetXData(i);
-			else if (data.GetXData(i) < xMinOriginal)
-				xMinOriginal = data.GetXData(i);
+			if (data.GetX()[i] > xMaxOriginal)
+				xMaxOriginal = data.GetX()[i];
+			else if (data.GetX()[i] < xMinOriginal)
+				xMinOriginal = data.GetX()[i];
 		}
 
-		if (yAxis == axisLeft && PlotMath::IsValid<double>(data.GetYData(i)))
+		if (yAxis == axisLeft && PlotMath::IsValid<double>(data.GetY()[i]))
 		{
-			if (data.GetYData(i) > yLeftMaxOriginal)
-				yLeftMaxOriginal = data.GetYData(i);
-			else if (data.GetYData(i) < yLeftMinOriginal)
-				yLeftMinOriginal = data.GetYData(i);
+			if (data.GetY()[i] > yLeftMaxOriginal)
+				yLeftMaxOriginal = data.GetY()[i];
+			else if (data.GetY()[i] < yLeftMinOriginal)
+				yLeftMinOriginal = data.GetY()[i];
 		}
-		else if (yAxis == axisRight && PlotMath::IsValid<double>(data.GetYData(i)))
+		else if (yAxis == axisRight && PlotMath::IsValid<double>(data.GetY()[i]))
 		{
-			if (data.GetYData(i) > yRightMaxOriginal)
-				yRightMaxOriginal = data.GetYData(i);
-			else if (data.GetYData(i) < yRightMinOriginal)
-				yRightMinOriginal = data.GetYData(i);
+			if (data.GetY()[i] > yRightMaxOriginal)
+				yRightMaxOriginal = data.GetY()[i];
+			else if (data.GetY()[i] < yRightMinOriginal)
+				yRightMinOriginal = data.GetY()[i];
 		}
 	}
 }
