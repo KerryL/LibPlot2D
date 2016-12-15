@@ -2071,11 +2071,43 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index,
 	renderer->SaveCurrentZoom();
 }
 
+//=============================================================================
+// Class:			GuiInterface
+// Function:		UpdateCurveProperties
+//
+// Description:		Copies the plot area image to the clipboard.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
 void GuiInterface::Copy()
 {
 	renderer->DoCopy();
 }
 
+//=============================================================================
+// Class:			GuiInterface
+// Function:		Paste
+//
+// Description:		Pastes from the clipboard.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
 void GuiInterface::Paste()
 {
 	renderer->DoPaste();
