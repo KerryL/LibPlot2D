@@ -301,6 +301,7 @@ void Text::SetSize(const double& width, const double& height)
 bool Text::GenerateGlyphs()
 {
 	assert(!RenderWindow::GLHasError());
+	assert(!glyphsGenerated);// Doing this twice could leak memory via OpenGL
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	Glyph g;
@@ -744,16 +745,16 @@ Primitive::BufferInfo Text::BuildLocalText()
 void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 {
 	bufferInfo.GetOpenGLIndices(true);
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
+	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
 		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(vertexLocation);
 	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
 		bufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
 

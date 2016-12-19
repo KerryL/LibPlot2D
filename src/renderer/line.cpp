@@ -420,9 +420,9 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 	if (update != UpdateImmediate)
 		return;
 
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
+	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), hint);
@@ -480,9 +480,9 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 	if (update != UpdateImmediate)
 		return;
 
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
+	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), hint);
@@ -577,9 +577,9 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 	if (update != UpdateImmediate)
 		return;
 
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
+	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), hint);
@@ -592,7 +592,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
 		bufferInfo.indexBuffer.data(), hint);
 
@@ -677,9 +677,9 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 	if (update != UpdateImmediate)
 		return;
 
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
+	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), hint);
@@ -692,7 +692,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
 		bufferInfo.indexBuffer.data(), hint);
 

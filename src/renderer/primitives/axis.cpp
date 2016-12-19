@@ -149,26 +149,26 @@ void Axis::GenerateGeometry()
 	// Draw gridlines first
 	if ((majorGrid || minorGrid) && bufferInfo[1].indexBuffer.size() > 0)
 	{
-		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[1].GetVertexArrayIndex());
 		Line::DoPrettyDraw(bufferInfo[1].indexBuffer.size());
 	}
 
 	// Axis and ticks next
 	if (bufferInfo[0].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
 		Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
 	}
 
 	if (valueText.IsOK() && bufferInfo[2].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[2].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[2].GetVertexArrayIndex());
 		valueText.RenderBufferedGlyph(bufferInfo[2].vertexCount);
 	}
 
 	if (!label.IsEmpty() && labelText.IsOK() && bufferInfo[3].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[3].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[3].GetVertexArrayIndex());
 		labelText.RenderBufferedGlyph(bufferInfo[3].vertexCount);
 	}
 

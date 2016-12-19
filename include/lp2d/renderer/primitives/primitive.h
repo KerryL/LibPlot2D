@@ -18,6 +18,7 @@
 // Standard C++ headers
 #include <vector>
 #include <memory>
+#include <limits>
 
 // Local headers
 #include "lp2d/renderer/color.h"
@@ -61,16 +62,20 @@ public:
 		std::vector<unsigned int> indexBuffer;
 		bool vertexCountModified = true;
 
-		unsigned int vertexBufferIndex;
-		unsigned int vertexArrayIndex;
-		unsigned int indexBufferIndex;
-
 		void GetOpenGLIndices(const bool& needIndexObject = false);
 		void FreeOpenGLObjects();
+
+		const unsigned int& GetVertexBufferIndex() const { return vertexBufferIndex; }
+		const unsigned int& GetVertexArrayIndex() const { return vertexArrayIndex; }
+		const unsigned int& GetIndexBufferIndex() const { return indexBufferIndex; }
 
 	private:
 		bool glVertexBufferExists = false;
 		bool glIndexBufferExists = false;
+
+		unsigned int vertexBufferIndex = std::numeric_limits<unsigned int>::max();
+		unsigned int vertexArrayIndex = std::numeric_limits<unsigned int>::max();
+		unsigned int indexBufferIndex = std::numeric_limits<unsigned int>::max();
 	};
 
 protected:

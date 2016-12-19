@@ -190,9 +190,9 @@ void PlotCurve::Update(const unsigned int& i)
 
 		BuildMarkers();
 
-		glBindVertexArray(bufferInfo[i].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[i].GetVertexArrayIndex());
 
-		glBindBuffer(GL_ARRAY_BUFFER, bufferInfo[i].vertexBufferIndex);
+		glBindBuffer(GL_ARRAY_BUFFER, bufferInfo[i].GetVertexBufferIndex());
 		glBufferData(GL_ARRAY_BUFFER,
 			sizeof(GLfloat) * bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4),
 			bufferInfo[i].vertexBuffer.data(), GL_DYNAMIC_DRAW);
@@ -243,7 +243,7 @@ void PlotCurve::GenerateGeometry()
 
 	if (lineSize > 0.0)
 	{
-		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
 
 		if (pretty)
 			Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
@@ -253,7 +253,7 @@ void PlotCurve::GenerateGeometry()
 
 	if (NeedsMarkersDrawn())
 	{
-		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[1].GetVertexArrayIndex());
 		glDrawArrays(GL_QUADS, 0, bufferInfo[1].vertexCount);
 	}
 

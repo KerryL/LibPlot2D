@@ -108,7 +108,7 @@ void TextRendering::GenerateGeometry()
 {
 	if (font.IsOK() && bufferInfo[0].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
 		font.RenderBufferedGlyph(bufferInfo[0].vertexCount);
 	}
 }

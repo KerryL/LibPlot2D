@@ -155,14 +155,14 @@ void Legend::GenerateGeometry()
 	// intended to be built as elements of the index array.
 	if (bufferInfo[0].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
 		Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
 	}
 
 	// Text last
 	if (text.IsOK() && bufferInfo[1].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[1].vertexArrayIndex);
+		glBindVertexArray(bufferInfo[1].GetVertexArrayIndex());
 		text.RenderBufferedGlyph(bufferInfo[1].vertexCount);
 	}
 }
@@ -1058,9 +1058,9 @@ void Legend::BuildSampleLines()
 void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 {
 	bufferInfo.GetOpenGLIndices(true);
-	glBindVertexArray(bufferInfo.vertexArrayIndex);
+	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.vertexBufferIndex);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
@@ -1073,7 +1073,7 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * bufferInfo.vertexCount * renderWindow.GetVertexDimension()));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.indexBufferIndex);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
 		bufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
 

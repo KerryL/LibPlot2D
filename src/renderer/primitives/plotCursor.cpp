@@ -108,7 +108,7 @@ void PlotCursor::GenerateGeometry()
 	if (bufferInfo.size() == 0)
 		return;
 
-	glBindVertexArray(bufferInfo[0].vertexArrayIndex);
+	glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
 	Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
 	glBindVertexArray(0);
 }
