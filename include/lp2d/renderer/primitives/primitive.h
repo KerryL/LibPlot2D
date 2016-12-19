@@ -57,6 +57,14 @@ public:
 
 	struct BufferInfo
 	{
+		BufferInfo() = default;
+		BufferInfo(const BufferInfo&) = delete;
+		BufferInfo(BufferInfo&& b);
+		~BufferInfo();
+
+		BufferInfo& operator=(const BufferInfo&) = delete;
+		BufferInfo& operator=(BufferInfo&& b);
+
 		unsigned int vertexCount = 0;
 		std::vector<float> vertexBuffer;
 		std::vector<unsigned int> indexBuffer;

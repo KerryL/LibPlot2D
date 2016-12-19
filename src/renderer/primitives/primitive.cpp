@@ -342,6 +342,87 @@ void Primitive::DisableAlphaBlending()
 
 //=============================================================================
 // Class:			Primitive::BufferInfo
+// Function:		BufferInfo
+//
+// Description:		Move constructor for BufferInfo class.
+//
+// Input Arguments:
+//		b	= BufferInfo&&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+Primitive::BufferInfo::BufferInfo(BufferInfo&& b)
+{
+	*this = std::move(b);
+}
+
+//=============================================================================
+// Class:			Primitive::BufferInfo
+// Function:		~BufferInfo
+//
+// Description:		Destructor for BufferInfo class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+Primitive::BufferInfo::~BufferInfo()
+{
+	FreeOpenGLObjects();
+}
+
+//=============================================================================
+// Class:			Primitive::BufferInfo
+// Function:		operator=
+//
+// Description:		Move assignment operator for BufferInfo class.
+//
+// Input Arguments:
+//		b	= BufferInfo&&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+Primitive::BufferInfo& Primitive::BufferInfo::operator=(BufferInfo&& b)
+{
+	if (this == &b)
+		return *this;
+
+	vertexCount = std::move(b.vertexCount);
+	vertexBuffer = std::move(b.vertexBuffer);
+	indexBuffer = std::move(b.indexBuffer);
+	vertexCountModified = std::move(b.vertexCountModified);
+
+	vertexBufferIndex = std::move(b.vertexBufferIndex);
+	vertexArrayIndex = std::move(b.vertexArrayIndex);
+	indexBufferIndex = std::move(b.indexBufferIndex);
+
+	glVertexBufferExists = b.glVertexBufferExists;
+	glIndexBufferExists = b.glIndexBufferExists;
+
+	b.glVertexBufferExists = false;
+	b.glIndexBufferExists = false;
+
+	return *this;
+}
+
+//=============================================================================
+// Class:			Primitive::BufferInfo
 // Function:		GetOpenGLIndices
 //
 // Description:		Method for safely initializing this object.
@@ -405,7 +486,7 @@ void Primitive::BufferInfo::FreeOpenGLObjects()
 		glIndexBufferExists = false;
 	}
 
-	assert(!RenderWindow::GLHasError());
+	//assert(!RenderWindow::GLHasError());
 }
 
 }// namespace LibPlot2D

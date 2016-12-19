@@ -111,8 +111,9 @@ void Legend::Update(const unsigned int& i)
 		lines.SetWidth(borderSize);
 		lines.SetLineColor(borderColor);
 		lines.SetBackgroundColorForAlphaFade();
-		lines.Build(BuildBorderPoints(), Line::UpdateManual);
-		bufferVector.push_back(lines.GetBufferInfo());
+		bufferVector.push_back(BufferInfo());
+		lines.Build(BuildBorderPoints(), bufferVector.back(),
+			Line::UpdateManual);
 
 		BuildSampleLines();
 		BuildMarkers();
@@ -930,7 +931,7 @@ void Legend::BuildMarkers()
 		buffer.indexBuffer[4] = 3;
 		buffer.indexBuffer[5] = 0;
 
-		bufferVector.push_back(buffer);
+		bufferVector.push_back(std::move(buffer));
 	}
 }
 
@@ -1033,9 +1034,9 @@ void Legend::BuildSampleLines()
 
 		y -= entrySpacing + textHeight;
 
-		lines.Build(x + entrySpacing, y,
-			x + entrySpacing + sampleLength, y, Line::UpdateManual);
-		bufferVector.push_back(lines.GetBufferInfo());
+		bufferVector.push_back(BufferInfo());
+		lines.Build(x + entrySpacing, y, x + entrySpacing + sampleLength,
+			y, bufferVector.back(), Line::UpdateManual);
 	}
 }
 

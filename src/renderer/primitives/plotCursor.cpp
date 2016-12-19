@@ -72,16 +72,15 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 	{
 		line.Build(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
 			locationAlongAxis, renderWindow.GetSize().GetHeight()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge());
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), bufferInfo[0]);
 	}
 	else
 	{
 		line.Build(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
 			renderWindow.GetSize().GetWidth()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), locationAlongAxis);
+			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(),
+			locationAlongAxis, bufferInfo[0]);
 	}
-
-	bufferInfo[0] = line.GetBufferInfo();
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
 	value = axis.PixelToValue(locationAlongAxis);

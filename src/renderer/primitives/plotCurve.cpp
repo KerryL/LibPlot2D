@@ -55,7 +55,7 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 
 	line.SetBufferHint(GL_STATIC_DRAW);
 
-	bufferInfo.push_back(BufferInfo());// Add a second empty info block for the markers
+	bufferInfo.resize(2);// First one for lines, second one for the markers
 }
 
 //=============================================================================
@@ -176,12 +176,10 @@ void PlotCurve::Update(const unsigned int& i)
 					return data.GetY();
 			}());
 
-			line.Build(xRef, yRef);
+			line.Build(xRef, yRef, bufferInfo[i]);
 		}
 		else
 			line.SetWidth(0.0);
-
-		bufferInfo[i] = line.GetBufferInfo();
 	}
 	else
 	{

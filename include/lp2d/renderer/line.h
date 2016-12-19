@@ -59,20 +59,24 @@ public:
 	// Geometry is constructed in Build() call, so all options need to be set prior
 	void Build(const unsigned int &x1, const unsigned int &y1,
 		const unsigned int &x2, const unsigned int &y2,
-		const UpdateMethod& update = UpdateImmediate);
+		Primitive::BufferInfo& bufferInfo,
+		const UpdateMethod& update = UpdateImmediate) const;
 	void Build(const double &x1, const double &y1, const double &x2,
-		const double &y2, const UpdateMethod& update = UpdateImmediate);
-	void Build(const std::vector<std::pair<unsigned int, unsigned int>> &points,
-		const UpdateMethod& update = UpdateImmediate);
+		const double &y2, Primitive::BufferInfo& bufferInfo,
+		const UpdateMethod& update = UpdateImmediate) const;
+	void Build(
+		const std::vector<std::pair<unsigned int, unsigned int>> &points,
+		Primitive::BufferInfo& bufferInfo,
+		const UpdateMethod& update = UpdateImmediate) const;
 	void Build(const std::vector<std::pair<double, double>> &points,
-		const UpdateMethod& update = UpdateImmediate);
+		Primitive::BufferInfo& bufferInfo,
+		const UpdateMethod& update = UpdateImmediate) const;
 	void Build(const std::vector<double>& x,
-		const std::vector<double>& y,
-		const UpdateMethod& update = UpdateImmediate);
+		const std::vector<double>& y, Primitive::BufferInfo& bufferInfo,
+		const UpdateMethod& update = UpdateImmediate) const;
 	void BuildSegments(const std::vector<std::pair<double, double>> &points,
-		const UpdateMethod& update = UpdateImmediate);
-
-	const Primitive::BufferInfo& GetBufferInfo() const { return bufferInfo; }
+		Primitive::BufferInfo& bufferInfo,
+		const UpdateMethod& update = UpdateImmediate) const;
 
 	static void DoUglyDraw(const unsigned int& vertexCount);
 	static void DoPrettyDraw(const unsigned int& indexCount);
@@ -93,13 +97,14 @@ private:
 	GLenum hint;
 
 	const RenderWindow& renderWindow;
-	Primitive::BufferInfo bufferInfo;
 
 	void ComputeOffsets(const double &x1, const double &y1, const double &x2,
-		const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const;
+		const double &y2, double& dxLine, double& dyLine, double& dxEdge,
+		double& dyEdge) const;
 	void ComputeOffsets(const double &xPrior, const double &yPrior,
-		const double &x, const double &y, const double &xNext, const double &yNext,
-		double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const;
+		const double &x, const double &y, const double &xNext,
+		const double &yNext, double& dxLine, double& dyLine, double& dxEdge,
+		double& dyEdge) const;
 
 	struct Offsets
 	{
@@ -109,11 +114,17 @@ private:
 		double dyEdge;
 	};
 
-	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2, const UpdateMethod& update);
-	void DoUglyDraw(const std::vector<std::pair<double, double>> &points, const UpdateMethod& update);
-	void DoPrettyDraw(const std::vector<std::pair<double, double>> &points, const UpdateMethod& update);
+	void DoUglyDraw(const double &x1, const double &y1, const double &x2,
+		const double &y2, const UpdateMethod& update,
+		Primitive::BufferInfo& bufferInfo) const;
+	void DoUglyDraw(const std::vector<std::pair<double, double>> &points,
+		const UpdateMethod& update, Primitive::BufferInfo& bufferInfo) const;
+	void DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
+		const UpdateMethod& update, Primitive::BufferInfo& bufferInfo) const;
 
-	void DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &points, const UpdateMethod& update);
+	void DoPrettySegmentDraw(
+		const std::vector<std::pair<double, double>> &points,
+		const UpdateMethod& update, Primitive::BufferInfo& bufferInfo) const;
 
 	enum LineStyle
 	{
@@ -122,9 +133,10 @@ private:
 	};
 
 	void AssignVertexData(const std::vector<std::pair<double, double>>& points,
-		const LineStyle& style);
+		const LineStyle& style, Primitive::BufferInfo& bufferInfo) const;
 
-	void AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount);
+	void AllocateBuffer(const unsigned int& vertexCount,
+		const unsigned int& triangleCount, Primitive::BufferInfo& bufferInfo) const;
 };
 
 }// namespace LibPlot2D

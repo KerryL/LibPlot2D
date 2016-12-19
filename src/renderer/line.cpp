@@ -88,17 +88,18 @@ Line::Line(const RenderWindow& renderWindow)
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::Build(const unsigned int &x1, const unsigned int &y1,
-	const unsigned int &x2, const unsigned int &y2, const UpdateMethod& update)
+	const unsigned int &x2, const unsigned int &y2,
+	Primitive::BufferInfo& bufferInfo, const UpdateMethod& update) const
 {
 	Build(static_cast<double>(x1), static_cast<double>(y1),
-		static_cast<double>(x2), static_cast<double>(y2), update);
+		static_cast<double>(x2), static_cast<double>(y2), bufferInfo, update);
 }
 
 //=============================================================================
@@ -115,24 +116,25 @@ void Line::Build(const unsigned int &x1, const unsigned int &y1,
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
-void Line::Build(const double &x1, const double &y1,
-	const double &x2, const double &y2, const UpdateMethod& update)
+void Line::Build(const double &x1, const double &y1,const double &x2,
+	const double &y2, Primitive::BufferInfo& bufferInfo,
+	const UpdateMethod& update) const
 {
 	if (pretty)
 	{
 		std::vector<std::pair<double, double>> v;
 		v.push_back(std::make_pair(x1, y1));
 		v.push_back(std::make_pair(x2, y2));
-		DoPrettyDraw(v, update);
+		DoPrettyDraw(v, update, bufferInfo);
 	}
 	else
-		DoUglyDraw(x1, y1, x2, y2, update);
+		DoUglyDraw(x1, y1, x2, y2, update, bufferInfo);
 }
 
 //=============================================================================
@@ -146,7 +148,7 @@ void Line::Build(const double &x1, const double &y1,
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
@@ -154,7 +156,7 @@ void Line::Build(const double &x1, const double &y1,
 //=============================================================================
 void Line::Build(
 	const std::vector<std::pair<unsigned int, unsigned int>> &points,
-	const UpdateMethod& update)
+	Primitive::BufferInfo& bufferInfo, const UpdateMethod& update) const
 {
 	std::vector<std::pair<double, double>> dPoints(points.size());
 	unsigned int i;
@@ -164,7 +166,7 @@ void Line::Build(
 		dPoints[i].second = static_cast<double>(points[i].second);
 	}
 	
-	Build(dPoints, update);
+	Build(dPoints, bufferInfo, update);
 }
 
 //=============================================================================
@@ -178,22 +180,22 @@ void Line::Build(
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::Build(const std::vector<std::pair<double, double>> &points,
-	const UpdateMethod& update)
+	Primitive::BufferInfo& bufferInfo, const UpdateMethod& update) const
 {
 	if (points.size() < 2)
 		return;
 
 	if (pretty)
-		DoPrettyDraw(points, update);
+		DoPrettyDraw(points, update, bufferInfo);
 	else
-		DoUglyDraw(points, update);
+		DoUglyDraw(points, update, bufferInfo);
 }
 
 //=============================================================================
@@ -208,14 +210,14 @@ void Line::Build(const std::vector<std::pair<double, double>> &points,
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
-void Line::Build(const std::vector<double>& x,
-	const std::vector<double>& y, const UpdateMethod& update)
+void Line::Build(const std::vector<double>& x, const std::vector<double>& y,
+	Primitive::BufferInfo& bufferInfo,const UpdateMethod& update) const
 {
 	assert(x.size() == y.size());
 
@@ -226,7 +228,7 @@ void Line::Build(const std::vector<double>& x,
 		dPoints[i].first = x[i];
 		dPoints[i].second = y[i];
 	}
-	Build(dPoints, update);
+	Build(dPoints, bufferInfo, update);
 }
 
 //=============================================================================
@@ -240,23 +242,23 @@ void Line::Build(const std::vector<double>& x,
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::BuildSegments(const std::vector<std::pair<double, double>> &points,
-	const UpdateMethod& update)
+	Primitive::BufferInfo& bufferInfo, const UpdateMethod& update) const
 {
 	if (points.size() == 0)
 		return;
 	assert(points.size() % 2 == 0);
 
 	if (pretty)
-		DoPrettySegmentDraw(points, update);
+		DoPrettySegmentDraw(points, update, bufferInfo);
 	else
-		DoUglyDraw(points, update);
+		DoUglyDraw(points, update, bufferInfo);
 }
 
 //=============================================================================
@@ -358,18 +360,20 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 //		triangleCount	= const unsigned int&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
-void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount)
+void Line::AllocateBuffer(const unsigned int& vertexCount,
+	const unsigned int& triangleCount, Primitive::BufferInfo& bufferInfo) const
 {
 	bufferInfo.GetOpenGLIndices(triangleCount > 0);
 
 	bufferInfo.vertexCount = vertexCount;
-	bufferInfo.vertexBuffer.resize(bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4));
+	bufferInfo.vertexBuffer.resize(bufferInfo.vertexCount
+		* (renderWindow.GetVertexDimension() + 4));
 	assert(renderWindow.GetVertexDimension() == 2);
 
 	if (triangleCount > 0)
@@ -392,16 +396,17 @@ void Line::AllocateBuffer(const unsigned int& vertexCount, const unsigned int& t
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::DoUglyDraw(const double &x1, const double &y1,
-	const double &x2, const double &y2, const UpdateMethod& update)
+	const double &x2, const double &y2, const UpdateMethod& update,
+	Primitive::BufferInfo& bufferInfo) const
 {
-	AllocateBuffer(2, 0);
+	AllocateBuffer(2, 0, bufferInfo);
 
 	bufferInfo.vertexBuffer[0] = (float)x1;
 	bufferInfo.vertexBuffer[1] = (float)y1;
@@ -453,16 +458,16 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
-	const UpdateMethod& update)
+	const UpdateMethod& update, Primitive::BufferInfo& bufferInfo) const
 {
-	AllocateBuffer(points.size(), 0);
+	AllocateBuffer(points.size(), 0, bufferInfo);
 
 	const unsigned int dimension(renderWindow.GetVertexDimension());
 	const unsigned int start(points.size() * dimension);
@@ -513,14 +518,14 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
-	const UpdateMethod& update)
+	const UpdateMethod& update, Primitive::BufferInfo& bufferInfo) const
 {
 	std::vector<Offsets> offsets(points.size());
 
@@ -544,8 +549,8 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 	0+----+4
 	*/
 
-	AllocateBuffer(points.size() * 4, 6 * (points.size() - 1));
-	AssignVertexData(points, StyleContinuous);
+	AllocateBuffer(points.size() * 4, 6 * (points.size() - 1), bufferInfo);
+	AssignVertexData(points, StyleContinuous, bufferInfo);
 
 	unsigned int i;
 	for (i = 0; i < points.size() - 1; ++i)
@@ -613,14 +618,14 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &points,
-	const UpdateMethod& update)
+	const UpdateMethod& update, Primitive::BufferInfo& bufferInfo) const
 {
 	assert(!RenderWindow::GLHasError());
 	/* Draw the segments as follows:
@@ -644,8 +649,8 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &poi
 	*/
 
 	assert(points.size() % 2 == 0);
-	AllocateBuffer(points.size() * 4, 6 * (points.size() / 2));
-	AssignVertexData(points, StyleSegments);
+	AllocateBuffer(points.size() * 4, 6 * (points.size() / 2), bufferInfo);
+	AssignVertexData(points, StyleSegments, bufferInfo);
 
 	unsigned int i;
 	for (i = 0; i < points.size() / 2; ++i)
@@ -713,14 +718,14 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &poi
 //		style	= const LineStyle&
 //
 // Output Arguments:
-//		None
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Return Value:
 //		None
 //
 //=============================================================================
 void Line::AssignVertexData(const std::vector<std::pair<double, double>>& points,
-	const LineStyle& style)
+	const LineStyle& style, Primitive::BufferInfo& bufferInfo) const
 {
 	std::vector<Offsets> offsets(points.size());
 	const unsigned int dimension(renderWindow.GetVertexDimension());

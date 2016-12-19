@@ -77,9 +77,7 @@ void ZoomBox::Update(const unsigned int& /*i*/)
 	points.push_back(std::make_pair(xFloat, yFloat));
 	points.push_back(std::make_pair(xAnchor, yFloat));
 	points.push_back(std::make_pair(xAnchor, yAnchor));
-	box.Build(points);
-
-	bufferInfo[0] = box.GetBufferInfo();
+	box.Build(points, bufferInfo[0]);
 }
 
 //=============================================================================
