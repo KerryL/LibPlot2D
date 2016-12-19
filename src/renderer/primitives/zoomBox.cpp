@@ -38,7 +38,8 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(renderWindow)
+ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow),
+	box(renderWindow)
 {
 	// Initially, we don't want to draw this
 	isVisible = false;
@@ -70,7 +71,7 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow), box(rend
 //=============================================================================
 void ZoomBox::Update(const unsigned int& /*i*/)
 {
-	std::vector<std::pair<double, double> > points;
+	std::vector<std::pair<double, double>> points;
 	points.push_back(std::make_pair(xAnchor, yAnchor));
 	points.push_back(std::make_pair(xFloat, yAnchor));
 	points.push_back(std::make_pair(xFloat, yFloat));

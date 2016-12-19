@@ -1940,7 +1940,7 @@ wxString ExpressionTree::StringSubtract(const double &first, const wxString &sec
 wxString ExpressionTree::StringMultiply(const wxString &first,
 	const double &second) const
 {
-	std::vector<std::pair<int, double> > terms(FindPowersAndCoefficients(
+	std::vector<std::pair<int, double>> terms(FindPowersAndCoefficients(
 		BreakApartTerms(first)));
 	wxString expression;
 	for (const auto& term : terms)
@@ -1969,11 +1969,11 @@ wxString ExpressionTree::StringMultiply(const wxString &first,
 wxString ExpressionTree::StringMultiply(const wxString &first,
 	const wxString &second) const
 {
-	std::vector<std::pair<int, double> > firstTerms(
+	std::vector<std::pair<int, double>> firstTerms(
 		FindPowersAndCoefficients(BreakApartTerms(first)));
-	std::vector<std::pair<int, double> > secondTerms(
+	std::vector<std::pair<int, double>> secondTerms(
 		FindPowersAndCoefficients(BreakApartTerms(second)));
-	std::vector<std::pair<int, double> > terms;
+	std::vector<std::pair<int, double>> terms;
 	for (const auto& firstTerm : firstTerms)
 	{
 		for (const auto& secondTerm : secondTerms)
@@ -2165,12 +2165,12 @@ unsigned int ExpressionTree::FindEndOfNextTerm(const wxString &s, const unsigned
 //		None
 //
 // Return Value:
-//		std::vector<std::pair<int, double> >
+//		std::vector<std::pair<int, double>>
 //
 //=============================================================================
-std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(const wxArrayString &terms)
+std::vector<std::pair<int, double>> ExpressionTree::FindPowersAndCoefficients(const wxArrayString &terms)
 {
-	std::vector<std::pair<int, double> > processedTerms;
+	std::vector<std::pair<int, double>> processedTerms;
 	double temp;
 	for (const auto& term : terms)
 	{

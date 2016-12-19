@@ -60,7 +60,8 @@ const double Line::fadeDistance(0.05);
 //		None
 //
 //=============================================================================
-Line::Line(const RenderWindow& renderWindow) : renderWindow(renderWindow)
+Line::Line(const RenderWindow& renderWindow)
+	: renderWindow(renderWindow)
 {
 	pretty = true;
 	SetWidth(1.0);
@@ -125,7 +126,7 @@ void Line::Build(const double &x1, const double &y1,
 {
 	if (pretty)
 	{
-		std::vector<std::pair<double, double> > v;
+		std::vector<std::pair<double, double>> v;
 		v.push_back(std::make_pair(x1, y1));
 		v.push_back(std::make_pair(x2, y2));
 		DoPrettyDraw(v, update);
@@ -141,7 +142,7 @@ void Line::Build(const double &x1, const double &y1,
 // Description:		Builds the specified line segments.
 //
 // Input Arguments:
-//		points	= const std::vector<std::pair<unsigned int, unsigned int> >&
+//		points	= const std::vector<std::pair<unsigned int, unsigned int>>&
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
@@ -152,10 +153,10 @@ void Line::Build(const double &x1, const double &y1,
 //
 //=============================================================================
 void Line::Build(
-	const std::vector<std::pair<unsigned int, unsigned int> > &points,
+	const std::vector<std::pair<unsigned int, unsigned int>> &points,
 	const UpdateMethod& update)
 {
-	std::vector<std::pair<double, double> > dPoints(points.size());
+	std::vector<std::pair<double, double>> dPoints(points.size());
 	unsigned int i;
 	for (i = 0; i < points.size(); ++i)
 	{
@@ -173,7 +174,7 @@ void Line::Build(
 // Description:		Builds the specified line segments.
 //
 // Input Arguments:
-//		points	= cosnt std::vector<std::pair<double, double> >&
+//		points	= cosnt std::vector<std::pair<double, double>>&
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
@@ -183,7 +184,7 @@ void Line::Build(
 //		None
 //
 //=============================================================================
-void Line::Build(const std::vector<std::pair<double, double> > &points,
+void Line::Build(const std::vector<std::pair<double, double>> &points,
 	const UpdateMethod& update)
 {
 	if (points.size() < 2)
@@ -218,7 +219,7 @@ void Line::Build(const std::vector<double>& x,
 {
 	assert(x.size() == y.size());
 
-	std::vector<std::pair<double, double> > dPoints(x.size());
+	std::vector<std::pair<double, double>> dPoints(x.size());
 	unsigned int i;
 	for (i = 0; i < dPoints.size(); ++i)
 	{
@@ -235,7 +236,7 @@ void Line::Build(const std::vector<double>& x,
 // Description:		Builds the specified disconnected line segments.
 //
 // Input Arguments:
-//		points	= const std::vector<std::pair<double, double> >
+//		points	= const std::vector<std::pair<double, double>>
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
@@ -245,7 +246,7 @@ void Line::Build(const std::vector<double>& x,
 //		None
 //
 //=============================================================================
-void Line::BuildSegments(const std::vector<std::pair<double, double> > &points,
+void Line::BuildSegments(const std::vector<std::pair<double, double>> &points,
 	const UpdateMethod& update)
 {
 	if (points.size() == 0)
@@ -448,7 +449,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 // Description:		Draws a line strip using OpenGL lines.
 //
 // Input Arguments:
-//		points	= const std::vector<std::pair<double, double> >&
+//		points	= const std::vector<std::pair<double, double>>&
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
@@ -458,7 +459,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 //		None
 //
 //=============================================================================
-void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
+void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 	const UpdateMethod& update)
 {
 	AllocateBuffer(points.size(), 0);
@@ -508,7 +509,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 // Description:		Draws a line strip using OpenGL triangles.
 //
 // Input Arguments:
-//		points	= const std::vector<std::pair<double, double> >&
+//		points	= const std::vector<std::pair<double, double>>&
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
@@ -518,7 +519,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double> > &points,
 //		None
 //
 //=============================================================================
-void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
+void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 	const UpdateMethod& update)
 {
 	std::vector<Offsets> offsets(points.size());
@@ -608,7 +609,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 // Description:		Draws disconnected lines using OpenGL triangles.
 //
 // Input Arguments:
-//		points	= const std::vector<std::pair<double, double> >&
+//		points	= const std::vector<std::pair<double, double>>&
 //		update	= const UpdateMethod&
 //
 // Output Arguments:
@@ -618,7 +619,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double> > &points,
 //		None
 //
 //=============================================================================
-void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points,
+void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &points,
 	const UpdateMethod& update)
 {
 	assert(!RenderWindow::GLHasError());
@@ -708,7 +709,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 // Description:		Assigns vertex data to the vertex buffer (pretty lines).
 //
 // Input Arguments:
-//		points	= const std::vector<std::pair<double, double> >&
+//		points	= const std::vector<std::pair<double, double>>&
 //		style	= const LineStyle&
 //
 // Output Arguments:
@@ -718,7 +719,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &po
 //		None
 //
 //=============================================================================
-void Line::AssignVertexData(const std::vector<std::pair<double, double> >& points,
+void Line::AssignVertexData(const std::vector<std::pair<double, double>>& points,
 	const LineStyle& style)
 {
 	std::vector<Offsets> offsets(points.size());

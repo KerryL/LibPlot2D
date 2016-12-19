@@ -304,7 +304,7 @@ wxArrayString DataFile::CreateDelimiterList() const
 {
 	// Don't use decimals because we're going to have those in regular numbers
 	std::locale usersLocale = std::locale("");// get user's preferred locale settings
-	wxChar point = std::use_facet< std::numpunct<wxChar> >(usersLocale).decimal_point();
+	wxChar point = std::use_facet< std::numpunct<wxChar>>(usersLocale).decimal_point();
 
 	wxArrayString delimiterList;
 	if (point != ',')

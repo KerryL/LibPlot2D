@@ -62,14 +62,14 @@ public:
 		const UpdateMethod& update = UpdateImmediate);
 	void Build(const double &x1, const double &y1, const double &x2,
 		const double &y2, const UpdateMethod& update = UpdateImmediate);
-	void Build(const std::vector<std::pair<unsigned int, unsigned int> > &points,
+	void Build(const std::vector<std::pair<unsigned int, unsigned int>> &points,
 		const UpdateMethod& update = UpdateImmediate);
-	void Build(const std::vector<std::pair<double, double> > &points,
+	void Build(const std::vector<std::pair<double, double>> &points,
 		const UpdateMethod& update = UpdateImmediate);
 	void Build(const std::vector<double>& x,
 		const std::vector<double>& y,
 		const UpdateMethod& update = UpdateImmediate);
-	void BuildSegments(const std::vector<std::pair<double, double> > &points,
+	void BuildSegments(const std::vector<std::pair<double, double>> &points,
 		const UpdateMethod& update = UpdateImmediate);
 
 	const Primitive::BufferInfo& GetBufferInfo() const { return bufferInfo; }
@@ -110,10 +110,10 @@ private:
 	};
 
 	void DoUglyDraw(const double &x1, const double &y1, const double &x2, const double &y2, const UpdateMethod& update);
-	void DoUglyDraw(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update);
-	void DoPrettyDraw(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update);
+	void DoUglyDraw(const std::vector<std::pair<double, double>> &points, const UpdateMethod& update);
+	void DoPrettyDraw(const std::vector<std::pair<double, double>> &points, const UpdateMethod& update);
 
-	void DoPrettySegmentDraw(const std::vector<std::pair<double, double> > &points, const UpdateMethod& update);
+	void DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &points, const UpdateMethod& update);
 
 	enum LineStyle
 	{
@@ -121,7 +121,7 @@ private:
 		StyleSegments
 	};
 
-	void AssignVertexData(const std::vector<std::pair<double, double> >& points,
+	void AssignVertexData(const std::vector<std::pair<double, double>>& points,
 		const LineStyle& style);
 
 	void AllocateBuffer(const unsigned int& vertexCount, const unsigned int& triangleCount);

@@ -1857,7 +1857,7 @@ void PlotRenderer::UpdateLegendAnchor()
 	if (!legend)
 		return;
 
-	std::vector<std::pair<double, Legend::PositionReference> > distances;
+	std::vector<std::pair<double, Legend::PositionReference>> distances;
 	double x, y;
 
 	legend->GetPosition(Legend::BottomLeft, Legend::BottomLeft, x, y);

@@ -309,7 +309,7 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 		// TODO:  Generate a warning here?
 	}
 
-	std::vector<std::pair<int, double> > terms =
+	std::vector<std::pair<int, double>> terms =
 		ExpressionTree::FindPowersAndCoefficients(ExpressionTree::BreakApartTerms(expression));
 
 	terms = CollectLikeTerms(terms);
@@ -332,16 +332,16 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 //					coefficients together.
 //
 // Input Arguments:
-//		terms	= std::vector<std::pair<int, double> >
+//		terms	= std::vector<std::pair<int, double>>
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		std::vector<std::pair<int, double> >
+//		std::vector<std::pair<int, double>>
 //
 //=============================================================================
-std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::pair<int, double> > terms)
+std::vector<std::pair<int, double>> Filter::CollectLikeTerms(std::vector<std::pair<int, double>> terms)
 {
 	unsigned int i, j;
 	for (i = 0; i < terms.size(); ++i)
@@ -369,18 +369,18 @@ std::vector<std::pair<int, double> > Filter::CollectLikeTerms(std::vector<std::p
 //					the appropriate location in the vector.
 //
 // Input Arguments:
-//		terms	= std::vector<std::pair<int, double> >
+//		terms	= std::vector<std::pair<int, double>>
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		std::vector<std::pair<int, double> >
+//		std::vector<std::pair<int, double>>
 //
 //=============================================================================
-std::vector<std::pair<int, double> > Filter::PadMissingTerms(std::vector<std::pair<int, double> > terms)
+std::vector<std::pair<int, double>> Filter::PadMissingTerms(std::vector<std::pair<int, double>> terms)
 {
-	std::sort(terms.begin(), terms.end(), std::greater<std::pair<int, double> >());// Sort in descending order of power
+	std::sort(terms.begin(), terms.end(), std::greater<std::pair<int, double>>());// Sort in descending order of power
 
 	int i, expectedPower(terms[0].first - 1);
 	while (expectedPower < -1)

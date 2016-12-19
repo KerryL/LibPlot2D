@@ -138,8 +138,8 @@ private:
 
 	Line axisLines;
 	Line gridLines;
-	std::vector<std::pair<double, double> > axisPoints;
-	std::vector<std::pair<double, double> > gridPoints;
+	std::vector<std::pair<double, double>> axisPoints;
+	std::vector<std::pair<double, double>> gridPoints;
 
 	void DrawFullAxis();
 	int ComputeMainAxisLocation() const;

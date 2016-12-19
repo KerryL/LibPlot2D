@@ -116,7 +116,7 @@ private:
 	unsigned int sampleLength;// [pixels]
 	double textHeight;// [pixels]
 
-	std::vector<std::pair<double, double> > GetCornerVertices() const;
+	std::vector<std::pair<double, double>> GetCornerVertices() const;
 
 	void UpdateBoundingBox();
 	unsigned int height;
@@ -133,7 +133,7 @@ private:
 	void BuildMarkers();
 	void BuildLabelStrings();
 	Primitive::BufferInfo AssembleBuffers();
-	std::vector<std::pair<double, double> > BuildBorderPoints() const;
+	std::vector<std::pair<double, double>> BuildBorderPoints() const;
 	void BuildSampleLines();
 	void ConfigureVertexArray(Primitive::BufferInfo& buffer) const;
 	void RequiresRedraw();

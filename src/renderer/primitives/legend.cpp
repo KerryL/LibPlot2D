@@ -205,15 +205,15 @@ bool Legend::HasValidParameters()
 //		None
 //
 // Return Value:
-//		std::vector<std::pair<double, double> >
+//		std::vector<std::pair<double, double>>
 //
 //=============================================================================
-std::vector<std::pair<double, double> > Legend::GetCornerVertices() const
+std::vector<std::pair<double, double>> Legend::GetCornerVertices() const
 {
 	double x, y;
 	GetAdjustedPosition(x, y);
 
-	std::vector<std::pair<double, double> > points;
+	std::vector<std::pair<double, double>> points;
 	points.push_back(std::make_pair(x, y));
 	points.push_back(std::make_pair(x + width, y));
 	points.push_back(std::make_pair(x + width, y + height));
@@ -767,12 +767,12 @@ void Legend::GetPosition(const PositionReference& legendRef,
 //		None
 //
 // Return Value:
-//		std::vector<std::pair<double, double> >
+//		std::vector<std::pair<double, double>>
 //
 //=============================================================================
-std::vector<std::pair<double, double> > Legend::BuildBorderPoints() const
+std::vector<std::pair<double, double>> Legend::BuildBorderPoints() const
 {
-	std::vector<std::pair<double, double> > corners(GetCornerVertices());
+	std::vector<std::pair<double, double>> corners(GetCornerVertices());
 	corners.push_back(corners[0]);
 
 	return corners;
@@ -804,7 +804,7 @@ Primitive::BufferInfo Legend::BuildBackground() const
 
 	buffer.indexBuffer.resize(6);
 
-	std::vector<std::pair<double, double> > corners(GetCornerVertices());
+	std::vector<std::pair<double, double>> corners(GetCornerVertices());
 	buffer.vertexBuffer[0] = (float)corners[0].first;
 	buffer.vertexBuffer[1] = (float)corners[0].second;
 

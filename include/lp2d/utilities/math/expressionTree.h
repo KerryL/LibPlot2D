@@ -41,7 +41,7 @@ public:
 	std::string Solve(std::string expression, std::string &solvedExpression);
 
 	static wxArrayString BreakApartTerms(const wxString &s);
-	static std::vector<std::pair<int, double> > FindPowersAndCoefficients(const wxArrayString &terms);
+	static std::vector<std::pair<int, double>> FindPowersAndCoefficients(const wxArrayString &terms);
 
 private:
 	static const unsigned int printfPrecision;
