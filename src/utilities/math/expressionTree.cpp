@@ -2171,15 +2171,13 @@ unsigned int ExpressionTree::FindEndOfNextTerm(const wxString &s, const unsigned
 std::vector<std::pair<int, double> > ExpressionTree::FindPowersAndCoefficients(const wxArrayString &terms)
 {
 	std::vector<std::pair<int, double> > processedTerms;
-	unsigned int start, end;
-	int count;
-	double temp, coefficient;
+	double temp;
 	for (const auto& term : terms)
 	{
-		count = 0;
-		start = 0;
-		end = 0;
-		coefficient = 1.0;
+		int count(0);
+		unsigned int start(0);
+		unsigned int end(0);
+		double coefficient(1.0);
 		while (end != (unsigned int)wxNOT_FOUND)
 		{
 			end = term.Mid(start).Find('*');

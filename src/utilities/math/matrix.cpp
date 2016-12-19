@@ -669,11 +669,10 @@ Matrix Matrix::GetRowReduced() const
 //=============================================================================
 Matrix& Matrix::SwapRows(const unsigned int &r1, const unsigned int &r2)
 {
-	double swap;
 	unsigned int i;
 	for (i = 0; i < columns; ++i)
 	{
-		swap = elements[r1][i];
+		double swap(elements[r1][i]);
 		elements[r1][i] = elements[r2][i];
 		elements[r2][i] = swap;
 	}
@@ -1193,16 +1192,16 @@ void Matrix::InitializeSVDMatrices(Matrix &U, Matrix &V, Matrix &W) const
 //=============================================================================
 double Matrix::ReduceToBidiagonalForm(Matrix &U, Matrix &V, Matrix &W, std::vector<double>& rv1) const
 {
-	unsigned int i, j, k, l(0);
-	double anorm(0.0), f, g(0.0), h, s, scale(0.0);
+	unsigned int i, j, k;
+	double anorm(0.0), f, g(0.0), h, scale(0.0);
 
 	for (i = 0; i < V.rows; ++i)
 	{
-		l = i + 2;
+		unsigned int l(i + 2);
 		rv1[i] = scale * g;
 		g = 0.0;
 		scale = 0.0;
-		s = 0.0;
+		double s(0.0);
 		if (i < U.rows)
 		{
 			for (k = i; k < U.rows; ++k)
@@ -1366,12 +1365,12 @@ void Matrix::AccumulateRightHandTransforms(Matrix &U, Matrix &V, const std::vect
 void Matrix::AccumulateLeftHandTransforms(Matrix &U, Matrix &V, Matrix &W) const
 {
 	int i;
-	unsigned int j, l, k;
-	double f, g, s;
+	unsigned int j, k;
+	double f, s;
 	for (i = GetMinimumDimension() - 1; i >= 0; --i)
 	{
-		l = i + 1;
-		g = W.elements[i][i];
+		unsigned int l(i + 1);
+		double g(W.elements[i][i]);
 		for (j = l; j < V.rows; ++j)
 			U.elements[i][j] = 0.0;
 
@@ -1614,7 +1613,7 @@ void Matrix::RemoveZeroSingularValues(Matrix &U, Matrix &W) const
 void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
 {
 	unsigned int its(1), i, j, k;
-	double sw, s;
+	double sw;
 	std::vector<double> su(U.rows);
 	std::vector<double> sv(V.rows);
 
@@ -1663,7 +1662,7 @@ void Matrix::SortSingularValues(Matrix &U, Matrix &V, Matrix &W) const
 
 	for (k = 0; k < V.rows; ++k)
 	{
-		s = 0.0;
+		double s(0.0);
 		for (i = 0; i < U.rows; ++i)
 		{
 			if (U.elements[i][k] < 0.0)

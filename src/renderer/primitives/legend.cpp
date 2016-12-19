@@ -870,7 +870,7 @@ void Legend::BuildMarkers()
 
 	Primitive::BufferInfo buffer;
 
-	double x, y, halfSize;
+	double x, y;
 	GetAdjustedPosition(x, y);
 
 	x += entrySpacing + 0.5 * sampleLength;
@@ -878,7 +878,7 @@ void Legend::BuildMarkers()
 
 	for (const auto& entry : entries)
 	{
-		halfSize = entry.markerSize * 2.0;// This relationship comes from PlotCurve class
+		double halfSize(entry.markerSize * 2.0);// This relationship comes from PlotCurve class
 		y -= entrySpacing + textHeight;
 
 		if (halfSize <= 0.0)
@@ -964,12 +964,14 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 		buffer.vertexCount += b.vertexCount;
 	}
 
-	const unsigned int colorStart(buffer.vertexCount * renderWindow.GetVertexDimension());
+	const unsigned int colorStart(
+		buffer.vertexCount * renderWindow.GetVertexDimension());
 
-	unsigned int j, k(0), m(0), indexShift(0), bufferColorStart;
+	unsigned int j, k(0), m(0), indexShift(0);
 	for (auto& b : bufferVector)
 	{
-		bufferColorStart = b.vertexCount * renderWindow.GetVertexDimension();
+		unsigned int bufferColorStart(
+			b.vertexCount * renderWindow.GetVertexDimension());
 
 		for (j = 0; j < b.vertexCount; ++j)
 		{

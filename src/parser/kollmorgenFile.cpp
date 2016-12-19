@@ -170,7 +170,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 {
 	std::string nextLine;
 	wxArrayString parsed;
-	unsigned int i, set, curveCount(choices.size() + 1);
+	unsigned int i, curveCount(choices.size() + 1);
 	unsigned int lineNumber(headerLines);
 	double tempDouble, time(0.0);
 
@@ -188,7 +188,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 			return true;
 		}
 
-		set = 0;
+		unsigned int set(0);
 		for (i = 0; i < parsed.size(); ++i)
 		{
 			if (!parsed[i].ToDouble(&tempDouble))

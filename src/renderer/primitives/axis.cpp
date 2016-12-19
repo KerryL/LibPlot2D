@@ -422,10 +422,9 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
 	unsigned int tick;
-	double location;
 	for (tick = 0; tick < count; ++tick)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
+		double location(ValueToPixel(GetNextTickValue(false, false, tick + 1)));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
@@ -495,10 +494,9 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 	InitializeTickParameters(insideTick, outsideTick, sign);
 
 	unsigned int tick;
-	double location;
 	for (tick = 0; tick < count; ++tick)
 	{
-		location = ValueToPixel(GetNextTickValue(false, false, tick + 1));
+		double location(ValueToPixel(GetNextTickValue(false, false, tick + 1)));
 		if (location <= minAxis->GetOffsetFromWindowEdge() ||
 			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
 			continue;
@@ -659,14 +657,14 @@ void Axis::DrawTickLabels()
 
 	if (!wxString::Format("%0.*f", precision, minimum).ToDouble(&minimum)) { /*Warn the user?*/ }
 
-	double value;
 	wxString valueLabel;
 	double valueOffsetFromEdge = offsetFromWindowEdge * 0.8;
 	unsigned int tick, numberOfTicks;
 	ComputeGridAndTickCounts(numberOfTicks);
 	for (tick = 0; tick < numberOfTicks + 2; ++tick)
 	{
-		value = std::min(GetNextTickValue(tick == 0, tick == numberOfTicks + 1, tick), maximum);
+		double value(std::min(GetNextTickValue(tick == 0,
+			tick == numberOfTicks + 1, tick), maximum));
 		valueLabel.Printf("%0.*f", precision, value);
 
 		// TODO:  Don't draw it if it's too close to the maximum (based on text size)

@@ -493,7 +493,7 @@ void FastFourierTransform::DoBitReversal(Dataset2D &set)
 {
 	assert(double(set.GetNumberOfPoints()) / 2.0 == double(set.GetNumberOfPoints() / 2));
 
-	unsigned int i, j, k;
+	unsigned int i, j;
 	double tempX, tempY;
 
 	j = 0;
@@ -509,7 +509,7 @@ void FastFourierTransform::DoBitReversal(Dataset2D &set)
 			set.GetY()[j] = tempY;
 		}
 
-		k = set.GetNumberOfPoints() >> 1;
+		unsigned int k(set.GetNumberOfPoints() >> 1);
 		while (k <= j)
 		{
 			j -= k;
@@ -539,8 +539,8 @@ void FastFourierTransform::DoBitReversal(Dataset2D &set)
 //=============================================================================
 void FastFourierTransform::DoFFT(Dataset2D &temp)
 {
-	unsigned int i, j, i1, l, l1, l2;
-	double c1, c2, t1, t2, u1, u2, z;
+	unsigned int i, j, i1, l, l2;
+	double c1, c2, t1, t2, z;
 	unsigned int powerOfTwo = GetMaxPowerOfTwo(temp.GetNumberOfPoints());
 
 	c1 = -1.0;
@@ -548,10 +548,10 @@ void FastFourierTransform::DoFFT(Dataset2D &temp)
 	l2 = 1;
 	for (l = 0; l < powerOfTwo; ++l)
 	{
-		l1 = l2;
+		unsigned int l1(l2);
 		l2 <<= 1;
-		u1 = 1.0;
-		u2 = 0.0;
+		double u1(1.0);
+		double u2(0.0);
 		for (j = 0; j < l1; ++j)
 		{
 			for (i = j; i < temp.GetNumberOfPoints(); i += l2)
@@ -837,10 +837,9 @@ Dataset2D FastFourierTransform::ComplexDivide(const Dataset2D &a, const Dataset2
 	Dataset2D result(a.GetNumberOfPoints());
 
 	unsigned int i;
-	double denominator;
 	for (i = 0; i < a.GetNumberOfPoints(); ++i)
 	{
-		denominator = b.GetX()[i] * b.GetX()[i] + b.GetY()[i] * b.GetY()[i];
+		double denominator(b.GetX()[i] * b.GetX()[i] + b.GetY()[i] * b.GetY()[i]);
 		result.GetX()[i] = (a.GetX()[i] * b.GetX()[i] + a.GetY()[i] * b.GetY()[i]) / denominator;
 		result.GetY()[i] = (a.GetY()[i] * b.GetX()[i] - a.GetX()[i] * b.GetY()[i]) / denominator;
 	}
@@ -900,13 +899,11 @@ Dataset2D FastFourierTransform::ComplexPower(const Dataset2D &a, const double &p
 {
 	Dataset2D result(a.GetNumberOfPoints());
 
-	double magnitude, angle;
-
 	unsigned int i;
 	for (i = 0; i < a.GetNumberOfPoints(); ++i)
 	{
-		magnitude = sqrt(a.GetX()[i] * a.GetX()[i] + a.GetY()[i] * a.GetY()[i]);
-		angle = atan2(a.GetY()[i], a.GetX()[i]);
+		double magnitude(sqrt(a.GetX()[i] * a.GetX()[i] + a.GetY()[i] * a.GetY()[i]));
+		double angle(atan2(a.GetY()[i], a.GetX()[i]));
 
 		magnitude = pow(magnitude, power);
 		angle *= power;

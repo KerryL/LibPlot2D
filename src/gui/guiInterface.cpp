@@ -1906,10 +1906,9 @@ wxString GuiInterface::ExtractUnitFromDescription(const wxString &description)
 	delimiters.Add(_T("-"));
 	delimiters.Add(_T(":"));
 
-	int location;
 	for (const auto& delimiter : delimiters)
 	{
-		location = description.Find(delimiter.mb_str());
+		int location(description.Find(delimiter.mb_str()));
 		if (location != wxNOT_FOUND && location < (int)description.Len() - 1)
 		{
 			unit = description.Mid(location + 1);

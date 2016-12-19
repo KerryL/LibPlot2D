@@ -229,8 +229,7 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file,
 		{
 			if (!file.eof() &&
 				(fileFormat.GetEndIdentifier().IsEmpty() ||
-				(!fileFormat.GetEndIdentifier().IsEmpty() &&
-				parsed[0].Cmp(fileFormat.GetEndIdentifier()) != 0)))
+				parsed[0].Cmp(fileFormat.GetEndIdentifier()) != 0))
 				wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
 					_T("Column Count Mismatch"), wxICON_WARNING);
 			return true;

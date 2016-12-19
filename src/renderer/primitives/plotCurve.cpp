@@ -376,12 +376,11 @@ void PlotCurve::BuildMarkers()
 	else
 		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetRightYScaleFunction();
 
-	float x, y;
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
-		x = static_cast<float>(xScaleFunction(data.GetX()[i]));
-		y = static_cast<float>(yScaleFunction(data.GetY()[i]));
+		float x(static_cast<float>(xScaleFunction(data.GetX()[i])));
+		float y(static_cast<float>(yScaleFunction(data.GetY()[i])));
 
 		bufferInfo[1].vertexBuffer[i * 4 * dimension] = x + halfMarkerXSize;
 		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = y + halfMarkerYSize;

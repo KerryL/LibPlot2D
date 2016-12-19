@@ -613,7 +613,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 {
 	std::string nextLine;
 	wxArrayString parsed;
-	unsigned int i, set, curveCount(choices.size() + 1);
+	unsigned int i, curveCount(choices.size() + 1);
 	unsigned int lineNumber(headerLines);
 	double tempDouble;
 	std::vector<double> newFactors(choices.size() + 1, 1.0);
@@ -629,7 +629,7 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 			return true;
 		}
 
-		set = 0;
+		unsigned int set(0);
 		for (i = 0; i < parsed.size(); ++i)
 		{
 			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
@@ -813,12 +813,12 @@ double DataFile::GetTimeValue(const wxString &timeString,
 		factor = 1.0;
 
 	wxChar delimiter(':');
-	unsigned int formatStart(0), formatCount(0), timeStart(0), timeCount(0);
+	unsigned int formatStart(0), timeStart(0);
 	double time(0.0), value;
 	while (true)
 	{
-		formatCount = timeFormat.Mid(formatStart).Find(delimiter);
-		timeCount = timeString.Mid(timeStart).Find(delimiter);
+		unsigned int formatCount(timeFormat.Mid(formatStart).Find(delimiter));
+		unsigned int timeCount(timeString.Mid(timeStart).Find(delimiter));
 		if (!timeString.Mid(timeStart, timeCount).ToDouble(&value))
 		{
 			// TODO:  Add warning for user in this case?

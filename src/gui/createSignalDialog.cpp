@@ -446,11 +446,10 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 {
 	dataset = std::make_unique<Dataset2D>(duration * sampleRate + 1);
 
-	double time;
 	unsigned int i;
 	for (i = 0; i < dataset->GetNumberOfPoints(); ++i)
 	{
-		time = startTime + (double)i / sampleRate;
+		double time(startTime + (double)i / sampleRate);
 		dataset->GetX()[i] = time;
 		dataset->GetY()[i] = GetValue(time);
 	}

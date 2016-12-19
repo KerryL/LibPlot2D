@@ -157,12 +157,11 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 
 	// Determine ssTotal (total sum of squares) and ssResidual (residual sum of squares)
 	double ssTotal(0.0), ssResidual(0.0);
-	double fitValue;
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
 		ssTotal += (data.GetY()[i] - yBar) * (data.GetY()[i] - yBar);
-		fitValue = EvaluateFit(data.GetX()[i], fit);
+		double fitValue(EvaluateFit(data.GetX()[i], fit));
 		ssResidual += (data.GetY()[i] - fitValue) * (data.GetY()[i] - fitValue);
 	}
 
