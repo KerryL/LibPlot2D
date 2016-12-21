@@ -206,7 +206,12 @@ END_EVENT_TABLE()
 wxGLContext* RenderWindow::GetContext()
 {
 	if (!context)
+	{
+		wxGLContextAttrs attributes;
+		attributes.CoreProfile().OGLVersion(3, 0);
 		context = std::make_unique<wxGLContext>(this);
+		assert(context->IsOK() && "Minimum OpenGL verison not met (requires 3.0 ES)");
+	}
 
 	return context.get();
 }
