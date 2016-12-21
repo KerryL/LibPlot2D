@@ -79,11 +79,12 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //
 //=============================================================================
 const std::string PlotRenderer::defaultVertexShader(
-	"#version 300 es\n"
+	"#version 140\n"
 	"\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
+	"#extension GL_ARB_explicit_attrib_location : enable\n"// This can go away if version is 330 or 300 es
 	"layout(location = 0) in highp vec2 position;\n"
 	"layout(location = 1) in highp vec4 color;\n"
 	"\n"
