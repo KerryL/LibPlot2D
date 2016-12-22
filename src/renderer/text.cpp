@@ -73,11 +73,11 @@ unsigned int Text::ftReferenceCount(0);
 //=============================================================================
 const std::string Text::vertexShader(
 	"#version 140\n"
+	"#extension GL_ARB_explicit_attrib_location : enable\n"// This can go away if version is 330 or 300 es
 	"\n"
 	"uniform mat4 projectionMatrix;\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"\n"
-	"#extension GL_ARB_explicit_attrib_location : enable\n"// This can go away if version is 330 or 300 es
 	"layout(location = 0) in highp vec4 vertex;// <vec2 pos, vec2 tex>\n"
 	"layout(location = 1) in uint texIndex;\n"
 	"\n"
