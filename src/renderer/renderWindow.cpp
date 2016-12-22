@@ -75,8 +75,7 @@ const double RenderWindow::exactPixelShift(0.375);
 //
 //=============================================================================
 const std::string RenderWindow::defaultVertexShader(
-	"#version 140\n"
-	"#extension GL_ARB_explicit_attrib_location : enable\n"// This can go away if version is 330 or 300 es
+	"#version 300 es\n"
 	"\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
@@ -110,7 +109,7 @@ const std::string RenderWindow::defaultVertexShader(
 //
 //=============================================================================
 const std::string RenderWindow::defaultFragmentShader(
-	"#version 140\n"
+	"#version 300 es\n"
 	"\n"
 	"in highp vec4 vertexColor;\n"
 	"\n"
@@ -209,9 +208,9 @@ wxGLContext* RenderWindow::GetContext()
 	if (!context)
 	{
 		wxGLContextAttrs attributes;
-		attributes.PlatformDefaults().OGLVersion(3, 1).EndList();
+		attributes.PlatformDefaults().OGLVersion(3, 0).EndList();
 		context = std::make_unique<wxGLContext>(this, nullptr, &attributes);
-		assert(context->IsOK() && "Minimum OpenGL verison not met (requires 3.1)");
+		assert(context->IsOK() && "Minimum OpenGL verison not met (requires 3.0)");
 	}
 
 	return context.get();

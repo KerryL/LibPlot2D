@@ -72,8 +72,7 @@ unsigned int Text::ftReferenceCount(0);
 //
 //=============================================================================
 const std::string Text::vertexShader(
-	"#version 140\n"
-	"#extension GL_ARB_explicit_attrib_location : enable\n"// This can go away if version is 330 or 300 es
+	"#version 300 es\n"
 	"\n"
 	"uniform mat4 projectionMatrix;\n"
 	"uniform mat4 modelviewMatrix;\n"
@@ -109,7 +108,7 @@ const std::string Text::vertexShader(
 //
 //=============================================================================
 const std::string Text::fragmentShader(
-	"#version 140\n"
+	"#version 300 es\n"
 	"\n"
 	"uniform highp sampler2DArray text;\n"
 	"uniform highp vec3 textColor;\n"
