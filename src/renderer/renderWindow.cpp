@@ -289,8 +289,7 @@ void RenderWindow::Render()
 	for (auto& p : primitiveList)
 		p->Draw();
 
-	glFlush();
-	SwapBuffers();
+	SwapBuffers();// TODO:  Memory leak here?
 
 	// If shaders are added mid-render, we need to re-render to ensure everything gets displayed
 	if (shaders.size() != shaderCount)

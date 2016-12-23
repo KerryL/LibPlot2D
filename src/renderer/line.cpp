@@ -802,7 +802,7 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double>>& points
 void Line::DoUglyDraw(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
-	glDrawArrays(GL_LINE_STRIP, 0, vertexCount);
+	glDrawArrays(GL_LINE_STRIP, 0, vertexCount);// TODO:  Memory leak here
 	glLineWidth(1.0f);// TODO:  OGL4 Better way to do this? (prevent all lines after this from being drawn at this line's width)  Maybe include in vertex attrib array?
 	// Is it better to not even have ugly lines now?
 

@@ -71,6 +71,24 @@ BEGIN_EVENT_TABLE(PlotListGrid, wxGrid)
 	EVT_MENU(idContextFitCurve,						PlotListGrid::ContextFitCurve)
 END_EVENT_TABLE();
 
+//=============================================================================
+// Class:			PlotListGrid
+// Function:		PlotListGrid
+//
+// Description:		Constructor for PlotListGrid class.
+//
+// Input Arguments:
+//		guiInterface	= GuiInterface&
+//		parent			= wxWindow*
+//		id				= wxWindowID
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
 PlotListGrid::PlotListGrid(GuiInterface& guiInterface, wxWindow *parent,
 	wxWindowID id) : wxGrid(parent, id), guiInterface(guiInterface)
 {
@@ -78,6 +96,22 @@ PlotListGrid::PlotListGrid(GuiInterface& guiInterface, wxWindow *parent,
 	guiInterface.SetPlotListGrid(this);
 }
 
+//=============================================================================
+// Class:			PlotListGrid
+// Function:		Build
+//
+// Description:		Creates the grid and assigns the properties.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
 void PlotListGrid::Build()
 {
 	BeginBatch();
@@ -108,7 +142,7 @@ void PlotListGrid::Build()
 
 	unsigned int i;
 	for (i = 1; i < ColCount; ++i)// Skip the name column
-		AutoSizeColLabelSize(i);
+		AutoSizeColLabelSize(i);// TODO:  Memory leak here
 
 	EndBatch();
 }

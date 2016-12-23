@@ -347,7 +347,7 @@ bool Text::GenerateGlyphs()
 
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, c,
 			face->glyph->bitmap.width, face->glyph->bitmap.rows, 1,
-			GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+			GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);// TODO:  Memory leak here
 
 		g.index = c;
 		g.xSize = face->glyph->bitmap.width;
