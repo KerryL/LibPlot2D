@@ -13,7 +13,6 @@
 
 // Standard C++ headers
 #include <cstdlib>
-#include <cstdio>
 #include <cassert>
 #include <limits>
 #include <cstdarg>
