@@ -45,6 +45,7 @@
     <ClInclude Include="..\include\lp2d\renderer\text.h" />
     <ClInclude Include="..\include\lp2d\utilities\arrayStringCompare.h" />
     <ClInclude Include="..\include\lp2d\utilities\dataset2D.h" />
+    <ClInclude Include="..\include\lp2d\utilities\flagEnum.h" />
     <ClInclude Include="..\include\lp2d\utilities\fontFinder.h" />
     <ClInclude Include="..\include\lp2d\utilities\guiUtilities.h" />
     <ClInclude Include="..\include\lp2d\utilities\machineDefinitions.h" />

@@ -50,33 +50,33 @@ public:
 
 	inline void SetBufferHint(const GLenum& hint) { this->hint = hint; }
 
-	enum UpdateMethod
+	enum class UpdateMethod
 	{
-		UpdateImmediate,// Send to OpenGL immediately
-		UpdateManual// Caller is responsible for sending to OpenGL
+		Immediate,// Send to OpenGL immediately
+		Manual// Caller is responsible for sending to OpenGL
 	};
 
 	// Geometry is constructed in Build() call, so all options need to be set prior
 	void Build(const unsigned int &x1, const unsigned int &y1,
 		const unsigned int &x2, const unsigned int &y2,
 		Primitive::BufferInfo& bufferInfo,
-		const UpdateMethod& update = UpdateImmediate) const;
+		const UpdateMethod& update = UpdateMethod::Immediate) const;
 	void Build(const double &x1, const double &y1, const double &x2,
 		const double &y2, Primitive::BufferInfo& bufferInfo,
-		const UpdateMethod& update = UpdateImmediate) const;
+		const UpdateMethod& update = UpdateMethod::Immediate) const;
 	void Build(
 		const std::vector<std::pair<unsigned int, unsigned int>> &points,
 		Primitive::BufferInfo& bufferInfo,
-		const UpdateMethod& update = UpdateImmediate) const;
+		const UpdateMethod& update = UpdateMethod::Immediate) const;
 	void Build(const std::vector<std::pair<double, double>> &points,
 		Primitive::BufferInfo& bufferInfo,
-		const UpdateMethod& update = UpdateImmediate) const;
+		const UpdateMethod& update = UpdateMethod::Immediate) const;
 	void Build(const std::vector<double>& x,
 		const std::vector<double>& y, Primitive::BufferInfo& bufferInfo,
-		const UpdateMethod& update = UpdateImmediate) const;
+		const UpdateMethod& update = UpdateMethod::Immediate) const;
 	void BuildSegments(const std::vector<std::pair<double, double>> &points,
 		Primitive::BufferInfo& bufferInfo,
-		const UpdateMethod& update = UpdateImmediate) const;
+		const UpdateMethod& update = UpdateMethod::Immediate) const;
 
 	static void DoUglyDraw(const unsigned int& vertexCount);
 	static void DoPrettyDraw(const unsigned int& indexCount);
@@ -126,10 +126,10 @@ private:
 		const std::vector<std::pair<double, double>> &points,
 		const UpdateMethod& update, Primitive::BufferInfo& bufferInfo) const;
 
-	enum LineStyle
+	enum class LineStyle
 	{
-		StyleContinuous,
-		StyleSegments
+		Continuous,
+		Segments
 	};
 
 	void AssignVertexData(const std::vector<std::pair<double, double>>& points,

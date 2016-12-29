@@ -46,7 +46,7 @@ namespace LibPlot2D
 std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 	const Dataset2D& data)
 {
-	return ComputeFFT(data, WindowHann, 0, 0.0, true);
+	return ComputeFFT(data, WindowType::Hann, 0, 0.0, true);
 }
 
 //=============================================================================
@@ -59,7 +59,7 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 //
 // Input Arguments:
 //		data			= Dataset2D referring to the data of interest
-//		window			= const FFTWindow&
+//		window			= const WindowType&
 //		windowSize		= unsigned int, number of points in each sample;
 //						  zero uses max sample size
 //		overlap			= const double&, percentage overlap (0.0 - 1.0) between
@@ -75,7 +75,7 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 //
 //=============================================================================
 std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
-	Dataset2D data, const FFTWindow &window,
+	Dataset2D data, const WindowType &window,
 	unsigned int windowSize, const double &overlap, const bool &subtractMean)
 {
 	double sampleRate = 1.0 / data.GetAverageDeltaX();// [Hz]
@@ -209,7 +209,7 @@ void FastFourierTransform::AddToAverage(Dataset2D &average, const Dataset2D &dat
 // Input Arguments:
 //		data			= const Dataset2D&
 //		numberOfPoints	= const unsigned int&
-//		window			= const FFTWindow&
+//		window			= const WindowType&
 //
 // Output Arguments:
 //		rawFFT			= Dataset2D&
@@ -219,7 +219,7 @@ void FastFourierTransform::AddToAverage(Dataset2D &average, const Dataset2D &dat
 //
 //=============================================================================
 void FastFourierTransform::InitializeRawFFTDataset(Dataset2D &rawFFT,
-	const Dataset2D &data, const FFTWindow &window)
+	const Dataset2D &data, const WindowType &window)
 {
 	rawFFT.Resize(data.GetNumberOfPoints());
 
@@ -244,7 +244,7 @@ void FastFourierTransform::InitializeRawFFTDataset(Dataset2D &rawFFT,
 //
 // Input Arguments:
 //		data	= const Dataset2D&
-//		window	= const FFTWindow& indicating the type of window to use
+//		window	= const WindowType& indicating the type of window to use
 //
 // Output Arguments:
 //		None
@@ -253,7 +253,8 @@ void FastFourierTransform::InitializeRawFFTDataset(Dataset2D &rawFFT,
 //		Dataset2D
 //
 //=============================================================================
-Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWindow &window)
+Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data,
+	const WindowType &window)
 {
 	Dataset2D rawFFT;
 
@@ -277,7 +278,7 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 //		input				= const Dataset2D&
 //		output				= const Dataset2D&
 //		numberOfAverages	= unsigned int
-//		window				= const FFTWindow&
+//		window				= const WindowType&
 //		moduloRange			= const bool&
 //
 // Output Arguments:
@@ -291,7 +292,7 @@ Dataset2D FastFourierTransform::ComputeRawFFT(const Dataset2D &data, const FFTWi
 //==============================================================================
 void FastFourierTransform::ComputeFRF(const Dataset2D &input,
 	const Dataset2D &output, unsigned int numberOfAverages,
-	const FFTWindow &window, const bool &moduloPhase, Dataset2D& amplitude,
+	const WindowType &window, const bool &moduloPhase, Dataset2D& amplitude,
 	Dataset2D* phase, Dataset2D* coherence)
 {
 	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
@@ -403,8 +404,8 @@ Dataset2D FastFourierTransform::ComputeCoherence(const Dataset2D& input, const D
 	unsigned int windowSize = (unsigned int)pow(2, (double)GetMaxPowerOfTwo(input.GetNumberOfPoints()));
 
 	Dataset2D fftIn, fftOut;
-	fftIn = ComputeRawFFT(ChopSample(input, 0, windowSize, 0.0), WindowUniform);
-	fftOut = ComputeRawFFT(ChopSample(output, 0, windowSize, 0.0), WindowUniform);
+	fftIn = ComputeRawFFT(ChopSample(input, 0, windowSize, 0.0), WindowType::Uniform);
+	fftOut = ComputeRawFFT(ChopSample(output, 0, windowSize, 0.0), WindowType::Uniform);
 
 	Dataset2D crossPower = ComputeCrossPowerSpectrum(fftIn, fftOut);
 	Dataset2D inputPower = ComputePowerSpectrum(fftIn);
@@ -924,7 +925,7 @@ Dataset2D FastFourierTransform::ComplexPower(const Dataset2D &a, const double &p
 //
 // Input Arguments:
 //		data	= Dataset2D&
-//		window	= const FFTWindow&
+//		window	= const WindowType&
 //
 // Output Arguments:
 //		None
@@ -933,19 +934,19 @@ Dataset2D FastFourierTransform::ComplexPower(const Dataset2D &a, const double &p
 //		None
 //
 //=============================================================================
-void FastFourierTransform::ApplyWindow(Dataset2D &data, const FFTWindow &window)
+void FastFourierTransform::ApplyWindow(Dataset2D &data, const WindowType &window)
 {
-	if (window == WindowUniform)
+	if (window == WindowType::Uniform)
 		return;// No processing necessary
-	else if (window == WindowHann)
+	else if (window == WindowType::Hann)
 		ApplyHannWindow(data);
-	else if (window == WindowHamming)
+	else if (window == WindowType::Hamming)
 		ApplyHammingWindow(data);
-	else if (window == WindowFlatTop)
+	else if (window == WindowType::FlatTop)
 		ApplyFlatTopWindow(data);
-	/*else if (window == WindowForce)
+	/*else if (window == WindowType::Force)
 		ApplyForceWindow(data);*/
-	else if (window == WindowExponential)
+	else if (window == WindowType::Exponential)
 		ApplyExponentialWindow(data);
 	else
 		assert(false);
@@ -1090,7 +1091,7 @@ void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 // Description:		Returns a string describing the specified window.
 //
 // Input Arguments:
-//		window	= const FFTWindow&
+//		window	= const WindowType&
 //
 // Output Arguments:
 //		None
@@ -1099,19 +1100,19 @@ void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 //		std::string
 //
 //=============================================================================
-std::string FastFourierTransform::GetWindowName(const FFTWindow &window)
+std::string FastFourierTransform::GetWindowName(const WindowType &window)
 {
-	if (window == WindowUniform)
+	if (window == WindowType::Uniform)
 		return "Uniform";
-	else if (window == WindowHann)
+	else if (window == WindowType::Hann)
 		return "Hann";
-	else if (window == WindowHamming)
+	else if (window == WindowType::Hamming)
 		return "Hamming";
-	else if (window == WindowFlatTop)
+	else if (window == WindowType::FlatTop)
 		return "Flat Top";
-	/*else if (window == WindowForce)
+	/*else if (window == WindowType::Force)
 		return "Force";*/
-	else if (window == WindowExponential)
+	else if (window == WindowType::Exponential)
 		return "Exponential";
 
 	assert(false);

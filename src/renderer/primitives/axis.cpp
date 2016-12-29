@@ -47,8 +47,8 @@ Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(rend
 {
 	color.Set(0.0, 0.0, 0.0, 1.0);
 
-	orientation = OrientationBottom;
-	tickStyle = TickStyleThrough;
+	orientation = Orientation::Bottom;
+	tickStyle = TickStyle::Through;
 
 	tickSize = 7;
 
@@ -199,7 +199,7 @@ void Axis::DrawFullAxis()
 		if ((majorGrid || minorGrid) && oppositeAxis)
 			DrawHorizontalGrid(numberOfGridLines);
 
-		if (tickStyle != TickStyleNone)
+		if (tickStyle != TickStyle::None)
 			DrawHorizontalTicks(numberOfTicks, mainAxisLocation);
 	}
 	else
@@ -207,7 +207,7 @@ void Axis::DrawFullAxis()
 		if ((majorGrid || minorGrid) && oppositeAxis)
 			DrawVerticalGrid(numberOfGridLines);
 
-		if (tickStyle != TickStyleNone)
+		if (tickStyle != TickStyle::None)
 			DrawVerticalTicks(numberOfTicks, mainAxisLocation);
 	}
 
@@ -233,9 +233,9 @@ void Axis::DrawFullAxis()
 int Axis::ComputeMainAxisLocation() const
 {
 	// Compute the mainAxisLocation (X for vertical axis, Y for horizontal axis)
-	if (orientation == OrientationBottom || orientation == OrientationLeft)
+	if (orientation == Orientation::Bottom || orientation == Orientation::Left)
 		return offsetFromWindowEdge;
-	else if (orientation == OrientationRight)
+	else if (orientation == Orientation::Right)
 		return renderWindow.GetSize().GetWidth() - offsetFromWindowEdge;
 
 	//else// OrientationTop
@@ -344,17 +344,17 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 	outside = 0;
 	sign = 1;
 
-	if (tickStyle == TickStyleInside)
+	if (tickStyle == TickStyle::Inside)
 		inside = 1.0;
-	else if (tickStyle == TickStyleOutside)
+	else if (tickStyle == TickStyle::Outside)
 		outside = 1.0;
-	else if (tickStyle == TickStyleThrough)
+	else if (tickStyle == TickStyle::Through)
 	{
 		inside = 0.5;
 		outside = 0.5;
 	}
 
-	if (orientation == OrientationTop || orientation == OrientationRight)
+	if (orientation == Orientation::Top || orientation == Orientation::Right)
 		sign = -1.0;
 }
 
@@ -606,16 +606,16 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 {
 	switch (orientation)
 	{
-	case OrientationBottom:
+	case Orientation::Bottom:
 		return offset;
 
-	case OrientationLeft:
+	case Orientation::Left:
 		return offset + fontHeight;
 
-	case OrientationTop:
+	case Orientation::Top:
 		return renderWindow.GetSize().GetHeight() - offset - fontHeight;
 
-	case OrientationRight:
+	case Orientation::Right:
 		return renderWindow.GetSize().GetWidth() - offset;
 
 	default:
@@ -757,7 +757,7 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 {
 	if (IsHorizontal())
 	{
-		if (orientation == OrientationBottom)
+		if (orientation == Orientation::Bottom)
 			yTranslation = offset - boundingBox.yUp;
 		else
 			yTranslation = renderWindow.GetSize().GetHeight() - offset;
@@ -767,7 +767,7 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 	}
 	else
 	{
-		if (orientation == OrientationLeft)
+		if (orientation == Orientation::Left)
 			xTranslation = offset - boundingBox.xRight;
 		else
 			xTranslation = renderWindow.GetSize().GetWidth() - offset;
@@ -795,7 +795,7 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 //=============================================================================
 bool Axis::IsHorizontal() const
 {
-	if (orientation == OrientationBottom || orientation == OrientationTop)
+	if (orientation == Orientation::Bottom || orientation == Orientation::Top)
 		return true;
 
 	return false;
@@ -958,7 +958,7 @@ double Axis::GetNextGridValue(const unsigned int &tick) const
 //=============================================================================
 unsigned int Axis::GetAxisLength() const
 {
-	if (orientation == OrientationTop || orientation == OrientationBottom)
+	if (orientation == Orientation::Top || orientation == Orientation::Bottom)
 	{
 		return renderWindow.GetSize().GetWidth()
 			- minAxis->GetOffsetFromWindowEdge()

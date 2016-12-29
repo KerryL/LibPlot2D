@@ -56,7 +56,7 @@ private:
 	bool IsSelected(const int &i) const;
 
 	// Object IDs
-	enum
+	enum EventIDs
 	{
 		idSelectAll = wxID_HIGHEST + 300,
 		idFilterText

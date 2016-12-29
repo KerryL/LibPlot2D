@@ -204,6 +204,9 @@
     <ClInclude Include="..\include\lp2d\parser\fileTypeManager.h">
       <Filter>Header Files\parser</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\lp2d\utilities\flagEnum.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gui\createSignalDialog.cpp">

@@ -83,7 +83,7 @@ private:
 
 	struct Identifier
 	{
-		enum Location
+		enum class Location
 		{
 			BOF,	// beginning of file
 			BOL,	// beginning of any pre-data line

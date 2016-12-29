@@ -131,7 +131,7 @@ wxSizer* FFTDialog::CreateInputControls()
 	wxStaticText *windowLabel = new wxStaticText(this, wxID_ANY, _T("Window"));
 	windowCombo = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
 		wxDefaultSize, GetWindowList(), wxCB_READONLY);
-	windowCombo->SetSelection(FastFourierTransform::WindowHann);
+	windowCombo->SetSelection(static_cast<int>(FastFourierTransform::WindowType::Hann));
 	sizer->Add(windowLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 2);
 	sizer->Add(windowCombo, 1, wxALL | wxGROW, 2);
 
@@ -283,8 +283,10 @@ wxArrayString FFTDialog::GetWindowList() const
 	wxArrayString list;
 
 	unsigned int i;
-	for (i = 0; i < FastFourierTransform::WindowCount; ++i)
-		list.Add(FastFourierTransform::GetWindowName((FastFourierTransform::FFTWindow)i));
+	for (i = 0; i < static_cast<unsigned int>(
+		FastFourierTransform::WindowType::Count); ++i)
+		list.Add(FastFourierTransform::GetWindowName(
+			static_cast<FastFourierTransform::WindowType>(i)));
 
 	return list;
 }
@@ -393,12 +395,12 @@ bool FFTDialog::TransferDataFromWindow()
 //		None
 //
 // Return Value:
-//		FastFourierTransform::FFTWindow
+//		FastFourierTransform::WindowType
 //
 //=============================================================================
-FastFourierTransform::FFTWindow FFTDialog::GetFFTWindow() const
+FastFourierTransform::WindowType FFTDialog::GetFFTWindow() const
 {
-	return (FastFourierTransform::FFTWindow)windowCombo->GetSelection();
+	return static_cast<FastFourierTransform::WindowType>(windowCombo->GetSelection());
 }
 
 //=============================================================================

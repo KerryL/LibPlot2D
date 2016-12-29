@@ -173,16 +173,16 @@ private:
 
 	void Render();
 
-	enum InteractionType
+	enum class Interaction
 	{
-		InteractionDollyDrag,// zoom
-		InteractionDollyWheel,// zoom
-		InteractionPan,// translate
-		InteractionRotate
+		DollyDrag,// zoom
+		DollyWheel,// zoom
+		Pan,// translate
+		Rotate
 	};
 
 	// Performs the computations and transformations associated with the specified interaction
-	void PerformInteraction(InteractionType interaction, wxMouseEvent &event);
+	void PerformInteraction(Interaction interaction, wxMouseEvent &event);
 
 	// The interaction events (called from within the real event handlers)
 	void DoRotate(wxMouseEvent &event);
@@ -226,8 +226,8 @@ protected:
 	long lastMousePosition[2];
 	void StoreMousePosition(wxMouseEvent &event);
 
-	bool Determine2DInteraction(const wxMouseEvent &event, InteractionType &interaction) const;
-	bool Determine3DInteraction(const wxMouseEvent &event, InteractionType &interaction) const;
+	bool Determine2DInteraction(const wxMouseEvent &event, Interaction &interaction) const;
+	bool Determine3DInteraction(const wxMouseEvent &event, Interaction &interaction) const;
 
 	// Flag indicating whether or not we should select a new focal point for the interactions
 	bool isInteracting = false;

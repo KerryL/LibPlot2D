@@ -33,14 +33,14 @@ namespace LibPlot2D
 
 struct FilterParameters
 {
-	enum Type
+	enum class Type
 	{
-		TypeLowPass,
-		TypeHighPass,
-		TypeBandPass,
-		TypeBandStop,
-		TypeNotch,
-		TypeCustom
+		LowPass,
+		HighPass,
+		BandPass,
+		BandStop,
+		Notch,
+		Custom
 	} type;
 
 	bool phaseless;

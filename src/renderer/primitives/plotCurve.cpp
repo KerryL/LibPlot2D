@@ -232,10 +232,10 @@ void PlotCurve::Update(const unsigned int& i)
 //=============================================================================
 void PlotCurve::GenerateGeometry()
 {
-	if (yAxis->GetOrientation() == Axis::OrientationLeft)
-		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewLeft);
+	if (yAxis->GetOrientation() == Axis::Orientation::Left)
+		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Left);
 	else
-		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewRight);
+		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Right);
 
 	glEnable(GL_SCISSOR_TEST);
 
@@ -260,7 +260,7 @@ void PlotCurve::GenerateGeometry()
 
 	assert(!RenderWindow::GLHasError());
 
-	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::ModelviewFixed);
+	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Fixed);
 }
 
 //=============================================================================
@@ -369,7 +369,7 @@ void PlotCurve::BuildMarkers()
 		dynamic_cast<PlotRenderer&>(renderWindow).GetXScaleFunction());
 	PlotRenderer::ScalingFunction yScaleFunction;
 
-	if (yAxis->GetOrientation() == Axis::OrientationLeft)
+	if (yAxis->GetOrientation() == Axis::Orientation::Left)
 		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetLeftYScaleFunction();
 	else
 		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetRightYScaleFunction();
@@ -464,18 +464,18 @@ bool PlotCurve::RangeIsSmall() const
 
 	switch (XRangeIsSmall())
 	{
-	case RangeSizeSmall:
+	case RangeSize::Small:
 		return true;
 
-	case RangeSizeLarge:
+	case RangeSize::Large:
 		return false;
 
 	default:
-	case RangeSizeUndetermined:
+	case RangeSize::Undetermined:
 		break;
 	}
 
-	return YRangeIsSmall() == RangeSizeSmall;
+	return YRangeIsSmall() == RangeSize::Small;
 }
 
 //=============================================================================
@@ -501,20 +501,20 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
 	double period(fabs(data.GetX()[1] - data.GetX()[0]));
 	if (period == 0.0)
-		return RangeSizeUndetermined;
+		return RangeSize::Undetermined;
 
 	unsigned int points = (unsigned int)floor((xAxis->GetMaximum() - xAxis->GetMinimum()) / period);
 	if (points == 0)
-		return RangeSizeSmall;
+		return RangeSize::Small;
 
 	unsigned int spacing = (renderWindow.GetSize().GetWidth()
 		- xAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
 		- xAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 
 	if (spacing > 7)
-		return RangeSizeSmall;
+		return RangeSize::Small;
 
-	return RangeSizeLarge;
+	return RangeSize::Large;
 }
 
 //=============================================================================
@@ -540,20 +540,20 @@ PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
 	double period(data.GetY()[1] - data.GetY()[0]);
 	if (period == 0.0)
-		return RangeSizeUndetermined;
+		return RangeSize::Undetermined;
 
 	unsigned int points = (unsigned int)floor((yAxis->GetMaximum() - yAxis->GetMinimum()) / period);
 	if (points == 0)
-		return RangeSizeSmall;
+		return RangeSize::Small;
 
 	unsigned int spacing = (renderWindow.GetSize().GetHeight()
 		- yAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
 		- yAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 
 	if (spacing > 7)
-		return RangeSizeSmall;
+		return RangeSize::Small;
 
-	return RangeSizeLarge;
+	return RangeSize::Large;
 }
 
 //=============================================================================

@@ -25,6 +25,7 @@
 // Local headers
 #include "lp2d/renderer/renderWindow.h"
 #include "lp2d/renderer/primitives/legend.h"
+#include "lp2d/utilities/flagEnum.h"
 
 // wxWidgets forward declarations
 class wxString;
@@ -148,13 +149,13 @@ public:
 	static const unsigned int maxYTicks;
 	static double ComputeTickSpacing(const double &min, const double &max, const int &maxTicks);
 
-	enum CurveQuality
+	enum class CurveQuality
 	{
-		QualityAlwaysLow = 0,
-		QualityHighWrite = 1 << 0,
-		QualityHighDrag = 1 << 1,
-		QualityHighStatic = 1 << 2,
-		QualityAlwaysHigh = QualityHighWrite | QualityHighDrag | QualityHighStatic
+		AlwaysLow = 0,
+		HighWrite = 1 << 0,
+		HighDrag = 1 << 1,
+		HighStatic = 1 << 2,
+		AlwaysHigh = HighWrite | HighDrag | HighStatic
 	};
 
 	void SetCurveQuality(const CurveQuality& curveQuality);
@@ -166,11 +167,11 @@ public:
 
 	virtual unsigned int GetVertexDimension() const { return 2; }
 
-	enum Modelview
+	enum class Modelview
 	{
-		ModelviewFixed,
-		ModelviewLeft,
-		ModelviewRight
+		Fixed,
+		Left,
+		Right
 	};
 
 	void LoadModelviewUniform(const Modelview& mv);
@@ -191,12 +192,12 @@ public:
 	static inline double DoLineaerScale(const double& value) { return value; }
 	static inline double DoLogarithmicScale(const double& value) { return log10(value); }
 
-	enum PlotContext
+	enum class PlotContext
 	{
-		PlotContextXAxis,
-		PlotContextLeftYAxis,
-		PlotContextRightYAxis,
-		PlotContextPlotArea
+		XAxis,
+		LeftYAxis,
+		RightYAxis,
+		PlotArea
 	};
 
 	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
@@ -297,7 +298,7 @@ protected:
 	ScalingFunction rightYScaleFunction;
 
 	// The event IDs
-	enum MainFrameEventID
+	enum EventIDs
 	{
 		idPlotContextCopy,
 		idPlotContextPaste,
@@ -386,6 +387,12 @@ protected:
 
 	// For the event table
 	DECLARE_EVENT_TABLE()
+};
+
+template<>
+struct EnableBitwiseOperators<PlotRenderer::CurveQuality>
+{
+	static constexpr bool enable = true;
 };
 
 }// namespace LibPlot2D

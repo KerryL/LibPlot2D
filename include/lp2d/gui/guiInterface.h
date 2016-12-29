@@ -63,12 +63,12 @@ public:
 
 	void SetApplicationTitle(const wxString& title) { applicationTitle = title; }
 
-	enum FileFormat
+	enum class FileFormat
 	{
-		FormatBaumuller,
-		FormatKollmorgen,
-		FormatFrequency,
-		FormatGeneric
+		Baumuller,
+		Kollmorgen,
+		Frequency,
+		Generic
 	};
 
 	template<typename T>
@@ -136,13 +136,13 @@ private:
 
 	FileTypeManager fileTypeManager;
 
-	FileFormat currentFileFormat = FormatGeneric;
+	FileFormat currentFileFormat = FileFormat::Generic;
 	wxString genericXAxisLabel;
 
 	bool GetXAxisScalingFactor(double &factor, wxString *label = nullptr);
 
 	void UpdateSingleCursorValue(const unsigned int &row, double value,
-		const unsigned int &column, const bool &isVisible);
+		const PlotListGrid::Column &column, const bool &isVisible);
 
 	FilterParameters DisplayFilterDialog();
 	void ApplyFilter(const FilterParameters &parameters,

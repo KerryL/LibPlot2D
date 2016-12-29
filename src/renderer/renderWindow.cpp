@@ -503,7 +503,7 @@ void RenderWindow::Initialize()
 //=============================================================================
 void RenderWindow::OnMouseWheelEvent(wxMouseEvent &event)
 {
-	PerformInteraction(InteractionDollyWheel, event);
+	PerformInteraction(Interaction::DollyWheel, event);
 }
 
 //=============================================================================
@@ -532,7 +532,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	InteractionType interaction;
+	Interaction interaction;
 	if (view3D)
 	{
 		if (!Determine3DInteraction(event, interaction))
@@ -563,7 +563,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 //					relative to the eyepoint in the scene's coordinate system!
 //
 // Input Arguments:
-//		interaction	= InteractionType specifying which type of motion to create
+//		interaction	= Interaction specifying which type of motion to create
 //		event		= wxMouseEvent&
 //
 // Output Arguments:
@@ -573,7 +573,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 //		None
 //
 //=============================================================================
-void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent &event)
+void RenderWindow::PerformInteraction(Interaction interaction, wxMouseEvent &event)
 {
 	SetCurrent(*GetContext());
 
@@ -586,13 +586,13 @@ void RenderWindow::PerformInteraction(InteractionType interaction, wxMouseEvent 
 		isInteracting = true;
 	}
 
-	if (interaction == InteractionDollyWheel)
+	if (interaction == Interaction::DollyWheel)
 		DoWheelDolly(event);
-	else if (interaction == InteractionDollyDrag)
+	else if (interaction == Interaction::DollyDrag)
 		DoDragDolly(event);
-	else if (interaction == InteractionPan)
+	else if (interaction == Interaction::Pan)
 		DoPan(event);
-	else if (interaction == InteractionRotate)
+	else if (interaction == Interaction::Rotate)
 		DoRotate(event);
 
 	Refresh();
@@ -1426,21 +1426,22 @@ void RenderWindow::SetViewOrthogonal(const bool &viewOrthogonal)
 //		event		= wxMouseEvent&
 //
 // Output Arguments:
-//		interaction	= InteractionType&
+//		interaction	= Interaction&
 //
 // Return Value:
 //		bool
 //
 //=============================================================================
-bool RenderWindow::Determine2DInteraction(const wxMouseEvent &event, InteractionType &interaction) const
+bool RenderWindow::Determine2DInteraction(const wxMouseEvent &event,
+	Interaction &interaction) const
 {
 	// DOLLY:  Left mouse button + Ctrl OR Left mouse button + Alt OR Middle mouse button
 	if ((event.LeftIsDown() && event.ShiftDown()) || event.RightIsDown())
-		interaction = InteractionDollyDrag;
+		interaction = Interaction::DollyDrag;
 
 	// PAN:  Left mouse button (includes with any buttons not caught above)
 	else if (event.LeftIsDown())
-		interaction = InteractionPan;
+		interaction = Interaction::Pan;
 
 	else
 		return false;
@@ -1458,26 +1459,27 @@ bool RenderWindow::Determine2DInteraction(const wxMouseEvent &event, Interaction
 //		event		= wxMouseEvent&
 //
 // Output Arguments:
-//		interaction	= InteractionType&
+//		interaction	= Interaction&
 //
 // Return Value:
 //		bool
 //
 //=============================================================================
-bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event, InteractionType &interaction) const
+bool RenderWindow::Determine3DInteraction(const wxMouseEvent &event,
+	Interaction &interaction) const
 {
 	// PAN:  Left mouse button + Shift OR Right mouse button
 	if ((event.LeftIsDown() && event.ShiftDown()) || event.RightIsDown())
-		interaction = InteractionPan;
+		interaction = Interaction::Pan;
 
 	// DOLLY:  Left mouse button + Ctrl OR Left mouse button + Alt OR Middle mouse button
 	else if ((event.LeftIsDown() && (event.CmdDown() || event.AltDown()))
 		|| event.MiddleIsDown())
-		interaction = InteractionDollyDrag;
+		interaction = Interaction::DollyDrag;
 
 	// ROTATE:  Left mouse button (includes with any buttons not caught above)
 	else if (event.LeftIsDown())
-		interaction = InteractionRotate;
+		interaction = Interaction::Rotate;
 
 	else
 		return false;

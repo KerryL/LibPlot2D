@@ -33,7 +33,7 @@ public:
 
 	~FFTDialog() = default;
 
-	FastFourierTransform::FFTWindow GetFFTWindow() const;
+	FastFourierTransform::WindowType GetFFTWindow() const;
 	unsigned int GetWindowSize() const;
 	double GetOverlap() const;
 	bool GetUseZoomedData() const;

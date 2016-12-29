@@ -173,7 +173,7 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 
 	wxArrayString signalList;
 	unsigned int i;
-	for (i = 0; i < SignalCount; ++i)
+	for (i = 0; i < static_cast<unsigned int>(SignalType::Count); ++i)
 		signalList.Add(GetSignalName((SignalType)i));
 
 	wxStaticText *typeLabel = new wxStaticText(this, wxID_ANY, _T("Signal Type"));
@@ -263,21 +263,21 @@ wxString CreateSignalDialog::GetSignalName(const SignalType &type)
 {
 	assert(type >= 0 && type < SignalCount);
 
-	if (type == SignalStep)
+	if (type == SignalType::Step)
 		return _T("Step");
-	else if (type == SignalRamp)
+	else if (type == SignalType::Ramp)
 		return _T("Ramp");
-	else if (type == SignalSinusoid)
+	else if (type == SignalType::Sinusoid)
 		return _T("Sinusoid");
-	else if (type == SignalSquare)
+	else if (type == SignalType::Square)
 		return _T("Square");
-	else if (type == SignalTriangle)
+	else if (type == SignalType::Triangle)
 		return _T("Triangle");
-	else if (type == SignalSawtooth)
+	else if (type == SignalType::Sawtooth)
 		return _T("Sawtooth");
-	else if (type == SignalChirp)
+	else if (type == SignalType::Chirp)
 		return _T("Chirp");
-	else if (type == SignalWhiteNoise)
+	else if (type == SignalType::WhiteNoise)
 		return _T("White Noise");
 
 	return _T("Unknown signal type");
@@ -342,11 +342,11 @@ bool CreateSignalDialog::TransferDataFromWindow()
 		wxMessageBox(initialValueLabel->GetLabel() + _T(" must be numeric."), _T("Error"), 5L, this);
 		return false;
 	}
-	else if (lastSelection == SignalSinusoid ||
-		lastSelection == SignalSquare ||
-		lastSelection == SignalTriangle ||
-		lastSelection == SignalSawtooth ||
-		lastSelection == SignalChirp)
+	else if (lastSelection == SignalType::Sinusoid ||
+		lastSelection == SignalType::Square ||
+		lastSelection == SignalType::Triangle ||
+		lastSelection == SignalType::Sawtooth ||
+		lastSelection == SignalType::Chirp)
 	{
 		if (PlotMath::IsZero(value) && wxMessageBox(_T("Amplitude is zero.  Continue anyway?"), _T("Warning"), wxYES_NO, this) == wxNO)
 			return false;
@@ -358,7 +358,7 @@ bool CreateSignalDialog::TransferDataFromWindow()
 		return false;
 	}
 
-	if (lastSelection != SignalWhiteNoise)
+	if (lastSelection != SignalType::WhiteNoise)
 	{
 		if (!frequencyTextBox->GetValue().ToDouble(&value))
 		{
@@ -366,18 +366,18 @@ bool CreateSignalDialog::TransferDataFromWindow()
 			return false;
 		}
 
-		if (lastSelection != SignalStep && lastSelection != SignalRamp && value < 0.0)
+		if (lastSelection != SignalType::Step && lastSelection != SignalType::Ramp && value < 0.0)
 		{
 			if (wxMessageBox(_T("Frequency is negative.  Continue anyway?"), _T("Warning"), wxYES_NO, this) == wxNO)
 				return false;
 		}
 	}
 
-	if (lastSelection == SignalRamp ||
-		lastSelection == SignalSquare ||
-		lastSelection == SignalTriangle ||
-		lastSelection == SignalSawtooth ||
-		lastSelection == SignalChirp)
+	if (lastSelection == SignalType::Ramp ||
+		lastSelection == SignalType::Square ||
+		lastSelection == SignalType::Triangle ||
+		lastSelection == SignalType::Sawtooth ||
+		lastSelection == SignalType::Chirp)
 	{
 		if (!slopeTextBox->GetValue().ToDouble(&value))
 		{
@@ -385,7 +385,7 @@ bool CreateSignalDialog::TransferDataFromWindow()
 			return false;
 		}
 
-		if (lastSelection == SignalSquare)
+		if (lastSelection == SignalType::Square)
 		{
 			if (value < 0.0 || value > 1.0)
 			{
@@ -395,9 +395,9 @@ bool CreateSignalDialog::TransferDataFromWindow()
 		}
 	}
 
-	if (lastSelection != SignalStep &&
-		lastSelection != SignalRamp &&
-		lastSelection != SignalWhiteNoise)
+	if (lastSelection != SignalType::Step &&
+		lastSelection != SignalType::Ramp &&
+		lastSelection != SignalType::WhiteNoise)
 	{
 		if (!periodTextBox->GetValue().ToDouble(&value))
 		{
@@ -474,7 +474,7 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 //=============================================================================
 double CreateSignalDialog::GetValue(const double &time)
 {
-	if (lastSelection == SignalStep)
+	if (lastSelection == SignalType::Step)
 	{
 		double eventTime(0.0), initialValue(0.0), finalValue(0.0);
 		if (!frequencyTextBox->GetValue().ToDouble(&eventTime) ||
@@ -487,7 +487,7 @@ double CreateSignalDialog::GetValue(const double &time)
 		else
 			return finalValue;
 	}
-	else if (lastSelection == SignalRamp)
+	else if (lastSelection == SignalType::Ramp)
 	{
 		double eventTime(0.0), initialValue(0.0), finalValue(0.0), slope(0.0);
 		if (!frequencyTextBox->GetValue().ToDouble(&eventTime) ||
@@ -509,7 +509,7 @@ double CreateSignalDialog::GetValue(const double &time)
 		else
 			return initialValue + slope * (time - eventTime);
 	}
-	else if (lastSelection == SignalSinusoid)
+	else if (lastSelection == SignalType::Sinusoid)
 	{
 		double amplitude(0.0), offset(0.0), frequency(0.0), phase(0.0);
 		if (!frequencyTextBox->GetValue().ToDouble(&frequency) ||
@@ -523,7 +523,7 @@ double CreateSignalDialog::GetValue(const double &time)
 
 		return amplitude * sin(frequency * time + phase) + offset;
 	}
-	else if (lastSelection == SignalSquare)
+	else if (lastSelection == SignalType::Square)
 	{
 		double amplitude(0.0), offset(0.0), period(0.0), phase(0.0), duty(0.0);
 		if (!periodTextBox->GetValue().ToDouble(&period) ||
@@ -540,7 +540,7 @@ double CreateSignalDialog::GetValue(const double &time)
 		else
 			return offset - amplitude * 0.5;
 	}
-	else if (lastSelection == SignalTriangle)
+	else if (lastSelection == SignalType::Triangle)
 	{
 		double amplitude(0.0), offset(0.0), period(0.0), phase(0.0);
 		if (!periodTextBox->GetValue().ToDouble(&period) ||
@@ -554,7 +554,7 @@ double CreateSignalDialog::GetValue(const double &time)
 		else
 			return -2.0 * amplitude * fmod(phase + time, period * 0.5) / period + offset + amplitude * 0.5;
 	}
-	else if (lastSelection == SignalSawtooth)
+	else if (lastSelection == SignalType::Sawtooth)
 	{
 		double amplitude(0.0), offset(0.0), period(0.0), phase(0.0);
 		if (!periodTextBox->GetValue().ToDouble(&period) ||
@@ -565,7 +565,7 @@ double CreateSignalDialog::GetValue(const double &time)
 
 		return amplitude * fmod(phase + time, period) + offset - amplitude * 0.5;
 	}
-	else if (lastSelection == SignalChirp)
+	else if (lastSelection == SignalType::Chirp)
 	{
 		double amplitude(0.0), offset(0.0), frequency(0.0), phase(0.0), slope(0.0);
 		if (!frequencyTextBox->GetValue().ToDouble(&frequency) ||
@@ -581,7 +581,7 @@ double CreateSignalDialog::GetValue(const double &time)
 
 		return amplitude * sin(frequency * time + phase) + offset;
 	}
-	else if (lastSelection == SignalWhiteNoise)
+	else if (lastSelection == SignalType::WhiteNoise)
 	{
 		double amplitude(0.0), offset(0.0);
 		if (!initialValueTextBox->GetValue().ToDouble(&amplitude) ||
@@ -642,10 +642,10 @@ void CreateSignalDialog::OnSignalTypeChangeEvent(wxCommandEvent& WXUNUSED(event)
 void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 {
 	// Prepare inputs for non-periodic functions
-	if (lastSelection == SignalStep ||
-		lastSelection == SignalRamp)
+	if (lastSelection == SignalType::Step ||
+		lastSelection == SignalType::Ramp)
 	{
-		slopeTextBox->Enable(lastSelection == SignalRamp);
+		slopeTextBox->Enable(lastSelection == SignalType::Ramp);
 		frequencyTextBox->Enable(true);
 		periodTextBox->Enable(false);
 		phaseAngleTextBox->Enable(false);
@@ -663,22 +663,22 @@ void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 	// Prepare inputs for periodic functions
 	else
 	{
-		slopeTextBox->Enable(lastSelection != SignalSinusoid && lastSelection != SignalWhiteNoise);
-		frequencyTextBox->Enable(lastSelection != SignalWhiteNoise);
-		periodTextBox->Enable(lastSelection != SignalWhiteNoise);
-		phaseAngleTextBox->Enable(lastSelection != SignalWhiteNoise);
-		phaseTimeTextBox->Enable(lastSelection != SignalWhiteNoise);
+		slopeTextBox->Enable(lastSelection != SignalType::Sinusoid && lastSelection != SignalType::WhiteNoise);
+		frequencyTextBox->Enable(lastSelection != SignalType::WhiteNoise);
+		periodTextBox->Enable(lastSelection != SignalType::WhiteNoise);
+		phaseAngleTextBox->Enable(lastSelection != SignalType::WhiteNoise);
+		phaseTimeTextBox->Enable(lastSelection != SignalType::WhiteNoise);
 
 		initialValueLabel->SetLabel(_T("Amplitude"));
 		finalValueLabel->SetLabel(_T("Offset"));
 
-		if (lastSelection == SignalChirp)
+		if (lastSelection == SignalType::Chirp)
 		{
 			slopeLabel->SetLabel(_T("Frequency Rate"));
 			slopeUnits->SetLabel(_T("Hz / seconds"));
 			frequencyLabel->SetLabel(_T("Initial Frequency"));
 		}
-		else if (lastSelection == SignalSquare)
+		else if (lastSelection == SignalType::Square)
 		{
 			slopeLabel->SetLabel(_T("Duty Cycle"));
 			slopeUnits->SetLabel(_T("%"));
@@ -714,13 +714,13 @@ void CreateSignalDialog::SetTextBoxLabelsAndEnables()
 void CreateSignalDialog::SetDefaultInputs()
 {
 	// Defaults for non-periodic functions
-	if (lastSelection == SignalStep ||
-		lastSelection == SignalRamp)
+	if (lastSelection == SignalType::Step ||
+		lastSelection == SignalType::Ramp)
 	{
 		initialValueTextBox->SetValue(_T("0.0"));
 		finalValueTextBox->SetValue(_T("1.0"));
 
-		if (lastSelection == SignalRamp)
+		if (lastSelection == SignalType::Ramp)
 			slopeTextBox->SetValue(_T("1.0"));
 
 		frequencyTextBox->SetValue(_T("1.0"));
@@ -733,9 +733,9 @@ void CreateSignalDialog::SetDefaultInputs()
 		frequencyTextBox->SetValue(_T("1.0"));
 		phaseAngleTextBox->SetValue(_T("0.0"));
 
-		if (lastSelection == SignalChirp)
+		if (lastSelection == SignalType::Chirp)
 			slopeTextBox->SetValue(_T("1.0"));
-		else if (lastSelection == SignalSquare)
+		else if (lastSelection == SignalType::Square)
 			slopeTextBox->SetValue(_T("0.5"));
 	}
 }
@@ -758,8 +758,8 @@ void CreateSignalDialog::SetDefaultInputs()
 //=============================================================================
 void CreateSignalDialog::OnAmplitudeChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
-	if (lastSelection != SignalTriangle &&
-		lastSelection != SignalSawtooth)
+	if (lastSelection != SignalType::Triangle &&
+		lastSelection != SignalType::Sawtooth)
 		return;
 
 	UpdateSlope();
@@ -784,8 +784,8 @@ void CreateSignalDialog::OnAmplitudeChangeEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void CreateSignalDialog::OnSlopeChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
-	if (lastSelection != SignalTriangle &&
-		lastSelection != SignalSawtooth)
+	if (lastSelection != SignalType::Triangle &&
+		lastSelection != SignalType::Sawtooth)
 		return;
 
 	UpdateAmplitude();
@@ -810,7 +810,7 @@ void CreateSignalDialog::OnSlopeChangeEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void CreateSignalDialog::OnFrequencyChangeEvent(wxCommandEvent& WXUNUSED(event))
 {
-	if (lastSelection == SignalStep || lastSelection == SignalRamp)
+	if (lastSelection == SignalType::Step || lastSelection == SignalType::Ramp)
 		return;
 
 	double value;
@@ -994,7 +994,7 @@ void CreateSignalDialog::UpdateAmplitude()
 		return;
 
 	double factor(1.0);
-	if (lastSelection == SignalTriangle)
+	if (lastSelection == SignalType::Triangle)
 		factor = 2.0;
 
 	initialValueTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(period * slope / factor), period * slope / factor));
@@ -1028,7 +1028,7 @@ void CreateSignalDialog::UpdateSlope()
 		return;
 
 	double factor(1.0);
-	if (lastSelection == SignalTriangle)
+	if (lastSelection == SignalType::Triangle)
 		factor = 2.0;
 
 	slopeTextBox->ChangeValue(wxString::Format(_T("%0.*f"), PlotMath::GetPrecision(amplitude / period * factor), amplitude / period * factor));

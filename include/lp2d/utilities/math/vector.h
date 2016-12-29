@@ -40,11 +40,11 @@ public:
 	double x, y, z;
 
 	// Enumerations
-	enum Axis
+	enum class Axis
 	{
-		AxisX,
-		AxisY,
-		AxisZ
+		X,
+		Y,
+		Z
 	};
 
 	// Vector norm
@@ -55,8 +55,8 @@ public:
 		+ (y - v.y) * (y - v.y) + (z - v.z) * (z - v.z)); }
 
 	// Rotation functions
-	void Rotate(const Vector &cor, const Vector &rotations, Axis first = AxisX,
-		Axis second = AxisY, Axis tThird = AxisZ);
+	void Rotate(const Vector &cor, const Vector &rotations, Axis first = Axis::X,
+		Axis second = Axis::Y, Axis tThird = Axis::Z);
 	void Rotate(const Vector &cor, const double &Angle, const Axis &about);
 	void Rotate(const double &angle, const Axis &about);
 	void Rotate(const double &angle, const Vector &rotationAxis);

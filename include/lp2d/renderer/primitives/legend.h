@@ -47,7 +47,7 @@ public:
 	void SetBorderSize(const unsigned int &size) { borderSize = size; RequiresRedraw(); }
 	void SetSampleLineLength(const unsigned int &size) { sampleLength = size; RequiresRedraw(); }
 
-	enum PositionReference
+	enum class PositionReference
 	{
 		Center,
 		BottomLeft,

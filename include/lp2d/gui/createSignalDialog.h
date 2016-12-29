@@ -84,18 +84,18 @@ private:
 		const double &sampleRate);
 	double GetValue(const double &time);
 
-	enum SignalType
+	enum class SignalType
 	{
-		SignalStep,
-		SignalRamp,
-		SignalSinusoid,
-		SignalSquare,
-		SignalTriangle,
-		SignalSawtooth,
-		SignalChirp,
-		SignalWhiteNoise,
+		Step,
+		Ramp,
+		Sinusoid,
+		Square,
+		Triangle,
+		Sawtooth,
+		Chirp,
+		WhiteNoise,
 
-		SignalCount
+		Count
 	};
 
 	static wxString GetSignalName(const SignalType &type);

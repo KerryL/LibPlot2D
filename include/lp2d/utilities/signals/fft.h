@@ -31,15 +31,15 @@ class FastFourierTransform
 {
 public:
 	/// Enumeration of available FFT window functions
-	enum FFTWindow
+	enum class WindowType
 	{
-		WindowUniform,///< For use with transients whose duration is less than the length of the window
-		WindowHann,///< For use in general-purpose applications
-		WindowHamming,///< For use with closely-spaced sine waves
-		WindowFlatTop,///< For use in accurate single-tone amplitude measurements
-		//WindowForce,
-		WindowExponential,///< For use with response measurements (i.e. response to an impact test)
-		WindowCount///< Number of windows available
+		Uniform,///< For use with transients whose duration is less than the length of the window
+		Hann,///< For use in general-purpose applications
+		Hamming,///< For use with closely-spaced sine waves
+		FlatTop,///< For use in accurate single-tone amplitude measurements
+		//Force,
+		Exponential,///< For use with response measurements (i.e. response to an impact test)
+		Count///< Number of windows available
 	};
 
 	/// Computes FFT of the specified dataset with default options.
@@ -67,8 +67,9 @@ public:
 
 		\sa GetNumberOfAverages
 	*/
-	static std::unique_ptr<Dataset2D> ComputeFFT(Dataset2D data, const FFTWindow &window,
-		unsigned int windowSize, const double &overlap, const bool &subtractMean);
+	static std::unique_ptr<Dataset2D> ComputeFFT(Dataset2D data,
+		const WindowType &window, unsigned int windowSize,
+		const double &overlap, const bool &subtractMean);
 
 	/// Computes the Frequency Response Function for the specified signals.
 	/*! Determines the frequency-dependent relationship between the specified signals.
@@ -90,7 +91,7 @@ public:
 		\sa ComputeOverlap
 	*/
 	static void ComputeFRF(const Dataset2D& input, const Dataset2D& output,
-		unsigned int numberOfAverages, const FFTWindow &window,
+		unsigned int numberOfAverages, const WindowType &window,
 		const bool &moduloPhase,Dataset2D& amplitude,
 		Dataset2D* phase, Dataset2D* coherence);
 
@@ -132,7 +133,7 @@ public:
 
 		\return The name of the window
 	*/
-	static std::string GetWindowName(const FFTWindow &window);
+	static std::string GetWindowName(const WindowType &window);
 
 	/// Returns the largest power of two that is smaller than the specified sample size.
 	/*!
@@ -148,7 +149,7 @@ private:
 		\param[in,out] data	to be windowed
 		\param[in] window	to be applied
 	*/
-	static void ApplyWindow(Dataset2D &data, const FFTWindow &window);
+	static void ApplyWindow(Dataset2D &data, const WindowType &window);
 
 	/// Applies a Hann window to the dataset.
 	/*!
@@ -274,8 +275,8 @@ private:
 	*/
 	static Dataset2D GetPhaseData(const Dataset2D &rawFFT, const double &sampleRate, const bool &moduloPhase);
 
-	static Dataset2D ComputeRawFFT(const Dataset2D &data, const FFTWindow &window);
-	static void InitializeRawFFTDataset(Dataset2D &rawFFT, const Dataset2D &data, const FFTWindow &window);
+	static Dataset2D ComputeRawFFT(const Dataset2D &data, const WindowType &window);
+	static void InitializeRawFFTDataset(Dataset2D &rawFFT, const Dataset2D &data, const WindowType &window);
 
 	/// Element-wise addition of two complex datasets.
 	/*! This treats the x-component as the real part and the y-component as the

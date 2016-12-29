@@ -68,8 +68,8 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
 	borderSize = 1;
 	sampleLength = 15;
 
-	windowRef = BottomLeft;
-	legendRef = Center;
+	windowRef = PositionReference::BottomLeft;
+	legendRef = PositionReference::Center;
 
 	SetDrawOrder(3000);// Draw this last
 
@@ -113,7 +113,7 @@ void Legend::Update(const unsigned int& i)
 		lines.SetBackgroundColorForAlphaFade();
 		bufferVector.push_back(BufferInfo());
 		lines.Build(BuildBorderPoints(), bufferVector.back(),
-			Line::UpdateManual);
+			Line::UpdateMethod::Manual);
 
 		BuildSampleLines();
 		BuildMarkers();
@@ -344,21 +344,21 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 	switch (windowRef)
 	{
 	default:
-	case BottomLeft:
-	case MiddleLeft:
-	case TopLeft:
+	case PositionReference::BottomLeft:
+	case PositionReference::MiddleLeft:
+	case PositionReference::TopLeft:
 		x = this->x;
 		break;
 
-	case BottomCenter:
-	case Center:
-	case TopCenter:
+	case PositionReference::BottomCenter:
+	case PositionReference::Center:
+	case PositionReference::TopCenter:
 		x = renderWindow.GetSize().GetWidth() * 0.5 + this->x;
 		break;
 
-	case BottomRight:
-	case MiddleRight:
-	case TopRight:
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleRight:
+	case PositionReference::TopRight:
 		x = renderWindow.GetSize().GetWidth() - this->x;
 		break;
 	}
@@ -366,21 +366,21 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 	switch (windowRef)
 	{
 	default:
-	case BottomLeft:
-	case BottomCenter:
-	case BottomRight:
+	case PositionReference::BottomLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::BottomRight:
 		y = this->y;
 		break;
 
-	case MiddleLeft:
-	case Center:
-	case MiddleRight:
+	case PositionReference::MiddleLeft:
+	case PositionReference::Center:
+	case PositionReference::MiddleRight:
 		y = renderWindow.GetSize().GetHeight() * 0.5 + this->y;
 		break;
 
-	case TopLeft:
-	case TopCenter:
-	case TopRight:
+	case PositionReference::TopLeft:
+	case PositionReference::TopCenter:
+	case PositionReference::TopRight:
 		y = renderWindow.GetSize().GetHeight() - this->y;
 		break;
 	}
@@ -390,42 +390,42 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 
 	switch (legendRef)
 	{
-	case BottomLeft:
-	case MiddleLeft:
-	case TopLeft:
+	case PositionReference::BottomLeft:
+	case PositionReference::MiddleLeft:
+	case PositionReference::TopLeft:
 		break;
 
 	default:
-	case BottomCenter:
-	case Center:
-	case TopCenter:
+	case PositionReference::BottomCenter:
+	case PositionReference::Center:
+	case PositionReference::TopCenter:
 		x -= width * 0.5;
 		break;
 
-	case BottomRight:
-	case MiddleRight:
-	case TopRight:
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleRight:
+	case PositionReference::TopRight:
 		x -= width;
 		break;
 	}
 
 	switch (legendRef)
 	{
-	case BottomLeft:
-	case BottomCenter:
-	case BottomRight:
+	case PositionReference::BottomLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::BottomRight:
 		break;
 
 	default:
-	case MiddleLeft:
-	case Center:
-	case MiddleRight:
+	case PositionReference::MiddleLeft:
+	case PositionReference::Center:
+	case PositionReference::MiddleRight:
 		y -= height * 0.5;
 		break;
 
-	case TopLeft:
-	case TopCenter:
-	case TopRight:
+	case PositionReference::TopLeft:
+	case PositionReference::TopCenter:
+	case PositionReference::TopRight:
 		y -= height;
 		break;
 	}
@@ -453,18 +453,18 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 	switch (windowRef)
 	{
 	default:
-	case BottomLeft:
-	case MiddleLeft:
-	case TopLeft:
-	case BottomCenter:
-	case Center:
-	case TopCenter:
+	case PositionReference::BottomLeft:
+	case PositionReference::MiddleLeft:
+	case PositionReference::TopLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::Center:
+	case PositionReference::TopCenter:
 		this->x += x;
 		break;
 
-	case BottomRight:
-	case MiddleRight:
-	case TopRight:
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleRight:
+	case PositionReference::TopRight:
 		this->x -= x;
 		break;
 	}
@@ -472,18 +472,18 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 	switch (windowRef)
 	{
 	default:
-	case BottomLeft:
-	case BottomCenter:
-	case BottomRight:
-	case MiddleLeft:
-	case Center:
-	case MiddleRight:
+	case PositionReference::BottomLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleLeft:
+	case PositionReference::Center:
+	case PositionReference::MiddleRight:
 		this->y += y;
 		break;
 
-	case TopLeft:
-	case TopCenter:
-	case TopRight:
+	case PositionReference::TopLeft:
+	case PositionReference::TopCenter:
+	case PositionReference::TopRight:
 		this->y -= y;
 		break;
 	}
@@ -568,21 +568,21 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	switch (this->windowRef)
 	{
 	default:
-	case BottomLeft:
-	case MiddleLeft:
-	case TopLeft:
+	case PositionReference::BottomLeft:
+	case PositionReference::MiddleLeft:
+	case PositionReference::TopLeft:
 		x = this->x;
 		break;
 
-	case BottomCenter:
-	case Center:
-	case TopCenter:
+	case PositionReference::BottomCenter:
+	case PositionReference::Center:
+	case PositionReference::TopCenter:
 		x = renderWindow.GetSize().GetWidth() * 0.5 + this->x;
 		break;
 
-	case BottomRight:
-	case MiddleRight:
-	case TopRight:
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleRight:
+	case PositionReference::TopRight:
 		x = renderWindow.GetSize().GetWidth() - this->x;
 		break;
 	}
@@ -590,21 +590,21 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	switch (this->windowRef)
 	{
 	default:
-	case BottomLeft:
-	case BottomCenter:
-	case BottomRight:
+	case PositionReference::BottomLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::BottomRight:
 		y = this->y;
 		break;
 
-	case MiddleLeft:
-	case Center:
-	case MiddleRight:
+	case PositionReference::MiddleLeft:
+	case PositionReference::Center:
+	case PositionReference::MiddleRight:
 		y = renderWindow.GetSize().GetHeight() * 0.5 + this->y;
 		break;
 
-	case TopLeft:
-	case TopCenter:
-	case TopRight:
+	case PositionReference::TopLeft:
+	case PositionReference::TopCenter:
+	case PositionReference::TopRight:
 		y = renderWindow.GetSize().GetHeight() - this->y;
 		break;
 	}
@@ -614,42 +614,42 @@ void Legend::GetPosition(const PositionReference& legendRef,
 
 	switch (this->legendRef)
 	{
-	case BottomLeft:
-	case MiddleLeft:
-	case TopLeft:
+	case PositionReference::BottomLeft:
+	case PositionReference::MiddleLeft:
+	case PositionReference::TopLeft:
 		break;
 
 	default:
-	case BottomCenter:
-	case Center:
-	case TopCenter:
+	case PositionReference::BottomCenter:
+	case PositionReference::Center:
+	case PositionReference::TopCenter:
 		x -= width * 0.5;
 		break;
 
-	case BottomRight:
-	case MiddleRight:
-	case TopRight:
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleRight:
+	case PositionReference::TopRight:
 		x -= width;
 		break;
 	}
 
 	switch (this->legendRef)
 	{
-	case BottomLeft:
-	case BottomCenter:
-	case BottomRight:
+	case PositionReference::BottomLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::BottomRight:
 		break;
 
 	default:
-	case MiddleLeft:
-	case Center:
-	case MiddleRight:
+	case PositionReference::MiddleLeft:
+	case PositionReference::Center:
+	case PositionReference::MiddleRight:
 		y -= height * 0.5;
 		break;
 
-	case TopLeft:
-	case TopCenter:
-	case TopRight:
+	case PositionReference::TopLeft:
+	case PositionReference::TopCenter:
+	case PositionReference::TopRight:
 		y -= height;
 		break;
 	}
@@ -660,20 +660,20 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	switch (windowRef)
 	{
 	default:
-	case BottomLeft:
-	case MiddleLeft:
-	case TopLeft:
+	case PositionReference::BottomLeft:
+	case PositionReference::MiddleLeft:
+	case PositionReference::TopLeft:
 		break;
 
-	case BottomCenter:
-	case Center:
-	case TopCenter:
+	case PositionReference::BottomCenter:
+	case PositionReference::Center:
+	case PositionReference::TopCenter:
 		x -= renderWindow.GetSize().GetWidth() * 0.5;
 		break;
 
-	case BottomRight:
-	case MiddleRight:
-	case TopRight:
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleRight:
+	case PositionReference::TopRight:
 		x = renderWindow.GetSize().GetWidth() - x;
 		break;
 	}
@@ -681,20 +681,20 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	switch (windowRef)
 	{
 	default:
-	case BottomLeft:
-	case BottomCenter:
-	case BottomRight:
+	case PositionReference::BottomLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::BottomRight:
 		break;
 
-	case MiddleLeft:
-	case Center:
-	case MiddleRight:
+	case PositionReference::MiddleLeft:
+	case PositionReference::Center:
+	case PositionReference::MiddleRight:
 		y -= renderWindow.GetSize().GetHeight() * 0.5;
 		break;
 
-	case TopLeft:
-	case TopCenter:
-	case TopRight:
+	case PositionReference::TopLeft:
+	case PositionReference::TopCenter:
+	case PositionReference::TopRight:
 		y = renderWindow.GetSize().GetHeight() - y;
 		break;
 	}
@@ -704,24 +704,24 @@ void Legend::GetPosition(const PositionReference& legendRef,
 
 	switch (legendRef)
 	{
-	case BottomLeft:
-	case MiddleLeft:
-	case TopLeft:
+	case PositionReference::BottomLeft:
+	case PositionReference::MiddleLeft:
+	case PositionReference::TopLeft:
 		break;
 
 	default:
-	case BottomCenter:
-	case Center:
-	case TopCenter:
+	case PositionReference::BottomCenter:
+	case PositionReference::Center:
+	case PositionReference::TopCenter:
 		x += width * 0.5;
 		break;
 
-	case BottomRight:
-	case MiddleRight:
-	case TopRight:
-		if (windowRef == BottomRight ||
-			windowRef == MiddleRight ||
-			windowRef == TopRight)
+	case PositionReference::BottomRight:
+	case PositionReference::MiddleRight:
+	case PositionReference::TopRight:
+		if (windowRef == PositionReference::BottomRight ||
+			windowRef == PositionReference::MiddleRight ||
+			windowRef == PositionReference::TopRight)
 			x -= width;
 		else
 			x += width;
@@ -730,24 +730,24 @@ void Legend::GetPosition(const PositionReference& legendRef,
 
 	switch (legendRef)
 	{
-	case BottomLeft:
-	case BottomCenter:
-	case BottomRight:
+	case PositionReference::BottomLeft:
+	case PositionReference::BottomCenter:
+	case PositionReference::BottomRight:
 		break;
 
 	default:
-	case MiddleLeft:
-	case Center:
-	case MiddleRight:
+	case PositionReference::MiddleLeft:
+	case PositionReference::Center:
+	case PositionReference::MiddleRight:
 		y += height * 0.5;
 		break;
 
-	case TopLeft:
-	case TopCenter:
-	case TopRight:
-		if (windowRef == TopLeft ||
-			windowRef == TopCenter ||
-			windowRef == TopRight)
+	case PositionReference::TopLeft:
+	case PositionReference::TopCenter:
+	case PositionReference::TopRight:
+		if (windowRef == PositionReference::TopLeft ||
+			windowRef == PositionReference::TopCenter ||
+			windowRef == PositionReference::TopRight)
 			y -= height;
 		else
 			y += height;
@@ -1036,7 +1036,7 @@ void Legend::BuildSampleLines()
 
 		bufferVector.push_back(BufferInfo());
 		lines.Build(x + entrySpacing, y, x + entrySpacing + sampleLength,
-			y, bufferVector.back(), Line::UpdateManual);
+			y, bufferVector.back(), Line::UpdateMethod::Manual);
 	}
 }
 

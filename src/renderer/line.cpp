@@ -423,7 +423,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 	bufferInfo.vertexBuffer[10] = (float)lineColor.GetBlue();
 	bufferInfo.vertexBuffer[11] = (float)lineColor.GetAlpha();
 
-	if (update != UpdateImmediate)
+	if (update != UpdateMethod::Immediate)
 		return;
 
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
@@ -483,7 +483,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 		bufferInfo.vertexBuffer[start + i * 4 + 3] = (float)lineColor.GetAlpha();
 	}
 
-	if (update != UpdateImmediate)
+	if (update != UpdateMethod::Immediate)
 		return;
 
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
@@ -550,7 +550,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 	*/
 
 	AllocateBuffer(points.size() * 4, 6 * (points.size() - 1), bufferInfo);
-	AssignVertexData(points, StyleContinuous, bufferInfo);
+	AssignVertexData(points, LineStyle::Continuous, bufferInfo);
 
 	unsigned int i;
 	for (i = 0; i < points.size() - 1; ++i)
@@ -580,7 +580,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 		bufferInfo.indexBuffer[i * 18 + 17] = (i + 1) * 4 + 2;
 	}
 
-	if (update != UpdateImmediate)
+	if (update != UpdateMethod::Immediate)
 		return;
 
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
@@ -650,7 +650,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &poi
 
 	assert(points.size() % 2 == 0);
 	AllocateBuffer(points.size() * 4, 6 * (points.size() / 2), bufferInfo);
-	AssignVertexData(points, StyleSegments, bufferInfo);
+	AssignVertexData(points, LineStyle::Segments, bufferInfo);
 
 	unsigned int i;
 	for (i = 0; i < points.size() / 2; ++i)
@@ -680,7 +680,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &poi
 		bufferInfo.indexBuffer[i * 18 + 17] = i * 8 + 6;
 	}
 
-	if (update != UpdateImmediate)
+	if (update != UpdateMethod::Immediate)
 		return;
 
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
@@ -733,11 +733,11 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double>>& points
 	unsigned int i;
 	for (i = 0; i < points.size(); ++i)
 	{
-		if (i == 0 || (style == StyleSegments && i % 2 == 0))
+		if (i == 0 || (style == LineStyle::Segments && i % 2 == 0))
 			ComputeOffsets(points[i].first, points[i].second, points[i + 1].first,
 				points[i + 1].second, offsets[i].dxLine, offsets[i].dyLine,
 				offsets[i].dxEdge, offsets[i].dyEdge);
-		else if (style == StyleSegments)
+		else if (style == LineStyle::Segments)
 			offsets[i] = offsets[i - 1];
 		else if (i == points.size() - 1)
 			ComputeOffsets(points[i - 1].first, points[i - 1].second, points[i].first,

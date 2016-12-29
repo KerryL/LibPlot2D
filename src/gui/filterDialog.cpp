@@ -73,7 +73,7 @@ FilterDialog::FilterDialog(wxWindow *parent, const FilterParameters* parameters)
 		mParameters.cutoffFrequency = 5.0;
 		mParameters.dampingRatio = 1.0;
 		mParameters.order = 2;
-		mParameters.type = FilterParameters::TypeLowPass;
+		mParameters.type = FilterParameters::Type::LowPass;
 		mParameters.phaseless = false;
 		mParameters.butterworth = false;
 		mParameters.width = mParameters.cutoffFrequency;
@@ -272,17 +272,17 @@ wxSizer* FilterDialog::CreateRadioButtons()
 	typeSizer->Add(notchRadio, 0, wxALL, 2);
 	typeSizer->Add(customRadio, 0, wxALL, 2);
 
-	if (mParameters.type == FilterParameters::TypeHighPass)
+	if (mParameters.type == FilterParameters::Type::HighPass)
 		highPassRadio->SetValue(true);
-	else if (mParameters.type == FilterParameters::TypeLowPass)
+	else if (mParameters.type == FilterParameters::Type::LowPass)
 		lowPassRadio->SetValue(true);
-	else if (mParameters.type == FilterParameters::TypeBandStop)
+	else if (mParameters.type == FilterParameters::Type::BandStop)
 		bandStopRadio->SetValue(true);
-	else if (mParameters.type == FilterParameters::TypeBandPass)
+	else if (mParameters.type == FilterParameters::Type::BandPass)
 		bandPassRadio->SetValue(true);
-	else if (mParameters.type == FilterParameters::TypeNotch)
+	else if (mParameters.type == FilterParameters::Type::Notch)
 		notchRadio->SetValue(true);
-	else if (mParameters.type == FilterParameters::TypeCustom)
+	else if (mParameters.type == FilterParameters::Type::Custom)
 		customRadio->SetValue(true);
 	else
 		assert(false);
@@ -486,23 +486,23 @@ void FilterDialog::OnInputTextChange(wxCommandEvent& WXUNUSED(event))
 FilterParameters::Type FilterDialog::GetType() const
 {
 	if (!initialized)
-		return FilterParameters::TypeLowPass;
+		return FilterParameters::Type::LowPass;
 
 	if (highPassRadio->GetValue())
-		return FilterParameters::TypeHighPass;
+		return FilterParameters::Type::HighPass;
 	else if (lowPassRadio->GetValue())
-		return FilterParameters::TypeLowPass;
+		return FilterParameters::Type::LowPass;
 	else if (bandStopRadio->GetValue())
-		return FilterParameters::TypeBandStop;
+		return FilterParameters::Type::BandStop;
 	else if (bandPassRadio->GetValue())
-		return FilterParameters::TypeBandPass;
+		return FilterParameters::Type::BandPass;
 	else if (notchRadio->GetValue())
-		return FilterParameters::TypeNotch;
+		return FilterParameters::Type::Notch;
 	else if (customRadio->GetValue())
-		return FilterParameters::TypeCustom;
+		return FilterParameters::Type::Custom;
 
 	assert(false);
-	return FilterParameters::TypeLowPass;
+	return FilterParameters::Type::LowPass;
 }
 
 //=============================================================================
@@ -660,9 +660,9 @@ bool FilterDialog::DampingRatioIsValid()
 //=============================================================================
 bool FilterDialog::WidthIsValid()
 {
-	if (mParameters.type == FilterParameters::TypeBandStop ||
-		mParameters.type == FilterParameters::TypeBandPass ||
-		mParameters.type == FilterParameters::TypeNotch)
+	if (mParameters.type == FilterParameters::Type::BandStop ||
+		mParameters.type == FilterParameters::Type::BandPass ||
+		mParameters.type == FilterParameters::Type::Notch)
 	{
 		if (!widthBox->GetValue().ToDouble(&mParameters.width))
 		{
@@ -697,7 +697,7 @@ bool FilterDialog::WidthIsValid()
 //=============================================================================
 bool FilterDialog::ExpressionIsValid(const wxString &expression)
 {
-	if (mParameters.type != FilterParameters::TypeCustom)
+	if (mParameters.type != FilterParameters::Type::Custom)
 		return true;
 
 	ExpressionTree e;
@@ -1240,17 +1240,17 @@ void FilterDialog::UpdateEnabledControls()
 wxString FilterDialog::GetFilterNamePrefix(const FilterParameters &parameters)
 {
 	wxString name;
-	if (parameters.type == FilterParameters::TypeHighPass)
+	if (parameters.type == FilterParameters::Type::HighPass)
 		name = GetHighPassName(parameters);
-	else if (parameters.type == FilterParameters::TypeLowPass)
+	else if (parameters.type == FilterParameters::Type::LowPass)
 		name = GetLowPassName(parameters);
-	else if (parameters.type == FilterParameters::TypeBandStop)
+	else if (parameters.type == FilterParameters::Type::BandStop)
 		name = GetBandStopName(parameters);
-	else if (parameters.type == FilterParameters::TypeBandPass)
+	else if (parameters.type == FilterParameters::Type::BandPass)
 		name = GetBandPassName(parameters);
-	else if (parameters.type == FilterParameters::TypeNotch)
+	else if (parameters.type == FilterParameters::Type::Notch)
 		name = GetNotchName(parameters);
-	else if (parameters.type == FilterParameters::TypeCustom)
+	else if (parameters.type == FilterParameters::Type::Custom)
 		name = GetCustomName(parameters);
 	else
 		assert(false);

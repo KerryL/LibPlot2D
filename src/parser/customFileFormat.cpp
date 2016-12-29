@@ -315,15 +315,15 @@ bool CustomFileFormat::IsFormat(const wxString &pathAndFileName, const Identifie
 	wxXmlDocument document;
 	switch (id.location)
 	{
-	case Identifier::BOF:
+	case Identifier::Location::BOF:
 		formatMatches = MatchNextLine(dataFile, id);
 		break;
 
-	case Identifier::BOL:
+	case Identifier::Location::BOL:
 		formatMatches = MatchSpecifiedLine(dataFile, id);
 		break;
 
-	case Identifier::ROOT:
+	case Identifier::Location::ROOT:
 		formatMatches = isXML &&
 			MatchNextLine(dataFile, _T("<?xml")) &&
 			document.Load(pathAndFileName) &&
@@ -552,14 +552,14 @@ bool CustomFileFormat::ProcessLocationID(const wxString &value, Identifier &id) 
 {
 	if (value.CmpNoCase(_T("BOF")) == 0)
 	{
-		id.location = Identifier::BOF;
+		id.location = Identifier::Location::BOF;
 		id.bolNumber = 0;
 		return true;
 	}
 
 	if (value.CmpNoCase(_T("BOL")) == 0)
 	{
-		id.location = Identifier::BOL;
+		id.location = Identifier::Location::BOL;
 
 		if (value.Len() > 3)
 		{
@@ -574,7 +574,7 @@ bool CustomFileFormat::ProcessLocationID(const wxString &value, Identifier &id) 
 
 	if (value.CmpNoCase(_T("ROOT")) == 0)
 	{
-		id.location = Identifier::ROOT;
+		id.location = Identifier::Location::ROOT;
 		id.bolNumber = -1;
 		return true;
 	}

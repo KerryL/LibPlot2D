@@ -257,15 +257,15 @@ Matrix Vector::GenerateRotationMatrix(const Axis &axis, const double &angle)
 	Matrix rotationMatrix(3, 3);
 
 	// Create the first rotation matrix
-	if (axis == AxisX)
+	if (axis == Axis::X)
 		rotationMatrix.Set(	1.0,	0.0,	0.0,
 							0.0,	c,		-s,
 							0.0,	s,		c);
-	else if (axis == AxisY)
+	else if (axis == Axis::Y)
 		rotationMatrix.Set(	c,		0.0,	s,
 							0.0,	1.0,	0.0,
 							-s,		0.0,	c);
-	else// if (axis == AxisZ)
+	else// if (axis == Axis::Z)
 		rotationMatrix.Set(	c,		-s,		0.0,
 							s,		c,		0.0,
 							0.0,	0.0,	1.0);
@@ -293,15 +293,15 @@ wxString Vector::GetAxisName(Axis axis)
 {
 	switch (axis)
 	{
-	case AxisX:
+	case Axis::X:
 		return _T("X");
 		break;
 
-	case AxisY:
+	case Axis::Y:
 		return _T("Y");
 		break;
 
-	case AxisZ:
+	case Axis::Z:
 		return _T("Z");
 		break;
 

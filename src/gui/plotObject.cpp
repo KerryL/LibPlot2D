@@ -551,10 +551,10 @@ void PlotObject::FormatPlot()
 //=============================================================================
 void PlotObject::FormatAxesBasics()
 {
-	Axis::TickStyle tickStyle = Axis::TickStyleInside;
+	Axis::TickStyle tickStyle = Axis::TickStyle::Inside;
 
 	FormatBottomBasics(tickStyle);
-	FormatTopBasics(Axis::TickStyleNone);
+	FormatTopBasics(Axis::TickStyle::None);
 	FormatLeftBasics(tickStyle);
 	FormatRightBasics(tickStyle);
 
@@ -671,7 +671,7 @@ void PlotObject::UpdateAxesOffsets()
 //=============================================================================
 void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 {
-	axisBottom->SetOrientation(Axis::OrientationBottom);
+	axisBottom->SetOrientation(Axis::Orientation::Bottom);
 	axisBottom->SetTickStyle(tickStyle);
 }
 
@@ -693,7 +693,7 @@ void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 //=============================================================================
 void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 {
-	axisTop->SetOrientation(Axis::OrientationTop);
+	axisTop->SetOrientation(Axis::Orientation::Top);
 	axisTop->SetTickStyle(tickStyle);
 }
 
@@ -715,7 +715,7 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 //=============================================================================
 void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 {
-	axisLeft->SetOrientation(Axis::OrientationLeft);
+	axisLeft->SetOrientation(Axis::Orientation::Left);
 	axisLeft->SetTickStyle(tickStyle);
 }
 
@@ -737,7 +737,7 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 //=============================================================================
 void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 {
-	axisRight->SetOrientation(Axis::OrientationRight);
+	axisRight->SetOrientation(Axis::Orientation::Right);
 	axisRight->SetTickStyle(tickStyle);
 }
 

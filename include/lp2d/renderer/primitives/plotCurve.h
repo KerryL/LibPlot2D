@@ -73,11 +73,11 @@ private:
 	bool NeedsMarkersDrawn() const;
 	void BuildMarkers();
 
-	enum RangeSize
+	enum class RangeSize
 	{
-		RangeSizeSmall,
-		RangeSizeLarge,
-		RangeSizeUndetermined
+		Small,
+		Large,
+		Undetermined
 	};
 
 	bool RangeIsSmall() const;

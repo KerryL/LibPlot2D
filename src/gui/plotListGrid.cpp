@@ -116,32 +116,32 @@ void PlotListGrid::Build()
 {
 	BeginBatch();
 
-	CreateGrid(0, ColCount, wxGrid::wxGridSelectRows);
+	CreateGrid(0, static_cast<int>(Column::Count), wxGrid::wxGridSelectRows);
 	SetRowLabelSize(0);
-	SetColFormatNumber(ColLineSize);
-	SetColFormatNumber(ColMarkerSize);
-	SetColFormatFloat(ColLeftCursor);
-	SetColFormatFloat(ColRightCursor);
-	SetColFormatFloat(ColDifference);
-	SetColFormatBool(ColVisible);
-	SetColFormatBool(ColRightAxis);
+	SetColFormatNumber(static_cast<int>(Column::LineSize));
+	SetColFormatNumber(static_cast<int>(Column::MarkerSize));
+	SetColFormatFloat(static_cast<int>(Column::LeftCursor));
+	SetColFormatFloat(static_cast<int>(Column::RightCursor));
+	SetColFormatFloat(static_cast<int>(Column::Difference));
+	SetColFormatBool(static_cast<int>(Column::Visible));
+	SetColFormatBool(static_cast<int>(Column::RightAxis));
 
-	SetColLabelValue(ColName, _T("Curve"));
-	SetColLabelValue(ColColor, _T("Color"));
-	SetColLabelValue(ColLineSize, _T("Line"));
-	SetColLabelValue(ColMarkerSize, _T("Marker"));
-	SetColLabelValue(ColLeftCursor, _T("Left Cursor"));
-	SetColLabelValue(ColRightCursor, _T("Right Cursor"));
-	SetColLabelValue(ColDifference, _T("Difference"));
-	SetColLabelValue(ColVisible, _T("Visible"));
-	SetColLabelValue(ColRightAxis, _T("Right Axis"));
+	SetColLabelValue(static_cast<int>(Column::Name), _T("Curve"));
+	SetColLabelValue(static_cast<int>(Column::Color), _T("Color"));
+	SetColLabelValue(static_cast<int>(Column::LineSize), _T("Line"));
+	SetColLabelValue(static_cast<int>(Column::MarkerSize), _T("Marker"));
+	SetColLabelValue(static_cast<int>(Column::LeftCursor), _T("Left Cursor"));
+	SetColLabelValue(static_cast<int>(Column::RightCursor), _T("Right Cursor"));
+	SetColLabelValue(static_cast<int>(Column::Difference), _T("Difference"));
+	SetColLabelValue(static_cast<int>(Column::Visible), _T("Visible"));
+	SetColLabelValue(static_cast<int>(Column::RightAxis), _T("Right Axis"));
 
 	SetColLabelAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 	SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 	EnableDragRowSize(false);
 
 	unsigned int i;
-	for (i = 1; i < ColCount; ++i)// Skip the name column
+	for (i = 1; i < static_cast<unsigned int>(Column::Count); ++i)// Skip the name column
 		AutoSizeColLabelSize(i);// TODO:  Memory leak here
 
 	EndBatch();
@@ -178,7 +178,7 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 
 	contextMenu->AppendSeparator();
 
-	if (row == 0 && guiInterface.GetCurrentFileFormat() == GuiInterface::FormatGeneric)
+	if (row == 0 && guiInterface.GetCurrentFileFormat() == GuiInterface::FileFormat::Generic)
 	{
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
 		contextMenu->Append(idContextScaleXData, _T("Scale X-Data"));
@@ -229,29 +229,29 @@ unsigned int PlotListGrid::AddDataRow(const wxString &name)
 
 	unsigned int maxMarkerSize(5);
 
-	SetCellRenderer(index, ColVisible, new wxGridCellBoolRenderer);
-	SetCellRenderer(index, ColRightAxis, new wxGridCellBoolRenderer);
-	SetCellEditor(index, ColLineSize, new wxGridCellFloatEditor(1, 1));
-	SetCellEditor(index, ColMarkerSize, new wxGridCellNumberEditor(-1, maxMarkerSize));
+	SetCellRenderer(index, static_cast<int>(Column::Visible), new wxGridCellBoolRenderer);
+	SetCellRenderer(index, static_cast<int>(Column::RightAxis), new wxGridCellBoolRenderer);
+	SetCellEditor(index, static_cast<int>(Column::LineSize), new wxGridCellFloatEditor(1, 1));
+	SetCellEditor(index, static_cast<int>(Column::MarkerSize), new wxGridCellNumberEditor(-1, maxMarkerSize));
 
 	unsigned int i;
-	for (i = 1; i < ColCount; ++i)
+	for (i = 1; i < static_cast<unsigned int>(Column::Count); ++i)
 			SetReadOnly(index, i, true);
-	SetReadOnly(index, ColLineSize, false);
-	SetReadOnly(index, ColMarkerSize, false);
-	SetCellValue(index, ColName, name);
+	SetReadOnly(index, static_cast<int>(Column::LineSize), false);
+	SetReadOnly(index, static_cast<int>(Column::MarkerSize), false);
+	SetCellValue(index, static_cast<int>(Column::Name), name);
 
 	Color color = GetNextColor(index);
 
-	SetCellBackgroundColour(index, ColColor, color.ToWxColor());
-	SetCellValue(index, ColLineSize, _T("1"));
-	SetCellValue(index, ColMarkerSize, _T("-1"));
-	SetCellValue(index, ColVisible, _T("1"));
+	SetCellBackgroundColour(index, static_cast<int>(Column::Color), color.ToWxColor());
+	SetCellValue(index, static_cast<int>(Column::LineSize), _T("1"));
+	SetCellValue(index, static_cast<int>(Column::MarkerSize), _T("-1"));
+	SetCellValue(index, static_cast<int>(Column::Visible), _T("1"));
 
-	int width = GetColSize(ColName);
-	AutoSizeColumn(ColName, false);
-	if (GetColSize(ColName) < width)
-		SetColSize(ColName, width);
+	int width = GetColSize(static_cast<int>(Column::Name));
+	AutoSizeColumn(static_cast<int>(Column::Name), false);
+	if (GetColSize(static_cast<int>(Column::Name)) < width)
+		SetColSize(static_cast<int>(Column::Name), width);
 
 	return index;
 }
@@ -306,14 +306,14 @@ void PlotListGrid::GridDoubleClickEvent(wxGridEvent &event)
 	if (row == 0)
 		return;
 
-	if (event.GetCol() != ColColor)
+	if (event.GetCol() != static_cast<int>(Column::Color))
 	{
 		event.Skip();
 		return;
 	}
 
 	wxColourData colorData;
-	colorData.SetColour(GetCellBackgroundColour(row, ColColor));
+	colorData.SetColour(GetCellBackgroundColour(row, static_cast<int>(Column::Color)));
 
 	wxColourDialog dialog(this, &colorData);
 	dialog.CenterOnParent();
@@ -321,7 +321,8 @@ void PlotListGrid::GridDoubleClickEvent(wxGridEvent &event)
 	if (dialog.ShowModal() == wxID_OK)
     {
         colorData = dialog.GetColourData();
-		SetCellBackgroundColour(row, ColColor, colorData.GetColour());
+		SetCellBackgroundColour(row, static_cast<int>(Column::Color),
+			colorData.GetColour());
 		guiInterface.UpdateCurveProperties(row - 1);
 	}
 }
@@ -355,7 +356,9 @@ void PlotListGrid::GridLeftClickEvent(wxGridEvent &event)
 	event.Skip();
 
 	// Was this click in one of the boolean columns and not in the time row?
-	if (row == 0 || (event.GetCol() != ColVisible && event.GetCol() != ColRightAxis))
+	if (row == 0 ||
+		(event.GetCol() != static_cast<int>(Column::Visible) &&
+		event.GetCol() != static_cast<int>(Column::RightAxis)))
 		return;
 
 	if (GetCellValue(row, event.GetCol()).Cmp(_T("1")) == 0)
@@ -387,7 +390,9 @@ void PlotListGrid::GridLeftClickEvent(wxGridEvent &event)
 void PlotListGrid::GridCellChangeEvent(wxGridEvent &event)
 {
 	unsigned int row(event.GetRow());
-	if (row == 0 || (event.GetCol() != ColLineSize && event.GetCol() != ColMarkerSize))
+	if (row == 0 ||
+		(event.GetCol() != static_cast<int>(Column::LineSize) &&
+		event.GetCol() != static_cast<int>(Column::MarkerSize)))
 	{
 		event.Skip();
 		guiInterface.UpdateLegend();// Included in case of text changes
@@ -747,7 +752,7 @@ void PlotListGrid::AddTimeRow()
 	guiInterface.SetXDataLabel(guiInterface.GetCurrentFileFormat());
 
 	unsigned int i;
-	for (i = 0; i < ColCount; ++i)
+	for (i = 0; i < static_cast<unsigned int>(Column::Count); ++i)
 		SetReadOnly(0, i, true);
 }
 

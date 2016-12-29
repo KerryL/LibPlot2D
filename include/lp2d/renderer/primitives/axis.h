@@ -33,25 +33,25 @@ public:
 	~Axis() = default;
 
 	// Enumeration for the axis orientations
-	enum AxisOrientation
+	enum class Orientation
 	{
-		OrientationBottom,
-		OrientationTop,
-		OrientationLeft,
-		OrientationRight
+		Bottom,
+		Top,
+		Left,
+		Right
 	};
 
 	// Enumeration for the tick styles
-	enum TickStyle
+	enum class TickStyle
 	{
-		TickStyleThrough,
-		TickStyleInside,
-		TickStyleOutside,
-		TickStyleNone
+		Through,
+		Inside,
+		Outside,
+		None
 	};
 
 	// Set option methods
-	void SetOrientation(const AxisOrientation &orientation) { this->orientation = orientation; modified = true; }
+	void SetOrientation(const Orientation &orientation) { this->orientation = orientation; modified = true; }
 	void SetMinimum(const double &minimum) { this->minimum = minimum; modified = true; }
 	void SetMaximum(const double &maximum) { this->maximum = maximum; modified = true; }
 	void SetMajorResolution(const double &majorResolution) { this->majorResolution = majorResolution; modified = true; }
@@ -83,7 +83,7 @@ public:
 	inline const Axis* GetAxisAtMinEnd() const { return minAxis; }
 	inline const Axis* GetAxisAtMaxEnd() const { return maxAxis; }
 	inline const Axis* GetOppositeAxis() const { return oppositeAxis; }
-	inline AxisOrientation GetOrientation() const { return orientation; }
+	inline Orientation GetOrientation() const { return orientation; }
 
 	unsigned int GetAxisLength() const;
 
@@ -103,7 +103,7 @@ protected:
 
 private:
 	// This object's orientation
-	AxisOrientation orientation;
+	Orientation orientation;
 
 	// This object's range
 	double minimum;

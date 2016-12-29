@@ -47,19 +47,19 @@ public:
 	unsigned int AddDataRow(const wxString& name);
 
 	/// Enumeration of columns contained within the grid.
-	enum Columns
+	enum class Column
 	{
-		ColName = 0,
-		ColColor,
-		ColLineSize,
-		ColMarkerSize,
-		ColLeftCursor,
-		ColRightCursor,
-		ColDifference,
-		ColVisible,
-		ColRightAxis,
+		Name = 0,
+		Color,
+		LineSize,
+		MarkerSize,
+		LeftCursor,
+		RightCursor,
+		Difference,
+		Visible,
+		RightAxis,
 
-		ColCount
+		Count
 	};
 
 protected:
@@ -68,7 +68,7 @@ protected:
 	virtual void CreateGridContextMenu(const wxPoint& position, const unsigned int& row);
 
 	// The event IDs
-	enum MainFrameEventID
+	enum EventIDs
 	{
 		idContextAddMathChannel = wxID_HIGHEST + 100,
 		idContextFRF,

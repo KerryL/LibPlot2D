@@ -131,7 +131,7 @@ PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent,
 
 	ignoreNextMouseMove = false;
 
-	curveQuality = QualityAlwaysHigh;
+	curveQuality = CurveQuality::AlwaysHigh;
 
 	SetDropTarget(static_cast<wxDropTarget*>(new DropTarget(guiInterface)));
 
@@ -288,8 +288,8 @@ void PlotRenderer::CreateActors()
 		const unsigned int offset(5);
 		legend = new Legend(*this);
 		legend->SetFont(plot->GetAxisFont(), 12);
-		legend->SetLegendReference(Legend::TopRight);
-		legend->SetWindowReference(Legend::TopRight);
+		legend->SetLegendReference(Legend::PositionReference::TopRight);
+		legend->SetWindowReference(Legend::PositionReference::TopRight);
 		legend->SetPosition(plot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
 			plot->GetTopAxis()->GetOffsetFromWindowEdge() + offset);
 		legend->SetVisibility(false);
@@ -412,7 +412,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 
 	if (!event.Dragging() || ignoreNextMouseMove)// ignoreNextMouseMove prevents panning on maximize by double clicking title bar or after creating a context menu
 	{
-		plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
+		plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
 		ignoreNextMouseMove = false;
 		StoreMousePosition(event);
 		return;
@@ -439,7 +439,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	plot->SetPrettyCurves((curveQuality & QualityHighDrag) != 0);
+	plot->SetPrettyCurves((curveQuality & CurveQuality::HighDrag) != 0);
 	StoreMousePosition(event);
 	UpdateDisplay();
 }
@@ -462,7 +462,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 {
-	plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
+	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
 
 	if (!zoomBox->GetIsVisible())
 	{
@@ -778,7 +778,7 @@ void PlotRenderer::SetMinorGridOff()
 void PlotRenderer::SetCurveQuality(const CurveQuality& curveQuality)
 {
 	this->curveQuality = curveQuality;
-	plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
+	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
 }
 
 //=============================================================================
@@ -1616,13 +1616,13 @@ void PlotRenderer::SetLeftYLabel(wxString text)
 
 	if (oldOffset != newOffset)
 	{
-		if (legend->GetWindowReference() == Legend::BottomCenter ||
-			legend->GetWindowReference() == Legend::Center ||
-			legend->GetWindowReference() == Legend::TopCenter)
+		if (legend->GetWindowReference() == Legend::PositionReference::BottomCenter ||
+			legend->GetWindowReference() == Legend::PositionReference::Center ||
+			legend->GetWindowReference() == Legend::PositionReference::TopCenter)
 			legend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
-		else if (legend->GetWindowReference() == Legend::BottomLeft ||
-			legend->GetWindowReference() == Legend::MiddleLeft ||
-			legend->GetWindowReference() == Legend::TopLeft)
+		else if (legend->GetWindowReference() == Legend::PositionReference::BottomLeft ||
+			legend->GetWindowReference() == Legend::PositionReference::MiddleLeft ||
+			legend->GetWindowReference() == Legend::PositionReference::TopLeft)
 			legend->SetDeltaPosition(newOffset - oldOffset, 0);
 	}
 
@@ -1653,13 +1653,13 @@ void PlotRenderer::SetRightYLabel(wxString text)
 
 	if (oldOffset != newOffset)
 	{
-		if (legend->GetWindowReference() == Legend::BottomCenter ||
-			legend->GetWindowReference() == Legend::Center ||
-			legend->GetWindowReference() == Legend::TopCenter)
+		if (legend->GetWindowReference() == Legend::PositionReference::BottomCenter ||
+			legend->GetWindowReference() == Legend::PositionReference::Center ||
+			legend->GetWindowReference() == Legend::PositionReference::TopCenter)
 			legend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
-		else if (legend->GetWindowReference() == Legend::BottomRight ||
-			legend->GetWindowReference() == Legend::MiddleRight ||
-			legend->GetWindowReference() == Legend::TopRight)
+		else if (legend->GetWindowReference() == Legend::PositionReference::BottomRight ||
+			legend->GetWindowReference() == Legend::PositionReference::MiddleRight ||
+			legend->GetWindowReference() == Legend::PositionReference::TopRight)
 			legend->SetDeltaPosition(oldOffset - newOffset, 0);
 	}
 
@@ -1690,13 +1690,13 @@ void PlotRenderer::SetTitle(wxString text)
 
 	if (oldOffset != newOffset)
 	{
-		if (legend->GetWindowReference() == Legend::TopLeft ||
-			legend->GetWindowReference() == Legend::TopCenter ||
-			legend->GetWindowReference() == Legend::TopRight)
+		if (legend->GetWindowReference() == Legend::PositionReference::TopLeft ||
+			legend->GetWindowReference() == Legend::PositionReference::TopCenter ||
+			legend->GetWindowReference() == Legend::PositionReference::TopRight)
 			legend->SetDeltaPosition(0, newOffset - oldOffset);
-		else if (legend->GetWindowReference() == Legend::MiddleLeft ||
-			legend->GetWindowReference() == Legend::Center ||
-			legend->GetWindowReference() == Legend::MiddleRight)
+		else if (legend->GetWindowReference() == Legend::PositionReference::MiddleLeft ||
+			legend->GetWindowReference() == Legend::PositionReference::Center ||
+			legend->GetWindowReference() == Legend::PositionReference::MiddleRight)
 			legend->SetDeltaPosition(0, (newOffset - oldOffset) / 2);
 	}*/ // Adjust legend position as plot area size changes
 	// Not implemented due to possiblity that legend would be moved off-screen
@@ -1819,7 +1819,7 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 {
-	plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
+	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
 
 	if (draggingLegend)
 	{
@@ -1860,32 +1860,32 @@ void PlotRenderer::UpdateLegendAnchor()
 	std::vector<std::pair<double, Legend::PositionReference>> distances;
 	double x, y;
 
-	legend->GetPosition(Legend::BottomLeft, Legend::BottomLeft, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::BottomLeft));
+	legend->GetPosition(Legend::PositionReference::BottomLeft, Legend::PositionReference::BottomLeft, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::BottomLeft));
 
-	legend->GetPosition(Legend::BottomCenter, Legend::BottomCenter, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::BottomCenter));
+	legend->GetPosition(Legend::PositionReference::BottomCenter, Legend::PositionReference::BottomCenter, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::BottomCenter));
 
-	legend->GetPosition(Legend::BottomRight, Legend::BottomRight, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::BottomRight));
+	legend->GetPosition(Legend::PositionReference::BottomRight, Legend::PositionReference::BottomRight, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::BottomRight));
 
-	legend->GetPosition(Legend::MiddleLeft, Legend::MiddleLeft, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::MiddleLeft));
+	legend->GetPosition(Legend::PositionReference::MiddleLeft, Legend::PositionReference::MiddleLeft, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::MiddleLeft));
 
-	legend->GetPosition(Legend::Center, Legend::Center, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::Center));
+	legend->GetPosition(Legend::PositionReference::Center, Legend::PositionReference::Center, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::Center));
 
-	legend->GetPosition(Legend::MiddleRight, Legend::MiddleRight, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::MiddleRight));
+	legend->GetPosition(Legend::PositionReference::MiddleRight, Legend::PositionReference::MiddleRight, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::MiddleRight));
 
-	legend->GetPosition(Legend::TopLeft, Legend::TopLeft, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::TopLeft));
+	legend->GetPosition(Legend::PositionReference::TopLeft, Legend::PositionReference::TopLeft, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::TopLeft));
 
-	legend->GetPosition(Legend::TopCenter, Legend::TopCenter, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::TopCenter));
+	legend->GetPosition(Legend::PositionReference::TopCenter, Legend::PositionReference::TopCenter, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::TopCenter));
 
-	legend->GetPosition(Legend::TopRight, Legend::TopRight, x, y);
-	distances.push_back(std::make_pair(x * x + y * y, Legend::TopRight));
+	legend->GetPosition(Legend::PositionReference::TopRight, Legend::PositionReference::TopRight, x, y);
+	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::TopRight));
 
 	Legend::PositionReference bestRef = std::min_element(distances.begin(), distances.end())->second;
 	legend->GetPosition(bestRef, bestRef, x, y);
@@ -2625,17 +2625,17 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotContextLeftYAxis;
+		context = PlotContext::LeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotContextRightYAxis;
+		context = PlotContext::RightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = PlotContextXAxis;
+		context = PlotContext::XAxis;
 	else
-		context = PlotContextPlotArea;
+		context = PlotContext::PlotArea;
 
 	guiInterface.DisplayAxisRangeDialog(context);
 }
@@ -2665,17 +2665,17 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotContextLeftYAxis;
+		context = PlotContext::LeftYAxis;
 	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
 		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
 		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		context = PlotContextRightYAxis;
+		context = PlotContext::RightYAxis;
 	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
 		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
 		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		context = PlotContextXAxis;
+		context = PlotContext::XAxis;
 	else
-		context = PlotContextPlotArea;
+		context = PlotContext::PlotArea;
 
 	// Display the context menu
 	CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
@@ -2966,12 +2966,12 @@ double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
 //=============================================================================
 wxImage PlotRenderer::GetImage() const
 {
-	plot->SetPrettyCurves((curveQuality & QualityHighWrite) != 0);
-	if (((curveQuality & QualityHighStatic) != 0) != ((curveQuality & QualityHighWrite) != 0))
+	plot->SetPrettyCurves((curveQuality & CurveQuality::HighWrite) != 0);
+	if (((curveQuality & CurveQuality::HighStatic) != 0) != ((curveQuality & CurveQuality::HighWrite) != 0))
 		{/*UpdateDisplay();*/}// TODO:  Can't call from const method, so HighQualityWrite flag currently doesn't work
 
 	wxImage newImage(RenderWindow::GetImage());
-	plot->SetPrettyCurves((curveQuality & QualityHighStatic) != 0);
+	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
 	return newImage;
 }
 
@@ -3018,16 +3018,16 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 
 	switch(mv)
 	{
-	case ModelviewLeft:
+	case Modelview::Left:
 		ConvertMatrixToGL(leftModelview, glModelviewMatrix);
 		break;
 
-	case ModelviewRight:
+	case Modelview::Right:
 		ConvertMatrixToGL(rightModelview, glModelviewMatrix);
 		break;
 
 	default:
-	case ModelviewFixed:
+	case Modelview::Fixed:
 		ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
 	}
 
@@ -3108,21 +3108,21 @@ void PlotRenderer::CreatePlotContextMenu(const wxPoint &position, const PlotCont
 
 	switch (context)
 	{
-	case PlotContextXAxis:
+	case PlotContext::XAxis:
 		contextMenu = CreateAxisContextMenu(idPlotContextBottomMajorGridlines);
 		contextMenu->Check(idPlotContextBottomLogarithmic, GetXLogarithmic());
 		contextMenu->Check(idPlotContextBottomMajorGridlines, GetBottomMajorGrid());
 		contextMenu->Check(idPlotContextBottomMinorGridlines, GetBottomMinorGrid());
 		break;
 
-	case PlotContextLeftYAxis:
+	case PlotContext::LeftYAxis:
 		contextMenu = CreateAxisContextMenu(idPlotContextLeftMajorGridlines);
 		contextMenu->Check(idPlotContextLeftLogarithmic, GetLeftLogarithmic());
 		contextMenu->Check(idPlotContextLeftMajorGridlines, GetLeftMajorGrid());
 		contextMenu->Check(idPlotContextLeftMinorGridlines, GetLeftMinorGrid());
 		break;
 
-	case PlotContextRightYAxis:
+	case PlotContext::RightYAxis:
 		contextMenu = CreateAxisContextMenu(idPlotContextRightMajorGridlines);
 		contextMenu->Check(idPlotContextRightLogarithmic, GetRightLogarithmic());
 		contextMenu->Check(idPlotContextRightMajorGridlines, GetRightMajorGrid());
@@ -3130,7 +3130,7 @@ void PlotRenderer::CreatePlotContextMenu(const wxPoint &position, const PlotCont
 		break;
 
 	default:
-	case PlotContextPlotArea:
+	case PlotContext::PlotArea:
 		contextMenu = CreatePlotAreaContextMenu();
 		break;
 	}
@@ -3381,23 +3381,23 @@ bool PlotRenderer::GetCurrentAxisRange(const PlotContext &axis, double &min, dou
 {
 	switch (axis)
 	{
-	case PlotContextXAxis:
+	case PlotContext::XAxis:
 		min = GetXMin();
 		max = GetXMax();
 		break;
 
-	case PlotContextLeftYAxis:
+	case PlotContext::LeftYAxis:
 		min = GetLeftYMin();
 		max = GetLeftYMax();
 		break;
 
-	case PlotContextRightYAxis:
+	case PlotContext::RightYAxis:
 		min = GetRightYMin();
 		max = GetRightYMax();
 		break;
 
 	default:
-	case PlotContextPlotArea:
+	case PlotContext::PlotArea:
 		// Plot area is not a valid context in which we can set axis limits
 		return false;
 	}
@@ -3427,20 +3427,20 @@ void PlotRenderer::SetNewAxisRange(const PlotContext &axis, const double &min, c
 {
 	switch (axis)
 	{
-	case PlotContextLeftYAxis:
+	case PlotContext::LeftYAxis:
 		SetLeftYLimits(min, max);
 		break;
 
-	case PlotContextRightYAxis:
+	case PlotContext::RightYAxis:
 		SetRightYLimits(min, max);
 		break;
 
 	default:
-	case PlotContextXAxis:
+	case PlotContext::XAxis:
 		SetXLimits(min, max);
 		break;
 
-	case PlotContextPlotArea:
+	case PlotContext::PlotArea:
 		assert(false);
 	}
 
@@ -3528,7 +3528,7 @@ void PlotRenderer::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.DisplayAxisRangeDialog(PlotContextXAxis);
+	guiInterface.DisplayAxisRangeDialog(PlotContext::XAxis);
 }
 
 //=============================================================================
@@ -3644,7 +3644,7 @@ void PlotRenderer::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.DisplayAxisRangeDialog(PlotContextLeftYAxis);
+	guiInterface.DisplayAxisRangeDialog(PlotContext::LeftYAxis);
 }
 
 //=============================================================================
@@ -3760,7 +3760,7 @@ void PlotRenderer::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.DisplayAxisRangeDialog(PlotContextRightYAxis);
+	guiInterface.DisplayAxisRangeDialog(PlotContext::RightYAxis);
 }
 
 //=============================================================================
