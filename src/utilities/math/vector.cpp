@@ -1,10 +1,9 @@
 /*=============================================================================
-                                    DataPlotter
-                          Copyright Kerry R. Loux 2011-2016
+                                   LibPlot2D
+                       Copyright Kerry R. Loux 2011-2016
 
-                   This code is licensed under the GPLv2 License
-                     (http://opensource.org/licenses/GPL-2.0).
-
+                  This code is licensed under the GPLv2 License
+                    (http://opensource.org/licenses/GPL-2.0).
 =============================================================================*/
 
 // File:  vector.cpp
