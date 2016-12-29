@@ -198,7 +198,7 @@ void Axis::DrawFullAxis()
 		if ((majorGrid || minorGrid) && oppositeAxis)
 			DrawHorizontalGrid(numberOfGridLines);
 
-		if (tickStyle != TickStyle::None)
+		if (tickStyle != TickStyle::NoTicks)
 			DrawHorizontalTicks(numberOfTicks, mainAxisLocation);
 	}
 	else
@@ -206,7 +206,7 @@ void Axis::DrawFullAxis()
 		if ((majorGrid || minorGrid) && oppositeAxis)
 			DrawVerticalGrid(numberOfGridLines);
 
-		if (tickStyle != TickStyle::None)
+		if (tickStyle != TickStyle::NoTicks)
 			DrawVerticalTicks(numberOfTicks, mainAxisLocation);
 	}
 

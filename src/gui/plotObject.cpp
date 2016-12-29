@@ -553,7 +553,7 @@ void PlotObject::FormatAxesBasics()
 	Axis::TickStyle tickStyle = Axis::TickStyle::Inside;
 
 	FormatBottomBasics(tickStyle);
-	FormatTopBasics(Axis::TickStyle::None);
+	FormatTopBasics(Axis::TickStyle::NoTicks);
 	FormatLeftBasics(tickStyle);
 	FormatRightBasics(tickStyle);
 

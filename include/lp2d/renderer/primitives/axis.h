@@ -46,7 +46,7 @@ public:
 		Through,
 		Inside,
 		Outside,
-		None
+		NoTicks
 	};
 
 	// Set option methods
