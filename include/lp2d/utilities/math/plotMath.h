@@ -14,6 +14,9 @@
 #ifndef PLOT_MATH_H_
 #define PLOT_MATH_H_
 
+// Eigen headers
+#include <Eigen/Eigen>
+
 // Standard C++ headers
 #include <limits>// For QNaN
 
@@ -37,7 +40,7 @@ namespace PlotMath
 	// Prototypes =====================================================
 	// For determining if a number is close enough to zero to regard as zero
 	bool IsZero(const double &n, const double &eps = NearlyZero);
-	bool IsZero(const Vector &v, const double &eps = NearlyZero);
+	bool IsZero(const Eigen::VectorXd &v, const double &eps = NearlyZero);
 
 	template<typename T>
 	bool IsNaN(const T &value);

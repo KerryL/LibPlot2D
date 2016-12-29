@@ -49,7 +49,7 @@ unsigned int Text::colorLocation;
 unsigned int Text::vertexLocation;
 unsigned int Text::indexLocation;
 unsigned int Text::modelviewMatrixLocation;
-bool Text::initialized;
+bool Text::initialized(false);
 FT_Library Text::ft;
 unsigned int Text::ftReferenceCount(0);
 
@@ -142,16 +142,7 @@ const std::string Text::fragmentShader(
 //=============================================================================
 Text::Text(RenderWindow& renderer) : renderer(renderer)
 {
-	color = Color::ColorBlack;
-	scale = 1.0;
-	initialized = false;
-	glyphsGenerated = false;
-	face = nullptr;
-	isOK = true;
-
-	modelview.Resize(4, 4);
 	SetOrientation(0.0);
-
 	Initialize();
 }
 
@@ -573,8 +564,8 @@ void Text::DoInternalInitialization()
 //=============================================================================
 void Text::SetOrientation(const double& angle)
 {
-	modelview.MakeIdentity();
-	renderer.Rotate(modelview, angle, 0.0, 0.0, 1.0);
+	modelview.setIdentity();
+	renderer.Rotate(modelview, angle, Eigen::Vector3d(0.0, 0.0, 1.0));
 }
 
 //=============================================================================

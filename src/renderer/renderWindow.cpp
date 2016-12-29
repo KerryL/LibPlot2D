@@ -15,21 +15,24 @@
 //        be drawn.  Objects in the PrimitivesList become managed by this
 //        object and are deleted automatically.
 
-// Standard C++ headers
-#include <vector>
-#include <algorithm>
-#include <iostream>
+// GLEW headers
+#include <GL/glew.h>// Must be included before gl.h (so, before renderWindow.h)
+
+// Local headers
+#include "lp2d/renderer/renderWindow.h"
+#include "lp2d/utilities/math/plotMath.h"
+
+// Eigen headers
+#include <Eigen/Geometry>
 
 // wxWidgets headers
 #include <wx/dcclient.h>
 #include <wx/image.h>
 
-// GLEW headers
-#include <GL/glew.h>
-
-// Local headers
-#include "lp2d/renderer/renderWindow.h"
-#include "lp2d/utilities/math/plotMath.h"
+// Standard C++ headers
+#include <vector>
+#include <algorithm>
+#include <iostream>
 
 namespace LibPlot2D
 {
@@ -142,16 +145,16 @@ const std::string RenderWindow::defaultFragmentShader(
 //		None
 //
 //=============================================================================
-RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
-    const wxPoint& position, const wxSize& size, long style) : wxGLCanvas(
-	&parent, attr, id, position, size, style | wxFULL_REPAINT_ON_RESIZE)
+RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id,
+	const wxGLAttributes& attr, const wxPoint& position, const wxSize& size,
+	long style) : wxGLCanvas(&parent, attr, id, position, size,
+		style | wxFULL_REPAINT_ON_RESIZE)
 {
 	AutoSetFrustum();
 
-	modelviewMatrix.Resize(4, 4);
-	projectionMatrix.Resize(4, 4);
-
-	SetCameraView(Vector(1.0, 0.0, 0.0), Vector(0.0, 0.0, 0.0), Vector(0.0, 0.0, 1.0));
+	SetCameraView((Eigen::Vector3d() << 1.0, 0.0, 0.0).finished(),
+		Eigen::Vector3d::Zero(),
+		(Eigen::Vector3d() << 0.0, 0.0, 1.0).finished());
 
 	SetBackgroundStyle(wxBG_STYLE_CUSTOM);// To avoid flashing under MSW
 }
@@ -447,7 +450,7 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 //=============================================================================
 void RenderWindow::Initialize()
 {
-	Matrix projectionMatrix;
+	Eigen::Matrix4d projectionMatrix;
 	if (view3D)
 	{
 		Initialize3D();
@@ -662,35 +665,43 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 	if (!view3D)
 		return;
 
-	Vector upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
+	Eigen::Vector3d upDirection(0.0, 1.0, 0.0);
+	Eigen::Vector3d normal(0.0, 0.0, 1.0);
+
 	upDirection = TransformToModel(upDirection);
 	normal = TransformToModel(normal);
-	leftDirection = normal.Cross(upDirection);
+	Eigen::Vector3d leftDirection{ normal.cross(upDirection) };
 
-	Vector mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
-		+ leftDirection * double(GetSize().GetWidth() / 2 - event.GetX());
-	Vector lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
-		+ leftDirection * double(GetSize().GetWidth() / 2 - lastMousePosition[0]);
+	Eigen::Vector3d mouseVector{ upDirection *
+		static_cast<double>(GetSize().GetHeight() / 2 - event.GetY())
+		+ leftDirection *
+		static_cast<double>(GetSize().GetWidth() / 2 - event.GetX()) };
+	Eigen::Vector3d lastMouseVector{ upDirection *
+		static_cast<double>(GetSize().GetHeight() / 2 - lastMousePosition[1])
+		+ leftDirection *
+		static_cast<double>(GetSize().GetWidth() / 2 - lastMousePosition[0]) };
 
 	// Get a vector that represents the mouse motion (projected onto a plane with the camera
 	// position as a normal)
-	Vector mouseMotion = mouseVector - lastMouseVector;
-	Vector axisOfRotation = normal.Cross(mouseMotion);
+	Eigen::Vector3d mouseMotion{ mouseVector - lastMouseVector };
+	Eigen::Vector3d axisOfRotation{ normal.cross(mouseMotion) };
 
-	long xDistance = GetSize().GetWidth() / 2 - event.GetX();
-	long yDistance = GetSize().GetHeight() / 2 - event.GetY();
-	long lastXDistance = GetSize().GetWidth() / 2 - lastMousePosition[0];
-	long lastYDistance = GetSize().GetHeight() / 2 - lastMousePosition[1];
+	long xDistance{ GetSize().GetWidth() / 2 - event.GetX() };
+	long yDistance{ GetSize().GetHeight() / 2 - event.GetY() };
+	long lastXDistance{ GetSize().GetWidth() / 2 - lastMousePosition[0] };
+	long lastYDistance{ GetSize().GetHeight() / 2 - lastMousePosition[1] };
 
 	// The angle is determined by how much the mouse moved.  800 pixels of movement will result in
 	// a full 360 degrees rotation.
 	// TODO:  Add user-adjustable rotation sensitivity (actually, all of the interactions can be adjustable)
-	double angle = sqrt(fabs(double((xDistance - lastXDistance) * (xDistance - lastXDistance))
-		+ double((yDistance - lastYDistance) * (yDistance - lastYDistance)))) / 800.0 * 360.0;// [deg]
+	double angle{ sqrt(fabs(static_cast<double>((xDistance - lastXDistance)
+		* (xDistance - lastXDistance))
+		+ static_cast<double>((yDistance - lastYDistance)
+		* (yDistance - lastYDistance)))) / 800.0 * 360.0 };// [deg]
 
-	Translate(modelviewMatrix, focalPoint.x, focalPoint.y, focalPoint.z);
-	Rotate(modelviewMatrix, angle, axisOfRotation.x, axisOfRotation.y, axisOfRotation.z);
-	Translate(modelviewMatrix, -focalPoint.x, -focalPoint.y, -focalPoint.z);
+	Translate(modelviewMatrix, focalPoint);
+	Rotate(modelviewMatrix, angle, axisOfRotation);
+	Translate(modelviewMatrix, -focalPoint);
 	modelviewModified = true;
 }
 
@@ -776,26 +787,34 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 	// Handle 3D panning differently from 2D panning
 	if (view3D)
 	{
-		// Convert up and normal vectors from openGL coordinates to model coordinates
-		Vector upDirection(0.0, 1.0, 0.0), normal(0.0, 0.0, 1.0), leftDirection;
+		// Convert up and normal vectors from openGL coordinates to model
+		// coordinates
+		Eigen::Vector3d upDirection(0.0, 1.0, 0.0);
+		Eigen::Vector3d normal(0.0, 0.0, 1.0);
+
 		upDirection = TransformToModel(upDirection);
 		normal = TransformToModel(normal);
-		leftDirection = normal.Cross(upDirection);
+		Eigen::Vector3d leftDirection{ normal.cross(upDirection) };
 
-		// Get a vector that represents the mouse position relative to the center of the screen
-		Vector mouseVector = upDirection * double(GetSize().GetHeight() / 2 - event.GetY())
-			+ leftDirection * double(GetSize().GetWidth() / 2 - event.GetX());
-		Vector lastMouseVector = upDirection * double(GetSize().GetHeight() / 2 - lastMousePosition[1])
-			+ leftDirection * double(GetSize().GetWidth() / 2 - lastMousePosition[0]);
+		// Get a vector that represents the mouse position relative to the
+		// center of the screen
+		Eigen::Vector3d mouseVector{ upDirection *
+			static_cast<double>(GetSize().GetHeight() / 2 - event.GetY())
+			+ leftDirection *
+			static_cast<double>(GetSize().GetWidth() / 2 - event.GetX()) };
+		Eigen::Vector3d lastMouseVector{ upDirection *
+			static_cast<double>(GetSize().GetHeight() / 2 - lastMousePosition[1])
+			+ leftDirection *
+			static_cast<double>(GetSize().GetWidth() / 2 - lastMousePosition[0]) };
 
-		// Get a vector that represents the mouse motion (projected onto a plane with the camera
-		// position as a normal)
-		Vector mouseMotion = mouseVector - lastMouseVector;
+		// Get a vector that represents the mouse motion (projected onto a
+		// plane with the camera position as a normal)
+		Eigen::Vector3d mouseMotion = mouseVector - lastMouseVector;
 
 		double motionFactor = 0.15;
 		mouseMotion *= motionFactor;
 
-		Translate(modelviewMatrix, mouseMotion.x, mouseMotion.y, mouseMotion.z);
+		Translate(modelviewMatrix, mouseMotion);
 		modelviewModified = true;
 
 		focalPoint -= mouseMotion;
@@ -813,10 +832,10 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 // Description:		Sets the camera view as specified.
 //
 // Input Arguments:
-//		position	= const Vector& specifying the camera position
-//		lookAt		= const Vector& specifying the object at which the camera
+//		position	= const Eigen::Vector3d& specifying the camera position
+//		lookAt		= const Eigen::Vector3d& specifying the object at which the camera
 //					  is to be pointed
-//		upDirection	= const Vector& used to specify the final camera orientation DOF
+//		upDirection	= const Eigen::Vector3d& used to specify the final camera orientation DOF
 //
 // Output Arguments:
 //		None
@@ -825,25 +844,25 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 //		None
 //
 //=============================================================================
-void RenderWindow::SetCameraView(const Vector &position, const Vector &lookAt,
-	const Vector &upDirection)
+void RenderWindow::SetCameraView(const Eigen::Vector3d &position,
+	const Eigen::Vector3d &lookAt, const Eigen::Vector3d &upDirection)
 {
 	modelviewModified = true;
 
 	// Compute the MODELVIEW matrix
 	// (Use calculations from gluLookAt documentation)
-	Vector f = (lookAt - position).Normalize();
-	Vector up = upDirection.Normalize();
-	Vector s = f.Cross(up);
+	Eigen::Vector3d f{ (lookAt - position).normalized() };
+	Eigen::Vector3d up{ upDirection.normalized() };
+	Eigen::Vector3d s{ f.cross(up) };
 	if (!PlotMath::IsZero(s))
 	{
-		Vector u = s.Cross(f);
-		modelviewMatrix.Set(s.x, s.y, s.z, 0.0,
-							u.x, u.y, u.z, 0.0,
-							-f.x, -f.y, -f.z, 0.0,
-							0.0, 0.0, 0.0, 1.0);
+		Eigen::Vector3d u{ s.cross(f) };
+		modelviewMatrix << s(0), s(1), s(2), 0.0,
+							u(0), u(1), u(2), 0.0,
+							-f(0), -f(1), -f(2), 0.0,
+							0.0, 0.0, 0.0, 1.0;
 		
-		Translate(modelviewMatrix, -position.x, -position.y, -position.z);
+		Translate(modelviewMatrix, -position);
 		modelviewModified = true;
 	}
 
@@ -877,7 +896,8 @@ void RenderWindow::UpdateModelviewMatrix()
 		if (shaders[i - 1].needsModelview)
 		{
 			glUseProgram(shaders[i - 1].programId);
-			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
+			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1,
+				GL_FALSE, glModelviewMatrix);
 		}
 	}
 	modelviewModified = false;
@@ -891,18 +911,19 @@ void RenderWindow::UpdateModelviewMatrix()
 //					(assumed to be in model coordinates) in view coordinates.
 //
 // Input Arguments:
-//		modelVector	= const Vector& to be transformed
+//		modelVector	= const Eigen::Vector3d& to be transformed
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		Vector
+//		Eigen::Vector3d
 //
 //=============================================================================
-Vector RenderWindow::TransformToView(const Vector &modelVector) const
+Eigen::Vector3d RenderWindow::TransformToView(
+	const Eigen::Vector3d &modelVector) const
 {
-	return modelviewMatrix.GetSubMatrix(0, 0, 3, 3) * modelVector;
+	return modelviewMatrix.topLeftCorner<3, 3>() * modelVector;
 }
 
 //=============================================================================
@@ -913,18 +934,19 @@ Vector RenderWindow::TransformToView(const Vector &modelVector) const
 //					(assumed to be in view coordinates) in model coordinates.
 //
 // Input Arguments:
-//		viewVector	= const Vector& to be transformed
+//		viewVector	= const Eigen::Vector3d& to be transformed
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		Vector
+//		Eigen::Vector3d
 //
 //=============================================================================
-Vector RenderWindow::TransformToModel(const Vector &viewVector) const
+Eigen::Vector3d RenderWindow::TransformToModel(
+	const Eigen::Vector3d &viewVector) const
 {
-	return modelviewMatrix.GetSubMatrix(0, 0, 3, 3).Transpose() * viewVector;
+	return modelviewMatrix.topLeftCorner<3, 3>().transpose() * viewVector;
 }
 
 //=============================================================================
@@ -943,9 +965,10 @@ Vector RenderWindow::TransformToModel(const Vector &viewVector) const
 //		None
 //
 //=============================================================================
-Vector RenderWindow::GetCameraPosition() const
+Eigen::Vector3d RenderWindow::GetCameraPosition() const
 {
-	Vector cameraPosition(modelviewMatrix(0, 3), modelviewMatrix(1, 3), modelviewMatrix(2, 3));
+	Eigen::Vector3d cameraPosition(modelviewMatrix(0, 3),
+		modelviewMatrix(1, 3), modelviewMatrix(2, 3));
 	return TransformToModel(cameraPosition);
 }
 
@@ -1182,7 +1205,7 @@ bool RenderWindow::OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
 //					OpenGL.
 //
 // Input Arguments:
-//		matrix	= const Matrix& containing the original data
+//		matrix	= const Eigen::Matrix4d& containing the original data
 //
 // Output Arguments:
 //		gl		= float[] in the form expected by OpenGL
@@ -1191,13 +1214,15 @@ bool RenderWindow::OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
 //		None
 //
 //=============================================================================
-void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, float gl[])
+void RenderWindow::ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[])
 {
-	unsigned int i, j;
-	for (i = 0; i < matrix.GetNumberOfRows(); ++i)
+	// TODO:  Can this be eliminated by using built-in eigen routines?
+	int i;
+	for (i = 0; i < matrix.rows(); ++i)
 	{
-		for (j = 0; j < matrix.GetNumberOfColumns(); ++j)
-			gl[i * matrix.GetNumberOfColumns() + j] = matrix(j, i);
+		int j;
+		for (j = 0; j < matrix.cols(); ++j)
+			gl[i * matrix.cols() + j] = matrix(j, i);
 	}
 }
 
@@ -1212,19 +1237,20 @@ void RenderWindow::ConvertMatrixToGL(const Matrix& matrix, float gl[])
 //		gl		= float[] in the form expected by OpenGL
 //
 // Output Arguments:
-//		matrix	= const Matrix& containing the original data
+//		matrix	= const Eigen::Matrix4d& containing the original data
 //
 // Return Value:
 //		None
 //
 //=============================================================================
-void RenderWindow::ConvertGLToMatrix(Matrix& matrix, const float gl[])
+void RenderWindow::ConvertGLToMatrix(Eigen::Matrix4d& matrix, const float gl[])
 {
-	unsigned int i, j;
-	for (i = 0; i < matrix.GetNumberOfRows(); ++i)
+	int i;
+	for (i = 0; i < matrix.rows(); ++i)
 	{
-		for (j = 0; j < matrix.GetNumberOfColumns(); ++j)
-			matrix(j, i) = gl[i * matrix.GetNumberOfColumns() + j];
+		int j;
+		for (j = 0; j < matrix.cols(); ++j)
+			matrix(j, i) = gl[i * matrix.cols() + j];
 	}
 }
 
@@ -1259,7 +1285,7 @@ void RenderWindow::Initialize2D()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	modelviewMatrix.MakeIdentity();
+	modelviewMatrix.setIdentity();
 	ShiftForExactPixelization();
 	modelviewModified = true;
 
@@ -1310,20 +1336,20 @@ void RenderWindow::Initialize3D()
 //		None
 //
 // Return Value:
-//		Matrix
+//		Eigen::Matrix4d
 //
 //=============================================================================
-Matrix RenderWindow::Generate2DProjectionMatrix() const
+Eigen::Matrix4d RenderWindow::Generate2DProjectionMatrix() const
 {
 	// Set up an orthogonal 2D projection matrix (this puts (0,0) at the lower left-hand corner of the window)
-	Matrix projectionMatrix(4, 4);
-	projectionMatrix.SetElement(0, 0, 2.0 / GetSize().GetWidth());
-	projectionMatrix.SetElement(1, 1, 2.0 / GetSize().GetHeight());
-	projectionMatrix.SetElement(2, 2, -2.0);
-	projectionMatrix.SetElement(0, 3, -1.0);
-	projectionMatrix.SetElement(1, 3, -1.0);
-	projectionMatrix.SetElement(2, 3, -1.0);
-	projectionMatrix.SetElement(3, 3, 1.0);
+	Eigen::Matrix4d projectionMatrix(Eigen::Matrix4d::Zero());
+	projectionMatrix(0, 0) = 2.0 / GetSize().GetWidth();
+	projectionMatrix(1, 1) = 2.0 / GetSize().GetHeight();
+	projectionMatrix(2, 2) = -2.0;
+	projectionMatrix(0, 3) = -1.0;
+	projectionMatrix(1, 3) = -1.0;
+	projectionMatrix(2, 3) = -1.0;
+	projectionMatrix(3, 3) = 1.0;
 
 	return projectionMatrix;
 }
@@ -1341,10 +1367,10 @@ Matrix RenderWindow::Generate2DProjectionMatrix() const
 //		None
 //
 // Return Value:
-//		Matrix
+//		Eigen::Matrix4d
 //
 //=============================================================================
-Matrix RenderWindow::Generate3DProjectionMatrix() const
+Eigen::Matrix4d RenderWindow::Generate3DProjectionMatrix() const
 {
 	// For orthogonal projections, top - bottom and left - right give size in
 	// screen coordinates.  For perspective projections, these combined with
@@ -1354,24 +1380,24 @@ Matrix RenderWindow::Generate3DProjectionMatrix() const
 	//  vFOV = atan(nearClip * 2.0 / topMinusBottom);// [rad]
 	// The distance at which unity scaling occurs is the cotangent of (top - bottom) / 2.
 	// We can use the distance set in SetCameraView() to determine 
-	Matrix projectionMatrix(4, 4);
+	Eigen::Matrix4d projectionMatrix(Eigen::Matrix4d::Zero());
 	double rightMinusLeft(topMinusBottom * aspectRatio);
 	if (viewOrthogonal)
 	{
-		projectionMatrix.SetElement(0, 0, 2.0 / rightMinusLeft);
-		projectionMatrix.SetElement(1, 1, 2.0 / topMinusBottom);
-		projectionMatrix.SetElement(2, 2, 2.0 / (nearClip - farClip));
-		projectionMatrix.SetElement(3, 3, 1.0);
+		projectionMatrix(0, 0) = 2.0 / rightMinusLeft;
+		projectionMatrix(1, 1) = 2.0 / topMinusBottom;
+		projectionMatrix(2, 2) = 2.0 / (nearClip - farClip);
+		projectionMatrix(3, 3) = 1.0;
 		// For symmetric frustums, elements (0,3) and (1,3) are zero
-		projectionMatrix.SetElement(2, 3, (nearClip + farClip) / (nearClip - farClip));
+		projectionMatrix(2, 3) = (nearClip + farClip) / (nearClip - farClip);
 	}
 	else
 	{
-		projectionMatrix.SetElement(0, 0, 2.0 * nearClip / rightMinusLeft);
-		projectionMatrix.SetElement(1, 1, 2.0 * nearClip / topMinusBottom);
-		projectionMatrix.SetElement(2, 2, (nearClip + farClip) / (nearClip - farClip));
-		projectionMatrix.SetElement(2, 3, 2.0 * farClip * nearClip / (nearClip - farClip));
-		projectionMatrix.SetElement(3, 2, -1.0);
+		projectionMatrix(0, 0) = 2.0 * nearClip / rightMinusLeft;
+		projectionMatrix(1, 1) = 2.0 * nearClip / topMinusBottom;
+		projectionMatrix(2, 2) = (nearClip + farClip) / (nearClip - farClip);
+		projectionMatrix(2, 3) = 2.0 * farClip * nearClip / (nearClip - farClip);
+		projectionMatrix(3, 2) = -1.0;
 	}
 
 	return projectionMatrix;
@@ -1408,7 +1434,7 @@ void RenderWindow::SetViewOrthogonal(const bool &viewOrthogonal)
 	// We can compute the distance at which we are focused, and then determine
 	// the correct value of SetTopMinusBottom() in order to maintain unit scale
 	// at this distance.
-	double nominalDistance = GetCameraPosition().Distance(focalPoint);
+	double nominalDistance = (GetCameraPosition() - focalPoint).norm();
 	if (viewOrthogonal)// was perspective
 		topMinusBottom *= nominalDistance / nearClip;
 	else// was orthogonal
@@ -1659,7 +1685,7 @@ void RenderWindow::BuildShaders()
 // Description:		Applies the specified translation to the specified matrix.
 //
 // Input Arguments:
-//		m	= Matrix&
+//		m	= Eigen::Matrix4d&
 //		x	= const double&
 //		y	= const double&
 //		z	= const double&
@@ -1671,12 +1697,12 @@ void RenderWindow::BuildShaders()
 //		None
 //
 //=============================================================================
-void RenderWindow::Translate(Matrix& m, const double& x, const double& y, const double& z)
+void RenderWindow::Translate(Eigen::Matrix4d& m, const Eigen::Vector3d& v)
 {
-	Matrix translation(4, 4, 1.0, 0.0, 0.0, x,
-							 0.0, 1.0, 0.0, y,
-							 0.0, 0.0, 1.0, z,
-							 0.0, 0.0, 0.0, 1.0);
+	Eigen::Matrix4d translation(Eigen::Matrix4d::Identity());
+	translation(0, 3) = v(0);
+	translation(1, 3) = v(1);
+	translation(2, 3) = v(2);
 	m *= translation;
 }
 
@@ -1687,7 +1713,7 @@ void RenderWindow::Translate(Matrix& m, const double& x, const double& y, const 
 // Description:		Applies the specified rotation to the specified matrix.
 //
 // Input Arguments:
-//		m		= Matrix&
+//		m		= Eigen::Matrix4d&
 //		angle	= const double& (radians)
 //		x		= const double& axis of rotation x-component
 //		y		= const double& axis of rotation y-component
@@ -1700,22 +1726,16 @@ void RenderWindow::Translate(Matrix& m, const double& x, const double& y, const 
 //		None
 //
 //=============================================================================
-void RenderWindow::Rotate(Matrix& m, const double& angle,
-	const double& x, const double& y, const double& z)
+void RenderWindow::Rotate(Eigen::Matrix4d& m, const double& angle,
+	Eigen::Vector3d axis)
 {
-	Vector axis(x, y, z);
-	Matrix rotation3 = Vector::GenerateRotationMatrix(angle, axis);
-	Matrix rotation4(4, 4);
-	rotation4.MakeIdentity();
+	//Eigen::Vector3d axis(x, y, z);
+	axis.normalize();
+	Eigen::Matrix3d rotation3d(Eigen::AngleAxisd(angle, axis).toRotationMatrix());
+	Eigen::Matrix4d rotation4d(Eigen::Matrix4d::Identity());
 
-	unsigned int r, c;
-	for (r = 0; r < 3; ++r)
-	{
-		for (c = 0; c < 3; ++c)
-			rotation4(r, c) = rotation3(r, c);
-	}
-
-	m *= rotation4;
+	rotation4d.topLeftCorner<3, 3>() = rotation3d;
+	m *= rotation4d;
 }
 
 //=============================================================================
@@ -1725,7 +1745,7 @@ void RenderWindow::Rotate(Matrix& m, const double& angle,
 // Description:		Applies the specified scaling to the specified matrix.
 //
 // Input Arguments:
-//		m		= Matrix&
+//		m		= Eigen::Matrix4d&
 //		x		= const double&
 //		y		= const double&
 //		z		= const double&
@@ -1737,13 +1757,12 @@ void RenderWindow::Rotate(Matrix& m, const double& angle,
 //		None
 //
 //=============================================================================
-void RenderWindow::Scale(Matrix& m, const double& x, const double& y, const double& z)
+void RenderWindow::Scale(Eigen::Matrix4d& m, const Eigen::Vector3d& v)
 {
-	Matrix scale(4, 4);
-	scale.MakeIdentity();
-	scale(0,0) = x;
-	scale(1,1) = y;
-	scale(2,2) = z;
+	Eigen::Matrix4d scale(Eigen::Matrix4d::Identity());
+	scale(0,0) = v(0);
+	scale(1,1) = v(1);
+	scale(2,2) = v(2);
 
 	m *= scale;
 }
@@ -1787,7 +1806,8 @@ void RenderWindow::UseDefaultProgram() const
 //=============================================================================
 void RenderWindow::ShiftForExactPixelization()
 {
-	Translate(modelviewMatrix, exactPixelShift, exactPixelShift, 0.0);
+	Translate(modelviewMatrix,
+		Eigen::Vector3d(exactPixelShift, exactPixelShift, 0.0));
 }
 
 //=============================================================================
@@ -1819,7 +1839,8 @@ void RenderWindow::AddShader(const ShaderInfo& shader)
 // Description:		Loads uniform matrix to openGL.
 //
 // Input Arguments:
-//		shader	= const ShaderInfo&
+//		m			= const Eigen::Matrix4d&
+//		location	= const GLuint&
 //
 // Output Arguments:
 //		None
@@ -1828,7 +1849,7 @@ void RenderWindow::AddShader(const ShaderInfo& shader)
 //		None
 //
 //=============================================================================
-void RenderWindow::SendUniformMatrix(const Matrix& m, const GLuint& location)
+void RenderWindow::SendUniformMatrix(const Eigen::Matrix4d& m, const GLuint& location)
 {
 	float glMatrix[16];
 	ConvertMatrixToGL(m, glMatrix);

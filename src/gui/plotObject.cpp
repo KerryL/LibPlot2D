@@ -2095,37 +2095,45 @@ unsigned long long PlotObject::GetTotalPointCount() const
 //=============================================================================
 void PlotObject::ComputeTransformationMatrices()
 {
-	Matrix left(4,4), right(4,4);
-	left.MakeIdentity();
-	right.MakeIdentity();
+	Eigen::Matrix4d left(Eigen::Matrix4d::Identity());
+	Eigen::Matrix4d right(Eigen::Matrix4d::Identity());
+
+	RenderWindow::Translate(left, Eigen::Vector3d(
+		axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(), 0.0));
+	RenderWindow::Translate(right, Eigen::Vector3d(
+		axisLeft->GetOffsetFromWindowEdge(),
+		axisBottom->GetOffsetFromWindowEdge(), 0.0));
 
 	int width, height;
 	renderer.GetSize(&width, &height);
 
-	double plotAreaWidth = width - axisLeft->GetOffsetFromWindowEdge()
-		- axisRight->GetOffsetFromWindowEdge();
-	double plotAreaHeight = height - axisBottom->GetOffsetFromWindowEdge()
-		- axisTop->GetOffsetFromWindowEdge();
+	const double plotAreaWidth{ static_cast<double>(
+		width - axisLeft->GetOffsetFromWindowEdge()
+		- axisRight->GetOffsetFromWindowEdge()) };
+	const double plotAreaHeight{ static_cast<double>(
+		height - axisBottom->GetOffsetFromWindowEdge()
+		- axisTop->GetOffsetFromWindowEdge()) };
 
-	double xScale = plotAreaWidth / (renderer.DoXScale(axisBottom->GetMaximum())
-		- renderer.DoXScale(axisBottom->GetMinimum()));
-	double leftYScale = plotAreaHeight / (renderer.DoLeftYScale(axisLeft->GetMaximum())
-		- renderer.DoLeftYScale(axisLeft->GetMinimum()));
-	double rightYScale = plotAreaHeight / (renderer.DoRightYScale(axisRight->GetMaximum())
-		- renderer.DoRightYScale(axisRight->GetMinimum()));
+	const double xScale{ plotAreaWidth /
+		(renderer.DoXScale(axisBottom->GetMaximum())
+		- renderer.DoXScale(axisBottom->GetMinimum())) };
+	const double leftYScale{ plotAreaHeight /
+		(renderer.DoLeftYScale(axisLeft->GetMaximum())
+		- renderer.DoLeftYScale(axisLeft->GetMinimum())) };
+	const double rightYScale{ plotAreaHeight /
+		(renderer.DoRightYScale(axisRight->GetMaximum())
+		- renderer.DoRightYScale(axisRight->GetMinimum())) };
 
-	RenderWindow::Translate(left, axisLeft->GetOffsetFromWindowEdge(),
-		axisBottom->GetOffsetFromWindowEdge(), 0.0);
-	RenderWindow::Translate(right, axisLeft->GetOffsetFromWindowEdge(),
-		axisBottom->GetOffsetFromWindowEdge(), 0.0);
+	RenderWindow::Scale(left, Eigen::Vector3d(xScale, leftYScale, 1.0));
+	RenderWindow::Scale(right, Eigen::Vector3d(xScale, rightYScale, 1.0));
 
-	RenderWindow::Scale(left, xScale, leftYScale, 1.0);
-	RenderWindow::Scale(right, xScale, rightYScale, 1.0);
-
-	RenderWindow::Translate(left, -renderer.DoXScale(axisBottom->GetMinimum()),
-		-renderer.DoLeftYScale(axisLeft->GetMinimum()), 0.0);
-	RenderWindow::Translate(right, -renderer.DoXScale(axisBottom->GetMinimum()),
-		-renderer.DoRightYScale(axisRight->GetMinimum()), 0.0);
+	RenderWindow::Translate(left, Eigen::Vector3d(
+		-renderer.DoXScale(axisBottom->GetMinimum()),
+		-renderer.DoLeftYScale(axisLeft->GetMinimum()), 0.0));
+	RenderWindow::Translate(right, Eigen::Vector3d(
+		-renderer.DoXScale(axisBottom->GetMinimum()),
+		-renderer.DoRightYScale(axisRight->GetMinimum()), 0.0));
 
 	renderer.SetLeftModelview(left);
 	renderer.SetRightModelview(right);

@@ -20,9 +20,10 @@
 
 // Local headers
 #include "lp2d/utilities/managedList.h"
-#include "lp2d/utilities/math/vector.h"
-#include "lp2d/utilities/math/matrix.h"
 #include "lp2d/renderer/primitives/primitive.h"
+
+// Eigen headers
+#include <Eigen/Eigen>
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -42,12 +43,13 @@ public:
 	~RenderWindow() = default;
 
 	void Initialize();
-	void SetCameraView(const Vector &position, const Vector &lookAt, const Vector &upDirection);
+	void SetCameraView(const Eigen::Vector3d &position,
+		const Eigen::Vector3d &lookAt, const Eigen::Vector3d &upDirection);
 
 	// Transforms between the model coordinate system and the view (openGL) coordinate system
-	Vector TransformToView(const Vector &modelVector) const;
-	Vector TransformToModel(const Vector &viewVector) const;
-	Vector GetCameraPosition() const;
+	Eigen::Vector3d TransformToView(const Eigen::Vector3d &modelVector) const;
+	Eigen::Vector3d TransformToModel(const Eigen::Vector3d &viewVector) const;
+	Eigen::Vector3d GetCameraPosition() const;
 
 	// Sets the viewing frustum to match the current size of the window
 	void AutoSetFrustum();
@@ -100,7 +102,8 @@ public:
 	void SetNeedAlphaSort() { needAlphaSort = true; }
 	void SetNeedOrderSort() { needOrderSort = true; }
 
-	static GLuint CreateShader(const GLenum& type, const std::string& shaderContents);
+	static GLuint CreateShader(const GLenum& type,
+		const std::string& shaderContents);
 	static GLuint CreateProgram(const std::vector<GLuint>& shaderList);
 
 	void ShiftForExactPixelization();
@@ -111,12 +114,10 @@ public:
 
 	virtual unsigned int GetVertexDimension() const { return 4; }
 
-	static void Translate(Matrix& m, const double& x, const double& y,
-		const double& z);
-	static void Rotate(Matrix& m, const double& angle, const double& x,
-		const double& y, const double& z);
-	static void Scale(Matrix& m, const double& x, const double& y,
-		const double& z);
+	static void Translate(Eigen::Matrix4d& m, const Eigen::Vector3d& v);
+	static void Rotate(Eigen::Matrix4d& m, const double& angle,
+		Eigen::Vector3d axis);
+	static void Scale(Eigen::Matrix4d& m, const Eigen::Vector3d& v);
 
 	struct ShaderInfo
 	{
@@ -130,7 +131,10 @@ public:
 	};
 
 	void AddShader(const ShaderInfo& shader);
-	static void SendUniformMatrix(const Matrix& m, const GLuint& location);
+	static void SendUniformMatrix(const Eigen::Matrix4d& m,
+		const GLuint& location);
+
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
 	std::unique_ptr<wxGLContext> context;
@@ -180,7 +184,8 @@ private:
 		Rotate
 	};
 
-	// Performs the computations and transformations associated with the specified interaction
+	// Performs the computations and transformations associated with the
+	// specified interaction
 	void PerformInteraction(Interaction interaction, wxMouseEvent &event);
 
 	// The interaction events (called from within the real event handlers)
@@ -189,7 +194,8 @@ private:
 	void DoDragDolly(wxMouseEvent &event);
 	void DoPan(wxMouseEvent &event);
 
-	// Updates the transformation matrices according to the current modelview matrix
+	// Updates the transformation matrices according to the current modelview
+	// matrix
 	//void UpdateTransformationMatricies();
 	void UpdateModelviewMatrix();
 
@@ -209,7 +215,7 @@ private:
 	GLuint positionAttributeLocation;
 	GLuint colorAttributeLocation;
 
-	Vector focalPoint;
+	Eigen::Vector3d focalPoint;
 
 	void DoResize();
 
@@ -225,31 +231,35 @@ protected:
 	long lastMousePosition[2];
 	void StoreMousePosition(wxMouseEvent &event);
 
-	bool Determine2DInteraction(const wxMouseEvent &event, Interaction &interaction) const;
-	bool Determine3DInteraction(const wxMouseEvent &event, Interaction &interaction) const;
+	bool Determine2DInteraction(const wxMouseEvent &event,
+		Interaction &interaction) const;
+	bool Determine3DInteraction(const wxMouseEvent &event,
+		Interaction &interaction) const;
 
-	// Flag indicating whether or not we should select a new focal point for the interactions
+	// Flag indicating whether or not we should select a new focal point for
+	// the interactions
 	bool isInteracting = false;
 
-	static void ConvertMatrixToGL(const Matrix& matrix, float gl[]);
-	static void ConvertGLToMatrix(Matrix& matrix, const float gl[]);
+	static void ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[]);
+	static void ConvertGLToMatrix(Eigen::Matrix4d& matrix, const float gl[]);
 
 	void Initialize2D();
 	void Initialize3D();
 
-	Matrix Generate2DProjectionMatrix() const;
-	Matrix Generate3DProjectionMatrix() const;
+	Eigen::Matrix4d Generate2DProjectionMatrix() const;
+	Eigen::Matrix4d Generate3DProjectionMatrix() const;
 
 	bool modelviewModified = true;
-	Matrix modelviewMatrix;
-	Matrix projectionMatrix;
+	Eigen::Matrix4d modelviewMatrix;
 
 	std::vector<ShaderInfo> shaders;
 
 	DECLARE_EVENT_TABLE()
 
-	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
-	virtual std::string GetDefaultFragmentShader() const { return defaultFragmentShader; }
+	virtual std::string GetDefaultVertexShader() const
+	{ return defaultVertexShader; }
+	virtual std::string GetDefaultFragmentShader() const
+	{ return defaultFragmentShader; }
 };
 
 }// namespace LibPlot2D
