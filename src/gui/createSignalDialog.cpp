@@ -260,7 +260,8 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 //=============================================================================
 wxString CreateSignalDialog::GetSignalName(const SignalType &type)
 {
-	assert(type >= 0 && type < SignalCount);
+	assert(static_cast<typename std::underlying_type<SignalType>::type>(
+		type) >= 0 && type < SignalType::Count);
 
 	if (type == SignalType::Step)
 		return _T("Step");
