@@ -17,6 +17,7 @@
 #include <cassert>
 #include <limits>
 #include <cstdarg>
+#include <sstream>
 
 // wxWidgets headers
 #include <wx/wx.h>
@@ -90,7 +91,8 @@ bool PlotMath::IsZero(const Vector &v, const double &eps)
 //					has exceeded.
 //
 // Input Arguments:
-//		value		= const double& reference to the value which we want to clamp
+//		value		= const double& reference to the value which we want to
+//					  clamp
 //		lowerLimit	= const double& lower bound of allowable values
 //		upperLimit	= const double& upper bound of allowable values
 //
@@ -101,7 +103,8 @@ bool PlotMath::IsZero(const Vector &v, const double &eps)
 //		double, equal to the clamped value
 //
 //=============================================================================
-double PlotMath::Clamp(const double &value, const double &lowerLimit, const double &upperLimit)
+double PlotMath::Clamp(const double &value, const double &lowerLimit,
+	const double &upperLimit)
 {
 	// Make sure the arguments are valid
 	assert(lowerLimit < upperLimit);
@@ -162,8 +165,8 @@ double PlotMath::RangeToPlusMinus180(const double &angle)
 // Namespace:		PlotMath
 // Function:		Unwrap
 //
-// Description:		Minimizes the jump between adjacent points by adding/subtracting
-//					multiples of 2 * pi.
+// Description:		Minimizes the jump between adjacent points by adding or
+//					subtracting multiples of 2 * pi.
 //
 // Input Arguments:
 //		data	= Dataset2D&
@@ -192,7 +195,8 @@ void PlotMath::Unwrap(Dataset2D &data)
 // Namespace:		PlotMath
 // Function:		Sign
 //
-// Description:		Returns 1.0 for positive, -1.0 for negative and 0.0 for zero.
+// Description:		Returns 1.0 for positive, -1.0 for negative and 0.0 for
+//					zero.
 //
 // Input Arguments:
 //		value		= const double&
@@ -231,7 +235,8 @@ double PlotMath::Sign(const double &value)
 //		double
 //
 //=============================================================================
-Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data, const unsigned int &bit)
+Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data,
+	const unsigned int &bit)
 {
 	Dataset2D set(data);
 	for (auto& y : set.GetY())
@@ -256,7 +261,8 @@ Dataset2D PlotMath::ApplyBitMask(const Dataset2D &data, const unsigned int &bit)
 //		double
 //
 //=============================================================================
-unsigned int PlotMath::ApplyBitMask(const unsigned &value, const unsigned int &bit)
+unsigned int PlotMath::ApplyBitMask(const unsigned &value,
+	const unsigned int &bit)
 {
 	return (value >> bit) & 1;
 }
@@ -278,7 +284,8 @@ unsigned int PlotMath::ApplyBitMask(const unsigned &value, const unsigned int &b
 //		bool, true if the x-data spacing is within the tolerance
 //
 //=============================================================================
-bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data, const double &tolerancePercent)
+bool PlotMath::XDataConsistentlySpaced(const Dataset2D &data,
+	const double &tolerancePercent)
 {
 	assert(data.GetNumberOfPoints() > 1);
 
@@ -358,15 +365,15 @@ unsigned int PlotMath::GetPrecision(const double &value,
 	if (!dropTrailingZeros)
 		return precision;
 
-	const unsigned int sSize(512);
-	char s[sSize];
-	sprintf(s, sSize, "%0.*f", precision, value);
+	std::ostringstream ss;
+	ss.precision(precision);
+	ss << value;
 
-	std::string number(s);
+	std::string number(ss.str());
 	unsigned int i;
 	for (i = number.size() - 1; i > 0; --i)
 	{
-		if (s[i] == '0')
+		if (number[i] == '0')
 			--precision;
 		else
 			break;
@@ -401,67 +408,33 @@ unsigned int PlotMath::CountSignificantDigits(const wxString &valueString)
 		return 0;
 
 	wxString trimmedValueString = wxString::Format("%+0.15f", value);
-	unsigned int firstDigit, lastDigit;
-	for (firstDigit = 1; firstDigit < trimmedValueString.Len(); ++firstDigit)
+	unsigned int first;
+	for (first = 1; first < trimmedValueString.Len(); ++first)
 	{
-		if (trimmedValueString[firstDigit] != '0' && trimmedValueString[firstDigit] != '.')
+		if (trimmedValueString[first] != '0' &&
+			trimmedValueString[first] != '.')
 			break;
 	}
 
-	for (lastDigit = trimmedValueString.Len() - 1; lastDigit > firstDigit; --lastDigit)
+	unsigned int last;
+	for (last = trimmedValueString.Len() - 1; last > first; --last)
 	{
-		if (trimmedValueString[lastDigit] != '0' && trimmedValueString[lastDigit] != '.')
+		if (trimmedValueString[last] != '0' &&
+			trimmedValueString[last] != '.')
 			break;
 	}
 
 	unsigned int i;
-	for (i = firstDigit + 1; i < lastDigit - 1; ++i)
+	for (i = first + 1; i < last - 1; ++i)
 	{
 		if (trimmedValueString[i] == '.')
 		{
-			firstDigit++;
+			first++;
 			break;
 		}
 	}
 
-	return lastDigit - firstDigit + 1;
-}
-
-//=============================================================================
-// Namespace:		PlotMath
-// Function:		sprintf
-//
-// Description:		Cross-platform friendly sprintf(_s) macro.  Calls sprintf_s
-//					under MSW, sprintf otherwise.
-//
-// Input Arguments:
-//		dest	= char*
-//		size	= const unsigned int&
-//		format	= const char*
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-#ifdef __WXMSW__
-void PlotMath::sprintf(char *dest, const unsigned int &size, const char *format, ...)
-#else
-void PlotMath::sprintf(char *dest, const unsigned int&, const char *format, ...)
-#endif
-{
-	va_list list;
-	va_start(list, format);
-
-#ifdef __WXMSW__
-	vsprintf_s(dest, size, format, list);
-#else
-	vsprintf(dest, format, list);
-#endif
-
-	va_end(list);
+	return last - first + 1;
 }
 
 //=============================================================================
@@ -483,7 +456,8 @@ void PlotMath::sprintf(char *dest, const unsigned int&, const char *format, ...)
 //		unsigned int
 //
 //=============================================================================
-unsigned int PlotMath::GetPrecision(const double &minimum, const double &majorResolution, const bool &isLogarithmic)
+unsigned int PlotMath::GetPrecision(const double &minimum,
+	const double &majorResolution, const bool &isLogarithmic)
 {
 	double baseValue;
 	if (isLogarithmic)

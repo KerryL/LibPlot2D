@@ -49,14 +49,16 @@ namespace PlotMath
 	bool IsValid(const T &value);
 
 	// Ensure the value is between two definined limits
-	double Clamp(const double &value, const double &lowerLimit, const double &upperLimit);
+	double Clamp(const double &value, const double &lowerLimit,
+		const double &upperLimit);
 
 	double RangeToPlusMinusPi(const double &angle);
 	double RangeToPlusMinus180(const double &angle);
 
 	void Unwrap(Dataset2D &data);
 
-	bool XDataConsistentlySpaced(const Dataset2D &data, const double &tolerancePercent = 0.01);
+	bool XDataConsistentlySpaced(const Dataset2D &data,
+		const double &tolerancePercent = 0.01);
 	double GetAverageXSpacing(const Dataset2D &data);
 
 	// Returns the sign of the argument
@@ -66,13 +68,13 @@ namespace PlotMath
 	unsigned int ApplyBitMask(const unsigned &value, const unsigned int &bit);
 
 	unsigned int GetPrecision(const double &value,
-		const unsigned int &significantDigits = 2, const bool &dropTrailingZeros = true);
+		const unsigned int &significantDigits = 2,
+		const bool &dropTrailingZeros = true);
 
 	unsigned int CountSignificantDigits(const wxString &valueString);
 
-	void sprintf(char *dest, const unsigned int &size, const char *format, ...);
-
-	unsigned int GetPrecision(const double &minimum, const double &majorResolution, const bool &isLogarithmic = false);
+	unsigned int GetPrecision(const double &minimum,
+		const double &majorResolution, const bool &isLogarithmic = false);
 }
 
 // Template methods must be defined here:

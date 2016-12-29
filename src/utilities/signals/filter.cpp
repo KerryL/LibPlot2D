@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <functional>
+#include <sstream>
 
 // Local headers
 #include "lp2d/utilities/signals/filter.h"
@@ -137,11 +138,9 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	const unsigned int &highestPower) const
 {
-	const unsigned int tempSize(256);
-	char temp[tempSize];
-
-	PlotMath::sprintf(temp, tempSize, "(%f*(1+z^-1))", 1.0 / sampleRate);
-	std::string posBilinTerm(temp), negBilinTerm("(2*(1-z^-1))");
+	std::ostringstream ss;
+	ss << "(" << 1.0 / sampleRate << "*(1+z^-1))";
+	std::string posBilinTerm(ss.str()), negBilinTerm("(2*(1-z^-1))");
 	std::string result;
 
 	unsigned int i;
@@ -149,24 +148,28 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 	{
 		if (PlotMath::IsZero(coefficients[i]))
 			continue;
-		PlotMath::sprintf(temp, tempSize, "%f", coefficients[i]);
+
+		std::ostringstream term;
+		term << coefficients[i];
 		if (!result.empty() && coefficients[i] > 0.0)
 			result.append("+");
-		result.append(temp);
+		result.append(term.str());
 
 		if (coefficients.size() - 1 > i)
 			result.append("*" + negBilinTerm);
 		if (coefficients.size() - 1 > 1 + i)
 		{
-			PlotMath::sprintf(temp, tempSize, "^%lu", coefficients.size() - i - 1);
-			result.append(temp);
+			std::ostringstream power;
+			power << "^" << coefficients.size() - i - 1;
+			result.append(power.str());
 		}
 		if (highestPower + i > coefficients.size() - 1)
 			result.append("*" + posBilinTerm);
 		if (highestPower + i > coefficients.size())
 		{
-			PlotMath::sprintf(temp, tempSize, "^%lu", highestPower - coefficients.size() + 1 + i);
-			result.append(temp);
+			std::ostringstream power;
+			power << "^" << highestPower - coefficients.size() + 1 + i;
+			result.append(power.str());
 		}
 	}
 
