@@ -9,7 +9,8 @@
 // File:  flagEnum.h
 // Date:  12/29/2016
 // Auth:  K. Loux
-// Desc:  Container for x and y-data series for plotting.
+// Desc:  Collection of template methods for performing bitwise operations on
+//        enum classes.
 
 #ifndef FLAG_ENUM_H_
 #define FLAG_ENUM_H_
