@@ -11,6 +11,13 @@ INCDIRS_TEMP = \
 
 INCDIRS = $(addprefix -I,$(INCDIRS_TEMP))
 
+# For 3rd party files - will be included as system files so warnings
+# are ignored.  These macros must be defined in your bashrc file.
+LIB_INCDIRS_TEMP = \
+	$(EIGEN)
+
+LIB_INCDIRS = $(addprefix -isystem,$(LIB_INCDIRS_TEMP))
+
 # Library directories that are not already on the path
 # DO NOT include the -L prefix to these paths - it will
 # be added automatically
@@ -46,7 +53,7 @@ AR = ar rcs
 RANLIB = ranlib
 
 # Compiler flags
-CFLAGS = -Wall -Wextra $(INCDIRS) `pkg-config --cflags glew, freetype2` -Wno-unused-local-typedefs -std=c++14
+CFLAGS = -Wall -Wextra $(LIB_INCDIRS) $(INCDIRS) `pkg-config --cflags glew, freetype2` -Wno-unused-local-typedefs -std=c++14
 CFLAGS_RELEASE = $(CFLAGS) -O2 `wx-config --version=3.1 --debug=no --cppflags`
 CFLAGS_DEBUG = $(CFLAGS) -g `wx-config --version=3.1 --debug=yes --cppflags`
 
