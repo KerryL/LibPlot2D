@@ -29,6 +29,26 @@ namespace LibPlot2D
 
 //=============================================================================
 // Class:			FontFinder
+// Function:		Constant declarations
+//
+// Description:		Constant declarations for the FontFinder class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+const unsigned int FontFinder::familyNameRecordId(1);
+const unsigned int FontFinder::subFamilyNameRecordId(2);
+const unsigned int FontFinder::fullNameRecordId(4);
+
+//=============================================================================
+// Class:			FontFinder
 // Function:		GetFontFileName
 //
 // Description:		Searches the local hard drive (intelligently) and returns
@@ -213,15 +233,45 @@ bool FontFinder::GetFontName(const wxString &fontFile, wxString &fontName)
 
 	TT_NAME_TABLE_HEADER ttNTHeader = GetNameTableHeader(fontStream, tblDir.offset);
 
+	FontInformation fontInfo;
+
 	unsigned int i;
 	for (i = 0; i < ttNTHeader.nrCount; ++i)
 	{
-		fontName = CheckHeaderForName(fontStream, tblDir.offset + ttNTHeader.storageOffset);
-		if (!fontName.IsEmpty())
+		CheckHeaderForName(fontStream,
+			tblDir.offset + ttNTHeader.storageOffset, fontInfo);
+		if (RecordIsComplete(fontInfo))
+		{
+// TODO:  Better to return font info?
+			fontName = fontInfo.fullName;
 			return true;
+		}
 	}
 
 	return false;
+}
+
+//=============================================================================
+// Class:			FontFinder
+// Function:		RecordIsComplete
+//
+// Description:		Returns true if all information is non-empty.
+//
+// Input Arguments:
+//		info	= const FontInformation&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+bool FontFinder::RecordIsComplete(const FontInformation& info)
+{
+	return !info.fontFamily.IsEmpty() &&
+		!info.fontSubFamily.IsEmpty() &&
+		!info.fullName.IsEmpty();
 }
 
 //=============================================================================
@@ -338,13 +388,14 @@ FontFinder::TT_NAME_TABLE_HEADER FontFinder::GetNameTableHeader(std::ifstream &f
 //		offset	= const size_t& specifying the offset from the beginning of the file
 //
 // Output Arguments:
-//		None
+//		info	= FontInformation&
 //
 // Return Value:
-//		wxString containing the name, or an empty string if not found
+//		None
 //
 //=============================================================================
-wxString FontFinder::CheckHeaderForName(std::ifstream &file, const size_t &offset)
+void FontFinder::CheckHeaderForName(std::ifstream &file,
+	const size_t &offset, FontInformation& info)
 {
 	TT_NAME_RECORD ttRecord;
 	wxString name;
@@ -352,8 +403,15 @@ wxString FontFinder::CheckHeaderForName(std::ifstream &file, const size_t &offse
 	file.read((char*)&ttRecord, sizeof(TT_NAME_RECORD));
 	SwapEndian(ttRecord.nameID);
 
-	// Name ID == 1 indicates font name
-	if (ttRecord.nameID == 1)
+	wxString* target(nullptr);
+	if (ttRecord.nameID == familyNameRecordId)
+		target = &info.fontFamily;
+	else if (ttRecord.nameID == subFamilyNameRecordId)
+		target = &info.fontSubFamily;
+	else if (ttRecord.nameID == fullNameRecordId)
+		target = &info.fullName;
+
+	if (target)
 	{
 		SwapEndian(ttRecord.stringLength);
 		SwapEndian(ttRecord.stringOffset);
@@ -371,12 +429,10 @@ wxString FontFinder::CheckHeaderForName(std::ifstream &file, const size_t &offse
 		// longer emtpy, even though it contains no valid data.  As a workaround,
 		// we only assign the proper length if the string is not already empty
 		if (nameBuffer[0] != '\0')
-			name.assign(nameBuffer);
+			target->assign(nameBuffer);
 
 		file.seekg(nPos, std::ios_base::beg);
 	}
-
-	return name;
 }
 
 }// namespace LibPlot2D
