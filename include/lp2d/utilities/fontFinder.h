@@ -27,11 +27,11 @@ namespace LibPlot2D
 class FontFinder
 {
 public:
-	// Method for finding the best list on the system when given a list of desired font names
+	// Method for finding the best match on the system when given a list of desired font names
 	static bool GetFontFaceName(wxFontEncoding encoding, const wxArrayString &preferredFonts,
 		const bool &fixedWidth, wxString &fontName);
 
-	// Method for retrieving the path to a font .ttf file given only the file name
+	// Method for retrieving the path to a font .ttf file given only the face name
 	static wxString GetFontFileName(const wxString &fontName);
 	static bool GetPreferredFontFileName(wxFontEncoding encoding,
 		const wxArrayString &preferredFonts, const bool &fixedWidth, wxString &fontFile);
@@ -39,7 +39,20 @@ public:
 	// Method for retrieving the font name from a specific font file
 	static bool GetFontName(const wxString &fontFile, wxString &fontName);
 
+	/*enum class StylePreference
+	{
+		Regular,
+		Italics,
+		Bold,
+		BoldItalics,
+		NoPreference
+	};*/
+
 private:
+	static const unsigned int familyNameRecordId;
+	static const unsigned int subFamilyNameRecordId;
+	static const unsigned int fullNameRecordId;
+
 	// TTF file header
 	struct TT_OFFSET_TABLE
 	{
@@ -79,6 +92,15 @@ private:
 		unsigned short stringOffset;
 	};
 
+	struct FontInformation
+	{
+		wxString fontFamily;
+		wxString fontSubFamily;
+		wxString fullName;
+	};
+
+	static bool RecordIsComplete(const FontInformation& info);
+
 	inline static void SwapEndian(unsigned short& x)
 	{
 		x = (x >> 8) |
@@ -94,10 +116,12 @@ private:
 	}
 
 	static TT_OFFSET_TABLE ReadOffsetTable(std::ifstream &file);
-	static bool GetNameTable(std::ifstream &file, const TT_OFFSET_TABLE &offsetTable,
-		TT_TABLE_DIRECTORY &table);
-	static TT_NAME_TABLE_HEADER GetNameTableHeader(std::ifstream &file, const size_t &offset);
-	static wxString CheckHeaderForName(std::ifstream &file, const size_t &offset);
+	static bool GetNameTable(std::ifstream &file,
+		const TT_OFFSET_TABLE &offsetTable, TT_TABLE_DIRECTORY &table);
+	static TT_NAME_TABLE_HEADER GetNameTableHeader(std::ifstream &file,
+		const size_t &offset);
+	static void CheckHeaderForName(std::ifstream &file, const size_t &offset,
+		FontInformation& fontInfo);
 };
 
 }// namespace LibPlot2D

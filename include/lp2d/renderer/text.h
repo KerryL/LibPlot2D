@@ -14,18 +14,20 @@
 #ifndef TEXT_H_
 #define TEXT_H_
 
-// Standard C++ headers
-#include <string>
-#include <map>
-#include <limits>
+// Local headers
+#include "lp2d/renderer/primitives/primitive.h"
+
+// Eigen headers
+#include <Eigen/Eigen>
 
 // Freetype headers
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-// Local headers
-#include "lp2d/renderer/primitives/primitive.h"
-#include "lp2d/utilities/math/matrix.h"
+// Standard C++ headers
+#include <string>
+#include <map>
+#include <limits>
 
 namespace LibPlot2D
 {
@@ -71,6 +73,8 @@ public:
 
 	bool IsOK() const { return isOK && (glyphsGenerated || face); }
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 private:
 	static const std::string vertexShader;
 	static const std::string fragmentShader;
@@ -86,12 +90,12 @@ private:
 	static FT_Library ft;
 	static unsigned int ftReferenceCount;
 
-	FT_Face face;
-	Color color;
+	FT_Face face = nullptr;
+	Color color = Color::ColorBlack;
 
 	double x;
 	double y;
-	double scale;
+	double scale = 1.0;
 
 	unsigned int maxXSize;
 	unsigned int maxYSize;
@@ -114,13 +118,13 @@ private:
 	void DoInternalInitialization();
 	bool GenerateGlyphs();
 	static bool initialized;
-	bool glyphsGenerated;
+	bool glyphsGenerated = false;
 
 	void Initialize();
 	void FreeFTResources();
-	bool isOK;
+	bool isOK = true;
 
-	Matrix modelview;
+	Eigen::Matrix4d modelview;
 
 	std::vector<Primitive::BufferInfo> bufferVector;
 	Primitive::BufferInfo AssembleBuffers();

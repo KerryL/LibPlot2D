@@ -11,21 +11,19 @@
 // Auth:  K. Loux
 // Desc:  Collection of methods related to mathematical operations.
 
+// Local headers
+#include "lp2d/utilities/math/plotMath.h"
+#include "lp2d/utilities/dataset2D.h"
+
+// wxWidgets headers
+#include <wx/wx.h>
+
 // Standard C++ headers
 #include <cstdlib>
 #include <cassert>
 #include <limits>
 #include <cstdarg>
 #include <sstream>
-
-// wxWidgets headers
-#include <wx/wx.h>
-
-// Local headers
-#include "lp2d/utilities/math/plotMath.h"
-#include "lp2d/utilities/math/vector.h"
-#include "lp2d/utilities/math/matrix.h"
-#include "lp2d/utilities/dataset2D.h"
 
 namespace LibPlot2D
 {
@@ -62,7 +60,7 @@ bool PlotMath::IsZero(const double &n, const double &eps)
 //					This function checks the magnitude of the Vector.
 //
 // Input Arguments:
-//		v	= const Vector& to be checked for being close to zero
+//		v	= const Eigen::VectorXd& to be checked for being close to zero
 //
 // Output Arguments:
 //		None
@@ -71,10 +69,9 @@ bool PlotMath::IsZero(const double &n, const double &eps)
 //		bool, true if the magnitude is less than NEARLY_ZERO
 //
 //=============================================================================
-bool PlotMath::IsZero(const Vector &v, const double &eps)
+bool PlotMath::IsZero(const Eigen::VectorXd &v, const double &eps)
 {
-	// Check each component of the vector
-	if (v.Length() < eps)
+	if (v.norm() < eps)
 		return true;
 
 	return false;

@@ -90,13 +90,7 @@
     <ClInclude Include="..\include\lp2d\utilities\math\expressionTree.h">
       <Filter>Header Files\utilities\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\lp2d\utilities\math\matrix.h">
-      <Filter>Header Files\utilities\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\lp2d\utilities\math\plotMath.h">
-      <Filter>Header Files\utilities\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\lp2d\utilities\math\vector.h">
       <Filter>Header Files\utilities\math</Filter>
     </ClInclude>
     <ClInclude Include="..\include\lp2d\utilities\signals\curveFit.h">
@@ -308,13 +302,7 @@
     <ClCompile Include="..\src\utilities\math\expressionTree.cpp">
       <Filter>Source Files\utilities\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\utilities\math\matrix.cpp">
-      <Filter>Source Files\utilities\math</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\utilities\math\plotMath.cpp">
-      <Filter>Source Files\utilities\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\utilities\math\vector.cpp">
       <Filter>Source Files\utilities\math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\utilities\signals\curveFit.cpp">

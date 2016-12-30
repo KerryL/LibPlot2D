@@ -15,16 +15,19 @@
 #ifndef PLOT_RENDERER_H_
 #define PLOT_RENDERER_H_
 
+// Local headers
+#include "lp2d/renderer/renderWindow.h"
+#include "lp2d/renderer/primitives/legend.h"
+#include "lp2d/utilities/flagEnum.h"
+
+// Eigen headers
+#include <Eigen/Eigen>
+
 // Standard C++ headers
 #include <stack>
 #include <vector>
 #include <cmath>
 #include <memory>
-
-// Local headers
-#include "lp2d/renderer/renderWindow.h"
-#include "lp2d/renderer/primitives/legend.h"
-#include "lp2d/utilities/flagEnum.h"
 
 // wxWidgets forward declarations
 class wxString;
@@ -175,8 +178,8 @@ public:
 
 	void LoadModelviewUniform(const Modelview& mv);
 
-	void SetLeftModelview(const Matrix& m) { leftModelview = m; }
-	void SetRightModelview(const Matrix& m) { rightModelview = m; }
+	void SetLeftModelview(const Eigen::Matrix4d& m) { leftModelview = m; }
+	void SetRightModelview(const Eigen::Matrix4d& m) { rightModelview = m; }
 
 	// Scaling functions for handling differences in linear and logarithmic axis scales
 	inline double DoXScale(const double& value) { return xScaleFunction(value); }
@@ -288,8 +291,8 @@ protected:
 	bool ignoreNextMouseMove;
 	CurveQuality curveQuality;
 
-	Matrix leftModelview;
-	Matrix rightModelview;
+	Eigen::Matrix4d leftModelview;
+	Eigen::Matrix4d rightModelview;
 
 	// Function pointers for working with plot values
 	ScalingFunction xScaleFunction;

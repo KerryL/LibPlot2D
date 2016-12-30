@@ -93,6 +93,8 @@ public:
 	double ValueToPixel(const double &value) const;
 	double PixelToValue(const int &pixel) const;
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters

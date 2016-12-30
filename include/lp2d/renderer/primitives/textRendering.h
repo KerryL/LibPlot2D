@@ -41,6 +41,8 @@ public:
 	double GetTextWidth();
 	wxString GetText() const { return text; }
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
