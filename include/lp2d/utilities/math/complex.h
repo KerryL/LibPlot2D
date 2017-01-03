@@ -70,11 +70,11 @@ public:
 	friend std::ostream &operator<<(std::ostream &writeOut, const Complex &complex);
 
 	// The actual data contents of this class
-	double real;
-	double imaginary;
+	double mReal;
+	double mImaginary;
 
 	// Defining the square root of negative 1
-	static const Complex i;
+	static const Complex mI;
 };
 
 }// namespace LibPlot2D

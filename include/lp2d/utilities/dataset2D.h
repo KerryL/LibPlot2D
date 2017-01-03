@@ -41,13 +41,13 @@ public:
 	double ComputeYMean() const;
 	double GetAverageDeltaX() const;
 
-	unsigned int GetNumberOfPoints() const { return xData.size(); }
+	unsigned int GetNumberOfPoints() const { return mXData.size(); }
 	unsigned int GetNumberOfZoomedPoints(const double &min, const double &max) const;
 
-	const std::vector<double>& GetX() const { return xData; };
-	const std::vector<double>& GetY() const { return yData; };
-	std::vector<double>& GetX() { return xData; };
-	std::vector<double>& GetY() { return yData; };
+	const std::vector<double>& GetX() const { return mXData; };
+	const std::vector<double>& GetY() const { return mYData; };
+	std::vector<double>& GetX() { return mXData; };
+	std::vector<double>& GetY() { return mYData; };
 
 	Dataset2D& MultiplyXData(const double &target);
 	bool GetYAt(const double &x, double &y, bool *exactValue = nullptr) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
@@ -111,7 +111,7 @@ public:
 	static Dataset2D DoUnsyncrhonizedExponentiation(const Dataset2D &d1, const Dataset2D &d2);
 
 private:
-	std::vector<double> xData, yData;
+	std::vector<double> mXData, mYData;
 
 	static void GetOverlappingOnSameTimebase(const Dataset2D &d1,
 		const Dataset2D &d2, Dataset2D &d1Out, Dataset2D &d2Out);

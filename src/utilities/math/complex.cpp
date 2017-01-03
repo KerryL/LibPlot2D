@@ -40,7 +40,8 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-Complex::Complex(const double &real, const double &imaginary) : real(real), imaginary(imaginary)
+Complex::Complex(const double &real, const double &imaginary) : mReal(real),
+	mImaginary(imaginary)
 {
 }
 
@@ -60,7 +61,7 @@ Complex::Complex(const double &real, const double &imaginary) : real(real), imag
 //		None
 //
 //=============================================================================
-const Complex Complex::i(0.0, 1.0);
+const Complex Complex::mI(0.0, 1.0);
 
 //=============================================================================
 // Class:			friend of Complex
@@ -106,10 +107,10 @@ wxString Complex::Print() const
 {
 	wxString temp;
 
-	if (imaginary >= 0)
-		temp.Printf("%0.3f + %0.3f i", real, imaginary);
+	if (mImaginary >= 0)
+		temp.Printf("%0.3f + %0.3f i", mReal, mImaginary);
 	else
-		temp.Printf("%0.3f - %0.3f i", real, -imaginary);
+		temp.Printf("%0.3f - %0.3f i", mReal, -mImaginary);
 
 	return temp;
 }
@@ -241,16 +242,16 @@ const Complex Complex::operator/(const Complex &complex) const
 Complex& Complex::ToPower(const double &power)
 {
 	// Convert this from Cartesian to polar form
-	double r = sqrt(real * real + imaginary * imaginary);
-	double theta = atan2(imaginary, real);
+	double r = sqrt(mReal * mReal + mImaginary * mImaginary);
+	double theta = atan2(mImaginary, mReal);
 
 	// Use De Moivre's theorem to raise this to a power
 	r = pow(r, power);
 	theta *= power;
 
 	// Convert back to Cartesian form
-	real = r * cos(theta);
-	imaginary = r * sin(theta);
+	mReal = r * cos(theta);
+	mImaginary = r * sin(theta);
 
 	return *this;
 }
@@ -302,11 +303,11 @@ Complex& Complex::ToPower(const Complex &power)
 	double r = GetPolarLength();
 	double theta = GetPolarAngle();
 
-	double factor = pow(r, power.real) * exp(-power.imaginary * theta);
-	double angle = power.imaginary * log(r) + power.real * theta;
+	double factor = pow(r, power.mReal) * exp(-power.mImaginary * theta);
+	double angle = power.mImaginary * log(r) + power.mReal * theta;
 
-	real = factor * cos(angle);
-	imaginary = factor * sin(angle);
+	mReal = factor * cos(angle);
+	mImaginary = factor * sin(angle);
 
 	return *this;
 }
@@ -352,11 +353,8 @@ const Complex Complex::ToPower(const Complex &power) const
 //=============================================================================
 Complex& Complex::operator+=(const Complex &complex)
 {
-	// Add the real components
-	real += complex.real;
-
-	// Add the imaginary components
-	imaginary += complex.imaginary;
+	mReal += complex.mReal;
+	mImaginary += complex.mImaginary;
 
 	return *this;
 }
@@ -379,11 +377,8 @@ Complex& Complex::operator+=(const Complex &complex)
 //=============================================================================
 Complex& Complex::operator-=(const Complex &complex)
 {
-	// Subtract the real components
-	real -= complex.real;
-
-	// Subtract the imaginary components
-	imaginary -= complex.imaginary;
+	mReal -= complex.mReal;
+	mImaginary -= complex.mImaginary;
 
 	return *this;
 }
@@ -406,15 +401,15 @@ Complex& Complex::operator-=(const Complex &complex)
 //=============================================================================
 Complex& Complex::operator*=(const Complex &complex)
 {
-	double temp = real;
+	double temp(mReal);
 
 	// Similar to a dot product, the real component of the result
 	// is the sum of the products of the like components
-	real = real * complex.real - imaginary * complex.imaginary;
+	mReal = mReal * complex.mReal - mImaginary * complex.mImaginary;
 
 	// Similar to a cross product, the imaginary component of the
 	// result is the sum of the products of the opposite components
-	imaginary = temp * complex.imaginary + imaginary * complex.real;
+	mImaginary = temp * complex.mImaginary + mImaginary * complex.mReal;
 
 	return *this;
 }
@@ -437,15 +432,15 @@ Complex& Complex::operator*=(const Complex &complex)
 //=============================================================================
 Complex& Complex::operator/=(const Complex &complex)
 {
-	double temp = real;
+	double temp(mReal);
 
 	// Compute the real portion of the result
-	real = (real * complex.real + imaginary * complex.imaginary) /
-		(complex.real * complex.real + complex.imaginary * complex.imaginary);
+	mReal = (mReal * complex.mReal + mImaginary * complex.mImaginary) /
+		(complex.mReal * complex.mReal + complex.mImaginary * complex.mImaginary);
 
 	// Compute the imaginary portion of the result
-	imaginary = (imaginary * complex.real - temp * complex.imaginary) /
-		(complex.real * complex.real + complex.imaginary * complex.imaginary);
+	mImaginary = (mImaginary * complex.mReal - temp * complex.mImaginary) /
+		(complex.mReal * complex.mReal + complex.mImaginary * complex.mImaginary);
 
 	return *this;
 }
@@ -469,7 +464,7 @@ Complex& Complex::operator/=(const Complex &complex)
 bool Complex::operator==(const Complex &complex) const
 {
 	// Check to see if both the real and imaginary components are equal
-	if (real == complex.real && imaginary == complex.imaginary)
+	if (mReal == complex.mReal && mImaginary == complex.mImaginary)
 		return true;
 	else
 		return false;
@@ -518,10 +513,10 @@ const Complex Complex::GetConjugate() const
 	Complex temp;
 
 	// Direct assignment of the real component
-	temp.real = real;
+	temp.mReal = mReal;
 
 	// The imaginary part is the opposite of this
-	temp.imaginary = -imaginary;
+	temp.mImaginary = -mImaginary;
 
 	return temp;
 }
@@ -544,7 +539,7 @@ const Complex Complex::GetConjugate() const
 //=============================================================================
 double Complex::GetPolarLength() const
 {
-	return sqrt(real * real + imaginary * imaginary);
+	return sqrt(mReal * mReal + mImaginary * mImaginary);
 }
 
 //=============================================================================
@@ -565,7 +560,7 @@ double Complex::GetPolarLength() const
 //=============================================================================
 double Complex::GetPolarAngle() const
 {
-	return atan2(imaginary, real);
+	return atan2(mImaginary, mReal);
 }
 
 //=============================================================================
@@ -589,10 +584,10 @@ const Complex Complex::operator+(const double &value) const
 	Complex temp;
 
 	// Add the real component
-	temp.real = real + value;
+	temp.mReal = mReal + value;
 
 	// Direct assignment of the imaginary componet
-	temp.imaginary = imaginary;
+	temp.mImaginary = mImaginary;
 
 	return temp;
 }
@@ -618,10 +613,10 @@ const Complex Complex::operator-(const double &value) const
 	Complex temp;
 
 	// Subtract the real component
-	temp.real = real - value;
+	temp.mReal = mReal - value;
 
 	// Direct assignment of the imaginary component
-	temp.imaginary = imaginary;
+	temp.mImaginary = mImaginary;
 
 	return temp;
 }
@@ -647,8 +642,8 @@ const Complex Complex::operator*(const double &value) const
 	Complex temp;
 
 	// Perform the multiplication on both components
-	temp.real = real * value;
-	temp.imaginary = imaginary * value;
+	temp.mReal = mReal * value;
+	temp.mImaginary = mImaginary * value;
 
 	return temp;
 }
@@ -674,8 +669,8 @@ const Complex Complex::operator/(const double &value) const
 	Complex temp;
 
 	// Perform the division on both components
-	temp.real = real / value;
-	temp.imaginary = imaginary / value;
+	temp.mReal = mReal / value;
+	temp.mImaginary = mImaginary / value;
 
 	return temp;
 }

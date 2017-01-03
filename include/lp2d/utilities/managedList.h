@@ -40,7 +40,7 @@ public:
 	// Private data accessors
 	unsigned int Add(std::unique_ptr<T> toAdd);
 	virtual void Remove(const unsigned int &index);
-	inline unsigned int GetCount() const { return list.size(); }
+	inline unsigned int GetCount() const { return mList.size(); }
 
 	// Removes all objects from the list
 	virtual void Clear();
@@ -50,23 +50,23 @@ public:
 
 	const std::unique_ptr<T>& operator[](const unsigned int &index) const;
 
-	const std::unique_ptr<T>& Back() const { return list.back(); }
-	std::unique_ptr<T>& Back() { return list.back(); }
+	const std::unique_ptr<T>& Back() const { return mList.back(); }
+	std::unique_ptr<T>& Back() { return mList.back(); }
 
-	typename std::vector<std::unique_ptr<T>>::iterator begin() { return list.begin(); }
-	typename std::vector<std::unique_ptr<T>>::const_iterator begin() const { return list.begin(); }
+	typename std::vector<std::unique_ptr<T>>::iterator begin() { return mList.begin(); }
+	typename std::vector<std::unique_ptr<T>>::const_iterator begin() const { return mList.begin(); }
 
-	typename std::vector<std::unique_ptr<T>>::iterator end() { return list.end(); }
-	typename std::vector<std::unique_ptr<T>>::const_iterator end() const { return list.end(); }
+	typename std::vector<std::unique_ptr<T>>::iterator end() { return mList.end(); }
+	typename std::vector<std::unique_ptr<T>>::const_iterator end() const { return mList.end(); }
 
-	typename std::vector<std::unique_ptr<T>>::reverse_iterator rbegin() { return list.rbegin(); }
-	typename std::vector<std::unique_ptr<T>>::const_reverse_iterator rbegin() const { return list.rbegin(); }
+	typename std::vector<std::unique_ptr<T>>::reverse_iterator rbegin() { return mList.rbegin(); }
+	typename std::vector<std::unique_ptr<T>>::const_reverse_iterator rbegin() const { return mList.rbegin(); }
 
-	typename std::vector<std::unique_ptr<T>>::reverse_iterator rend() { return list.rend(); }
-	typename std::vector<std::unique_ptr<T>>::const_reverse_iterator rend() const { return list.rend(); }
+	typename std::vector<std::unique_ptr<T>>::reverse_iterator rend() { return mList.rend(); }
+	typename std::vector<std::unique_ptr<T>>::const_reverse_iterator rend() const { return mList.rend(); }
 
 private:
-	std::vector<std::unique_ptr<T>> list;
+	std::vector<std::unique_ptr<T>> mList;
 };
 
 //=============================================================================
@@ -89,8 +89,8 @@ private:
 template <class T>
 unsigned int ManagedList<T>::Add(std::unique_ptr<T> toAdd)
 {
-	list.push_back(std::move(toAdd));
-	return list.size() - 1;
+	mList.push_back(std::move(toAdd));
+	return mList.size() - 1;
 }
 
 //=============================================================================
@@ -112,8 +112,8 @@ unsigned int ManagedList<T>::Add(std::unique_ptr<T> toAdd)
 template <class T>
 void ManagedList<T>::Remove(const unsigned int &index)
 {
-	assert(index < list.size());
-	list.erase(list.begin() + index);
+	assert(index < mList.size());
+	mList.erase(mList.begin() + index);
 }
 
 //=============================================================================
@@ -136,9 +136,9 @@ template <class T>
 const std::unique_ptr<T>& ManagedList<T>::operator[](const unsigned int &index) const
 {
 	// Make sure the index is valid
-	assert(index < list.size());
+	assert(index < mList.size());
 
-	return list[index];
+	return mList[index];
 }
 
 //=============================================================================
@@ -164,13 +164,13 @@ const std::unique_ptr<T>& ManagedList<T>::operator[](const unsigned int &index) 
 template <class T>
 void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 {
-	assert(order.size() == list.size());
+	assert(order.size() == mList.size());
 
-	std::vector<T*> swap = list;
+	std::vector<T*> swap = mList;
 
 	unsigned int i;
-	for (i = 0; i < list.size(); ++i)
-		list[i] = swap[order[i]];
+	for (i = 0; i < mList.size(); ++i)
+		mList[i] = swap[order[i]];
 }
 
 //=============================================================================
@@ -192,7 +192,7 @@ void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
 template <class T>
 void ManagedList<T>::Clear()
 {
-	list.clear();
+	mList.clear();
 }
 
 }// namespace LibPlot2D

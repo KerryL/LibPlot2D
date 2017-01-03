@@ -67,7 +67,7 @@ Dataset2D::Dataset2D(const unsigned int &numberOfPoints)
 //=============================================================================
 void Dataset2D::Reverse()
 {
-	std::reverse(yData.begin(), yData.end());
+	std::reverse(mYData.begin(), mYData.end());
 }
 
 //=============================================================================
@@ -89,8 +89,8 @@ void Dataset2D::Reverse()
 //=============================================================================
 void Dataset2D::Resize(const unsigned int &numberOfPoints)
 {
-	xData.resize(numberOfPoints);
-	yData.resize(numberOfPoints);
+	mXData.resize(numberOfPoints);
+	mYData.resize(numberOfPoints);
 }
 
 //=============================================================================
@@ -127,8 +127,8 @@ void Dataset2D::ExportDataToFile(wxString pathAndFileName) const
 		return;
 
 	unsigned int i;
-	for (i = 0; i < xData.size(); ++i)
-		exportFile << xData[i] << delimiter << yData[i] << std::endl;
+	for (i = 0; i < mXData.size(); ++i)
+		exportFile << mXData[i] << delimiter << mYData[i] << std::endl;
 
 	exportFile.close();
 }
@@ -156,23 +156,23 @@ bool Dataset2D::GetYAt(const double &x, double &y, bool *exactValue) const
 {
 	// This assumes data is entered from small x to large x and that y is a function of x
 	unsigned int i;
-	for (i = 0; i < xData.size(); ++i)
+	for (i = 0; i < mXData.size(); ++i)
 	{
-		if (xData[i] == x)
+		if (mXData[i] == x)
 		{
-			y = yData[i];
+			y = mYData[i];
 
 			if (exactValue)
 				*exactValue = true;
 
 			return true;
 		}
-		else if (xData[i] > x)
+		else if (mXData[i] > x)
 		{
 			if (i > 0)
-				y = yData[i - 1] + (yData[i] - yData[i - 1]) * (x - xData[i - 1]) / (xData[i] - xData[i - 1]);
+				y = mYData[i - 1] + (mYData[i] - mYData[i - 1]) * (x - mXData[i - 1]) / (mXData[i] - mXData[i - 1]);
 			else
-				y = yData[i];
+				y = mYData[i];
 
 			if (exactValue)
 				*exactValue = false;
@@ -202,7 +202,7 @@ bool Dataset2D::GetYAt(const double &x, double &y, bool *exactValue) const
 //=============================================================================
 Dataset2D& Dataset2D::XShift(const double &shift)
 {
-	for (auto& x : xData)
+	for (auto& x : mXData)
 		x += shift;
 
 	return *this;
@@ -226,11 +226,11 @@ Dataset2D& Dataset2D::XShift(const double &shift)
 //=============================================================================
 Dataset2D& Dataset2D::operator+=(const Dataset2D &target)
 {
-	assert(yData.size() == target.yData.size());
+	assert(mYData.size() == target.mYData.size());
 
 	unsigned int i;
-	for (i = 0; i < yData.size(); ++i)
-		yData[i] += target.yData[i];
+	for (i = 0; i < mYData.size(); ++i)
+		mYData[i] += target.mYData[i];
 
 	return *this;
 }
@@ -253,11 +253,11 @@ Dataset2D& Dataset2D::operator+=(const Dataset2D &target)
 //=============================================================================
 Dataset2D& Dataset2D::operator-=(const Dataset2D &target)
 {
-	assert(yData.size() == target.yData.size());
+	assert(mYData.size() == target.mYData.size());
 
 	unsigned int i;
-	for (i = 0; i < yData.size(); ++i)
-		yData[i] -= target.yData[i];
+	for (i = 0; i < mYData.size(); ++i)
+		mYData[i] -= target.mYData[i];
 
 	return *this;
 }
@@ -280,11 +280,11 @@ Dataset2D& Dataset2D::operator-=(const Dataset2D &target)
 //=============================================================================
 Dataset2D& Dataset2D::operator*=(const Dataset2D &target)
 {
-	assert(yData.size() == target.yData.size());
+	assert(mYData.size() == target.mYData.size());
 
 	unsigned int i;
-	for (i = 0; i < yData.size(); ++i)
-		yData[i] *= target.yData[i];
+	for (i = 0; i < mYData.size(); ++i)
+		mYData[i] *= target.mYData[i];
 
 	return *this;
 }
@@ -307,11 +307,11 @@ Dataset2D& Dataset2D::operator*=(const Dataset2D &target)
 //=============================================================================
 Dataset2D& Dataset2D::operator/=(const Dataset2D &target)
 {
-	assert(yData.size() == target.yData.size());
+	assert(mYData.size() == target.mYData.size());
 
 	unsigned int i;
-	for (i = 0; i < yData.size(); ++i)
-		yData[i] /= target.yData[i];
+	for (i = 0; i < mYData.size(); ++i)
+		mYData[i] /= target.mYData[i];
 
 	return *this;
 }
@@ -430,7 +430,7 @@ const Dataset2D Dataset2D::operator/(const Dataset2D &target) const
 //=============================================================================
 Dataset2D& Dataset2D::operator+=(const double &target)
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y += target;
 
 	return *this;
@@ -454,7 +454,7 @@ Dataset2D& Dataset2D::operator+=(const double &target)
 //=============================================================================
 Dataset2D& Dataset2D::operator-=(const double &target)
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y -= target;
 
 	return *this;
@@ -478,7 +478,7 @@ Dataset2D& Dataset2D::operator-=(const double &target)
 //=============================================================================
 Dataset2D& Dataset2D::operator*=(const double &target)
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y *= target;
 
 	return *this;
@@ -502,7 +502,7 @@ Dataset2D& Dataset2D::operator*=(const double &target)
 //=============================================================================
 Dataset2D& Dataset2D::operator/=(const double &target)
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y /= target;
 
 	return *this;
@@ -624,8 +624,8 @@ const Dataset2D Dataset2D::operator%(const double &target) const
 {
 	Dataset2D result(*this);
 	unsigned int i;
-	for (i = 0; i < yData.size(); ++i)
-		result.yData[i] = fmod(yData[i], target);
+	for (i = 0; i < mYData.size(); ++i)
+		result.mYData[i] = fmod(mYData[i], target);
 
 	return result;
 }
@@ -648,7 +648,7 @@ const Dataset2D Dataset2D::operator%(const double &target) const
 //=============================================================================
 Dataset2D& Dataset2D::MultiplyXData(const double &target)
 {
-	for (auto& x : xData)
+	for (auto& x : mXData)
 		x *= target;
 
 	return *this;
@@ -672,7 +672,7 @@ Dataset2D& Dataset2D::MultiplyXData(const double &target)
 //=============================================================================
 Dataset2D& Dataset2D::ToPower(const double &target)
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = pow(y, target);
 
 	return *this;
@@ -696,11 +696,11 @@ Dataset2D& Dataset2D::ToPower(const double &target)
 //=============================================================================
 Dataset2D& Dataset2D::ToPower(const Dataset2D &target)
 {
-	assert(yData.size() == target.yData.size());
+	assert(mYData.size() == target.mYData.size());
 
 	unsigned int i;
-	for (i = 0; i < yData.size(); ++i)
-		yData[i] = pow(yData[i], target.GetY()[i]);
+	for (i = 0; i < mYData.size(); ++i)
+		mYData[i] = pow(mYData[i], target.GetY()[i]);
 	return *this;
 }
 
@@ -769,10 +769,10 @@ const Dataset2D Dataset2D::ToPower(const double &target) const
 unsigned int Dataset2D::GetNumberOfZoomedPoints(const double &min, const double &max) const
 {
 	unsigned int start(0), end(0);
-	while (start < xData.size() && xData[start] < min)
+	while (start < mXData.size() && mXData[start] < min)
 		++start;
 	end = start;
-	while (end < xData.size() && xData[end] < max)
+	while (end < mXData.size() && mXData[end] < max)
 		++end;
 
 	return end - start;
@@ -796,7 +796,7 @@ unsigned int Dataset2D::GetNumberOfZoomedPoints(const double &min, const double 
 //=============================================================================
 Dataset2D& Dataset2D::DoLog()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = log(y);
 
 	return *this;
@@ -820,7 +820,7 @@ Dataset2D& Dataset2D::DoLog()
 //=============================================================================
 Dataset2D& Dataset2D::DoLog10()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = log10(y);
 
 	return *this;
@@ -844,7 +844,7 @@ Dataset2D& Dataset2D::DoLog10()
 //=============================================================================
 Dataset2D& Dataset2D::DoExp()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = exp(y);
 
 	return *this;
@@ -868,7 +868,7 @@ Dataset2D& Dataset2D::DoExp()
 //=============================================================================
 Dataset2D& Dataset2D::DoAbs()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = abs(y);
 
 	return *this;
@@ -892,7 +892,7 @@ Dataset2D& Dataset2D::DoAbs()
 //=============================================================================
 Dataset2D& Dataset2D::DoSin()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = sin(y);
 
 	return *this;
@@ -916,7 +916,7 @@ Dataset2D& Dataset2D::DoSin()
 //=============================================================================
 Dataset2D& Dataset2D::DoCos()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = cos(y);
 
 	return *this;
@@ -940,7 +940,7 @@ Dataset2D& Dataset2D::DoCos()
 //=============================================================================
 Dataset2D& Dataset2D::DoTan()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = tan(y);
 
 	return *this;
@@ -964,7 +964,7 @@ Dataset2D& Dataset2D::DoTan()
 //=============================================================================
 Dataset2D& Dataset2D::DoArcSin()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = asin(y);
 
 	return *this;
@@ -988,7 +988,7 @@ Dataset2D& Dataset2D::DoArcSin()
 //=============================================================================
 Dataset2D& Dataset2D::DoArcCos()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = acos(y);
 
 	return *this;
@@ -1012,7 +1012,7 @@ Dataset2D& Dataset2D::DoArcCos()
 //=============================================================================
 Dataset2D& Dataset2D::DoArcTan()
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = atan(y);
 
 	return *this;
@@ -1257,7 +1257,7 @@ const Dataset2D Dataset2D::DoArcTan() const
 //=============================================================================
 Dataset2D& Dataset2D::ApplyPower(const double &target)
 {
-	for (auto& y : yData)
+	for (auto& y : mYData)
 		y = pow(target, y);
 	return *this;
 }
@@ -1303,8 +1303,8 @@ const Dataset2D Dataset2D::ApplyPower(const double &target) const
 //=============================================================================
 double Dataset2D::ComputeYMean() const
 {
-	return std::accumulate(yData.cbegin(), yData.cend(), 0.0)
-		/ (double)yData.size();
+	return std::accumulate(mYData.cbegin(), mYData.cend(), 0.0)
+		/ (double)mYData.size();
 }
 
 //=============================================================================
@@ -1327,10 +1327,10 @@ double Dataset2D::GetAverageDeltaX() const
 {
 	double sum(0.0);
 	unsigned int i;
-	for (i = 1; i < xData.size(); ++i)
-		sum += xData[i] - xData[i - 1];
+	for (i = 1; i < mXData.size(); ++i)
+		sum += mXData[i] - mXData[i - 1];
 
-	return sum / (static_cast<double>(xData.size()) - 1.0);
+	return sum / (static_cast<double>(mXData.size()) - 1.0);
 }
 
 //=============================================================================

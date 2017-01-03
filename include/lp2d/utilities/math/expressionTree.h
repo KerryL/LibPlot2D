@@ -43,12 +43,12 @@ public:
 	static std::vector<std::pair<int, double>> FindPowersAndCoefficients(const wxArrayString &terms);
 
 private:
-	static const unsigned int printfPrecision;
-	const ManagedList<const Dataset2D> *list;
+	static const unsigned int mPrintfPrecision;
+	const ManagedList<const Dataset2D> *mList;
 
 	double mXAxisFactor;
 
-	std::queue<wxString> outputQueue;
+	std::queue<wxString> mOutputQueue;
 
 	wxString ParseExpression(const wxString &expression);
 	wxString ParseNext(const wxString &expression, bool &lastWasOperator,

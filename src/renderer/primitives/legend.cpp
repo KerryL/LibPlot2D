@@ -485,7 +485,7 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 //
 // Input Arguments:
 //		legendRef	= const PositionReference&
-//		mWindowRef	= const PositionReference&
+//		windowRef	= const PositionReference&
 //
 // Output Arguments:
 //		None
@@ -494,10 +494,10 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 //		double
 //
 //=============================================================================
-double Legend::GetXPos(const PositionReference& legendRef, const PositionReference& mWindowRef) const
+double Legend::GetXPos(const PositionReference& legendRef, const PositionReference& windowRef) const
 {
 	double x, y;
-	GetPosition(legendRef, mWindowRef, x, y);
+	GetPosition(legendRef, windowRef, x, y);
 	return x;
 }
 
@@ -509,7 +509,7 @@ double Legend::GetXPos(const PositionReference& legendRef, const PositionReferen
 //
 // Input Arguments:
 //		ref	= const PositionReference&
-//		mWindowRef	= const PositionReference&
+//		windowRef	= const PositionReference&
 //
 // Output Arguments:
 //		None
@@ -518,10 +518,10 @@ double Legend::GetXPos(const PositionReference& legendRef, const PositionReferen
 //		double
 //
 //=============================================================================
-double Legend::GetYPos(const PositionReference& legendRef, const PositionReference& mWindowRef) const
+double Legend::GetYPos(const PositionReference& legendRef, const PositionReference& windowRef) const
 {
 	double x, y;
-	GetPosition(legendRef, mWindowRef, x, y);
+	GetPosition(legendRef, windowRef, x, y);
 	return y;
 }
 
@@ -535,7 +535,7 @@ double Legend::GetYPos(const PositionReference& legendRef, const PositionReferen
 //
 // Input Arguments:
 //		legendRef	= const PositionReference&
-//		mWindowRef	= const PositionReference&
+//		windowRef	= const PositionReference&
 //
 // Output Arguments:
 //		x			= double&
@@ -546,12 +546,12 @@ double Legend::GetYPos(const PositionReference& legendRef, const PositionReferen
 //
 //=============================================================================
 void Legend::GetPosition(const PositionReference& legendRef,
-	const PositionReference& mWindowRef, double &x, double &y) const
+	const PositionReference& windowRef, double &x, double &y) const
 {
 	// Internally, x and y are location of legendRef w.r.t. mWindowRef, so first
 	// we need to back out to a common reference, then apply the specified references
 
-	switch (this->mWindowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -573,7 +573,7 @@ void Legend::GetPosition(const PositionReference& legendRef,
 		break;
 	}
 
-	switch (this->mWindowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -643,7 +643,7 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	// At this point, x and y represent the lower left-hand corner of the
 	// legend w.r.t. the lower LH window corner of the render window
 
-	switch (mWindowRef)
+	switch (windowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -664,7 +664,7 @@ void Legend::GetPosition(const PositionReference& legendRef,
 		break;
 	}
 
-	switch (mWindowRef)
+	switch (windowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -705,9 +705,9 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		if (mWindowRef == PositionReference::BottomRight ||
-			mWindowRef == PositionReference::MiddleRight ||
-			mWindowRef == PositionReference::TopRight)
+		if (windowRef == PositionReference::BottomRight ||
+			windowRef == PositionReference::MiddleRight ||
+			windowRef == PositionReference::TopRight)
 			x -= mWidth;
 		else
 			x += mWidth;
@@ -731,9 +731,9 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		if (mWindowRef == PositionReference::TopLeft ||
-			mWindowRef == PositionReference::TopCenter ||
-			mWindowRef == PositionReference::TopRight)
+		if (windowRef == PositionReference::TopLeft ||
+			windowRef == PositionReference::TopCenter ||
+			windowRef == PositionReference::TopRight)
 			y -= mHeight;
 		else
 			y += mHeight;
@@ -1033,7 +1033,7 @@ void Legend::BuildSampleLines()
 // Description:		Handles configuration of OpenGL vertex array object.
 //
 // Input Arguments:
-//		mBufferInfo	= Primitive::BufferInfo&
+//		bufferInfo	= Primitive::BufferInfo&
 //
 // Output Arguments:
 //		None
@@ -1042,15 +1042,15 @@ void Legend::BuildSampleLines()
 //		Primitive::BufferInfo
 //
 //=============================================================================
-void Legend::ConfigureVertexArray(Primitive::BufferInfo& mBufferInfo) const
+void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 {
-	mBufferInfo.GetOpenGLIndices(true);
-	glBindVertexArray(mBufferInfo.GetVertexArrayIndex());
+	bufferInfo.GetOpenGLIndices(true);
+	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, mBufferInfo.GetVertexBufferIndex());
+	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * mBufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
-		mBufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
+		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
 	glVertexAttribPointer(mRenderWindow.GetPositionLocation(),
@@ -1058,11 +1058,11 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& mBufferInfo) const
 
 	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
 	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * mBufferInfo.vertexCount * mRenderWindow.GetVertexDimension()));
+		(void*)(sizeof(GLfloat) * bufferInfo.vertexCount * mRenderWindow.GetVertexDimension()));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferInfo.GetIndexBufferIndex());
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mBufferInfo.indexBuffer.size(),
-		mBufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
+		bufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
 }

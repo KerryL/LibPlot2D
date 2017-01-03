@@ -890,7 +890,7 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 	const std::vector<Complex> &roots) const
 {
 	std::vector<Complex> terms(roots.size() + 1, Complex(0.0, 0.0));
-	terms[0].real = 1.0;
+	terms[0].mReal = 1.0;
 	unsigned int i, j;
 	for (i = 0; i < roots.size(); ++i)// from MATLAB's poly.m
 	{
@@ -902,13 +902,13 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 	for (i = 0; i < terms.size(); ++i)
 	{
 		// TODO:  Check to ensure imaginary part is zero?  I think this is guaranteed through the above math?
-		if (!PlotMath::IsZero(terms[i].real))
+		if (!PlotMath::IsZero(terms[i].mReal))
 		{
-			if (PlotMath::IsZero(terms[i].real - 1.0))
+			if (PlotMath::IsZero(terms[i].mReal - 1.0))
 				coefficient.Clear();
 			else
 			{
-				coefficient.Printf("+%0.*f", PlotMath::GetPrecision(terms[i].real, stringPrecision), terms[i].real);
+				coefficient.Printf("+%0.*f", PlotMath::GetPrecision(terms[i].mReal, stringPrecision), terms[i].mReal);
 				if (i != terms.size() - 1)
 					coefficient.Append(_T("*"));
 			}

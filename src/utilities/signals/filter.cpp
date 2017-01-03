@@ -111,9 +111,9 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 
 	unsigned int i;
 	for (i = 0; i < zNum.size(); ++i)
-		a[i] = zNum[i] / zDen[0];
+		mA[i] = zNum[i] / zDen[0];
 	for (i = 0; i < zDen.size() - 1; ++i)
-		b[i] = zDen[i + 1] / zDen[0];
+		mB[i] = zDen[i + 1] / zDen[0];
 }
 
 //=============================================================================
@@ -194,11 +194,11 @@ std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
 //=============================================================================
 void Filter::Initialize(const double &initialValue)
 {
-	for (auto& v : u)
+	for (auto& v : mU)
 		v = initialValue;
 
 	double ssGain(ComputeSteadyStateGain());
-	for (auto& v : y)
+	for (auto& v : mY)
 		v = initialValue * ssGain;
 }
 
@@ -220,19 +220,19 @@ void Filter::Initialize(const double &initialValue)
 //=============================================================================
 double Filter::Apply(const double &u0)
 {
-	ShiftArray(u);
-	u[0] = u0;
+	ShiftArray(mU);
+	mU[0] = u0;
 
-	ShiftArray(y);
+	ShiftArray(mY);
 
-	y[0] = 0.0;
+	mY[0] = 0.0;
 	unsigned int i;
-	for (i = 0; i < a.size(); ++i)
-		y[0] += a[i] * this->u[i];
-	for (i = 1; i < y.size(); ++i)
-		y[0] -= b[i - 1] * y[i];
+	for (i = 0; i < mA.size(); ++i)
+		mY[0] += mA[i] * mU[i];
+	for (i = 1; i < mY.size(); ++i)
+		mY[0] -= mB[i - 1] * mY[i];
 
-	return y[0];
+	return mY[0];
 }
 
 //=============================================================================
@@ -276,12 +276,13 @@ void Filter::ShiftArray(std::vector<double>& s) const
 //		None
 //
 //=============================================================================
-void Filter::ResizeArrays(const unsigned int &inSize, const unsigned int &outSize)
+void Filter::ResizeArrays(const unsigned int &inSize,
+	const unsigned int &outSize)
 {
-	a.resize(inSize);
-	b.resize(outSize - 1);
-	u.resize(inSize);
-	y.resize(outSize);
+	mA.resize(inSize);
+	mB.resize(outSize - 1);
+	mU.resize(inSize);
+	mY.resize(outSize);
 }
 
 //=============================================================================
@@ -312,7 +313,8 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 	}
 
 	std::vector<std::pair<int, double>> terms =
-		ExpressionTree::FindPowersAndCoefficients(ExpressionTree::BreakApartTerms(expression));
+		ExpressionTree::FindPowersAndCoefficients(
+			ExpressionTree::BreakApartTerms(expression));
 
 	terms = CollectLikeTerms(terms);
 	terms = PadMissingTerms(terms);
@@ -343,7 +345,8 @@ std::vector<double> Filter::CoefficientsFromString(const std::string &s)
 //		std::vector<std::pair<int, double>>
 //
 //=============================================================================
-std::vector<std::pair<int, double>> Filter::CollectLikeTerms(std::vector<std::pair<int, double>> terms)
+std::vector<std::pair<int, double>> Filter::CollectLikeTerms(
+	std::vector<std::pair<int, double>> terms)
 {
 	unsigned int i, j;
 	for (i = 0; i < terms.size(); ++i)
@@ -380,9 +383,11 @@ std::vector<std::pair<int, double>> Filter::CollectLikeTerms(std::vector<std::pa
 //		std::vector<std::pair<int, double>>
 //
 //=============================================================================
-std::vector<std::pair<int, double>> Filter::PadMissingTerms(std::vector<std::pair<int, double>> terms)
+std::vector<std::pair<int, double>> Filter::PadMissingTerms(
+	std::vector<std::pair<int, double>> terms)
 {
-	std::sort(terms.begin(), terms.end(), std::greater<std::pair<int, double>>());// Sort in descending order of power
+	std::sort(terms.begin(), terms.end(),
+		std::greater<std::pair<int, double>>());// Sort in descending order of power
 
 	int i, expectedPower(terms[0].first - 1);
 	while (expectedPower < -1)
@@ -433,7 +438,8 @@ std::vector<std::pair<int, double>> Filter::PadMissingTerms(std::vector<std::pai
 //		double
 //
 //=============================================================================
-double Filter::ComputeSteadyStateGain(const std::string &num, const std::string &den)
+double Filter::ComputeSteadyStateGain(const std::string &num,
+	const std::string &den)
 {
 	std::vector<double> numeratorCoefficients = CoefficientsFromString(num);
 	std::vector<double> denominatorCoefficients = CoefficientsFromString(den);
@@ -492,9 +498,9 @@ double Filter::ComputeSteadyStateGain() const
 {
 	double numeratorSum(0.0);
 	double denominatorSum(1.0);
-	for (const auto& v : a)
+	for (const auto& v : mA)
 		numeratorSum += v;
-	for (const auto& v : b)
+	for (const auto& v : mB)
 		denominatorSum += v;
 
 	return numeratorSum / denominatorSum;

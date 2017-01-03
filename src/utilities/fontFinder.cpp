@@ -43,9 +43,9 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-const unsigned int FontFinder::familyNameRecordId(1);
-const unsigned int FontFinder::subFamilyNameRecordId(2);
-const unsigned int FontFinder::fullNameRecordId(4);
+const unsigned int FontFinder::mFamilyNameRecordId(1);
+const unsigned int FontFinder::mSubFamilyNameRecordId(2);
+const unsigned int FontFinder::mFullNameRecordId(4);
 
 //=============================================================================
 // Class:			FontFinder
@@ -403,36 +403,35 @@ void FontFinder::CheckHeaderForName(std::ifstream &file,
 	file.read((char*)&ttRecord, sizeof(TT_NAME_RECORD));
 	SwapEndian(ttRecord.nameID);
 
-	wxString* target(nullptr);
-	if (ttRecord.nameID == familyNameRecordId)
+	wxString* target;
+	if (ttRecord.nameID == mFamilyNameRecordId)
 		target = &info.fontFamily;
-	else if (ttRecord.nameID == subFamilyNameRecordId)
+	else if (ttRecord.nameID == mSubFamilyNameRecordId)
 		target = &info.fontSubFamily;
-	else if (ttRecord.nameID == fullNameRecordId)
+	else if (ttRecord.nameID == mFullNameRecordId)
 		target = &info.fullName;
+	else
+		return;
 
-	if (target)
-	{
-		SwapEndian(ttRecord.stringLength);
-		SwapEndian(ttRecord.stringOffset);
+	SwapEndian(ttRecord.stringLength);
+	SwapEndian(ttRecord.stringOffset);
 
-		// Save file position, so we can return to continue with search
-		int nPos = file.tellg();
-		file.seekg(ttRecord.stringOffset + offset, std::ios_base::beg);
+	// Save file position, so we can return to continue with search
+	int nPos = file.tellg();
+	file.seekg(ttRecord.stringOffset + offset, std::ios_base::beg);
 
-		std::string nameBuffer;
-		nameBuffer.resize(ttRecord.stringLength);
-		file.read(&nameBuffer[0], ttRecord.stringLength);
+	std::string nameBuffer;
+	nameBuffer.resize(ttRecord.stringLength);
+	file.read(&nameBuffer[0], ttRecord.stringLength);
 
-		// Apparent bug with setting the string length every time:
-		// When the string is empty, and we assign a length anyway, it is no
-		// longer emtpy, even though it contains no valid data.  As a workaround,
-		// we only assign the proper length if the string is not already empty
-		if (nameBuffer[0] != '\0')
-			target->assign(nameBuffer);
+	// Apparent bug with setting the string length every time:
+	// When the string is empty, and we assign a length anyway, it is no
+	// longer emtpy, even though it contains no valid data.  As a workaround,
+	// we only assign the proper length if the string is not already empty
+	if (nameBuffer[0] != '\0')
+		target->assign(nameBuffer);
 
-		file.seekg(nPos, std::ios_base::beg);
-	}
+	file.seekg(nPos, std::ios_base::beg);
 }
 
 }// namespace LibPlot2D

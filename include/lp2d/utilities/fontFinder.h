@@ -49,9 +49,9 @@ public:
 	};*/
 
 private:
-	static const unsigned int familyNameRecordId;
-	static const unsigned int subFamilyNameRecordId;
-	static const unsigned int fullNameRecordId;
+	static const unsigned int mFamilyNameRecordId;
+	static const unsigned int mSubFamilyNameRecordId;
+	static const unsigned int mFullNameRecordId;
 
 	// TTF file header
 	struct TT_OFFSET_TABLE
