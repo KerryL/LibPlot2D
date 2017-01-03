@@ -488,7 +488,7 @@ void PlotRenderer::OnMiddleButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 // Function:		ZoomChanged
 //
 // Description:		Determines if the zoom level is different from the previous
-//					mZoom level.
+//					zoom level.
 //
 // Input Arguments:
 //		None
@@ -2335,7 +2335,7 @@ bool PlotRenderer::GetXAxisZoomed() const
 // Class:			PlotRenderer
 // Function:		ProcessZoom
 //
-// Description:		Handles mouse-drag mZoom events.
+// Description:		Handles mouse-drag zoom events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2349,8 +2349,8 @@ bool PlotRenderer::GetXAxisZoomed() const
 //=============================================================================
 void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 {
-	// CTRL for Left Y-mZoom
-	// SHIFT for Right Y-mZoom
+	// CTRL for Left Y-zoom
+	// SHIFT for Right Y-zoom
 
 	// ZOOM in or out
 	double zoomXScale = 0.005 * (event.GetX() - mLastMousePosition[0]);// [% of current scale]
@@ -2381,7 +2381,7 @@ void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		ProcessZoomWithBox
 //
-// Description:		Handles mouse-drag mZoom box events.
+// Description:		Handles mouse-drag zoom box events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2412,7 +2412,7 @@ void PlotRenderer::ProcessZoomWithBox(wxMouseEvent &event)
 	y = event.GetY();
 	ForcePointWithinPlotArea(x, y);
 
-	// Tell the mZoom box where to draw the floaing corner
+	// Tell the zoom box where to draw the floaing corner
 	mZoomBox->SetFloatingCorner(x, GetSize().GetHeight() - y);
 }
 
@@ -2674,7 +2674,8 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		ProcessZoomBoxEnd
 //
-// Description:		Completes mZoom and cleans up box after user releases mZoom box.
+// Description:		Completes zoom and cleans up box after user releases zoom
+//					box.
 //
 // Input Arguments:
 //		None
