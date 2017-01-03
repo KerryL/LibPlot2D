@@ -146,7 +146,7 @@ double CurveFit::EvaluateFit(const double &x, const PolynomialFit& fit)
 	double value(0.0);
 	unsigned int i;
 	for (i = 0; i <= fit.order; ++i)
-		value += fit.coefficients[i] * pow(x, (int)i);
+		value += fit.coefficients[i] * pow(x, static_cast<int>(i));
 
 	return value;
 }

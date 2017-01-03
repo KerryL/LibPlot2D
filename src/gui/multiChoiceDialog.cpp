@@ -155,7 +155,7 @@ int MultiChoiceDialog::ComputeListBoxHeight(const wxArrayString& choices) const
 {
 	const double factor(0.6);
 	int value(choices.Count() * 20);
-	return std::min(std::max(200, value), (int)(wxGetClientDisplayRect().GetHeight() * factor));
+	return std::min(std::max(200, value), static_cast<int>(wxGetClientDisplayRect().GetHeight() * factor));
 }
 
 //=============================================================================

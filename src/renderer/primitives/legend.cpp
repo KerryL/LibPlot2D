@@ -233,7 +233,7 @@ void Legend::UpdateBoundingBox()
 	for (const auto& entry : mEntries)
 	{
 		boundingBox = mText.GetBoundingBox(entry.text.ToStdString());
-		if (boundingBox.xRight > (int)maxStringWidth)
+		if (boundingBox.xRight > static_cast<int>(maxStringWidth))
 			maxStringWidth = boundingBox.xRight;
 	}
 	

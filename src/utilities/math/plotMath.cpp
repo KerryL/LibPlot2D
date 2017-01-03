@@ -355,7 +355,7 @@ double PlotMath::GetAverageXSpacing(const Dataset2D &data)
 unsigned int PlotMath::GetPrecision(const double &value,
 	const unsigned int &significantDigits, const bool &dropTrailingZeros)
 {
-	int precision(significantDigits - (unsigned int)floor(log10(value)) - 1);
+	int precision(significantDigits - static_cast<unsigned int>(floor(log10(value)) - 1));
 	if (precision < 0)
 		precision = 0;
 	if (!dropTrailingZeros)

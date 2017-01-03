@@ -631,11 +631,11 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const 
 		(s[0] == '-' && lastWasOperator && NextIsDataset(s.Mid(1), nullptr, false)))
 	{
 		unsigned int close = s.Find(']');
-		if (close == (unsigned int)wxNOT_FOUND)
+		if (close == static_cast<unsigned int>(wxNOT_FOUND))
 			return false;
 
 		unsigned int i;
-		for (i = 1 + (unsigned int)lastWasOperator; i < close; ++i)
+		for (i = 1 + static_cast<unsigned int>(lastWasOperator); i < close; ++i)
 		{
 			if (int(s[i]) < '0' || int(s[i]) > '9')
 				return false;
@@ -2057,11 +2057,11 @@ wxString ExpressionTree::StringDivide(const double &first, const wxString &secon
 wxString ExpressionTree::StringPower(const double &first, const wxString &second) const
 {
 	if (first < 0.0)
-		return wxString::Format("%s^%i", second.c_str(), (int)first);
+		return wxString::Format("%s^%i", second.c_str(), static_cast<int>(first));
 
 	wxString result(second);
 	unsigned int i;
-	for (i = 1; i < (unsigned int)first; ++i)
+	for (i = 1; i < static_cast<unsigned int>(first); ++i)
 		result = StringMultiply(result, second);
 
 	return result;
@@ -2088,13 +2088,13 @@ wxArrayString ExpressionTree::BreakApartTerms(const wxString &s)
 {
 	wxArrayString terms;
 	unsigned int start(0), end(0);
-	while (end != (unsigned int)wxNOT_FOUND)
+	while (end != static_cast<unsigned int>(wxNOT_FOUND))
 	{
 		end = FindEndOfNextTerm(s, start);
 
 		if (start > 0 && s.Mid(start - 1, 1).Cmp(_T("-")) == 0)
 		{
-			if (end != (unsigned int)wxNOT_FOUND)
+			if (end != static_cast<unsigned int>(wxNOT_FOUND))
 				terms.Add(s.Mid(start - 1, end + 1));
 			else
 				terms.Add(s.Mid(start - 1));
@@ -2135,14 +2135,14 @@ unsigned int ExpressionTree::FindEndOfNextTerm(const wxString &s, const unsigned
 	if (minusEnd < plusEnd && start + minusEnd > 0 && NextIsOperator(s[start + minusEnd - 1]))
 	{
 		unsigned int nextMinus = s.Mid(start + minusEnd + 1).Find('-');
-		if (nextMinus != (unsigned int)wxNOT_FOUND)
+		if (nextMinus != static_cast<unsigned int>(wxNOT_FOUND))
 			minusEnd += nextMinus + 1;
 		else
 			minusEnd = nextMinus;
 	}
 	end = std::min(plusEnd, minusEnd);
 
-	if (end != (unsigned int)wxNOT_FOUND && NextIsOperator(s.Mid(start + end - 1)))
+	if (end != static_cast<unsigned int>(wxNOT_FOUND) && NextIsOperator(s.Mid(start + end - 1)))
 	{
 		plusEnd = s.Mid(start + end).Find('+');
 		minusEnd = s.Mid(start + end).Find('-');
@@ -2179,7 +2179,7 @@ std::vector<std::pair<int, double>> ExpressionTree::FindPowersAndCoefficients(co
 		unsigned int start(0);
 		unsigned int end(0);
 		double coefficient(1.0);
-		while (end != (unsigned int)wxNOT_FOUND)
+		while (end != static_cast<unsigned int>(wxNOT_FOUND))
 		{
 			end = term.Mid(start).Find('*');
 			if (term.Mid(start, end).ToDouble(&temp))
@@ -2190,7 +2190,7 @@ std::vector<std::pair<int, double>> ExpressionTree::FindPowersAndCoefficients(co
 				{
 					coefficient = -1.0;
 					++start;
-					if (end != (unsigned int)wxNOT_FOUND)
+					if (end != static_cast<unsigned int>(wxNOT_FOUND))
 						++end;
 				}
 

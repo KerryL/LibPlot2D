@@ -1007,7 +1007,7 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator,
 		return;
 
 	numerator = wxString::Format("%0.*f", PlotMath::GetPrecision(cutoff, stringPrecision),
-		pow(cutoff, (int)order));
+		pow(cutoff, static_cast<int>(order)));
 
 	if (mButterworthCheckBox->GetValue())
 		denominator = GenerateButterworthDenominator(order, cutoff);
@@ -1479,7 +1479,7 @@ wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParamete
 wxString FilterDialog::AddDampingName(const wxString& name, const FilterParameters &parameters)
 {
 	wxString s(name);
-	if (parameters.order > 1 + (unsigned int)parameters.phaseless)
+	if (parameters.order > 1 + static_cast<unsigned int>(parameters.phaseless))
 	{
 		if (parameters.butterworth)
 			s.Append(_T(", Butterworth"));

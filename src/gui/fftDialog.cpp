@@ -219,12 +219,14 @@ wxSizer* FFTDialog::CreateOutputControls()
 //=============================================================================
 void FFTDialog::ConfigureControls()
 {
-	unsigned int maxPower(FastFourierTransform::GetMaxPowerOfTwo(GetPointCount()));
+	unsigned int maxPower(
+		FastFourierTransform::GetMaxPowerOfTwo(GetPointCount()));
 	mWindowSizeCombo->Clear();
 
 	unsigned int i;
 	for (i = 1; i <= maxPower; ++i)
-		mWindowSizeCombo->Append(wxString::Format("%u", (unsigned int)pow(2, (double)i)));
+		mWindowSizeCombo->Append(wxString::Format("%u",
+			static_cast<unsigned int>(pow(2, static_cast<double>(i)))));
 	mWindowSizeCombo->SetSelection(mWindowSizeCombo->GetCount() - 1);
 }
 

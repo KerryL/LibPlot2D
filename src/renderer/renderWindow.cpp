@@ -999,7 +999,8 @@ void RenderWindow::AutoSetFrustum()
 		return;
 
 	wxSize windowSize = GetSize();
-	mAspectRatio = (double)windowSize.GetWidth() / (double)windowSize.GetHeight();
+	mAspectRatio = static_cast<double>(windowSize.GetWidth())
+		/ static_cast<double>(windowSize.GetHeight());
 }
 
 //=============================================================================

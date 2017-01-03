@@ -396,7 +396,7 @@ std::vector<std::pair<int, double>> Filter::PadMissingTerms(
 		terms.insert(terms.begin(), std::make_pair(expectedPower + 1, 0.0));
 	}
 
-	for (i = 1; i < (int)terms.size(); ++i)
+	for (i = 1; i < static_cast<int>(terms.size()); ++i)
 	{
 		if (terms[i].first != expectedPower)
 			terms.insert(terms.begin() + i, std::make_pair(expectedPower, 0.0));

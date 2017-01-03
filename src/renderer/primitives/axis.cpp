@@ -256,11 +256,11 @@ void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridC
 	{
 		assert(mMajorResolution > 0.0 && PlotMath::IsValid(mMajorResolution));
 		assert(mMinorResolution > 0.0 && PlotMath::IsValid(mMinorResolution));
-		tickCount = (unsigned int)((mMaximum - mMinimum) / mMajorResolution + 0.5) - 1;
+		tickCount = static_cast<unsigned int>((mMaximum - mMinimum) / mMajorResolution + 0.5) - 1U;
 		if (gridCount)
 		{
 			if (mMinorGrid)
-				*gridCount = (unsigned int)((mMaximum - mMinimum) / mMinorResolution + 0.5) - 1;
+				*gridCount = static_cast<unsigned int>((mMaximum - mMinimum) / mMinorResolution + 0.5) - 1U;
 			else
 				*gridCount = tickCount;
 		}
@@ -552,8 +552,8 @@ void Axis::DrawAxisLabel()
 
 	boundingBox = mLabelText.GetBoundingBox(mLabel.ToStdString());
 	const double textWidth = boundingBox.xRight - boundingBox.xLeft;
-	const double plotOffset = (double)mMinAxis->GetOffsetFromWindowEdge()
-		- (double)mMaxAxis->GetOffsetFromWindowEdge();
+	const double plotOffset = static_cast<double>(mMinAxis->GetOffsetFromWindowEdge())
+		- static_cast<double>(mMaxAxis->GetOffsetFromWindowEdge());
 
 	if (IsHorizontal())
 		mLabelText.SetPosition(0.5 * (mRenderWindow.GetSize().GetWidth()
@@ -718,7 +718,7 @@ double Axis::GetNextTickValue(const bool &first, const bool &last,
 			return pow(10.0, floor(log10(mMinimum)) + tick);
 	}
 
-	return mMinimum + (double)tick * mMajorResolution;
+	return mMinimum + static_cast<double>(tick) * mMajorResolution;
 }
 
 //=============================================================================

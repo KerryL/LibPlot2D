@@ -402,20 +402,20 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 {
 	AllocateBuffer(2, 0, bufferInfo);
 
-	bufferInfo.vertexBuffer[0] = (float)x1;
-	bufferInfo.vertexBuffer[1] = (float)y1;
-	bufferInfo.vertexBuffer[2] = (float)x2;
-	bufferInfo.vertexBuffer[3] = (float)y2;
+	bufferInfo.vertexBuffer[0] = static_cast<float>(x1);
+	bufferInfo.vertexBuffer[1] = static_cast<float>(y1);
+	bufferInfo.vertexBuffer[2] = static_cast<float>(x2);
+	bufferInfo.vertexBuffer[3] = static_cast<float>(y2);
 
-	bufferInfo.vertexBuffer[4] = (float)mLineColor.GetRed();
-	bufferInfo.vertexBuffer[5] = (float)mLineColor.GetGreen();
-	bufferInfo.vertexBuffer[6] = (float)mLineColor.GetBlue();
-	bufferInfo.vertexBuffer[7] = (float)mLineColor.GetAlpha();
+	bufferInfo.vertexBuffer[4] = static_cast<float>(mLineColor.GetRed());
+	bufferInfo.vertexBuffer[5] = static_cast<float>(mLineColor.GetGreen());
+	bufferInfo.vertexBuffer[6] = static_cast<float>(mLineColor.GetBlue());
+	bufferInfo.vertexBuffer[7] = static_cast<float>(mLineColor.GetAlpha());
 
-	bufferInfo.vertexBuffer[8] = (float)mLineColor.GetRed();
-	bufferInfo.vertexBuffer[9] = (float)mLineColor.GetGreen();
-	bufferInfo.vertexBuffer[10] = (float)mLineColor.GetBlue();
-	bufferInfo.vertexBuffer[11] = (float)mLineColor.GetAlpha();
+	bufferInfo.vertexBuffer[8] = static_cast<float>(mLineColor.GetRed());
+	bufferInfo.vertexBuffer[9] = static_cast<float>(mLineColor.GetGreen());
+	bufferInfo.vertexBuffer[10] = static_cast<float>(mLineColor.GetBlue());
+	bufferInfo.vertexBuffer[11] = static_cast<float>(mLineColor.GetAlpha());
 
 	if (update != UpdateMethod::Immediate)
 		return;
@@ -468,13 +468,13 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 	unsigned int i;
 	for (i = 0; i < points.size(); ++i)
 	{
-		bufferInfo.vertexBuffer[i * dimension] = (float)points[i].first;
-		bufferInfo.vertexBuffer[i * dimension + 1] = (float)points[i].second;
+		bufferInfo.vertexBuffer[i * dimension] = static_cast<float>(points[i].first);
+		bufferInfo.vertexBuffer[i * dimension + 1] = static_cast<float>(points[i].second);
 
-		bufferInfo.vertexBuffer[start + i * 4] = (float)mLineColor.GetRed();
-		bufferInfo.vertexBuffer[start + i * 4 + 1] = (float)mLineColor.GetGreen();
-		bufferInfo.vertexBuffer[start + i * 4 + 2] = (float)mLineColor.GetBlue();
-		bufferInfo.vertexBuffer[start + i * 4 + 3] = (float)mLineColor.GetAlpha();
+		bufferInfo.vertexBuffer[start + i * 4] = static_cast<float>(mLineColor.GetRed());
+		bufferInfo.vertexBuffer[start + i * 4 + 1] = static_cast<float>(mLineColor.GetGreen());
+		bufferInfo.vertexBuffer[start + i * 4 + 2] = static_cast<float>(mLineColor.GetBlue());
+		bufferInfo.vertexBuffer[start + i * 4 + 3] = static_cast<float>(mLineColor.GetAlpha());
 	}
 
 	if (update != UpdateMethod::Immediate)
@@ -743,37 +743,37 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double>>& points
 				points[i + 1].second, offsets[i].dxLine, offsets[i].dyLine,
 				offsets[i].dxEdge, offsets[i].dyEdge);
 
-		bufferInfo.vertexBuffer[i * dimension * 4] = (float)(points[i].first + offsets[i].dxEdge);
-		bufferInfo.vertexBuffer[i * dimension * 4 + 1] = (float)(points[i].second + offsets[i].dyEdge);
+		bufferInfo.vertexBuffer[i * dimension * 4] = static_cast<float>((points[i].first + offsets[i].dxEdge));
+		bufferInfo.vertexBuffer[i * dimension * 4 + 1] = static_cast<float>((points[i].second + offsets[i].dyEdge));
 
-		bufferInfo.vertexBuffer[i * dimension * 4 + dimension] = (float)(points[i].first + offsets[i].dxLine);
-		bufferInfo.vertexBuffer[i * dimension * 4 + dimension + 1] = (float)(points[i].second + offsets[i].dyLine);
+		bufferInfo.vertexBuffer[i * dimension * 4 + dimension] = static_cast<float>((points[i].first + offsets[i].dxLine));
+		bufferInfo.vertexBuffer[i * dimension * 4 + dimension + 1] = static_cast<float>((points[i].second + offsets[i].dyLine));
 
-		bufferInfo.vertexBuffer[i * dimension * 4 + 2 * dimension] = (float)(points[i].first - offsets[i].dxLine);
-		bufferInfo.vertexBuffer[i * dimension * 4 + 2 * dimension + 1] = (float)(points[i].second - offsets[i].dyLine);
+		bufferInfo.vertexBuffer[i * dimension * 4 + 2 * dimension] = static_cast<float>((points[i].first - offsets[i].dxLine));
+		bufferInfo.vertexBuffer[i * dimension * 4 + 2 * dimension + 1] = static_cast<float>((points[i].second - offsets[i].dyLine));
 
-		bufferInfo.vertexBuffer[i * dimension * 4 + 3 * dimension] = (float)(points[i].first - offsets[i].dxEdge);
-		bufferInfo.vertexBuffer[i * dimension * 4 + 3 * dimension + 1] = (float)(points[i].second - offsets[i].dyEdge);
+		bufferInfo.vertexBuffer[i * dimension * 4 + 3 * dimension] = static_cast<float>((points[i].first - offsets[i].dxEdge));
+		bufferInfo.vertexBuffer[i * dimension * 4 + 3 * dimension + 1] = static_cast<float>((points[i].second - offsets[i].dyEdge));
 
-		bufferInfo.vertexBuffer[colorStart + i * 16] = (float)mBackgroundColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 1] = (float)mBackgroundColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 2] = (float)mBackgroundColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 3] = (float)mBackgroundColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16] = static_cast<float>(mBackgroundColor.GetRed());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 1] = static_cast<float>(mBackgroundColor.GetGreen());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 2] = static_cast<float>(mBackgroundColor.GetBlue());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 3] = static_cast<float>(mBackgroundColor.GetAlpha());
 
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 4] = (float)mLineColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 5] = (float)mLineColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 6] = (float)mLineColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 7] = (float)mLineColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 4] = static_cast<float>(mLineColor.GetRed());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 5] = static_cast<float>(mLineColor.GetGreen());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 6] = static_cast<float>(mLineColor.GetBlue());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 7] = static_cast<float>(mLineColor.GetAlpha());
 
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 8] = (float)mLineColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 9] = (float)mLineColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 10] = (float)mLineColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 11] = (float)mLineColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 8] = static_cast<float>(mLineColor.GetRed());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 9] = static_cast<float>(mLineColor.GetGreen());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 10] = static_cast<float>(mLineColor.GetBlue());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 11] = static_cast<float>(mLineColor.GetAlpha());
 
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 12] = (float)mBackgroundColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 13] = (float)mBackgroundColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 14] = (float)mBackgroundColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 15] = (float)mBackgroundColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 12] = static_cast<float>(mBackgroundColor.GetRed());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 13] = static_cast<float>(mBackgroundColor.GetGreen());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 14] = static_cast<float>(mBackgroundColor.GetBlue());
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 15] = static_cast<float>(mBackgroundColor.GetAlpha());
 	}
 }
 

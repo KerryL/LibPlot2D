@@ -2353,14 +2353,16 @@ void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 	// SHIFT for Right Y-zoom
 
 	// ZOOM in or out
-	double zoomXScale = 0.005 * (event.GetX() - mLastMousePosition[0]);// [% of current scale]
-	double zoomYScale = 0.005 * (event.GetY() - mLastMousePosition[1]);// [% of current scale]
+	const double zoomXScale = 0.005 * (event.GetX() - mLastMousePosition[0]);// [% of current scale]
+	const double zoomYScale = 0.005 * (event.GetY() - mLastMousePosition[1]);// [% of current scale]
 
 	// TODO:  Focus the zooming around the cursor
 	// Adjust the axis limits
-	double xDelta = (mPlot->GetXMax() - mPlot->GetXMin()) * zoomXScale;
-	double yLeftDelta = (mPlot->GetLeftYMax() - mPlot->GetLeftYMin()) * zoomYScale * (int)event.ControlDown();
-	double yRightDelta = (mPlot->GetRightYMax() - mPlot->GetRightYMin()) * zoomYScale * (int)event.ShiftDown();
+	const double xDelta((mPlot->GetXMax() - mPlot->GetXMin()) * zoomXScale);
+	const double yLeftDelta((mPlot->GetLeftYMax() - mPlot->GetLeftYMin())
+		* zoomYScale * static_cast<int>(event.ControlDown()));
+	const double yRightDelta((mPlot->GetRightYMax() - mPlot->GetRightYMin())
+		* zoomYScale * static_cast<int>(event.ShiftDown()));
 
 	// Left mouse button fixes left and bottom corner, right button fixes right and top corner
 	if (event.LeftIsDown())
@@ -2457,19 +2459,25 @@ void PlotRenderer::ProcessPan(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::PanBottomXAxis(wxMouseEvent &event)
 {
-	int width = GetSize().GetWidth() - mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge();
+	const int width(GetSize().GetWidth()
+		- mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge()
+		- mPlot->GetRightYAxis()->GetOffsetFromWindowEdge());
 
 	if (mPlot->GetBottomAxis()->IsLogarithmic())
 	{
-		int pixelDelta = event.GetX() - mLastMousePosition[0];
+		const int pixelDelta(event.GetX() - mLastMousePosition[0]);
 		mPlot->SetXMin(mPlot->GetBottomAxis()->PixelToValue(
-			(int)mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+			static_cast<int>(mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge())
+			- pixelDelta));
 		mPlot->SetXMax(mPlot->GetBottomAxis()->PixelToValue(
-			GetSize().GetWidth() - (int)mPlot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+			GetSize().GetWidth()
+			- static_cast<int>(mPlot->GetRightYAxis()->GetOffsetFromWindowEdge())
+			- pixelDelta));
 	}
 	else
 	{
-		double xDelta = (mPlot->GetXMax() - mPlot->GetXMin()) * (event.GetX() - mLastMousePosition[0]) / width;
+		const double xDelta((mPlot->GetXMax() - mPlot->GetXMin())
+			* (event.GetX() - mLastMousePosition[0]) / width);
 		mPlot->SetXMin(mPlot->GetXMin() - xDelta);
 		mPlot->SetXMax(mPlot->GetXMax() - xDelta);
 	}
@@ -2493,19 +2501,25 @@ void PlotRenderer::PanBottomXAxis(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::PanLeftYAxis(wxMouseEvent &event)
 {
-	int height = GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() - mPlot->GetTopAxis()->GetOffsetFromWindowEdge();
+	const int height(GetSize().GetHeight()
+		- mPlot->GetBottomAxis()->GetOffsetFromWindowEdge()
+		- mPlot->GetTopAxis()->GetOffsetFromWindowEdge());
 
 	if (mPlot->GetLeftYAxis()->IsLogarithmic())
 	{
-		int pixelDelta = event.GetY() - mLastMousePosition[1];
+		const int pixelDelta(event.GetY() - mLastMousePosition[1]);
 		mPlot->SetLeftYMin(mPlot->GetLeftYAxis()->PixelToValue(
-			(int)mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+			static_cast<int>(mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
+			+ pixelDelta));
 		mPlot->SetLeftYMax(mPlot->GetLeftYAxis()->PixelToValue(
-			GetSize().GetHeight() - (int)mPlot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+			GetSize().GetHeight()
+			- static_cast<int>(mPlot->GetTopAxis()->GetOffsetFromWindowEdge())
+			+ pixelDelta));
 	}
 	else
 	{
-		double yLeftDelta = (mPlot->GetLeftYMax() - mPlot->GetLeftYMin()) * (event.GetY() - mLastMousePosition[1]) / height;
+		const double yLeftDelta = (mPlot->GetLeftYMax() - mPlot->GetLeftYMin())
+			* (event.GetY() - mLastMousePosition[1]) / height;
 		mPlot->SetLeftYMin(mPlot->GetLeftYMin() + yLeftDelta);
 		mPlot->SetLeftYMax(mPlot->GetLeftYMax() + yLeftDelta);
 	}
@@ -2529,19 +2543,26 @@ void PlotRenderer::PanLeftYAxis(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::PanRightYAxis(wxMouseEvent &event)
 {
-	int height = GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() - mPlot->GetTopAxis()->GetOffsetFromWindowEdge();
+	const int height(GetSize().GetHeight()
+		- mPlot->GetBottomAxis()->GetOffsetFromWindowEdge()
+		- mPlot->GetTopAxis()->GetOffsetFromWindowEdge());
 
 	if (mPlot->GetRightYAxis()->IsLogarithmic())
 	{
-		int pixelDelta = event.GetY() - mLastMousePosition[1];
+		const int pixelDelta(event.GetY() - mLastMousePosition[1]);
 		mPlot->SetRightYMin(mPlot->GetRightYAxis()->PixelToValue(
-			(int)mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+			static_cast<int>(mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
+			+ pixelDelta));
 		mPlot->SetRightYMax(mPlot->GetRightYAxis()->PixelToValue(
-			GetSize().GetHeight() - (int)mPlot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+			GetSize().GetHeight()
+			- static_cast<int>(mPlot->GetTopAxis()->GetOffsetFromWindowEdge())
+			+ pixelDelta));
 	}
 	else
 	{
-		double yRightDelta = (mPlot->GetRightYMax() - mPlot->GetRightYMin()) * (event.GetY() - mLastMousePosition[1]) / height;
+		const double yRightDelta = (mPlot->GetRightYMax()
+			- mPlot->GetRightYMin())
+			* (event.GetY() - mLastMousePosition[1]) / height;
 		mPlot->SetRightYMin(mPlot->GetRightYMin() + yRightDelta);
 		mPlot->SetRightYMax(mPlot->GetRightYMax() + yRightDelta);
 	}
@@ -2895,7 +2916,7 @@ double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
 {
 	assert(max > min);
 	double range = max - min;
-	int orderOfMagnitude = (int)log10(range);
+	int orderOfMagnitude(static_cast<int>(log10(range)));
 
 	// To prevent changing the number of ticks as we drag, we should round the range here
 	// The issues is that a range of about 10 could be 9.99999... or 10.000...1
@@ -2906,7 +2927,7 @@ double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
 	const double roundingScale(pow(10.0, 2 - orderOfMagnitude));// So we don't loose too much precision
 	range = floor(range * roundingScale + 0.5) / roundingScale;
 
-	orderOfMagnitude = (int)log10(range);
+	orderOfMagnitude = static_cast<int>(log10(range));
 	double tickSpacing = range / maxTicks;
 
 	// Acceptable resolution steps are:

@@ -455,7 +455,7 @@ void CustomFileFormat::ProcessChannels(wxArrayString &names, std::vector<double>
 		{
 			if (channel.code.IsEmpty())
 			{
-				if (i == (unsigned int)channel.column)
+				if (i == static_cast<unsigned int>(channel.column))
 				{
 					names[i] = channel.name;
 					if (!channel.units.IsEmpty())

@@ -1304,7 +1304,7 @@ const Dataset2D Dataset2D::ApplyPower(const double &target) const
 double Dataset2D::ComputeYMean() const
 {
 	return std::accumulate(mYData.cbegin(), mYData.cend(), 0.0)
-		/ (double)mYData.size();
+		/ mYData.size();
 }
 
 //=============================================================================
@@ -1330,7 +1330,7 @@ double Dataset2D::GetAverageDeltaX() const
 	for (i = 1; i < mXData.size(); ++i)
 		sum += mXData[i] - mXData[i - 1];
 
-	return sum / (static_cast<double>(mXData.size()) - 1.0);
+	return sum / (mXData.size() - 1.0);
 }
 
 //=============================================================================

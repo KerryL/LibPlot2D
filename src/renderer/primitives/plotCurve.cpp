@@ -491,17 +491,18 @@ bool PlotCurve::RangeIsSmall() const
 //=============================================================================
 PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
-	double period(fabs(mData.GetX()[1] - mData.GetX()[0]));
+	const double period(fabs(mData.GetX()[1] - mData.GetX()[0]));
 	if (period == 0.0)
 		return RangeSize::Undetermined;
 
-	unsigned int points = (unsigned int)floor((mXAxis->GetMaximum() - mXAxis->GetMinimum()) / period);
+	const unsigned int points(static_cast<unsigned int>(
+		floor((mXAxis->GetMaximum() - mXAxis->GetMinimum()) / period)));
 	if (points == 0)
 		return RangeSize::Small;
 
-	unsigned int spacing = (mRenderWindow.GetSize().GetWidth()
+	const unsigned int spacing((mRenderWindow.GetSize().GetWidth()
 		- mXAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
-		- mXAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
+		- mXAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points);
 
 	if (spacing > 7)
 		return RangeSize::Small;
@@ -530,17 +531,18 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 //=============================================================================
 PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
-	double period(mData.GetY()[1] - mData.GetY()[0]);
+	const double period(mData.GetY()[1] - mData.GetY()[0]);
 	if (period == 0.0)
 		return RangeSize::Undetermined;
 
-	unsigned int points = (unsigned int)floor((mYAxis->GetMaximum() - mYAxis->GetMinimum()) / period);
+	const unsigned int points(static_cast<unsigned int>(floor(
+		(mYAxis->GetMaximum() - mYAxis->GetMinimum()) / period)));
 	if (points == 0)
 		return RangeSize::Small;
 
-	unsigned int spacing = (mRenderWindow.GetSize().GetHeight()
+	const unsigned int spacing((mRenderWindow.GetSize().GetHeight()
 		- mYAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
-		- mYAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
+		- mYAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points);
 
 	if (spacing > 7)
 		return RangeSize::Small;

@@ -809,7 +809,7 @@ void PlotObject::SetOriginalAxisLimits()
 	mRightUsed = false;
 	unsigned int i;
 	Axis *yAxis;
-	for (i = 0; i < (unsigned int)mDataList.size(); ++i)
+	for (i = 0; i < static_cast<unsigned int>(mDataList.size()); ++i)
 	{
 		if (!mPlotList[i]->GetIsVisible())
 			continue;

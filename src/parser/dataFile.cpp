@@ -164,9 +164,9 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
 {
 	unsigned int adjustment(0);
-	for (const auto& col : mNonNumericColumns)
+	for (const unsigned int& col : mNonNumericColumns)
 	{
-		if (col - 1 <= (int)i)
+		if (col - 1 <= i)
 			++adjustment;
 		else
 			break;
@@ -827,7 +827,8 @@ double DataFile::GetTimeValue(const wxString &timeString,
 
 		// TODO:  Handle rollovers (i.e. going from 23:59:59 to 00:00:00)
 		time += value;
-		if ((int)formatCount == wxNOT_FOUND || (int)timeCount == wxNOT_FOUND)
+		if (static_cast<int>(formatCount) == wxNOT_FOUND ||
+			static_cast<int>(timeCount) == wxNOT_FOUND)
 			break;
 
 		formatStart += formatCount + 1;

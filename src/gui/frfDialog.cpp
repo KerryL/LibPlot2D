@@ -277,7 +277,7 @@ unsigned int FRFDialog::GetNumberOfAverages() const
 {
 	unsigned long value;
 	mAveragesTextBox->GetValue().ToULong(&value);
-	return std::max<unsigned int>((unsigned int)value, 1);
+	return std::max(value, 1UL);
 }
 
 //=============================================================================
