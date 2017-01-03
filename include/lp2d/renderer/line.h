@@ -97,9 +97,9 @@ private:
 	double mXScale = 1.0;
 	double mYScale = 1.0;
 
-	GLenum mHint;
-
 	const RenderWindow& mRenderWindow;
+
+	GLenum mHint;
 
 	void ComputeOffsets(const double &x1, const double &y1, const double &x2,
 		const double &y2, double& dxLine, double& dyLine, double& dxEdge,
