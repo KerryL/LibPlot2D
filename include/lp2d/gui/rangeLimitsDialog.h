@@ -36,7 +36,7 @@ private:
 	wxTextCtrl *mMaxBox;
 
 	// Overload from wxDialog
-	virtual void OnOKButton(wxCommandEvent &event);
+	void OnOKButton(wxCommandEvent &event);
 
 	// For the event table
 	DECLARE_EVENT_TABLE();

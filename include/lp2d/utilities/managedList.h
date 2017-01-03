@@ -35,15 +35,13 @@ template <class T>
 class ManagedList
 {
 public:
-	virtual ~ManagedList() = default;
-
 	// Private data accessors
 	unsigned int Add(std::unique_ptr<T> toAdd);
-	virtual void Remove(const unsigned int &index);
+	void Remove(const unsigned int &index);
 	inline unsigned int GetCount() const { return mList.size(); }
 
 	// Removes all objects from the list
-	virtual void Clear();
+	void Clear();
 
 	// Re-organizes the data in the list
 	void ReorderObjects(const std::vector<unsigned int> &order);

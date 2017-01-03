@@ -94,7 +94,7 @@ private:
 	FilterParameters mParameters;
 
 	// Overload from wxDialog
-	virtual bool TransferDataFromWindow();
+	bool TransferDataFromWindow() override;
 
 	// Event handlers
 	void OnSpinChange(wxSpinEvent &event);

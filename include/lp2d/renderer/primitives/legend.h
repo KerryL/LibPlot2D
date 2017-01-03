@@ -36,7 +36,7 @@ public:
 	explicit Legend(RenderWindow &renderWindow);
 
 	// Destructor
-	virtual ~Legend() = default;
+	~Legend() = default;
 
 	// Set option methods
 	void SetFont(const std::string& fontFileName, const double& size);
@@ -109,9 +109,9 @@ public:
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
-	virtual bool HasValidParameters();
-	virtual void Update(const unsigned int& i);
-	virtual void GenerateGeometry();
+	bool HasValidParameters() override;
+	void Update(const unsigned int& i) override;
+	void GenerateGeometry() override;
 
 private:
 	static const unsigned int mEntrySpacing;// [pixels]

@@ -46,9 +46,9 @@ public:
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
-	virtual bool HasValidParameters();
-	virtual void Update(const unsigned int& i);
-	virtual void GenerateGeometry();
+	bool HasValidParameters() override;
+	void Update(const unsigned int& i) override;
+	void GenerateGeometry() override;
 
 private:
 	double mAngle = 0.0;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen

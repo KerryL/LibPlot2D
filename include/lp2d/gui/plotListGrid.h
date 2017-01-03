@@ -64,7 +64,8 @@ public:
 protected:
 	GuiInterface& mGuiInterface;
 
-	virtual void CreateGridContextMenu(const wxPoint& position, const unsigned int& row);
+	void CreateGridContextMenu(const wxPoint& position,
+		const unsigned int& row);
 
 	// The event IDs
 	enum EventIDs
@@ -89,28 +90,28 @@ protected:
 	};
 
 	// Grid events
-	virtual void GridRightClickEvent(wxGridEvent &event);
-	virtual void GridDoubleClickEvent(wxGridEvent &event);
-	virtual void GridLeftClickEvent(wxGridEvent &event);
-	virtual void GridCellChangeEvent(wxGridEvent &event);
-	virtual void GridLabelRightClickEvent(wxGridEvent &event);
+	void GridRightClickEvent(wxGridEvent &event);
+	void GridDoubleClickEvent(wxGridEvent &event);
+	void GridLeftClickEvent(wxGridEvent &event);
+	void GridCellChangeEvent(wxGridEvent &event);
+	void GridLabelRightClickEvent(wxGridEvent &event);
 
 	// Context menu events
-	virtual void ContextAddMathChannelEvent(wxCommandEvent &event);
-	virtual void ContextFRFEvent(wxCommandEvent &event);
-	virtual void ContextCreateSignalEvent(wxCommandEvent &event);
-	virtual void ContextSetTimeUnitsEvent(wxCommandEvent &event);
-	virtual void ContextScaleXDataEvent(wxCommandEvent &event);
-	virtual void ContextPlotDerivativeEvent(wxCommandEvent &event);
-	virtual void ContextPlotIntegralEvent(wxCommandEvent &event);
-	virtual void ContextPlotRMSEvent(wxCommandEvent &event);
-	virtual void ContextPlotFFTEvent(wxCommandEvent &event);
-	virtual void ContextRemoveCurveEvent(wxCommandEvent &event);
-	virtual void ContextTimeShiftEvent(wxCommandEvent &event);
-	virtual void ContextBitMaskEvent(wxCommandEvent &event);
+	void ContextAddMathChannelEvent(wxCommandEvent &event);
+	void ContextFRFEvent(wxCommandEvent &event);
+	void ContextCreateSignalEvent(wxCommandEvent &event);
+	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
+	void ContextScaleXDataEvent(wxCommandEvent &event);
+	void ContextPlotDerivativeEvent(wxCommandEvent &event);
+	void ContextPlotIntegralEvent(wxCommandEvent &event);
+	void ContextPlotRMSEvent(wxCommandEvent &event);
+	void ContextPlotFFTEvent(wxCommandEvent &event);
+	void ContextRemoveCurveEvent(wxCommandEvent &event);
+	void ContextTimeShiftEvent(wxCommandEvent &event);
+	void ContextBitMaskEvent(wxCommandEvent &event);
 
-	virtual void ContextFilterEvent(wxCommandEvent &event);
-	virtual void ContextFitCurve(wxCommandEvent &event);
+	void ContextFilterEvent(wxCommandEvent &event);
+	void ContextFitCurve(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 

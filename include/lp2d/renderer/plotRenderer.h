@@ -168,7 +168,7 @@ public:
 
 	wxImage GetImage() const;
 
-	virtual unsigned int GetVertexDimension() const { return 2; }
+	unsigned int GetVertexDimension() const override { return 2; }
 
 	enum class Modelview
 	{
@@ -268,7 +268,7 @@ protected:
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
 
-	virtual std::string GetDefaultVertexShader() const { return mDefaultVertexShader; }
+	std::string GetDefaultVertexShader() const override { return mDefaultVertexShader; }
 
 	struct Zoom
 	{

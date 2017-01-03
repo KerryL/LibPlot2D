@@ -34,7 +34,7 @@ public:
 
 	~MultiChoiceDialog() = default;
 
-	virtual wxArrayInt GetSelections() const { return mSelections; }
+	wxArrayInt GetSelections() const { return mSelections; }
 
 	bool RemoveExistingCurves() const;
 

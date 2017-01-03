@@ -99,7 +99,7 @@ private:
 
 	static wxString GetSignalName(const SignalType &type);
 
-	virtual bool TransferDataFromWindow();
+	bool TransferDataFromWindow() override;
 
 	void OnSignalTypeChangeEvent(wxCommandEvent &event);
 	void OnAmplitudeChangeEvent(wxCommandEvent &event);

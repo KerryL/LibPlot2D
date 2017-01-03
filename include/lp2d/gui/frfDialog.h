@@ -51,7 +51,7 @@ private:
 
 	wxTextCtrl *mAveragesTextBox;
 
-	virtual bool TransferDataFromWindow();
+	bool TransferDataFromWindow() override;
 };
 
 }// namespace LibPlot2D

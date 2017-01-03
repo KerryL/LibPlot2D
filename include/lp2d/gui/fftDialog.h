@@ -61,7 +61,7 @@ private:
 	wxStaticText *mFrequencyResolution;
 	wxStaticText *mNumberOfAverages;
 
-	virtual bool TransferDataFromWindow();
+	bool TransferDataFromWindow() override;
 
 	void OnCheckBoxEvent(wxCommandEvent &event);
 	void OnComboBoxEvent(wxCommandEvent &event);

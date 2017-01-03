@@ -32,7 +32,7 @@ public:
 	explicit DropTarget(GuiInterface &guiInterface);
 	~DropTarget() = default;
 
-	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);
+	wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def) override;
 
 private:
 	GuiInterface &mGuiInterface;
