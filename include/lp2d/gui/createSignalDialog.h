@@ -32,12 +32,12 @@ class Dataset2D;
 class CreateSignalDialog : public wxDialog
 {
 public:
-	CreateSignalDialog(wxWindow *parent, const double &startTime, const double &duration,
-		const double &sampleRate);
+	CreateSignalDialog(wxWindow *parent, const double &startTime,
+		const double &duration, const double &sampleRate);
 
 	~CreateSignalDialog() = default;
 
-	std::unique_ptr<Dataset2D>& GetSignal() { return dataset; }
+	std::unique_ptr<Dataset2D>& GetSignal() { return mDataset; }
 
 	wxString GetSignalName() const;
 
@@ -45,27 +45,27 @@ private:
 	void CreateControls(const double &startTime, const double &duration,
 		const double &sampleRate);
 
-	wxTextCtrl *signalNameTextBox;
-	wxTextCtrl *startTimeTextBox;
-	wxTextCtrl *durationTextBox;
-	wxTextCtrl *sampleRateTextBox;
+	wxTextCtrl *mSignalNameTextBox;
+	wxTextCtrl *mStartTimeTextBox;
+	wxTextCtrl *mDurationTextBox;
+	wxTextCtrl *mSampleRateTextBox;
 
-	wxComboBox *signalTypeComboBox;
+	wxComboBox *mSignalTypeComboBox;
 
-	wxTextCtrl *initialValueTextBox;// or Amplitude
-	wxTextCtrl *finalValueTextBox;// or Offset
-	wxTextCtrl *slopeTextBox;// or Frequency Rate
-	wxTextCtrl *frequencyTextBox;// or Event Time
-	wxTextCtrl *periodTextBox;
-	wxTextCtrl *phaseAngleTextBox;
-	wxTextCtrl *phaseTimeTextBox;
+	wxTextCtrl *mInitialValueTextBox;// or Amplitude
+	wxTextCtrl *mFinalValueTextBox;// or Offset
+	wxTextCtrl *mSlopeTextBox;// or Frequency Rate
+	wxTextCtrl *mFrequencyTextBox;// or Event Time
+	wxTextCtrl *mPeriodTextBox;
+	wxTextCtrl *mPhaseAngleTextBox;
+	wxTextCtrl *mPhaseTimeTextBox;
 
-	wxStaticText *initialValueLabel;
-	wxStaticText *finalValueLabel;
-	wxStaticText *slopeLabel;
-	wxStaticText *slopeUnits;
-	wxStaticText *frequencyLabel;
-	wxStaticText *frequencyUnits;
+	wxStaticText *mInitialValueLabel;
+	wxStaticText *mFinalValueLabel;
+	wxStaticText *mSlopeLabel;
+	wxStaticText *mSlopeUnits;
+	wxStaticText *mFrequencyLabel;
+	wxStaticText *mFrequencyUnits;
 
 	enum EventIDs
 	{
@@ -78,7 +78,7 @@ private:
 		idPhaseTime
 	};
 
-	std::unique_ptr<Dataset2D> dataset;
+	std::unique_ptr<Dataset2D> mDataset;
 	void CreateSignal(const double &startTime, const double &duration,
 		const double &sampleRate);
 	double GetValue(const double &time);
@@ -111,15 +111,16 @@ private:
 
 	void SetTextBoxLabelsAndEnables();
 	void SetDefaultInputs();
-	SignalType lastSelection;
 
 	void UpdatePhaseAngle();
 	void UpdatePhaseTime();
-	bool keepPhaseAngle;
 
 	void UpdateAmplitude();
 	void UpdateSlope();
-	bool keepAmplitude;
+
+	SignalType mLastSelection;
+	bool mKeepPhaseAngle;
+	bool mKeepAmplitude;
 
 	DECLARE_EVENT_TABLE();
 };

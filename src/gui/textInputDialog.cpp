@@ -41,7 +41,8 @@ namespace LibPlot2D
 //
 //=============================================================================
 TextInputDialog::TextInputDialog(const wxString &message, const wxString &title,
-	const wxString &defaultText, wxWindow *parent) : wxDialog(parent, wxID_ANY, title)
+	const wxString &defaultText, wxWindow *parent) : wxDialog(parent, wxID_ANY,
+	title)
 {
 	CreateControls(message, defaultText);
 }
@@ -63,15 +64,16 @@ TextInputDialog::TextInputDialog(const wxString &message, const wxString &title,
 //		None
 //
 //=============================================================================
-void TextInputDialog::CreateControls(const wxString &message, const wxString &defaultText)
+void TextInputDialog::CreateControls(const wxString &message,
+	const wxString &defaultText)
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 8);
 
 	mainSizer->Add(new wxStaticText(this, wxID_ANY, message), 0, wxALL, 5);
-	text = new wxTextCtrl(this, wxID_ANY, defaultText);
-	mainSizer->Add(text, 1, wxGROW | wxALL, 5);
+	mText = new wxTextCtrl(this, wxID_ANY, defaultText);
+	mainSizer->Add(mText, 1, wxGROW | wxALL, 5);
 	mainSizer->AddSpacer(10);
 
 	wxSizer *buttons = CreateButtonSizer(wxOK | wxCANCEL);
@@ -81,7 +83,7 @@ void TextInputDialog::CreateControls(const wxString &message, const wxString &de
 	SetSizerAndFit(topSizer);
 	Center();
 
-	text->SetFocus();
+	mText->SetFocus();
 }
 
 }// namespace LibPlot2D

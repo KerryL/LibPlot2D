@@ -42,14 +42,14 @@ private:
 	wxSizer *CreateTextBox();
 	wxSizer *CreateCheckBoxes();
 
-	wxListBox *inputList;
-	wxListBox *outputList;
+	wxListBox *mInputList;
+	wxListBox *mOutputList;
 
-	wxCheckBox *phaseCheckBox;
-	wxCheckBox *coherenceCheckBox;
-	wxCheckBox *moduloPhaseCheckBox;
+	wxCheckBox *mPhaseCheckBox;
+	wxCheckBox *mCoherenceCheckBox;
+	wxCheckBox *mModuloPhaseCheckBox;
 
-	wxTextCtrl *averagesTextBox;
+	wxTextCtrl *mAveragesTextBox;
 
 	virtual bool TransferDataFromWindow();
 };

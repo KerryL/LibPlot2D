@@ -45,10 +45,10 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-const unsigned int PlotObject::horizontalOffsetWithLabel(75);
-const unsigned int PlotObject::horizontalOffsetWithoutLabel(50);
-const unsigned int PlotObject::verticalOffsetWithLabel(100);
-const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
+const unsigned int PlotObject::mHorizontalOffsetWithLabel(75);
+const unsigned int PlotObject::mHorizontalOffsetWithoutLabel(50);
+const unsigned int PlotObject::mVerticalOffsetWithLabel(100);
+const unsigned int PlotObject::mVerticalOffsetWithoutLabel(75);
 
 //=============================================================================
 // Class:			PlotObject
@@ -69,14 +69,12 @@ const unsigned int PlotObject::verticalOffsetWithoutLabel(75);
 //
 //=============================================================================
 PlotObject::PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface)
-	: renderer(renderer), guiInterface(guiInterface)
+	: mRenderer(renderer), mGuiInterface(guiInterface)
 {
 	CreateAxisObjects();
 	InitializeFonts();
 
 	ResetAutoScaling();
-
-	needScissorUpdate = true;
 }
 
 //=============================================================================
@@ -97,28 +95,28 @@ PlotObject::PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface)
 //=============================================================================
 void PlotObject::CreateAxisObjects()
 {
-	axisTop = new Axis(renderer);
-	axisBottom = new Axis(renderer);
-	axisLeft = new Axis(renderer);
-	axisRight = new Axis(renderer);
-	titleObject = new TextRendering(renderer);
+	mAxisTop = new Axis(mRenderer);
+	mAxisBottom = new Axis(mRenderer);
+	mAxisLeft = new Axis(mRenderer);
+	mAxisRight = new Axis(mRenderer);
+	mTitleObject = new TextRendering(mRenderer);
 
 	// Tell each axis how they relate to other axes
-	axisTop->SetAxisAtMaxEnd(axisRight);
-	axisTop->SetAxisAtMinEnd(axisLeft);
-	axisTop->SetOppositeAxis(axisBottom);
+	mAxisTop->SetAxisAtMaxEnd(mAxisRight);
+	mAxisTop->SetAxisAtMinEnd(mAxisLeft);
+	mAxisTop->SetOppositeAxis(mAxisBottom);
 
-	axisBottom->SetAxisAtMaxEnd(axisRight);
-	axisBottom->SetAxisAtMinEnd(axisLeft);
-	axisBottom->SetOppositeAxis(axisTop);
+	mAxisBottom->SetAxisAtMaxEnd(mAxisRight);
+	mAxisBottom->SetAxisAtMinEnd(mAxisLeft);
+	mAxisBottom->SetOppositeAxis(mAxisTop);
 
-	axisLeft->SetAxisAtMaxEnd(axisTop);
-	axisLeft->SetAxisAtMinEnd(axisBottom);
-	axisLeft->SetOppositeAxis(axisRight);
+	mAxisLeft->SetAxisAtMaxEnd(mAxisTop);
+	mAxisLeft->SetAxisAtMinEnd(mAxisBottom);
+	mAxisLeft->SetOppositeAxis(mAxisRight);
 
-	axisRight->SetAxisAtMaxEnd(axisTop);
-	axisRight->SetAxisAtMinEnd(axisBottom);
-	axisRight->SetOppositeAxis(axisLeft);
+	mAxisRight->SetAxisAtMaxEnd(mAxisTop);
+	mAxisRight->SetAxisAtMinEnd(mAxisBottom);
+	mAxisRight->SetOppositeAxis(mAxisLeft);
 
 	FormatAxesBasics();
 }
@@ -167,13 +165,13 @@ void PlotObject::InitializeFonts()
 		return;
 	}
 
-	fontFileName = fontFile.ToStdString();
-	axisBottom->InitializeFonts(fontFileName, 12);
-	//axisTop->InitializeFonts(fontFileName, 12);// No tick labels for top axis
-	axisLeft->InitializeFonts(fontFileName, 12);
-	axisRight->InitializeFonts(fontFileName, 12);
+	mFontFileName = fontFile.ToStdString();
+	mAxisBottom->InitializeFonts(mFontFileName, 12);
+	//mAxisTop->InitializeFonts(mFontFileName, 12);// No tick labels for top axis
+	mAxisLeft->InitializeFonts(mFontFileName, 12);
+	mAxisRight->InitializeFonts(mFontFileName, 12);
 
-	titleObject->InitializeFonts(fontFileName, 18);
+	mTitleObject->InitializeFonts(mFontFileName, 18);
 }
 
 //=============================================================================
@@ -198,10 +196,10 @@ void PlotObject::Update()
 	FormatPlot();
 	ComputeTransformationMatrices();
 
-	renderer.UpdateCursors();
-	guiInterface.UpdateCursorValues(
-		renderer.GetLeftCursorVisible(), renderer.GetRightCursorVisible(),
-		renderer.GetLeftCursorValue(), renderer.GetRightCursorValue());
+	mRenderer.UpdateCursors();
+	mGuiInterface.UpdateCursorValues(
+		mRenderer.GetLeftCursorVisible(), mRenderer.GetRightCursorVisible(),
+		mRenderer.GetLeftCursorValue(), mRenderer.GetRightCursorValue());
 }
 
 //=============================================================================
@@ -222,7 +220,7 @@ void PlotObject::Update()
 //=============================================================================
 void PlotObject::SetXMajorGrid(const bool &gridOn)
 {
-	axisBottom->SetMajorGrid(gridOn);
+	mAxisBottom->SetMajorGrid(gridOn);
 }
 
 //=============================================================================
@@ -243,7 +241,7 @@ void PlotObject::SetXMajorGrid(const bool &gridOn)
 //=============================================================================
 void PlotObject::SetXMinorGrid(const bool &gridOn)
 {
-	axisBottom->SetMinorGrid(gridOn);
+	mAxisBottom->SetMinorGrid(gridOn);
 }
 
 //=============================================================================
@@ -264,7 +262,7 @@ void PlotObject::SetXMinorGrid(const bool &gridOn)
 //=============================================================================
 void PlotObject::SetLeftYMajorGrid(const bool &gridOn)
 {
-	axisLeft->SetMajorGrid(gridOn);
+	mAxisLeft->SetMajorGrid(gridOn);
 }
 
 //=============================================================================
@@ -285,7 +283,7 @@ void PlotObject::SetLeftYMajorGrid(const bool &gridOn)
 //=============================================================================
 void PlotObject::SetLeftYMinorGrid(const bool &gridOn)
 {
-	axisLeft->SetMinorGrid(gridOn);
+	mAxisLeft->SetMinorGrid(gridOn);
 }
 
 //=============================================================================
@@ -306,7 +304,7 @@ void PlotObject::SetLeftYMinorGrid(const bool &gridOn)
 //=============================================================================
 void PlotObject::SetRightYMajorGrid(const bool &gridOn)
 {
-	axisRight->SetMajorGrid(gridOn);
+	mAxisRight->SetMajorGrid(gridOn);
 }
 
 //=============================================================================
@@ -327,7 +325,7 @@ void PlotObject::SetRightYMajorGrid(const bool &gridOn)
 //=============================================================================
 void PlotObject::SetRightYMinorGrid(const bool &gridOn)
 {
-	axisRight->SetMinorGrid(gridOn);
+	mAxisRight->SetMinorGrid(gridOn);
 }
 
 //=============================================================================
@@ -348,7 +346,7 @@ void PlotObject::SetRightYMinorGrid(const bool &gridOn)
 //=============================================================================
 void PlotObject::SetXMajorResolution(const double &resolution)
 {
-	xMajorResolution = resolution;
+	mXMajorResolution = resolution;
 }
 
 //=============================================================================
@@ -369,7 +367,7 @@ void PlotObject::SetXMajorResolution(const double &resolution)
 //=============================================================================
 void PlotObject::SetLeftYMajorResolution(const double &resolution)
 {
-	yLeftMajorResolution = resolution;
+	mYLeftMajorResolution = resolution;
 }
 
 //=============================================================================
@@ -390,7 +388,7 @@ void PlotObject::SetLeftYMajorResolution(const double &resolution)
 //=============================================================================
 void PlotObject::SetRightYMajorResolution(const double &resolution)
 {
-	yRightMajorResolution = resolution;
+	mYRightMajorResolution = resolution;
 }
 
 //=============================================================================
@@ -411,7 +409,7 @@ void PlotObject::SetRightYMajorResolution(const double &resolution)
 //=============================================================================
 void PlotObject::RemoveExistingPlots()
 {
-	while (plotList.size() > 0)
+	while (mPlotList.size() > 0)
 		RemovePlot(0);
 }
 
@@ -433,10 +431,10 @@ void PlotObject::RemoveExistingPlots()
 //=============================================================================
 void PlotObject::RemovePlot(const unsigned int &index)
 {
-	renderer.RemoveActor(plotList[index]);
+	mRenderer.RemoveActor(mPlotList[index]);
 
-	plotList.erase(plotList.begin() + index);
-	dataList.erase(dataList.begin() + index);
+	mPlotList.erase(mPlotList.begin() + index);
+	mDataList.erase(mDataList.begin() + index);
 }
 
 //=============================================================================
@@ -457,12 +455,12 @@ void PlotObject::RemovePlot(const unsigned int &index)
 //=============================================================================
 void PlotObject::AddCurve(const Dataset2D &data)
 {
-	PlotCurve *newPlot = new PlotCurve(renderer, data);
-	plotList.push_back(newPlot);
-	dataList.push_back(&data);
+	PlotCurve *newPlot = new PlotCurve(mRenderer, data);
+	mPlotList.push_back(newPlot);
+	mDataList.push_back(&data);
 
-	newPlot->BindToXAxis(axisBottom);
-	newPlot->BindToYAxis(axisLeft);
+	newPlot->BindToXAxis(mAxisBottom);
+	newPlot->BindToYAxis(mAxisLeft);
 }
 
 //=============================================================================
@@ -485,7 +483,7 @@ void PlotObject::FormatPlot()
 {
 	UpdateAxesOffsets();
 	FormatTitle();
-	if (dataList.size() == 0)
+	if (mDataList.size() == 0)
 		return;
 
 	SetOriginalAxisLimits();
@@ -494,41 +492,41 @@ void PlotObject::FormatPlot()
 	MatchYAxes();
 	FormatCurves();
 
-	bool forceLeftYLimits(!autoScaleLeftY), forceRightYLimits(!autoScaleRightY);
-	if (leftUsed && !rightUsed)
+	bool forceLeftYLimits(!mAutoScaleLeftY), forceRightYLimits(!mAutoScaleRightY);
+	if (mLeftUsed && !mRightUsed)
 		forceRightYLimits = forceLeftYLimits;
-	else if (rightUsed && !leftUsed)
+	else if (mRightUsed && !mLeftUsed)
 		forceLeftYLimits = forceRightYLimits;
 
-	double xMajor(xMajorResolution);
-	double yLeftMajor(yLeftMajorResolution);
-	double yRightMajor(yRightMajorResolution);
+	double xMajor(mXMajorResolution);
+	double yLeftMajor(mYLeftMajorResolution);
+	double yRightMajor(mYRightMajorResolution);
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
-	AutoScaleAxis(xMin, xMax, xMajor, PlotRenderer::maxXTicks, axisBottom->IsLogarithmic(), !autoScaleX);
-	AutoScaleAxis(yLeftMin, yLeftMax, yLeftMajor, PlotRenderer::maxYTicks, axisLeft->IsLogarithmic(), forceLeftYLimits);
-	AutoScaleAxis(yRightMin, yRightMax, yRightMajor, PlotRenderer::maxYTicks, axisRight->IsLogarithmic(), forceRightYLimits);
+	AutoScaleAxis(mXMin, mXMax, xMajor, PlotRenderer::maxXTicks, mAxisBottom->IsLogarithmic(), !mAutoScaleX);
+	AutoScaleAxis(mYLeftMin, mYLeftMax, yLeftMajor, PlotRenderer::maxYTicks, mAxisLeft->IsLogarithmic(), forceLeftYLimits);
+	AutoScaleAxis(mYRightMin, mYRightMax, yRightMajor, PlotRenderer::maxYTicks, mAxisRight->IsLogarithmic(), forceRightYLimits);
 
-	double xMinor = ComputeMinorResolution(xMin, xMax, xMajor, axisBottom->GetAxisLength());
-	double yLeftMinor = ComputeMinorResolution(yLeftMin, yLeftMax, yLeftMajor, axisLeft->GetAxisLength());
-	double yRightMinor = ComputeMinorResolution(yRightMin, yRightMax, yRightMajor, axisRight->GetAxisLength());
+	double xMinor = ComputeMinorResolution(mXMin, mXMax, xMajor, mAxisBottom->GetAxisLength());
+	double yLeftMinor = ComputeMinorResolution(mYLeftMin, mYLeftMax, yLeftMajor, mAxisLeft->GetAxisLength());
+	double yRightMinor = ComputeMinorResolution(mYRightMin, mYRightMax, yRightMajor, mAxisRight->GetAxisLength());
 
-	ValidateRangeLimits(xMin, xMax, autoScaleX, xMajor, xMinor);
-	ValidateRangeLimits(yLeftMin, yLeftMax, !forceLeftYLimits, yLeftMajor, yLeftMinor);
-	ValidateRangeLimits(yRightMin, yRightMax, !forceRightYLimits, yRightMajor, yRightMinor);
+	ValidateRangeLimits(mXMin, mXMax, mAutoScaleX, xMajor, xMinor);
+	ValidateRangeLimits(mYLeftMin, mYLeftMax, !forceLeftYLimits, yLeftMajor, yLeftMinor);
+	ValidateRangeLimits(mYRightMin, mYRightMax, !forceRightYLimits, yRightMajor, yRightMinor);
 
-	ValidateLogarithmicLimits(*axisBottom, xMin);
-	ValidateLogarithmicLimits(*axisLeft, yLeftMin);
-	ValidateLogarithmicLimits(*axisRight, yRightMin);
+	ValidateLogarithmicLimits(*mAxisBottom, mXMin);
+	ValidateLogarithmicLimits(*mAxisLeft, mYLeftMin);
+	ValidateLogarithmicLimits(*mAxisRight, mYRightMin);
 
 	ResetOriginalLimits();
 	ApplyRangeLimits(xMinor, xMajor, yLeftMinor, yLeftMajor, yRightMinor, yRightMajor);
 	UpdateLimitValues();
 
-	if (needScissorUpdate)
+	if (mNeedScissorUpdate)
 	{
 		UpdateScissorArea();
-		needScissorUpdate = false;
+		mNeedScissorUpdate = false;
 	}
 }
 
@@ -580,9 +578,9 @@ void PlotObject::FormatAxesBasics()
 unsigned int PlotObject::GetHorizontalAxisOffset(const bool &withLabel) const
 {
 	if (withLabel)
-		return horizontalOffsetWithLabel;
+		return mHorizontalOffsetWithLabel;
 
-	return horizontalOffsetWithoutLabel;
+	return mHorizontalOffsetWithoutLabel;
 }
 
 //=============================================================================
@@ -605,9 +603,9 @@ unsigned int PlotObject::GetHorizontalAxisOffset(const bool &withLabel) const
 unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
 {
 	if (withLabel)
-		return verticalOffsetWithLabel;
+		return mVerticalOffsetWithLabel;
 
-	return verticalOffsetWithoutLabel;
+	return mVerticalOffsetWithoutLabel;
 }
 
 //=============================================================================
@@ -628,28 +626,29 @@ unsigned int PlotObject::GetVerticalAxisOffset(const bool &withLabel) const
 //=============================================================================
 void PlotObject::UpdateAxesOffsets()
 {
-	if (axisBottom->GetLabel().IsEmpty())
-		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
+	if (mAxisBottom->GetLabel().IsEmpty())
+		mAxisBottom->SetOffsetFromWindowEdge(mHorizontalOffsetWithoutLabel);
 	else
-		axisBottom->SetOffsetFromWindowEdge(horizontalOffsetWithLabel);
+		mAxisBottom->SetOffsetFromWindowEdge(mHorizontalOffsetWithLabel);
 
-	if (axisTop->GetLabel().IsEmpty())
-		axisTop->SetOffsetFromWindowEdge(horizontalOffsetWithoutLabel);
+	if (mAxisTop->GetLabel().IsEmpty())
+		mAxisTop->SetOffsetFromWindowEdge(mHorizontalOffsetWithoutLabel);
 	else
-		axisTop->SetOffsetFromWindowEdge(horizontalOffsetWithLabel);
+		mAxisTop->SetOffsetFromWindowEdge(mHorizontalOffsetWithLabel);
 
-	if (!titleObject->GetText().IsEmpty())
-		axisTop->SetOffsetFromWindowEdge(axisTop->GetOffsetFromWindowEdge() + titleObject->GetTextHeight());
+	if (!mTitleObject->GetText().IsEmpty())
+		mAxisTop->SetOffsetFromWindowEdge(mAxisTop->GetOffsetFromWindowEdge()
+			+ mTitleObject->GetTextHeight());
 
-	if (axisLeft->GetLabel().IsEmpty())
-		axisLeft->SetOffsetFromWindowEdge(verticalOffsetWithoutLabel);
+	if (mAxisLeft->GetLabel().IsEmpty())
+		mAxisLeft->SetOffsetFromWindowEdge(mVerticalOffsetWithoutLabel);
 	else
-		axisLeft->SetOffsetFromWindowEdge(verticalOffsetWithLabel);
+		mAxisLeft->SetOffsetFromWindowEdge(mVerticalOffsetWithLabel);
 
-	if (axisRight->GetLabel().IsEmpty())
-		axisRight->SetOffsetFromWindowEdge(verticalOffsetWithoutLabel);
+	if (mAxisRight->GetLabel().IsEmpty())
+		mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithoutLabel);
 	else
-		axisRight->SetOffsetFromWindowEdge(verticalOffsetWithLabel);
+		mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithLabel);
 }
 
 //=============================================================================
@@ -670,8 +669,8 @@ void PlotObject::UpdateAxesOffsets()
 //=============================================================================
 void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 {
-	axisBottom->SetOrientation(Axis::Orientation::Bottom);
-	axisBottom->SetTickStyle(tickStyle);
+	mAxisBottom->SetOrientation(Axis::Orientation::Bottom);
+	mAxisBottom->SetTickStyle(tickStyle);
 }
 
 //=============================================================================
@@ -692,8 +691,8 @@ void PlotObject::FormatBottomBasics(const Axis::TickStyle &tickStyle)
 //=============================================================================
 void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 {
-	axisTop->SetOrientation(Axis::Orientation::Top);
-	axisTop->SetTickStyle(tickStyle);
+	mAxisTop->SetOrientation(Axis::Orientation::Top);
+	mAxisTop->SetTickStyle(tickStyle);
 }
 
 //=============================================================================
@@ -714,8 +713,8 @@ void PlotObject::FormatTopBasics(const Axis::TickStyle &tickStyle)
 //=============================================================================
 void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 {
-	axisLeft->SetOrientation(Axis::Orientation::Left);
-	axisLeft->SetTickStyle(tickStyle);
+	mAxisLeft->SetOrientation(Axis::Orientation::Left);
+	mAxisLeft->SetTickStyle(tickStyle);
 }
 
 //=============================================================================
@@ -736,8 +735,8 @@ void PlotObject::FormatLeftBasics(const Axis::TickStyle &tickStyle)
 //=============================================================================
 void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 {
-	axisRight->SetOrientation(Axis::Orientation::Right);
-	axisRight->SetTickStyle(tickStyle);
+	mAxisRight->SetOrientation(Axis::Orientation::Right);
+	mAxisRight->SetTickStyle(tickStyle);
 }
 
 //=============================================================================
@@ -758,10 +757,10 @@ void PlotObject::FormatRightBasics(const Axis::TickStyle &tickStyle)
 //=============================================================================
 void PlotObject::SetAxesColor(const Color &color)
 {
-	axisBottom->SetColor(color);
-	axisTop->SetColor(color);
-	axisLeft->SetColor(color);
-	axisRight->SetColor(color);
+	mAxisBottom->SetColor(color);
+	mAxisTop->SetColor(color);
+	mAxisLeft->SetColor(color);
+	mAxisRight->SetColor(color);
 }
 
 //=============================================================================
@@ -782,9 +781,9 @@ void PlotObject::SetAxesColor(const Color &color)
 //=============================================================================
 void PlotObject::FormatTitle()
 {
-	titleObject->SetCentered(true);
-	titleObject->SetPosition(renderer.GetSize().GetWidth() / 2.0,
-		renderer.GetSize().GetHeight() - axisTop->GetOffsetFromWindowEdge() / 2.0);
+	mTitleObject->SetCentered(true);
+	mTitleObject->SetPosition(mRenderer.GetSize().GetWidth() / 2.0,
+		mRenderer.GetSize().GetHeight() - mAxisTop->GetOffsetFromWindowEdge() / 2.0);
 }
 
 //=============================================================================
@@ -806,34 +805,34 @@ void PlotObject::FormatTitle()
 //=============================================================================
 void PlotObject::SetOriginalAxisLimits()
 {
-	leftUsed = false;
-	rightUsed = false;
+	mLeftUsed = false;
+	mRightUsed = false;
 	unsigned int i;
 	Axis *yAxis;
-	for (i = 0; i < (unsigned int)dataList.size(); ++i)
+	for (i = 0; i < (unsigned int)mDataList.size(); ++i)
 	{
-		if (!plotList[i]->GetIsVisible())
+		if (!mPlotList[i]->GetIsVisible())
 			continue;
-		if (!leftUsed && !rightUsed)
+		if (!mLeftUsed && !mRightUsed)
 		{
-			xMinOriginal = GetFirstValidValue(dataList[i]->GetX());
-			xMaxOriginal = xMinOriginal;
+			mXMinOriginal = GetFirstValidValue(mDataList[i]->GetX());
+			mXMaxOriginal = mXMinOriginal;
 		}
 
-		yAxis = plotList[i]->GetYAxis();
-		if (yAxis == axisLeft && !leftUsed)
+		yAxis = mPlotList[i]->GetYAxis();
+		if (yAxis == mAxisLeft && !mLeftUsed)
 		{
-			leftUsed = true;
-			yLeftMinOriginal = GetFirstValidValue(dataList[i]->GetY());
-			yLeftMaxOriginal = yLeftMinOriginal;
+			mLeftUsed = true;
+			mYLeftMinOriginal = GetFirstValidValue(mDataList[i]->GetY());
+			mYLeftMaxOriginal = mYLeftMinOriginal;
 		}
-		else if (yAxis == axisRight && !rightUsed)
+		else if (yAxis == mAxisRight && !mRightUsed)
 		{
-			rightUsed = true;
-			yRightMinOriginal = GetFirstValidValue(dataList[i]->GetY());
-			yRightMaxOriginal = yRightMinOriginal;
+			mRightUsed = true;
+			mYRightMinOriginal = GetFirstValidValue(mDataList[i]->GetY());
+			mYRightMaxOriginal = mYRightMinOriginal;
 		}
-		GetAxisExtremes(*dataList[i], yAxis);
+		GetAxisExtremes(*mDataList[i], yAxis);
 	}
 }
 
@@ -884,23 +883,23 @@ double PlotObject::GetFirstValidValue(const std::vector<double>& data) const
 void PlotObject::MatchYAxes()
 {
 	// If one axis is unused, make it match the other
-	if (leftUsed && !rightUsed)
+	if (mLeftUsed && !mRightUsed)
 	{
-		axisRight->SetLogarithmicScale(axisLeft->IsLogarithmic());
-		yRightMinOriginal = yLeftMinOriginal;
-		yRightMaxOriginal = yLeftMaxOriginal;
-		yRightMin = yLeftMin;
-		yRightMax = yLeftMax;
-		yRightMajorResolution = yLeftMajorResolution;
+		mAxisRight->SetLogarithmicScale(mAxisLeft->IsLogarithmic());
+		mYRightMinOriginal = mYLeftMinOriginal;
+		mYRightMaxOriginal = mYLeftMaxOriginal;
+		mYRightMin = mYLeftMin;
+		mYRightMax = mYLeftMax;
+		mYRightMajorResolution = mYLeftMajorResolution;
 	}
-	else if (!leftUsed && rightUsed)
+	else if (!mLeftUsed && mRightUsed)
 	{
-		axisLeft->SetLogarithmicScale(axisRight->IsLogarithmic());
-		yLeftMinOriginal = yRightMinOriginal;
-		yLeftMaxOriginal = yRightMaxOriginal;
-		yLeftMin = yRightMin;
-		yLeftMax = yRightMax;
-		yLeftMajorResolution = yRightMajorResolution;
+		mAxisLeft->SetLogarithmicScale(mAxisRight->IsLogarithmic());
+		mYLeftMinOriginal = mYRightMinOriginal;
+		mYLeftMaxOriginal = mYRightMaxOriginal;
+		mYLeftMin = mYRightMin;
+		mYLeftMax = mYRightMax;
+		mYLeftMajorResolution = mYRightMajorResolution;
 	}
 }
 
@@ -929,25 +928,25 @@ void PlotObject::GetAxisExtremes(const Dataset2D &data, Axis *yAxis)
 	{
 		if (PlotMath::IsValid<double>(data.GetX()[i]))
 		{
-			if (data.GetX()[i] > xMaxOriginal)
-				xMaxOriginal = data.GetX()[i];
-			else if (data.GetX()[i] < xMinOriginal)
-				xMinOriginal = data.GetX()[i];
+			if (data.GetX()[i] > mXMaxOriginal)
+				mXMaxOriginal = data.GetX()[i];
+			else if (data.GetX()[i] < mXMinOriginal)
+				mXMinOriginal = data.GetX()[i];
 		}
 
-		if (yAxis == axisLeft && PlotMath::IsValid<double>(data.GetY()[i]))
+		if (yAxis == mAxisLeft && PlotMath::IsValid<double>(data.GetY()[i]))
 		{
-			if (data.GetY()[i] > yLeftMaxOriginal)
-				yLeftMaxOriginal = data.GetY()[i];
-			else if (data.GetY()[i] < yLeftMinOriginal)
-				yLeftMinOriginal = data.GetY()[i];
+			if (data.GetY()[i] > mYLeftMaxOriginal)
+				mYLeftMaxOriginal = data.GetY()[i];
+			else if (data.GetY()[i] < mYLeftMinOriginal)
+				mYLeftMinOriginal = data.GetY()[i];
 		}
-		else if (yAxis == axisRight && PlotMath::IsValid<double>(data.GetY()[i]))
+		else if (yAxis == mAxisRight && PlotMath::IsValid<double>(data.GetY()[i]))
 		{
-			if (data.GetY()[i] > yRightMaxOriginal)
-				yRightMaxOriginal = data.GetY()[i];
-			else if (data.GetY()[i] < yRightMinOriginal)
-				yRightMinOriginal = data.GetY()[i];
+			if (data.GetY()[i] > mYRightMaxOriginal)
+				mYRightMaxOriginal = data.GetY()[i];
+			else if (data.GetY()[i] < mYRightMinOriginal)
+				mYRightMinOriginal = data.GetY()[i];
 		}
 	}
 }
@@ -977,26 +976,26 @@ void PlotObject::ApplyRangeLimits(const double &xMinor, const double &xMajor,
 	const double &yLeftMinor, const double &yLeftMajor,
 	const double &yRightMinor, const double &yRightMajor)
 {
-	axisBottom->SetMinimum(xMin);
-	axisBottom->SetMaximum(xMax);
-	axisBottom->SetMinorResolution(xMinor);
-	axisBottom->SetMajorResolution(xMajor);
+	mAxisBottom->SetMinimum(mXMin);
+	mAxisBottom->SetMaximum(mXMax);
+	mAxisBottom->SetMinorResolution(xMinor);
+	mAxisBottom->SetMajorResolution(xMajor);
 
-	axisTop->SetLogarithmicScale(axisBottom->IsLogarithmic());// Make it match the bottom
-	axisTop->SetMinimum(xMin);
-	axisTop->SetMaximum(xMax);
-	axisTop->SetMinorResolution(xMinor);
-	axisTop->SetMajorResolution(xMajor);
+	mAxisTop->SetLogarithmicScale(mAxisBottom->IsLogarithmic());// Make it match the bottom
+	mAxisTop->SetMinimum(mXMin);
+	mAxisTop->SetMaximum(mXMax);
+	mAxisTop->SetMinorResolution(xMinor);
+	mAxisTop->SetMajorResolution(xMajor);
 
-	axisLeft->SetMinimum(yLeftMin);
-	axisLeft->SetMaximum(yLeftMax);
-	axisLeft->SetMinorResolution(yLeftMinor);
-	axisLeft->SetMajorResolution(yLeftMajor);
+	mAxisLeft->SetMinimum(mYLeftMin);
+	mAxisLeft->SetMaximum(mYLeftMax);
+	mAxisLeft->SetMinorResolution(yLeftMinor);
+	mAxisLeft->SetMajorResolution(yLeftMajor);
 
-	axisRight->SetMinimum(yRightMin);
-	axisRight->SetMaximum(yRightMax);
-	axisRight->SetMinorResolution(yRightMinor);
-	axisRight->SetMajorResolution(yRightMajor);
+	mAxisRight->SetMinimum(mYRightMin);
+	mAxisRight->SetMaximum(mYRightMax);
+	mAxisRight->SetMinorResolution(yRightMinor);
+	mAxisRight->SetMajorResolution(yRightMajor);
 }
 
 //=============================================================================
@@ -1051,22 +1050,22 @@ void PlotObject::ValidateRangeLimits(double &min, double &max,
 //=============================================================================
 void PlotObject::ResetOriginalLimits()
 {
-	if (autoScaleX)
+	if (mAutoScaleX)
 	{
-		xMinOriginal = xMin;
-		xMaxOriginal = xMax;
+		mXMinOriginal = mXMin;
+		mXMaxOriginal = mXMax;
 	}
 
-	if (autoScaleLeftY)
+	if (mAutoScaleLeftY)
 	{
-		yLeftMinOriginal = yLeftMin;
-		yLeftMaxOriginal = yLeftMax;
+		mYLeftMinOriginal = mYLeftMin;
+		mYLeftMaxOriginal = mYLeftMax;
 	}
 
-	if (autoScaleRightY)
+	if (mAutoScaleRightY)
 	{
-		yRightMinOriginal = yRightMin;
-		yRightMaxOriginal = yRightMax;
+		mYRightMinOriginal = mYRightMin;
+		mYRightMaxOriginal = mYRightMax;
 	}
 }
 
@@ -1148,14 +1147,14 @@ void PlotObject::HandleZeroRangeAxis(double &min, double &max) const
 //=============================================================================
 void PlotObject::CheckForZeroRange()
 {
-	if (PlotMath::IsZero(xMaxOriginal - xMinOriginal))
-		HandleZeroRangeAxis(xMinOriginal, xMaxOriginal);
+	if (PlotMath::IsZero(mXMaxOriginal - mXMinOriginal))
+		HandleZeroRangeAxis(mXMinOriginal, mXMaxOriginal);
 
-	if (PlotMath::IsZero(yLeftMaxOriginal - yLeftMinOriginal))
-		HandleZeroRangeAxis(yLeftMinOriginal, yLeftMaxOriginal);
+	if (PlotMath::IsZero(mYLeftMaxOriginal - mYLeftMinOriginal))
+		HandleZeroRangeAxis(mYLeftMinOriginal, mYLeftMaxOriginal);
 
-	if (PlotMath::IsZero(yRightMaxOriginal - yRightMinOriginal))
-		HandleZeroRangeAxis(yRightMinOriginal, yRightMaxOriginal);
+	if (PlotMath::IsZero(mYRightMaxOriginal - mYRightMinOriginal))
+		HandleZeroRangeAxis(mYRightMinOriginal, mYRightMaxOriginal);
 }
 
 //=============================================================================
@@ -1177,25 +1176,25 @@ void PlotObject::CheckForZeroRange()
 //=============================================================================
 void PlotObject::CheckAutoScaling()
 {
-	if (autoScaleX)
+	if (mAutoScaleX)
 	{
-		xMin = xMinOriginal;
-		xMax = xMaxOriginal;
-		xMajorResolution = 0.0;
+		mXMin = mXMinOriginal;
+		mXMax = mXMaxOriginal;
+		mXMajorResolution = 0.0;
 	}
 
-	if (autoScaleLeftY)
+	if (mAutoScaleLeftY)
 	{
-		yLeftMin = yLeftMinOriginal;
-		yLeftMax = yLeftMaxOriginal;
-		yLeftMajorResolution = 0.0;
+		mYLeftMin = mYLeftMinOriginal;
+		mYLeftMax = mYLeftMaxOriginal;
+		mYLeftMajorResolution = 0.0;
 	}
 
-	if (autoScaleRightY)
+	if (mAutoScaleRightY)
 	{
-		yRightMin = yRightMinOriginal;
-		yRightMax = yRightMaxOriginal;
-		yRightMajorResolution = 0.0;
+		mYRightMin = mYRightMinOriginal;
+		mYRightMax = mYRightMaxOriginal;
+		mYRightMajorResolution = 0.0;
 	}
 }
 
@@ -1218,17 +1217,17 @@ void PlotObject::CheckAutoScaling()
 //=============================================================================
 void PlotObject::UpdateLimitValues()
 {
-	axisBottom->Draw();
-	xMin = axisBottom->GetMinimum();
-	xMax = axisBottom->GetMaximum();
+	mAxisBottom->Draw();
+	mXMin = mAxisBottom->GetMinimum();
+	mXMax = mAxisBottom->GetMaximum();
 
-	axisLeft->Draw();
-	yLeftMin = axisLeft->GetMinimum();
-	yLeftMax = axisLeft->GetMaximum();
+	mAxisLeft->Draw();
+	mYLeftMin = mAxisLeft->GetMinimum();
+	mYLeftMax = mAxisLeft->GetMaximum();
 
-	axisRight->Draw();
-	yRightMin = axisRight->GetMinimum();
-	yRightMax = axisRight->GetMaximum();
+	mAxisRight->Draw();
+	mYRightMin = mAxisRight->GetMinimum();
+	mYRightMax = mAxisRight->GetMaximum();
 }
 
 //=============================================================================
@@ -1426,7 +1425,7 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 // Description:		Sets the lower X limit.
 //
 // Input Arguments:
-//		xMin	= const double& describing desired minimum X limit
+//		mXMin	= const double& describing desired minimum X limit
 //
 // Output Arguments:
 //		None
@@ -1435,14 +1434,14 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 //		None
 //
 //=============================================================================
-void PlotObject::SetXMin(const double &xMin)
+void PlotObject::SetXMin(const double &mXMin)
 {
 	// If the both limits are at the original value, enable auto-scaling again
-	if (xMax == xMaxOriginal && xMin == xMinOriginal && xMajorResolution == 0.0)
-		autoScaleX = true;
+	if (mXMax == mXMaxOriginal && mXMin == mXMinOriginal && mXMajorResolution == 0.0)
+		mAutoScaleX = true;
 	else
-		autoScaleX = false;
-	this->xMin = xMin;
+		mAutoScaleX = false;
+	this->mXMin = mXMin;
 }
 
 //=============================================================================
@@ -1464,11 +1463,11 @@ void PlotObject::SetXMin(const double &xMin)
 void PlotObject::SetXMax(const double &xMax)
 {
 	// If both limits are at the original value, enable auto-scaling again
-	if (xMin == xMinOriginal && xMax == xMaxOriginal && xMajorResolution == 0.0)
-		autoScaleX = true;
+	if (mXMin == mXMinOriginal && mXMax == mXMaxOriginal && mXMajorResolution == 0.0)
+		mAutoScaleX = true;
 	else
-		autoScaleX = false;
-	this->xMax = xMax;
+		mAutoScaleX = false;
+	mXMax = xMax;
 }
 
 //=============================================================================
@@ -1490,11 +1489,11 @@ void PlotObject::SetXMax(const double &xMax)
 void PlotObject::SetLeftYMin(const double &yMin)
 {
 	// If both limits are at the original value, enable auto-scaling again
-	if (yLeftMax == yLeftMaxOriginal && yMin == yLeftMinOriginal && yLeftMajorResolution == 0.0)
-		autoScaleLeftY = true;
+	if (mYLeftMax == mYLeftMaxOriginal && yMin == mYLeftMinOriginal && mYLeftMajorResolution == 0.0)
+		mAutoScaleLeftY = true;
 	else
-		autoScaleLeftY = false;
-	yLeftMin = yMin;
+		mAutoScaleLeftY = false;
+	mYLeftMin = yMin;
 }
 
 //=============================================================================
@@ -1516,11 +1515,11 @@ void PlotObject::SetLeftYMin(const double &yMin)
 void PlotObject::SetLeftYMax(const double &yMax)
 {
 	// If both limits are at the original value, enable auto-scaling again
-	if (yLeftMin == yLeftMinOriginal && yMax == yLeftMaxOriginal && yLeftMajorResolution == 0.0)
-		autoScaleLeftY = true;
+	if (mYLeftMin == mYLeftMinOriginal && yMax == mYLeftMaxOriginal && mYLeftMajorResolution == 0.0)
+		mAutoScaleLeftY = true;
 	else
-		autoScaleLeftY = false;
-	yLeftMax = yMax;
+		mAutoScaleLeftY = false;
+	mYLeftMax = yMax;
 }
 
 //=============================================================================
@@ -1542,11 +1541,11 @@ void PlotObject::SetLeftYMax(const double &yMax)
 void PlotObject::SetRightYMin(const double &yMin)
 {
 	// If the both limits are at the original value, enable auto-scaling again
-	if (yRightMax == yRightMaxOriginal && yMin == yRightMinOriginal && yRightMajorResolution == 0.0)
-		autoScaleRightY = true;
+	if (mYRightMax == mYRightMaxOriginal && yMin == mYRightMinOriginal && mYRightMajorResolution == 0.0)
+		mAutoScaleRightY = true;
 	else
-		autoScaleRightY = false;
-	yRightMin = yMin;
+		mAutoScaleRightY = false;
+	mYRightMin = yMin;
 }
 
 //=============================================================================
@@ -1568,11 +1567,11 @@ void PlotObject::SetRightYMin(const double &yMin)
 void PlotObject::SetRightYMax(const double &yMax)
 {
 	// If the both limits are at the original value, enable auto-scaling again
-	if (yRightMin == yRightMinOriginal && yMax == yRightMaxOriginal && yRightMajorResolution == 0.0)
-		autoScaleRightY = true;
+	if (mYRightMin == mYRightMinOriginal && yMax == mYRightMaxOriginal && mYRightMajorResolution == 0.0)
+		mAutoScaleRightY = true;
 	else
-		autoScaleRightY = false;
-	yRightMax = yMax;
+		mAutoScaleRightY = false;
+	mYRightMax = yMax;
 }
 
 //=============================================================================
@@ -1593,13 +1592,13 @@ void PlotObject::SetRightYMax(const double &yMax)
 //=============================================================================
 void PlotObject::ResetAutoScaling()
 {
-	autoScaleX = true;
-	autoScaleLeftY = true;
-	autoScaleRightY = true;
+	mAutoScaleX = true;
+	mAutoScaleLeftY = true;
+	mAutoScaleRightY = true;
 
-	xMajorResolution = 0.0;
-	yLeftMajorResolution = 0.0;
-	yRightMajorResolution = 0.0;
+	mXMajorResolution = 0.0;
+	mYLeftMajorResolution = 0.0;
+	mYRightMajorResolution = 0.0;
 }
 
 //=============================================================================
@@ -1626,15 +1625,15 @@ void PlotObject::ResetAutoScaling()
 void PlotObject::SetCurveProperties(const unsigned int &index, const Color &color,
 	const bool &visible, const bool &rightAxis, const double &lineSize, const int &markerSize)
 {
-	plotList[index]->SetColor(color);
-	plotList[index]->SetVisibility(visible);
-	plotList[index]->SetLineSize(lineSize);
-	plotList[index]->SetMarkerSize(markerSize);
+	mPlotList[index]->SetColor(color);
+	mPlotList[index]->SetVisibility(visible);
+	mPlotList[index]->SetLineSize(lineSize);
+	mPlotList[index]->SetMarkerSize(markerSize);
 
 	if (rightAxis)
-		plotList[index]->BindToYAxis(axisRight);
+		mPlotList[index]->BindToYAxis(mAxisRight);
 	else
-		plotList[index]->BindToYAxis(axisLeft);
+		mPlotList[index]->BindToYAxis(mAxisLeft);
 }
 
 //=============================================================================
@@ -1655,12 +1654,12 @@ void PlotObject::SetCurveProperties(const unsigned int &index, const Color &colo
 //=============================================================================
 void PlotObject::SetMajorGrid(const bool &gridOn)
 {
-	axisBottom->SetMajorGrid(gridOn);
-	axisLeft->SetMajorGrid(gridOn);
+	mAxisBottom->SetMajorGrid(gridOn);
+	mAxisLeft->SetMajorGrid(gridOn);
 
 	// These axis default to off, but can be specifically turned on via a right-click
-	axisTop->SetMajorGrid(false);
-	axisRight->SetMajorGrid(false);
+	mAxisTop->SetMajorGrid(false);
+	mAxisRight->SetMajorGrid(false);
 }
 
 //=============================================================================
@@ -1681,12 +1680,12 @@ void PlotObject::SetMajorGrid(const bool &gridOn)
 //=============================================================================
 void PlotObject::SetMinorGrid(const bool &gridOn)
 {
-	axisBottom->SetMinorGrid(gridOn);
-	axisLeft->SetMinorGrid(gridOn);
+	mAxisBottom->SetMinorGrid(gridOn);
+	mAxisLeft->SetMinorGrid(gridOn);
 
 	// These axis default to off, but can be specifically turned on via a right-click
-	axisTop->SetMinorGrid(false);
-	axisRight->SetMinorGrid(false);
+	mAxisTop->SetMinorGrid(false);
+	mAxisRight->SetMinorGrid(false);
 }
 
 //=============================================================================
@@ -1707,10 +1706,10 @@ void PlotObject::SetMinorGrid(const bool &gridOn)
 //=============================================================================
 bool PlotObject::GetMajorGrid()
 {
-	if (axisBottom == nullptr)
+	if (mAxisBottom == nullptr)
 		return false;
 
-	return axisBottom->GetMajorGrid();
+	return mAxisBottom->GetMajorGrid();
 }
 
 //=============================================================================
@@ -1731,10 +1730,10 @@ bool PlotObject::GetMajorGrid()
 //=============================================================================
 bool PlotObject::GetMinorGrid()
 {
-	if (axisBottom == nullptr)
+	if (mAxisBottom == nullptr)
 		return false;
 
-	return axisBottom->GetMinorGrid();
+	return mAxisBottom->GetMinorGrid();
 }
 
 //=============================================================================
@@ -1755,8 +1754,8 @@ bool PlotObject::GetMinorGrid()
 //=============================================================================
 void PlotObject::SetXLabel(wxString text)
 {
-	axisBottom->SetLabel(text);
-	needScissorUpdate = true;
+	mAxisBottom->SetLabel(text);
+	mNeedScissorUpdate = true;
 }
 
 //=============================================================================
@@ -1777,8 +1776,8 @@ void PlotObject::SetXLabel(wxString text)
 //=============================================================================
 void PlotObject::SetLeftYLabel(wxString text)
 {
-	axisLeft->SetLabel(text);
-	needScissorUpdate = true;
+	mAxisLeft->SetLabel(text);
+	mNeedScissorUpdate = true;
 }
 
 //=============================================================================
@@ -1799,8 +1798,8 @@ void PlotObject::SetLeftYLabel(wxString text)
 //=============================================================================
 void PlotObject::SetRightYLabel(wxString text)
 {
-	axisRight->SetLabel(text);
-	needScissorUpdate = true;
+	mAxisRight->SetLabel(text);
+	mNeedScissorUpdate = true;
 }
 
 //=============================================================================
@@ -1821,8 +1820,8 @@ void PlotObject::SetRightYLabel(wxString text)
 //=============================================================================
 void PlotObject::SetTitle(wxString text)
 {
-	titleObject->SetText(text);
-	needScissorUpdate = true;
+	mTitleObject->SetText(text);
+	mNeedScissorUpdate = true;
 }
 
 //=============================================================================
@@ -1843,10 +1842,10 @@ void PlotObject::SetTitle(wxString text)
 //=============================================================================
 void PlotObject::SetGridColor(const Color &color)
 {
-	axisBottom->SetGridColor(color);
-	axisTop->SetGridColor(color);
-	axisLeft->SetGridColor(color);
-	axisRight->SetGridColor(color);
+	mAxisBottom->SetGridColor(color);
+	mAxisTop->SetGridColor(color);
+	mAxisLeft->SetGridColor(color);
+	mAxisRight->SetGridColor(color);
 }
 
 //=============================================================================
@@ -1867,7 +1866,7 @@ void PlotObject::SetGridColor(const Color &color)
 //=============================================================================
 Color PlotObject::GetGridColor() const
 {
-	return axisBottom->GetGridColor();
+	return mAxisBottom->GetGridColor();
 }
 
 //=============================================================================
@@ -1888,10 +1887,10 @@ Color PlotObject::GetGridColor() const
 //=============================================================================
 void PlotObject::SetXLogarithmic(const bool &log)
 {
-	if (!axisBottom)
+	if (!mAxisBottom)
 		return;
 
-	axisBottom->SetLogarithmicScale(log);
+	mAxisBottom->SetLogarithmicScale(log);
 }
 
 //=============================================================================
@@ -1912,10 +1911,10 @@ void PlotObject::SetXLogarithmic(const bool &log)
 //=============================================================================
 void PlotObject::SetLeftLogarithmic(const bool &log)
 {
-	if (!axisLeft)
+	if (!mAxisLeft)
 		return;
 
-	axisLeft->SetLogarithmicScale(log);
+	mAxisLeft->SetLogarithmicScale(log);
 }
 
 //=============================================================================
@@ -1936,10 +1935,10 @@ void PlotObject::SetLeftLogarithmic(const bool &log)
 //=============================================================================
 void PlotObject::SetRightLogarithmic(const bool &log)
 {
-	if (!axisRight)
+	if (!mAxisRight)
 		return;
 
-	axisRight->SetLogarithmicScale(log);
+	mAxisRight->SetLogarithmicScale(log);
 }
 
 //=============================================================================
@@ -1960,10 +1959,10 @@ void PlotObject::SetRightLogarithmic(const bool &log)
 //=============================================================================
 void PlotObject::FormatCurves()
 {
-	for (auto& plot : plotList)
+	for (auto& plot : mPlotList)
 	{
 		plot->SetModified();
-		plot->SetPretty(pretty);
+		plot->SetPretty(mPretty);
 	}
 }
 
@@ -1985,7 +1984,7 @@ void PlotObject::FormatCurves()
 //=============================================================================
 wxString PlotObject::GetXLabel() const
 {
-	return axisBottom->GetLabel();
+	return mAxisBottom->GetLabel();
 }
 
 //=============================================================================
@@ -2006,7 +2005,7 @@ wxString PlotObject::GetXLabel() const
 //=============================================================================
 wxString PlotObject::GetLeftYLabel() const
 {
-	return axisLeft->GetLabel();
+	return mAxisLeft->GetLabel();
 }
 
 //=============================================================================
@@ -2027,7 +2026,7 @@ wxString PlotObject::GetLeftYLabel() const
 //=============================================================================
 wxString PlotObject::GetRightYLabel() const
 {
-	return axisRight->GetLabel();
+	return mAxisRight->GetLabel();
 }
 
 //=============================================================================
@@ -2048,7 +2047,7 @@ wxString PlotObject::GetRightYLabel() const
 //=============================================================================
 wxString PlotObject::GetTitle() const
 {
-	return titleObject->GetText();
+	return mTitleObject->GetText();
 }
 
 //=============================================================================
@@ -2070,7 +2069,7 @@ wxString PlotObject::GetTitle() const
 unsigned long long PlotObject::GetTotalPointCount() const
 {
 	unsigned long long count(0);
-	for (const auto& data : dataList)
+	for (const auto& data : mDataList)
 		count += data->GetNumberOfPoints();
 
 	return count;
@@ -2099,44 +2098,44 @@ void PlotObject::ComputeTransformationMatrices()
 	Eigen::Matrix4d right(Eigen::Matrix4d::Identity());
 
 	RenderWindow::Translate(left, Eigen::Vector3d(
-		axisLeft->GetOffsetFromWindowEdge(),
-		axisBottom->GetOffsetFromWindowEdge(), 0.0));
+		mAxisLeft->GetOffsetFromWindowEdge(),
+		mAxisBottom->GetOffsetFromWindowEdge(), 0.0));
 	RenderWindow::Translate(right, Eigen::Vector3d(
-		axisLeft->GetOffsetFromWindowEdge(),
-		axisBottom->GetOffsetFromWindowEdge(), 0.0));
+		mAxisLeft->GetOffsetFromWindowEdge(),
+		mAxisBottom->GetOffsetFromWindowEdge(), 0.0));
 
 	int width, height;
-	renderer.GetSize(&width, &height);
+	mRenderer.GetSize(&width, &height);
 
 	const double plotAreaWidth{ static_cast<double>(
-		width - axisLeft->GetOffsetFromWindowEdge()
-		- axisRight->GetOffsetFromWindowEdge()) };
+		width - mAxisLeft->GetOffsetFromWindowEdge()
+		- mAxisRight->GetOffsetFromWindowEdge()) };
 	const double plotAreaHeight{ static_cast<double>(
-		height - axisBottom->GetOffsetFromWindowEdge()
-		- axisTop->GetOffsetFromWindowEdge()) };
+		height - mAxisBottom->GetOffsetFromWindowEdge()
+		- mAxisTop->GetOffsetFromWindowEdge()) };
 
 	const double xScale{ plotAreaWidth /
-		(renderer.DoXScale(axisBottom->GetMaximum())
-		- renderer.DoXScale(axisBottom->GetMinimum())) };
+		(mRenderer.DoXScale(mAxisBottom->GetMaximum())
+		- mRenderer.DoXScale(mAxisBottom->GetMinimum())) };
 	const double leftYScale{ plotAreaHeight /
-		(renderer.DoLeftYScale(axisLeft->GetMaximum())
-		- renderer.DoLeftYScale(axisLeft->GetMinimum())) };
+		(mRenderer.DoLeftYScale(mAxisLeft->GetMaximum())
+		- mRenderer.DoLeftYScale(mAxisLeft->GetMinimum())) };
 	const double rightYScale{ plotAreaHeight /
-		(renderer.DoRightYScale(axisRight->GetMaximum())
-		- renderer.DoRightYScale(axisRight->GetMinimum())) };
+		(mRenderer.DoRightYScale(mAxisRight->GetMaximum())
+		- mRenderer.DoRightYScale(mAxisRight->GetMinimum())) };
 
 	RenderWindow::Scale(left, Eigen::Vector3d(xScale, leftYScale, 1.0));
 	RenderWindow::Scale(right, Eigen::Vector3d(xScale, rightYScale, 1.0));
 
 	RenderWindow::Translate(left, Eigen::Vector3d(
-		-renderer.DoXScale(axisBottom->GetMinimum()),
-		-renderer.DoLeftYScale(axisLeft->GetMinimum()), 0.0));
+		-mRenderer.DoXScale(mAxisBottom->GetMinimum()),
+		-mRenderer.DoLeftYScale(mAxisLeft->GetMinimum()), 0.0));
 	RenderWindow::Translate(right, Eigen::Vector3d(
-		-renderer.DoXScale(axisBottom->GetMinimum()),
-		-renderer.DoRightYScale(axisRight->GetMinimum()), 0.0));
+		-mRenderer.DoXScale(mAxisBottom->GetMinimum()),
+		-mRenderer.DoRightYScale(mAxisRight->GetMinimum()), 0.0));
 
-	renderer.SetLeftModelview(left);
-	renderer.SetRightModelview(right);
+	mRenderer.SetLeftModelview(left);
+	mRenderer.SetRightModelview(right);
 }
 
 //=============================================================================
@@ -2161,12 +2160,12 @@ void PlotObject::UpdateScissorArea() const
 	assert(!RenderWindow::GLHasError());
 
 	int width, height;
-	renderer.GetSize(&width, &height);
+	mRenderer.GetSize(&width, &height);
 	glEnable(GL_SCISSOR_TEST);
-	glScissor(axisLeft->GetOffsetFromWindowEdge(),
-		axisBottom->GetOffsetFromWindowEdge(),
-		width - axisRight->GetOffsetFromWindowEdge() - axisLeft->GetOffsetFromWindowEdge(),
-		height - axisTop->GetOffsetFromWindowEdge() - axisBottom->GetOffsetFromWindowEdge());
+	glScissor(mAxisLeft->GetOffsetFromWindowEdge(),
+		mAxisBottom->GetOffsetFromWindowEdge(),
+		width - mAxisRight->GetOffsetFromWindowEdge() - mAxisLeft->GetOffsetFromWindowEdge(),
+		height - mAxisTop->GetOffsetFromWindowEdge() - mAxisBottom->GetOffsetFromWindowEdge());
 
 	glDisable(GL_SCISSOR_TEST);
 

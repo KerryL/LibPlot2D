@@ -45,21 +45,21 @@ private:
 	void ConfigureControls();
 	void SetCheckBoxDefaults();
 
-	unsigned int dataPoints;
-	unsigned int zoomDataPoints;
-	double sampleTime;
+	unsigned int mDataPoints;
+	unsigned int mZoomDataPoints;
+	double mSampleTime;
 
 	unsigned int GetPointCount() const;
 
-	wxComboBox *windowSizeCombo;
-	wxComboBox *windowCombo;
-	wxTextCtrl *overlapTextBox;
-	wxCheckBox *useZoomCheckBox;
-	wxCheckBox *subtractMeanCheckBox;
+	wxComboBox *mWindowSizeCombo;
+	wxComboBox *mWindowCombo;
+	wxTextCtrl *mOverlapTextBox;
+	wxCheckBox *mUseZoomCheckBox;
+	wxCheckBox *mSubtractMeanCheckBox;
 
-	wxStaticText *frequencyRange;
-	wxStaticText *frequencyResolution;
-	wxStaticText *numberOfAverages;
+	wxStaticText *mFrequencyRange;
+	wxStaticText *mFrequencyResolution;
+	wxStaticText *mNumberOfAverages;
 
 	virtual bool TransferDataFromWindow();
 

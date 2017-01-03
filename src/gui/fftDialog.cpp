@@ -42,8 +42,8 @@ namespace LibPlot2D
 FFTDialog::FFTDialog(wxWindow *parent, const unsigned int &dataPoints,
 	const unsigned int &zoomDataPoints, const double &sampleTime)
 	: wxDialog(parent, wxID_ANY, _T("Fast Fourier Transform"), wxDefaultPosition),
-	dataPoints(dataPoints), zoomDataPoints(zoomDataPoints), sampleTime(sampleTime),
-	frequencyRange(nullptr), frequencyResolution(nullptr), numberOfAverages(nullptr)
+	mDataPoints(dataPoints), mZoomDataPoints(zoomDataPoints), mSampleTime(sampleTime),
+	mFrequencyRange(nullptr), mFrequencyResolution(nullptr), mNumberOfAverages(nullptr)
 {
 	CreateControls();
 }
@@ -128,29 +128,29 @@ wxSizer* FFTDialog::CreateInputControls()
 	topSizer->Add(sizer);
 
 	wxStaticText *windowLabel = new wxStaticText(this, wxID_ANY, _T("Window"));
-	windowCombo = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
+	mWindowCombo = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
 		wxDefaultSize, GetWindowList(), wxCB_READONLY);
-	windowCombo->SetSelection(static_cast<int>(FastFourierTransform::WindowType::Hann));
+	mWindowCombo->SetSelection(static_cast<int>(FastFourierTransform::WindowType::Hann));
 	sizer->Add(windowLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 2);
-	sizer->Add(windowCombo, 1, wxALL | wxGROW, 2);
+	sizer->Add(mWindowCombo, 1, wxALL | wxGROW, 2);
 
 	wxStaticText *windowSizeLabel = new wxStaticText(this, wxID_ANY, _T("Window Size"));
 	wxArrayString empty;
-	windowSizeCombo = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
+	mWindowSizeCombo = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
 		wxDefaultSize, empty, wxCB_READONLY);
 	sizer->Add(windowSizeLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 2);
-	sizer->Add(windowSizeCombo, 1, wxALL | wxGROW, 2);
+	sizer->Add(mWindowSizeCombo, 1, wxALL | wxGROW, 2);
 
 	wxStaticText *overlapLabel = new wxStaticText(this, wxID_ANY, _T("Overlap"));
-	overlapTextBox = new wxTextCtrl(this, wxID_ANY, _T("0.0"));
+	mOverlapTextBox = new wxTextCtrl(this, wxID_ANY, _T("0.0"));
 	sizer->Add(overlapLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 2);
-	sizer->Add(overlapTextBox, 1, wxALL | wxGROW, 2);
+	sizer->Add(mOverlapTextBox, 1, wxALL | wxGROW, 2);
 
 	topSizer->AddSpacer(5);
-	useZoomCheckBox = new wxCheckBox(this, wxID_ANY, _T("Use Zoomed Region Only"));
-	topSizer->Add(useZoomCheckBox, 0, wxALL, 2);
-	subtractMeanCheckBox = new wxCheckBox(this, wxID_ANY, _T("Subtract Mean Value"));
-	topSizer->Add(subtractMeanCheckBox, 0, wxALL, 2);
+	mUseZoomCheckBox = new wxCheckBox(this, wxID_ANY, _T("Use Zoomed Region Only"));
+	topSizer->Add(mUseZoomCheckBox, 0, wxALL, 2);
+	mSubtractMeanCheckBox = new wxCheckBox(this, wxID_ANY, _T("Subtract Mean Value"));
+	topSizer->Add(mSubtractMeanCheckBox, 0, wxALL, 2);
 
 	SetCheckBoxDefaults();
 	ConfigureControls();
@@ -179,22 +179,22 @@ wxSizer* FFTDialog::CreateOutputControls()
 	wxFlexGridSizer *sizer = new wxFlexGridSizer(2, 5, 5);
 
 	wxStaticText *rangeLabel = new wxStaticText(this, wxID_ANY, _T("Range"));
-	frequencyRange = new wxStaticText(this, wxID_ANY, wxEmptyString);
+	mFrequencyRange = new wxStaticText(this, wxID_ANY, wxEmptyString);
 
 	wxStaticText *resolutionLabel = new wxStaticText(this, wxID_ANY, _T("Resolution"));
-	frequencyResolution = new wxStaticText(this, wxID_ANY, wxEmptyString);
+	mFrequencyResolution = new wxStaticText(this, wxID_ANY, wxEmptyString);
 
 	wxStaticText *averagesLabel = new wxStaticText(this, wxID_ANY, _T("Averages"));
-	numberOfAverages = new wxStaticText(this, wxID_ANY, wxEmptyString);
+	mNumberOfAverages = new wxStaticText(this, wxID_ANY, wxEmptyString);
 
 	sizer->Add(rangeLabel, 0, wxALL, 2);
-	sizer->Add(frequencyRange, 1, wxGROW | wxALL, 2);
+	sizer->Add(mFrequencyRange, 1, wxGROW | wxALL, 2);
 
 	sizer->Add(resolutionLabel, 0, wxALL, 2);
-	sizer->Add(frequencyResolution, 1, wxGROW | wxALL, 2);
+	sizer->Add(mFrequencyResolution, 1, wxGROW | wxALL, 2);
 
 	sizer->Add(averagesLabel, 0, wxALL, 2);
-	sizer->Add(numberOfAverages, 1, wxGROW | wxALL, 2);
+	sizer->Add(mNumberOfAverages, 1, wxGROW | wxALL, 2);
 
 	UpdateOutputControls();
 
@@ -220,12 +220,12 @@ wxSizer* FFTDialog::CreateOutputControls()
 void FFTDialog::ConfigureControls()
 {
 	unsigned int maxPower(FastFourierTransform::GetMaxPowerOfTwo(GetPointCount()));
-	windowSizeCombo->Clear();
+	mWindowSizeCombo->Clear();
 
 	unsigned int i;
 	for (i = 1; i <= maxPower; ++i)
-		windowSizeCombo->Append(wxString::Format("%u", (unsigned int)pow(2, (double)i)));
-	windowSizeCombo->SetSelection(windowSizeCombo->GetCount() - 1);
+		mWindowSizeCombo->Append(wxString::Format("%u", (unsigned int)pow(2, (double)i)));
+	mWindowSizeCombo->SetSelection(mWindowSizeCombo->GetCount() - 1);
 }
 
 //=============================================================================
@@ -247,18 +247,18 @@ void FFTDialog::ConfigureControls()
 //=============================================================================
 void FFTDialog::SetCheckBoxDefaults()
 {
-	if (zoomDataPoints == dataPoints || zoomDataPoints == 0)
+	if (mZoomDataPoints == mDataPoints || mZoomDataPoints == 0)
 	{
-		useZoomCheckBox->SetValue(false);
-		useZoomCheckBox->Enable(false);
+		mUseZoomCheckBox->SetValue(false);
+		mUseZoomCheckBox->Enable(false);
 	}
 	else
 	{
-		useZoomCheckBox->Enable(true);
-		useZoomCheckBox->SetValue(true);
+		mUseZoomCheckBox->Enable(true);
+		mUseZoomCheckBox->SetValue(true);
 	}
 
-	subtractMeanCheckBox->SetValue(true);
+	mSubtractMeanCheckBox->SetValue(true);
 }
 
 //=============================================================================
@@ -372,9 +372,11 @@ void FFTDialog::OnTextBoxEvent(wxCommandEvent& WXUNUSED(event))
 bool FFTDialog::TransferDataFromWindow()
 {
 	double value;
-	if (!overlapTextBox->GetValue().ToDouble(&value) || value < 0.0 || value > 1.0)
+	if (!mOverlapTextBox->GetValue().ToDouble(&value)
+		|| value < 0.0 || value > 1.0)
 	{
-		wxMessageBox(_T("Overlap value must be a number between 0.0 and 1.0."), _T("Value Error"), wxICON_ERROR, this);
+		wxMessageBox(_T("Overlap value must be a number between 0.0 and 1.0."),
+			_T("Value Error"), wxICON_ERROR, this);
 		return false;
 	}
 
@@ -399,7 +401,8 @@ bool FFTDialog::TransferDataFromWindow()
 //=============================================================================
 FastFourierTransform::WindowType FFTDialog::GetFFTWindow() const
 {
-	return static_cast<FastFourierTransform::WindowType>(windowCombo->GetSelection());
+	return static_cast<FastFourierTransform::WindowType>(
+		mWindowCombo->GetSelection());
 }
 
 //=============================================================================
@@ -421,9 +424,9 @@ FastFourierTransform::WindowType FFTDialog::GetFFTWindow() const
 unsigned int FFTDialog::GetWindowSize() const
 {
 	unsigned long value;
-	windowSizeCombo->GetValue().ToULong(&value);
+	mWindowSizeCombo->GetValue().ToULong(&value);
 
-	return (unsigned int)value;
+	return static_cast<unsigned int>(value);
 }
 
 //=============================================================================
@@ -445,7 +448,7 @@ unsigned int FFTDialog::GetWindowSize() const
 double FFTDialog::GetOverlap() const
 {
 	double value;
-	overlapTextBox->GetValue().ToDouble(&value);
+	mOverlapTextBox->GetValue().ToDouble(&value);
 
 	return value;
 }
@@ -469,7 +472,7 @@ double FFTDialog::GetOverlap() const
 //=============================================================================
 bool FFTDialog::GetUseZoomedData() const
 {
-	return useZoomCheckBox->GetValue();
+	return mUseZoomCheckBox->GetValue();
 }
 
 //=============================================================================
@@ -491,7 +494,7 @@ bool FFTDialog::GetUseZoomedData() const
 //=============================================================================
 bool FFTDialog::GetSubtractMean() const
 {
-	return subtractMeanCheckBox->GetValue();
+	return mSubtractMeanCheckBox->GetValue();
 }
 
 //=============================================================================
@@ -512,13 +515,15 @@ bool FFTDialog::GetSubtractMean() const
 //=============================================================================
 void FFTDialog::UpdateOutputControls()
 {
-	if (!frequencyRange || !frequencyResolution || !numberOfAverages)
+	if (!mFrequencyRange || !mFrequencyResolution || !mNumberOfAverages)
 		return;
 
-	frequencyRange->SetLabel(wxString::Format("%0.3f Hz", 0.5 / sampleTime));
-	frequencyResolution->SetLabel(wxString::Format("%0.3f Hz", 1.0 / (sampleTime * (double)GetWindowSize())));
-	numberOfAverages->SetLabel(wxString::Format("%i",
-		FastFourierTransform::GetNumberOfAverages(GetWindowSize(), GetOverlap(), GetPointCount())));
+	mFrequencyRange->SetLabel(wxString::Format("%0.3f Hz", 0.5 / mSampleTime));
+	mFrequencyResolution->SetLabel(wxString::Format("%0.3f Hz",
+		1.0 / (mSampleTime * static_cast<double>(GetWindowSize()))));
+	mNumberOfAverages->SetLabel(wxString::Format("%i",
+		FastFourierTransform::GetNumberOfAverages(GetWindowSize(),
+			GetOverlap(), GetPointCount())));
 }
 
 //=============================================================================
@@ -539,10 +544,10 @@ void FFTDialog::UpdateOutputControls()
 //=============================================================================
 unsigned int FFTDialog::GetPointCount() const
 {
-	if (useZoomCheckBox->GetValue())
-		return zoomDataPoints;
+	if (mUseZoomCheckBox->GetValue())
+		return mZoomDataPoints;
 
-	return dataPoints;
+	return mDataPoints;
 }
 
 }// namespace LibPlot2D

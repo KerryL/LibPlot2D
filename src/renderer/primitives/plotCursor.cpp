@@ -192,7 +192,7 @@ void PlotCursor::SetLocation(const int& location)
 {
 	locationAlongAxis = location;
 	value = axis.PixelToValue(location);
-	modified = true;
+	mModified = true;
 }
 
 //=============================================================================

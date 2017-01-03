@@ -59,8 +59,10 @@ public:
 		MiddleLeft
 	};
 
-	void SetWindowReference(const PositionReference &windowRef) { this->windowRef = windowRef; modified = true; }
-	void SetLegendReference(const PositionReference &legendRef) { this->legendRef = legendRef; modified = true; }
+	void SetWindowReference(const PositionReference &windowRef)
+	{ this->windowRef = windowRef; mModified = true; }
+	void SetLegendReference(const PositionReference &legendRef)
+	{ this->legendRef = legendRef; mModified = true; }
 
 	PositionReference GetWindowReference() const { return windowRef; }
 	PositionReference GetLegendReference() const { return legendRef; }

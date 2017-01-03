@@ -9,7 +9,7 @@
 // File:  guiInterface.cpp
 // Date:  12/9/2016
 // Auth:  K. Loux
-// Desc:  Manages interactions between plot grid and plot renderings, handles
+// Desc:  Manages interactions between plot mGrid and plot renderings, handles
 //        context menus, etc.
 
 // Local headers
@@ -62,7 +62,7 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-GuiInterface::GuiInterface(wxFrame* owner) : owner(owner)
+GuiInterface::GuiInterface(wxFrame* owner) : mOwner(owner)
 {
 }
 
@@ -95,7 +95,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 	bool atLeastOneFileLoaded(false);
 	for (i = 0; i < fileList.Count(); ++i)
 	{
-		files[i] = fileTypeManager.GetDataFile(fileList[i]);
+		files[i] = mFileTypeManager.GetDataFile(fileList[i]);
 		if (!files[i])
 		{
 			// TODO:  Error message?
@@ -106,8 +106,8 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 		it = selectionInfoMap.find(files[i]->GetAllDescriptions());
 		if (it == selectionInfoMap.end())
 		{
-			if (files[i]->DescriptionsMatch(lastDescriptions))
-				selectionInfo = lastSelectionInfo;
+			if (files[i]->DescriptionsMatch(mLastDescriptions))
+				selectionInfo = mLastSelectionInfo;
 			else
 				selectionInfo.selections.Clear();
 
@@ -121,7 +121,7 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 			}
 			else
 			{
-				files[i]->GetSelectionsFromUser(selectionInfo, owner);
+				files[i]->GetSelectionsFromUser(selectionInfo, mOwner);
 				if (selectionInfo.selections.Count() < 1)
 					return false;
 				selectionInfoMap[files[i]->GetAllDescriptions()] = selectionInfo;
@@ -156,23 +156,23 @@ bool GuiInterface::LoadFiles(const wxArrayString &fileList)
 		}
 	}
 
-	if (owner)
+	if (mOwner)
 	{
 		if (fileList.Count() > 1)
-			owner->SetTitle(_T("Multiple Files - ") + applicationTitle);
+			mOwner->SetTitle(_T("Multiple Files - ") + mApplicationTitle);
 		else
-			owner->SetTitle(GuiUtilities::ExtractFileNameFromPath(fileList[0]) + _T("- ") + applicationTitle);
+			mOwner->SetTitle(GuiUtilities::ExtractFileNameFromPath(fileList[0]) + _T("- ") + mApplicationTitle);
 	}
 
-	genericXAxisLabel = files[0]->GetDescription(0);
-	SetXDataLabel(genericXAxisLabel);
-	renderer->SaveCurrentZoom();
+	mGenericXAxisLabel = files[0]->GetDescription(0);
+	SetXDataLabel(mGenericXAxisLabel);
+	mRenderer->SaveCurrentZoom();
 
 	// Because fileList is a reference (and may refer to lastFilesLoaded), we need to check for self-assignment
-	if (&fileList != &lastFilesLoaded)
-		lastFilesLoaded = fileList;
-	lastSelectionInfo = selectionInfo;
-	lastDescriptions = files[files.size() - 1]->GetAllDescriptions();
+	if (&fileList != &mLastFilesLoaded)
+		mLastFilesLoaded = fileList;
+	mLastSelectionInfo = selectionInfo;
+	mLastDescriptions = files[files.size() - 1]->GetAllDescriptions();
 
 	return true;
 }
@@ -207,7 +207,7 @@ bool GuiInterface::LoadText(const wxString &textData)
 		tempFile.close();
 		if (remove(tempFileName.mb_str()) != 0)
 			wxMessageBox(_T("Error deleting temporary file '") + tempFileName + _T("'."),
-			_T("Could Not Delete File"), wxICON_ERROR, owner);
+			_T("Could Not Delete File"), wxICON_ERROR, mOwner);
 		return false;
 	}
 
@@ -217,10 +217,10 @@ bool GuiInterface::LoadText(const wxString &textData)
 	bool fileLoaded = LoadFiles(wxArrayString(1, &tempFileName));
 	if (remove(tempFileName.mb_str()) != 0)
 		wxMessageBox(_T("Error deleting temporary file '") + tempFileName + _T("'."),
-		_T("Could Not Delete File"), wxICON_ERROR, owner);
+		_T("Could Not Delete File"), wxICON_ERROR, mOwner);
 
-	if (fileLoaded && owner)
-		owner->SetTitle(_T("Clipboard Data - ") + applicationTitle);
+	if (fileLoaded && mOwner)
+		mOwner->SetTitle(_T("Clipboard Data - ") + mApplicationTitle);
 
 	return fileLoaded;
 }
@@ -243,10 +243,10 @@ bool GuiInterface::LoadText(const wxString &textData)
 //=============================================================================
 void GuiInterface::ReloadData()
 {
-	if (lastFilesLoaded.IsEmpty())
+	if (mLastFilesLoaded.IsEmpty())
 		return;
 
-	LoadFiles(lastFilesLoaded);
+	LoadFiles(mLastFilesLoaded);
 }
 
 //=============================================================================
@@ -350,7 +350,7 @@ void GuiInterface::AddCurve(wxString mathString)
 	if (!errors.IsEmpty())
 	{
 		wxMessageBox(_T("Could not solve expression:\n\n") + errors,
-			_T("Error Solving Expression"), wxICON_ERROR, owner);
+			_T("Error Solving Expression"), wxICON_ERROR, mOwner);
 		DisplayMathChannelDialog(mathString);
 		return;
 	}
@@ -379,19 +379,19 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 {
 	plotList.Add(std::move(data));
 
-	grid->BeginBatch();
-	if (grid->GetNumberRows() == 0)
-		grid->AddTimeRow();
-	unsigned int index(grid->AddDataRow(name));
-	grid->EndBatch();
+	mGrid->BeginBatch();
+	if (mGrid->GetNumberRows() == 0)
+		mGrid->AddTimeRow();
+	unsigned int index(mGrid->AddDataRow(name));
+	mGrid->EndBatch();
 
-	grid->Scroll(-1, grid->GetNumberRows());
+	mGrid->Scroll(-1, mGrid->GetNumberRows());
 
-	renderer->AddCurve(*plotList.Back());
-	UpdateCurveProperties(index - 1, grid->GetNextColor(index), true, false);
+	mRenderer->AddCurve(*plotList.Back());
+	UpdateCurveProperties(index - 1, mGrid->GetNextColor(index), true, false);
 
 	UpdateCurveQuality();
-	renderer->UpdateDisplay();
+	mRenderer->UpdateDisplay();
 }
 
 //=============================================================================
@@ -412,14 +412,14 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 //=============================================================================
 void GuiInterface::RemoveCurve(const unsigned int &i)
 {
-	grid->DeleteRows(i + 1);
+	mGrid->DeleteRows(i + 1);
 
-	if (grid->GetNumberRows() == 1)
-		grid->DeleteRows();
+	if (mGrid->GetNumberRows() == 1)
+		mGrid->DeleteRows();
 
-	grid->AutoSizeColumns();
+	mGrid->AutoSizeColumns();
 
-	renderer->RemoveCurve(i);
+	mRenderer->RemoveCurve(i);
 	plotList.Remove(i);
 
 	UpdateCurveQuality();
@@ -457,7 +457,7 @@ void GuiInterface::RemoveCurves(wxArrayInt curves)
 		// minus 1 because we remove based on curve index, not row index
 		RemoveCurve(curve - 1);
 
-	renderer->UpdateDisplay();
+	mRenderer->UpdateDisplay();
 }
 
 //=============================================================================
@@ -478,7 +478,7 @@ void GuiInterface::RemoveCurves(wxArrayInt curves)
 //=============================================================================
 void GuiInterface::RemoveSelectedCurves()
 {
-	RemoveCurves(grid->GetSelectedRows());
+	RemoveCurves(mGrid->GetSelectedRows());
 }
 
 //=============================================================================
@@ -486,7 +486,7 @@ void GuiInterface::RemoveSelectedCurves()
 // Function:		UpdateCursorValues
 //
 // Description:		Updates the values for the cursors and their differences
-//					in the options grid.
+//					in the options mGrid.
 //
 // Input Arguments:
 //		leftVisible		= const bool& indicating whether or not the left
@@ -506,7 +506,7 @@ void GuiInterface::RemoveSelectedCurves()
 void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &rightVisible,
 		const double &leftValue, const double &rightValue)
 {
-	if (grid == nullptr)
+	if (mGrid == nullptr)
 		return;
 
 	// TODO:  This would be nicer with smart precision so we show enough digits but not too many
@@ -514,7 +514,7 @@ void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &right
 	// For each curve, update the cursor values
 	int i;
 	bool showXDifference(false);
-	for (i = 1; i < grid->GetNumberRows(); ++i)
+	for (i = 1; i < mGrid->GetNumberRows(); ++i)
 	{
 		UpdateSingleCursorValue(i, leftValue, PlotListGrid::Column::LeftCursor, leftVisible);
 		UpdateSingleCursorValue(i, rightValue, PlotListGrid::Column::RightCursor, rightVisible);
@@ -524,16 +524,16 @@ void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &right
 			double left, right;
 			if (plotList[i - 1]->GetYAt(leftValue, left) && plotList[i - 1]->GetYAt(rightValue, right))
 			{
-				grid->SetCellValue(i, static_cast<int>(PlotListGrid::Column::Difference), wxString::Format("%f", right - left));
+				mGrid->SetCellValue(i, static_cast<int>(PlotListGrid::Column::Difference), wxString::Format("%f", right - left));
 				showXDifference = true;
 			}
 			else
-				grid->SetCellValue(i, static_cast<int>(PlotListGrid::Column::Difference), wxEmptyString);
+				mGrid->SetCellValue(i, static_cast<int>(PlotListGrid::Column::Difference), wxEmptyString);
 		}
 	}
 
 	if (showXDifference)
-		grid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Difference), wxString::Format("%f", rightValue - leftValue));
+		mGrid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Difference), wxString::Format("%f", rightValue - leftValue));
 }
 
 //=============================================================================
@@ -543,9 +543,9 @@ void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &right
 // Description:		Updates a single cursor value.
 //
 // Input Arguments:
-//		row			= const unsigned int& specifying the grid row
+//		row			= const unsigned int& specifying the mGrid row
 //		value		= const double& specifying the value to populate
-//		column		= const PlotListGrid::Column& specifying which grid column to populate
+//		column		= const PlotListGrid::Column& specifying which mGrid column to populate
 //		isVisible	= const bool& indicating whether or not the cursor is visible
 //
 // Output Arguments:
@@ -560,28 +560,28 @@ void GuiInterface::UpdateSingleCursorValue(const unsigned int &row,
 {
 	if (isVisible)
 	{
-		grid->SetCellValue(0, static_cast<int>(column), wxString::Format("%f", value));
+		mGrid->SetCellValue(0, static_cast<int>(column), wxString::Format("%f", value));
 
 		bool exact;
 		double valueOut;
 		if (plotList[row - 1]->GetYAt(value, valueOut, &exact))
 		{
 			if (exact)
-				grid->SetCellValue(row, static_cast<int>(column), _T("*") + wxString::Format("%f", valueOut));
+				mGrid->SetCellValue(row, static_cast<int>(column), _T("*") + wxString::Format("%f", valueOut));
 			else
-				grid->SetCellValue(row, static_cast<int>(column), wxString::Format("%f", valueOut));
+				mGrid->SetCellValue(row, static_cast<int>(column), wxString::Format("%f", valueOut));
 		}
 		else
-			grid->SetCellValue(row, static_cast<int>(column), wxEmptyString);
+			mGrid->SetCellValue(row, static_cast<int>(column), wxEmptyString);
 	}
 	else
 	{
-		grid->SetCellValue(0, static_cast<int>(column), wxEmptyString);
-		grid->SetCellValue(row, static_cast<int>(column), wxEmptyString);
+		mGrid->SetCellValue(0, static_cast<int>(column), wxEmptyString);
+		mGrid->SetCellValue(row, static_cast<int>(column), wxEmptyString);
 
 		// The difference column only exists if both cursors are visible
-		grid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Difference), wxEmptyString);
-		grid->SetCellValue(row, static_cast<int>(PlotListGrid::Column::Difference), wxEmptyString);
+		mGrid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Difference), wxEmptyString);
+		mGrid->SetCellValue(row, static_cast<int>(PlotListGrid::Column::Difference), wxEmptyString);
 	}
 }
 
@@ -631,7 +631,7 @@ void GuiInterface::ExportData()
 	wxString wildcard(_T("Comma Separated (*.csv)|*.csv"));
 	wildcard.append("|Tab Delimited (*.txt)|*.txt");
 
-	wxArrayString pathAndFileName = GuiUtilities::GetFileNameFromUser(owner, _T("Save As"),
+	wxArrayString pathAndFileName = GuiUtilities::GetFileNameFromUser(mOwner, _T("Save As"),
 		wxEmptyString, wxEmptyString, wildcard, wxFD_SAVE);
 
 	if (pathAndFileName.Count() == 0)
@@ -639,7 +639,7 @@ void GuiInterface::ExportData()
 
 	if (wxFile::Exists(pathAndFileName[0]))
 	{
-		if (wxMessageBox(_T("File exists.  Overwrite?"), _T("Overwrite File?"), wxYES_NO, owner) == wxNO)
+		if (wxMessageBox(_T("File exists.  Overwrite?"), _T("Overwrite File?"), wxYES_NO, mOwner) == wxNO)
 			return;
 	}
 
@@ -654,7 +654,7 @@ void GuiInterface::ExportData()
 	if (!outFile.is_open() || !outFile.good())
 	{
 		wxMessageBox(_T("Could not open '") + pathAndFileName[0] + _T("' for output."),
-			_T("Error Writing File"), wxICON_ERROR, owner);
+			_T("Error Writing File"), wxICON_ERROR, mOwner);
 		return;
 	}
 
@@ -662,29 +662,29 @@ void GuiInterface::ExportData()
 	wxString temp;
 	for (i = 1; i < plotList.GetCount() + 1; ++i)
 	{
-		if (grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Contains(_T("FFT")) ||
-			grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Contains(_T("FRF")))
+		if (mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Contains(_T("FFT")) ||
+			mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Contains(_T("FRF")))
 			outFile << _T("Frequency [Hz]") << delimiter;
 		else
 		{
 			if (delimiter.Cmp(",") == 0)
 			{
-				temp = genericXAxisLabel;
+				temp = mGenericXAxisLabel;
 				temp.Replace(",", ";");
 				outFile << temp << delimiter;
 			}
 			else
-				outFile << genericXAxisLabel << delimiter;
+				outFile << mGenericXAxisLabel << delimiter;
 		}
 
 		if (delimiter.Cmp(",") == 0)
 		{
-			temp = grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
+			temp = mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
 			temp.Replace(",", ";");
 			outFile << temp;
 		}
 		else
-			outFile << grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
+			outFile << mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
 
 		if (i == plotList.GetCount())
 			outFile << std::endl;
@@ -742,14 +742,14 @@ void GuiInterface::GenerateFRF()
 	if (!GetXAxisScalingFactor(factor))
 		// Warn the user if we cannot determine the time units, but create the plot anyway
 		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"),
-			_T("Accuracy Warning"), wxICON_WARNING, owner);
+			_T("Accuracy Warning"), wxICON_WARNING, mOwner);
 
 	wxArrayString descriptions;
 	int i;
-	for (i = 1; i < grid->GetNumberRows(); ++i)
-		descriptions.Add(grid->GetCellValue(i, 0));
+	for (i = 1; i < mGrid->GetNumberRows(); ++i)
+		descriptions.Add(mGrid->GetCellValue(i, 0));
 
-	FRFDialog dialog(owner, descriptions);
+	FRFDialog dialog(mOwner, descriptions);
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
@@ -763,7 +763,7 @@ void GuiInterface::GenerateFRF()
 	if (!PlotMath::XDataConsistentlySpaced(*plotList[dialog.GetInputIndex()]) ||
 		!PlotMath::XDataConsistentlySpaced(*plotList[dialog.GetOutputIndex()]))
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
-			_T("Accuracy Warning"), wxICON_WARNING, owner);
+			_T("Accuracy Warning"), wxICON_WARNING, mOwner);
 
 	FastFourierTransform::ComputeFRF(*plotList[dialog.GetInputIndex()],
 		*plotList[dialog.GetOutputIndex()], dialog.GetNumberOfAverages(),
@@ -806,7 +806,7 @@ void GuiInterface::CreateSignal()
 		duration = plotList[0]->GetX().back() / factor - startTime;
 	}
 
-	CreateSignalDialog dialog(owner, startTime, duration, sampleRate);
+	CreateSignalDialog dialog(mOwner, startTime, duration, sampleRate);
 
 	if (dialog.ShowModal() != wxID_OK)
 		return;
@@ -818,8 +818,8 @@ void GuiInterface::CreateSignal()
 	double dummy;
 	if (!GetXAxisScalingFactor(dummy))
 	{
-		genericXAxisLabel = _T("Time [sec]");
-		SetXDataLabel(genericXAxisLabel);
+		mGenericXAxisLabel = _T("Time [sec]");
+		SetXDataLabel(mGenericXAxisLabel);
 		//plotArea->SaveCurrentZoom();// TODO:  Is this necessary?
 	}
 }
@@ -850,20 +850,20 @@ void GuiInterface::AddFFTCurves(const double& xFactor,
 {
 	amplitude->MultiplyXData(xFactor);
 	AddCurve(std::move(amplitude), _T("FRF Amplitude, ") + namePortion + _T(", [dB]"));
-	SetMarkerSize(grid->GetNumberRows() - 2, 0);
+	SetMarkerSize(mGrid->GetNumberRows() - 2, 0);
 
 	if (phase)
 	{
 		phase->MultiplyXData(xFactor);
 		AddCurve(std::move(phase), _T("FRF Phase, ") + namePortion + _T(", [deg]"));
-		SetMarkerSize(grid->GetNumberRows() - 2, 0);
+		SetMarkerSize(mGrid->GetNumberRows() - 2, 0);
 	}
 
 	if (coherence)
 	{
 		coherence->MultiplyXData(xFactor);
 		AddCurve(std::move(coherence), _T("FRF Coherence, ") + namePortion + _T(", [-]"));
-		SetMarkerSize(grid->GetNumberRows() - 2, 0);
+		SetMarkerSize(mGrid->GetNumberRows() - 2, 0);
 	}
 }
 
@@ -894,28 +894,28 @@ void GuiInterface::SetTimeUnits()
 	{
 		// Ask the user to confirm, since we don't think we need their help
 		if (wxMessageBox(_T("Time units are being interpreted as ") + units +
-			_T(", are you sure you want to change them?"), _T("Are You Sure?"), wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, owner) == wxNO)
+			_T(", are you sure you want to change them?"), _T("Are You Sure?"), wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, mOwner) == wxNO)
 			return;
 	}
 
 	// Ask the user to specify the correct units
 	wxString userUnits;
 	userUnits = ::wxGetTextFromUser(_T("Specify time units (e.g. \"msec\" or \"minutes\")"),
-		_T("Specify Units"), _T("seconds"), owner);
+		_T("Specify Units"), _T("seconds"), mOwner);
 
 	// If the user cancelled, we will have a blank string
 	if (userUnits.IsEmpty())
 		return;
 
 	// Check to make sure we understand what the user specified
-	wxString currentLabel(grid->GetCellValue(0, static_cast<int>(PlotListGrid::Column::Name)));
-	genericXAxisLabel = _T("Time, [") + userUnits + _T("]");
-	SetXDataLabel(genericXAxisLabel);
+	wxString currentLabel(mGrid->GetCellValue(0, static_cast<int>(PlotListGrid::Column::Name)));
+	mGenericXAxisLabel = _T("Time, [") + userUnits + _T("]");
+	SetXDataLabel(mGenericXAxisLabel);
 	if (!GetXAxisScalingFactor(f, &units))
 	{
 		// Set the label back to what it used to be and warn the user
 		SetXDataLabel(currentLabel);
-		wxMessageBox(_T("Could not understand units \"") + userUnits + _T("\"."), _T("Error Setting Units"), wxICON_ERROR, owner);
+		wxMessageBox(_T("Could not understand units \"") + userUnits + _T("\"."), _T("Error Setting Units"), wxICON_ERROR, mOwner);
 	}
 }
 //=============================================================================
@@ -942,7 +942,7 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 	while (!factorText.ToDouble(&factor) || factor == 0.0)
 	{
 		factorText = ::wxGetTextFromUser(_T("Specify scaling factor:"),
-		_T("Specify Factor"), _T("1"), owner);
+		_T("Specify Factor"), _T("1"), mOwner);
 		if (factorText.IsEmpty())
 			return;
 	}
@@ -956,18 +956,18 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 		{
 			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[i]));
 			scaledData->MultiplyXData(factor);
-			AddCurve(std::move(scaledData), grid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::Name)));
+			AddCurve(std::move(scaledData), mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::Name)));
 
-			grid->SetCellBackgroundColour(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::Color),
-				grid->GetCellBackgroundColour(i + 1, static_cast<int>(PlotListGrid::Column::Color)));
-			grid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::LineSize),
-				grid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::LineSize)));
-			grid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::MarkerSize),
-				grid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::MarkerSize)));
-			grid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::Visible),
-				grid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::Visible)));
-			grid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::RightAxis),
-				grid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::RightAxis)));
+			mGrid->SetCellBackgroundColour(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::Color),
+				mGrid->GetCellBackgroundColour(i + 1, static_cast<int>(PlotListGrid::Column::Color)));
+			mGrid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::LineSize),
+				mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::LineSize)));
+			mGrid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::MarkerSize),
+				mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::MarkerSize)));
+			mGrid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::Visible),
+				mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::Visible)));
+			mGrid->SetCellValue(i + stopIndex + 1, static_cast<int>(PlotListGrid::Column::RightAxis),
+				mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::RightAxis)));
 
 			UpdateCurveProperties(i + stopIndex);
 		}
@@ -982,7 +982,7 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 		{
 			std::unique_ptr<Dataset2D> scaledData(std::make_unique<Dataset2D>(*plotList[row - 1]));
 			scaledData->MultiplyXData(factor);
-			AddCurve(std::move(scaledData), grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
+			AddCurve(std::move(scaledData), mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
 				+ wxString::Format(", X-scaled by %f", factor));
 		}
 	}
@@ -992,7 +992,7 @@ void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotDerivative
 //
-// Description:		Adds a curve showing the derivative of the selected grid
+// Description:		Adds a curve showing the derivative of the selected mGrid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1013,7 +1013,7 @@ void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			DiscreteDerivative::ComputeTimeHistory(*plotList[row - 1])));
 
-		wxString name(_T("d/dt(") + grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
+		wxString name(_T("d/dt(") + mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1022,7 +1022,7 @@ void GuiInterface::PlotDerivative(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotIntegral
 //
-// Description:		Adds a curve showing the integral of the selected grid
+// Description:		Adds a curve showing the integral of the selected mGrid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1043,7 +1043,7 @@ void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			DiscreteIntegral::ComputeTimeHistory(*plotList[row - 1])));
 
-		wxString name(_T("integral(") + grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
+		wxString name(_T("integral(") + mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1052,7 +1052,7 @@ void GuiInterface::PlotIntegral(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotRMS
 //
-// Description:		Adds a curve showing the RMS of the selected grid
+// Description:		Adds a curve showing the RMS of the selected mGrid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1073,7 +1073,7 @@ void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			RootMeanSquare::ComputeTimeHistory(*plotList[row - 1])));
 
-		wxString name(_T("RMS(") + grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
+		wxString name(_T("RMS(") + mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1082,7 +1082,7 @@ void GuiInterface::PlotRMS(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		PlotFFT
 //
-// Description:		Adds a curve showing the FFT of the selected grid
+// Description:		Adds a curve showing the FFT of the selected mGrid
 //					row to the plot.
 //
 // Input Arguments:
@@ -1103,9 +1103,9 @@ void GuiInterface::PlotFFT(const wxArrayInt& selectedRows)
 		if (!newData)
 			continue;
 
-		wxString name(_T("FFT(") + grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
+		wxString name(_T("FFT(") + mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")"));
 		AddCurve(std::move(newData), name);
-		SetMarkerSize(grid->GetNumberRows() - 2, 0);
+		SetMarkerSize(mGrid->GetNumberRows() - 2, 0);
 	}
 }
 
@@ -1129,13 +1129,13 @@ void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 {
 	unsigned long bit;
 	wxString bitString = wxGetTextFromUser(_T("Specify the bit to plot:"),
-		_T("Bit Seleciton"), _T("0"), owner);
+		_T("Bit Seleciton"), _T("0"), mOwner);
 	if (bitString.IsEmpty())
 		return;
 	else if (!bitString.ToULong(&bit))
 	{
 		wxMessageBox(_T("Bit value must be a positive integer."),
-			_T("Bit Selection Error"), wxICON_ERROR, owner);
+			_T("Bit Selection Error"), wxICON_ERROR, mOwner);
 		return;
 	}
 
@@ -1144,7 +1144,7 @@ void GuiInterface::BitMask(const wxArrayInt& selectedRows)
 		std::unique_ptr<Dataset2D> newData(std::make_unique<Dataset2D>(
 			PlotMath::ApplyBitMask(*plotList[row - 1], bit)));
 
-		wxString name(grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
+		wxString name(mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
 			+ _T(", Bit ") + wxString::Format("%lu", bit));
 		AddCurve(std::move(newData), name);
 	}
@@ -1173,7 +1173,7 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 	wxString shiftText = ::wxGetTextFromUser(
 		_T("Specify the time to add to time data in original data:\n")
 		_T("Use same units as time series.  Positive values shift curve to the right."),
-		_T("Time Shift"), _T("0"), owner);
+		_T("Time Shift"), _T("0"), mOwner);
 
 	if (!shiftText.ToDouble(&shift) || shift == 0.0)
 		return;
@@ -1185,7 +1185,7 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 			std::make_unique<Dataset2D>(*plotList[row - 1]));
 		newData->XShift(shift);
 
-		wxString name(grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
+		wxString name(mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
 			+ _T(", t = t0 + "));
 		name += shiftText;
 		AddCurve(std::move(newData), name);
@@ -1223,7 +1223,7 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 		ApplyFilter(filterParameters, newData);
 
 		wxString name = FilterDialog::GetFilterNamePrefix(filterParameters)
-			+ _T(" (") + grid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")");
+			+ _T(" (") + mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name)) + _T(")");
 		AddCurve(std::move(newData), name);
 	}
 }
@@ -1232,7 +1232,7 @@ void GuiInterface::FilterCurves(const wxArrayInt& selectedRows)
 // Class:			GuiInterface
 // Function:		FitCurves
 //
-// Description:		Fits a curve to the dataset selected in the grid control.
+// Description:		Fits a curve to the dataset selected in the mGrid control.
 //					User is asked to specify the order of the fit.
 //
 // Input Arguments:
@@ -1250,7 +1250,7 @@ void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 	// Ask the user what order to use for the polynomial
 	unsigned long order;
 	wxString orderString = ::wxGetTextFromUser(_T("Specify the order of the polynomial fit:"),
-		_T("Polynomial Curve Fit"), _T("2"), owner);
+		_T("Polynomial Curve Fit"), _T("2"), mOwner);
 
 	// If cancelled, the orderString will be empty.  It is possible that the user cleared the textbox
 	// and clicked OK, but we'll ignore this case since we can't tell the difference
@@ -1259,7 +1259,7 @@ void GuiInterface::FitCurves(const wxArrayInt& selectedRows)
 
 	if (!orderString.ToULong(&order))
 	{
-		wxMessageBox(_T("ERROR:  Order must be a positive integer!"), _T("Error Fitting Curve"), wxICON_ERROR, owner);
+		wxMessageBox(_T("ERROR:  Order must be a positive integer!"), _T("Error Fitting Curve"), wxICON_ERROR, mOwner);
 		return;
 	}
 
@@ -1380,7 +1380,7 @@ void GuiInterface::DisplayMathChannelDialog(wxString defaultInput)
 	message.Append(_T("    Valid operations are: +, -, *, /, %, ddt, int, fft and trigonometric functions.\n"));
 	message.Append(_T("    Use () to specify order of operations"));
 
-	AddCurve(::wxGetTextFromUser(message, _T("Specify Math Channel"), defaultInput, owner));
+	AddCurve(::wxGetTextFromUser(message, _T("Specify Math Channel"), defaultInput, mOwner));
 }
 
 //=============================================================================
@@ -1403,10 +1403,10 @@ void GuiInterface::DisplayMathChannelDialog(wxString defaultInput)
 void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 {
 	double min, max;
-	if (!renderer->GetCurrentAxisRange(axis, min, max))
+	if (!mRenderer->GetCurrentAxisRange(axis, min, max))
 		return;
 
-	RangeLimitsDialog dialog(owner, min, max);
+	RangeLimitsDialog dialog(mOwner, min, max);
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
@@ -1425,12 +1425,12 @@ void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 	// Make sure the limits aren't equal
 	if (min == max)
 	{
-		wxMessageBox(_T("ERROR:  Limits must unique!"), _T("Error Setting Limits"), wxICON_ERROR, owner);
+		wxMessageBox(_T("ERROR:  Limits must unique!"), _T("Error Setting Limits"), wxICON_ERROR, mOwner);
 		return;
 	}
 
-	renderer->SetNewAxisRange(axis, min, max);
-	renderer->SaveCurrentZoom();
+	mRenderer->SetNewAxisRange(axis, min, max);
+	mRenderer->SaveCurrentZoom();
 }
 
 //=============================================================================
@@ -1452,7 +1452,7 @@ void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 //=============================================================================
 FilterParameters GuiInterface::DisplayFilterDialog()
 {
-	FilterDialog dialog(renderer);
+	FilterDialog dialog(mRenderer);
 	if (dialog.ShowModal() != wxID_OK)
 	{
 		FilterParameters parameters;
@@ -1486,11 +1486,11 @@ void GuiInterface::ApplyFilter(const FilterParameters &parameters,
 	double factor;
 	if (!GetXAxisScalingFactor(factor))
 		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Cutoff frequency may be incorrect!"),
-			_T("Accuracy Warning"), wxICON_WARNING, owner);
+			_T("Accuracy Warning"), wxICON_WARNING, mOwner);
 
 	if (!PlotMath::XDataConsistentlySpaced(*data))
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
-			_T("Accuracy Warning"), wxICON_WARNING, owner);
+			_T("Accuracy Warning"), wxICON_WARNING, mOwner);
 
 	std::unique_ptr<Filter> filter(GetFilter(
 		parameters, factor / data->GetAverageDeltaX(), data->GetY()[0]));
@@ -1559,20 +1559,20 @@ void GuiInterface::UpdateLegend()
 	std::vector<LibPlot2D::Legend::LegendEntryInfo> entries;
 	LibPlot2D::Legend::LegendEntryInfo info;
 	int i;
-	for (i = 1; i < grid->GetNumberRows(); ++i)
+	for (i = 1; i < mGrid->GetNumberRows(); ++i)
 	{
-		if (grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)).IsEmpty())
+		if (mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)).IsEmpty())
 			continue;
 			
-		grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::LineSize)).ToDouble(&lineSize);
-		grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::MarkerSize)).ToLong(&markerSize);
-		info.color = LibPlot2D::Color(grid->GetCellBackgroundColour(i, static_cast<int>(PlotListGrid::Column::Color)));
+		mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::LineSize)).ToDouble(&lineSize);
+		mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::MarkerSize)).ToLong(&markerSize);
+		info.color = LibPlot2D::Color(mGrid->GetCellBackgroundColour(i, static_cast<int>(PlotListGrid::Column::Color)));
 		info.lineSize = lineSize;
 		info.markerSize = markerSize;
-		info.text = grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
+		info.text = mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
 		entries.push_back(info);
 	}
-	renderer->UpdateLegend(entries);
+	mRenderer->UpdateLegend(entries);
 }
 
 //=============================================================================
@@ -1594,7 +1594,7 @@ void GuiInterface::UpdateLegend()
 //=============================================================================
 void GuiInterface::SetMarkerSize(const unsigned int &curve, const int &size)
 {
-	grid->SetCellValue(curve + 1, static_cast<int>(PlotListGrid::Column::MarkerSize), wxString::Format("%i", size));
+	mGrid->SetCellValue(curve + 1, static_cast<int>(PlotListGrid::Column::MarkerSize), wxString::Format("%i", size));
 	UpdateCurveProperties(curve);
 }
 
@@ -1617,10 +1617,10 @@ void GuiInterface::SetMarkerSize(const unsigned int &curve, const int &size)
 //=============================================================================
 void GuiInterface::UpdateCurveQuality()
 {
-	//if (renderer->GetTotalPointCount() > highQualityCurvePointLimit)
-		renderer->SetCurveQuality(LibPlot2D::PlotRenderer::CurveQuality::HighWrite);
+	//if (mRenderer->GetTotalPointCount() > highQualityCurvePointLimit)
+		mRenderer->SetCurveQuality(LibPlot2D::PlotRenderer::CurveQuality::HighWrite);
 	/*else
-		renderer->SetCurveQuality(static_cast<PlotRenderer::CurveQuality>(
+		mRenderer->SetCurveQuality(static_cast<PlotRenderer::CurveQuality>(
 		PlotRenderer::CurveQuality::HighStatic | PlotRenderer::CurveQuality::HighWrite));*/// TODO:  Fix this after line rendering is improved
 }
 
@@ -1692,10 +1692,10 @@ std::unique_ptr<Dataset2D> GuiInterface::GetFFTData(
 	if (!GetXAxisScalingFactor(factor))
 		// Warn the user if we cannot determine the time units, but create the plot anyway
 		wxMessageBox(_T("Warning:  Unable to identify X-axis units!  Frequency may be incorrectly scaled!"),
-			_T("Accuracy Warning"), wxICON_WARNING, owner);
+			_T("Accuracy Warning"), wxICON_WARNING, mOwner);
 
-	LibPlot2D::FFTDialog dialog(owner, data->GetNumberOfPoints(),
-		data->GetNumberOfZoomedPoints(renderer->GetXMin(), renderer->GetXMax()),
+	LibPlot2D::FFTDialog dialog(mOwner, data->GetNumberOfPoints(),
+		data->GetNumberOfZoomedPoints(mRenderer->GetXMin(), mRenderer->GetXMax()),
 		data->GetAverageDeltaX() / factor);
 
 	if (dialog.ShowModal() != wxID_OK)
@@ -1703,7 +1703,7 @@ std::unique_ptr<Dataset2D> GuiInterface::GetFFTData(
 
 	if (!LibPlot2D::PlotMath::XDataConsistentlySpaced(*data))
 		wxMessageBox(_T("Warning:  X-data is not consistently spaced.  Results may be unreliable."),
-			_T("Accuracy Warning"), wxICON_WARNING, owner);
+			_T("Accuracy Warning"), wxICON_WARNING, mOwner);
 
 	std::unique_ptr<Dataset2D> newData(std::move(
 		FastFourierTransform::ComputeFFT([&dialog, &data, this]()
@@ -1741,11 +1741,11 @@ std::unique_ptr<Dataset2D> GuiInterface::GetXZoomedDataset(
 	const std::unique_ptr<const Dataset2D>& fullData) const
 {
 	unsigned int i, startIndex(0), endIndex(0);
-	while (fullData->GetX()[startIndex] < renderer->GetXMin() &&
+	while (fullData->GetX()[startIndex] < mRenderer->GetXMin() &&
 		startIndex < fullData->GetNumberOfPoints())
 		++startIndex;
 	endIndex = startIndex;
-	while (fullData->GetX()[endIndex] < renderer->GetXMax() &&
+	while (fullData->GetX()[endIndex] < mRenderer->GetXMax() &&
 		endIndex < fullData->GetNumberOfPoints())
 		++endIndex;
 
@@ -1780,12 +1780,12 @@ void GuiInterface::ShowAppropriateXLabel()
 	// If the only visible curves are frequency plots, change the x-label
 	int i;
 	bool showFrequencyLabel(false);
-	for (i = 1; i < grid->GetNumberRows(); ++i)
+	for (i = 1; i < mGrid->GetNumberRows(); ++i)
 	{
-		if (grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)).Cmp(_T("1")) == 0)
+		if (mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)).Cmp(_T("1")) == 0)
 		{
-			if (grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Mid(0, 3).CmpNoCase(_T("FFT")) == 0 ||
-				grid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Mid(0, 3).CmpNoCase(_T("FRF")) == 0)
+			if (mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Mid(0, 3).CmpNoCase(_T("FFT")) == 0 ||
+				mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name)).Mid(0, 3).CmpNoCase(_T("FRF")) == 0)
 				showFrequencyLabel = true;
 			else
 			{
@@ -1798,7 +1798,7 @@ void GuiInterface::ShowAppropriateXLabel()
 	if (showFrequencyLabel)
 		SetXDataLabel(FileFormat::Frequency);
 	else
-		SetXDataLabel(currentFileFormat);
+		SetXDataLabel(mCurrentFileFormat);
 }
 
 //=============================================================================
@@ -1824,7 +1824,7 @@ bool GuiInterface::GetXAxisScalingFactor(double &factor, wxString *label)
 	if (XScalingFactorIsKnown(factor, label))
 		return true;
 
-	wxString unit = ExtractUnitFromDescription(genericXAxisLabel);
+	wxString unit = ExtractUnitFromDescription(mGenericXAxisLabel);
 
 	unit = unit.Trim().Trim(false);
 	if (label)
@@ -1852,14 +1852,14 @@ bool GuiInterface::GetXAxisScalingFactor(double &factor, wxString *label)
 //=============================================================================
 bool GuiInterface::XScalingFactorIsKnown(double &factor, wxString *label) const
 {
-	if (currentFileFormat == FileFormat::Baumuller)
+	if (mCurrentFileFormat == FileFormat::Baumuller)
 	{
 		factor = 1000.0;
 		if (label)
 			label->assign(_T("msec"));
 		return true;
 	}
-	else if (currentFileFormat == FileFormat::Kollmorgen)
+	else if (mCurrentFileFormat == FileFormat::Kollmorgen)
 	{
 		factor = 1.0;
 		if (label)
@@ -1977,8 +1977,8 @@ bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 //=============================================================================
 void GuiInterface::SetXDataLabel(wxString label)
 {
-	grid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Name), label);
-	renderer->SetXLabel(label);
+	mGrid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Name), label);
+	mRenderer->SetXLabel(label);
 }
 
 //=============================================================================
@@ -2009,7 +2009,7 @@ void GuiInterface::SetXDataLabel(const FileFormat &format)
 	case FileFormat::Generic:
 	case FileFormat::Kollmorgen:
 	case FileFormat::Baumuller:
-		SetXDataLabel(genericXAxisLabel);
+		SetXDataLabel(mGenericXAxisLabel);
 	}
 }
 
@@ -2032,10 +2032,10 @@ void GuiInterface::SetXDataLabel(const FileFormat &format)
 void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 {
 	Color color;
-	color.Set(grid->GetCellBackgroundColour(index + 1, static_cast<int>(PlotListGrid::Column::Color)));
+	color.Set(mGrid->GetCellBackgroundColour(index + 1, static_cast<int>(PlotListGrid::Column::Color)));
 	UpdateCurveProperties(index, color,
-		!grid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::Visible)).IsEmpty(),
-		!grid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::RightAxis)).IsEmpty());
+		!mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::Visible)).IsEmpty(),
+		!mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::RightAxis)).IsEmpty());
 }
 
 //=============================================================================
@@ -2063,10 +2063,10 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index,
 	double lineSize;
 	long markerSize;
 	UpdateLegend();// Must come first in order to be updated simultaneously with line
-	grid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::LineSize)).ToDouble(&lineSize);
-	grid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::MarkerSize)).ToLong(&markerSize);
-	renderer->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
-	renderer->SaveCurrentZoom();
+	mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::LineSize)).ToDouble(&lineSize);
+	mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::MarkerSize)).ToLong(&markerSize);
+	mRenderer->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
+	mRenderer->SaveCurrentZoom();
 }
 
 //=============================================================================
@@ -2087,7 +2087,7 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index,
 //=============================================================================
 void GuiInterface::Copy()
 {
-	renderer->DoCopy();
+	mRenderer->DoCopy();
 }
 
 //=============================================================================
@@ -2108,7 +2108,7 @@ void GuiInterface::Copy()
 //=============================================================================
 void GuiInterface::Paste()
 {
-	renderer->DoPaste();
+	mRenderer->DoPaste();
 }
 
 }// namespace LibPlot2D

@@ -1128,7 +1128,7 @@ void Legend::BuildLabelStrings()
 //=============================================================================
 void Legend::RequiresRedraw()
 {
-	modified = true;
+	mModified = true;
 	for (auto& buffer : bufferInfo)
 		buffer.vertexCountModified = true;
 }

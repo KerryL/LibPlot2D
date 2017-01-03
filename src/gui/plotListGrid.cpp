@@ -89,7 +89,7 @@ END_EVENT_TABLE();
 //
 //=============================================================================
 PlotListGrid::PlotListGrid(GuiInterface& guiInterface, wxWindow *parent,
-	wxWindowID id) : wxGrid(parent, id), guiInterface(guiInterface)
+	wxWindowID id) : wxGrid(parent, id), mGuiInterface(guiInterface)
 {
 	Build();
 	guiInterface.SetPlotListGrid(this);
@@ -177,7 +177,7 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 
 	contextMenu->AppendSeparator();
 
-	if (row == 0 && guiInterface.GetCurrentFileFormat() == GuiInterface::FileFormat::Generic)
+	if (row == 0 && mGuiInterface.GetCurrentFileFormat() == GuiInterface::FileFormat::Generic)
 	{
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
 		contextMenu->Append(idContextScaleXData, _T("Scale X-Data"));
@@ -322,7 +322,7 @@ void PlotListGrid::GridDoubleClickEvent(wxGridEvent &event)
         colorData = dialog.GetColourData();
 		SetCellBackgroundColour(row, static_cast<int>(Column::Color),
 			colorData.GetColour());
-		guiInterface.UpdateCurveProperties(row - 1);
+		mGuiInterface.UpdateCurveProperties(row - 1);
 	}
 }
 
@@ -365,9 +365,9 @@ void PlotListGrid::GridLeftClickEvent(wxGridEvent &event)
 	else
 		SetCellValue(row, event.GetCol(), _T("1"));
 
-	guiInterface.ShowAppropriateXLabel();
+	mGuiInterface.ShowAppropriateXLabel();
 
-	guiInterface.UpdateCurveProperties(row - 1);
+	mGuiInterface.UpdateCurveProperties(row - 1);
 }
 
 //=============================================================================
@@ -394,12 +394,12 @@ void PlotListGrid::GridCellChangeEvent(wxGridEvent &event)
 		event.GetCol() != static_cast<int>(Column::MarkerSize)))
 	{
 		event.Skip();
-		guiInterface.UpdateLegend();// Included in case of text changes
-		guiInterface.RefreshRenderer();
+		mGuiInterface.UpdateLegend();// Included in case of text changes
+		mGuiInterface.RefreshRenderer();
 		return;
 	}
 
-	guiInterface.UpdateCurveProperties(row - 1);
+	mGuiInterface.UpdateCurveProperties(row - 1);
 }
 
 //=============================================================================
@@ -445,7 +445,7 @@ void PlotListGrid::GridLabelRightClickEvent(wxGridEvent &event)
 //=============================================================================
 void PlotListGrid::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.DisplayMathChannelDialog(wxString::Format("[%i]", GetSelectedRows()[0]));
+	mGuiInterface.DisplayMathChannelDialog(wxString::Format("[%i]", GetSelectedRows()[0]));
 }
 
 //=============================================================================
@@ -466,7 +466,7 @@ void PlotListGrid::ContextAddMathChannelEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.GenerateFRF();
+	mGuiInterface.GenerateFRF();
 }
 
 //=============================================================================
@@ -487,7 +487,7 @@ void PlotListGrid::ContextFRFEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextCreateSignalEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.CreateSignal();
+	mGuiInterface.CreateSignal();
 }
 
 //=============================================================================
@@ -509,7 +509,7 @@ void PlotListGrid::ContextCreateSignalEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextSetTimeUnitsEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.SetTimeUnits();
+	mGuiInterface.SetTimeUnits();
 }
 //=============================================================================
 // Class:			PlotListGrid
@@ -529,7 +529,7 @@ void PlotListGrid::ContextSetTimeUnitsEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextScaleXDataEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.ScaleXData(GetSelectedRows());
+	mGuiInterface.ScaleXData(GetSelectedRows());
 }
 
 //=============================================================================
@@ -551,7 +551,7 @@ void PlotListGrid::ContextScaleXDataEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.PlotDerivative(GetSelectedRows());
+	mGuiInterface.PlotDerivative(GetSelectedRows());
 }
 
 //=============================================================================
@@ -573,7 +573,7 @@ void PlotListGrid::ContextPlotDerivativeEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.PlotIntegral(GetSelectedRows());
+	mGuiInterface.PlotIntegral(GetSelectedRows());
 }
 
 //=============================================================================
@@ -595,7 +595,7 @@ void PlotListGrid::ContextPlotIntegralEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.PlotRMS(GetSelectedRows());
+	mGuiInterface.PlotRMS(GetSelectedRows());
 }
 
 //=============================================================================
@@ -617,7 +617,7 @@ void PlotListGrid::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.PlotFFT(GetSelectedRows());
+	mGuiInterface.PlotFFT(GetSelectedRows());
 }
 
 //=============================================================================
@@ -638,7 +638,7 @@ void PlotListGrid::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextRemoveCurveEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.RemoveCurves(GetSelectedRows());
+	mGuiInterface.RemoveCurves(GetSelectedRows());
 }
 
 //=============================================================================
@@ -659,7 +659,7 @@ void PlotListGrid::ContextRemoveCurveEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.BitMask(GetSelectedRows());
+	mGuiInterface.BitMask(GetSelectedRows());
 }
 
 //=============================================================================
@@ -681,7 +681,7 @@ void PlotListGrid::ContextBitMaskEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.TimeShift(GetSelectedRows());
+	mGuiInterface.TimeShift(GetSelectedRows());
 }
 
 //=============================================================================
@@ -703,7 +703,7 @@ void PlotListGrid::ContextTimeShiftEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.FilterCurves(GetSelectedRows());
+	mGuiInterface.FilterCurves(GetSelectedRows());
 }
 
 //=============================================================================
@@ -725,7 +725,7 @@ void PlotListGrid::ContextFilterEvent(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotListGrid::ContextFitCurve(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.FitCurves(GetSelectedRows());
+	mGuiInterface.FitCurves(GetSelectedRows());
 }
 
 //=============================================================================
@@ -748,7 +748,7 @@ void PlotListGrid::AddTimeRow()
 {
 	AppendRows();
 
-	guiInterface.SetXDataLabel(guiInterface.GetCurrentFileFormat());
+	mGuiInterface.SetXDataLabel(mGuiInterface.GetCurrentFileFormat());
 
 	unsigned int i;
 	for (i = 0; i < static_cast<unsigned int>(Column::Count); ++i)

@@ -31,11 +31,11 @@ public:
 	~TextRendering() = default;
 
 	// Set option methods
-	void SetAngle(const double& angle) { this->angle = angle; modified = true; }// [rad]
+	void SetAngle(const double& angle) { this->angle = angle; mModified = true; }// [rad]
 	void InitializeFonts(const std::string& fontFileName, const double& size);
-	void SetText(const wxString& text) { this->text = text; modified = true; }
-	void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; modified = true; }
-	void SetCentered(const bool& centered) { this->centered = centered; modified = true; }
+	void SetText(const wxString& text) { this->text = text; mModified = true; }
+	void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; mModified = true; }
+	void SetCentered(const bool& centered) { this->centered = centered; mModified = true; }
 
 	double GetTextHeight();
 	double GetTextWidth();

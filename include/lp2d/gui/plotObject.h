@@ -46,19 +46,19 @@ public:
 	void AddCurve(const Dataset2D &data);
 
 	// Accessors for the axes limits
-	inline double GetXMin() const { return xMin; }
-	inline double GetXMax() const { return xMax; }
-	inline double GetLeftYMin() const { return yLeftMin; }
-	inline double GetLeftYMax() const { return yLeftMax; }
-	inline double GetRightYMin() const { return yRightMin; }
-	inline double GetRightYMax() const { return yRightMax; }
+	inline double GetXMin() const { return mXMin; }
+	inline double GetXMax() const { return mXMax; }
+	inline double GetLeftYMin() const { return mYLeftMin; }
+	inline double GetLeftYMax() const { return mYLeftMax; }
+	inline double GetRightYMin() const { return mYRightMin; }
+	inline double GetRightYMax() const { return mYRightMax; }
 
-	inline double GetXMinOriginal() const { return xMinOriginal; }
-	inline double GetXMaxOriginal() const { return xMaxOriginal; }
-	inline double GetLeftYMinOriginal() const { return yLeftMinOriginal; }
-	inline double GetLeftYMaxOriginal() const { return yLeftMaxOriginal; }
-	inline double GetRightYMinOriginal() const { return yRightMinOriginal; }
-	inline double GetRightYMaxOriginal() const { return yRightMaxOriginal; }
+	inline double GetXMinOriginal() const { return mXMinOriginal; }
+	inline double GetXMaxOriginal() const { return mXMaxOriginal; }
+	inline double GetLeftYMinOriginal() const { return mYLeftMinOriginal; }
+	inline double GetLeftYMaxOriginal() const { return mYLeftMaxOriginal; }
+	inline double GetRightYMinOriginal() const { return mYRightMinOriginal; }
+	inline double GetRightYMaxOriginal() const { return mYRightMaxOriginal; }
 
 	void SetXMin(const double &xMin);
 	void SetXMax(const double &xMax);
@@ -84,11 +84,11 @@ public:
 	void SetLeftYMajorResolution(const double &resolution);
 	void SetRightYMajorResolution(const double &resolution);
 
-	void SetPrettyCurves(const bool &pretty) { this->pretty = pretty; }
+	void SetPrettyCurves(const bool &pretty) { mPretty = pretty; }
 
-	inline double GetXMajorResolution() const { return xMajorResolution; }
-	inline double GetLeftYMajorResolution() const { return yLeftMajorResolution; }
-	inline double GetRightYMajorResolution() const { return yRightMajorResolution; }
+	inline double GetXMajorResolution() const { return mXMajorResolution; }
+	inline double GetLeftYMajorResolution() const { return mYLeftMajorResolution; }
+	inline double GetRightYMajorResolution() const { return mYRightMajorResolution; }
 
 	void SetXLabel(wxString text);
 	void SetLeftYLabel(wxString text);
@@ -104,14 +104,14 @@ public:
 	Color GetGridColor() const;
 
 	void ResetAutoScaling();
-	void SetAutoScaleBottom() { autoScaleX = true; }
-	void SetAutoScaleLeft() { autoScaleLeftY = true; }
-	void SetAutoScaleRight() { autoScaleRightY = true; }
+	void SetAutoScaleBottom() { mAutoScaleX = true; }
+	void SetAutoScaleLeft() { mAutoScaleLeftY = true; }
+	void SetAutoScaleRight() { mAutoScaleRightY = true; }
 
-	const Axis* GetBottomAxis() const { return axisBottom; }
-	const Axis* GetTopAxis() const { return axisTop; }
-	const Axis* GetLeftYAxis() const { return axisLeft; }
-	const Axis* GetRightYAxis() const { return axisRight; }
+	const Axis* GetBottomAxis() const { return mAxisBottom; }
+	const Axis* GetTopAxis() const { return mAxisTop; }
+	const Axis* GetLeftYAxis() const { return mAxisLeft; }
+	const Axis* GetRightYAxis() const { return mAxisRight; }
 	bool GetMajorGrid();
 	bool GetMinorGrid();
 
@@ -119,64 +119,64 @@ public:
 	void SetLeftLogarithmic(const bool &log);
 	void SetRightLogarithmic(const bool &log);
 
-	bool GetXAxisAutoScaled() const { return autoScaleX; }
+	bool GetXAxisAutoScaled() const { return mAutoScaleX; }
 
-	unsigned int GetCurveCount() const { return plotList.size(); }
+	unsigned int GetCurveCount() const { return mPlotList.size(); }
 	unsigned long long GetTotalPointCount() const;
 
 	unsigned int GetHorizontalAxisOffset(const bool &withLabel) const;
 	unsigned int GetVerticalAxisOffset(const bool &withLabel) const;
 
-	inline void UpdatePlotAreaSize() { needScissorUpdate = true; }
+	inline void UpdatePlotAreaSize() { mNeedScissorUpdate = true; }
 
-	inline std::string GetAxisFont() const { return fontFileName; }
+	inline std::string GetAxisFont() const { return mFontFileName; }
 
 private:
-	PlotRenderer &renderer;
-	GuiInterface &guiInterface;
+	PlotRenderer &mRenderer;
+	GuiInterface &mGuiInterface;
 
-	static const unsigned int horizontalOffsetWithLabel;
-	static const unsigned int horizontalOffsetWithoutLabel;
-	static const unsigned int verticalOffsetWithLabel;
-	static const unsigned int verticalOffsetWithoutLabel;
+	static const unsigned int mHorizontalOffsetWithLabel;
+	static const unsigned int mHorizontalOffsetWithoutLabel;
+	static const unsigned int mVerticalOffsetWithLabel;
+	static const unsigned int mVerticalOffsetWithoutLabel;
 
 	// The actors (the non-plot actors that are always present)
-	Axis *axisTop;
-	Axis *axisBottom;
-	Axis *axisLeft;
-	Axis *axisRight;
+	Axis *mAxisTop;
+	Axis *mAxisBottom;
+	Axis *mAxisLeft;
+	Axis *mAxisRight;
 
-	TextRendering *titleObject;
+	TextRendering *mTitleObject;
 
 	// The minimums and maximums for the axis
-	double xMin, xMax, yLeftMin, yLeftMax, yRightMin, yRightMax;
-	double xMinOriginal = 0.0;
-	double xMaxOriginal = 0.0;
-	double yLeftMinOriginal = 0.0;
-	double yLeftMaxOriginal = 0.0;
-	double yRightMinOriginal = 0.0;
-	double yRightMaxOriginal = 0.0;
+	double mXMin, mXMax, mYLeftMin, mYLeftMax, mYRightMin, mYRightMax;
+	double mXMinOriginal = 0.0;
+	double mXMaxOriginal = 0.0;
+	double mYLeftMinOriginal = 0.0;
+	double mYLeftMaxOriginal = 0.0;
+	double mYRightMinOriginal = 0.0;
+	double mYRightMaxOriginal = 0.0;
 
-	bool autoScaleX;
-	bool autoScaleLeftY;
-	bool autoScaleRightY;
+	bool mAutoScaleX;
+	bool mAutoScaleLeftY;
+	bool mAutoScaleRightY;
 
-	bool leftUsed;
-	bool rightUsed;
+	bool mLeftUsed;
+	bool mRightUsed;
 
-	bool pretty;
+	bool mPretty;
 
-	double xMajorResolution;
-	double yLeftMajorResolution;
-	double yRightMajorResolution;
+	double mXMajorResolution;
+	double mYLeftMajorResolution;
+	double mYRightMajorResolution;
 
-	bool needScissorUpdate;
+	bool mNeedScissorUpdate = true;
 
 	// The actual plot objects
-	std::vector<PlotCurve*> plotList;
-	std::vector<const Dataset2D*> dataList;
+	std::vector<PlotCurve*> mPlotList;
+	std::vector<const Dataset2D*> mDataList;
 
-	std::string fontFileName;
+	std::string mFontFileName;
 	void CreateAxisObjects();
 	void InitializeFonts();
 
@@ -185,12 +185,15 @@ private:
 	void ComputeTransformationMatrices();
 
 	// Handles the spacing of the axis ticks
-	void AutoScaleAxis(double &min, double &max, double &majorRes, const int &maxTicks, const bool &logarithmic,
+	void AutoScaleAxis(double &min, double &max, double &majorRes,
+		const int &maxTicks, const bool &logarithmic,
 		const bool &forceLimits) const;
-	void AutoScaleLogAxis(double &min, double &max, double &majorRes, const bool &forceLimits) const;
-	void AutoScaleLinearAxis(double &min, double &max, double &majorRes, const int &maxTicks,
+	void AutoScaleLogAxis(double &min, double &max, double &majorRes,
 		const bool &forceLimits) const;
-	void RoundMinMax(double &min, double &max, const double &tickSpacing, const bool &forceLimits) const;
+	void AutoScaleLinearAxis(double &min, double &max, double &majorRes,
+		const int &maxTicks, const bool &forceLimits) const;
+	void RoundMinMax(double &min, double &max, const double &tickSpacing,
+		const bool &forceLimits) const;
 	double ComputeMinorResolution(const double &min, const double &max,
 		const double &majorResolution, const double &axisLength) const;
 
@@ -208,11 +211,13 @@ private:
 	void CheckForZeroRange();
 	void HandleZeroRangeAxis(double &min, double &max) const;
 
-	void ApplyRangeLimits(const double &xMinor, const double &xMajor, const double &yLeftMinor,
-		const double &yLeftMajor, const double &yRightMinor, const double &yRightMajor);
+	void ApplyRangeLimits(const double &xMinor, const double &xMajor,
+		const double &yLeftMinor, const double &yLeftMajor,
+		const double &yRightMinor, const double &yRightMajor);
 	void CheckAutoScaling();
 	void UpdateLimitValues();
-	void ValidateRangeLimits(double &min, double &max, const bool &autoScale, double &major, double &minor) const;
+	void ValidateRangeLimits(double &min, double &max, const bool &autoScale,
+		double &major, double &minor) const;
 	void ValidateLogarithmicLimits(Axis &axis, const double &min);
 	void SetOriginalAxisLimits();
 	void GetAxisExtremes(const Dataset2D &data, Axis *yAxis);

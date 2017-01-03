@@ -35,8 +35,9 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const double &max)
-									 : wxDialog(parent, wxID_ANY, _T("Set Axis Limits"), wxDefaultPosition)
+RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min,
+	const double &max) : wxDialog(parent, wxID_ANY, _T("Set Axis Limits"),
+	wxDefaultPosition)
 {
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -49,15 +50,15 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 	wxString valueString;
 	wxStaticText *minLabel = new wxStaticText(this, wxID_ANY, _T("Minimum"));
 	valueString.Printf("%f", min);
-	minBox = new wxTextCtrl(this, wxID_ANY, valueString);
+	mMinBox = new wxTextCtrl(this, wxID_ANY, valueString);
 	inputSizer->Add(minLabel);
-	inputSizer->Add(minBox, 0, wxEXPAND);
+	inputSizer->Add(mMinBox, 0, wxEXPAND);
 
 	wxStaticText *maxLabel = new wxStaticText(this, wxID_ANY, _T("Maximum"));
 	valueString.Printf("%f", max);
-	maxBox = new wxTextCtrl(this, wxID_ANY, valueString);
+	mMaxBox = new wxTextCtrl(this, wxID_ANY, valueString);
 	inputSizer->Add(maxLabel);
-	inputSizer->Add(maxBox, 0, wxEXPAND);
+	inputSizer->Add(mMaxBox, 0, wxEXPAND);
 
 	mainSizer->AddSpacer(10);
 
@@ -65,7 +66,7 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min, const 
 	if (buttons)
 		mainSizer->Add(buttons, 1, wxGROW);
 
-	minBox->SetFocus();
+	mMinBox->SetFocus();
 
 	SetSizerAndFit(topSizer);
 
@@ -111,7 +112,7 @@ END_EVENT_TABLE()
 double RangeLimitsDialog::GetMinimum() const
 {
 	double value;
-	if (!minBox->GetValue().ToDouble(&value))
+	if (!mMinBox->GetValue().ToDouble(&value))
 		value = 0.0;
 
 	return value;
@@ -136,7 +137,7 @@ double RangeLimitsDialog::GetMinimum() const
 double RangeLimitsDialog::GetMaximum() const
 {
 	double value;
-	if (!maxBox->GetValue().ToDouble(&value))
+	if (!mMaxBox->GetValue().ToDouble(&value))
 		value = 0.0;
 
 	return value;
@@ -162,7 +163,7 @@ void RangeLimitsDialog::OnOKButton(wxCommandEvent &event)
 {
 	// Validate the values in the min and max boxes
 	double dummy;
-	if (!minBox->GetValue().ToDouble(&dummy) || !maxBox->GetValue().ToDouble(&dummy))
+	if (!mMinBox->GetValue().ToDouble(&dummy) || !mMaxBox->GetValue().ToDouble(&dummy))
 	{
 		::wxMessageBox(_T("ERROR:  Minimum and Maximum values must be numbers!"), _T("Error Setting Limits"));
 		return;

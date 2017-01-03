@@ -34,15 +34,15 @@ public:
 
 	~PlotCurve() = default;
 
-	inline void SetLineSize(const double &size) { lineSize = size; modified = true; }
-	inline void SetMarkerSize(const double &size) { markerSize = size; modified = true; }
-	inline void SetPretty(const bool &pretty) { this->pretty = pretty; line.SetPretty(pretty); modified = true; }
+	inline void SetLineSize(const double &size) { mLineSize = size; mModified = true; }
+	inline void SetMarkerSize(const double &size) { mMarkerSize = size; mModified = true; }
+	inline void SetPretty(const bool &pretty) { mPretty = pretty; mLine.SetPretty(pretty); mModified = true; }
 
 	// For setting up the plot
-	inline void BindToXAxis(Axis* xAxis) { this->xAxis = xAxis; modified = true; }
-	inline void BindToYAxis(Axis* yAxis) { this->yAxis = yAxis; modified = true; }
+	inline void BindToXAxis(Axis* xAxis) { mXAxis = xAxis; mModified = true; }
+	inline void BindToYAxis(Axis* yAxis) { mYAxis = yAxis; mModified = true; }
 
-	inline Axis* GetYAxis() { return yAxis; }
+	inline Axis* GetYAxis() { return mYAxis; }
 
 	// Overloaded operators
 	PlotCurve& operator=(const PlotCurve &plotCurve);
@@ -56,16 +56,16 @@ protected:
 
 private:
 	// The axes with which this object is associated
-	Axis *xAxis;
-	Axis *yAxis;
+	Axis *mXAxis = nullptr;
+	Axis *mYAxis = nullptr;
 
-	const Dataset2D& data;
+	const Dataset2D& mData;
 
-	Line line;
+	Line mLine;
 
-	bool pretty;
-	double lineSize;
-	double markerSize;
+	bool mPretty = true;
+	double mLineSize = 1.0;
+	double mMarkerSize = -1.0;
 
 	bool PointIsValid(const unsigned int &i) const;
 
@@ -83,8 +83,8 @@ private:
 	RangeSize XRangeIsSmall() const;
 	RangeSize YRangeIsSmall() const;
 
-	double xScale;
-	double yScale;
+	double mXScale;
+	double mYScale;
 
 	void InitializeMarkerVertexBuffer();
 	static std::vector<double> DoLogarithmicScale(

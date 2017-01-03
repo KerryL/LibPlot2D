@@ -39,19 +39,12 @@ namespace LibPlot2D
 //=============================================================================
 Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 {
-	isVisible = true;
-
-	SetColor(Color::ColorBlack);
-	drawOrder = 1000;
-
 	renderWindow.AddActor(std::unique_ptr<Primitive>(this));
 	renderWindow.SetNeedAlphaSort();
 	renderWindow.SetNeedOrderSort();
 
 	// Add a default info block to ensure the initialize and update functions get called
 	bufferInfo.push_back(BufferInfo());
-
-	modified = true;
 }
 
 //=============================================================================
@@ -144,13 +137,13 @@ void Primitive::Draw()
 	unsigned int i;
 	for (i = 0; i < bufferInfo.size(); ++i)
 	{
-		if (bufferInfo[i].vertexCountModified || modified)
+		if (bufferInfo[i].vertexCountModified || mModified)
 			Update(i);
 	}
 
 	assert(!RenderWindow::GLHasError());
 
-	modified = false;
+	mModified = false;
 	GenerateGeometry();
 
 	assert(!RenderWindow::GLHasError());
@@ -175,7 +168,7 @@ void Primitive::Draw()
 void Primitive::SetVisibility(const bool &isVisible)
 {
 	this->isVisible = isVisible;
-	modified = true;
+	mModified = true;
 }
 
 //=============================================================================
@@ -198,7 +191,7 @@ void Primitive::SetColor(const Color &color)
 {
 	this->color = color;
 	renderWindow.SetNeedAlphaSort();
-	modified = true;
+	mModified = true;
 }
 
 //=============================================================================
@@ -248,7 +241,7 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 	// Perform the assignment
 	isVisible	= primitive.isVisible;
 	color		= primitive.color;
-	modified	= true;
+	mModified	= true;
 	drawOrder	= primitive.drawOrder;
 
 	renderWindow.SetNeedAlphaSort();
@@ -282,7 +275,7 @@ Primitive& Primitive::operator=(Primitive &&primitive)
 	// Perform the assignment
 	isVisible	= std::move(primitive.isVisible);
 	color		= std::move(primitive.color);
-	modified	= true;
+	mModified	= true;
 	drawOrder	= std::move(primitive.drawOrder);
 	bufferInfo	= std::move(primitive.bufferInfo);
 

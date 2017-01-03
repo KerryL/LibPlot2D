@@ -32,8 +32,8 @@ public:
 	double GetMaximum() const;
 
 private:
-	wxTextCtrl *minBox;
-	wxTextCtrl *maxBox;
+	wxTextCtrl *mMinBox;
+	wxTextCtrl *mMaxBox;
 
 	// Overload from wxDialog
 	virtual void OnOKButton(wxCommandEvent &event);

@@ -35,7 +35,7 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-DropTarget::DropTarget(GuiInterface &guiInterface) : guiInterface(guiInterface)
+DropTarget::DropTarget(GuiInterface &guiInterface) : mGuiInterface(guiInterface)
 {
 	wxDataObjectComposite *dataObject = new wxDataObjectComposite;
 
@@ -64,7 +64,7 @@ DropTarget::DropTarget(GuiInterface &guiInterface) : guiInterface(guiInterface)
 //=============================================================================
 bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 {
-	guiInterface.LoadFiles(filenames);
+	mGuiInterface.LoadFiles(filenames);
 	return true;// TODO:  Should I ever return false?
 }
 
@@ -86,7 +86,7 @@ bool DropTarget::OnDropFiles(const wxArrayString &filenames)
 //=============================================================================
 bool DropTarget::OnDropText(const wxString& data)
 {
-	guiInterface.LoadText(data);
+	mGuiInterface.LoadText(data);
 	return true;// TODO:  Should I ever return false?
 }
 

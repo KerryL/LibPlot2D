@@ -45,7 +45,7 @@ public:
 	void SetColor(const Color &color);
 	inline Color GetColor() const { return color; }
 	void SetDrawOrder(const unsigned int &drawOrder);
-	inline void SetModified() { modified = true; }// Forces a re-draw
+	inline void SetModified() { mModified = true; }// Forces a re-draw
 
 	inline bool GetIsVisible() const { return isVisible; }
 	inline unsigned int GetDrawOrder() const { return drawOrder; }
@@ -86,11 +86,11 @@ public:
 	};
 
 protected:
-	bool isVisible;
+	bool isVisible = true;
 
-	Color color;
+	Color color = Color::ColorBlack;
 
-	bool modified;
+	bool mModified = true;
 
 	RenderWindow &renderWindow;
 
@@ -104,7 +104,7 @@ protected:
 	std::vector<BufferInfo> bufferInfo;
 
 private:
-	unsigned int drawOrder;
+	unsigned int drawOrder = 1000;
 };
 
 }// namespace LibPlot2D

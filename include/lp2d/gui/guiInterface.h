@@ -60,7 +60,7 @@ public:
 	void RemoveSelectedCurves();
 	void ClearAllCurves();
 
-	void SetApplicationTitle(const wxString& title) { applicationTitle = title; }
+	void SetApplicationTitle(const wxString& title) { mApplicationTitle = title; }
 
 	enum class FileFormat
 	{
@@ -74,9 +74,9 @@ public:
 	void RegisterFileType();
 	void RegisterAllBuiltInFileTypes();
 
-	FileFormat GetCurrentFileFormat() const { return currentFileFormat; }
+	FileFormat GetCurrentFileFormat() const { return mCurrentFileFormat; }
 
-	void RefreshRenderer() { renderer->Refresh(); }
+	void RefreshRenderer() { mRenderer->Refresh(); }
 
 	void DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis);
 	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);
@@ -110,10 +110,10 @@ public:
 	static bool UnitStringToFactor(const wxString &unit, double &factor);
 
 private:
-	wxFrame* owner;
+	wxFrame* mOwner;
 
-	void SetPlotListGrid(PlotListGrid* g) { grid = g; }
-	void SetRenderWindow(PlotRenderer* r) { renderer = r; }
+	void SetPlotListGrid(PlotListGrid* grid) { mGrid = grid; }
+	void SetRenderWindow(PlotRenderer* renderer) { mRenderer = renderer; }
 
 	friend PlotRenderer::PlotRenderer(GuiInterface& guiInterface,
 		wxWindow &wxParent, wxWindowID id, const wxGLAttributes& attr);
@@ -122,21 +122,21 @@ private:
 
 	ManagedList<const Dataset2D> plotList;
 
-	PlotListGrid* grid = nullptr;
-	PlotRenderer* renderer = nullptr;
+	PlotListGrid* mGrid = nullptr;
+	PlotRenderer* mRenderer = nullptr;
 
-	wxString applicationTitle;
+	wxString mApplicationTitle;
 
 	wxString GenerateTemporaryFileName(const unsigned int &length = 10) const;
 
-	wxArrayString lastFilesLoaded;
-	DataFile::SelectionData lastSelectionInfo;
-	wxArrayString lastDescriptions;
+	wxArrayString mLastFilesLoaded;
+	DataFile::SelectionData mLastSelectionInfo;
+	wxArrayString mLastDescriptions;
 
-	FileTypeManager fileTypeManager;
+	FileTypeManager mFileTypeManager;
 
-	FileFormat currentFileFormat = FileFormat::Generic;
-	wxString genericXAxisLabel;
+	FileFormat mCurrentFileFormat = FileFormat::Generic;
+	wxString mGenericXAxisLabel;
 
 	bool GetXAxisScalingFactor(double &factor, wxString *label = nullptr);
 
@@ -185,7 +185,7 @@ void GuiInterface::RegisterFileType()
 {
 	static_assert(std::is_base_of<DataFile, T>::value,
 		"T must be a descendant of DataFile");
-	fileTypeManager.RegisterFileType(T::IsType, DataFile::Create<T>);
+	mFileTypeManager.RegisterFileType(T::IsType, DataFile::Create<T>);
 }
 
 }// namespace LibPlot2D

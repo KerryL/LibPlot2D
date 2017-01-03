@@ -150,7 +150,7 @@ void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &y
 	this->xAnchor = xAnchor;
 	this->yAnchor = yAnchor;
 
-	modified = true;
+	mModified = true;
 }
 
 //=============================================================================
@@ -175,7 +175,7 @@ void ZoomBox::SetFloatingCorner(const unsigned int &xFloat, const unsigned int &
 	this->xFloat = xFloat;
 	this->yFloat = yFloat;
 
-	modified = true;
+	mModified = true;
 }
 
 }// namespace LibPlot2D

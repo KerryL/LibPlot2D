@@ -41,7 +41,7 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-const double Line::fadeDistance(0.05);
+const double Line::mFadeDistance(0.05);
 
 //=============================================================================
 // Class:			Line
@@ -59,18 +59,11 @@ const double Line::fadeDistance(0.05);
 //		None
 //
 //=============================================================================
-Line::Line(const RenderWindow& renderWindow)
-	: renderWindow(renderWindow)
+Line::Line(const RenderWindow& renderWindow) : mRenderWindow(renderWindow),
+	mHint(GL_DYNAMIC_DRAW)
 {
-	pretty = true;
 	SetWidth(1.0);
-	lineColor = Color::ColorBlack;
 	SetBackgroundColorForAlphaFade();
-
-	xScale = 1.0;
-	yScale = 1.0;
-
-	hint = GL_DYNAMIC_DRAW;
 }
 
 //=============================================================================
@@ -125,7 +118,7 @@ void Line::Build(const double &x1, const double &y1,const double &x2,
 	const double &y2, Primitive::BufferInfo& bufferInfo,
 	const UpdateMethod& update) const
 {
-	if (pretty)
+	if (mPretty)
 	{
 		std::vector<std::pair<double, double>> v;
 		v.push_back(std::make_pair(x1, y1));
@@ -191,7 +184,7 @@ void Line::Build(const std::vector<std::pair<double, double>> &points,
 	if (points.size() < 2)
 		return;
 
-	if (pretty)
+	if (mPretty)
 		DoPrettyDraw(points, update, bufferInfo);
 	else
 		DoUglyDraw(points, update, bufferInfo);
@@ -254,7 +247,7 @@ void Line::BuildSegments(const std::vector<std::pair<double, double>> &points,
 		return;
 	assert(points.size() % 2 == 0);
 
-	if (pretty)
+	if (mPretty)
 		DoPrettySegmentDraw(points, update, bufferInfo);
 	else
 		DoUglyDraw(points, update, bufferInfo);
@@ -286,13 +279,13 @@ void Line::BuildSegments(const std::vector<std::pair<double, double>> &points,
 void Line::ComputeOffsets(const double &x1, const double &y1, const double &x2,
 	const double &y2, double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
 {
-	double miter(atan2((y2 - y1) / yScale, (x2 - x1) / xScale) + M_PI * 0.5);
+	double miter(atan2((y2 - y1) / mYScale, (x2 - x1) / mXScale) + M_PI * 0.5);
 
-	dxLine = halfWidth * cos(miter) * xScale;
-	dyLine = halfWidth * sin(miter) * yScale;
+	dxLine = mHalfWidth * cos(miter) * mXScale;
+	dyLine = mHalfWidth * sin(miter) * mYScale;
 
-	dxEdge = dxLine * (halfWidth + fadeDistance) / halfWidth;
-	dyEdge = dyLine * (halfWidth + fadeDistance) / halfWidth;
+	dxEdge = dxLine * (mHalfWidth + mFadeDistance) / mHalfWidth;
+	dyEdge = dyLine * (mHalfWidth + mFadeDistance) / mHalfWidth;
 }
 
 //=============================================================================
@@ -324,8 +317,10 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 	const double &x, const double &y, const double &xNext, const double &yNext,
 	double& dxLine, double& dyLine, double& dxEdge, double& dyEdge) const
 {
-	const double anglePrior(atan2((y - yPrior) / yScale, (x - xPrior) / xScale));
-	const double angleNext(atan2((yNext - y) / yScale, (xNext - x) / xScale));
+	const double anglePrior(atan2((y - yPrior) / mYScale,
+		(x - xPrior) / mXScale));
+	const double angleNext(atan2((yNext - y) / mYScale,
+		(xNext - x) / mXScale));
 	double miter(0.5 * (anglePrior + angleNext));
 	
 	if (fabs(angleNext - anglePrior) < M_PI)
@@ -333,7 +328,7 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 	else
 		miter -= M_PI * 0.5;
 
-	double miterLength(halfWidth), fade(fadeDistance);
+	double miterLength(mHalfWidth), fade(mFadeDistance);
 	const double divisor(sin((M_PI - angleNext + anglePrior) * 0.5));
 	if (!PlotMath::IsZero(divisor))
 	{
@@ -341,8 +336,8 @@ void Line::ComputeOffsets(const double &xPrior, const double &yPrior,
 		fade /= fabs(divisor);
 	}
 
-	dxLine = miterLength * cos(miter) * xScale;
-	dyLine = miterLength * sin(miter) * yScale;
+	dxLine = miterLength * cos(miter) * mXScale;
+	dyLine = miterLength * sin(miter) * mYScale;
 
 	dxEdge = dxLine * (miterLength + fade) / miterLength;
 	dyEdge = dyLine * (miterLength + fade) / miterLength;
@@ -372,8 +367,8 @@ void Line::AllocateBuffer(const unsigned int& vertexCount,
 
 	bufferInfo.vertexCount = vertexCount;
 	bufferInfo.vertexBuffer.resize(bufferInfo.vertexCount
-		* (renderWindow.GetVertexDimension() + 4));
-	assert(renderWindow.GetVertexDimension() == 2);
+		* (mRenderWindow.GetVertexDimension() + 4));
+	assert(mRenderWindow.GetVertexDimension() == 2);
 
 	if (triangleCount > 0)
 		bufferInfo.indexBuffer.resize(triangleCount * 3);
@@ -412,15 +407,15 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 	bufferInfo.vertexBuffer[2] = (float)x2;
 	bufferInfo.vertexBuffer[3] = (float)y2;
 
-	bufferInfo.vertexBuffer[4] = (float)lineColor.GetRed();
-	bufferInfo.vertexBuffer[5] = (float)lineColor.GetGreen();
-	bufferInfo.vertexBuffer[6] = (float)lineColor.GetBlue();
-	bufferInfo.vertexBuffer[7] = (float)lineColor.GetAlpha();
+	bufferInfo.vertexBuffer[4] = (float)mLineColor.GetRed();
+	bufferInfo.vertexBuffer[5] = (float)mLineColor.GetGreen();
+	bufferInfo.vertexBuffer[6] = (float)mLineColor.GetBlue();
+	bufferInfo.vertexBuffer[7] = (float)mLineColor.GetAlpha();
 
-	bufferInfo.vertexBuffer[8] = (float)lineColor.GetRed();
-	bufferInfo.vertexBuffer[9] = (float)lineColor.GetGreen();
-	bufferInfo.vertexBuffer[10] = (float)lineColor.GetBlue();
-	bufferInfo.vertexBuffer[11] = (float)lineColor.GetAlpha();
+	bufferInfo.vertexBuffer[8] = (float)mLineColor.GetRed();
+	bufferInfo.vertexBuffer[9] = (float)mLineColor.GetGreen();
+	bufferInfo.vertexBuffer[10] = (float)mLineColor.GetBlue();
+	bufferInfo.vertexBuffer[11] = (float)mLineColor.GetAlpha();
 
 	if (update != UpdateMethod::Immediate)
 		return;
@@ -429,17 +424,17 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer.data(), hint);
+		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(renderWindow.GetColorLocation());
-	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo.vertexCount));
+	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * bufferInfo.vertexCount));
 
-	glLineWidth(2.0 * halfWidth);
+	glLineWidth(2.0 * mHalfWidth);
 
 	glBindVertexArray(0);
 
@@ -468,7 +463,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 {
 	AllocateBuffer(points.size(), 0, bufferInfo);
 
-	const unsigned int dimension(renderWindow.GetVertexDimension());
+	const unsigned int dimension(mRenderWindow.GetVertexDimension());
 	const unsigned int start(points.size() * dimension);
 	unsigned int i;
 	for (i = 0; i < points.size(); ++i)
@@ -476,10 +471,10 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 		bufferInfo.vertexBuffer[i * dimension] = (float)points[i].first;
 		bufferInfo.vertexBuffer[i * dimension + 1] = (float)points[i].second;
 
-		bufferInfo.vertexBuffer[start + i * 4] = (float)lineColor.GetRed();
-		bufferInfo.vertexBuffer[start + i * 4 + 1] = (float)lineColor.GetGreen();
-		bufferInfo.vertexBuffer[start + i * 4 + 2] = (float)lineColor.GetBlue();
-		bufferInfo.vertexBuffer[start + i * 4 + 3] = (float)lineColor.GetAlpha();
+		bufferInfo.vertexBuffer[start + i * 4] = (float)mLineColor.GetRed();
+		bufferInfo.vertexBuffer[start + i * 4 + 1] = (float)mLineColor.GetGreen();
+		bufferInfo.vertexBuffer[start + i * 4 + 2] = (float)mLineColor.GetBlue();
+		bufferInfo.vertexBuffer[start + i * 4 + 3] = (float)mLineColor.GetAlpha();
 	}
 
 	if (update != UpdateMethod::Immediate)
@@ -489,17 +484,17 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer.data(), hint);
+		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-	glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(renderWindow.GetColorLocation());
-	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo.vertexCount));
+	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * bufferInfo.vertexCount));
 
-	glLineWidth(2.0 * halfWidth);
+	glLineWidth(2.0 * mHalfWidth);
 
 	glBindVertexArray(0);
 
@@ -586,20 +581,20 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer.data(), hint);
+		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-	glVertexAttribPointer(renderWindow.GetPositionLocation(),
-		renderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetPositionLocation(),
+		mRenderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(renderWindow.GetColorLocation());
-	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
+	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * 4 * points.size()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
-		bufferInfo.indexBuffer.data(), hint);
+		bufferInfo.indexBuffer.data(), mHint);
 
 	glBindVertexArray(0);
 
@@ -686,20 +681,20 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &poi
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer.data(), hint);
+		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-	glVertexAttribPointer(renderWindow.GetPositionLocation(),
-		renderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetPositionLocation(),
+		mRenderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(renderWindow.GetColorLocation());
-	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * 4 * points.size()));
+	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * 4 * points.size()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
-		bufferInfo.indexBuffer.data(), hint);
+		bufferInfo.indexBuffer.data(), mHint);
 
 	glBindVertexArray(0);
 
@@ -727,7 +722,7 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double>>& points
 	const LineStyle& style, Primitive::BufferInfo& bufferInfo) const
 {
 	std::vector<Offsets> offsets(points.size());
-	const unsigned int dimension(renderWindow.GetVertexDimension());
+	const unsigned int dimension(mRenderWindow.GetVertexDimension());
 	const unsigned int colorStart(dimension * 4 * points.size());
 	unsigned int i;
 	for (i = 0; i < points.size(); ++i)
@@ -760,25 +755,25 @@ void Line::AssignVertexData(const std::vector<std::pair<double, double>>& points
 		bufferInfo.vertexBuffer[i * dimension * 4 + 3 * dimension] = (float)(points[i].first - offsets[i].dxEdge);
 		bufferInfo.vertexBuffer[i * dimension * 4 + 3 * dimension + 1] = (float)(points[i].second - offsets[i].dyEdge);
 
-		bufferInfo.vertexBuffer[colorStart + i * 16] = (float)backgroundColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 1] = (float)backgroundColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 2] = (float)backgroundColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 3] = (float)backgroundColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16] = (float)mBackgroundColor.GetRed();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 1] = (float)mBackgroundColor.GetGreen();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 2] = (float)mBackgroundColor.GetBlue();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 3] = (float)mBackgroundColor.GetAlpha();
 
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 4] = (float)lineColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 5] = (float)lineColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 6] = (float)lineColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 7] = (float)lineColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 4] = (float)mLineColor.GetRed();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 5] = (float)mLineColor.GetGreen();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 6] = (float)mLineColor.GetBlue();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 7] = (float)mLineColor.GetAlpha();
 
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 8] = (float)lineColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 9] = (float)lineColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 10] = (float)lineColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 11] = (float)lineColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 8] = (float)mLineColor.GetRed();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 9] = (float)mLineColor.GetGreen();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 10] = (float)mLineColor.GetBlue();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 11] = (float)mLineColor.GetAlpha();
 
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 12] = (float)backgroundColor.GetRed();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 13] = (float)backgroundColor.GetGreen();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 14] = (float)backgroundColor.GetBlue();
-		bufferInfo.vertexBuffer[colorStart + i * 16 + 15] = (float)backgroundColor.GetAlpha();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 12] = (float)mBackgroundColor.GetRed();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 13] = (float)mBackgroundColor.GetGreen();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 14] = (float)mBackgroundColor.GetBlue();
+		bufferInfo.vertexBuffer[colorStart + i * 16 + 15] = (float)mBackgroundColor.GetAlpha();
 	}
 }
 

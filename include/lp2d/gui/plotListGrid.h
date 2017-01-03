@@ -62,7 +62,7 @@ public:
 	};
 
 protected:
-	GuiInterface& guiInterface;
+	GuiInterface& mGuiInterface;
 
 	virtual void CreateGridContextMenu(const wxPoint& position, const unsigned int& row);
 

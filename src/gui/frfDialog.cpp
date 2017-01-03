@@ -102,14 +102,14 @@ wxSizer* FRFDialog::CreateSelectionControls(const wxArrayString &descriptions)
 	sizer->Add(rightSizer, 1, wxGROW);
 
 	wxStaticText *inputText = new wxStaticText(this, wxID_ANY, _T("Specify stimulus data:"));
-	inputList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, descriptions, wxLB_SINGLE);
+	mInputList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, descriptions, wxLB_SINGLE);
 	leftSizer->Add(inputText);
-	leftSizer->Add(inputList, 0, wxGROW | wxALL, 5);
+	leftSizer->Add(mInputList, 0, wxGROW | wxALL, 5);
 
 	wxStaticText *outputText = new wxStaticText(this, wxID_ANY, _T("Specify response data:"));
-	outputList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, descriptions, wxLB_SINGLE);
+	mOutputList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, descriptions, wxLB_SINGLE);
 	rightSizer->Add(outputText);
-	rightSizer->Add(outputList, 0, wxGROW | wxALL, 5);
+	rightSizer->Add(mOutputList, 0, wxGROW | wxALL, 5);
 
 	return sizer;
 }
@@ -135,9 +135,9 @@ wxSizer* FRFDialog::CreateTextBox()
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxStaticText *averagesLabel = new wxStaticText(this, wxID_ANY, _T("Number of Averages"));
-	averagesTextBox = new wxTextCtrl(this, wxID_ANY, _T("1"));
+	mAveragesTextBox = new wxTextCtrl(this, wxID_ANY, _T("1"));
 	sizer->Add(averagesLabel, 0, wxALL, 5);
-	sizer->Add(averagesTextBox, 1, wxGROW | wxALL, 5);
+	sizer->Add(mAveragesTextBox, 1, wxGROW | wxALL, 5);
 
 	return sizer;
 }
@@ -162,19 +162,19 @@ wxSizer *FRFDialog::CreateCheckBoxes()
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-	phaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Phase Data"));
-	moduloPhaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Keep Phase Data Within \261") _T("180 deg"));
-	coherenceCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Coherence Data"));
+	mPhaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Phase Data"));
+	mModuloPhaseCheckBox = new wxCheckBox(this, wxID_ANY, _T("Keep Phase Data Within \261") _T("180 deg"));
+	mCoherenceCheckBox = new wxCheckBox(this, wxID_ANY, _T("Include Coherence Data"));
 
-	phaseCheckBox->SetValue(true);
+	mPhaseCheckBox->SetValue(true);
 
 	wxBoxSizer *moduloSizer = new wxBoxSizer(wxHORIZONTAL);
-	moduloSizer->AddSpacer(phaseCheckBox->GetSize().GetHeight());
-	moduloSizer->Add(moduloPhaseCheckBox);
+	moduloSizer->AddSpacer(mPhaseCheckBox->GetSize().GetHeight());
+	moduloSizer->Add(mModuloPhaseCheckBox);
 
-	sizer->Add(phaseCheckBox, 0, wxALL, 5);
+	sizer->Add(mPhaseCheckBox, 0, wxALL, 5);
 	sizer->Add(moduloSizer, 0, wxALL, 5);
-	sizer->Add(coherenceCheckBox, 0, wxALL, 5);
+	sizer->Add(mCoherenceCheckBox, 0, wxALL, 5);
 
 	return sizer;
 }
@@ -197,7 +197,7 @@ wxSizer *FRFDialog::CreateCheckBoxes()
 //=============================================================================
 bool FRFDialog::TransferDataFromWindow()
 {
-	if (inputList->GetSelection() == wxNOT_FOUND || outputList->GetSelection() == wxNOT_FOUND)
+	if (mInputList->GetSelection() == wxNOT_FOUND || mOutputList->GetSelection() == wxNOT_FOUND)
 	{
 		wxMessageBox(_T("Please select one stimulus signal and one response signal."),
 			_T("Transfer Function"), wxICON_ERROR);
@@ -205,7 +205,7 @@ bool FRFDialog::TransferDataFromWindow()
 	}
 
 	unsigned long value;
-	if (!averagesTextBox->GetValue().ToULong(&value))
+	if (!mAveragesTextBox->GetValue().ToULong(&value))
 	{
 		wxMessageBox(_T("Number of averages must be an integer."),
 			_T("Transfer Function"), wxICON_ERROR);
@@ -233,7 +233,7 @@ bool FRFDialog::TransferDataFromWindow()
 //=============================================================================
 unsigned int FRFDialog::GetInputIndex() const
 {
-	return inputList->GetSelection();
+	return mInputList->GetSelection();
 }
 
 //=============================================================================
@@ -254,7 +254,7 @@ unsigned int FRFDialog::GetInputIndex() const
 //=============================================================================
 unsigned int FRFDialog::GetOutputIndex() const
 {
-	return outputList->GetSelection();
+	return mOutputList->GetSelection();
 }
 
 //=============================================================================
@@ -276,7 +276,7 @@ unsigned int FRFDialog::GetOutputIndex() const
 unsigned int FRFDialog::GetNumberOfAverages() const
 {
 	unsigned long value;
-	averagesTextBox->GetValue().ToULong(&value);
+	mAveragesTextBox->GetValue().ToULong(&value);
 	return std::max<unsigned int>((unsigned int)value, 1);
 }
 
@@ -298,7 +298,7 @@ unsigned int FRFDialog::GetNumberOfAverages() const
 //=============================================================================
 bool FRFDialog::GetComputePhase() const
 {
-	return phaseCheckBox->GetValue();
+	return mPhaseCheckBox->GetValue();
 }
 
 //=============================================================================
@@ -319,7 +319,7 @@ bool FRFDialog::GetComputePhase() const
 //=============================================================================
 bool FRFDialog::GetComputeCoherence() const
 {
-	return coherenceCheckBox->GetValue();
+	return mCoherenceCheckBox->GetValue();
 }
 
 //=============================================================================
@@ -340,7 +340,7 @@ bool FRFDialog::GetComputeCoherence() const
 //=============================================================================
 bool FRFDialog::GetModuloPhase() const
 {
-	return moduloPhaseCheckBox->GetValue();
+	return mModuloPhaseCheckBox->GetValue();
 }
 
 }// namespace LibPlot2D

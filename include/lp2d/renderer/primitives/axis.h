@@ -50,25 +50,25 @@ public:
 	};
 
 	// Set option methods
-	void SetOrientation(const Orientation &orientation) { this->orientation = orientation; modified = true; }
-	void SetMinimum(const double &minimum) { this->minimum = minimum; modified = true; }
-	void SetMaximum(const double &maximum) { this->maximum = maximum; modified = true; }
-	void SetMajorResolution(const double &majorResolution) { this->majorResolution = majorResolution; modified = true; }
-	void SetMinorResolution(const double &minorResolution) { this->minorResolution = minorResolution; modified = true; }
-	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; modified = true; }
-	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; modified = true; }
-	void SetLabel(wxString label) { this->label = label; modified = true; }
+	void SetOrientation(const Orientation &orientation) { this->orientation = orientation; mModified = true; }
+	void SetMinimum(const double &minimum) { this->minimum = minimum; mModified = true; }
+	void SetMaximum(const double &maximum) { this->maximum = maximum; mModified = true; }
+	void SetMajorResolution(const double &majorResolution) { this->majorResolution = majorResolution; mModified = true; }
+	void SetMinorResolution(const double &minorResolution) { this->minorResolution = minorResolution; mModified = true; }
+	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; mModified = true; }
+	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; mModified = true; }
+	void SetLabel(wxString label) { this->label = label; mModified = true; }
 	bool InitializeFonts(const std::string& fontFileName, const double& size);
-	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; modified = true; }
-	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; modified = true; }
-	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; modified = true; }
-	void SetOffsetFromWindowEdge(const unsigned int &offset) { offsetFromWindowEdge = offset; modified = true; }
+	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; mModified = true; }
+	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; mModified = true; }
+	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; mModified = true; }
+	void SetOffsetFromWindowEdge(const unsigned int &offset) { offsetFromWindowEdge = offset; mModified = true; }
 
-	void SetAxisAtMinEnd(const Axis *min) { minAxis = min; modified = true; }
-	void SetAxisAtMaxEnd(const Axis *max) { maxAxis = max; modified = true; }
-	void SetOppositeAxis(const Axis *opposite) { oppositeAxis = opposite; modified = true; }
+	void SetAxisAtMinEnd(const Axis *min) { minAxis = min; mModified = true; }
+	void SetAxisAtMaxEnd(const Axis *max) { maxAxis = max; mModified = true; }
+	void SetOppositeAxis(const Axis *opposite) { oppositeAxis = opposite; mModified = true; }
 
-	void SetLogarithmicScale(const bool &log) { logarithmic = log; modified = true; }
+	void SetLogarithmicScale(const bool &log) { logarithmic = log; mModified = true; }
 
 	// Get option methods
 	inline double GetMinimum() const { return minimum; }

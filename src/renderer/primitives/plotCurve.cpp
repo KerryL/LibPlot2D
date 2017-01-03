@@ -43,17 +43,9 @@ namespace LibPlot2D
 //
 //=============================================================================
 PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
-	: Primitive(renderWindow), data(data), line(renderWindow)
+	: Primitive(renderWindow), mData(data), mLine(renderWindow)
 {
-	xAxis = nullptr;
-	yAxis = nullptr;
-
-	lineSize = 1;
-	markerSize = -1;
-	pretty = true;
-
-	line.SetBufferHint(GL_STATIC_DRAW);
-
+	mLine.SetBufferHint(GL_STATIC_DRAW);
 	bufferInfo.resize(2);// First one for lines, second one for the markers
 }
 
@@ -74,7 +66,7 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 //
 //=============================================================================
 PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
-	data(plotCurve.data), line(renderWindow)
+	mData(plotCurve.mData), mLine(renderWindow)
 {
 	*this = plotCurve;
 }
@@ -99,7 +91,7 @@ void PlotCurve::InitializeMarkerVertexBuffer()
 {
 	bufferInfo[1].GetOpenGLIndices();
 
-	bufferInfo[1].vertexCount = data.GetNumberOfPoints() * 4;
+	bufferInfo[1].vertexCount = mData.GetNumberOfPoints() * 4;
 	bufferInfo[1].vertexBuffer.resize(bufferInfo[1].vertexCount * (renderWindow.GetVertexDimension() + 4));
 	assert(renderWindow.GetVertexDimension() == 2);
 
@@ -128,57 +120,57 @@ void PlotCurve::Update(const unsigned int& i)
 	{
 		int width, height;
 			renderWindow.GetSize(&width, &height);
-			width -= yAxis->GetOffsetFromWindowEdge() + yAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
-			height -= xAxis->GetOffsetFromWindowEdge() + xAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+			width -= mYAxis->GetOffsetFromWindowEdge() + mYAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+			height -= mXAxis->GetOffsetFromWindowEdge() + mXAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 
-			if (xAxis->IsLogarithmic())
-				xScale = (log10(xAxis->GetMaximum()) - log10(xAxis->GetMinimum())) / width;
+			if (mXAxis->IsLogarithmic())
+				mXScale = (log10(mXAxis->GetMaximum()) - log10(mXAxis->GetMinimum())) / width;
 			else
-				xScale = (xAxis->GetMaximum() - xAxis->GetMinimum()) / width;
+				mXScale = (mXAxis->GetMaximum() - mXAxis->GetMinimum()) / width;
 
-			if (yAxis->IsLogarithmic())
-				yScale = (log10(yAxis->GetMaximum()) - log10(yAxis->GetMinimum())) / height;
+			if (mYAxis->IsLogarithmic())
+				mYScale = (log10(mYAxis->GetMaximum()) - log10(mYAxis->GetMinimum())) / height;
 			else
-				yScale = (yAxis->GetMaximum() - yAxis->GetMinimum()) / height;
+				mYScale = (mYAxis->GetMaximum() - mYAxis->GetMinimum()) / height;
 
-		if (lineSize > 0.0)
+		if (mLineSize > 0.0)
 		{
 			const double lineSizeScale(1.2);
 
-			line.SetLineColor(color);
-			line.SetBackgroundColorForAlphaFade();
-			line.SetWidth(lineSize * lineSizeScale);
-			line.SetXScale(xScale);
-			line.SetYScale(yScale);
+			mLine.SetLineColor(color);
+			mLine.SetBackgroundColorForAlphaFade();
+			mLine.SetWidth(mLineSize * lineSizeScale);
+			mLine.SetXScale(mXScale);
+			mLine.SetYScale(mYScale);
 
 			std::vector<double> xLogData;
 			std::vector<double> yLogData;
 			const std::vector<double>& xRef([this, &xLogData]()
 			{
-				if (this->xAxis->IsLogarithmic())
+				if (this->mXAxis->IsLogarithmic())
 				{
-					xLogData = std::move(DoLogarithmicScale(this->data.GetX()));
+					xLogData = std::move(DoLogarithmicScale(this->mData.GetX()));
 					return xLogData;
 				}
 				else
-					return data.GetX();
+					return mData.GetX();
 			}());
 
 			const std::vector<double>& yRef([this, &yLogData]()
 			{
-				if (yAxis->IsLogarithmic())
+				if (mYAxis->IsLogarithmic())
 				{
-					yLogData = std::move(DoLogarithmicScale(data.GetY()));
+					yLogData = std::move(DoLogarithmicScale(mData.GetY()));
 					return yLogData;
 				}
 				else
-					return data.GetY();
+					return mData.GetY();
 			}());
 
-			line.Build(xRef, yRef, bufferInfo[i]);
+			mLine.Build(xRef, yRef, bufferInfo[i]);
 		}
 		else
-			line.SetWidth(0.0);
+			mLine.SetWidth(0.0);
 	}
 	else
 	{
@@ -231,18 +223,18 @@ void PlotCurve::Update(const unsigned int& i)
 //=============================================================================
 void PlotCurve::GenerateGeometry()
 {
-	if (yAxis->GetOrientation() == Axis::Orientation::Left)
+	if (mYAxis->GetOrientation() == Axis::Orientation::Left)
 		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Left);
 	else
 		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Right);
 
 	glEnable(GL_SCISSOR_TEST);
 
-	if (lineSize > 0.0)
+	if (mLineSize > 0.0)
 	{
 		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
 
-		if (pretty)
+		if (mPretty)
 			Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
 		else
 			Line::DoUglyDraw(bufferInfo[0].vertexCount);
@@ -280,10 +272,10 @@ void PlotCurve::GenerateGeometry()
 //=============================================================================
 bool PlotCurve::PointIsValid(const unsigned int &i) const
 {
-	assert(i < data.GetNumberOfPoints());
+	assert(i < mData.GetNumberOfPoints());
 
-	return PlotMath::IsValid<double>(data.GetX()[i]) &&
-		PlotMath::IsValid<double>(data.GetY()[i]);
+	return PlotMath::IsValid<double>(mData.GetX()[i]) &&
+		PlotMath::IsValid<double>(mData.GetY()[i]);
 }
 
 //=============================================================================
@@ -305,9 +297,9 @@ bool PlotCurve::PointIsValid(const unsigned int &i) const
 //=============================================================================
 bool PlotCurve::HasValidParameters()
 {
-	if (xAxis != nullptr && yAxis != nullptr && data.GetNumberOfPoints() > 1)
+	if (mXAxis != nullptr && mYAxis != nullptr && mData.GetNumberOfPoints() > 1)
 	{
-		if (xAxis->IsHorizontal() && !yAxis->IsHorizontal())
+		if (mXAxis->IsHorizontal() && !mYAxis->IsHorizontal())
 			return true;
 	}
 
@@ -358,26 +350,26 @@ PlotCurve& PlotCurve::operator=(const PlotCurve &plotCurve)
 //=============================================================================
 void PlotCurve::BuildMarkers()
 {
-	float halfMarkerXSize = 2 * markerSize * xScale;
-	float halfMarkerYSize = 2 * markerSize * yScale;
+	float halfMarkerYSize = 2 * mMarkerSize * mYScale;
+	float halfMarkerXSize = 2 * mMarkerSize * mXScale;
 	const unsigned int dimension(renderWindow.GetVertexDimension());
-	const unsigned int colorStart(data.GetNumberOfPoints() * dimension * 4);
+	const unsigned int colorStart(mData.GetNumberOfPoints() * dimension * 4);
 
 	// Use function pointers to save a few checks in the loop
 	PlotRenderer::ScalingFunction xScaleFunction(
 		dynamic_cast<PlotRenderer&>(renderWindow).GetXScaleFunction());
 	PlotRenderer::ScalingFunction yScaleFunction;
 
-	if (yAxis->GetOrientation() == Axis::Orientation::Left)
+	if (mYAxis->GetOrientation() == Axis::Orientation::Left)
 		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetLeftYScaleFunction();
 	else
 		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetRightYScaleFunction();
 
 	unsigned int i;
-	for (i = 0; i < data.GetNumberOfPoints(); ++i)
+	for (i = 0; i < mData.GetNumberOfPoints(); ++i)
 	{
-		float x(static_cast<float>(xScaleFunction(data.GetX()[i])));
-		float y(static_cast<float>(yScaleFunction(data.GetY()[i])));
+		float x(static_cast<float>(xScaleFunction(mData.GetX()[i])));
+		float y(static_cast<float>(yScaleFunction(mData.GetY()[i])));
 
 		bufferInfo[1].vertexBuffer[i * 4 * dimension] = x + halfMarkerXSize;
 		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = y + halfMarkerYSize;
@@ -458,7 +450,7 @@ std::vector<double> PlotCurve::DoLogarithmicScale(
 //=============================================================================
 bool PlotCurve::RangeIsSmall() const
 {
-	if (data.GetNumberOfPoints() < 2)
+	if (mData.GetNumberOfPoints() < 2)
 		return false;
 
 	switch (XRangeIsSmall())
@@ -498,17 +490,17 @@ bool PlotCurve::RangeIsSmall() const
 //=============================================================================
 PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
-	double period(fabs(data.GetX()[1] - data.GetX()[0]));
+	double period(fabs(mData.GetX()[1] - mData.GetX()[0]));
 	if (period == 0.0)
 		return RangeSize::Undetermined;
 
-	unsigned int points = (unsigned int)floor((xAxis->GetMaximum() - xAxis->GetMinimum()) / period);
+	unsigned int points = (unsigned int)floor((mXAxis->GetMaximum() - mXAxis->GetMinimum()) / period);
 	if (points == 0)
 		return RangeSize::Small;
 
 	unsigned int spacing = (renderWindow.GetSize().GetWidth()
-		- xAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
-		- xAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
+		- mXAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
+		- mXAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 
 	if (spacing > 7)
 		return RangeSize::Small;
@@ -537,17 +529,17 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 //=============================================================================
 PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
-	double period(data.GetY()[1] - data.GetY()[0]);
+	double period(mData.GetY()[1] - mData.GetY()[0]);
 	if (period == 0.0)
 		return RangeSize::Undetermined;
 
-	unsigned int points = (unsigned int)floor((yAxis->GetMaximum() - yAxis->GetMinimum()) / period);
+	unsigned int points = (unsigned int)floor((mYAxis->GetMaximum() - mYAxis->GetMinimum()) / period);
 	if (points == 0)
 		return RangeSize::Small;
 
 	unsigned int spacing = (renderWindow.GetSize().GetHeight()
-		- yAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
-		- yAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
+		- mYAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
+		- mYAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 
 	if (spacing > 7)
 		return RangeSize::Small;
@@ -573,7 +565,7 @@ PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 //=============================================================================
 bool PlotCurve::NeedsMarkersDrawn() const
 {
-	return markerSize > 0 || (markerSize < 0 && RangeIsSmall());
+	return mMarkerSize > 0 || (mMarkerSize < 0 && RangeIsSmall());
 }
 
 }// namespace LibPlot2D

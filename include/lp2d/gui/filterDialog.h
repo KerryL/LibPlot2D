@@ -67,29 +67,29 @@ public:
 	static wxString GetFilterNamePrefix(const FilterParameters &parameters);
 
 private:
-	static const unsigned int defaultPrecision;
-	static const unsigned int calculationPrecision;
+	static const unsigned int mDefaultPrecision;
+	static const unsigned int mCalculationPrecision;
 
-	static const unsigned int maxFilterOrder;
+	static const unsigned int mMaxFilterOrder;
 
-	wxTextCtrl *cutoffFrequencyBox;
-	wxTextCtrl *dampingRatioBox;
-	wxTextCtrl *widthBox;
+	wxTextCtrl *mCutoffFrequencyBox;
+	wxTextCtrl *mDampingRatioBox;
+	wxTextCtrl *mWidthBox;
 
-	wxCheckBox *phaselessCheckBox;
-	wxCheckBox *butterworthCheckBox;
+	wxCheckBox *mPhaselessCheckBox;
+	wxCheckBox *mButterworthCheckBox;
 
-	wxSpinCtrl *orderSpin;
+	wxSpinCtrl *mOrderSpin;
 
-	wxRadioButton *lowPassRadio;
-	wxRadioButton *highPassRadio;
-	wxRadioButton *bandStopRadio;
-	wxRadioButton *bandPassRadio;
-	wxRadioButton *notchRadio;
-	wxRadioButton *customRadio;
+	wxRadioButton *mLowPassRadio;
+	wxRadioButton *mHighPassRadio;
+	wxRadioButton *mBandStopRadio;
+	wxRadioButton *mBandPassRadio;
+	wxRadioButton *mNotchRadio;
+	wxRadioButton *mCustomRadio;
 
-	wxTextCtrl *numeratorBox;
-	wxTextCtrl *denominatorBox;
+	wxTextCtrl *mNumeratorBox;
+	wxTextCtrl *mDenominatorBox;
 
 	FilterParameters mParameters;
 
@@ -167,7 +167,7 @@ private:
 	void ComputeLogCutoffs(const double &center, const double &width,
 		double &lowCutoff, double &highCutoff) const;
 
-	bool initialized;
+	bool mInitialized;
 
 	// For the event table
 	DECLARE_EVENT_TABLE();

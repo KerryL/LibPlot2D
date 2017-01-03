@@ -194,7 +194,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;GLEW_STATIC;LIBPLOT2D_64_BIT_;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../include/;$(EIGEN);$(FREETYPE)\include\freetype2;$(WXWIN)\lib\vc_dll\mswud;$(WXWIN)\include;$(GLEW)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <DisableSpecificWarnings>4458;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4714</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -241,7 +241,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;LIBPLOT2D_64_BIT_;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../include/;$(EIGEN);$(FREETYPE)\include\freetype2;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(GLEW)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <DisableSpecificWarnings>4458;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4714</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>

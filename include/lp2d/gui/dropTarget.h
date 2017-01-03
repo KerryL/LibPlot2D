@@ -35,7 +35,7 @@ public:
 	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);
 
 private:
-	GuiInterface &guiInterface;
+	GuiInterface &mGuiInterface;
 
 	bool OnDropFiles(const wxArrayString &filenames);
 	bool OnDropText(const wxString& data);

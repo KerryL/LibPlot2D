@@ -24,13 +24,14 @@ namespace LibPlot2D
 class TextInputDialog : public wxDialog
 {
 public:
-	TextInputDialog(const wxString &message, const wxString &title, const wxString &defaultText, wxWindow *parent);
+	TextInputDialog(const wxString &message, const wxString &title,
+		const wxString &defaultText, wxWindow *parent);
 	~TextInputDialog() = default;
 
-	wxString GetText() const { return text->GetValue(); }
+	wxString GetText() const { return mText->GetValue(); }
 
 private:
-	wxTextCtrl *text;
+	wxTextCtrl *mText;
 
 	void CreateControls(const wxString &message, const wxString &defaultText);
 };

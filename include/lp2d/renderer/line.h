@@ -38,16 +38,21 @@ public:
 	explicit Line(const RenderWindow& renderWindow);
 	virtual ~Line() = default;
 
-	inline void SetPretty(const bool &pretty) { this->pretty = pretty; }
-	inline void SetWidth(const double &width) { assert(width >= 0.0); halfWidth = 0.5 * width; }
-	inline void SetLineColor(const Color &color) { lineColor = color; }
-	inline void SetBackgroundColor(const Color &color) { backgroundColor = color; }
-	inline void SetBackgroundColorForAlphaFade() { backgroundColor = lineColor; backgroundColor.SetAlpha(0.0); }
+	inline void SetPretty(const bool &pretty) { mPretty = pretty; }
+	inline void SetWidth(const double &width)
+	{ assert(width >= 0.0); mHalfWidth = 0.5 * width; }
+	inline void SetLineColor(const Color &color) { mLineColor = color; }
+	inline void SetBackgroundColor(const Color &color)
+	{ mBackgroundColor = color; }
+	inline void SetBackgroundColorForAlphaFade()
+	{ mBackgroundColor = mLineColor; mBackgroundColor.SetAlpha(0.0); }
 
-	inline void SetXScale(const double& scale) { assert(scale > 0.0); xScale = scale; }
-	inline void SetYScale(const double& scale) { assert(scale > 0.0); yScale = scale; }
+	inline void SetXScale(const double& scale)
+	{ assert(scale > 0.0); mXScale = scale; }
+	inline void SetYScale(const double& scale)
+	{ assert(scale > 0.0); mYScale = scale; }
 
-	inline void SetBufferHint(const GLenum& hint) { this->hint = hint; }
+	inline void SetBufferHint(const GLenum& hint) { mHint = hint; }
 
 	enum class UpdateMethod
 	{
@@ -83,19 +88,19 @@ public:
 	static void DoUglySegmentDraw(const unsigned int& vertexCount);
 
 private:
-	static const double fadeDistance;
-	double halfWidth;
+	static const double mFadeDistance;
+	double mHalfWidth;
 
-	Color lineColor;
-	Color backgroundColor;
-	bool pretty;
+	Color mLineColor = Color::ColorBlack;
+	Color mBackgroundColor;
+	bool mPretty = true;
 
-	double xScale;
-	double yScale;
+	double mXScale = 1.0;
+	double mYScale = 1.0;
 
-	GLenum hint;
+	GLenum mHint;
 
-	const RenderWindow& renderWindow;
+	const RenderWindow& mRenderWindow;
 
 	void ComputeOffsets(const double &x1, const double &y1, const double &x2,
 		const double &y2, double& dxLine, double& dyLine, double& dxEdge,

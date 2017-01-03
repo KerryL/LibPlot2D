@@ -34,7 +34,7 @@ public:
 
 	~MultiChoiceDialog() = default;
 
-	virtual wxArrayInt GetSelections() const { return selections; }
+	virtual wxArrayInt GetSelections() const { return mSelections; }
 
 	bool RemoveExistingCurves() const;
 
@@ -43,13 +43,13 @@ private:
 	wxSizer* CreateButtons();
 	int ComputeListBoxHeight(const wxArrayString& choices) const;
 
-	wxCheckListBox *choiceListBox;
-	wxCheckBox *removeCheckBox;
-	wxTextCtrl *filterText;
+	wxCheckListBox *mChoiceListBox;
+	wxCheckBox *mRemoveCheckBox;
+	wxTextCtrl *mFilterText;
 
-	wxArrayString descriptions;
-	wxArrayInt selections;
-	std::vector<bool> shown;
+	wxArrayString mDescriptions;
+	wxArrayInt mSelections;
+	std::vector<bool> mShown;
 	unsigned int GetCorrectedIndex(const unsigned int &index) const;
 	void UpdateSelectionList(const unsigned int &index);
 	bool IsSelected(const int &i) const;
