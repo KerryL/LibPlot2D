@@ -53,7 +53,7 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-const std::string RenderWindow::mModelviewName("mModelviewMatrix");
+const std::string RenderWindow::mModelviewName("modelviewMatrix");
 const std::string RenderWindow::mProjectionName("projectionMatrix");
 const std::string RenderWindow::mPositionName("position");
 const std::string RenderWindow::mColorName("color");
@@ -79,7 +79,7 @@ const double RenderWindow::mExactPixelShift(0.375);
 const std::string RenderWindow::mDefaultVertexShader(
 	"#version 300 es\n"
 	"\n"
-	"uniform mat4 mModelviewMatrix;\n"
+	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
 	"layout(location = 0) in highp vec4 position;\n"
@@ -90,7 +90,7 @@ const std::string RenderWindow::mDefaultVertexShader(
 	"void main()\n"
 	"{\n"
 	"    vertexColor = color;\n"
-	"    gl_Position = projectionMatrix * mModelviewMatrix * position;\n"
+	"    gl_Position = projectionMatrix * modelviewMatrix * position;\n"
 	"}\n"
 );
 
@@ -263,8 +263,10 @@ void RenderWindow::Render()
 	else if (mModelviewModified)
 		UpdateModelviewMatrix();
 
-	glClearColor((float)mBackgroundColor.GetRed(), (float)mBackgroundColor.GetGreen(),
-		(float)mBackgroundColor.GetBlue(), (float)mBackgroundColor.GetAlpha());
+	glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
+		static_cast<float>(mBackgroundColor.GetGreen()),
+		static_cast<float>(mBackgroundColor.GetBlue()),
+		static_cast<float>(mBackgroundColor.GetAlpha()));
 
 	if (mView3D)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1381,7 +1383,7 @@ Eigen::Matrix4d RenderWindow::Generate3DProjectionMatrix() const
 	// The distance at which unity scaling occurs is the cotangent of (top - bottom) / 2.
 	// We can use the distance set in SetCameraView() to determine 
 	Eigen::Matrix4d projectionMatrix(Eigen::Matrix4d::Zero());
-	double rightMinusLeft(mTopMinusBottom * mAspectRatio);
+	const double rightMinusLeft(mTopMinusBottom * mAspectRatio);
 	if (mViewOrthogonal)
 	{
 		projectionMatrix(0, 0) = 2.0 / rightMinusLeft;
@@ -1645,7 +1647,7 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 // Class:			RenderWindow
 // Function:		BuildShaders
 //
-// Description:		Builds the default mShaders and sets the indices to the
+// Description:		Builds the default shaders and sets the indices to the
 //					matrices we need to track.
 //
 // Input Arguments:
@@ -1814,7 +1816,7 @@ void RenderWindow::ShiftForExactPixelization()
 // Class:			RenderWindow
 // Function:		AddShader
 //
-// Description:		Adds a shader to our list of managed mShaders.
+// Description:		Adds a shader to our list of managed shaders.
 //
 // Input Arguments:
 //		shader	= const ShaderInfo&

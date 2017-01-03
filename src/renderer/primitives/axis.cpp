@@ -50,7 +50,7 @@ Axis::Axis(RenderWindow &mRenderWindow) : Primitive(mRenderWindow),
 	mGridColor.Set(0.8, 0.8, 0.8, 1.0);
 	SetDrawOrder(500);
 
-	mBufferInfo.resize(4);// Main axis line, gridlines, values and mLabel
+	mBufferInfo.resize(4);// Main axis line, gridlines, values and label
 }
 
 //=============================================================================
@@ -524,7 +524,7 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 // Class:			Axis
 // Function:		DrawAxisLabel
 //
-// Description:		Draws the mLabel text for the axis.
+// Description:		Draws the label text for the axis.
 //
 // Input Arguments:
 //		None
@@ -545,20 +545,24 @@ void Axis::DrawAxisLabel()
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
 
-	// TODO:  Change plot dimension if there is a title? or if there is a title and a mLabel for the top axis?
+	// TODO:  Change plot dimension if there is a title? or if there is a title and a label for the top axis?
 	Text::BoundingBox boundingBox = mLabelText.GetBoundingBox("H");// Some capital letter to assure uniform spacing
-	double edgeOffset = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.yUp);
+	const double edgeOffset(GetAxisLabelTranslation(fontOffsetFromWindowEdge,
+		boundingBox.yUp));
 
 	boundingBox = mLabelText.GetBoundingBox(mLabel.ToStdString());
-	double textWidth = boundingBox.xRight - boundingBox.xLeft;
-	double plotOffset = (double)mMinAxis->GetOffsetFromWindowEdge() - (double)mMaxAxis->GetOffsetFromWindowEdge();
+	const double textWidth = boundingBox.xRight - boundingBox.xLeft;
+	const double plotOffset = (double)mMinAxis->GetOffsetFromWindowEdge()
+		- (double)mMaxAxis->GetOffsetFromWindowEdge();
 
 	if (IsHorizontal())
-		mLabelText.SetPosition(0.5 * (mRenderWindow.GetSize().GetWidth() - textWidth + plotOffset), edgeOffset);
+		mLabelText.SetPosition(0.5 * (mRenderWindow.GetSize().GetWidth()
+			- textWidth + plotOffset), edgeOffset);
 	else
 	{
 		mLabelText.SetOrientation(M_PI * 0.5);
-		mLabelText.SetPosition(0.5 * (mRenderWindow.GetSize().GetHeight() - textWidth + plotOffset), -edgeOffset);
+		mLabelText.SetPosition(0.5 * (mRenderWindow.GetSize().GetHeight()
+			- textWidth + plotOffset), -edgeOffset);
 	}
 
 	mLabelText.SetText(mLabel.ToStdString());
@@ -568,7 +572,7 @@ void Axis::DrawAxisLabel()
 // Class:			Axis
 // Function:		GetAxisLabelTranslation
 //
-// Description:		Determines the translation required for drawing the mLabel.
+// Description:		Determines the translation required for drawing the label.
 //
 // Input Arguments:
 //		offset		= const double&
@@ -581,7 +585,8 @@ void Axis::DrawAxisLabel()
 //		double indicating the translation to use for this mLabel
 //
 //=============================================================================
-double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHeight) const
+double Axis::GetAxisLabelTranslation(const double &offset,
+	const double &fontHeight) const
 {
 	switch (mOrientation)
 	{
@@ -608,7 +613,7 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 // Function:		DrawTickLabels
 //
 // Description:		Draws the numeric labels for each axis tick.  This also
-//					determines the precision for each tick mLabel.  The goal
+//					determines the precision for each tick label.  The goal
 //					is to provide just enough precision so that adjacent tick
 //					marks are distinguishable, and then add just a hair more.
 //					Here we also reset the axis min and max values to be exactly
@@ -642,9 +647,10 @@ void Axis::DrawTickLabels()
 			tick == numberOfTicks + 1, tick), mMaximum));
 		valueLabel.Printf("%0.*f", precision, value);
 
-		// TODO:  Don't draw it if it's too close to the mMaximum (based on text size)
+		// TODO:  Don't draw it if it's too close to the maximum (based on text size)
 		ComputeTranslations(value, xTranslation, yTranslation,
-			mValueText.GetBoundingBox(valueLabel.ToStdString()), valueOffsetFromEdge);
+			mValueText.GetBoundingBox(valueLabel.ToStdString()),
+			valueOffsetFromEdge);
 		mValueText.SetPosition(xTranslation, yTranslation);
 		mValueText.AppendText(valueLabel.ToStdString());
 	}
@@ -673,10 +679,12 @@ void Axis::DrawTickLabels()
 //=============================================================================
 unsigned int Axis::GetPrecision() const
 {
-	// It does look nicer to use the raw return value of GetPrecision(), but it affects the function
-	// of dragging the plot around.  Because we always force the limits to actually
-	// match the printed values, it makes the dragging operation very coarse.  So we add two.
-	return PlotMath::GetPrecision(mMinimum, mMajorResolution, mLogarithmic) + 2;
+	// It does look nicer to use the raw return value of GetPrecision(), but it
+	// affects the function of dragging the plot around.  Because we always
+	// force the limits to actually match the printed values, it makes the
+	// dragging operation very coarse.  So we add two.
+	return PlotMath::GetPrecision(
+		mMinimum, mMajorResolution, mLogarithmic) + 2;
 }
 
 //=============================================================================
@@ -697,7 +705,8 @@ unsigned int Axis::GetPrecision() const
 //		double
 //
 //=============================================================================
-double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const
+double Axis::GetNextTickValue(const bool &first, const bool &last,
+	const unsigned int &tick) const
 {
 	if (mLogarithmic)
 	{
@@ -716,7 +725,8 @@ double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigne
 // Class:			Axis
 // Function:		ComputeTranslations
 //
-// Description:		Computes the translations required for the specified bounding box.
+// Description:		Computes the translations required for the specified
+//					bounding box.
 //
 // Input Arguments:
 //		value			= const double&
@@ -731,8 +741,9 @@ double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigne
 //		double
 //
 //=============================================================================
-void Axis::ComputeTranslations(const double &value, float &xTranslation, float &yTranslation,
-	const Text::BoundingBox &boundingBox, const double &offset) const
+void Axis::ComputeTranslations(const double &value, float &xTranslation,
+	float &yTranslation, const Text::BoundingBox &boundingBox,
+	const double &offset) const
 {
 	if (IsHorizontal())
 	{
@@ -774,7 +785,8 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 //=============================================================================
 bool Axis::IsHorizontal() const
 {
-	if (mOrientation == Orientation::Bottom || mOrientation == Orientation::Top)
+	if (mOrientation == Orientation::Bottom ||
+		mOrientation == Orientation::Top)
 		return true;
 
 	return false;
@@ -879,17 +891,22 @@ double Axis::PixelToValue(const int &pixel) const
 	// Get the plot size
 	double fraction;
 	if (IsHorizontal())
-		fraction = double(pixel - (double)mMinAxis->GetOffsetFromWindowEdge()) / double(mRenderWindow.GetSize().GetWidth()
-				- (double)mMinAxis->GetOffsetFromWindowEdge()
-				- (double)mMaxAxis->GetOffsetFromWindowEdge());
+		fraction = (static_cast<double>(pixel)
+			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()))
+			/ (static_cast<double>(mRenderWindow.GetSize().GetWidth())
+			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()
+			- mMaxAxis->GetOffsetFromWindowEdge()));
 	else
-		fraction = double(pixel - (double)mMinAxis->GetOffsetFromWindowEdge()) / double(mRenderWindow.GetSize().GetHeight()
-				- (double)mMinAxis->GetOffsetFromWindowEdge()
-				- (double)mMaxAxis->GetOffsetFromWindowEdge());
+		fraction = (static_cast<double>(pixel)
+			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()))
+			/ (static_cast<double>(mRenderWindow.GetSize().GetHeight())
+			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()
+			- mMaxAxis->GetOffsetFromWindowEdge()));
 
 	// Do the scaling
 	if (IsLogarithmic())
-		return pow(10.0, fraction * (log10(mMaximum) - log10(mMinimum)) + log10(mMinimum));
+		return pow(10.0, fraction * (log10(mMaximum) - log10(mMinimum))
+			+ log10(mMinimum));
 
 	return fraction * (mMaximum - mMinimum) + mMinimum;
 }
@@ -916,7 +933,7 @@ double Axis::GetNextGridValue(const unsigned int &tick) const
 		return pow(10.0, floor(log10(mMinimum)) + floor(tick / 9.0))
 			* (tick - 9.0 * floor(tick / 9.0) + 1.0);
 
-	return mMinimum + (double)tick * mMinorResolution;
+	return mMinimum + tick * mMinorResolution;
 }
 
 //=============================================================================
