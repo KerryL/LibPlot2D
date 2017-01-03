@@ -26,14 +26,15 @@ namespace LibPlot2D
 class Color
 {
 public:
-	Color();
-	Color(const double &red, const double &green, const double &blue, const double &alpha = 1.0);
+	Color() = default;
+	Color(const double &red, const double &green, const double &blue,
+		const double &alpha = 1.0);
 	explicit Color(const wxColor &c);
 
-	inline double GetRed() const { return red; }
-	inline double GetGreen() const { return green; }
-	inline double GetBlue() const { return blue; }
-	inline double GetAlpha()  const { return alpha; }
+	inline double GetRed() const { return mRed; }
+	inline double GetGreen() const { return mGreen; }
+	inline double GetBlue() const { return mBlue; }
+	inline double GetAlpha()  const { return mAlpha; }
 
 	double GetHue() const;// 0 to 1 for 0 to 360 deg
 	double GetSaturation() const;
@@ -58,22 +59,26 @@ public:
 	static const Color ColorGray;
 
 	// For setting the value
-	void Set(const double &red, const double &green, const double &blue, const double &alpha = 1.0);
-	void SetHSL(const double &hue, const double &sat, const double &lum, const double &alpha = 1.0);
+	void Set(const double &red, const double &green, const double &blue,
+		const double &alpha = 1.0);
+	void SetHSL(const double &hue, const double &sat, const double &lum,
+		const double &alpha = 1.0);
 	void Set(const wxColor &color);
 	void SetAlpha(const double &alpha);
 
 	wxColor ToWxColor() const;
 
-	static Color GetColorHSL(const double &hue, const double &sat, const double &lum, const double &alpha = 1.0);
-	static Color GetColor(const double &red, const double &green, const double &blue, const double &alpha = 1.0);
+	static Color GetColorHSL(const double &hue, const double &sat,
+		const double &lum, const double &alpha = 1.0);
+	static Color GetColor(const double &red, const double &green,
+		const double &blue, const double &alpha = 1.0);
 
 private:
 	// The class data
-	double red;
-	double green;
-	double blue;
-	double alpha;
+	double mRed = 0.0;
+	double mGreen = 0.0;
+	double mBlue = 0.0;
+	double mAlpha = 1.0;
 
 	// Checks to make sure all values are between 0 and 1 (forces this to be true)
 	void ValidateColor();

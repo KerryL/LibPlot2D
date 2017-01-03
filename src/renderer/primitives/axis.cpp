@@ -32,7 +32,7 @@ namespace LibPlot2D
 // Description:		Constructor for the Axis class.
 //
 // Input Arguments:
-//		renderWindow	= RenderWindow& reference to the object that owns this
+//		mRenderWindow	= RenderWindow& reference to the object that owns this
 //
 // Output Arguments:
 //		None
@@ -41,36 +41,16 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-Axis::Axis(RenderWindow &renderWindow) : Primitive(renderWindow), labelText(renderWindow),
-	valueText(renderWindow), axisLines(renderWindow), gridLines(renderWindow)
+Axis::Axis(RenderWindow &mRenderWindow) : Primitive(mRenderWindow),
+	mLabelText(mRenderWindow), mValueText(mRenderWindow),
+	mAxisLines(mRenderWindow), mGridLines(mRenderWindow)
 {
-	color.Set(0.0, 0.0, 0.0, 1.0);
+	mColor.Set(0.0, 0.0, 0.0, 1.0);
 
-	orientation = Orientation::Bottom;
-	tickStyle = TickStyle::Through;
-
-	tickSize = 7;
-
-	minimum = 0.0;
-	maximum = 1.0;
-	majorResolution = 1.0;
-	minorResolution = 1.0;
-
-	offsetFromWindowEdge = 75;// [pixels]
-
-	majorGrid = false;
-	minorGrid = false;
-
-	logarithmic = false;
-
-	minAxis = nullptr;
-	maxAxis = nullptr;
-	oppositeAxis = nullptr;
-
-	gridColor.Set(0.8, 0.8, 0.8, 1.0);
+	mGridColor.Set(0.8, 0.8, 0.8, 1.0);
 	SetDrawOrder(500);
 
-	bufferInfo.resize(4);// Main axis line, gridlines, values and label
+	mBufferInfo.resize(4);// Main axis line, gridlines, values and mLabel
 }
 
 //=============================================================================
@@ -93,32 +73,32 @@ void Axis::Update(const unsigned int& i)
 {
 	if (i == 0)// Axis and ticks
 	{
-		axisLines.SetWidth(1.0);
-		axisLines.SetLineColor(color);
-		axisLines.SetBackgroundColorForAlphaFade();
+		mAxisLines.SetWidth(1.0);
+		mAxisLines.SetLineColor(mColor);
+		mAxisLines.SetBackgroundColorForAlphaFade();
 
-		gridLines.SetWidth(1.0);
-		gridLines.SetLineColor(gridColor);
-		gridLines.SetBackgroundColorForAlphaFade();
+		mGridLines.SetWidth(1.0);
+		mGridLines.SetLineColor(mGridColor);
+		mGridLines.SetBackgroundColorForAlphaFade();
 
-		axisPoints.clear();
-		gridPoints.clear();
+		mAxisPoints.clear();
+		mGridPoints.clear();
 		DrawFullAxis();
-		axisLines.BuildSegments(axisPoints, bufferInfo[i]);
+		mAxisLines.BuildSegments(mAxisPoints, mBufferInfo[i]);
 	}
 	else if (i == 1)// Gridlines
 	{
-		gridLines.BuildSegments(gridPoints, bufferInfo[i]);
+		mGridLines.BuildSegments(mGridPoints, mBufferInfo[i]);
 	}
-	else if (i == 2 && valueText.IsOK())// Values
+	else if (i == 2 && mValueText.IsOK())// Values
 	{
 		DrawTickLabels();
-		bufferInfo[i] = valueText.BuildText();
+		mBufferInfo[i] = mValueText.BuildText();
 	}
-	else if (i == 3 && labelText.IsOK())// Label
+	else if (i == 3 && mLabelText.IsOK())// Label
 	{
 		DrawAxisLabel();
-		bufferInfo[i] = labelText.BuildText();
+		mBufferInfo[i] = mLabelText.BuildText();
 	}
 }
 
@@ -142,29 +122,29 @@ void Axis::Update(const unsigned int& i)
 void Axis::GenerateGeometry()
 {
 	// Draw gridlines first
-	if ((majorGrid || minorGrid) && bufferInfo[1].indexBuffer.size() > 0)
+	if ((mMajorGrid || mMinorGrid) && mBufferInfo[1].indexBuffer.size() > 0)
 	{
-		glBindVertexArray(bufferInfo[1].GetVertexArrayIndex());
-		Line::DoPrettyDraw(bufferInfo[1].indexBuffer.size());
+		glBindVertexArray(mBufferInfo[1].GetVertexArrayIndex());
+		Line::DoPrettyDraw(mBufferInfo[1].indexBuffer.size());
 	}
 
 	// Axis and ticks next
-	if (bufferInfo[0].vertexCount > 0)
+	if (mBufferInfo[0].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
-		Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
+		glBindVertexArray(mBufferInfo[0].GetVertexArrayIndex());
+		Line::DoPrettyDraw(mBufferInfo[0].indexBuffer.size());
 	}
 
-	if (valueText.IsOK() && bufferInfo[2].vertexCount > 0)
+	if (mValueText.IsOK() && mBufferInfo[2].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[2].GetVertexArrayIndex());
-		valueText.RenderBufferedGlyph(bufferInfo[2].vertexCount);
+		glBindVertexArray(mBufferInfo[2].GetVertexArrayIndex());
+		mValueText.RenderBufferedGlyph(mBufferInfo[2].vertexCount);
 	}
 
-	if (!label.IsEmpty() && labelText.IsOK() && bufferInfo[3].vertexCount > 0)
+	if (!mLabel.IsEmpty() && mLabelText.IsOK() && mBufferInfo[3].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[3].GetVertexArrayIndex());
-		labelText.RenderBufferedGlyph(bufferInfo[3].vertexCount);
+		glBindVertexArray(mBufferInfo[3].GetVertexArrayIndex());
+		mLabelText.RenderBufferedGlyph(mBufferInfo[3].vertexCount);
 	}
 
 	glBindVertexArray(0);
@@ -195,18 +175,18 @@ void Axis::DrawFullAxis()
 
 	if (IsHorizontal())
 	{
-		if ((majorGrid || minorGrid) && oppositeAxis)
+		if ((mMajorGrid || mMinorGrid) && mOppositeAxis)
 			DrawHorizontalGrid(numberOfGridLines);
 
-		if (tickStyle != TickStyle::NoTicks)
+		if (mTickStyle != TickStyle::NoTicks)
 			DrawHorizontalTicks(numberOfTicks, mainAxisLocation);
 	}
 	else
 	{
-		if ((majorGrid || minorGrid) && oppositeAxis)
+		if ((mMajorGrid || mMinorGrid) && mOppositeAxis)
 			DrawVerticalGrid(numberOfGridLines);
 
-		if (tickStyle != TickStyle::NoTicks)
+		if (mTickStyle != TickStyle::NoTicks)
 			DrawVerticalTicks(numberOfTicks, mainAxisLocation);
 	}
 
@@ -232,13 +212,13 @@ void Axis::DrawFullAxis()
 int Axis::ComputeMainAxisLocation() const
 {
 	// Compute the mainAxisLocation (X for vertical axis, Y for horizontal axis)
-	if (orientation == Orientation::Bottom || orientation == Orientation::Left)
-		return offsetFromWindowEdge;
-	else if (orientation == Orientation::Right)
-		return renderWindow.GetSize().GetWidth() - offsetFromWindowEdge;
+	if (mOrientation == Orientation::Bottom || mOrientation == Orientation::Left)
+		return mOffsetFromWindowEdge;
+	else if (mOrientation == Orientation::Right)
+		return mRenderWindow.GetSize().GetWidth() - mOffsetFromWindowEdge;
 
 	//else// OrientationTop
-	return renderWindow.GetSize().GetHeight() - offsetFromWindowEdge;
+	return mRenderWindow.GetSize().GetHeight() - mOffsetFromWindowEdge;
 }
 
 //=============================================================================
@@ -260,27 +240,27 @@ int Axis::ComputeMainAxisLocation() const
 //=============================================================================
 void Axis::ComputeGridAndTickCounts(unsigned int &tickCount, unsigned int *gridCount)
 {
-	if (logarithmic)
+	if (mLogarithmic)
 	{
 		// Only allow strictly positive limits
-		if (minimum <= 0.0)
-			minimum = 0.1;
-		if (maximum <= minimum)
-			maximum = 10.0 * minimum;
+		if (mMinimum <= 0.0)
+			mMinimum = 0.1;
+		if (mMaximum <= mMinimum)
+			mMaximum = 10.0 * mMinimum;
 
-		tickCount = ceil(log10(maximum)) - floor(log10(minimum)) - 1;
+		tickCount = ceil(log10(mMaximum)) - floor(log10(mMinimum)) - 1;
 		if (gridCount)
 			*gridCount = (tickCount + 1) * 8 + tickCount;
 	}
 	else
 	{
-		assert(majorResolution > 0.0 && PlotMath::IsValid(majorResolution));
-		assert(minorResolution > 0.0 && PlotMath::IsValid(minorResolution));
-		tickCount = (unsigned int)((maximum - minimum) / majorResolution + 0.5) - 1;
+		assert(mMajorResolution > 0.0 && PlotMath::IsValid(mMajorResolution));
+		assert(mMinorResolution > 0.0 && PlotMath::IsValid(mMinorResolution));
+		tickCount = (unsigned int)((mMaximum - mMinimum) / mMajorResolution + 0.5) - 1;
 		if (gridCount)
 		{
-			if (minorGrid)
-				*gridCount = (unsigned int)((maximum - minimum) / minorResolution + 0.5) - 1;
+			if (mMinorGrid)
+				*gridCount = (unsigned int)((mMaximum - mMinimum) / mMinorResolution + 0.5) - 1;
 			else
 				*gridCount = tickCount;
 		}
@@ -307,15 +287,15 @@ void Axis::DrawMainAxis(const int &mainAxisLocation)
 {
 	if (IsHorizontal())
 	{
-		axisPoints.push_back(std::make_pair(minAxis->GetOffsetFromWindowEdge(), mainAxisLocation));
-		axisPoints.push_back(std::make_pair(renderWindow.GetSize().GetWidth()
-			- maxAxis->GetOffsetFromWindowEdge(), mainAxisLocation));
+		mAxisPoints.push_back(std::make_pair(mMinAxis->GetOffsetFromWindowEdge(), mainAxisLocation));
+		mAxisPoints.push_back(std::make_pair(mRenderWindow.GetSize().GetWidth()
+			- mMaxAxis->GetOffsetFromWindowEdge(), mainAxisLocation));
 	}
 	else
 	{
-		axisPoints.push_back(std::make_pair(mainAxisLocation, minAxis->GetOffsetFromWindowEdge()));
-		axisPoints.push_back(std::make_pair(mainAxisLocation, renderWindow.GetSize().GetHeight() -
-			maxAxis->GetOffsetFromWindowEdge()));
+		mAxisPoints.push_back(std::make_pair(mainAxisLocation, mMinAxis->GetOffsetFromWindowEdge()));
+		mAxisPoints.push_back(std::make_pair(mainAxisLocation, mRenderWindow.GetSize().GetHeight() -
+			mMaxAxis->GetOffsetFromWindowEdge()));
 	}
 }
 
@@ -343,17 +323,17 @@ void Axis::InitializeTickParameters(int &inside, int &outside, int &sign) const
 	outside = 0;
 	sign = 1;
 
-	if (tickStyle == TickStyle::Inside)
+	if (mTickStyle == TickStyle::Inside)
 		inside = 1.0;
-	else if (tickStyle == TickStyle::Outside)
+	else if (mTickStyle == TickStyle::Outside)
 		outside = 1.0;
-	else if (tickStyle == TickStyle::Through)
+	else if (mTickStyle == TickStyle::Through)
 	{
 		inside = 0.5;
 		outside = 0.5;
 	}
 
-	if (orientation == Orientation::Top || orientation == Orientation::Right)
+	if (mOrientation == Orientation::Top || mOrientation == Orientation::Right)
 		sign = -1.0;
 }
 
@@ -379,18 +359,18 @@ void Axis::DrawHorizontalGrid(const unsigned int &count)
 	double location;
 	for (grid = 0; grid < count; ++grid)
 	{
-		if (minorGrid)
+		if (mMinorGrid)
 			location = ValueToPixel(GetNextGridValue(grid + 1));
 		else
 			location = ValueToPixel(GetNextTickValue(false, false, grid + 1));
 
-		if (location <= minAxis->GetOffsetFromWindowEdge() ||
-			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
+		if (location <= mMinAxis->GetOffsetFromWindowEdge() ||
+			location >= mRenderWindow.GetSize().GetWidth() - mMaxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		gridPoints.push_back(std::make_pair(location, static_cast<double>(offsetFromWindowEdge)));
-		gridPoints.push_back(std::make_pair(location,
-			static_cast<double>(renderWindow.GetSize().GetHeight() - oppositeAxis->GetOffsetFromWindowEdge())));
+		mGridPoints.push_back(std::make_pair(location, static_cast<double>(mOffsetFromWindowEdge)));
+		mGridPoints.push_back(std::make_pair(location,
+			static_cast<double>(mRenderWindow.GetSize().GetHeight() - mOppositeAxis->GetOffsetFromWindowEdge())));
 	}
 }
 
@@ -420,12 +400,12 @@ void Axis::DrawHorizontalTicks(const unsigned int &count, const int &mainAxisLoc
 	for (tick = 0; tick < count; ++tick)
 	{
 		double location(ValueToPixel(GetNextTickValue(false, false, tick + 1)));
-		if (location <= minAxis->GetOffsetFromWindowEdge() ||
-			location >= renderWindow.GetSize().GetWidth() - maxAxis->GetOffsetFromWindowEdge())
+		if (location <= mMinAxis->GetOffsetFromWindowEdge() ||
+			location >= mRenderWindow.GetSize().GetWidth() - mMaxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		axisPoints.push_back(std::make_pair(location, static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign)));
-		axisPoints.push_back(std::make_pair(location, static_cast<double>(mainAxisLocation + tickSize * insideTick * sign)));
+		mAxisPoints.push_back(std::make_pair(location, static_cast<double>(mainAxisLocation - mTickSize * outsideTick * sign)));
+		mAxisPoints.push_back(std::make_pair(location, static_cast<double>(mainAxisLocation + mTickSize * insideTick * sign)));
 	}
 }
 
@@ -451,18 +431,18 @@ void Axis::DrawVerticalGrid(const unsigned int &count)
 	double location;
 	for (grid = 0; grid < count; ++grid)
 	{
-		if (minorGrid)
+		if (mMinorGrid)
 			location = ValueToPixel(GetNextGridValue(grid + 1));
 		else
 			location = ValueToPixel(GetNextTickValue(false, false, grid + 1));
 
-		if (location <= minAxis->GetOffsetFromWindowEdge() ||
-			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
+		if (location <= mMinAxis->GetOffsetFromWindowEdge() ||
+			location >= mRenderWindow.GetSize().GetHeight() - mMaxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		gridPoints.push_back(std::make_pair(static_cast<double>(offsetFromWindowEdge), location));
-		gridPoints.push_back(std::make_pair(static_cast<double>(renderWindow.GetSize().GetWidth()
-			- oppositeAxis->GetOffsetFromWindowEdge()), location));
+		mGridPoints.push_back(std::make_pair(static_cast<double>(mOffsetFromWindowEdge), location));
+		mGridPoints.push_back(std::make_pair(static_cast<double>(mRenderWindow.GetSize().GetWidth()
+			- mOppositeAxis->GetOffsetFromWindowEdge()), location));
 	}
 }
 
@@ -492,12 +472,12 @@ void Axis::DrawVerticalTicks(const unsigned int &count, const int &mainAxisLocat
 	for (tick = 0; tick < count; ++tick)
 	{
 		double location(ValueToPixel(GetNextTickValue(false, false, tick + 1)));
-		if (location <= minAxis->GetOffsetFromWindowEdge() ||
-			location >= renderWindow.GetSize().GetHeight() - maxAxis->GetOffsetFromWindowEdge())
+		if (location <= mMinAxis->GetOffsetFromWindowEdge() ||
+			location >= mRenderWindow.GetSize().GetHeight() - mMaxAxis->GetOffsetFromWindowEdge())
 			continue;
 
-		axisPoints.push_back(std::make_pair(static_cast<double>(mainAxisLocation - tickSize * outsideTick * sign), location));
-		axisPoints.push_back(std::make_pair(static_cast<double>(mainAxisLocation + tickSize * insideTick * sign), location));
+		mAxisPoints.push_back(std::make_pair(static_cast<double>(mainAxisLocation - mTickSize * outsideTick * sign), location));
+		mAxisPoints.push_back(std::make_pair(static_cast<double>(mainAxisLocation + mTickSize * insideTick * sign), location));
 	}
 }
 
@@ -523,9 +503,9 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 {
 	if (first)
 	{
-		value = pow(10.0, floor(log10(minimum)));
+		value = pow(10.0, floor(log10(mMinimum)));
 		int scale(1);
-		while (value * scale <= minimum)
+		while (value * scale <= mMinimum)
 			++scale;
 		value *= scale;
 	}
@@ -544,7 +524,7 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 // Class:			Axis
 // Function:		DrawAxisLabel
 //
-// Description:		Draws the label text for the axis.
+// Description:		Draws the mLabel text for the axis.
 //
 // Input Arguments:
 //		None
@@ -558,37 +538,37 @@ void Axis::GetNextLogValue(const bool &first, double &value) const
 //=============================================================================
 void Axis::DrawAxisLabel()
 {
-	if (label.IsEmpty())
+	if (mLabel.IsEmpty())
 		return;
 
-	double fontOffsetFromWindowEdge = offsetFromWindowEdge / 3.0;
+	double fontOffsetFromWindowEdge = mOffsetFromWindowEdge / 3.0;
 	if (!IsHorizontal())
 		fontOffsetFromWindowEdge /= 2.0;
 
-	// TODO:  Change plot dimension if there is a title? or if there is a title and a label for the top axis?
-	Text::BoundingBox boundingBox = labelText.GetBoundingBox("H");// Some capital letter to assure uniform spacing
+	// TODO:  Change plot dimension if there is a title? or if there is a title and a mLabel for the top axis?
+	Text::BoundingBox boundingBox = mLabelText.GetBoundingBox("H");// Some capital letter to assure uniform spacing
 	double edgeOffset = GetAxisLabelTranslation(fontOffsetFromWindowEdge, boundingBox.yUp);
 
-	boundingBox = labelText.GetBoundingBox(label.ToStdString());
+	boundingBox = mLabelText.GetBoundingBox(mLabel.ToStdString());
 	double textWidth = boundingBox.xRight - boundingBox.xLeft;
-	double plotOffset = (double)minAxis->GetOffsetFromWindowEdge() - (double)maxAxis->GetOffsetFromWindowEdge();
+	double plotOffset = (double)mMinAxis->GetOffsetFromWindowEdge() - (double)mMaxAxis->GetOffsetFromWindowEdge();
 
 	if (IsHorizontal())
-		labelText.SetPosition(0.5 * (renderWindow.GetSize().GetWidth() - textWidth + plotOffset), edgeOffset);
+		mLabelText.SetPosition(0.5 * (mRenderWindow.GetSize().GetWidth() - textWidth + plotOffset), edgeOffset);
 	else
 	{
-		labelText.SetOrientation(M_PI * 0.5);
-		labelText.SetPosition(0.5 * (renderWindow.GetSize().GetHeight() - textWidth + plotOffset), -edgeOffset);
+		mLabelText.SetOrientation(M_PI * 0.5);
+		mLabelText.SetPosition(0.5 * (mRenderWindow.GetSize().GetHeight() - textWidth + plotOffset), -edgeOffset);
 	}
 
-	labelText.SetText(label.ToStdString());
+	mLabelText.SetText(mLabel.ToStdString());
 }
 
 //=============================================================================
 // Class:			Axis
 // Function:		GetAxisLabelTranslation
 //
-// Description:		Determines the translation required for drawing the label.
+// Description:		Determines the translation required for drawing the mLabel.
 //
 // Input Arguments:
 //		offset		= const double&
@@ -598,12 +578,12 @@ void Axis::DrawAxisLabel()
 //		None
 //
 // Return Value:
-//		double indicating the translation to use for this label
+//		double indicating the translation to use for this mLabel
 //
 //=============================================================================
 double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHeight) const
 {
-	switch (orientation)
+	switch (mOrientation)
 	{
 	case Orientation::Bottom:
 		return offset;
@@ -612,10 +592,10 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 		return offset + fontHeight;
 
 	case Orientation::Top:
-		return renderWindow.GetSize().GetHeight() - offset - fontHeight;
+		return mRenderWindow.GetSize().GetHeight() - offset - fontHeight;
 
 	case Orientation::Right:
-		return renderWindow.GetSize().GetWidth() - offset;
+		return mRenderWindow.GetSize().GetWidth() - offset;
 
 	default:
 		assert(false);
@@ -628,7 +608,7 @@ double Axis::GetAxisLabelTranslation(const double &offset, const double &fontHei
 // Function:		DrawTickLabels
 //
 // Description:		Draws the numeric labels for each axis tick.  This also
-//					determines the precision for each tick label.  The goal
+//					determines the precision for each tick mLabel.  The goal
 //					is to provide just enough precision so that adjacent tick
 //					marks are distinguishable, and then add just a hair more.
 //					Here we also reset the axis min and max values to be exactly
@@ -650,27 +630,27 @@ void Axis::DrawTickLabels()
 	float xTranslation, yTranslation;
 	unsigned int precision = GetPrecision();
 
-	if (!wxString::Format("%0.*f", precision, minimum).ToDouble(&minimum)) { /*Warn the user?*/ }
+	if (!wxString::Format("%0.*f", precision, mMinimum).ToDouble(&mMinimum)) { /*Warn the user?*/ }
 
 	wxString valueLabel;
-	double valueOffsetFromEdge = offsetFromWindowEdge * 0.8;
+	double valueOffsetFromEdge = mOffsetFromWindowEdge * 0.8;
 	unsigned int tick, numberOfTicks;
 	ComputeGridAndTickCounts(numberOfTicks);
 	for (tick = 0; tick < numberOfTicks + 2; ++tick)
 	{
 		double value(std::min(GetNextTickValue(tick == 0,
-			tick == numberOfTicks + 1, tick), maximum));
+			tick == numberOfTicks + 1, tick), mMaximum));
 		valueLabel.Printf("%0.*f", precision, value);
 
-		// TODO:  Don't draw it if it's too close to the maximum (based on text size)
+		// TODO:  Don't draw it if it's too close to the mMaximum (based on text size)
 		ComputeTranslations(value, xTranslation, yTranslation,
-			valueText.GetBoundingBox(valueLabel.ToStdString()), valueOffsetFromEdge);
-		valueText.SetPosition(xTranslation, yTranslation);
-		valueText.AppendText(valueLabel.ToStdString());
+			mValueText.GetBoundingBox(valueLabel.ToStdString()), valueOffsetFromEdge);
+		mValueText.SetPosition(xTranslation, yTranslation);
+		mValueText.AppendText(valueLabel.ToStdString());
 	}
 
-	valueLabel.Printf("%0.*f", precision, maximum);
-	if (!valueLabel.ToDouble(&maximum)) { /*Warn the user?*/ }
+	valueLabel.Printf("%0.*f", precision, mMaximum);
+	if (!valueLabel.ToDouble(&mMaximum)) { /*Warn the user?*/ }
 }
 
 //=============================================================================
@@ -678,7 +658,7 @@ void Axis::DrawTickLabels()
 // Function:		GetPrecision
 //
 // Description:		Determines appropriate precision to use for axis resolution.
-//					Ideal precision is determined by the minimum number of digits
+//					Ideal precision is determined by the mMinimum number of digits
 //					to differentiate one tick mark from the next, plus two.
 //
 // Input Arguments:
@@ -696,7 +676,7 @@ unsigned int Axis::GetPrecision() const
 	// It does look nicer to use the raw return value of GetPrecision(), but it affects the function
 	// of dragging the plot around.  Because we always force the limits to actually
 	// match the printed values, it makes the dragging operation very coarse.  So we add two.
-	return PlotMath::GetPrecision(minimum, majorResolution, logarithmic) + 2;
+	return PlotMath::GetPrecision(mMinimum, mMajorResolution, mLogarithmic) + 2;
 }
 
 //=============================================================================
@@ -719,17 +699,17 @@ unsigned int Axis::GetPrecision() const
 //=============================================================================
 double Axis::GetNextTickValue(const bool &first, const bool &last, const unsigned int &tick) const
 {
-	if (logarithmic)
+	if (mLogarithmic)
 	{
 		if (first)
-			return minimum;
+			return mMinimum;
 		else if (last)
-			return maximum;
+			return mMaximum;
 		else
-			return pow(10.0, floor(log10(minimum)) + tick);
+			return pow(10.0, floor(log10(mMinimum)) + tick);
 	}
 
-	return minimum + (double)tick * majorResolution;
+	return mMinimum + (double)tick * mMajorResolution;
 }
 
 //=============================================================================
@@ -756,20 +736,20 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 {
 	if (IsHorizontal())
 	{
-		if (orientation == Orientation::Bottom)
+		if (mOrientation == Orientation::Bottom)
 			yTranslation = offset - boundingBox.yUp;
 		else
-			yTranslation = renderWindow.GetSize().GetHeight() - offset;
+			yTranslation = mRenderWindow.GetSize().GetHeight() - offset;
 
 		xTranslation = ValueToPixel(value) -
 			(boundingBox.xRight - boundingBox.xLeft) / 2.0;
 	}
 	else
 	{
-		if (orientation == Orientation::Left)
+		if (mOrientation == Orientation::Left)
 			xTranslation = offset - boundingBox.xRight;
 		else
-			xTranslation = renderWindow.GetSize().GetWidth() - offset;
+			xTranslation = mRenderWindow.GetSize().GetWidth() - offset;
 
 		yTranslation = ValueToPixel(value) -
 			(boundingBox.yUp - boundingBox.yDown) / 2.0;
@@ -780,7 +760,7 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 // Class:			Axis
 // Function:		IsHorizontal
 //
-// Description:		Checks to see if this object has horizontal orientation.
+// Description:		Checks to see if this object has horizontal mOrientation.
 //
 // Input Arguments:
 //		None
@@ -794,7 +774,7 @@ void Axis::ComputeTranslations(const double &value, float &xTranslation, float &
 //=============================================================================
 bool Axis::IsHorizontal() const
 {
-	if (orientation == Orientation::Bottom || orientation == Orientation::Top)
+	if (mOrientation == Orientation::Bottom || mOrientation == Orientation::Top)
 		return true;
 
 	return false;
@@ -820,11 +800,11 @@ bool Axis::IsHorizontal() const
 bool Axis::HasValidParameters()
 {
 	// Don't draw if any of the limits are not numbers
-	if (PlotMath::IsNaN(minimum) || PlotMath::IsNaN(maximum))
+	if (PlotMath::IsNaN(mMinimum) || PlotMath::IsNaN(mMaximum))
 		return false;
 
 	// Make sure the pointers to the perpendicular axes have been provided
-	if (!minAxis || !maxAxis)
+	if (!mMinAxis || !mMaxAxis)
 		return false;
 
 	return true;
@@ -853,28 +833,28 @@ double Axis::ValueToPixel(const double &value) const
 	// Get the plot size
 	int plotDimension;
 	if (IsHorizontal())
-		plotDimension = renderWindow.GetSize().GetWidth()
-				- minAxis->GetOffsetFromWindowEdge()
-				- maxAxis->GetOffsetFromWindowEdge();
+		plotDimension = mRenderWindow.GetSize().GetWidth()
+				- mMinAxis->GetOffsetFromWindowEdge()
+				- mMaxAxis->GetOffsetFromWindowEdge();
 	else
-		plotDimension = renderWindow.GetSize().GetHeight()
-				- minAxis->GetOffsetFromWindowEdge()
-				- maxAxis->GetOffsetFromWindowEdge();
+		plotDimension = mRenderWindow.GetSize().GetHeight()
+				- mMinAxis->GetOffsetFromWindowEdge()
+				- mMaxAxis->GetOffsetFromWindowEdge();
 
 	// Do the scaling
 	if (IsLogarithmic())
 	{
-		if (value <= 0.0 || minimum <= 0.0)
+		if (value <= 0.0 || mMinimum <= 0.0)
 			return GetOffsetFromWindowEdge();
 		else
-			return minAxis->GetOffsetFromWindowEdge()
-				+ (log10(value) - log10(minimum)) /
-				(log10(maximum) - log10(minimum)) * plotDimension;
+			return mMinAxis->GetOffsetFromWindowEdge()
+				+ (log10(value) - log10(mMinimum)) /
+				(log10(mMaximum) - log10(mMinimum)) * plotDimension;
 	}
 
-	return minAxis->GetOffsetFromWindowEdge()
-		+ (value - minimum) /
-		(maximum - minimum) * plotDimension;
+	return mMinAxis->GetOffsetFromWindowEdge()
+		+ (value - mMinimum) /
+		(mMaximum - mMinimum) * plotDimension;
 }
 
 //=============================================================================
@@ -899,19 +879,19 @@ double Axis::PixelToValue(const int &pixel) const
 	// Get the plot size
 	double fraction;
 	if (IsHorizontal())
-		fraction = double(pixel - (double)minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetWidth()
-				- (double)minAxis->GetOffsetFromWindowEdge()
-				- (double)maxAxis->GetOffsetFromWindowEdge());
+		fraction = double(pixel - (double)mMinAxis->GetOffsetFromWindowEdge()) / double(mRenderWindow.GetSize().GetWidth()
+				- (double)mMinAxis->GetOffsetFromWindowEdge()
+				- (double)mMaxAxis->GetOffsetFromWindowEdge());
 	else
-		fraction = double(pixel - (double)minAxis->GetOffsetFromWindowEdge()) / double(renderWindow.GetSize().GetHeight()
-				- (double)minAxis->GetOffsetFromWindowEdge()
-				- (double)maxAxis->GetOffsetFromWindowEdge());
+		fraction = double(pixel - (double)mMinAxis->GetOffsetFromWindowEdge()) / double(mRenderWindow.GetSize().GetHeight()
+				- (double)mMinAxis->GetOffsetFromWindowEdge()
+				- (double)mMaxAxis->GetOffsetFromWindowEdge());
 
 	// Do the scaling
 	if (IsLogarithmic())
-		return pow(10.0, fraction * (log10(maximum) - log10(minimum)) + log10(minimum));
+		return pow(10.0, fraction * (log10(mMaximum) - log10(mMinimum)) + log10(mMinimum));
 
-	return fraction * (maximum - minimum) + minimum;
+	return fraction * (mMaximum - mMinimum) + mMinimum;
 }
 
 //=============================================================================
@@ -932,11 +912,11 @@ double Axis::PixelToValue(const int &pixel) const
 //=============================================================================
 double Axis::GetNextGridValue(const unsigned int &tick) const
 {
-	if (logarithmic)
-		return pow(10.0, floor(log10(minimum)) + floor(tick / 9.0))
+	if (mLogarithmic)
+		return pow(10.0, floor(log10(mMinimum)) + floor(tick / 9.0))
 			* (tick - 9.0 * floor(tick / 9.0) + 1.0);
 
-	return minimum + (double)tick * minorResolution;
+	return mMinimum + (double)tick * mMinorResolution;
 }
 
 //=============================================================================
@@ -957,17 +937,17 @@ double Axis::GetNextGridValue(const unsigned int &tick) const
 //=============================================================================
 unsigned int Axis::GetAxisLength() const
 {
-	if (orientation == Orientation::Top || orientation == Orientation::Bottom)
+	if (mOrientation == Orientation::Top || mOrientation == Orientation::Bottom)
 	{
-		return renderWindow.GetSize().GetWidth()
-			- minAxis->GetOffsetFromWindowEdge()
-			- maxAxis->GetOffsetFromWindowEdge();
+		return mRenderWindow.GetSize().GetWidth()
+			- mMinAxis->GetOffsetFromWindowEdge()
+			- mMaxAxis->GetOffsetFromWindowEdge();
 	}
 	else
 	{
-		return renderWindow.GetSize().GetHeight()
-			- minAxis->GetOffsetFromWindowEdge()
-			- maxAxis->GetOffsetFromWindowEdge();
+		return mRenderWindow.GetSize().GetHeight()
+			- mMinAxis->GetOffsetFromWindowEdge()
+			- mMaxAxis->GetOffsetFromWindowEdge();
 	}
 }
 
@@ -990,22 +970,22 @@ unsigned int Axis::GetAxisLength() const
 //=============================================================================
 bool Axis::InitializeFonts(const std::string& fontFileName, const double& size)
 {
-	if (!labelText.SetFace(fontFileName) || !valueText.SetFace(fontFileName))
+	if (!mLabelText.SetFace(fontFileName) || !mValueText.SetFace(fontFileName))
 		return false;
 
-	labelText.SetColor(color);
-	valueText.SetColor(color);
+	mLabelText.SetColor(mColor);
+	mValueText.SetColor(mColor);
 
 	// For some reason, fonts tend to render more clearly at a larger size.  So
 	// we up-scale to render the fonts then down-scale to achieve the desired
 	// on-screen size.
 	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
 	const double factor(3.0);
-	labelText.SetSize(size * factor);
-	valueText.SetSize(size * factor);
+	mLabelText.SetSize(size * factor);
+	mValueText.SetSize(size * factor);
 
-	labelText.SetScale(1.0 / factor);
-	valueText.SetScale(1.0 / factor);
+	mLabelText.SetScale(1.0 / factor);
+	mValueText.SetScale(1.0 / factor);
 
 	return true;
 }

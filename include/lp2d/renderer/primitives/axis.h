@@ -50,45 +50,45 @@ public:
 	};
 
 	// Set option methods
-	void SetOrientation(const Orientation &orientation) { this->orientation = orientation; mModified = true; }
-	void SetMinimum(const double &minimum) { this->minimum = minimum; mModified = true; }
-	void SetMaximum(const double &maximum) { this->maximum = maximum; mModified = true; }
-	void SetMajorResolution(const double &majorResolution) { this->majorResolution = majorResolution; mModified = true; }
-	void SetMinorResolution(const double &minorResolution) { this->minorResolution = minorResolution; mModified = true; }
-	void SetMajorGrid(const bool &majorGrid) { this->majorGrid = majorGrid; mModified = true; }
-	void SetMinorGrid(const bool &minorGrid) { this->minorGrid = minorGrid; mModified = true; }
-	void SetLabel(wxString label) { this->label = label; mModified = true; }
+	void SetOrientation(const Orientation &orientation) { mOrientation = orientation; mModified = true; }
+	void SetMinimum(const double &minimum) { mMinimum = minimum; mModified = true; }
+	void SetMaximum(const double &maximum) { mMaximum = maximum; mModified = true; }
+	void SetMajorResolution(const double &majorResolution) { mMajorResolution = majorResolution; mModified = true; }
+	void SetMinorResolution(const double &minorResolution) { mMinorResolution = minorResolution; mModified = true; }
+	void SetMajorGrid(const bool &majorGrid) { mMajorGrid = majorGrid; mModified = true; }
+	void SetMinorGrid(const bool &minorGrid) { mMinorGrid = minorGrid; mModified = true; }
+	void SetLabel(wxString label) { mLabel = label; mModified = true; }
 	bool InitializeFonts(const std::string& fontFileName, const double& size);
-	void SetGridColor(const Color &gridColor) { this->gridColor = gridColor; mModified = true; }
-	void SetTickStyle(const TickStyle &tickStyle) { this->tickStyle = tickStyle; mModified = true; }
-	void SetTickSize(const int &tickSize) { this->tickSize = tickSize; mModified = true; }
-	void SetOffsetFromWindowEdge(const unsigned int &offset) { offsetFromWindowEdge = offset; mModified = true; }
+	void SetGridColor(const Color &gridColor) { mGridColor = gridColor; mModified = true; }
+	void SetTickStyle(const TickStyle &tickStyle) { mTickStyle = tickStyle; mModified = true; }
+	void SetTickSize(const int &tickSize) { mTickSize = tickSize; mModified = true; }
+	void SetOffsetFromWindowEdge(const unsigned int &offset) { mOffsetFromWindowEdge = offset; mModified = true; }
 
-	void SetAxisAtMinEnd(const Axis *min) { minAxis = min; mModified = true; }
-	void SetAxisAtMaxEnd(const Axis *max) { maxAxis = max; mModified = true; }
-	void SetOppositeAxis(const Axis *opposite) { oppositeAxis = opposite; mModified = true; }
+	void SetAxisAtMinEnd(const Axis *min) { mMinAxis = min; mModified = true; }
+	void SetAxisAtMaxEnd(const Axis *max) { mMaxAxis = max; mModified = true; }
+	void SetOppositeAxis(const Axis *opposite) { mOppositeAxis = opposite; mModified = true; }
 
-	void SetLogarithmicScale(const bool &log) { logarithmic = log; mModified = true; }
+	void SetLogarithmicScale(const bool &log) { mLogarithmic = log; mModified = true; }
 
 	// Get option methods
-	inline double GetMinimum() const { return minimum; }
-	inline double GetMaximum() const { return maximum; }
+	inline double GetMinimum() const { return mMinimum; }
+	inline double GetMaximum() const { return mMaximum; }
 	bool IsHorizontal() const;
-	inline unsigned int GetOffsetFromWindowEdge() const { return offsetFromWindowEdge; }
-	inline bool GetMajorGrid() const { return majorGrid; }
-	inline bool GetMinorGrid() const { return minorGrid; }
-	inline Color GetGridColor() const { return gridColor; }
+	inline unsigned int GetOffsetFromWindowEdge() const { return mOffsetFromWindowEdge; }
+	inline bool GetMajorGrid() const { return mMajorGrid; }
+	inline bool GetMinorGrid() const { return mMinorGrid; }
+	inline Color GetGridColor() const { return mGridColor; }
 
-	inline const Axis* GetAxisAtMinEnd() const { return minAxis; }
-	inline const Axis* GetAxisAtMaxEnd() const { return maxAxis; }
-	inline const Axis* GetOppositeAxis() const { return oppositeAxis; }
-	inline Orientation GetOrientation() const { return orientation; }
+	inline const Axis* GetAxisAtMinEnd() const { return mMinAxis; }
+	inline const Axis* GetAxisAtMaxEnd() const { return mMaxAxis; }
+	inline const Axis* GetOppositeAxis() const { return mOppositeAxis; }
+	inline Orientation GetOrientation() const { return mOrientation; }
 
 	unsigned int GetAxisLength() const;
 
-	inline wxString GetLabel() const { return label; }
+	inline wxString GetLabel() const { return mLabel; }
 
-	inline bool IsLogarithmic() const { return logarithmic; }
+	inline bool IsLogarithmic() const { return mLogarithmic; }
 
 	double ValueToPixel(const double &value) const;
 	double PixelToValue(const int &pixel) const;
@@ -104,43 +104,43 @@ protected:
 
 private:
 	// This object's orientation
-	Orientation orientation;
+	Orientation mOrientation = Orientation::Bottom;
 
 	// This object's range
-	double minimum;
-	double maximum;
+	double mMinimum = 0.0;
+	double mMaximum = 1.0;
 
 	// For the tick and grid spacing
-	double majorResolution;
-	double minorResolution;
+	double mMajorResolution = 1.0;
+	double mMinorResolution = 1.0;
 
-	bool logarithmic;
+	bool mLogarithmic = false;
 
 	// The tick options
-	TickStyle tickStyle;
-	bool majorGrid;
-	bool minorGrid;
-	int tickSize;
+	TickStyle mTickStyle = TickStyle::Through;
+	bool mMajorGrid = false;
+	bool mMinorGrid = false;
+	int mTickSize = 7;
 
-	Color gridColor;
+	Color mGridColor;
 
 	// Distance for edge of plot render window to the axis
-	unsigned int offsetFromWindowEdge;// [pixels]
+	unsigned int mOffsetFromWindowEdge = 75;// [pixels]
 	
 	// Pointers to the axes at either end of this axis
-	const Axis *minAxis;
-	const Axis *maxAxis;
-	const Axis *oppositeAxis;
+	const Axis *mMinAxis = nullptr;
+	const Axis *mMaxAxis = nullptr;
+	const Axis *mOppositeAxis = nullptr;
 
 	// The axis label and font
-	wxString label;
-	Text labelText;
-	Text valueText;
+	wxString mLabel;
+	Text mLabelText;
+	Text mValueText;
 
-	Line axisLines;
-	Line gridLines;
-	std::vector<std::pair<double, double>> axisPoints;
-	std::vector<std::pair<double, double>> gridPoints;
+	Line mAxisLines;
+	Line mGridLines;
+	std::vector<std::pair<double, double>> mAxisPoints;
+	std::vector<std::pair<double, double>> mGridPoints;
 
 	void DrawFullAxis();
 	int ComputeMainAxisLocation() const;

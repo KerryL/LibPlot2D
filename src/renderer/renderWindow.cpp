@@ -53,16 +53,16 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-const std::string RenderWindow::modelviewName("modelviewMatrix");
-const std::string RenderWindow::projectionName("projectionMatrix");
-const std::string RenderWindow::positionName("position");
-const std::string RenderWindow::colorName("color");
+const std::string RenderWindow::mModelviewName("mModelviewMatrix");
+const std::string RenderWindow::mProjectionName("projectionMatrix");
+const std::string RenderWindow::mPositionName("position");
+const std::string RenderWindow::mColorName("color");
 
-const double RenderWindow::exactPixelShift(0.375);
+const double RenderWindow::mExactPixelShift(0.375);
 
 //=============================================================================
 // Class:			RenderWindow
-// Function:		defaultVertexShader
+// Function:		mDefaultVertexShader
 //
 // Description:		Default vertex shader.
 //
@@ -76,10 +76,10 @@ const double RenderWindow::exactPixelShift(0.375);
 //		None
 //
 //=============================================================================
-const std::string RenderWindow::defaultVertexShader(
+const std::string RenderWindow::mDefaultVertexShader(
 	"#version 300 es\n"
 	"\n"
-	"uniform mat4 modelviewMatrix;\n"
+	"uniform mat4 mModelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
 	"layout(location = 0) in highp vec4 position;\n"
@@ -90,13 +90,13 @@ const std::string RenderWindow::defaultVertexShader(
 	"void main()\n"
 	"{\n"
 	"    vertexColor = color;\n"
-	"    gl_Position = projectionMatrix * modelviewMatrix * position;\n"
+	"    gl_Position = projectionMatrix * mModelviewMatrix * position;\n"
 	"}\n"
 );
 
 //=============================================================================
 // Class:			RenderWindow
-// Function:		defaultFragmentShader
+// Function:		mDefaultFragmentShader
 //
 // Description:		Default fragment shader.
 //
@@ -110,7 +110,7 @@ const std::string RenderWindow::defaultVertexShader(
 //		None
 //
 //=============================================================================
-const std::string RenderWindow::defaultFragmentShader(
+const std::string RenderWindow::mDefaultFragmentShader(
 	"#version 300 es\n"
 	"\n"
 	"in highp vec4 vertexColor;\n"
@@ -207,15 +207,15 @@ END_EVENT_TABLE()
 //=============================================================================
 wxGLContext* RenderWindow::GetContext()
 {
-	if (!context)
+	if (!mContext)
 	{
 		wxGLContextAttrs attributes;
 		attributes.PlatformDefaults().OGLVersion(3, 0).EndList();
-		context = std::make_unique<wxGLContext>(this, nullptr, &attributes);
-		assert(context->IsOK() && "Minimum OpenGL verison not met (requires 3.0)");
+		mContext = std::make_unique<wxGLContext>(this, nullptr, &attributes);
+		assert(mContext->IsOK() && "Minimum OpenGL verison not met (requires 3.0)");
 	}
 
-	return context.get();
+	return mContext.get();
 }
 
 //=============================================================================
@@ -240,61 +240,61 @@ void RenderWindow::Render()
 	if (!GetContext() || !IsShownOnScreen())
 		return;
 
-	SetCurrent(*context);
+	SetCurrent(*mContext);
 	wxPaintDC(this);
 
-	const unsigned int shaderCount(shaders.size());
+	const unsigned int shaderCount(mShaders.size());
 
 	assert(!GLHasError());
 
-	if (!glewInitialized)
+	if (!mGlewInitialized)
 	{
 		if (glewInit() != GLEW_OK)
 			return;
 		BuildShaders();
-		glewInitialized = true;
+		mGlewInitialized = true;
 	}
 
-	if (sizeUpdateRequired)
+	if (mSizeUpdateRequired)
 		DoResize();
 
-	if (modified)
+	if (mModified)
 		Initialize();
-	else if (modelviewModified)
+	else if (mModelviewModified)
 		UpdateModelviewMatrix();
 
-	glClearColor((float)backgroundColor.GetRed(), (float)backgroundColor.GetGreen(),
-		(float)backgroundColor.GetBlue(), (float)backgroundColor.GetAlpha());
+	glClearColor((float)mBackgroundColor.GetRed(), (float)mBackgroundColor.GetGreen(),
+		(float)mBackgroundColor.GetBlue(), (float)mBackgroundColor.GetAlpha());
 
-	if (view3D)
+	if (mView3D)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	else
 		glClear(GL_COLOR_BUFFER_BIT);
 
 	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-	if (needAlphaSort)
+	if (mNeedAlphaSort)
 	{
-		std::sort(primitiveList.begin(), primitiveList.end(), AlphaSortPredicate);
-		needAlphaSort = false;
+		std::sort(mPrimitiveList.begin(), mPrimitiveList.end(), AlphaSortPredicate);
+		mNeedAlphaSort = false;
 	}
 
 	// Generally, all objects will have the same draw order and this won't do anything,
 	// but for some cases we do want to override the draw order just before rendering
-	if (needOrderSort)
+	if (mNeedOrderSort)
 	{
-		std::stable_sort(primitiveList.begin(), primitiveList.end(), OrderSortPredicate);
-		needOrderSort = false;
+		std::stable_sort(mPrimitiveList.begin(), mPrimitiveList.end(), OrderSortPredicate);
+		mNeedOrderSort = false;
 	}
 
 	// NOTE:  Any primitive that uses it's own program should re-load the default program
 	// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
-	for (auto& p : primitiveList)
+	for (auto& p : mPrimitiveList)
 		p->Draw();
 
 	SwapBuffers();// TODO:  Memory leak here?
 
 	// If shaders are added mid-render, we need to re-render to ensure everything gets displayed
-	if (shaders.size() != shaderCount)
+	if (mShaders.size() != shaderCount)
 		Render();
 
 	assert(!GLHasError());
@@ -340,7 +340,7 @@ void RenderWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
 //=============================================================================
 void RenderWindow::OnSize(wxSizeEvent& WXUNUSED(event))
 {
-    sizeUpdateRequired = true;
+    mSizeUpdateRequired = true;
 	Refresh();
 }
 
@@ -369,9 +369,9 @@ void RenderWindow::DoResize()
 
 	AutoSetFrustum();// This takes care of any change in aspect ratio
 
-	sizeUpdateRequired = false;
-	modelviewModified = true;
-	modified = true;
+	mSizeUpdateRequired = false;
+	mModelviewModified = true;
+	mModified = true;
 }
 
 //=============================================================================
@@ -419,11 +419,11 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 		return false;
 
 	unsigned int i;
-	for (i = 0; i < primitiveList.GetCount(); ++i)
+	for (i = 0; i < mPrimitiveList.GetCount(); ++i)
 	{
-		if (toRemove == primitiveList[i].get())
+		if (toRemove == mPrimitiveList[i].get())
 		{
-			primitiveList.Remove(i);
+			mPrimitiveList.Remove(i);
 			return true;
 		}
 	}
@@ -451,7 +451,7 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 void RenderWindow::Initialize()
 {
 	Eigen::Matrix4d projectionMatrix;
-	if (view3D)
+	if (mView3D)
 	{
 		Initialize3D();
 		projectionMatrix = Generate3DProjectionMatrix();
@@ -462,29 +462,29 @@ void RenderWindow::Initialize()
 		projectionMatrix = Generate2DProjectionMatrix();
 	}
 
-	if (wireFrame)
+	if (mWireFrame)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	float glMatrix[16];
 	GLuint i;
-	for (i = shaders.size(); i > 0; --i)
+	for (i = mShaders.size(); i > 0; --i)
 	{
-		if (shaders[i - 1].needsModelview || shaders[i - 1].needsProjection)
-			glUseProgram(shaders[i - 1].programId);
+		if (mShaders[i - 1].needsModelview || mShaders[i - 1].needsProjection)
+			glUseProgram(mShaders[i - 1].programId);
 
-		ConvertMatrixToGL(modelviewMatrix, glMatrix);
-		if (shaders[i - 1].needsModelview && modelviewModified)
-			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1, GL_FALSE, glMatrix);
-		modelviewModified = false;
+		ConvertMatrixToGL(mModelviewMatrix, glMatrix);
+		if (mShaders[i - 1].needsModelview && mModelviewModified)
+			glUniformMatrix4fv(mShaders[i - 1].modelViewLocation, 1, GL_FALSE, glMatrix);
+		mModelviewModified = false;
 
 		ConvertMatrixToGL(projectionMatrix, glMatrix);
-		if (shaders[i - 1].needsProjection)
-			glUniformMatrix4fv(shaders[i - 1].projectionLocation, 1, GL_FALSE, glMatrix);
+		if (mShaders[i - 1].needsProjection)
+			glUniformMatrix4fv(mShaders[i - 1].projectionLocation, 1, GL_FALSE, glMatrix);
 	}
 
-	modified = false;
+	mModified = false;
 }
 
 //=============================================================================
@@ -535,7 +535,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 	}
 
 	Interaction interaction;
-	if (view3D)
+	if (mView3D)
 	{
 		if (!Determine3DInteraction(event, interaction))
 		{
@@ -579,13 +579,13 @@ void RenderWindow::PerformInteraction(Interaction interaction, wxMouseEvent &eve
 {
 	SetCurrent(*GetContext());
 
-	if (!isInteracting)
+	if (!mIsInteracting)
 	{
 		// TODO:  Get focal point in order to perform interactions around the cursor
 		//FocalPoint.Set(0.0, 0.0, 0.0);
 
 		// Don't re-compute the focal point until the next interaction
-		isInteracting = true;
+		mIsInteracting = true;
 	}
 
 	if (interaction == Interaction::DollyWheel)
@@ -618,8 +618,8 @@ void RenderWindow::PerformInteraction(Interaction interaction, wxMouseEvent &eve
 //=============================================================================
 void RenderWindow::StoreMousePosition(wxMouseEvent &event)
 {
-	lastMousePosition[0] = event.GetX();
-	lastMousePosition[1] = event.GetY();
+	mLastMousePosition[0] = event.GetX();
+	mLastMousePosition[1] = event.GetY();
 }
 
 //=============================================================================
@@ -640,7 +640,7 @@ void RenderWindow::StoreMousePosition(wxMouseEvent &event)
 //=============================================================================
 void RenderWindow::OnMouseUpEvent(wxMouseEvent& WXUNUSED(event))
 {
-	isInteracting = false;
+	mIsInteracting = false;
 }
 
 //=============================================================================
@@ -662,7 +662,7 @@ void RenderWindow::OnMouseUpEvent(wxMouseEvent& WXUNUSED(event))
 //=============================================================================
 void RenderWindow::DoRotate(wxMouseEvent &event)
 {
-	if (!view3D)
+	if (!mView3D)
 		return;
 
 	Eigen::Vector3d upDirection(0.0, 1.0, 0.0);
@@ -677,9 +677,9 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 		+ leftDirection *
 		static_cast<double>(GetSize().GetWidth() / 2 - event.GetX()) };
 	Eigen::Vector3d lastMouseVector{ upDirection *
-		static_cast<double>(GetSize().GetHeight() / 2 - lastMousePosition[1])
+		static_cast<double>(GetSize().GetHeight() / 2 - mLastMousePosition[1])
 		+ leftDirection *
-		static_cast<double>(GetSize().GetWidth() / 2 - lastMousePosition[0]) };
+		static_cast<double>(GetSize().GetWidth() / 2 - mLastMousePosition[0]) };
 
 	// Get a vector that represents the mouse motion (projected onto a plane with the camera
 	// position as a normal)
@@ -688,8 +688,8 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 
 	long xDistance{ GetSize().GetWidth() / 2 - event.GetX() };
 	long yDistance{ GetSize().GetHeight() / 2 - event.GetY() };
-	long lastXDistance{ GetSize().GetWidth() / 2 - lastMousePosition[0] };
-	long lastYDistance{ GetSize().GetHeight() / 2 - lastMousePosition[1] };
+	long lastXDistance{ GetSize().GetWidth() / 2 - mLastMousePosition[0] };
+	long lastYDistance{ GetSize().GetHeight() / 2 - mLastMousePosition[1] };
 
 	// The angle is determined by how much the mouse moved.  800 pixels of movement will result in
 	// a full 360 degrees rotation.
@@ -699,10 +699,10 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 		+ static_cast<double>((yDistance - lastYDistance)
 		* (yDistance - lastYDistance)))) / 800.0 * 360.0 };// [deg]
 
-	Translate(modelviewMatrix, focalPoint);
-	Rotate(modelviewMatrix, angle, axisOfRotation);
-	Translate(modelviewMatrix, -focalPoint);
-	modelviewModified = true;
+	Translate(mModelviewMatrix, mFocalPoint);
+	Rotate(mModelviewMatrix, angle, axisOfRotation);
+	Translate(mModelviewMatrix, -mFocalPoint);
+	mModelviewModified = true;
 }
 
 //=============================================================================
@@ -724,11 +724,11 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 {
 	// Handle 3D dollying differently than 2D dollying
-	if (view3D)
+	if (mView3D)
 	{
 		const double dollyFactor(0.05);
 		const double nominalWheelRotation(120.0);
-		SetTopMinusBottom(topMinusBottom * (1.0 + event.GetWheelRotation() / nominalWheelRotation * dollyFactor));
+		SetTopMinusBottom(mTopMinusBottom * (1.0 + event.GetWheelRotation() / nominalWheelRotation * dollyFactor));
 	}
 	else
 	{
@@ -754,11 +754,11 @@ void RenderWindow::DoWheelDolly(wxMouseEvent &event)
 //=============================================================================
 void RenderWindow::DoDragDolly(wxMouseEvent &event)
 {
-	if (view3D)
+	if (mView3D)
 	{
 		const double dollyFactor(0.05);
-		double deltaMouse = lastMousePosition[1] - event.GetY();
-		SetTopMinusBottom(topMinusBottom * (1.0 + deltaMouse * dollyFactor));
+		double deltaMouse = mLastMousePosition[1] - event.GetY();
+		SetTopMinusBottom(mTopMinusBottom * (1.0 + deltaMouse * dollyFactor));
 	}
 	else
 	{
@@ -785,7 +785,7 @@ void RenderWindow::DoDragDolly(wxMouseEvent &event)
 void RenderWindow::DoPan(wxMouseEvent &event)
 {
 	// Handle 3D panning differently from 2D panning
-	if (view3D)
+	if (mView3D)
 	{
 		// Convert up and normal vectors from openGL coordinates to model
 		// coordinates
@@ -803,9 +803,9 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 			+ leftDirection *
 			static_cast<double>(GetSize().GetWidth() / 2 - event.GetX()) };
 		Eigen::Vector3d lastMouseVector{ upDirection *
-			static_cast<double>(GetSize().GetHeight() / 2 - lastMousePosition[1])
+			static_cast<double>(GetSize().GetHeight() / 2 - mLastMousePosition[1])
 			+ leftDirection *
-			static_cast<double>(GetSize().GetWidth() / 2 - lastMousePosition[0]) };
+			static_cast<double>(GetSize().GetWidth() / 2 - mLastMousePosition[0]) };
 
 		// Get a vector that represents the mouse motion (projected onto a
 		// plane with the camera position as a normal)
@@ -814,10 +814,10 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 		double motionFactor = 0.15;
 		mouseMotion *= motionFactor;
 
-		Translate(modelviewMatrix, mouseMotion);
-		modelviewModified = true;
+		Translate(mModelviewMatrix, mouseMotion);
+		mModelviewModified = true;
 
-		focalPoint -= mouseMotion;
+		mFocalPoint -= mouseMotion;
 	}
 	else
 	{
@@ -847,7 +847,7 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 void RenderWindow::SetCameraView(const Eigen::Vector3d &position,
 	const Eigen::Vector3d &lookAt, const Eigen::Vector3d &upDirection)
 {
-	modelviewModified = true;
+	mModelviewModified = true;
 
 	// Compute the MODELVIEW matrix
 	// (Use calculations from gluLookAt documentation)
@@ -857,16 +857,16 @@ void RenderWindow::SetCameraView(const Eigen::Vector3d &position,
 	if (!PlotMath::IsZero(s))
 	{
 		Eigen::Vector3d u{ s.cross(f) };
-		modelviewMatrix << s(0), s(1), s(2), 0.0,
+		mModelviewMatrix << s(0), s(1), s(2), 0.0,
 							u(0), u(1), u(2), 0.0,
 							-f(0), -f(1), -f(2), 0.0,
 							0.0, 0.0, 0.0, 1.0;
 		
-		Translate(modelviewMatrix, -position);
-		modelviewModified = true;
+		Translate(mModelviewMatrix, -position);
+		mModelviewModified = true;
 	}
 
-	focalPoint = lookAt;
+	mFocalPoint = lookAt;
 }
 
 //=============================================================================
@@ -888,19 +888,19 @@ void RenderWindow::SetCameraView(const Eigen::Vector3d &position,
 void RenderWindow::UpdateModelviewMatrix()
 {
 	float glModelviewMatrix[16];
-	ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
+	ConvertMatrixToGL(mModelviewMatrix, glModelviewMatrix);
 
 	unsigned int i;
-	for (i = shaders.size(); i > 0; --i)
+	for (i = mShaders.size(); i > 0; --i)
 	{
-		if (shaders[i - 1].needsModelview)
+		if (mShaders[i - 1].needsModelview)
 		{
-			glUseProgram(shaders[i - 1].programId);
-			glUniformMatrix4fv(shaders[i - 1].modelViewLocation, 1,
+			glUseProgram(mShaders[i - 1].programId);
+			glUniformMatrix4fv(mShaders[i - 1].modelViewLocation, 1,
 				GL_FALSE, glModelviewMatrix);
 		}
 	}
-	modelviewModified = false;
+	mModelviewModified = false;
 }
 
 //=============================================================================
@@ -923,7 +923,7 @@ void RenderWindow::UpdateModelviewMatrix()
 Eigen::Vector3d RenderWindow::TransformToView(
 	const Eigen::Vector3d &modelVector) const
 {
-	return modelviewMatrix.topLeftCorner<3, 3>() * modelVector;
+	return mModelviewMatrix.topLeftCorner<3, 3>() * modelVector;
 }
 
 //=============================================================================
@@ -946,7 +946,7 @@ Eigen::Vector3d RenderWindow::TransformToView(
 Eigen::Vector3d RenderWindow::TransformToModel(
 	const Eigen::Vector3d &viewVector) const
 {
-	return modelviewMatrix.topLeftCorner<3, 3>().transpose() * viewVector;
+	return mModelviewMatrix.topLeftCorner<3, 3>().transpose() * viewVector;
 }
 
 //=============================================================================
@@ -967,8 +967,8 @@ Eigen::Vector3d RenderWindow::TransformToModel(
 //=============================================================================
 Eigen::Vector3d RenderWindow::GetCameraPosition() const
 {
-	Eigen::Vector3d cameraPosition(modelviewMatrix(0, 3),
-		modelviewMatrix(1, 3), modelviewMatrix(2, 3));
+	Eigen::Vector3d cameraPosition(mModelviewMatrix(0, 3),
+		mModelviewMatrix(1, 3), mModelviewMatrix(2, 3));
 	return TransformToModel(cameraPosition);
 }
 
@@ -990,14 +990,14 @@ Eigen::Vector3d RenderWindow::GetCameraPosition() const
 //=============================================================================
 void RenderWindow::AutoSetFrustum()
 {
-	modified = true;
+	mModified = true;
 
 	// This method is really for 3D renderers - for 2D, we just re-initialize to handle change in aspect ratio/size
-	if (!view3D)
+	if (!mView3D)
 		return;
 
 	wxSize windowSize = GetSize();
-	aspectRatio = (double)windowSize.GetWidth() / (double)windowSize.GetHeight();
+	mAspectRatio = (double)windowSize.GetWidth() / (double)windowSize.GetHeight();
 }
 
 //=============================================================================
@@ -1141,7 +1141,7 @@ bool RenderWindow::IsThisRendererSelected(const Primitive *pickedObject) const
 {
 	// Iterate through the list of primitives in the scene
 	// If one of them has the same address as our argument, return true
-	for (const auto& p : primitiveList)
+	for (const auto& p : mPrimitiveList)
 	{
 		if (p.get() == pickedObject)
 			return true;
@@ -1285,9 +1285,9 @@ void RenderWindow::Initialize2D()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	modelviewMatrix.setIdentity();
+	mModelviewMatrix.setIdentity();
 	ShiftForExactPixelization();
-	modelviewModified = true;
+	mModelviewModified = true;
 
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
@@ -1381,22 +1381,22 @@ Eigen::Matrix4d RenderWindow::Generate3DProjectionMatrix() const
 	// The distance at which unity scaling occurs is the cotangent of (top - bottom) / 2.
 	// We can use the distance set in SetCameraView() to determine 
 	Eigen::Matrix4d projectionMatrix(Eigen::Matrix4d::Zero());
-	double rightMinusLeft(topMinusBottom * aspectRatio);
-	if (viewOrthogonal)
+	double rightMinusLeft(mTopMinusBottom * mAspectRatio);
+	if (mViewOrthogonal)
 	{
 		projectionMatrix(0, 0) = 2.0 / rightMinusLeft;
-		projectionMatrix(1, 1) = 2.0 / topMinusBottom;
-		projectionMatrix(2, 2) = 2.0 / (nearClip - farClip);
+		projectionMatrix(1, 1) = 2.0 / mTopMinusBottom;
+		projectionMatrix(2, 2) = 2.0 / (mNearClip - mFarClip);
 		projectionMatrix(3, 3) = 1.0;
 		// For symmetric frustums, elements (0,3) and (1,3) are zero
-		projectionMatrix(2, 3) = (nearClip + farClip) / (nearClip - farClip);
+		projectionMatrix(2, 3) = (mNearClip + mFarClip) / (mNearClip - mFarClip);
 	}
 	else
 	{
-		projectionMatrix(0, 0) = 2.0 * nearClip / rightMinusLeft;
-		projectionMatrix(1, 1) = 2.0 * nearClip / topMinusBottom;
-		projectionMatrix(2, 2) = (nearClip + farClip) / (nearClip - farClip);
-		projectionMatrix(2, 3) = 2.0 * farClip * nearClip / (nearClip - farClip);
+		projectionMatrix(0, 0) = 2.0 * mNearClip / rightMinusLeft;
+		projectionMatrix(1, 1) = 2.0 * mNearClip / mTopMinusBottom;
+		projectionMatrix(2, 2) = (mNearClip + mFarClip) / (mNearClip - mFarClip);
+		projectionMatrix(2, 3) = 2.0 * mFarClip * mNearClip / (mNearClip - mFarClip);
 		projectionMatrix(3, 2) = -1.0;
 	}
 
@@ -1422,11 +1422,11 @@ Eigen::Matrix4d RenderWindow::Generate3DProjectionMatrix() const
 //=============================================================================
 void RenderWindow::SetViewOrthogonal(const bool &viewOrthogonal)
 {
-	if (this->viewOrthogonal == viewOrthogonal)
+	if (mViewOrthogonal == viewOrthogonal)
 		return;
 
-	this->viewOrthogonal = viewOrthogonal;
-	modified = true;
+	mViewOrthogonal = viewOrthogonal;
+	mModified = true;
 
 	// TODO:  Would be better to have some parameter that is common between the
 	// two modes and to just compute the projection matrix accordingly.
@@ -1434,11 +1434,11 @@ void RenderWindow::SetViewOrthogonal(const bool &viewOrthogonal)
 	// We can compute the distance at which we are focused, and then determine
 	// the correct value of SetTopMinusBottom() in order to maintain unit scale
 	// at this distance.
-	double nominalDistance = (GetCameraPosition() - focalPoint).norm();
+	double nominalDistance = (GetCameraPosition() - mFocalPoint).norm();
 	if (viewOrthogonal)// was perspective
-		topMinusBottom *= nominalDistance / nearClip;
+		mTopMinusBottom *= nominalDistance / mNearClip;
 	else// was orthogonal
-		topMinusBottom *= nearClip / nominalDistance;
+		mTopMinusBottom *= mNearClip / nominalDistance;
 }
 
 //=============================================================================
@@ -1645,7 +1645,7 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 // Class:			RenderWindow
 // Function:		BuildShaders
 //
-// Description:		Builds the default shaders and sets the indices to the
+// Description:		Builds the default mShaders and sets the indices to the
 //					matrices we need to track.
 //
 // Input Arguments:
@@ -1669,11 +1669,11 @@ void RenderWindow::BuildShaders()
 	s.needsModelview = true;
 	s.needsProjection = true;
 
-	s.modelViewLocation = glGetUniformLocation(s.programId, modelviewName.c_str());
-	s.projectionLocation = glGetUniformLocation(s.programId, projectionName.c_str());
+	s.modelViewLocation = glGetUniformLocation(s.programId, mModelviewName.c_str());
+	s.projectionLocation = glGetUniformLocation(s.programId, mProjectionName.c_str());
 
-	positionAttributeLocation = glGetAttribLocation(s.programId, positionName.c_str());
-	colorAttributeLocation = glGetAttribLocation(s.programId, colorName.c_str());
+	mPositionAttributeLocation = glGetAttribLocation(s.programId, mPositionName.c_str());
+	mColorAttributeLocation = glGetAttribLocation(s.programId, mColorName.c_str());
 
 	AddShader(s);
 }
@@ -1785,7 +1785,7 @@ void RenderWindow::Scale(Eigen::Matrix4d& m, const Eigen::Vector3d& v)
 //=============================================================================
 void RenderWindow::UseDefaultProgram() const
 {
-	glUseProgram(shaders[0].programId);
+	glUseProgram(mShaders[0].programId);
 }
 
 //=============================================================================
@@ -1806,15 +1806,15 @@ void RenderWindow::UseDefaultProgram() const
 //=============================================================================
 void RenderWindow::ShiftForExactPixelization()
 {
-	Translate(modelviewMatrix,
-		Eigen::Vector3d(exactPixelShift, exactPixelShift, 0.0));
+	Translate(mModelviewMatrix,
+		Eigen::Vector3d(mExactPixelShift, mExactPixelShift, 0.0));
 }
 
 //=============================================================================
 // Class:			RenderWindow
 // Function:		AddShader
 //
-// Description:		Adds a shader to our list of managed shaders.
+// Description:		Adds a shader to our list of managed mShaders.
 //
 // Input Arguments:
 //		shader	= const ShaderInfo&
@@ -1828,8 +1828,8 @@ void RenderWindow::ShiftForExactPixelization()
 //=============================================================================
 void RenderWindow::AddShader(const ShaderInfo& shader)
 {
-	shaders.push_back(shader);
-	modified = true;
+	mShaders.push_back(shader);
+	mModified = true;
 }
 
 //=============================================================================

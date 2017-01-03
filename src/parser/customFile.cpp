@@ -63,11 +63,11 @@ bool CustomFile::IsType(const wxString &fileName)
 //=============================================================================
 wxArrayString CustomFile::CreateDelimiterList() const
 {
-	if (fileFormat.GetDelimiter().IsEmpty())
+	if (mFileFormat.GetDelimiter().IsEmpty())
 		return DataFile::CreateDelimiterList();
 
 	wxArrayString delimiterList;
-	delimiterList.Add(fileFormat.GetDelimiter());
+	delimiterList.Add(mFileFormat.GetDelimiter());
 	return delimiterList;
 }
 
@@ -90,7 +90,7 @@ wxArrayString CustomFile::CreateDelimiterList() const
 //=============================================================================
 unsigned int CustomFile::GetRawDataSize(const unsigned int &selectedCount) const
 {
-	if (fileFormat.IsAsynchronous())
+	if (mFileFormat.IsAsynchronous())
 		return selectedCount * 2;
 
 	return DataFile::GetRawDataSize(selectedCount);
@@ -121,7 +121,7 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
 	wxString &errorString) const
 {
-	if (fileFormat.IsAsynchronous() || !fileFormat.GetTimeFormat().IsEmpty())
+	if (mFileFormat.IsAsynchronous() || !mFileFormat.GetTimeFormat().IsEmpty())
 		return ExtractSpecialData(file, choices, rawData, factors, errorString);
 
 	return DataFile::ExtractData(file, choices, rawData, factors, errorString);
@@ -148,7 +148,7 @@ bool CustomFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 void CustomFile::AssembleDatasets(
 	const std::vector<std::vector<double>>& rawData)
 {
-	if (fileFormat.IsAsynchronous())
+	if (mFileFormat.IsAsynchronous())
 		AssembleAsynchronousDatasets(rawData);
 	else
 		DataFile::AssembleDatasets(rawData);
@@ -180,11 +180,12 @@ wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
 	wxArrayInt nonNumericColumns;// TODO:  Use this
-	wxArrayString names = DataFile::GetCurveInformation(headerLineCount, factors, nonNumericColumns);
-	fileFormat.ProcessChannels(names, factors);
+	wxArrayString names = DataFile::GetCurveInformation(headerLineCount,
+		factors, nonNumericColumns);
+	mFileFormat.ProcessChannels(names, factors);
 
-	if (!fileFormat.GetTimeUnits().IsEmpty())
-		names[0] = _T("Time, [") + fileFormat.GetTimeUnits() + _T("]");
+	if (!mFileFormat.GetTimeUnits().IsEmpty())
+		names[0] = _T("Time, [") + mFileFormat.GetTimeUnits() + _T("]");
 
 	return names;
 }
@@ -217,24 +218,24 @@ bool CustomFile::ExtractSpecialData(std::ifstream &file,
 	std::string nextLine;
 	wxArrayString parsed;
 	unsigned int curveCount(choices.size() + 1);
-	unsigned int lineNumber(headerLines);
+	unsigned int lineNumber(mHeaderLines);
 	double timeZero(-1.0);
 
 	while (std::getline(file, nextLine))
 	{
 		++lineNumber;
-		parsed = ParseLineIntoColumns(nextLine, delimiter);
+		parsed = ParseLineIntoColumns(nextLine, mDelimiter);
 		if (parsed.size() < curveCount && parsed.size() > 0)
 		{
 			if (!file.eof() &&
-				(fileFormat.GetEndIdentifier().IsEmpty() ||
-				parsed[0].Cmp(fileFormat.GetEndIdentifier()) != 0))
+				(mFileFormat.GetEndIdentifier().IsEmpty() ||
+				parsed[0].Cmp(mFileFormat.GetEndIdentifier()) != 0))
 				wxMessageBox(_T("Terminating data extraction prior to reaching end-of-file."),
 					_T("Column Count Mismatch"), wxICON_WARNING);
 			return true;
 		}
 
-		if (fileFormat.IsAsynchronous())
+		if (mFileFormat.IsAsynchronous())
 		{
 			if (!ExtractAsynchronousData(timeZero, parsed, rawData, factors, choices, errorString))
 			{
@@ -282,9 +283,10 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero,
 {
 	double time, value;
 	unsigned int set(0);
-	if (!fileFormat.GetTimeFormat().IsEmpty())
+	if (!mFileFormat.GetTimeFormat().IsEmpty())
 	{
-		time = GetTimeValue(parsedLine[0], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
+		time = GetTimeValue(parsedLine[0], mFileFormat.GetTimeFormat(),
+			mFileFormat.GetTimeUnits());
 		if (timeZero < 0.0)
 			timeZero = time;
 	}
@@ -342,9 +344,10 @@ bool CustomFile::ExtractSynchronousData(double &timeZero,
 	unsigned int i, set(0);
 	for (i = 0; i < parsedLine.size(); ++i)
 	{
-		if (i == 0 && !fileFormat.GetTimeFormat().IsEmpty())
+		if (i == 0 && !mFileFormat.GetTimeFormat().IsEmpty())
 		{
-			time = GetTimeValue(parsedLine[i], fileFormat.GetTimeFormat(), fileFormat.GetTimeUnits());
+			time = GetTimeValue(parsedLine[i], mFileFormat.GetTimeFormat(),
+				mFileFormat.GetTimeUnits());
 			if (timeZero < 0.0)
 				timeZero = time;
 			value = time - timeZero;
@@ -394,8 +397,8 @@ void CustomFile::AssembleAsynchronousDatasets(
 		std::unique_ptr<Dataset2D> dataset(std::make_unique<Dataset2D>(rawData[i].size()));
 		std::copy(rawData[i].begin(), rawData[i].end(), dataset->GetX().begin());
 		std::copy(rawData[i + 1].begin(), rawData[i + 1].end(), dataset->GetY().begin());
-		*dataset *= scales[i / 2];
-		data.push_back(std::move(dataset));
+		*dataset *= mScales[i / 2];
+		mData.push_back(std::move(dataset));
 	}
 }
 
@@ -417,8 +420,8 @@ void CustomFile::AssembleAsynchronousDatasets(
 //=============================================================================
 void CustomFile::DoTypeSpecificLoadTasks()
 {
-	ignoreConsecutiveDelimiters = !fileFormat.IsAsynchronous();
-	timeIsFormatted = !fileFormat.GetTimeFormat().IsEmpty();
+	mIgnoreConsecutiveDelimiters = !mFileFormat.IsAsynchronous();
+	mTimeIsFormatted = !mFileFormat.GetTimeFormat().IsEmpty();
 }
 
 }// namespace LibPlot2D

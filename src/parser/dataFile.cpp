@@ -27,14 +27,10 @@ namespace LibPlot2D
 // Class:			DataFile
 // Function:		DataFile
 //
-// Description:		Constructor for DataFile class.  Assigns arguments and
-//					default values.
+// Description:		Constructor for DataFile class.
 //
 // Input Arguments:
 //		fileName		= const wxString& file which this object represents
-//		parent			= wxWindow* parent for centering curve choice dialog
-//		selections		= wxArrayInt*, optional, default selections
-//		removeExisting	= bool*, optional, default value of checkbox
 //
 // Output Arguments:
 //		None
@@ -43,12 +39,8 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-DataFile::DataFile(const wxString& fileName) : fileName(fileName)
+DataFile::DataFile(const wxString& fileName) : mFileName(fileName)
 {
-	headerLines = 0;
-
-	ignoreConsecutiveDelimiters = true;
-	timeIsFormatted = false;
 }
 
 //=============================================================================
@@ -69,9 +61,10 @@ DataFile::DataFile(const wxString& fileName) : fileName(fileName)
 //=============================================================================
 void DataFile::Initialize()
 {
-	delimiter = DetermineBestDelimiter();
+	mDelimiter = DetermineBestDelimiter();
 	DoTypeSpecificLoadTasks();
-	descriptions = GetCurveInformation(headerLines, scales, nonNumericColumns);
+	mDescriptions = GetCurveInformation(mHeaderLines, mScales,
+		mNonNumericColumns);
 }
 
 //=============================================================================
@@ -93,19 +86,19 @@ void DataFile::Initialize()
 //=============================================================================
 void DataFile::GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *parent)
 {
-	if (delimiter.IsEmpty())
+	if (mDelimiter.IsEmpty())
 	{
 		wxMessageBox(_T("Could not find an appropriate delimiter."), _T("Error Parsing File"), wxICON_ERROR);
 		return;
 	}
-	else if (descriptions.size() < 2)
+	else if (mDescriptions.size() < 2)
 	{
 		wxMessageBox(_T("No plottable data found in file!"), _T("Error Generating Plot"), wxICON_ERROR);
 		return;
 	}
 
 	MultiChoiceDialog dialog(parent, _T("Select data to plot:"), _T("Select Data"),
-		wxArrayString(descriptions.begin() + 1, descriptions.end()), wxCHOICEDLG_STYLE,
+		wxArrayString(mDescriptions.begin() + 1, mDescriptions.end()), wxCHOICEDLG_STYLE,
 		wxDefaultPosition, &selectionInfo.selections, &selectionInfo.removeExisting);
 	if (dialog.ShowModal() == wxID_CANCEL)
 	{
@@ -171,7 +164,7 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
 {
 	unsigned int adjustment(0);
-	for (const auto& col : nonNumericColumns)
+	for (const auto& col : mNonNumericColumns)
 	{
 		if (col - 1 <= (int)i)
 			++adjustment;
@@ -201,20 +194,23 @@ unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
 //=============================================================================
 bool DataFile::Load(const SelectionData &selectionInfo)
 {
-	selectedDescriptions = RemoveUnwantedDescriptions(descriptions, selectionInfo.selections);
+	mSelectedDescriptions = RemoveUnwantedDescriptions(mDescriptions,
+		selectionInfo.selections);
 
-	std::ifstream file(fileName.mb_str(), std::ios::in);
+	std::ifstream file(mFileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
+		wxMessageBox(_T("Could not open file '") + mFileName + _T("'!"),
+			_T("Error Reading File"), wxICON_ERROR);
 		return false;
 	}
-	SkipLines(file, headerLines);
+	SkipLines(file, mHeaderLines);
 	DoTypeSpecificProcessTasks();
 
-	std::vector<std::vector<double>> rawData(GetRawDataSize(selectionInfo.selections.size()));
+	std::vector<std::vector<double>> rawData(GetRawDataSize(
+		selectionInfo.selections.size()));
 	wxString errorString;
-	if (!ExtractData(file, selectionInfo.selections, rawData, scales, errorString))
+	if (!ExtractData(file, selectionInfo.selections, rawData, mScales, errorString))
 	{
 		wxMessageBox(_T("Error during data extraction:\n") + errorString,
 			_T("Error Reading File"), wxICON_ERROR);
@@ -251,10 +247,10 @@ wxString DataFile::DetermineBestDelimiter() const
 
 	if (delimiterList.size() == 1)
 		return delimiterList[0];
-	std::ifstream file(fileName.mb_str(), std::ios::in);
+	std::ifstream file(mFileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
+		wxMessageBox(_T("Could not open file '") + mFileName + _T("'!"),
 			_T("Error Reading File"), wxICON_ERROR);
 		return wxEmptyString;
 	}
@@ -340,19 +336,19 @@ wxArrayString DataFile::CreateDelimiterList() const
 wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors, wxArrayInt &nonNumericColumns) const
 {
-	std::ifstream file(fileName.mb_str(), std::ios::in);
+	std::ifstream file(mFileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
+		wxMessageBox(_T("Could not open file '") + mFileName + _T("'!"),
 			_T("Error Reading File"), wxICON_ERROR);
-		return descriptions;
+		return mDescriptions;
 	}
 
 	std::string nextLine;
 	wxArrayString delimitedLine, previousLines, names;
 	while (std::getline(file, nextLine))
 	{
-		delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
+		delimitedLine = ParseLineIntoColumns(nextLine, mDelimiter);
 		if (delimitedLine.size() > 1)
 		{
 			if (IsDataRow(delimitedLine))
@@ -413,7 +409,7 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 		// delimiters as one)
 		// Changed 4/29/2012 - For some Baumuller data, there are no units, which
 		// results in consecutive delimiters that should NOT be treated as one
-		if (end == start && ignoreConsecutiveDelimiters)
+		if (end == start && mIgnoreConsecutiveDelimiters)
 		{
 			++start;
 			continue;
@@ -427,7 +423,7 @@ wxArrayString DataFile::ParseLineIntoColumns(wxString line,
 		start = end + 1;
 	}
 
-	if (!ignoreConsecutiveDelimiters && line.Last() == delimiter)
+	if (!mIgnoreConsecutiveDelimiters && line.Last() == delimiter)
 		parsed.Add(wxEmptyString);
 
 	return parsed;
@@ -458,7 +454,8 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 	double value;
 	for (line = previousLines.size() - 1; line >= 0; --line)
 	{
-		wxArrayString delimitedPreviousLine = ParseLineIntoColumns(previousLines[line].c_str(), delimiter);
+		wxArrayString delimitedPreviousLine = ParseLineIntoColumns(
+			previousLines[line].c_str(), mDelimiter);
 		if (delimitedPreviousLine.size() != currentLine.size())
 			break;
 
@@ -484,7 +481,8 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 				if (names.size() < i + 1 - nonNumericColumns.size())
 					names.Add(delimitedPreviousLine[i]);
 				else
-					names[i - nonNumericColumns.size()].Prepend(delimitedPreviousLine[i] + _T(", "));
+					names[i - nonNumericColumns.size()].Prepend(
+						delimitedPreviousLine[i] + _T(", "));
 			}
 		}
 	}
@@ -613,13 +611,13 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	std::string nextLine;
 	wxArrayString parsed;
 	unsigned int i, curveCount(choices.size() + 1);
-	unsigned int lineNumber(headerLines);
+	unsigned int lineNumber(mHeaderLines);
 	double tempDouble;
 	std::vector<double> newFactors(choices.size() + 1, 1.0);
 	while (std::getline(file, nextLine))
 	{
 		++lineNumber;
-		parsed = ParseLineIntoColumns(nextLine, delimiter);
+		parsed = ParseLineIntoColumns(nextLine, mDelimiter);
 		if (parsed.size() < curveCount)
 		{
 			if (!file.eof())
@@ -710,11 +708,11 @@ void DataFile::AssembleDatasets(
 			std::copy(rawData[0].begin(), rawData[0].end(), dataset->GetX().begin());
 		}
 		else
-			dataset = std::make_unique<Dataset2D>(*data[0]);
+			dataset = std::make_unique<Dataset2D>(*mData[0]);
 
 		std::copy(rawData[i].begin(), rawData[i].end(), dataset->GetY().begin());
-		*dataset *= scales[i];
-		data.push_back(std::move(dataset));
+		*dataset *= mScales[i];
+		mData.push_back(std::move(dataset));
 	}
 }
 
@@ -763,7 +761,7 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 bool DataFile::IsDataRow(const wxArrayString &list) const
 {
 	double value;
-	if (!timeIsFormatted)
+	if (!mTimeIsFormatted)
 	{
 		if (list[0].IsEmpty() || !list[0].ToDouble(&value))
 			return false;
@@ -891,7 +889,7 @@ double DataFile::GetTimeScalingFactor(const wxString &format) const
 //=============================================================================
 bool DataFile::DescriptionsMatch(const DataFile &file) const
 {
-	return DescriptionsMatch(file.descriptions);
+	return DescriptionsMatch(file.mDescriptions);
 }
 
 //=============================================================================
@@ -913,13 +911,13 @@ bool DataFile::DescriptionsMatch(const DataFile &file) const
 //=============================================================================
 bool DataFile::DescriptionsMatch(const wxArrayString &descriptions) const
 {
-	if (this->descriptions.Count() != descriptions.Count())
+	if (mDescriptions.Count() != descriptions.Count())
 		return false;
 
 	unsigned int i;
 	for (i = 0; i < descriptions.Count(); ++i)
 	{
-		if (this->descriptions[i].compare(descriptions[i]) != 0)
+		if (mDescriptions[i].compare(descriptions[i]) != 0)
 			return false;
 	}
 

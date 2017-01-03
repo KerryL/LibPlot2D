@@ -68,10 +68,10 @@ public:
 
 	bool Load(const SelectionData &selectionInfo);
 
-	std::unique_ptr<Dataset2D>& GetDataset(const unsigned int &i) { return data[i]; }
-	wxString GetDescription(const unsigned int &i) const { return selectedDescriptions[i]; }
-	wxArrayString GetAllDescriptions() const { return descriptions; }
-	unsigned int GetDataCount() { return data.size(); }
+	std::unique_ptr<Dataset2D>& GetDataset(const unsigned int &i) { return mData[i]; }
+	wxString GetDescription(const unsigned int &i) const { return mSelectedDescriptions[i]; }
+	wxArrayString GetAllDescriptions() const { return mDescriptions; }
+	unsigned int GetDataCount() { return mData.size(); }
 
 	bool DescriptionsMatch(const DataFile &file) const;
 	bool DescriptionsMatch(const wxArrayString &descriptions) const;
@@ -80,17 +80,17 @@ protected:
 	// Constructor
 	explicit DataFile(const wxString& fileName);
 
-	const wxString fileName;
+	const wxString mFileName;
 
-	std::vector<std::unique_ptr<Dataset2D>> data;
-	std::vector<double> scales;
-	wxArrayString descriptions, selectedDescriptions;
-	wxString delimiter;
-	wxArrayInt nonNumericColumns;
+	std::vector<std::unique_ptr<Dataset2D>> mData;
+	std::vector<double> mScales;
+	wxArrayString mDescriptions, mSelectedDescriptions;
+	wxString mDelimiter;
+	wxArrayInt mNonNumericColumns;
 
-	unsigned int headerLines;
-	bool ignoreConsecutiveDelimiters;
-	bool timeIsFormatted;
+	unsigned int mHeaderLines = 0;
+	bool mIgnoreConsecutiveDelimiters = true;
+	bool mTimeIsFormatted = false;
 
 	wxString DetermineBestDelimiter() const;
 

@@ -82,12 +82,12 @@ bool KollmorgenFile::IsType(const wxString &testFile)
 wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
-	std::ifstream file(fileName.mb_str(), std::ios::in);
+	std::ifstream file(mFileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"),
+		wxMessageBox(_T("Could not open file '") + mFileName + _T("'!"),
 			_T("Error Reading File"), wxICON_ERROR);
-		return descriptions;
+		return mDescriptions;
 	}
 
 	SkipLines(file, 3);
@@ -95,7 +95,7 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 
 	std::string nextLine;
 	std::getline(file, nextLine);// The fourth line contains the data set labels
-	wxArrayString names = ParseLineIntoColumns(nextLine, delimiter);
+	wxArrayString names = ParseLineIntoColumns(nextLine, mDelimiter);
 	names.Insert(_T("Time, [sec]"), 0);
 
 	factors.resize(names.size(), 1.0);
@@ -122,12 +122,12 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 //=============================================================================
 void KollmorgenFile::DoTypeSpecificLoadTasks()
 {
-	std::ifstream file(fileName.mb_str(), std::ios::in);
+	std::ifstream file(mFileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
 		wxMessageBox(_T("Could not determine sample rate!  Using 1 Hz."),
 			_T("Error Reading File"), wxICON_ERROR);
-		timeStep = 1.0;
+		mTimeStep = 1.0;
 		return;
 	}
 
@@ -138,7 +138,7 @@ void KollmorgenFile::DoTypeSpecificLoadTasks()
 
 	// The third line contains the number of data points and the sampling period in msec
 	// We use this information to generate the time series (file does not contain a time series)
-	timeStep = atof(nextLine.substr(nextLine.find_first_of(delimiter) + 1).c_str()) / 1000.0;// [sec]
+	mTimeStep = atof(nextLine.substr(nextLine.find_first_of(mDelimiter) + 1).c_str()) / 1000.0;// [sec]
 
 	file.close();
 }
@@ -170,14 +170,14 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	std::string nextLine;
 	wxArrayString parsed;
 	unsigned int i, curveCount(choices.size() + 1);
-	unsigned int lineNumber(headerLines);
+	unsigned int lineNumber(mHeaderLines);
 	double tempDouble, time(0.0);
 
 	while (!file.eof())
 	{
 		++lineNumber;
 		std::getline(file, nextLine);
-		parsed = ParseLineIntoColumns(nextLine, delimiter);
+		parsed = ParseLineIntoColumns(nextLine, mDelimiter);
 		parsed.Insert(wxString::Format("%f", time), 0);
 		if (parsed.size() < curveCount)
 		{
@@ -203,7 +203,7 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 				++set;
 			}
 		}
-		time += timeStep;
+		time += mTimeStep;
 	}
 	return true;
 }

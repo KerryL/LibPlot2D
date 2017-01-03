@@ -56,36 +56,36 @@ public:
 
 	// Adds actors to the primitives list
 	inline void AddActor(std::unique_ptr<Primitive> toAdd)
-	{ primitiveList.Add(std::move(toAdd)); modified = true; }
+	{ mPrimitiveList.Add(std::move(toAdd)); mModified = true; }
 
 	// Removes actors from the primitives list
 	bool RemoveActor(Primitive *toRemove);
 
 	// Private data accessors
 	inline void SetWireFrame(const bool& wireFrame)
-	{ this->wireFrame = wireFrame; modified = true; }
+	{ mWireFrame = wireFrame; mModified = true; }
 	void SetViewOrthogonal(const bool& viewOrthogonal);
 
 	inline void SetTopMinusBottom(const double& topMinusBottom)
-	{ this->topMinusBottom = topMinusBottom; modified = true; }
+	{ mTopMinusBottom = topMinusBottom; mModified = true; }
 	inline void SetAspectRatio(const double& aspectRatio)
-	{ this->aspectRatio = aspectRatio; modified = true; }
+	{ mAspectRatio = aspectRatio; mModified = true; }
 	inline void SetNearClip(const double& nearClip)
-	{ this->nearClip = nearClip; modified = true; }
+	{ mNearClip = nearClip; mModified = true; }
 	inline void SetFarClip(const double& farClip)
-	{ this->farClip = farClip; modified = true; }
+	{ mFarClip = farClip; mModified = true; }
 	inline void SetView3D(const bool& view3D)
-	{ this->view3D = view3D; modified = true; }
+	{ mView3D = view3D; mModified = true; }
 
 	virtual void SetBackgroundColor(const Color& backgroundColor)
-	{ this->backgroundColor = backgroundColor; modified = true; }
-	inline Color GetBackgroundColor() { return backgroundColor; }
+	{ mBackgroundColor = backgroundColor; mModified = true; }
+	inline Color GetBackgroundColor() { return mBackgroundColor; }
 
-	inline bool GetWireFrame() const { return wireFrame; }
-	inline bool GetViewOrthogonal() const { return viewOrthogonal; }
-	inline bool GetView3D() const { return view3D; }
+	inline bool GetWireFrame() const { return mWireFrame; }
+	inline bool GetViewOrthogonal() const { return mViewOrthogonal; }
+	inline bool GetView3D() const { return mView3D; }
 
-	inline double GetAspectRatio() const { return aspectRatio; }
+	inline double GetAspectRatio() const { return mAspectRatio; }
 
 	// Returns a string containing any OpenGL errors
 	static wxString GetGLError();
@@ -99,8 +99,8 @@ public:
 	// Determines if a particular primitive is in the scene owned by this object
 	bool IsThisRendererSelected(const Primitive *pickedObject) const;
 
-	void SetNeedAlphaSort() { needAlphaSort = true; }
-	void SetNeedOrderSort() { needOrderSort = true; }
+	void SetNeedAlphaSort() { mNeedAlphaSort = true; }
+	void SetNeedOrderSort() { mNeedOrderSort = true; }
 
 	static GLuint CreateShader(const GLenum& type,
 		const std::string& shaderContents);
@@ -109,8 +109,8 @@ public:
 	void ShiftForExactPixelization();
 	void UseDefaultProgram() const;
 
-	GLuint GetPositionLocation() const { return positionAttributeLocation; }
-	GLuint GetColorLocation() const { return colorAttributeLocation; }
+	GLuint GetPositionLocation() const { return mPositionAttributeLocation; }
+	GLuint GetColorLocation() const { return mColorAttributeLocation; }
 
 	virtual unsigned int GetVertexDimension() const { return 4; }
 
@@ -137,30 +137,30 @@ public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
-	std::unique_ptr<wxGLContext> context;
+	std::unique_ptr<wxGLContext> mContext;
 	wxGLContext* GetContext();
 
-	static const double exactPixelShift;
+	static const double mExactPixelShift;
 
 	// Flags describing the options for this object's functionality
-	bool wireFrame = false;
-	bool viewOrthogonal = false;
+	bool mWireFrame = false;
+	bool mViewOrthogonal = false;
 
 	// The parameters that describe the viewing frustum
-	double topMinusBottom = 100.0;// in model-space units
-	double aspectRatio;
-	double nearClip = 1.0;
-	double farClip = 500.0;
+	double mTopMinusBottom = 100.0;// in model-space units
+	double mAspectRatio;
+	double mNearClip = 1.0;
+	double mFarClip = 500.0;
 
-	Color backgroundColor;
+	Color mBackgroundColor;
 
 	static bool AlphaSortPredicate(const std::unique_ptr<Primitive>& p1,
 		const std::unique_ptr<Primitive>& p2);
 	static bool OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
 		const std::unique_ptr<Primitive>& p2);
 
-	bool needAlphaSort = true;
-	bool needOrderSort = true;
+	bool mNeedAlphaSort = true;
+	bool mNeedOrderSort = true;
 
 	// Event handlers-----------------------------------------------------
 	// Interactor events
@@ -199,36 +199,36 @@ private:
 	//void UpdateTransformationMatricies();
 	void UpdateModelviewMatrix();
 
-	static const std::string modelviewName;
-	static const std::string projectionName;
-	static const std::string positionName;
-	static const std::string colorName;
+	static const std::string mModelviewName;
+	static const std::string mProjectionName;
+	static const std::string mPositionName;
+	static const std::string mColorName;
 
-	static const std::string defaultVertexShader;
-	static const std::string defaultFragmentShader;
+	static const std::string mDefaultVertexShader;
+	static const std::string mDefaultFragmentShader;
 
 	void BuildShaders();
 
 	GLuint CreateDefaultVertexShader();
 	GLuint CreateDefaultFragmentShader();
 
-	GLuint positionAttributeLocation;
-	GLuint colorAttributeLocation;
+	GLuint mPositionAttributeLocation;
+	GLuint mColorAttributeLocation;
 
-	Eigen::Vector3d focalPoint;
+	Eigen::Vector3d mFocalPoint;
 
 	void DoResize();
 
-	bool glewInitialized = false;
+	bool mGlewInitialized = false;
 
 protected:
-	bool view3D = true;
-	bool modified = true;
-	bool sizeUpdateRequired = true;
+	bool mView3D = true;
+	bool mModified = true;
+	bool mSizeUpdateRequired = true;
 
-	ManagedList<Primitive> primitiveList;
+	ManagedList<Primitive> mPrimitiveList;
 
-	long lastMousePosition[2];
+	long mLastMousePosition[2];
 	void StoreMousePosition(wxMouseEvent &event);
 
 	bool Determine2DInteraction(const wxMouseEvent &event,
@@ -238,7 +238,7 @@ protected:
 
 	// Flag indicating whether or not we should select a new focal point for
 	// the interactions
-	bool isInteracting = false;
+	bool mIsInteracting = false;
 
 	static void ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[]);
 	static void ConvertGLToMatrix(Eigen::Matrix4d& matrix, const float gl[]);
@@ -249,17 +249,17 @@ protected:
 	Eigen::Matrix4d Generate2DProjectionMatrix() const;
 	Eigen::Matrix4d Generate3DProjectionMatrix() const;
 
-	bool modelviewModified = true;
-	Eigen::Matrix4d modelviewMatrix;
+	bool mModelviewModified = true;
+	Eigen::Matrix4d mModelviewMatrix;
 
-	std::vector<ShaderInfo> shaders;
+	std::vector<ShaderInfo> mShaders;
 
 	DECLARE_EVENT_TABLE()
 
 	virtual std::string GetDefaultVertexShader() const
-	{ return defaultVertexShader; }
+	{ return mDefaultVertexShader; }
 	virtual std::string GetDefaultFragmentShader() const
-	{ return defaultFragmentShader; }
+	{ return mDefaultFragmentShader; }
 };
 
 }// namespace LibPlot2D

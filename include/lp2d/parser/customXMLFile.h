@@ -29,14 +29,14 @@ class CustomXMLFile : public DataFile
 public:
 	// Constructor
 	explicit CustomXMLFile(const wxString& fileName) : DataFile(fileName),
-		fileFormat(fileName) {}
+		mFileFormat(fileName) {}
 
 	~CustomXMLFile() = default;
 
 	static bool IsType(const wxString &fileName);
 
 protected:
-	CustomFileFormat fileFormat;
+	CustomFileFormat mFileFormat;
 
 	wxArrayString CreateDelimiterList() const override;
 	bool ExtractData(std::ifstream &file, const wxArrayInt &choices,

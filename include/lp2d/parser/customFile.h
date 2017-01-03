@@ -27,14 +27,14 @@ class CustomFile : public DataFile
 public:
 	// Constructor
 	explicit CustomFile(const wxString& fileName) : DataFile(fileName),
-		fileFormat(fileName) {}
+		mFileFormat(fileName) {}
 
 	~CustomFile() = default;
 
 	static bool IsType(const wxString &fileName);
 
 protected:
-	CustomFileFormat fileFormat;
+	CustomFileFormat mFileFormat;
 
 	wxArrayString CreateDelimiterList() const override;
 	bool ExtractData(std::ifstream &file, const wxArrayInt &choices,

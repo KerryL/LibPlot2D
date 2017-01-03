@@ -47,13 +47,13 @@ protected:
 
 private:
 	// The axis we are associated with (perpendicular to)
-	const Axis &axis;
+	const Axis &mAxis;
 
-	Line line;
+	Line mLine;
 
 	// Current value where this object meets the axis
 	double value = -1.0;
-	int locationAlongAxis;
+	int mLocationAlongAxis;
 };
 
 }// namespace LibPlot2D

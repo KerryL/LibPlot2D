@@ -61,11 +61,11 @@ bool CustomXMLFile::IsType(const wxString &fileName)
 //=============================================================================
 wxArrayString CustomXMLFile::CreateDelimiterList() const
 {
-	if (fileFormat.GetDelimiter().IsEmpty())
+	if (mFileFormat.GetDelimiter().IsEmpty())
 		return DataFile::CreateDelimiterList();
 
 	wxArrayString delimiterList;
-	delimiterList.Add(fileFormat.GetDelimiter());
+	delimiterList.Add(mFileFormat.GetDelimiter());
 	return delimiterList;
 }
 
@@ -89,25 +89,28 @@ wxArrayString CustomXMLFile::CreateDelimiterList() const
 //		bool, true for success, false otherwise
 //
 //=============================================================================
-bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt &choices,
-	std::vector<std::vector<double>>& rawData, std::vector<double> &factors, wxString &errorString) const
+bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file),
+	const wxArrayInt &choices, std::vector<std::vector<double>>& rawData,
+	std::vector<double> &factors, wxString &errorString) const
 {
 	if (!ExtractXData(rawData, factors, errorString))
 		return false;
 
-	wxXmlDocument document(fileName);
+	wxXmlDocument document(mFileName);
 	unsigned int channelCount(0), set(1);
-	wxXmlNode *node = FollowNodePath(document, fileFormat.GetXMLChannelParentNode());
+	wxXmlNode *node = FollowNodePath(document,
+		mFileFormat.GetXMLChannelParentNode());
 	if (!node)
 	{
-		errorString = _T("Could not follow path to channel parent node:  ") + fileFormat.GetXMLChannelParentNode();
+		errorString = _T("Could not follow path to channel parent node:  ")
+			+ mFileFormat.GetXMLChannelParentNode();
 		return false;
 	}
 
 	node = node->GetChildren();
 	while (node)
 	{
-		if (node->GetName() == fileFormat.GetXMLChannelNode())
+		if (node->GetName() == mFileFormat.GetXMLChannelNode())
 		{
 			if (!ArrayContainsValue(channelCount++, choices))
 			{
@@ -148,15 +151,17 @@ bool CustomXMLFile::ExtractData(std::ifstream& WXUNUSED(file), const wxArrayInt 
 bool CustomXMLFile::ExtractXData(std::vector<std::vector<double>>& rawData,
 	std::vector<double> &factors, wxString& errorString) const
 {
-	wxXmlDocument document(fileName);
-	wxXmlNode *node = FollowNodePath(document, fileFormat.GetXMLXDataNode());
+	wxXmlDocument document(mFileName);
+	wxXmlNode *node = FollowNodePath(document, mFileFormat.GetXMLXDataNode());
 	if (!node)
 	{
-		errorString = _T("Could not follow path to x-data node:  ") + fileFormat.GetXMLXDataNode();
+		errorString = _T("Could not follow path to x-data node:  ")
+			+ mFileFormat.GetXMLXDataNode();
 		return false;
 	}
 
-	wxString data = node->GetAttribute(fileFormat.GetXMLXDataKey(), wxEmptyString);
+	wxString data = node->GetAttribute(mFileFormat.GetXMLXDataKey(),
+		wxEmptyString);
 	if (data.IsEmpty())
 	{
 		errorString = _T("Could not read x-data!");
@@ -191,14 +196,14 @@ bool CustomXMLFile::ExtractYData(wxXmlNode *channel,
 	std::vector<std::vector<double>>&rawData, std::vector<double> &factors,
 	const unsigned int &set, wxString& errorString) const
 {
-	channel = FollowNodePath(channel, fileFormat.GetXMLYDataNode());
+	channel = FollowNodePath(channel, mFileFormat.GetXMLYDataNode());
 	if (!channel)
 	{
 		errorString = _T("Could not find y-data node!");
 		return false;
 	}
 
-	wxString data = channel->GetAttribute(fileFormat.GetXMLYDataKey(), wxEmptyString);
+	wxString data = channel->GetAttribute(mFileFormat.GetXMLYDataKey(), wxEmptyString);
 	if (data.IsEmpty())
 	{
 		errorString = _T("Could not read y-data!");
@@ -242,33 +247,36 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount,
 	wxArrayString names;
 	headerLineCount = 0;// Unused for XML types
 
-	wxXmlDocument document(fileName);
-	wxXmlNode *channel, *channelParent = FollowNodePath(document, fileFormat.GetXMLChannelParentNode());
+	wxXmlDocument document(mFileName);
+	wxXmlNode *channel, *channelParent = FollowNodePath(document,
+		mFileFormat.GetXMLChannelParentNode());
 	if (!channelParent)
 	{
-		wxMessageBox(_T("Could not follow path to channel nodes:  ") + fileFormat.GetXMLChannelParentNode(),
+		wxMessageBox(_T("Could not follow path to channel nodes:  ")
+			+ mFileFormat.GetXMLChannelParentNode(),
 			_T("Error Reading File"), wxICON_ERROR);
 		return names;
 	}
 
-	if (!fileFormat.GetTimeUnits().IsEmpty())
-		names.Add(_T("Time, [") + fileFormat.GetTimeUnits() + _T("]"));
+	if (!mFileFormat.GetTimeUnits().IsEmpty())
+		names.Add(_T("Time, [") + mFileFormat.GetTimeUnits() + _T("]"));
 	else
 		names.Add(_T("Time"));
 
 	channel = channelParent->GetChildren();
 	while (channel)
 	{
-		if (channel->GetName() == fileFormat.GetXMLChannelNode())
-			names.Add(channel->GetAttribute(fileFormat.GetXMLCodeKey(), _T("Unnamed Channel")));
+		if (channel->GetName() == mFileFormat.GetXMLChannelNode())
+			names.Add(channel->GetAttribute(mFileFormat.GetXMLCodeKey(),
+				_T("Unnamed Channel")));
 		channel = channel->GetNext();
 	}
 
 	factors.resize(names.size(), 1.0);
-	fileFormat.ProcessChannels(names, factors);
+	mFileFormat.ProcessChannels(names, factors);
 
-	if (!fileFormat.GetTimeUnits().IsEmpty())
-		names[0] = _T("Time, [") + fileFormat.GetTimeUnits() + _T("]");
+	if (!mFileFormat.GetTimeUnits().IsEmpty())
+		names[0] = _T("Time, [") + mFileFormat.GetTimeUnits() + _T("]");
 
 	return names;
 }
@@ -391,7 +399,7 @@ bool CustomXMLFile::DataStringToVector(const wxString &data,
 	std::vector<double> &dataVector, const double &factor, wxString& errorString) const
 {
 	double value;
-	wxArrayString parsed(ParseLineIntoColumns(data, fileFormat.GetDelimiter()));
+	wxArrayString parsed(ParseLineIntoColumns(data, mFileFormat.GetDelimiter()));
 	for (const auto& entry : parsed)
 	{
 		if (!entry.ToDouble(&value))

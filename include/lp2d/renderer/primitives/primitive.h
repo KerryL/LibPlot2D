@@ -43,12 +43,12 @@ public:
 	// Private data accessors
 	void SetVisibility(const bool &isVisible);
 	void SetColor(const Color &color);
-	inline Color GetColor() const { return color; }
+	inline Color GetColor() const { return mColor; }
 	void SetDrawOrder(const unsigned int &drawOrder);
 	inline void SetModified() { mModified = true; }// Forces a re-draw
 
-	inline bool GetIsVisible() const { return isVisible; }
-	inline unsigned int GetDrawOrder() const { return drawOrder; }
+	inline bool GetIsVisible() const { return mIsVisible; }
+	inline unsigned int GetDrawOrder() const { return mDrawOrder; }
 
 	// Overloaded operators
 	Primitive& operator=(const Primitive& primitive);
@@ -86,13 +86,13 @@ public:
 	};
 
 protected:
-	bool isVisible = true;
+	bool mIsVisible = true;
 
-	Color color = Color::ColorBlack;
+	Color mColor = Color::ColorBlack;
 
 	bool mModified = true;
 
-	RenderWindow &renderWindow;
+	RenderWindow &mRenderWindow;
 
 	virtual bool HasValidParameters() = 0;
 	virtual void Update(const unsigned int& i) = 0;
@@ -101,10 +101,10 @@ protected:
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
 
-	std::vector<BufferInfo> bufferInfo;
+	std::vector<BufferInfo> mBufferInfo;
 
 private:
-	unsigned int drawOrder = 1000;
+	unsigned int mDrawOrder = 1000;
 };
 
 }// namespace LibPlot2D

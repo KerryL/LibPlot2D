@@ -44,18 +44,18 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-unsigned int Text::program;
-unsigned int Text::colorLocation;
-unsigned int Text::vertexLocation;
-unsigned int Text::indexLocation;
-unsigned int Text::modelviewMatrixLocation;
-bool Text::initialized(false);
-FT_Library Text::ft;
-unsigned int Text::ftReferenceCount(0);
+unsigned int Text::mProgram;
+unsigned int Text::mColorLocation;
+unsigned int Text::mVertexLocation;
+unsigned int Text::mIndexLocation;
+unsigned int Text::mModelviewMatrixLocation;
+bool Text::mInitialized(false);
+FT_Library Text::mFt;
+unsigned int Text::mFtReferenceCount(0);
 
 //=============================================================================
 // Class:			Text
-// Function:		vertexShader
+// Function:		mVertexShader
 //
 // Description:		Text vertex shader.
 //
@@ -70,7 +70,7 @@ unsigned int Text::ftReferenceCount(0);
 //		None
 //
 //=============================================================================
-const std::string Text::vertexShader(
+const std::string Text::mVertexShader(
 	"#version 300 es\n"
 	"\n"
 	"uniform mat4 projectionMatrix;\n"
@@ -92,7 +92,7 @@ const std::string Text::vertexShader(
 
 //=============================================================================
 // Class:			Text
-// Function:		fragmentShader
+// Function:		mFragmentShader
 //
 // Description:		Text fragment shader.
 //
@@ -106,7 +106,7 @@ const std::string Text::vertexShader(
 //		None
 //
 //=============================================================================
-const std::string Text::fragmentShader(
+const std::string Text::mFragmentShader(
 	"#version 300 es\n"
 	"\n"
 	"uniform highp sampler2DArray text;\n"
@@ -140,7 +140,7 @@ const std::string Text::fragmentShader(
 //		None
 //
 //=============================================================================
-Text::Text(RenderWindow& renderer) : renderer(renderer)
+Text::Text(RenderWindow& renderer) : mRenderer(renderer)
 {
 	SetOrientation(0.0);
 	Initialize();
@@ -166,8 +166,8 @@ Text::~Text()
 {
 	FreeFTResources();
 
-	if (glIsTexture(textureId))
-		glDeleteTextures(1, &textureId);
+	if (glIsTexture(mTextureId))
+		glDeleteTextures(1, &mTextureId);
 }
 
 //=============================================================================
@@ -189,16 +189,16 @@ Text::~Text()
 //=============================================================================
 void Text::Initialize()
 {
-	assert(!glyphsGenerated);
-	assert(isOK);
+	assert(!mGlyphsGenerated);
+	assert(mIsOK);
 
-	if (ftReferenceCount == 0)
+	if (mFtReferenceCount == 0)
 	{
-		if (FT_Init_FreeType(&ft))
-			isOK = false;
+		if (FT_Init_FreeType(&mFt))
+			mIsOK = false;
 	}
 
-	++ftReferenceCount;
+	++mFtReferenceCount;
 }
 
 //=============================================================================
@@ -220,8 +220,8 @@ void Text::Initialize()
 //=============================================================================
 bool Text::SetFace(const std::string& fontFileName)
 {
-	assert(!glyphsGenerated);
-	if (FT_New_Face(ft, fontFileName.c_str(), 0, &face))
+	assert(!mGlyphsGenerated);
+	if (FT_New_Face(mFt, fontFileName.c_str(), 0, &mFace))
 		return false;
 
 	return true;
@@ -268,8 +268,8 @@ void Text::SetSize(const double& height)
 //=============================================================================
 void Text::SetSize(const double& width, const double& height)
 {
-	assert(!glyphsGenerated);
-	FT_Set_Pixel_Sizes(face, width, height);
+	assert(!mGlyphsGenerated);
+	FT_Set_Pixel_Sizes(mFace, width, height);
 }
 
 //=============================================================================
@@ -291,30 +291,30 @@ void Text::SetSize(const double& width, const double& height)
 bool Text::GenerateGlyphs()
 {
 	assert(!RenderWindow::GLHasError());
-	assert(!glyphsGenerated);// Doing this twice could leak memory via OpenGL
+	assert(!mGlyphsGenerated);// Doing this twice could leak memory via OpenGL
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	Glyph g;
 	GLubyte c;
 
-	maxXSize = 0;
-	maxYSize = 0;
+	mMaxXSize = 0;
+	mMaxYSize = 0;
 
 	// First loop determines max required image size
 	const unsigned int glyphCount(128);
 	for (c = 0; c < glyphCount; ++c)
 	{
-		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+		if (FT_Load_Char(mFace, c, FT_LOAD_RENDER))
 			return false;
 
-		maxXSize = std::max(maxXSize, face->glyph->bitmap.width);
-		maxYSize = std::max(maxYSize, face->glyph->bitmap.rows);
+		mMaxXSize = std::max(mMaxXSize, mFace->glyph->bitmap.width);
+		mMaxYSize = std::max(mMaxYSize, mFace->glyph->bitmap.rows);
 	}
 
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, textureId);
+	glGenTextures(1, &mTextureId);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, mTextureId);
 
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, maxXSize, maxYSize, glyphCount,
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, mMaxXSize, mMaxYSize, glyphCount,
 		0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -327,7 +327,7 @@ bool Text::GenerateGlyphs()
 	// Second loop actually builds and stores the textures
 	for (c = 0; c < glyphCount; ++c)
 	{
-		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+		if (FT_Load_Char(mFace, c, FT_LOAD_RENDER))
 			return false;
 
 		int w, h, d;
@@ -336,21 +336,21 @@ bool Text::GenerateGlyphs()
 		glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_DEPTH, &d);
 
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, c,
-			face->glyph->bitmap.width, face->glyph->bitmap.rows, 1,
-			GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);// TODO:  Memory leak here
+			mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows, 1,
+			GL_RED, GL_UNSIGNED_BYTE, mFace->glyph->bitmap.buffer);// TODO:  Memory leak here
 
 		g.index = c;
-		g.xSize = face->glyph->bitmap.width;
-		g.ySize = face->glyph->bitmap.rows;
-		g.xBearing = face->glyph->bitmap_left;
-		g.yBearing = face->glyph->bitmap_top;
-		g.advance = face->glyph->advance.x;
+		g.xSize = mFace->glyph->bitmap.width;
+		g.ySize = mFace->glyph->bitmap.rows;
+		g.xBearing = mFace->glyph->bitmap_left;
+		g.yBearing = mFace->glyph->bitmap_top;
+		g.advance = mFace->glyph->advance.x;
 
-		glyphs.insert(std::make_pair(c, g));
+		mGlyphs.insert(std::make_pair(c, g));
 	}
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-	glyphsGenerated = true;
+	mGlyphsGenerated = true;
 
 	assert(!RenderWindow::GLHasError());
 	return true;
@@ -375,12 +375,12 @@ bool Text::GenerateGlyphs()
 //=============================================================================
 void Text::FreeFTResources()
 {
-	FT_Done_Face(face);
+	FT_Done_Face(mFace);
 
-	assert(ftReferenceCount > 0);
-	--ftReferenceCount;
-	if (ftReferenceCount == 0)
-		FT_Done_FreeType(ft);
+	assert(mFtReferenceCount > 0);
+	--mFtReferenceCount;
+	if (mFtReferenceCount == 0)
+		FT_Done_FreeType(mFt);
 }
 
 //=============================================================================
@@ -401,7 +401,7 @@ void Text::FreeFTResources()
 //=============================================================================
 Primitive::BufferInfo Text::BuildText()
 {
-	if (bufferVector.size() > 0)
+	if (mBufferVector.size() > 0)
 		return AssembleBuffers();
 
 	Primitive::BufferInfo bufferInfo(BuildLocalText());
@@ -430,21 +430,21 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
 
-	glUseProgram(program);
+	glUseProgram(mProgram);
 
 	// TODO:  Really, we don't want to access state here that isn't contained within BufferInfo
 	// Are we making an exception for color and orientation?  Assume that this object will
 	// be used only to render text having the same color and orientation (and size?).
 	// Maybe put some assertions in the Set() methods then to ensure it hasn't yet been initialized?
-	glUniform3f(colorLocation, color.GetRed(), color.GetGreen(), color.GetBlue());
-	RenderWindow::SendUniformMatrix(modelview, modelviewMatrixLocation);
+	glUniform3f(mColorLocation, mColor.GetRed(), mColor.GetGreen(), mColor.GetBlue());
+	RenderWindow::SendUniformMatrix(mModelview, mModelviewMatrixLocation);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, textureId);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, mTextureId);
 
 	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
-	renderer.UseDefaultProgram();
+	mRenderer.UseDefaultProgram();
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
 	assert(!RenderWindow::GLHasError());
@@ -479,7 +479,7 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 
 	for (const auto& c : s)
 	{
-		Glyph g = glyphs.find(c)->second;
+		Glyph g = mGlyphs.find(c)->second;
 
 		//b.xLeft += 0;
 		b.xRight += g.advance >> 6;
@@ -487,10 +487,10 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 		b.yDown = std::min(b.yDown, g.yBearing - g.ySize);
 	}
 
-	b.xLeft *= scale;
-	b.xRight *= scale;
-	b.yUp *= scale;
-	b.yDown *= scale;
+	b.xLeft *= mScale;
+	b.xRight *= mScale;
+	b.yUp *= mScale;
+	b.yDown *= mScale;
 
 	return b;
 }
@@ -513,36 +513,36 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 //=============================================================================
 void Text::DoInternalInitialization()
 {
-	if (!glyphsGenerated)
+	if (!mGlyphsGenerated)
 	{
 		if (!GenerateGlyphs())
 		{
-			isOK = false;
+			mIsOK = false;
 			return;
 		}
 	}
 
-	if (!initialized)
+	if (!mInitialized)
 	{
 		std::vector<GLuint> shaderList;
-		shaderList.push_back(renderer.CreateShader(GL_VERTEX_SHADER, vertexShader));
-		shaderList.push_back(renderer.CreateShader(GL_FRAGMENT_SHADER, fragmentShader));
+		shaderList.push_back(mRenderer.CreateShader(GL_VERTEX_SHADER, mVertexShader));
+		shaderList.push_back(mRenderer.CreateShader(GL_FRAGMENT_SHADER, mFragmentShader));
 
-		program = renderer.CreateProgram(shaderList);
-		colorLocation = glGetUniformLocation(program, "textColor");
+		mProgram = mRenderer.CreateProgram(shaderList);
+		mColorLocation = glGetUniformLocation(mProgram, "textColor");
 
 		RenderWindow::ShaderInfo s;
-		s.programId = program;
+		s.programId = mProgram;
 		s.needsModelview = false;
 		s.needsProjection = true;
-		s.projectionLocation = glGetUniformLocation(program, "projectionMatrix");
-		modelviewMatrixLocation = glGetUniformLocation(program, "modelviewMatrix");
-		renderer.AddShader(s);
+		s.projectionLocation = glGetUniformLocation(mProgram, "projectionMatrix");
+		mModelviewMatrixLocation = glGetUniformLocation(mProgram, "modelviewMatrix");
+		mRenderer.AddShader(s);
 
-		vertexLocation = glGetAttribLocation(program, "vertex");
-		indexLocation = glGetAttribLocation(program, "texIndex");
+		mVertexLocation = glGetAttribLocation(mProgram, "vertex");
+		mIndexLocation = glGetAttribLocation(mProgram, "texIndex");
 
-		initialized = true;
+		mInitialized = true;
 	}
 }
 
@@ -550,7 +550,7 @@ void Text::DoInternalInitialization()
 // Class:			Text
 // Function:		SetOrientation
 //
-// Description:		Alters the modelview matrix according to the text rotation angle.
+// Description:		Alters the mModelview matrix according to the text rotation angle.
 //
 // Input Arguments:
 //		angle	= const double& [rad]
@@ -564,8 +564,8 @@ void Text::DoInternalInitialization()
 //=============================================================================
 void Text::SetOrientation(const double& angle)
 {
-	modelview.setIdentity();
-	renderer.Rotate(modelview, angle, Eigen::Vector3d(0.0, 0.0, 1.0));
+	mModelview.setIdentity();
+	mRenderer.Rotate(mModelview, angle, Eigen::Vector3d(0.0, 0.0, 1.0));
 }
 
 //=============================================================================
@@ -591,7 +591,7 @@ void Text::SetOrientation(const double& angle)
 void Text::AppendText(const std::string& text)
 {
 	SetText(text);
-	bufferVector.push_back(BuildLocalText());
+	mBufferVector.push_back(BuildLocalText());
 }
 
 //=============================================================================
@@ -614,7 +614,7 @@ Primitive::BufferInfo Text::AssembleBuffers()
 {
 	Primitive::BufferInfo bufferInfo;
 
-	for (const auto& buffer : bufferVector)
+	for (const auto& buffer : mBufferVector)
 	{
 		bufferInfo.indexBuffer.insert(bufferInfo.indexBuffer.end(),
 			buffer.indexBuffer.begin(),
@@ -626,7 +626,7 @@ Primitive::BufferInfo Text::AssembleBuffers()
 	}
 
 	ConfigureVertexArray(bufferInfo);
-	bufferVector.clear();
+	mBufferVector.clear();
 
 	return bufferInfo;
 }
@@ -656,22 +656,22 @@ Primitive::BufferInfo Text::BuildLocalText()
 	assert(sizeof(GLuint) == sizeof(unsigned int));
 
 	Primitive::BufferInfo bufferInfo;
-	bufferInfo.vertexCount = 6 * text.length();
+	bufferInfo.vertexCount = 6 * mText.length();
 	bufferInfo.vertexBuffer.resize(bufferInfo.vertexCount * 4);
 	bufferInfo.indexBuffer.resize(bufferInfo.vertexCount);
 
-	double xStart(x);
+	double xStart(mX);
 
 	unsigned int i(0), texI(0);
-	for (const auto &c : text)
+	for (const auto &c : mText)
 	{
-		Glyph g = glyphs[c];
+		Glyph g = mGlyphs[c];
 
-		GLfloat xpos = xStart + g.xBearing * scale;
-		GLfloat ypos = y - (g.ySize - g.yBearing) * scale;
+		GLfloat xpos = xStart + g.xBearing * mScale;
+		GLfloat ypos = mY - (g.ySize - g.yBearing) * mScale;
 
-		GLfloat w = g.xSize * scale;
-		GLfloat h = g.ySize * scale;
+		GLfloat w = g.xSize * mScale;
+		GLfloat h = g.ySize * mScale;
 
 		bufferInfo.indexBuffer[texI++] = g.index;
 		bufferInfo.indexBuffer[texI++] = g.index;
@@ -683,7 +683,7 @@ Primitive::BufferInfo Text::BuildLocalText()
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(mMaxYSize);
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
@@ -692,25 +692,25 @@ Primitive::BufferInfo Text::BuildLocalText()
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(mMaxXSize);
 		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos + h;
-		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(mMaxXSize);
 		bufferInfo.vertexBuffer[i++] = 0.0;
 
 		bufferInfo.vertexBuffer[i++] = xpos + w;
 		bufferInfo.vertexBuffer[i++] = ypos;
-		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(maxXSize);
-		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
+		bufferInfo.vertexBuffer[i++] = float(g.xSize) / float(mMaxXSize);
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(mMaxYSize);
 
 		bufferInfo.vertexBuffer[i++] = xpos;
 		bufferInfo.vertexBuffer[i++] = ypos;
 		bufferInfo.vertexBuffer[i++] = 0.0;
-		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(maxYSize);
+		bufferInfo.vertexBuffer[i++] = float(g.ySize) / float(mMaxYSize);
 
-		xStart += (g.advance >> 6) * scale;// Bitshift by 6 to get value in pixels (2^6 = 64)
+		xStart += (g.advance >> 6) * mScale;// Bitshift by 6 to get value in pixels (2^6 = 64)
     }
 
 	return bufferInfo;
@@ -741,15 +741,15 @@ void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
 		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
-	glEnableVertexAttribArray(vertexLocation);
-	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mVertexLocation);
+	glVertexAttribPointer(mVertexLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
 		bufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
 
-	glEnableVertexAttribArray(indexLocation);
-	glVertexAttribIPointer(indexLocation, 1, GL_UNSIGNED_INT, 0, 0);
+	glEnableVertexAttribArray(mIndexLocation);
+	glVertexAttribIPointer(mIndexLocation, 1, GL_UNSIGNED_INT, 0, 0);
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);

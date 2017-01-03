@@ -34,7 +34,7 @@ public:
 	std::unique_ptr<DataFile> GetDataFile(const wxString &fileName);
 
 private:
-	std::vector<std::pair<TypeCheckFunction, FileFactory>> registeredTypes;
+	std::vector<std::pair<TypeCheckFunction, FileFactory>> mRegisteredTypes;
 };
 
 }// namespace LibPlot2D

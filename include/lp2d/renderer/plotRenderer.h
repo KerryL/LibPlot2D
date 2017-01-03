@@ -147,9 +147,10 @@ public:
 	void SaveCurrentZoom();
 	void ClearZoomStack();
 
-	static const unsigned int maxXTicks;
-	static const unsigned int maxYTicks;
-	static double ComputeTickSpacing(const double &min, const double &max, const int &maxTicks);
+	static const unsigned int mMaxXTicks;
+	static const unsigned int mMaxYTicks;
+	static double ComputeTickSpacing(const double &min, const double &max,
+		const int &maxTicks);
 
 	enum class CurveQuality
 	{
@@ -161,7 +162,7 @@ public:
 	};
 
 	void SetCurveQuality(const CurveQuality& curveQuality);
-	CurveQuality GetCurveQuality() const { return curveQuality; }
+	CurveQuality GetCurveQuality() const { return mCurveQuality; }
 
 	unsigned long long GetTotalPointCount() const;
 
@@ -178,21 +179,25 @@ public:
 
 	void LoadModelviewUniform(const Modelview& mv);
 
-	void SetLeftModelview(const Eigen::Matrix4d& m) { leftModelview = m; }
-	void SetRightModelview(const Eigen::Matrix4d& m) { rightModelview = m; }
+	void SetLeftModelview(const Eigen::Matrix4d& m) { mLeftModelview = m; }
+	void SetRightModelview(const Eigen::Matrix4d& m) { mRightModelview = m; }
 
-	// Scaling functions for handling differences in linear and logarithmic axis scales
-	inline double DoXScale(const double& value) { return xScaleFunction(value); }
-	inline double DoLeftYScale(const double& value) { return leftYScaleFunction(value); }
-	inline double DoRightYScale(const double& value) { return rightYScaleFunction(value); }
+	// Scaling functions for handling differences in linear and log axis scales
+	inline double DoXScale(const double& value)
+	{ return mXScaleFunction(value); }
+	inline double DoLeftYScale(const double& value)
+	{ return mLeftYScaleFunction(value); }
+	inline double DoRightYScale(const double& value)
+	{ return mRightYScaleFunction(value); }
 
 	typedef double (*ScalingFunction)(const double&);
-	ScalingFunction GetXScaleFunction() { return xScaleFunction; }
-	ScalingFunction GetLeftYScaleFunction() { return leftYScaleFunction; }
-	ScalingFunction GetRightYScaleFunction() { return rightYScaleFunction; }
+	ScalingFunction GetXScaleFunction() { return mXScaleFunction; }
+	ScalingFunction GetLeftYScaleFunction() { return mLeftYScaleFunction; }
+	ScalingFunction GetRightYScaleFunction() { return mRightYScaleFunction; }
 
 	static inline double DoLineaerScale(const double& value) { return value; }
-	static inline double DoLogarithmicScale(const double& value) { return log10(value); }
+	static inline double DoLogarithmicScale(const double& value)
+	{ return log10(value); }
 
 	enum class PlotContext
 	{
@@ -209,12 +214,12 @@ public:
 	void DoPaste();
 
 private:
-	static const std::string defaultVertexShader;
+	static const std::string mDefaultVertexShader;
 
 	// Called from the PlotRenderer constructor only in order to initialize the display
 	void CreateActors();
 
-	std::unique_ptr<PlotObject> plot;
+	std::unique_ptr<PlotObject> mPlot;
 
 	// Overload of size event
 	void OnSize(wxSizeEvent &event);
@@ -230,14 +235,14 @@ private:
 	void OnMouseLeaveWindowEvent(wxMouseEvent &event);
 	void OnDoubleClickEvent(wxMouseEvent &event);
 
-	ZoomBox *zoomBox;
-	PlotCursor *leftCursor;
-	PlotCursor *rightCursor;
-	Legend *legend;
+	ZoomBox *mZoomBox;
+	PlotCursor *mLeftCursor;
+	PlotCursor *mRightCursor;
+	Legend *mLegend;
 
-	bool draggingLeftCursor;
-	bool draggingRightCursor;
-	bool draggingLegend;
+	bool mDraggingLeftCursor = false;
+	bool mDraggingRightCursor = false;
+	bool mDraggingLegend = false;
 
 	void ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const;
 	void UpdateLegendAnchor();
@@ -245,7 +250,7 @@ private:
 	void CreatePlotContextMenu(const wxPoint &position, const PlotContext &context);
 
 protected:
-	GuiInterface& guiInterface;
+	GuiInterface& mGuiInterface;
 
 	void ProcessZoom(wxMouseEvent &event);
 	void ProcessZoomWithBox(wxMouseEvent &event);
@@ -263,11 +268,7 @@ protected:
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
 
-	virtual std::string GetDefaultVertexShader() const { return defaultVertexShader; }
-
-	// Use RenderWindow::glModelViewMatrix for window-fixed things like axes and gridlines
-	float glModelViewMatrixLeftAxis[16];
-	float glModelViewMatrixRightAxis[16];
+	virtual std::string GetDefaultVertexShader() const { return mDefaultVertexShader; }
 
 	struct Zoom
 	{
@@ -284,20 +285,20 @@ protected:
 		double rightYMajor;
 	};
 
-	std::stack<Zoom> zoom;
+	std::stack<Zoom> mZoom;
 	void UndoZoom();
 	bool ZoomChanged() const;
 
-	bool ignoreNextMouseMove;
-	CurveQuality curveQuality;
+	bool mIgnoreNextMouseMove = false;
+	CurveQuality mCurveQuality = CurveQuality::AlwaysHigh;
 
-	Eigen::Matrix4d leftModelview;
-	Eigen::Matrix4d rightModelview;
+	Eigen::Matrix4d mLeftModelview;
+	Eigen::Matrix4d mRightModelview;
 
 	// Function pointers for working with plot values
-	ScalingFunction xScaleFunction;
-	ScalingFunction leftYScaleFunction;
-	ScalingFunction rightYScaleFunction;
+	ScalingFunction mXScaleFunction = DoLineaerScale;
+	ScalingFunction mLeftYScaleFunction = DoLineaerScale;
+	ScalingFunction mRightYScaleFunction = DoLineaerScale;
 
 	// The event IDs
 	enum EventIDs
@@ -347,7 +348,8 @@ protected:
 		idPlotContextEditRightLabel
 	};
 
-	std::unique_ptr<wxMenu> CreateAxisContextMenu(const unsigned int &baseEventId) const;
+	std::unique_ptr<wxMenu> CreateAxisContextMenu(
+		const unsigned int &baseEventId) const;
 	std::unique_ptr<wxMenu> CreatePlotAreaContextMenu() const;
 
 	// Context menu events
@@ -394,7 +396,7 @@ protected:
 template<>
 struct EnableBitwiseOperators<PlotRenderer::CurveQuality>
 {
-	static constexpr bool enable = true;
+	static constexpr bool mEnable = true;
 };
 
 }// namespace LibPlot2D

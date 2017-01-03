@@ -503,9 +503,9 @@ void PlotObject::FormatPlot()
 	double yRightMajor(mYRightMajorResolution);
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
-	AutoScaleAxis(mXMin, mXMax, xMajor, PlotRenderer::maxXTicks, mAxisBottom->IsLogarithmic(), !mAutoScaleX);
-	AutoScaleAxis(mYLeftMin, mYLeftMax, yLeftMajor, PlotRenderer::maxYTicks, mAxisLeft->IsLogarithmic(), forceLeftYLimits);
-	AutoScaleAxis(mYRightMin, mYRightMax, yRightMajor, PlotRenderer::maxYTicks, mAxisRight->IsLogarithmic(), forceRightYLimits);
+	AutoScaleAxis(mXMin, mXMax, xMajor, PlotRenderer::mMaxXTicks, mAxisBottom->IsLogarithmic(), !mAutoScaleX);
+	AutoScaleAxis(mYLeftMin, mYLeftMax, yLeftMajor, PlotRenderer::mMaxYTicks, mAxisLeft->IsLogarithmic(), forceLeftYLimits);
+	AutoScaleAxis(mYRightMin, mYRightMax, yRightMajor, PlotRenderer::mMaxYTicks, mAxisRight->IsLogarithmic(), forceRightYLimits);
 
 	double xMinor = ComputeMinorResolution(mXMin, mXMax, xMajor, mAxisBottom->GetAxisLength());
 	double yLeftMinor = ComputeMinorResolution(mYLeftMin, mYLeftMax, yLeftMajor, mAxisLeft->GetAxisLength());
@@ -1026,7 +1026,7 @@ void PlotObject::ValidateRangeLimits(double &min, double &max,
 	{
 		min = -1.0;
 		max = 1.0;
-		AutoScaleAxis(min, max, major, PlotRenderer::maxXTicks, false, !autoScale);
+		AutoScaleAxis(min, max, major, PlotRenderer::mMaxXTicks, false, !autoScale);
 		minor = major;
 	}
 }
@@ -1425,7 +1425,7 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 // Description:		Sets the lower X limit.
 //
 // Input Arguments:
-//		mXMin	= const double& describing desired minimum X limit
+//		xMin	= const double& describing desired minimum X limit
 //
 // Output Arguments:
 //		None
@@ -1434,14 +1434,14 @@ double PlotObject::ComputeMinorResolution(const double &min, const double &max,
 //		None
 //
 //=============================================================================
-void PlotObject::SetXMin(const double &mXMin)
+void PlotObject::SetXMin(const double &xMin)
 {
 	// If the both limits are at the original value, enable auto-scaling again
-	if (mXMax == mXMaxOriginal && mXMin == mXMinOriginal && mXMajorResolution == 0.0)
+	if (mXMax == mXMaxOriginal && xMin == mXMinOriginal && mXMajorResolution == 0.0)
 		mAutoScaleX = true;
 	else
 		mAutoScaleX = false;
-	this->mXMin = mXMin;
+	mXMin = xMin;
 }
 
 //=============================================================================
@@ -1463,7 +1463,7 @@ void PlotObject::SetXMin(const double &mXMin)
 void PlotObject::SetXMax(const double &xMax)
 {
 	// If both limits are at the original value, enable auto-scaling again
-	if (mXMin == mXMinOriginal && mXMax == mXMaxOriginal && mXMajorResolution == 0.0)
+	if (mXMin == mXMinOriginal && xMax == mXMaxOriginal && mXMajorResolution == 0.0)
 		mAutoScaleX = true;
 	else
 		mAutoScaleX = false;

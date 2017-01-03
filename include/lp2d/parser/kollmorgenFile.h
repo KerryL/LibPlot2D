@@ -40,7 +40,7 @@ protected:
 		wxString &errorString) const override;
 
 private:
-	double timeStep;// [sec]
+	double mTimeStep;// [sec]
 
 	friend std::unique_ptr<DataFile>
 		DataFile::Create<KollmorgenFile>(const wxString&);

@@ -38,7 +38,7 @@ namespace LibPlot2D
 void FileTypeManager::RegisterFileType(TypeCheckFunction typeFunction,
 	FileFactory fileFactory)
 {
-	registeredTypes.push_back(std::make_pair(typeFunction, fileFactory));
+	mRegisteredTypes.push_back(std::make_pair(typeFunction, fileFactory));
 }
 
 //=============================================================================
@@ -61,7 +61,7 @@ void FileTypeManager::RegisterFileType(TypeCheckFunction typeFunction,
 //=============================================================================
 std::unique_ptr<DataFile> FileTypeManager::GetDataFile(const wxString &fileName)
 {
-	for (const auto& type : registeredTypes)
+	for (const auto& type : mRegisteredTypes)
 	{
 		if (type.first(fileName))
 			return type.second(fileName);

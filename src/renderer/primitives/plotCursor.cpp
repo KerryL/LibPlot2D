@@ -29,7 +29,7 @@ namespace LibPlot2D
 // Description:		Constructor for the PlotCursor class.
 //
 // Input Arguments:
-//		renderWindow	= RenderWindow&
+//		mRenderWindow	= RenderWindow&
 //		axis			= Axis& with which we are associated
 //
 // Output Arguments:
@@ -39,12 +39,12 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
-	: Primitive(renderWindow), axis(axis), line(renderWindow)
+PlotCursor::PlotCursor(RenderWindow &mRenderWindow, const Axis &axis)
+	: Primitive(mRenderWindow), mAxis(axis), mLine(mRenderWindow)
 {
-	isVisible = false;
-	color = Color::ColorBlack;
-	line.SetLineColor(color);
+	mIsVisible = false;
+	mColor = Color::ColorBlack;
+	mLine.SetLineColor(mColor);
 
 	SetDrawOrder(2800);
 }
@@ -67,22 +67,22 @@ PlotCursor::PlotCursor(RenderWindow &renderWindow, const Axis &axis)
 //=============================================================================
 void PlotCursor::Update(const unsigned int& /*i*/)
 {
-	if (axis.IsHorizontal())
+	if (mAxis.IsHorizontal())
 	{
-		line.Build(locationAlongAxis, axis.GetOffsetFromWindowEdge(),
-			locationAlongAxis, renderWindow.GetSize().GetHeight()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(), bufferInfo[0]);
+		mLine.Build(mLocationAlongAxis, mAxis.GetOffsetFromWindowEdge(),
+			mLocationAlongAxis, mRenderWindow.GetSize().GetHeight()
+			- mAxis.GetOppositeAxis()->GetOffsetFromWindowEdge(), mBufferInfo[0]);
 	}
 	else
 	{
-		line.Build(axis.GetOffsetFromWindowEdge(), locationAlongAxis,
-			renderWindow.GetSize().GetWidth()
-			- axis.GetOppositeAxis()->GetOffsetFromWindowEdge(),
-			locationAlongAxis, bufferInfo[0]);
+		mLine.Build(mAxis.GetOffsetFromWindowEdge(), mLocationAlongAxis,
+			mRenderWindow.GetSize().GetWidth()
+			- mAxis.GetOppositeAxis()->GetOffsetFromWindowEdge(),
+			mLocationAlongAxis, mBufferInfo[0]);
 	}
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
-	value = axis.PixelToValue(locationAlongAxis);
+	value = mAxis.PixelToValue(mLocationAlongAxis);
 }
 
 //=============================================================================
@@ -103,11 +103,11 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 //=============================================================================
 void PlotCursor::GenerateGeometry()
 {
-	if (bufferInfo.size() == 0)
+	if (mBufferInfo.size() == 0)
 		return;
 
-	glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
-	Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
+	glBindVertexArray(mBufferInfo[0].GetVertexArrayIndex());
+	Line::DoPrettyDraw(mBufferInfo[0].indexBuffer.size());
 	glBindVertexArray(0);
 }
 
@@ -130,12 +130,12 @@ void PlotCursor::GenerateGeometry()
 bool PlotCursor::HasValidParameters()
 {
 	// Make sure the value is within the axis limits
-	if (value >= axis.GetMinimum() && value <= axis.GetMaximum() &&
-		axis.GetAxisAtMaxEnd() && axis.GetAxisAtMinEnd())
+	if (value >= mAxis.GetMinimum() && value <= mAxis.GetMaximum() &&
+		mAxis.GetAxisAtMaxEnd() && mAxis.GetAxisAtMinEnd())
 		return true;
 
 	// If the parameters aren't valid, also hide this to prevent the cursor values from updating
-	isVisible = false;
+	mIsVisible = false;
 
 	return false;
 }
@@ -160,13 +160,13 @@ bool PlotCursor::HasValidParameters()
 //=============================================================================
 bool PlotCursor::IsUnder(const unsigned int &pixel)
 {
-	if (!isVisible)
+	if (!mIsVisible)
 		return false;
 
 	// Apparent line width for clicking
 	int width = 2;// [pixels]
 
-	if (abs(int(locationAlongAxis - pixel)) <= width && isVisible)
+	if (abs(int(mLocationAlongAxis - pixel)) <= width && mIsVisible)
 		return true;
 
 	return false;
@@ -190,8 +190,8 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 //=============================================================================
 void PlotCursor::SetLocation(const int& location)
 {
-	locationAlongAxis = location;
-	value = axis.PixelToValue(location);
+	mLocationAlongAxis = location;
+	value = mAxis.PixelToValue(location);
 	mModified = true;
 }
 
@@ -217,7 +217,7 @@ PlotCursor& PlotCursor::operator=(const PlotCursor &target)
 		return *this;
 
 	value = target.value;
-	locationAlongAxis = target.locationAlongAxis;
+	mLocationAlongAxis = target.mLocationAlongAxis;
 
 	return *this;
 }

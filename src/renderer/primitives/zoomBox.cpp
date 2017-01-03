@@ -41,15 +41,9 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow),
 	box(renderWindow)
 {
 	// Initially, we don't want to draw this
-	isVisible = false;
+	mIsVisible = false;
 
-	xAnchor = 0;
-	yAnchor = 0;
-
-	xFloat = 0;
-	yFloat = 0;
-
-	color = Color::ColorBlack;
+	mColor = Color::ColorBlack;
 }
 
 //=============================================================================
@@ -71,12 +65,12 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow),
 void ZoomBox::Update(const unsigned int& /*i*/)
 {
 	std::vector<std::pair<double, double>> points;
-	points.push_back(std::make_pair(xAnchor, yAnchor));
-	points.push_back(std::make_pair(xFloat, yAnchor));
-	points.push_back(std::make_pair(xFloat, yFloat));
-	points.push_back(std::make_pair(xAnchor, yFloat));
-	points.push_back(std::make_pair(xAnchor, yAnchor));
-	box.Build(points, bufferInfo[0]);
+	points.push_back(std::make_pair(mXAnchor, mYAnchor));
+	points.push_back(std::make_pair(mXFloat, mYAnchor));
+	points.push_back(std::make_pair(mXFloat, mYFloat));
+	points.push_back(std::make_pair(mXAnchor, mYFloat));
+	points.push_back(std::make_pair(mXAnchor, mYAnchor));
+	box.Build(points, mBufferInfo[0]);
 }
 
 //=============================================================================
@@ -97,8 +91,8 @@ void ZoomBox::Update(const unsigned int& /*i*/)
 //=============================================================================
 void ZoomBox::GenerateGeometry()
 {
-	glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
-	Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
+	glBindVertexArray(mBufferInfo[0].GetVertexArrayIndex());
+	Line::DoPrettyDraw(mBufferInfo[0].indexBuffer.size());
 	glBindVertexArray(0);
 }
 
@@ -122,7 +116,7 @@ bool ZoomBox::HasValidParameters()
 {
 	// Just make sure the box actually exists
 	// It is up to the render window to ensure the coordinates are valid
-	if (abs(int(xAnchor - xFloat)) > 0 && abs(int(yAnchor - yFloat)) > 0)
+	if (abs(int(mXAnchor - mXFloat)) > 0 && abs(int(mYAnchor - mYFloat)) > 0)
 		return true;
 
 	return false;
@@ -147,8 +141,8 @@ bool ZoomBox::HasValidParameters()
 //=============================================================================
 void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor)
 {
-	this->xAnchor = xAnchor;
-	this->yAnchor = yAnchor;
+	mXAnchor = xAnchor;
+	mYAnchor = yAnchor;
 
 	mModified = true;
 }
@@ -172,8 +166,8 @@ void ZoomBox::SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &y
 //=============================================================================
 void ZoomBox::SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat)
 {
-	this->xFloat = xFloat;
-	this->yFloat = yFloat;
+	mXFloat = xFloat;
+	mYFloat = yFloat;
 
 	mModified = true;
 }

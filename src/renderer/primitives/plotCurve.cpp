@@ -46,7 +46,7 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 	: Primitive(renderWindow), mData(data), mLine(renderWindow)
 {
 	mLine.SetBufferHint(GL_STATIC_DRAW);
-	bufferInfo.resize(2);// First one for lines, second one for the markers
+	mBufferInfo.resize(2);// First one for lines, second one for the markers
 }
 
 //=============================================================================
@@ -66,7 +66,7 @@ PlotCurve::PlotCurve(RenderWindow &renderWindow, const Dataset2D& data)
 //
 //=============================================================================
 PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
-	mData(plotCurve.mData), mLine(renderWindow)
+	mData(plotCurve.mData), mLine(mRenderWindow)
 {
 	*this = plotCurve;
 }
@@ -89,13 +89,14 @@ PlotCurve::PlotCurve(const PlotCurve &plotCurve) : Primitive(plotCurve),
 //=============================================================================
 void PlotCurve::InitializeMarkerVertexBuffer()
 {
-	bufferInfo[1].GetOpenGLIndices();
+	mBufferInfo[1].GetOpenGLIndices();
 
-	bufferInfo[1].vertexCount = mData.GetNumberOfPoints() * 4;
-	bufferInfo[1].vertexBuffer.resize(bufferInfo[1].vertexCount * (renderWindow.GetVertexDimension() + 4));
-	assert(renderWindow.GetVertexDimension() == 2);
+	mBufferInfo[1].vertexCount = mData.GetNumberOfPoints() * 4;
+	mBufferInfo[1].vertexBuffer.resize(mBufferInfo[1].vertexCount
+		* (mRenderWindow.GetVertexDimension() + 4));
+	assert(mRenderWindow.GetVertexDimension() == 2);
 
-	bufferInfo[1].vertexCountModified = false;
+	mBufferInfo[1].vertexCountModified = false;
 }
 
 //=============================================================================
@@ -119,7 +120,7 @@ void PlotCurve::Update(const unsigned int& i)
 	if (i == 0)
 	{
 		int width, height;
-			renderWindow.GetSize(&width, &height);
+			mRenderWindow.GetSize(&width, &height);
 			width -= mYAxis->GetOffsetFromWindowEdge() + mYAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 			height -= mXAxis->GetOffsetFromWindowEdge() + mXAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 
@@ -137,7 +138,7 @@ void PlotCurve::Update(const unsigned int& i)
 		{
 			const double lineSizeScale(1.2);
 
-			mLine.SetLineColor(color);
+			mLine.SetLineColor(mColor);
 			mLine.SetBackgroundColorForAlphaFade();
 			mLine.SetWidth(mLineSize * lineSizeScale);
 			mLine.SetXScale(mXScale);
@@ -167,35 +168,35 @@ void PlotCurve::Update(const unsigned int& i)
 					return mData.GetY();
 			}());
 
-			mLine.Build(xRef, yRef, bufferInfo[i]);
+			mLine.Build(xRef, yRef, mBufferInfo[i]);
 		}
 		else
 			mLine.SetWidth(0.0);
 	}
 	else
 	{
-		if (bufferInfo[i].vertexCountModified)
+		if (mBufferInfo[i].vertexCountModified)
 			InitializeMarkerVertexBuffer();
 
 		BuildMarkers();
 
-		glBindVertexArray(bufferInfo[i].GetVertexArrayIndex());
+		glBindVertexArray(mBufferInfo[i].GetVertexArrayIndex());
 
-		glBindBuffer(GL_ARRAY_BUFFER, bufferInfo[i].GetVertexBufferIndex());
+		glBindBuffer(GL_ARRAY_BUFFER, mBufferInfo[i].GetVertexBufferIndex());
 		glBufferData(GL_ARRAY_BUFFER,
-			sizeof(GLfloat) * bufferInfo[i].vertexCount * (renderWindow.GetVertexDimension() + 4),
-			bufferInfo[i].vertexBuffer.data(), GL_DYNAMIC_DRAW);
+			sizeof(GLfloat) * mBufferInfo[i].vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+			mBufferInfo[i].vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
-		glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-		glVertexAttribPointer(renderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
+		glVertexAttribPointer(mRenderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glEnableVertexAttribArray(renderWindow.GetColorLocation());
-		glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-			(void*)(sizeof(GLfloat) * renderWindow.GetVertexDimension() * bufferInfo[i].vertexCount));
+		glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
+		glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+			(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * mBufferInfo[i].vertexCount));
 
-		/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].indexBufferIndex);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo[i].indexBuffer.size(),
-			bufferInfo[i].indexBuffer.data(), GL_DYNAMIC_DRAW);*/
+		/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferInfo[i].indexBufferIndex);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mBufferInfo[i].indexBuffer.size(),
+			mBufferInfo[i].indexBuffer.data(), GL_DYNAMIC_DRAW);*/
 		// TODO:  Why doesn't this work?  Similar code worked just fine before switching to std::vector
 
 		glBindVertexArray(0);
@@ -224,26 +225,26 @@ void PlotCurve::Update(const unsigned int& i)
 void PlotCurve::GenerateGeometry()
 {
 	if (mYAxis->GetOrientation() == Axis::Orientation::Left)
-		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Left);
+		dynamic_cast<PlotRenderer&>(mRenderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Left);
 	else
-		dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Right);
+		dynamic_cast<PlotRenderer&>(mRenderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Right);
 
 	glEnable(GL_SCISSOR_TEST);
 
 	if (mLineSize > 0.0)
 	{
-		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
+		glBindVertexArray(mBufferInfo[0].GetVertexArrayIndex());
 
 		if (mPretty)
-			Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
+			Line::DoPrettyDraw(mBufferInfo[0].indexBuffer.size());
 		else
-			Line::DoUglyDraw(bufferInfo[0].vertexCount);
+			Line::DoUglyDraw(mBufferInfo[0].vertexCount);
 	}
 
 	if (NeedsMarkersDrawn())
 	{
-		glBindVertexArray(bufferInfo[1].GetVertexArrayIndex());
-		glDrawArrays(GL_QUADS, 0, bufferInfo[1].vertexCount);
+		glBindVertexArray(mBufferInfo[1].GetVertexArrayIndex());
+		glDrawArrays(GL_QUADS, 0, mBufferInfo[1].vertexCount);
 	}
 
 	glBindVertexArray(0);
@@ -251,7 +252,7 @@ void PlotCurve::GenerateGeometry()
 
 	assert(!RenderWindow::GLHasError());
 
-	dynamic_cast<PlotRenderer&>(renderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Fixed);
+	dynamic_cast<PlotRenderer&>(mRenderWindow).LoadModelviewUniform(PlotRenderer::Modelview::Fixed);
 }
 
 //=============================================================================
@@ -352,18 +353,18 @@ void PlotCurve::BuildMarkers()
 {
 	float halfMarkerYSize = 2 * mMarkerSize * mYScale;
 	float halfMarkerXSize = 2 * mMarkerSize * mXScale;
-	const unsigned int dimension(renderWindow.GetVertexDimension());
+	const unsigned int dimension(mRenderWindow.GetVertexDimension());
 	const unsigned int colorStart(mData.GetNumberOfPoints() * dimension * 4);
 
 	// Use function pointers to save a few checks in the loop
 	PlotRenderer::ScalingFunction xScaleFunction(
-		dynamic_cast<PlotRenderer&>(renderWindow).GetXScaleFunction());
+		dynamic_cast<PlotRenderer&>(mRenderWindow).GetXScaleFunction());
 	PlotRenderer::ScalingFunction yScaleFunction;
 
 	if (mYAxis->GetOrientation() == Axis::Orientation::Left)
-		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetLeftYScaleFunction();
+		yScaleFunction = dynamic_cast<PlotRenderer&>(mRenderWindow).GetLeftYScaleFunction();
 	else
-		yScaleFunction = dynamic_cast<PlotRenderer&>(renderWindow).GetRightYScaleFunction();
+		yScaleFunction = dynamic_cast<PlotRenderer&>(mRenderWindow).GetRightYScaleFunction();
 
 	unsigned int i;
 	for (i = 0; i < mData.GetNumberOfPoints(); ++i)
@@ -371,37 +372,37 @@ void PlotCurve::BuildMarkers()
 		float x(static_cast<float>(xScaleFunction(mData.GetX()[i])));
 		float y(static_cast<float>(yScaleFunction(mData.GetY()[i])));
 
-		bufferInfo[1].vertexBuffer[i * 4 * dimension] = x + halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = y + halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension] = x + halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = y + halfMarkerYSize;
 
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension] = x + halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + dimension + 1] = y - halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension + dimension] = x + halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension + dimension + 1] = y - halfMarkerYSize;
 
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension] = x - halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension + 1] = y - halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension] = x - halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension + 1] = y - halfMarkerYSize;
 
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension] = x - halfMarkerXSize;
-		bufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension + 1] = y + halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension] = x - halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension + 1] = y + halfMarkerYSize;
 
-		bufferInfo[1].vertexBuffer[colorStart + i * 16] = (float)color.GetRed();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 1] = (float)color.GetGreen();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 2] = (float)color.GetBlue();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 3] = (float)color.GetAlpha();
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 1] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 2] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 3] = static_cast<float>(mColor.GetAlpha());
 
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 4] = (float)color.GetRed();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 5] = (float)color.GetGreen();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 6] = (float)color.GetBlue();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 7] = (float)color.GetAlpha();
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 4] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 5] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 6] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 7] = static_cast<float>(mColor.GetAlpha());
 
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 8] = (float)color.GetRed();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 9] = (float)color.GetGreen();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 10] = (float)color.GetBlue();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 11] = (float)color.GetAlpha();
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 8] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 9] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 10] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 11] = static_cast<float>(mColor.GetAlpha());
 
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 12] = (float)color.GetRed();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 13] = (float)color.GetGreen();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 14] = (float)color.GetBlue();
-		bufferInfo[1].vertexBuffer[colorStart + i * 16 + 15] = (float)color.GetAlpha();
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 12] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 13] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 14] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 15] = static_cast<float>(mColor.GetAlpha());
 	}
 }
 
@@ -498,7 +499,7 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 	if (points == 0)
 		return RangeSize::Small;
 
-	unsigned int spacing = (renderWindow.GetSize().GetWidth()
+	unsigned int spacing = (mRenderWindow.GetSize().GetWidth()
 		- mXAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
 		- mXAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 
@@ -537,7 +538,7 @@ PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 	if (points == 0)
 		return RangeSize::Small;
 
-	unsigned int spacing = (renderWindow.GetSize().GetHeight()
+	unsigned int spacing = (mRenderWindow.GetSize().GetHeight()
 		- mYAxis->GetAxisAtMaxEnd()->GetOffsetFromWindowEdge()
 		- mYAxis->GetAxisAtMinEnd()->GetOffsetFromWindowEdge()) / points;
 

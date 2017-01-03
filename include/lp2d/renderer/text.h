@@ -49,13 +49,13 @@ public:
 
 	bool SetFace(const std::string& fontFileName);
 
-	inline void SetColor(const Color& color) { this->color = color; }
+	inline void SetColor(const Color& color) { mColor = color; }
 	void SetOrientation(const double& angle);// [rad]
 
-	inline void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; }
-	inline void SetScale(const double& scale) { assert(scale > 0.0); this->scale = scale; }
+	inline void SetPosition(const double& x, const double& y) { mX = x; mY = y; }
+	inline void SetScale(const double& scale) { assert(scale > 0.0); mScale = scale; }
 
-	inline void SetText(const std::string& text) { this->text = text; }
+	inline void SetText(const std::string& text) { mText = text; }
 	void AppendText(const std::string& text);
 
 	Primitive::BufferInfo BuildText();
@@ -71,36 +71,36 @@ public:
 
 	BoundingBox GetBoundingBox(const std::string& s);
 
-	bool IsOK() const { return isOK && (glyphsGenerated || face); }
+	bool IsOK() const { return mIsOK && (mGlyphsGenerated || mFace); }
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
-	static const std::string vertexShader;
-	static const std::string fragmentShader;
+	static const std::string mVertexShader;
+	static const std::string mFragmentShader;
 
-	RenderWindow& renderer;
+	RenderWindow& mRenderer;
 
-	static unsigned int program;
-	static unsigned int vertexLocation;
-	static unsigned int colorLocation;
-	static unsigned int indexLocation;
-	static unsigned int modelviewMatrixLocation;
+	static unsigned int mProgram;
+	static unsigned int mVertexLocation;
+	static unsigned int mColorLocation;
+	static unsigned int mIndexLocation;
+	static unsigned int mModelviewMatrixLocation;
 
-	static FT_Library ft;
-	static unsigned int ftReferenceCount;
+	static FT_Library mFt;
+	static unsigned int mFtReferenceCount;
 
-	FT_Face face = nullptr;
-	Color color = Color::ColorBlack;
+	FT_Face mFace = nullptr;
+	Color mColor = Color::ColorBlack;
 
-	double x;
-	double y;
-	double scale = 1.0;
+	double mX;
+	double mY;
+	double mScale = 1.0;
 
-	unsigned int maxXSize;
-	unsigned int maxYSize;
+	unsigned int mMaxXSize;
+	unsigned int mMaxYSize;
 
-	std::string text;
+	std::string mText;
 
 	struct Glyph
 	{
@@ -112,21 +112,21 @@ private:
 		unsigned int advance;
 	};
 
-	std::map<char, Glyph> glyphs;
-	unsigned int textureId = std::numeric_limits<unsigned int>::max();
+	std::map<char, Glyph> mGlyphs;
+	unsigned int mTextureId = std::numeric_limits<unsigned int>::max();
 
 	void DoInternalInitialization();
 	bool GenerateGlyphs();
-	static bool initialized;
-	bool glyphsGenerated = false;
+	static bool mInitialized;
+	bool mGlyphsGenerated = false;
 
 	void Initialize();
 	void FreeFTResources();
-	bool isOK = true;
+	bool mIsOK = true;
 
-	Eigen::Matrix4d modelview;
+	Eigen::Matrix4d mModelview;
 
-	std::vector<Primitive::BufferInfo> bufferVector;
+	std::vector<Primitive::BufferInfo> mBufferVector;
 	Primitive::BufferInfo AssembleBuffers();
 	Primitive::BufferInfo BuildLocalText();
 	void ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const;

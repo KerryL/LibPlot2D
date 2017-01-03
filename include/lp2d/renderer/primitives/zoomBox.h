@@ -30,10 +30,10 @@ public:
 	void SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor);
 	void SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat);
 
-	unsigned int GetXAnchor() { return xAnchor; }
-	unsigned int GetYAnchor() { return yAnchor; }
-	unsigned int GetXFloat() { return xFloat; }
-	unsigned int GetYFloat() { return yFloat; }
+	unsigned int GetXAnchor() { return mXAnchor; }
+	unsigned int GetYAnchor() { return mYAnchor; }
+	unsigned int GetXFloat() { return mXFloat; }
+	unsigned int GetYFloat() { return mYFloat; }
 
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
@@ -43,7 +43,10 @@ protected:
 	virtual void GenerateGeometry();
 
 private:
-	unsigned int xAnchor, yAnchor, xFloat, yFloat;
+	unsigned int mXAnchor = 0;
+	unsigned int mYAnchor = 0;
+	unsigned int mXFloat = 0;
+	unsigned int mYFloat = 0;
 
 	Line box;
 };

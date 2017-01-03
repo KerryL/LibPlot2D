@@ -31,15 +31,15 @@ public:
 	~TextRendering() = default;
 
 	// Set option methods
-	void SetAngle(const double& angle) { this->angle = angle; mModified = true; }// [rad]
+	void SetAngle(const double& angle) { mAngle = angle; mModified = true; }// [rad]
 	void InitializeFonts(const std::string& fontFileName, const double& size);
-	void SetText(const wxString& text) { this->text = text; mModified = true; }
-	void SetPosition(const double& x, const double& y) { this->x = x; this->y = y; mModified = true; }
-	void SetCentered(const bool& centered) { this->centered = centered; mModified = true; }
+	void SetText(const wxString& text) { mText = text; mModified = true; }
+	void SetPosition(const double& x, const double& y) { mX = x; mY = y; mModified = true; }
+	void SetCentered(const bool& centered) { mCentered = centered; mModified = true; }
 
 	double GetTextHeight();
 	double GetTextWidth();
-	wxString GetText() const { return text; }
+	wxString GetText() const { return mText; }
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -51,15 +51,16 @@ protected:
 	virtual void GenerateGeometry();
 
 private:
-	double angle;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen
+	double mAngle = 0.0;// 0 is horizontal, angle builds counter-clockwise about an axis out of the screen
 
-	wxString text;
-	Text font;
+	wxString mText;
+	Text mFont;
 
 	// Flag indicating whether the text is centered at (X, Y) or if, if false,
 	// (0, 0) represents the lower left corner of the text bounding box
-	bool centered;
-	double x, y;
+	bool mCentered = false;
+	double mX = 0.0;
+	double mY = 0.0;
 };
 
 }// namespace LibPlot2D

@@ -40,11 +40,16 @@ public:
 
 	// Set option methods
 	void SetFont(const std::string& fontFileName, const double& size);
-	void SetFontColor(const Color &color) { fontColor = color; RequiresRedraw(); }
-	void SetBackgroundColor(const Color &color) { backgroundColor = color; RequiresRedraw(); }
-	void SetBorderColor(const Color &color) { borderColor = color; RequiresRedraw(); }
-	void SetBorderSize(const unsigned int &size) { borderSize = size; RequiresRedraw(); }
-	void SetSampleLineLength(const unsigned int &size) { sampleLength = size; RequiresRedraw(); }
+	void SetFontColor(const Color &color)
+	{ mFontColor = color; RequiresRedraw(); }
+	void SetBackgroundColor(const Color &color)
+	{ mBackgroundColor = color; RequiresRedraw(); }
+	void SetBorderColor(const Color &color)
+	{ mBorderColor = color; RequiresRedraw(); }
+	void SetBorderSize(const unsigned int &size)
+	{ mBorderSize = size; RequiresRedraw(); }
+	void SetSampleLineLength(const unsigned int &size)
+	{ mSampleLength = size; RequiresRedraw(); }
 
 	enum class PositionReference
 	{
@@ -60,28 +65,32 @@ public:
 	};
 
 	void SetWindowReference(const PositionReference &windowRef)
-	{ this->windowRef = windowRef; mModified = true; }
+	{ mWindowRef = windowRef; mModified = true; }
 	void SetLegendReference(const PositionReference &legendRef)
-	{ this->legendRef = legendRef; mModified = true; }
+	{ mLegendRef = legendRef; mModified = true; }
 
-	PositionReference GetWindowReference() const { return windowRef; }
-	PositionReference GetLegendReference() const { return legendRef; }
+	PositionReference GetWindowReference() const { return mWindowRef; }
+	PositionReference GetLegendReference() const { return mLegendRef; }
 
 	// Specifies bottom left corner of legend
-	void SetPosition(const double &x, const double &y) { this->x = x; this->y = y; RequiresRedraw(); }
+	void SetPosition(const double &x, const double &y)
+	{ mX = x; mY = y; RequiresRedraw(); }
 	void SetDeltaPosition(const double &x, const double &y);
 
 	// These are w.r.t. reference specified by SetWindowRef()
-	inline double GetXPos() const { return x; }
-	inline double GetYPos() const { return y; }
-	inline void GetPosition(double &x, double &y) const { x = this->x; y = this->y; }
+	inline double GetXPos() const { return mX; }
+	inline double GetYPos() const { return mY; }
+	inline void GetPosition(double &x, double &y) const { x = mX; y = mY; }
 
-	double GetXPos(const PositionReference& legendRef, const PositionReference& windowRef) const;
-	double GetYPos(const PositionReference& legendRef, const PositionReference& windowRef) const;
-	void GetPosition(const PositionReference& legendRef, const PositionReference& windowRef, double &x, double &y) const;
+	double GetXPos(const PositionReference& legendRef,
+		const PositionReference& windowRef) const;
+	double GetYPos(const PositionReference& legendRef,
+		const PositionReference& windowRef) const;
+	void GetPosition(const PositionReference& legendRef,
+		const PositionReference& windowRef, double &x, double &y) const;
 
-	inline unsigned int GetHeight() const { return height; }
-	inline unsigned int GetWidth() const { return width; }
+	inline unsigned int GetHeight() const { return mHeight; }
+	inline unsigned int GetWidth() const { return mWidth; }
 
 	struct LegendEntryInfo
 	{
@@ -91,7 +100,7 @@ public:
 		int markerSize;
 	};
 
-	void SetContents(const std::vector<LegendEntryInfo> &entries) { this->entries = entries; RequiresRedraw(); }
+	void SetContents(const std::vector<LegendEntryInfo> &entries) { mEntries = entries; RequiresRedraw(); }
 
 	bool IsUnder(const unsigned int &x, const unsigned int &y) const;
 
@@ -105,33 +114,34 @@ protected:
 	virtual void GenerateGeometry();
 
 private:
-	static const unsigned int entrySpacing;// [pixels]
-	Text text;
+	static const unsigned int mEntrySpacing;// [pixels]
+	Text mText;
 
-	Color fontColor;
-	Color backgroundColor;
-	Color borderColor;
+	Color mFontColor = Color::ColorBlack;
+	Color mBackgroundColor = Color::ColorWhite;
+	Color mBorderColor = Color::ColorBlack;
 
-	std::vector<LegendEntryInfo> entries;
+	std::vector<LegendEntryInfo> mEntries;
 
-	double x, y;// [pixels]
-	unsigned int borderSize;// [pixels]
-	unsigned int sampleLength;// [pixels]
-	double textHeight;// [pixels]
+	double mX = 0.0;
+	double mY = 0.0;// [pixels]
+	unsigned int mBorderSize = 1;// [pixels]
+	unsigned int mSampleLength = 15;// [pixels]
+	double mTextHeight;// [pixels]
 
 	std::vector<std::pair<double, double>> GetCornerVertices() const;
 
 	void UpdateBoundingBox();
-	unsigned int height;
-	unsigned int width;
+	unsigned int mHeight;
+	unsigned int mWidth;
 
-	PositionReference windowRef;
-	PositionReference legendRef;
+	PositionReference mWindowRef = PositionReference::BottomLeft;
+	PositionReference mLegendRef = PositionReference::Center;
 	void GetAdjustedPosition(double &x, double &y) const;
 
-	Line lines;
+	Line mLines;
 
-	std::vector<Primitive::BufferInfo> bufferVector;
+	std::vector<Primitive::BufferInfo> mBufferVector;
 	Primitive::BufferInfo BuildBackground() const;
 	void BuildMarkers();
 	void BuildLabelStrings();

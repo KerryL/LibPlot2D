@@ -34,51 +34,53 @@ public:
 	// Constructor
 	explicit CustomFileFormat(const wxString &pathAndFileName);
 
-	bool IsCustomFormat() const { return !formatName.IsEmpty(); }
-	bool IsAsynchronous() const { return asynchronous; }
+	bool IsCustomFormat() const { return !mFormatName.IsEmpty(); }
+	bool IsAsynchronous() const { return mAsynchronous; }
 
-	wxString GetDelimiter() const { return delimiter; }
-	wxString GetTimeUnits() const { return timeUnits; }
-	wxString GetTimeFormat() const { return timeFormat; }
-	wxString GetEndIdentifier() const { return endIdentifier; }
+	wxString GetDelimiter() const { return mDelimiter; }
+	wxString GetTimeUnits() const { return mTimeUnits; }
+	wxString GetTimeFormat() const { return mTimeFormat; }
+	wxString GetEndIdentifier() const { return mEndIdentifier; }
 
-	bool IsXML() const { return isXML; }
+	bool IsXML() const { return mIsXML; }
 
-	wxString GetXMLXDataNode() const { return xDataNode; }
-	wxString GetXMLXDataKey() const { return xDataKey; }
-	wxString GetXMLYDataNode() const { return yDataNode; }
-	wxString GetXMLYDataKey() const { return yDataKey; }
-	wxString GetXMLChannelParentNode() const { return channelParentNode; }
-	wxString GetXMLChannelNode() const { return channelNode; }
-	wxString GetXMLCodeKey() const { return codeKey; }
+	wxString GetXMLXDataNode() const { return mXDataNode; }
+	wxString GetXMLXDataKey() const { return mXDataKey; }
+	wxString GetXMLYDataNode() const { return mYDataNode; }
+	wxString GetXMLYDataKey() const { return mYDataKey; }
+	wxString GetXMLChannelParentNode() const { return mChannelParentNode; }
+	wxString GetXMLChannelNode() const { return mChannelNode; }
+	wxString GetXMLCodeKey() const { return mCodeKey; }
 
-	void ProcessChannels(wxArrayString &names, std::vector<double> &scales) const;
+	void ProcessChannels(wxArrayString &names,
+		std::vector<double> &scales) const;
 
-	inline static bool CustomDefinitionsExist() { return wxFileExists(customFormatsXMLFileName); }
+	inline static bool CustomDefinitionsExist()
+	{ return wxFileExists(mCustomFormatsXMLFileName); }
 
 private:
-	static const wxString customFormatsXMLFileName;
-	static const wxString customFormatsRootName;
-	static const unsigned long customFormatsVersion;
+	static const wxString mCustomFormatsXMLFileName;
+	static const wxString mCustomFormatsRootName;
+	static const unsigned long mCustomFormatsVersion;
 
-	const wxString pathAndFileName;
+	const wxString mPathAndFileName;
 
-	wxString formatName;
-	wxString delimiter;
-	wxString timeUnits;
-	wxString timeFormat;
-	wxString endIdentifier;
+	wxString mFormatName;
+	wxString mDelimiter;
+	wxString mTimeUnits;
+	wxString mTimeFormat;
+	wxString mEndIdentifier;
 
-	bool asynchronous;
-	bool isXML;
+	bool mAsynchronous;
+	bool mIsXML;
 
-	wxString xDataNode;
-	wxString xDataKey;
-	wxString yDataNode;
-	wxString yDataKey;
-	wxString channelParentNode;
-	wxString channelNode;
-	wxString codeKey;
+	wxString mXDataNode;
+	wxString mXDataKey;
+	wxString mYDataNode;
+	wxString mYDataKey;
+	wxString mChannelParentNode;
+	wxString mChannelNode;
+	wxString mCodeKey;
 
 	struct Identifier
 	{
@@ -109,7 +111,7 @@ private:
 		bool discardCode;
 	};
 
-	std::vector<Channel> channels;
+	std::vector<Channel> mChannels;
 
 	bool CheckRootAndVersion(const wxXmlDocument &document) const;
 

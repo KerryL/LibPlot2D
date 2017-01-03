@@ -78,11 +78,12 @@ bool BaumullerFile::IsType(const wxString &fileName)
 wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
 {
-	std::ifstream file(fileName.mb_str(), std::ios::in);
+	std::ifstream file(mFileName.mb_str(), std::ios::in);
 	if (!file.is_open())
 	{
-		wxMessageBox(_T("Could not open file '") + fileName + _T("'!"), _T("Error Reading File"), wxICON_ERROR);
-		return descriptions;
+		wxMessageBox(_T("Could not open file '") + mFileName + _T("'!"),
+			_T("Error Reading File"), wxICON_ERROR);
+		return mDescriptions;
 	}
 
 	std::string nextLine;
@@ -126,7 +127,7 @@ wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 	wxArrayString &names, wxArrayString &previousLines) const
 {
-	wxArrayString delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
+	wxArrayString delimitedLine = ParseLineIntoColumns(nextLine, mDelimiter);
 	if (delimitedLine.size() > 1 && delimitedLine[0].Cmp(_T("Par.number:")) == 0)
 	{
 		unsigned int i, j;
@@ -141,7 +142,7 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 			}
 			if (!std::getline(file, nextLine))
 				break;
-			delimitedLine = ParseLineIntoColumns(nextLine, delimiter);
+			delimitedLine = ParseLineIntoColumns(nextLine, mDelimiter);
 		}
 
 		return true;
@@ -170,7 +171,7 @@ bool BaumullerFile::ConstructNames(std::string &nextLine, std::ifstream &file,
 //=============================================================================
 void BaumullerFile::DoTypeSpecificLoadTasks()
 {
-	ignoreConsecutiveDelimiters = false;
+	mIgnoreConsecutiveDelimiters = false;
 }
 
 //=============================================================================
@@ -191,7 +192,7 @@ void BaumullerFile::DoTypeSpecificLoadTasks()
 //=============================================================================
 void BaumullerFile::DoTypeSpecificProcessTasks()
 {
-	ignoreConsecutiveDelimiters = true;
+	mIgnoreConsecutiveDelimiters = true;
 }
 
 }// namespace LibPlot2D

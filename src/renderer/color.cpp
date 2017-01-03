@@ -31,39 +31,15 @@ namespace LibPlot2D
 // Class:			Color
 // Function:		Color
 //
-// Description:		Constructor for the Color class (default).
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-Color::Color()
-{
-	// Assign default values to the class members (solid black)
-	red = 0.0;
-	green = 0.0;
-	blue = 0.0;
-	alpha = 1.0;
-}
-
-//=============================================================================
-// Class:			Color
-// Function:		Color
-//
 // Description:		Constructor for the Color class.  Sets the class contents
-//					as specified by the arguments.
+//					as specified by the arguments.  Arguments must lie between
+//					0.0 and 1.0.
 //
 // Input Arguments:
-//		red		= const double& specifying the amount of red in this color (0.0 - 1.0)
-//		green	= const double& specifying the amount of green in this color (0.0 - 1.0)
-//		blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
-//		alpha	= const double& specifying the opacity of this color (0.0 - 1.0)
+//		red		= const double& specifying the amount of red in this color
+//		green	= const double& specifying the amount of green in this color
+//		blue	= const double& specifying the amount of blue in this color
+//		alpha	= const double& specifying the opacity of this color
 //
 // Output Arguments:
 //		None
@@ -72,7 +48,8 @@ Color::Color()
 //		None
 //
 //=============================================================================
-Color::Color(const double &red, const double &green, const double &blue, const double &alpha)
+Color::Color(const double &red, const double &green, const double &blue,
+	const double &alpha)
 {
 	Set(red, green, blue, alpha);
 	ValidateColor();
@@ -97,7 +74,8 @@ Color::Color(const double &red, const double &green, const double &blue, const d
 //=============================================================================
 Color::Color(const wxColor &c)
 {
-	Set(c.Red() / 255.0, c.Green() / 255.0, c.Blue() / 255.0, c.Alpha() / 255.0);
+	Set(c.Red() / 255.0, c.Green() / 255.0, c.Blue() / 255.0,
+		c.Alpha() / 255.0);
 	ValidateColor();
 }
 
@@ -159,14 +137,14 @@ double Color::GetHue() const
 	if (chroma == 0.0)
 		return 0.0;// Undefined
 
-	double maxColor = std::max(red, std::max(green, blue));
+	double maxColor = std::max(mRed, std::max(mGreen, mBlue));
 
-	if (maxColor == red)
-		return fmod((green - blue) / chroma / 6.0, 1.0);
-	else if (maxColor == green)
-		return fmod(((blue - red) / chroma + 2.0) / 6.0, 1.0);
+	if (maxColor == mRed)
+		return fmod((mGreen - mBlue) / chroma / 6.0, 1.0);
+	else if (maxColor == mGreen)
+		return fmod(((mBlue - mRed) / chroma + 2.0) / 6.0, 1.0);
 	else
-		return fmod(((red - green) / chroma + 4.0) / 6.0, 1.0);
+		return fmod(((mRed - mGreen) / chroma + 4.0) / 6.0, 1.0);
 }
 
 //=============================================================================
@@ -212,7 +190,8 @@ double Color::GetSaturation() const
 //=============================================================================
 double Color::GetLightness() const
 {
-	return 0.5 * (std::max(red, std::max(green, blue)) + std::min(red, std::min(green, blue)));
+	return 0.5 * (std::max(mRed, std::max(mGreen, mBlue))
+		+ std::min(mRed, std::min(mGreen, mBlue)));
 }
 
 //=============================================================================
@@ -233,7 +212,8 @@ double Color::GetLightness() const
 //=============================================================================
 double Color::GetChroma() const
 {
-	return std::max(red, std::max(green, blue)) - std::min(red, std::min(green, blue));
+	return std::max(mRed, std::max(mGreen, mBlue))
+		- std::min(mRed, std::min(mGreen, mBlue));
 }
 
 //=============================================================================
@@ -255,7 +235,8 @@ double Color::GetChroma() const
 //		None
 //
 //=============================================================================
-void Color::SetHSL(const double &hue, const double &sat, const double &lum, const double &alpha)
+void Color::SetHSL(const double &hue, const double &sat, const double &lum,
+	const double &alpha)
 {
 	double chroma = (1.0 - fabs(2.0 * lum - 1.0)) * sat;
 	double huePrime = hue * 6.0;
@@ -263,47 +244,47 @@ void Color::SetHSL(const double &hue, const double &sat, const double &lum, cons
 
 	if (huePrime < 1.0)
 	{
-		red = chroma;
-		green = x;
-		blue = 0.0;
+		mRed = chroma;
+		mGreen = x;
+		mBlue = 0.0;
 	}
 	else if (huePrime < 2.0)
 	{
-		red = x;
-		green = chroma;
-		blue = 0.0;
+		mRed = x;
+		mGreen = chroma;
+		mBlue = 0.0;
 	}
 	else if (huePrime < 3.0)
 	{
-		red = 0.0;
-		green = chroma;
-		blue = x;
+		mRed = 0.0;
+		mGreen = chroma;
+		mBlue = x;
 	}
 	else if (huePrime < 4.0)
 	{
-		red = 0.0;
-		green = x;
-		blue = chroma;
+		mRed = 0.0;
+		mGreen = x;
+		mBlue = chroma;
 	}
 	else if (huePrime < 5.0)
 	{
-		red = x;
-		green = 0.0;
-		blue = chroma;
+		mRed = x;
+		mGreen = 0.0;
+		mBlue = chroma;
 	}
 	else
 	{
-		red = chroma;
-		green = 0.0;
-		blue = x;
+		mRed = chroma;
+		mGreen = 0.0;
+		mBlue = x;
 	}
 
 	double m = lum - 0.5 * chroma;
-	red += m;
-	green += m;
-	blue += m;
+	mRed += m;
+	mGreen += m;
+	mBlue += m;
 
-	this->alpha = alpha;
+	mAlpha = alpha;
 }
 
 //=============================================================================
@@ -313,10 +294,10 @@ void Color::SetHSL(const double &hue, const double &sat, const double &lum, cons
 // Description:		Sets the RGBA values for this color.
 //
 // Input Arguments:
-//		red		= const double& specifying the amount of red in this color (0.0 - 1.0)
-//		green	= const double& specifying the amount of green in this color (0.0 - 1.0)
-//		blue	= const double& specifying the amount of blue in this color (0.0 - 1.0)
-//		alpha	= const double& specifying the opacity of this color (0.0 - 1.0)
+//		red		= const double& specifying the amount of red in this color
+//		green	= const double& specifying the amount of green in this color
+//		blue	= const double& specifying the amount of blue in this color
+//		alpha	= const double& specifying the opacity of this color
 //
 // Output Arguments:
 //		None
@@ -325,12 +306,13 @@ void Color::SetHSL(const double &hue, const double &sat, const double &lum, cons
 //		None
 //
 //=============================================================================
-void Color::Set(const double &red, const double &green, const double &blue, const double &alpha)
+void Color::Set(const double &red, const double &green, const double &blue,
+	const double &alpha)
 {
-	this->red = red;
-	this->green = green;
-	this->blue = blue;
-	this->alpha = alpha;
+	mRed = red;
+	mGreen = green;
+	mBlue = blue;
+	mAlpha = alpha;
 
 	ValidateColor();
 }
@@ -355,10 +337,10 @@ void Color::Set(const double &red, const double &green, const double &blue, cons
 void Color::Set(const wxColor &color)
 {
 	// Convert from the wxColor to Color
-	red = (double)color.Red() / 255.0;
-	green = (double)color.Green() / 255.0;
-	blue = (double)color.Blue() / 255.0;
-	alpha = (double)color.Alpha() / 255.0;
+	mRed = static_cast<double>(color.Red()) / 255.0;
+	mGreen = static_cast<double>(color.Green()) / 255.0;
+	mBlue = static_cast<double>(color.Blue()) / 255.0;
+	mAlpha = static_cast<double>(color.Alpha()) / 255.0;
 
 	ValidateColor();
 }
@@ -381,7 +363,7 @@ void Color::Set(const wxColor &color)
 //=============================================================================
 void Color::SetAlpha(const double &alpha)
 {
-	this->alpha = alpha;
+	mAlpha = alpha;
 	ValidateColor();
 }
 
@@ -404,7 +386,10 @@ void Color::SetAlpha(const double &alpha)
 wxColor Color::ToWxColor() const
 {
 	wxColor color;
-	color.Set(char(red * 255), char(green * 255), char(blue * 255), char(alpha * 255));
+	color.Set(static_cast<char>(mRed * 255),
+		static_cast<char>(mGreen * 255),
+		static_cast<char>(mBlue * 255),
+		static_cast<char>(mAlpha * 255));
 
 	return color;
 }
@@ -428,25 +413,25 @@ wxColor Color::ToWxColor() const
 //=============================================================================
 void Color::ValidateColor()
 {
-	if (red < 0.0)
-		red = 0.0;
-	else if (red > 1.0)
-		red = 1.0;
+	if (mRed < 0.0)
+		mRed = 0.0;
+	else if (mRed > 1.0)
+		mRed = 1.0;
 
-	if (green < 0.0)
-		green = 0.0;
-	else if (green > 1.0)
-		green = 1.0;
+	if (mGreen < 0.0)
+		mGreen = 0.0;
+	else if (mGreen > 1.0)
+		mGreen = 1.0;
 
-	if (blue < 0.0)
-		blue = 0.0;
-	else if (blue > 1.0)
-		blue = 1.0;
+	if (mBlue < 0.0)
+		mBlue = 0.0;
+	else if (mBlue > 1.0)
+		mBlue = 1.0;
 
-	if (alpha < 0.0)
-		alpha= 0.0;
-	else if (alpha > 1.0)
-		alpha = 1.0;
+	if (mAlpha < 0.0)
+		mAlpha= 0.0;
+	else if (mAlpha > 1.0)
+		mAlpha = 1.0;
 }
 
 //=============================================================================
@@ -468,7 +453,8 @@ void Color::ValidateColor()
 //		Color
 //
 //=============================================================================
-Color Color::GetColorHSL(const double &hue, const double &sat, const double &lum, const double &alpha)
+Color Color::GetColorHSL(const double &hue, const double &sat,
+	const double &lum, const double &alpha)
 {
 	Color c;
 	c.SetHSL(hue, sat, lum, alpha);
@@ -494,7 +480,8 @@ Color Color::GetColorHSL(const double &hue, const double &sat, const double &lum
 //		Color
 //
 //=============================================================================
-Color Color::GetColor(const double &red, const double &green, const double &blue, const double &alpha)
+Color Color::GetColor(const double &red, const double &green,
+	const double &blue, const double &alpha)
 {
 	Color c(red, green, blue, alpha);
 	return c;

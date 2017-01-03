@@ -21,11 +21,11 @@ namespace LibPlot2D
 template<typename E>
 struct EnableBitwiseOperators
 {
-	static constexpr bool enable = false;
+	static constexpr bool mEnable = false;
 };
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator|(
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type operator|(
 	const E& lhs, const E& rhs)
 {
 	typedef typename std::underlying_type<E>::type T;
@@ -33,7 +33,7 @@ typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator|(
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator&(
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type operator&(
 	const E& lhs, const E& rhs)
 {
 	typedef typename std::underlying_type<E>::type T;
@@ -41,7 +41,7 @@ typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator&(
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator^(
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type operator^(
 	const E& lhs, const E& rhs)
 {
 	typedef typename std::underlying_type<E>::type T;
@@ -49,7 +49,7 @@ typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator^(
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator~(
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type operator~(
 	const E& lhs)
 {
 	typedef typename std::underlying_type<E>::type T;
@@ -57,7 +57,7 @@ typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type operator~(
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type& operator|=(
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type& operator|=(
 	E& lhs, const E& rhs)
 {
 	lhs = lhs | rhs;
@@ -65,7 +65,7 @@ typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type& operator|=(
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type& operator&=(
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type& operator&=(
 	E& lhs, const E& rhs)
 {
 	lhs = lhs & rhs;
@@ -73,7 +73,7 @@ typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type& operator&=(
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type& operator^=(
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type& operator^=(
 	E& lhs, const E& rhs)
 {
 	lhs = lhs ^ rhs;
@@ -81,14 +81,14 @@ typename std::enable_if<EnableBitwiseOperators<E>::enable, E>::type& operator^=(
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, bool>::type
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, bool>::type
 	operator==(const E& lhs, const typename std::underlying_type<E>::type& rhs)
 {
 	return static_cast<typename std::underlying_type<E>::type>(lhs) == rhs;
 }
 
 template<typename E>
-typename std::enable_if<EnableBitwiseOperators<E>::enable, bool>::type
+typename std::enable_if<EnableBitwiseOperators<E>::mEnable, bool>::type
 	operator!=(const E& lhs, const typename std::underlying_type<E>::type& rhs)
 {
 	return !(lhs == rhs);

@@ -58,8 +58,8 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-const unsigned int PlotRenderer::maxXTicks(7);
-const unsigned int PlotRenderer::maxYTicks(10);
+const unsigned int PlotRenderer::mMaxXTicks(7);
+const unsigned int PlotRenderer::mMaxYTicks(10);
 
 //=============================================================================
 // Class:			PlotRenderer
@@ -77,7 +77,7 @@ const unsigned int PlotRenderer::maxYTicks(10);
 //		None
 //
 //=============================================================================
-const std::string PlotRenderer::defaultVertexShader(
+const std::string PlotRenderer::mDefaultVertexShader(
 	"#version 300 es\n"
 	"\n"
 	"uniform mat4 modelviewMatrix;\n"
@@ -116,21 +116,9 @@ const std::string PlotRenderer::defaultVertexShader(
 //=============================================================================
 PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent,
 	wxWindowID id, const wxGLAttributes& attr) : RenderWindow(wxParent, id, attr,
-	wxDefaultPosition, wxDefaultSize), guiInterface(guiInterface)
+	wxDefaultPosition, wxDefaultSize), mGuiInterface(guiInterface)
 {
-	xScaleFunction = DoLineaerScale;
-	leftYScaleFunction = DoLineaerScale;
-	rightYScaleFunction = DoLineaerScale;
-
 	SetView3D(false);
-
-	draggingLeftCursor = false;
-	draggingRightCursor = false;
-	draggingLegend = false;
-
-	ignoreNextMouseMove = false;
-
-	curveQuality = CurveQuality::AlwaysHigh;
 
 	SetDropTarget(static_cast<wxDropTarget*>(new DropTarget(guiInterface)));
 
@@ -236,21 +224,21 @@ END_EVENT_TABLE()
 void PlotRenderer::UpdateDisplay()
 {
 	if (GetXLogarithmic())
-		xScaleFunction = DoLogarithmicScale;
+		mXScaleFunction = DoLogarithmicScale;
 	else
-		xScaleFunction = DoLineaerScale;
+		mXScaleFunction = DoLineaerScale;
 
 	if (GetLeftLogarithmic())
-		leftYScaleFunction = DoLogarithmicScale;
+		mLeftYScaleFunction = DoLogarithmicScale;
 	else
-		leftYScaleFunction = DoLineaerScale;
+		mLeftYScaleFunction = DoLineaerScale;
 
 	if (GetRightLogarithmic())
-		rightYScaleFunction = DoLogarithmicScale;
+		mRightYScaleFunction = DoLogarithmicScale;
 	else
-		rightYScaleFunction = DoLineaerScale;
+		mRightYScaleFunction = DoLineaerScale;
 
-	plot->Update();
+	mPlot->Update();
 	Refresh();
 	Update();
 }
@@ -273,25 +261,25 @@ void PlotRenderer::UpdateDisplay()
 //=============================================================================
 void PlotRenderer::CreateActors()
 {
-	plot = std::make_unique<PlotObject>(*this, guiInterface);
+	mPlot = std::make_unique<PlotObject>(*this, mGuiInterface);
 	SetBackgroundColor(Color::ColorWhite);
 
-	// Also create the zoom box and cursors, even though they aren't drawn yet
-	zoomBox = new ZoomBox(*this);
-	leftCursor = new PlotCursor(*this, *plot->GetBottomAxis());
-	rightCursor = new PlotCursor(*this, *plot->GetBottomAxis());
+	// Also create the mZoom box and cursors, even though they aren't drawn yet
+	mZoomBox = new ZoomBox(*this);
+	mLeftCursor = new PlotCursor(*this, *mPlot->GetBottomAxis());
+	mRightCursor = new PlotCursor(*this, *mPlot->GetBottomAxis());
 
-	if (!plot->GetAxisFont().empty())
+	if (!mPlot->GetAxisFont().empty())
 	{
-		plot->Update();// Need to make sure sizes update before we reference them to position the legend
+		mPlot->Update();// Need to make sure sizes update before we reference them to position the legend
 		const unsigned int offset(5);
-		legend = new Legend(*this);
-		legend->SetFont(plot->GetAxisFont(), 12);
-		legend->SetLegendReference(Legend::PositionReference::TopRight);
-		legend->SetWindowReference(Legend::PositionReference::TopRight);
-		legend->SetPosition(plot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
-			plot->GetTopAxis()->GetOffsetFromWindowEdge() + offset);
-		legend->SetVisibility(false);
+		mLegend = new Legend(*this);
+		mLegend->SetFont(mPlot->GetAxisFont(), 12);
+		mLegend->SetLegendReference(Legend::PositionReference::TopRight);
+		mLegend->SetWindowReference(Legend::PositionReference::TopRight);
+		mLegend->SetPosition(mPlot->GetRightYAxis()->GetOffsetFromWindowEdge() + offset,
+			mPlot->GetTopAxis()->GetOffsetFromWindowEdge() + offset);
+		mLegend->SetVisibility(false);
 	}
 }
 
@@ -314,17 +302,17 @@ void PlotRenderer::CreateActors()
 //=============================================================================
 void PlotRenderer::OnSize(wxSizeEvent &event)
 {
-	ignoreNextMouseMove = true;
+	mIgnoreNextMouseMove = true;
 
-	if (leftCursor->GetIsVisible())
-		leftCursor->SetVisibility(true);
-	if (rightCursor->GetIsVisible())
-		rightCursor->SetVisibility(true);
+	if (mLeftCursor->GetIsVisible())
+		mLeftCursor->SetVisibility(true);
+	if (mRightCursor->GetIsVisible())
+		mRightCursor->SetVisibility(true);
 
-	if (legend)
-		legend->SetModified();
+	if (mLegend)
+		mLegend->SetModified();
 
-	plot->UpdatePlotAreaSize();
+	mPlot->UpdatePlotAreaSize();
 	UpdateDisplay();
 
 	// Skip this event so the base class OnSize event fires, too
@@ -349,7 +337,7 @@ void PlotRenderer::OnSize(wxSizeEvent &event)
 //=============================================================================
 void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 {
-	if (view3D)
+	if (mView3D)
 	{
 		event.Skip();
 		return;
@@ -369,16 +357,16 @@ void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 
 	// TODO:  Focus the zooming around the cursor
 	// Adjust the axis limits to achieve zooming
-	double xDelta = (plot->GetXMax() - plot->GetXMin()) * zoomScaleX * event.GetWheelRotation() / 120.0;
-	double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomScaleY * event.GetWheelRotation() / 120.0;
-	double yRightDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomScaleY * event.GetWheelRotation() / 120.0;
+	double xDelta = (mPlot->GetXMax() - mPlot->GetXMin()) * zoomScaleX * event.GetWheelRotation() / 120.0;
+	double yLeftDelta = (mPlot->GetLeftYMax() - mPlot->GetLeftYMin()) * zoomScaleY * event.GetWheelRotation() / 120.0;
+	double yRightDelta = (mPlot->GetLeftYMax() - mPlot->GetLeftYMin()) * zoomScaleY * event.GetWheelRotation() / 120.0;
 
-	plot->SetXMin(plot->GetXMin() + xDelta);
-	plot->SetXMax(plot->GetXMax() - xDelta);
-	plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
-	plot->SetLeftYMax(plot->GetLeftYMax() - yLeftDelta);
-	plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
-	plot->SetRightYMax(plot->GetRightYMax() - yRightDelta);
+	mPlot->SetXMin(mPlot->GetXMin() + xDelta);
+	mPlot->SetXMax(mPlot->GetXMax() - xDelta);
+	mPlot->SetLeftYMin(mPlot->GetLeftYMin() + yLeftDelta);
+	mPlot->SetLeftYMax(mPlot->GetLeftYMax() - yLeftDelta);
+	mPlot->SetRightYMin(mPlot->GetRightYMin() + yRightDelta);
+	mPlot->SetRightYMax(mPlot->GetRightYMax() - yRightDelta);
 
 	UpdateDisplay();
 }
@@ -403,26 +391,26 @@ void PlotRenderer::OnMouseWheelEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 {
-	if (view3D)
+	if (mView3D)
 	{
 		event.Skip();
 		return;
 	}
 
-	if (!event.Dragging() || ignoreNextMouseMove)// ignoreNextMouseMove prevents panning on maximize by double clicking title bar or after creating a context menu
+	if (!event.Dragging() || mIgnoreNextMouseMove)// mIgnoreNextMouseMove prevents panning on maximize by double clicking title bar or after creating a context menu
 	{
-		plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
-		ignoreNextMouseMove = false;
+		mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
+		mIgnoreNextMouseMove = false;
 		StoreMousePosition(event);
 		return;
 	}
 
-	if (draggingLegend && legend)
-		legend->SetDeltaPosition(event.GetX() - lastMousePosition[0], lastMousePosition[1] - event.GetY());
-	else if (draggingLeftCursor)
-		leftCursor->SetLocation(event.GetX());
-	else if (draggingRightCursor)
-		rightCursor->SetLocation(event.GetX());
+	if (mDraggingLegend && mLegend)
+		mLegend->SetDeltaPosition(event.GetX() - mLastMousePosition[0], mLastMousePosition[1] - event.GetY());
+	else if (mDraggingLeftCursor)
+		mLeftCursor->SetLocation(event.GetX());
+	else if (mDraggingRightCursor)
+		mRightCursor->SetLocation(event.GetX());
 	// ZOOM:  Left or Right mouse button + CTRL or SHIFT
 	else if ((event.ControlDown() || event.ShiftDown()) && (event.RightIsDown() || event.LeftIsDown()))
 		ProcessZoom(event);
@@ -438,7 +426,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	plot->SetPrettyCurves((curveQuality & CurveQuality::HighDrag) != 0);
+	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighDrag) != 0);
 	StoreMousePosition(event);
 	UpdateDisplay();
 }
@@ -447,7 +435,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnRightButtonUpEvent
 //
-// Description:		Handles end of zoom-by-box events.
+// Description:		Handles end of mZoom-by-box events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -461,9 +449,9 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 {
-	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
+	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 
-	if (!zoomBox->GetIsVisible())
+	if (!mZoomBox->GetIsVisible())
 	{
 		ProcessRightClick(event);
 		return;
@@ -478,7 +466,7 @@ void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnMiddleButtonUpEvent
 //
-// Description:		Undoes the zoom level (if available).
+// Description:		Undoes the mZoom level (if available).
 //
 // Input Arguments:
 //		event	= wxMouseEvent& (unused)
@@ -499,8 +487,8 @@ void PlotRenderer::OnMiddleButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ZoomChanged
 //
-// Description:		Determines if the zoom level is different from the previous
-//					zoom level.
+// Description:		Determines if the mZoom level is different from the previous
+//					mZoom level.
 //
 // Input Arguments:
 //		None
@@ -514,20 +502,20 @@ void PlotRenderer::OnMiddleButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 //=============================================================================
 bool PlotRenderer::ZoomChanged() const
 {
-	if (zoom.size() == 0)
+	if (mZoom.size() == 0)
 		return true;
 
-	Zoom lastZoom = zoom.top();
+	Zoom lastZoom = mZoom.top();
 
-	if (lastZoom.xMin == plot->GetXMin() &&
-		lastZoom.xMax == plot->GetXMax() &&
-		lastZoom.xMajor == plot->GetXMajorResolution() &&
-		lastZoom.leftYMin == plot->GetLeftYMin() &&
-		lastZoom.leftYMax == plot->GetLeftYMax() &&
-		lastZoom.leftYMajor == plot->GetLeftYMajorResolution() &&
-		lastZoom.rightYMin == plot->GetRightYMin() &&
-		lastZoom.rightYMax == plot->GetRightYMax() &&
-		lastZoom.rightYMajor == plot->GetRightYMajorResolution())
+	if (lastZoom.xMin == mPlot->GetXMin() &&
+		lastZoom.xMax == mPlot->GetXMax() &&
+		lastZoom.xMajor == mPlot->GetXMajorResolution() &&
+		lastZoom.leftYMin == mPlot->GetLeftYMin() &&
+		lastZoom.leftYMax == mPlot->GetLeftYMax() &&
+		lastZoom.leftYMajor == mPlot->GetLeftYMajorResolution() &&
+		lastZoom.rightYMin == mPlot->GetRightYMin() &&
+		lastZoom.rightYMax == mPlot->GetRightYMax() &&
+		lastZoom.rightYMajor == mPlot->GetRightYMajorResolution())
 		return false;
 
 	return true;
@@ -537,7 +525,7 @@ bool PlotRenderer::ZoomChanged() const
 // Class:			PlotRenderer
 // Function:		SaveCurrentZoom
 //
-// Description:		Saves the current zoom level.
+// Description:		Saves the current mZoom level.
 //
 // Input Arguments:
 //		None
@@ -556,24 +544,24 @@ void PlotRenderer::SaveCurrentZoom()
 
 	Zoom currentZoom;
 
-	currentZoom.xMin = plot->GetXMin();
-	currentZoom.xMax = plot->GetXMax();
-	currentZoom.xMajor = plot->GetXMajorResolution();
-	currentZoom.leftYMin = plot->GetLeftYMin();
-	currentZoom.leftYMax = plot->GetLeftYMax();
-	currentZoom.leftYMajor = plot->GetLeftYMajorResolution();
-	currentZoom.rightYMin = plot->GetRightYMin();
-	currentZoom.rightYMax = plot->GetRightYMax();
-	currentZoom.rightYMajor = plot->GetRightYMajorResolution();
+	currentZoom.xMin = mPlot->GetXMin();
+	currentZoom.xMax = mPlot->GetXMax();
+	currentZoom.xMajor = mPlot->GetXMajorResolution();
+	currentZoom.leftYMin = mPlot->GetLeftYMin();
+	currentZoom.leftYMax = mPlot->GetLeftYMax();
+	currentZoom.leftYMajor = mPlot->GetLeftYMajorResolution();
+	currentZoom.rightYMin = mPlot->GetRightYMin();
+	currentZoom.rightYMax = mPlot->GetRightYMax();
+	currentZoom.rightYMajor = mPlot->GetRightYMajorResolution();
 
-	zoom.push(currentZoom);
+	mZoom.push(currentZoom);
 }
 
 //=============================================================================
 // Class:			PlotRenderer
 // Function:		UndoZoom
 //
-// Description:		Reverts to the previous zoom level.
+// Description:		Reverts to the previous mZoom level.
 //
 // Input Arguments:
 //		None
@@ -587,21 +575,21 @@ void PlotRenderer::SaveCurrentZoom()
 //=============================================================================
 void PlotRenderer::UndoZoom()
 {
-	if (zoom.size() < 2)
+	if (mZoom.size() < 2)
 		return;
 
-	zoom.pop();// Pop the current zoom in order to read the previous zoom
-	Zoom lastZoom = zoom.top();
+	mZoom.pop();// Pop the current mZoom in order to read the previous mZoom
+	Zoom lastZoom = mZoom.top();
 
-	plot->SetXMin(lastZoom.xMin);
-	plot->SetXMax(lastZoom.xMax);
-	plot->SetXMajorResolution(lastZoom.xMajor);
-	plot->SetLeftYMin(lastZoom.leftYMin);
-	plot->SetLeftYMax(lastZoom.leftYMax);
-	plot->SetLeftYMajorResolution(lastZoom.leftYMajor);
-	plot->SetRightYMin(lastZoom.rightYMin);
-	plot->SetRightYMax(lastZoom.rightYMax);
-	plot->SetRightYMajorResolution(lastZoom.rightYMajor);
+	mPlot->SetXMin(lastZoom.xMin);
+	mPlot->SetXMax(lastZoom.xMax);
+	mPlot->SetXMajorResolution(lastZoom.xMajor);
+	mPlot->SetLeftYMin(lastZoom.leftYMin);
+	mPlot->SetLeftYMax(lastZoom.leftYMax);
+	mPlot->SetLeftYMajorResolution(lastZoom.leftYMajor);
+	mPlot->SetRightYMin(lastZoom.rightYMin);
+	mPlot->SetRightYMax(lastZoom.rightYMax);
+	mPlot->SetRightYMajorResolution(lastZoom.rightYMajor);
 
 	UpdateDisplay();
 }
@@ -610,7 +598,7 @@ void PlotRenderer::UndoZoom()
 // Class:			PlotRenderer
 // Function:		ClearZoomStack
 //
-// Description:		Empties the zoom stack.
+// Description:		Empties the mZoom stack.
 //
 // Input Arguments:
 //		None
@@ -624,8 +612,8 @@ void PlotRenderer::UndoZoom()
 //=============================================================================
 void PlotRenderer::ClearZoomStack()
 {
-	while (zoom.size() > 0)
-		zoom.pop();
+	while (mZoom.size() > 0)
+		mZoom.pop();
 }
 
 //=============================================================================
@@ -646,7 +634,7 @@ void PlotRenderer::ClearZoomStack()
 //=============================================================================
 bool PlotRenderer::GetMajorGridOn() const
 {
-	return plot->GetMajorGrid();
+	return mPlot->GetMajorGrid();
 }
 
 //=============================================================================
@@ -667,7 +655,7 @@ bool PlotRenderer::GetMajorGridOn() const
 //=============================================================================
 bool PlotRenderer::GetMinorGridOn() const
 {
-	return plot->GetMinorGrid();
+	return mPlot->GetMinorGrid();
 }
 
 //=============================================================================
@@ -688,7 +676,7 @@ bool PlotRenderer::GetMinorGridOn() const
 //=============================================================================
 void PlotRenderer::SetMajorGridOn()
 {
-	plot->SetMajorGrid(true);
+	mPlot->SetMajorGrid(true);
 	UpdateDisplay();
 }
 
@@ -710,7 +698,7 @@ void PlotRenderer::SetMajorGridOn()
 //=============================================================================
 void PlotRenderer::SetMinorGridOn()
 {
-	plot->SetMinorGrid(true);
+	mPlot->SetMinorGrid(true);
 	UpdateDisplay();
 }
 
@@ -732,7 +720,7 @@ void PlotRenderer::SetMinorGridOn()
 //=============================================================================
 void PlotRenderer::SetMajorGridOff()
 {
-	plot->SetMajorGrid(false);
+	mPlot->SetMajorGrid(false);
 	UpdateDisplay();
 }
 
@@ -754,7 +742,7 @@ void PlotRenderer::SetMajorGridOff()
 //=============================================================================
 void PlotRenderer::SetMinorGridOff()
 {
-	plot->SetMinorGrid(false);
+	mPlot->SetMinorGrid(false);
 	UpdateDisplay();
 }
 
@@ -776,15 +764,15 @@ void PlotRenderer::SetMinorGridOff()
 //=============================================================================
 void PlotRenderer::SetCurveQuality(const CurveQuality& curveQuality)
 {
-	this->curveQuality = curveQuality;
-	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
+	mCurveQuality = curveQuality;
+	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 }
 
 //=============================================================================
 // Class:			PlotRenderer
 // Function:		LegendIsVisible
 //
-// Description:		Returns the status of the legend visibility.
+// Description:		Returns the status of the mLegend visibility.
 //
 // Input Arguments:
 //		None
@@ -798,16 +786,16 @@ void PlotRenderer::SetCurveQuality(const CurveQuality& curveQuality)
 //=============================================================================
 bool PlotRenderer::LegendIsVisible() const
 {
-	if (!legend)
+	if (!mLegend)
 		return false;
-	return legend->GetIsVisible();
+	return mLegend->GetIsVisible();
 }
 
 //=============================================================================
 // Class:			PlotRenderer
 // Function:		SetLegendOn
 //
-// Description:		Sets the legend to visible.
+// Description:		Sets the mLegend to visible.
 //
 // Input Arguments:
 //		None
@@ -821,16 +809,16 @@ bool PlotRenderer::LegendIsVisible() const
 //=============================================================================
 void PlotRenderer::SetLegendOn()
 {
-	if (!legend)
+	if (!mLegend)
 		return;
-	legend->SetVisibility(true);
+	mLegend->SetVisibility(true);
 }
 
 //=============================================================================
 // Class:			PlotRenderer
 // Function:		SetLegendOff
 //
-// Description:		Sets the legend to invisible.
+// Description:		Sets the mLegend to invisible.
 //
 // Input Arguments:
 //		None
@@ -844,16 +832,16 @@ void PlotRenderer::SetLegendOn()
 //=============================================================================
 void PlotRenderer::SetLegendOff()
 {
-	if (!legend)
+	if (!mLegend)
 		return;
-	legend->SetVisibility(false);
+	mLegend->SetVisibility(false);
 }
 
 //=============================================================================
 // Class:			PlotRenderer
 // Function:		UpdateLegend
 //
-// Description:		Updates the contents of the legend.
+// Description:		Updates the contents of the mLegend.
 //
 // Input Arguments:
 //		entries	= const std::vector<Legend::LegendEntryInfo>
@@ -867,8 +855,8 @@ void PlotRenderer::SetLegendOff()
 //=============================================================================
 void PlotRenderer::UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entries)
 {
-	if (legend)
-		legend->SetContents(entries);
+	if (mLegend)
+		mLegend->SetContents(entries);
 }
 
 //=============================================================================
@@ -889,7 +877,7 @@ void PlotRenderer::UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entr
 //=============================================================================
 bool PlotRenderer::GetBottomMajorGrid() const
 {
-	return plot->GetBottomAxis()->GetMajorGrid();
+	return mPlot->GetBottomAxis()->GetMajorGrid();
 }
 
 //=============================================================================
@@ -910,7 +898,7 @@ bool PlotRenderer::GetBottomMajorGrid() const
 //=============================================================================
 bool PlotRenderer::GetBottomMinorGrid() const
 {
-	return plot->GetBottomAxis()->GetMinorGrid();
+	return mPlot->GetBottomAxis()->GetMinorGrid();
 }
 
 //=============================================================================
@@ -931,7 +919,7 @@ bool PlotRenderer::GetBottomMinorGrid() const
 //=============================================================================
 bool PlotRenderer::GetLeftMajorGrid() const
 {
-	return plot->GetLeftYAxis()->GetMajorGrid();
+	return mPlot->GetLeftYAxis()->GetMajorGrid();
 }
 
 //=============================================================================
@@ -952,7 +940,7 @@ bool PlotRenderer::GetLeftMajorGrid() const
 //=============================================================================
 bool PlotRenderer::GetLeftMinorGrid() const
 {
-	return plot->GetLeftYAxis()->GetMinorGrid();
+	return mPlot->GetLeftYAxis()->GetMinorGrid();
 }
 
 //=============================================================================
@@ -973,7 +961,7 @@ bool PlotRenderer::GetLeftMinorGrid() const
 //=============================================================================
 bool PlotRenderer::GetRightMajorGrid() const
 {
-	return plot->GetRightYAxis()->GetMajorGrid();
+	return mPlot->GetRightYAxis()->GetMajorGrid();
 }
 
 //=============================================================================
@@ -994,7 +982,7 @@ bool PlotRenderer::GetRightMajorGrid() const
 //=============================================================================
 bool PlotRenderer::GetRightMinorGrid() const
 {
-	return plot->GetRightYAxis()->GetMinorGrid();
+	return mPlot->GetRightYAxis()->GetMinorGrid();
 }
 
 //=============================================================================
@@ -1015,7 +1003,7 @@ bool PlotRenderer::GetRightMinorGrid() const
 //=============================================================================
 void PlotRenderer::SetBottomMajorGrid(const bool &grid)
 {
-	plot->SetXMajorGrid(grid);
+	mPlot->SetXMajorGrid(grid);
 	UpdateDisplay();
 }
 
@@ -1037,7 +1025,7 @@ void PlotRenderer::SetBottomMajorGrid(const bool &grid)
 //=============================================================================
 void PlotRenderer::SetBottomMinorGrid(const bool &grid)
 {
-	plot->SetXMinorGrid(grid);
+	mPlot->SetXMinorGrid(grid);
 	UpdateDisplay();
 }
 
@@ -1059,7 +1047,7 @@ void PlotRenderer::SetBottomMinorGrid(const bool &grid)
 //=============================================================================
 void PlotRenderer::SetLeftMajorGrid(const bool &grid)
 {
-	plot->SetLeftYMajorGrid(grid);
+	mPlot->SetLeftYMajorGrid(grid);
 	UpdateDisplay();
 }
 
@@ -1081,7 +1069,7 @@ void PlotRenderer::SetLeftMajorGrid(const bool &grid)
 //=============================================================================
 void PlotRenderer::SetLeftMinorGrid(const bool &grid)
 {
-	plot->SetLeftYMinorGrid(grid);
+	mPlot->SetLeftYMinorGrid(grid);
 	UpdateDisplay();
 }
 
@@ -1103,7 +1091,7 @@ void PlotRenderer::SetLeftMinorGrid(const bool &grid)
 //=============================================================================
 void PlotRenderer::SetRightMajorGrid(const bool &grid)
 {
-	plot->SetRightYMajorGrid(grid);
+	mPlot->SetRightYMajorGrid(grid);
 	UpdateDisplay();
 }
 
@@ -1125,7 +1113,7 @@ void PlotRenderer::SetRightMajorGrid(const bool &grid)
 //=============================================================================
 void PlotRenderer::SetRightMinorGrid(const bool &grid)
 {
-	plot->SetRightYMinorGrid(grid);
+	mPlot->SetRightYMinorGrid(grid);
 	UpdateDisplay();
 	SaveCurrentZoom();
 }
@@ -1148,7 +1136,7 @@ void PlotRenderer::SetRightMinorGrid(const bool &grid)
 //=============================================================================
 void PlotRenderer::SetBottomMajorResolution(const double &resolution)
 {
-	plot->SetXMajorResolution(resolution);
+	mPlot->SetXMajorResolution(resolution);
 	UpdateDisplay();
 	SaveCurrentZoom();
 }
@@ -1171,7 +1159,7 @@ void PlotRenderer::SetBottomMajorResolution(const double &resolution)
 //=============================================================================
 void PlotRenderer::SetLeftMajorResolution(const double &resolution)
 {
-	plot->SetLeftYMajorResolution(resolution);
+	mPlot->SetLeftYMajorResolution(resolution);
 	UpdateDisplay();
 	SaveCurrentZoom();
 }
@@ -1194,7 +1182,7 @@ void PlotRenderer::SetLeftMajorResolution(const double &resolution)
 //=============================================================================
 void PlotRenderer::SetRightMajorResolution(const double &resolution)
 {
-	plot->SetRightYMajorResolution(resolution);
+	mPlot->SetRightYMajorResolution(resolution);
 	UpdateDisplay();
 }
 
@@ -1216,7 +1204,7 @@ void PlotRenderer::SetRightMajorResolution(const double &resolution)
 //=============================================================================
 double PlotRenderer::GetBottomMajorResolution() const
 {
-	return plot->GetXMajorResolution();
+	return mPlot->GetXMajorResolution();
 }
 
 //=============================================================================
@@ -1237,7 +1225,7 @@ double PlotRenderer::GetBottomMajorResolution() const
 //=============================================================================
 double PlotRenderer::GetLeftMajorResolution() const
 {
-	return plot->GetLeftYMajorResolution();
+	return mPlot->GetLeftYMajorResolution();
 }
 
 //=============================================================================
@@ -1258,7 +1246,7 @@ double PlotRenderer::GetLeftMajorResolution() const
 //=============================================================================
 double PlotRenderer::GetRightMajorResolution() const
 {
-	return plot->GetRightYMajorResolution();
+	return mPlot->GetRightYMajorResolution();
 }
 
 //=============================================================================
@@ -1288,7 +1276,7 @@ void PlotRenderer::SetCurveProperties(const unsigned int &index, const Color &co
 									  const bool &visible, const bool &rightAxis,
 									  const double &lineSize, const int &markerSize)
 {
-	plot->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
+	mPlot->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
 	UpdateDisplay();
 }
 
@@ -1313,13 +1301,13 @@ void PlotRenderer::SetXLimits(const double &min, const double &max)
 {
 	if (max > min)
 	{
-		plot->SetXMax(max);
-		plot->SetXMin(min);
+		mPlot->SetXMax(max);
+		mPlot->SetXMin(min);
 	}
 	else
 	{
-		plot->SetXMax(min);
-		plot->SetXMin(max);
+		mPlot->SetXMax(min);
+		mPlot->SetXMin(max);
 	}
 
 	UpdateDisplay();
@@ -1346,13 +1334,13 @@ void PlotRenderer::SetLeftYLimits(const double &min, const double &max)
 {
 	if (max > min)
 	{
-		plot->SetLeftYMax(max);
-		plot->SetLeftYMin(min);
+		mPlot->SetLeftYMax(max);
+		mPlot->SetLeftYMin(min);
 	}
 	else
 	{
-		plot->SetLeftYMax(min);
-		plot->SetLeftYMin(max);
+		mPlot->SetLeftYMax(min);
+		mPlot->SetLeftYMin(max);
 	}
 
 	UpdateDisplay();
@@ -1379,13 +1367,13 @@ void PlotRenderer::SetRightYLimits(const double &min, const double &max)
 {
 	if (max > min)
 	{
-		plot->SetRightYMax(max);
-		plot->SetRightYMin(min);
+		mPlot->SetRightYMax(max);
+		mPlot->SetRightYMin(min);
 	}
 	else
 	{
-		plot->SetRightYMax(min);
-		plot->SetRightYMin(max);
+		mPlot->SetRightYMax(min);
+		mPlot->SetRightYMin(max);
 	}
 
 	UpdateDisplay();
@@ -1409,7 +1397,7 @@ void PlotRenderer::SetRightYLimits(const double &min, const double &max)
 //=============================================================================
 void PlotRenderer::AddCurve(const Dataset2D &data)
 {
-	plot->AddCurve(data);
+	mPlot->AddCurve(data);
 }
 
 //=============================================================================
@@ -1430,9 +1418,9 @@ void PlotRenderer::AddCurve(const Dataset2D &data)
 //=============================================================================
 void PlotRenderer::RemoveAllCurves()
 {
-	plot->RemoveExistingPlots();
+	mPlot->RemoveExistingPlots();
 
-	if (plot->GetCurveCount() == 0)
+	if (mPlot->GetCurveCount() == 0)
 		ClearZoomStack();
 }
 
@@ -1454,9 +1442,9 @@ void PlotRenderer::RemoveAllCurves()
 //=============================================================================
 void PlotRenderer::RemoveCurve(const unsigned int& index)
 {
-	plot->RemovePlot(index);
+	mPlot->RemovePlot(index);
 
-	if (plot->GetCurveCount() == 0)
+	if (mPlot->GetCurveCount() == 0)
 		ClearZoomStack();
 }
 
@@ -1478,7 +1466,7 @@ void PlotRenderer::RemoveCurve(const unsigned int& index)
 //=============================================================================
 void PlotRenderer::AutoScale()
 {
-	plot->ResetAutoScaling();
+	mPlot->ResetAutoScaling();
 	UpdateDisplay();
 	SaveCurrentZoom();
 }
@@ -1501,7 +1489,7 @@ void PlotRenderer::AutoScale()
 //=============================================================================
 void PlotRenderer::AutoScaleBottom()
 {
-	plot->SetAutoScaleBottom();
+	mPlot->SetAutoScaleBottom();
 	UpdateDisplay();
 	SaveCurrentZoom();
 }
@@ -1524,7 +1512,7 @@ void PlotRenderer::AutoScaleBottom()
 //=============================================================================
 void PlotRenderer::AutoScaleLeft()
 {
-	plot->SetAutoScaleLeft();
+	mPlot->SetAutoScaleLeft();
 	UpdateDisplay();
 	SaveCurrentZoom();
 }
@@ -1547,7 +1535,7 @@ void PlotRenderer::AutoScaleLeft()
 //=============================================================================
 void PlotRenderer::AutoScaleRight()
 {
-	plot->SetAutoScaleRight();
+	mPlot->SetAutoScaleRight();
 	UpdateDisplay();
 	SaveCurrentZoom();
 }
@@ -1570,25 +1558,25 @@ void PlotRenderer::AutoScaleRight()
 //=============================================================================
 void PlotRenderer::SetXLabel(wxString text)
 {
-	/*const int oldOffset(plot->GetVerticalAxisOffset(!plot->GetXLabel().IsEmpty()));
-	const int newOffset(plot->GetVerticalAxisOffset(!text.IsEmpty()));
+	/*const int oldOffset(mPlot->GetVerticalAxisOffset(!mPlot->GetXLabel().IsEmpty()));
+	const int newOffset(mPlot->GetVerticalAxisOffset(!text.IsEmpty()));
 
 	if (oldOffset != newOffset)
 	{
-		if (legend->GetWindowReference() == Legend::BottomLeft ||
-			legend->GetWindowReference() == Legend::BottomCenter ||
-			legend->GetWindowReference() == Legend::BottomRight)
-			legend->SetDeltaPosition(0, newOffset - oldOffset);
-		else if (legend->GetWindowReference() == Legend::MiddleLeft ||
-			legend->GetWindowReference() == Legend::Center ||
-			legend->GetWindowReference() == Legend::MiddleRight)
-			legend->SetDeltaPosition(0, (newOffset - oldOffset) / 2);
-	}*/ // Adjust legend position as plot area size changes
-	// Not implemented due to possiblity that legend would be moved off-screen
+		if (mLegend->GetWindowReference() == Legend::BottomLeft ||
+			mLegend->GetWindowReference() == Legend::BottomCenter ||
+			mLegend->GetWindowReference() == Legend::BottomRight)
+			mLegend->SetDeltaPosition(0, newOffset - oldOffset);
+		else if (mLegend->GetWindowReference() == Legend::MiddleLeft ||
+			mLegend->GetWindowReference() == Legend::Center ||
+			mLegend->GetWindowReference() == Legend::MiddleRight)
+			mLegend->SetDeltaPosition(0, (newOffset - oldOffset) / 2);
+	}*/ // Adjust mLegend position as plot area size changes
+	// Not implemented due to possiblity that mLegend would be moved off-screen
 	// Also, when moved to bottom corners of the plot area, depending on window size, best anchor is reported as left/right middle instead of bottom
-	// Better solution would anchor legend to corner of plot area if placed within plot area, or corner of window if placed outside of plot area
+	// Better solution would anchor mLegend to corner of plot area if placed within plot area, or corner of window if placed outside of plot area
 
-	plot->SetXLabel(text);
+	mPlot->SetXLabel(text);
 	UpdateDisplay();
 }
 
@@ -1610,22 +1598,22 @@ void PlotRenderer::SetXLabel(wxString text)
 //=============================================================================
 void PlotRenderer::SetLeftYLabel(wxString text)
 {
-	const int oldOffset(plot->GetHorizontalAxisOffset(!plot->GetLeftYLabel().IsEmpty()));
-	const int newOffset(plot->GetHorizontalAxisOffset(!text.IsEmpty()));
+	const int oldOffset(mPlot->GetHorizontalAxisOffset(!mPlot->GetLeftYLabel().IsEmpty()));
+	const int newOffset(mPlot->GetHorizontalAxisOffset(!text.IsEmpty()));
 
 	if (oldOffset != newOffset)
 	{
-		if (legend->GetWindowReference() == Legend::PositionReference::BottomCenter ||
-			legend->GetWindowReference() == Legend::PositionReference::Center ||
-			legend->GetWindowReference() == Legend::PositionReference::TopCenter)
-			legend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
-		else if (legend->GetWindowReference() == Legend::PositionReference::BottomLeft ||
-			legend->GetWindowReference() == Legend::PositionReference::MiddleLeft ||
-			legend->GetWindowReference() == Legend::PositionReference::TopLeft)
-			legend->SetDeltaPosition(newOffset - oldOffset, 0);
+		if (mLegend->GetWindowReference() == Legend::PositionReference::BottomCenter ||
+			mLegend->GetWindowReference() == Legend::PositionReference::Center ||
+			mLegend->GetWindowReference() == Legend::PositionReference::TopCenter)
+			mLegend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
+		else if (mLegend->GetWindowReference() == Legend::PositionReference::BottomLeft ||
+			mLegend->GetWindowReference() == Legend::PositionReference::MiddleLeft ||
+			mLegend->GetWindowReference() == Legend::PositionReference::TopLeft)
+			mLegend->SetDeltaPosition(newOffset - oldOffset, 0);
 	}
 
-	plot->SetLeftYLabel(text);
+	mPlot->SetLeftYLabel(text);
 	UpdateDisplay();
 }
 
@@ -1647,22 +1635,22 @@ void PlotRenderer::SetLeftYLabel(wxString text)
 //=============================================================================
 void PlotRenderer::SetRightYLabel(wxString text)
 {
-	const int oldOffset(plot->GetHorizontalAxisOffset(!plot->GetRightYLabel().IsEmpty()));
-	const int newOffset(plot->GetHorizontalAxisOffset(!text.IsEmpty()));
+	const int oldOffset(mPlot->GetHorizontalAxisOffset(!mPlot->GetRightYLabel().IsEmpty()));
+	const int newOffset(mPlot->GetHorizontalAxisOffset(!text.IsEmpty()));
 
 	if (oldOffset != newOffset)
 	{
-		if (legend->GetWindowReference() == Legend::PositionReference::BottomCenter ||
-			legend->GetWindowReference() == Legend::PositionReference::Center ||
-			legend->GetWindowReference() == Legend::PositionReference::TopCenter)
-			legend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
-		else if (legend->GetWindowReference() == Legend::PositionReference::BottomRight ||
-			legend->GetWindowReference() == Legend::PositionReference::MiddleRight ||
-			legend->GetWindowReference() == Legend::PositionReference::TopRight)
-			legend->SetDeltaPosition(oldOffset - newOffset, 0);
+		if (mLegend->GetWindowReference() == Legend::PositionReference::BottomCenter ||
+			mLegend->GetWindowReference() == Legend::PositionReference::Center ||
+			mLegend->GetWindowReference() == Legend::PositionReference::TopCenter)
+			mLegend->SetDeltaPosition((newOffset - oldOffset) / 2, 0);
+		else if (mLegend->GetWindowReference() == Legend::PositionReference::BottomRight ||
+			mLegend->GetWindowReference() == Legend::PositionReference::MiddleRight ||
+			mLegend->GetWindowReference() == Legend::PositionReference::TopRight)
+			mLegend->SetDeltaPosition(oldOffset - newOffset, 0);
 	}
 
-	plot->SetRightYLabel(text);
+	mPlot->SetRightYLabel(text);
 	UpdateDisplay();
 }
 
@@ -1684,25 +1672,25 @@ void PlotRenderer::SetRightYLabel(wxString text)
 //=============================================================================
 void PlotRenderer::SetTitle(wxString text)
 {
-	/*const int oldOffset(plot->GetVerticalAxisOffset(!plot->GetTitle().IsEmpty()));
-	const int newOffset(plot->GetVerticalAxisOffset(!text.IsEmpty()));
+	/*const int oldOffset(mPlot->GetVerticalAxisOffset(!mPlot->GetTitle().IsEmpty()));
+	const int newOffset(mPlot->GetVerticalAxisOffset(!text.IsEmpty()));
 
 	if (oldOffset != newOffset)
 	{
-		if (legend->GetWindowReference() == Legend::PositionReference::TopLeft ||
-			legend->GetWindowReference() == Legend::PositionReference::TopCenter ||
-			legend->GetWindowReference() == Legend::PositionReference::TopRight)
-			legend->SetDeltaPosition(0, newOffset - oldOffset);
-		else if (legend->GetWindowReference() == Legend::PositionReference::MiddleLeft ||
-			legend->GetWindowReference() == Legend::PositionReference::Center ||
-			legend->GetWindowReference() == Legend::PositionReference::MiddleRight)
-			legend->SetDeltaPosition(0, (newOffset - oldOffset) / 2);
-	}*/ // Adjust legend position as plot area size changes
-	// Not implemented due to possiblity that legend would be moved off-screen
+		if (mLegend->GetWindowReference() == Legend::PositionReference::TopLeft ||
+			mLegend->GetWindowReference() == Legend::PositionReference::TopCenter ||
+			mLegend->GetWindowReference() == Legend::PositionReference::TopRight)
+			mLegend->SetDeltaPosition(0, newOffset - oldOffset);
+		else if (mLegend->GetWindowReference() == Legend::PositionReference::MiddleLeft ||
+			mLegend->GetWindowReference() == Legend::PositionReference::Center ||
+			mLegend->GetWindowReference() == Legend::PositionReference::MiddleRight)
+			mLegend->SetDeltaPosition(0, (newOffset - oldOffset) / 2);
+	}*/ // Adjust mLegend position as plot area size changes
+	// Not implemented due to possiblity that mLegend would be moved off-screen
 	// Also, when moved to bottom corners of the plot area, depending on window size, best anchor is reported as left/right middle instead of bottom
-	// Better solution would anchor legend to corner of plot area if placed within plot area, or corner of window if placed outside of plot area
+	// Better solution would anchor mLegend to corner of plot area if placed within plot area, or corner of window if placed outside of plot area
 
-	plot->SetTitle(text);
+	mPlot->SetTitle(text);
 	UpdateDisplay();
 }
 
@@ -1710,7 +1698,7 @@ void PlotRenderer::SetTitle(wxString text)
 // Class:			PlotRenderer
 // Function:		OnMouseLeaveWindowEvent
 //
-// Description:		Cleans up some zoom box and cursor items.
+// Description:		Cleans up some mZoom box and cursor items.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -1724,17 +1712,17 @@ void PlotRenderer::SetTitle(wxString text)
 //=============================================================================
 void PlotRenderer::OnMouseLeaveWindowEvent(wxMouseEvent& WXUNUSED(event))
 {
-	// Hide the zoom box (but only if it's not already hidden!)
-	if (zoomBox->GetIsVisible())
-		zoomBox->SetVisibility(false);
+	// Hide the mZoom box (but only if it's not already hidden!)
+	if (mZoomBox->GetIsVisible())
+		mZoomBox->SetVisibility(false);
 
 	// TODO:  Why were these lines added?  Removed them due to bug:
-	// Drag legend, move cursor off of screen (holding left button down), move
+	// Drag mLegend, move cursor off of screen (holding left button down), move
 	// cursor back onto screen, now we're dragging plot (expected to still drag
-	// legend).  Good reason to leave below lines?
-	/*draggingLegend = false;
-	draggingLeftCursor = false;
-	draggingRightCursor = false;*/
+	// mLegend).  Good reason to leave below lines?
+	/*mDraggingLegend = false;
+	mDraggingLeftCursor = false;
+	mDraggingRightCursor = false;*/
 
 	UpdateDisplay();
 }
@@ -1762,10 +1750,10 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 	unsigned int y = event.GetY();
 
 	// If the click is within the plot area, move a cursor there and make it visible
-	if (x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
-		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+	if (x > mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		x < GetSize().GetWidth() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
+		y > mPlot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
 		ProcessPlotAreaDoubleClick(x);
 	else
 		ProcessOffPlotDoubleClick(x, y);
@@ -1791,13 +1779,13 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 {
-	// Check to see if we're on a cursor or the legend
-	if (legend && legend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
-		draggingLegend = true;
-	else if (leftCursor->IsUnder(event.GetX()))
-		draggingLeftCursor = true;
-	else if (rightCursor->IsUnder(event.GetX()))
-		draggingRightCursor = true;
+	// Check to see if we're on a cursor or the mLegend
+	if (mLegend && mLegend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
+		mDraggingLegend = true;
+	else if (mLeftCursor->IsUnder(event.GetX()))
+		mDraggingLeftCursor = true;
+	else if (mRightCursor->IsUnder(event.GetX()))
+		mDraggingRightCursor = true;
 }
 
 //=============================================================================
@@ -1818,18 +1806,18 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 {
-	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
+	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 
-	if (draggingLegend)
+	if (mDraggingLegend)
 	{
-		// TODO:  If legend is off screen, reset to default position and turn visibility off
+		// TODO:  If mLegend is off screen, reset to default position and turn visibility off
 
 		UpdateLegendAnchor();
 	}
 
-	draggingLegend = false;
-	draggingLeftCursor = false;
-	draggingRightCursor = false;
+	mDraggingLegend = false;
+	mDraggingLeftCursor = false;
+	mDraggingRightCursor = false;
 
 	SaveCurrentZoom();
 	UpdateDisplay();
@@ -1839,7 +1827,7 @@ void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		UpdateLegendAnchor
 //
-// Description:		Updates the anchor depending on legend position.
+// Description:		Updates the anchor depending on mLegend position.
 //
 // Input Arguments:
 //		None
@@ -1853,44 +1841,44 @@ void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::UpdateLegendAnchor()
 {
-	if (!legend)
+	if (!mLegend)
 		return;
 
 	std::vector<std::pair<double, Legend::PositionReference>> distances;
 	double x, y;
 
-	legend->GetPosition(Legend::PositionReference::BottomLeft, Legend::PositionReference::BottomLeft, x, y);
+	mLegend->GetPosition(Legend::PositionReference::BottomLeft, Legend::PositionReference::BottomLeft, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::BottomLeft));
 
-	legend->GetPosition(Legend::PositionReference::BottomCenter, Legend::PositionReference::BottomCenter, x, y);
+	mLegend->GetPosition(Legend::PositionReference::BottomCenter, Legend::PositionReference::BottomCenter, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::BottomCenter));
 
-	legend->GetPosition(Legend::PositionReference::BottomRight, Legend::PositionReference::BottomRight, x, y);
+	mLegend->GetPosition(Legend::PositionReference::BottomRight, Legend::PositionReference::BottomRight, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::BottomRight));
 
-	legend->GetPosition(Legend::PositionReference::MiddleLeft, Legend::PositionReference::MiddleLeft, x, y);
+	mLegend->GetPosition(Legend::PositionReference::MiddleLeft, Legend::PositionReference::MiddleLeft, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::MiddleLeft));
 
-	legend->GetPosition(Legend::PositionReference::Center, Legend::PositionReference::Center, x, y);
+	mLegend->GetPosition(Legend::PositionReference::Center, Legend::PositionReference::Center, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::Center));
 
-	legend->GetPosition(Legend::PositionReference::MiddleRight, Legend::PositionReference::MiddleRight, x, y);
+	mLegend->GetPosition(Legend::PositionReference::MiddleRight, Legend::PositionReference::MiddleRight, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::MiddleRight));
 
-	legend->GetPosition(Legend::PositionReference::TopLeft, Legend::PositionReference::TopLeft, x, y);
+	mLegend->GetPosition(Legend::PositionReference::TopLeft, Legend::PositionReference::TopLeft, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::TopLeft));
 
-	legend->GetPosition(Legend::PositionReference::TopCenter, Legend::PositionReference::TopCenter, x, y);
+	mLegend->GetPosition(Legend::PositionReference::TopCenter, Legend::PositionReference::TopCenter, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::TopCenter));
 
-	legend->GetPosition(Legend::PositionReference::TopRight, Legend::PositionReference::TopRight, x, y);
+	mLegend->GetPosition(Legend::PositionReference::TopRight, Legend::PositionReference::TopRight, x, y);
 	distances.push_back(std::make_pair(x * x + y * y, Legend::PositionReference::TopRight));
 
 	Legend::PositionReference bestRef = std::min_element(distances.begin(), distances.end())->second;
-	legend->GetPosition(bestRef, bestRef, x, y);
-	legend->SetWindowReference(bestRef);
-	legend->SetLegendReference(bestRef);
-	legend->SetPosition(x, y);
+	mLegend->GetPosition(bestRef, bestRef, x, y);
+	mLegend->SetWindowReference(bestRef);
+	mLegend->SetLegendReference(bestRef);
+	mLegend->SetPosition(x, y);
 }
 
 //=============================================================================
@@ -1911,7 +1899,7 @@ void PlotRenderer::UpdateLegendAnchor()
 //=============================================================================
 bool PlotRenderer::GetLeftCursorVisible() const
 {
-	return leftCursor->GetIsVisible();
+	return mLeftCursor->GetIsVisible();
 }
 
 //=============================================================================
@@ -1932,7 +1920,7 @@ bool PlotRenderer::GetLeftCursorVisible() const
 //=============================================================================
 bool PlotRenderer::GetRightCursorVisible() const
 {
-	return rightCursor->GetIsVisible();
+	return mRightCursor->GetIsVisible();
 }
 
 //=============================================================================
@@ -1953,7 +1941,7 @@ bool PlotRenderer::GetRightCursorVisible() const
 //=============================================================================
 double PlotRenderer::GetLeftCursorValue() const
 {
-	return leftCursor->GetValue();
+	return mLeftCursor->GetValue();
 }
 
 //=============================================================================
@@ -1974,7 +1962,7 @@ double PlotRenderer::GetLeftCursorValue() const
 //=============================================================================
 double PlotRenderer::GetRightCursorValue() const
 {
-	return rightCursor->GetValue();
+	return mRightCursor->GetValue();
 }
 
 //=============================================================================
@@ -1996,12 +1984,12 @@ double PlotRenderer::GetRightCursorValue() const
 void PlotRenderer::UpdateCursors()
 {
 	// Tell the cursors they need to recalculate
-	leftCursor->SetModified();
-	rightCursor->SetModified();
+	mLeftCursor->SetModified();
+	mRightCursor->SetModified();
 
 	// Calculations are performed on Draw
-	leftCursor->Draw();
-	rightCursor->Draw();
+	mLeftCursor->Draw();
+	mRightCursor->Draw();
 
 	Refresh();
 }
@@ -2024,7 +2012,7 @@ void PlotRenderer::UpdateCursors()
 //=============================================================================
 double PlotRenderer::GetXMin() const
 {
-	return plot->GetBottomAxis()->GetMinimum();
+	return mPlot->GetBottomAxis()->GetMinimum();
 }
 
 //=============================================================================
@@ -2045,7 +2033,7 @@ double PlotRenderer::GetXMin() const
 //=============================================================================
 double PlotRenderer::GetXMax() const
 {
-	return plot->GetBottomAxis()->GetMaximum();
+	return mPlot->GetBottomAxis()->GetMaximum();
 }
 
 //=============================================================================
@@ -2066,7 +2054,7 @@ double PlotRenderer::GetXMax() const
 //=============================================================================
 double PlotRenderer::GetLeftYMin() const
 {
-	return plot->GetLeftYAxis()->GetMinimum();
+	return mPlot->GetLeftYAxis()->GetMinimum();
 }
 
 //=============================================================================
@@ -2087,7 +2075,7 @@ double PlotRenderer::GetLeftYMin() const
 //=============================================================================
 double PlotRenderer::GetLeftYMax() const
 {
-	return plot->GetLeftYAxis()->GetMaximum();
+	return mPlot->GetLeftYAxis()->GetMaximum();
 }
 
 //=============================================================================
@@ -2108,7 +2096,7 @@ double PlotRenderer::GetLeftYMax() const
 //=============================================================================
 double PlotRenderer::GetRightYMin() const
 {
-	return plot->GetRightYAxis()->GetMinimum();
+	return mPlot->GetRightYAxis()->GetMinimum();
 }
 
 //=============================================================================
@@ -2129,7 +2117,7 @@ double PlotRenderer::GetRightYMin() const
 //=============================================================================
 double PlotRenderer::GetRightYMax() const
 {
-	return plot->GetRightYAxis()->GetMaximum();
+	return mPlot->GetRightYAxis()->GetMaximum();
 }
 
 //=============================================================================
@@ -2150,7 +2138,7 @@ double PlotRenderer::GetRightYMax() const
 //=============================================================================
 Color PlotRenderer::GetGridColor() const
 {
-	return plot->GetGridColor();
+	return mPlot->GetGridColor();
 }
 
 //=============================================================================
@@ -2171,7 +2159,7 @@ Color PlotRenderer::GetGridColor() const
 //=============================================================================
 void PlotRenderer::SetGridColor(const Color &color)
 {
-	plot->SetGridColor(color);
+	mPlot->SetGridColor(color);
 }
 
 //=============================================================================
@@ -2193,8 +2181,8 @@ void PlotRenderer::SetGridColor(const Color &color)
 //=============================================================================
 bool PlotRenderer::GetXLogarithmic() const
 {
-	if (plot->GetBottomAxis())
-		return plot->GetBottomAxis()->IsLogarithmic();
+	if (mPlot->GetBottomAxis())
+		return mPlot->GetBottomAxis()->IsLogarithmic();
 
 	return false;
 }
@@ -2218,8 +2206,8 @@ bool PlotRenderer::GetXLogarithmic() const
 //=============================================================================
 bool PlotRenderer::GetLeftLogarithmic() const
 {
-	if (plot->GetLeftYAxis())
-		return plot->GetLeftYAxis()->IsLogarithmic();
+	if (mPlot->GetLeftYAxis())
+		return mPlot->GetLeftYAxis()->IsLogarithmic();
 
 	return false;
 }
@@ -2243,8 +2231,8 @@ bool PlotRenderer::GetLeftLogarithmic() const
 //=============================================================================
 bool PlotRenderer::GetRightLogarithmic() const
 {
-	if (plot->GetRightYAxis())
-		return plot->GetRightYAxis()->IsLogarithmic();
+	if (mPlot->GetRightYAxis())
+		return mPlot->GetRightYAxis()->IsLogarithmic();
 
 	return false;
 }
@@ -2267,7 +2255,7 @@ bool PlotRenderer::GetRightLogarithmic() const
 //=============================================================================
 void PlotRenderer::SetXLogarithmic(const bool &log)
 {
-	plot->SetXLogarithmic(log);
+	mPlot->SetXLogarithmic(log);
 
 	UpdateDisplay();
 }
@@ -2290,7 +2278,7 @@ void PlotRenderer::SetXLogarithmic(const bool &log)
 //=============================================================================
 void PlotRenderer::SetLeftLogarithmic(const bool &log)
 {
-	plot->SetLeftLogarithmic(log);
+	mPlot->SetLeftLogarithmic(log);
 
 	UpdateDisplay();
 }
@@ -2313,7 +2301,7 @@ void PlotRenderer::SetLeftLogarithmic(const bool &log)
 //=============================================================================
 void PlotRenderer::SetRightLogarithmic(const bool &log)
 {
-	plot->SetRightLogarithmic(log);
+	mPlot->SetRightLogarithmic(log);
 
 	UpdateDisplay();
 }
@@ -2337,17 +2325,17 @@ void PlotRenderer::SetRightLogarithmic(const bool &log)
 //=============================================================================
 bool PlotRenderer::GetXAxisZoomed() const
 {
-	if (!plot->GetBottomAxis())
+	if (!mPlot->GetBottomAxis())
 		return false;
 
-	return !plot->GetXAxisAutoScaled();
+	return !mPlot->GetXAxisAutoScaled();
 }
 
 //=============================================================================
 // Class:			PlotRenderer
 // Function:		ProcessZoom
 //
-// Description:		Handles mouse-drag zoom events.
+// Description:		Handles mouse-drag mZoom events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2361,31 +2349,31 @@ bool PlotRenderer::GetXAxisZoomed() const
 //=============================================================================
 void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 {
-	// CTRL for Left Y-zoom
-	// SHIFT for Right Y-zoom
+	// CTRL for Left Y-mZoom
+	// SHIFT for Right Y-mZoom
 
 	// ZOOM in or out
-	double zoomXScale = 0.005 * (event.GetX() - lastMousePosition[0]);// [% of current scale]
-	double zoomYScale = 0.005 * (event.GetY() - lastMousePosition[1]);// [% of current scale]
+	double zoomXScale = 0.005 * (event.GetX() - mLastMousePosition[0]);// [% of current scale]
+	double zoomYScale = 0.005 * (event.GetY() - mLastMousePosition[1]);// [% of current scale]
 
 	// TODO:  Focus the zooming around the cursor
 	// Adjust the axis limits
-	double xDelta = (plot->GetXMax() - plot->GetXMin()) * zoomXScale;
-	double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * zoomYScale * (int)event.ControlDown();
-	double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * zoomYScale * (int)event.ShiftDown();
+	double xDelta = (mPlot->GetXMax() - mPlot->GetXMin()) * zoomXScale;
+	double yLeftDelta = (mPlot->GetLeftYMax() - mPlot->GetLeftYMin()) * zoomYScale * (int)event.ControlDown();
+	double yRightDelta = (mPlot->GetRightYMax() - mPlot->GetRightYMin()) * zoomYScale * (int)event.ShiftDown();
 
 	// Left mouse button fixes left and bottom corner, right button fixes right and top corner
 	if (event.LeftIsDown())
 	{
-		plot->SetXMax(plot->GetXMax() - xDelta);
-		plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
-		plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
+		mPlot->SetXMax(mPlot->GetXMax() - xDelta);
+		mPlot->SetLeftYMax(mPlot->GetLeftYMax() + yLeftDelta);
+		mPlot->SetRightYMax(mPlot->GetRightYMax() + yRightDelta);
 	}
 	else
 	{
-		plot->SetXMin(plot->GetXMin() - xDelta);
-		plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
-		plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
+		mPlot->SetXMin(mPlot->GetXMin() - xDelta);
+		mPlot->SetLeftYMin(mPlot->GetLeftYMin() + yLeftDelta);
+		mPlot->SetRightYMin(mPlot->GetRightYMin() + yRightDelta);
 	}
 }
 
@@ -2393,7 +2381,7 @@ void PlotRenderer::ProcessZoom(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		ProcessZoomWithBox
 //
-// Description:		Handles mouse-drag zoom box events.
+// Description:		Handles mouse-drag mZoom box events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -2410,22 +2398,22 @@ void PlotRenderer::ProcessZoomWithBox(wxMouseEvent &event)
 	unsigned int x;
 	unsigned int y;
 
-	if (!zoomBox->GetIsVisible())
+	if (!mZoomBox->GetIsVisible())
 	{
-		x = lastMousePosition[0];
-		y = lastMousePosition[1];
+		x = mLastMousePosition[0];
+		y = mLastMousePosition[1];
 		ForcePointWithinPlotArea(x, y);
 
-		zoomBox->SetVisibility(true);
-		zoomBox->SetAnchorCorner(x, GetSize().GetHeight() - y);
+		mZoomBox->SetVisibility(true);
+		mZoomBox->SetAnchorCorner(x, GetSize().GetHeight() - y);
 	}
 
 	x = event.GetX();
 	y = event.GetY();
 	ForcePointWithinPlotArea(x, y);
 
-	// Tell the zoom box where to draw the floaing corner
-	zoomBox->SetFloatingCorner(x, GetSize().GetHeight() - y);
+	// Tell the mZoom box where to draw the floaing corner
+	mZoomBox->SetFloatingCorner(x, GetSize().GetHeight() - y);
 }
 
 //=============================================================================
@@ -2469,21 +2457,21 @@ void PlotRenderer::ProcessPan(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::PanBottomXAxis(wxMouseEvent &event)
 {
-	int width = GetSize().GetWidth() - plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
+	int width = GetSize().GetWidth() - mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge();
 
-	if (plot->GetBottomAxis()->IsLogarithmic())
+	if (mPlot->GetBottomAxis()->IsLogarithmic())
 	{
-		int pixelDelta = event.GetX() - lastMousePosition[0];
-		plot->SetXMin(plot->GetBottomAxis()->PixelToValue(
-			(int)plot->GetLeftYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
-		plot->SetXMax(plot->GetBottomAxis()->PixelToValue(
-			GetSize().GetWidth() - (int)plot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+		int pixelDelta = event.GetX() - mLastMousePosition[0];
+		mPlot->SetXMin(mPlot->GetBottomAxis()->PixelToValue(
+			(int)mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
+		mPlot->SetXMax(mPlot->GetBottomAxis()->PixelToValue(
+			GetSize().GetWidth() - (int)mPlot->GetRightYAxis()->GetOffsetFromWindowEdge() - pixelDelta));
 	}
 	else
 	{
-		double xDelta = (plot->GetXMax() - plot->GetXMin()) * (event.GetX() - lastMousePosition[0]) / width;
-		plot->SetXMin(plot->GetXMin() - xDelta);
-		plot->SetXMax(plot->GetXMax() - xDelta);
+		double xDelta = (mPlot->GetXMax() - mPlot->GetXMin()) * (event.GetX() - mLastMousePosition[0]) / width;
+		mPlot->SetXMin(mPlot->GetXMin() - xDelta);
+		mPlot->SetXMax(mPlot->GetXMax() - xDelta);
 	}
 }
 
@@ -2505,21 +2493,21 @@ void PlotRenderer::PanBottomXAxis(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::PanLeftYAxis(wxMouseEvent &event)
 {
-	int height = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() - plot->GetTopAxis()->GetOffsetFromWindowEdge();
+	int height = GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() - mPlot->GetTopAxis()->GetOffsetFromWindowEdge();
 
-	if (plot->GetLeftYAxis()->IsLogarithmic())
+	if (mPlot->GetLeftYAxis()->IsLogarithmic())
 	{
-		int pixelDelta = event.GetY() - lastMousePosition[1];
-		plot->SetLeftYMin(plot->GetLeftYAxis()->PixelToValue(
-			(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
-		plot->SetLeftYMax(plot->GetLeftYAxis()->PixelToValue(
-			GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		int pixelDelta = event.GetY() - mLastMousePosition[1];
+		mPlot->SetLeftYMin(mPlot->GetLeftYAxis()->PixelToValue(
+			(int)mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		mPlot->SetLeftYMax(mPlot->GetLeftYAxis()->PixelToValue(
+			GetSize().GetHeight() - (int)mPlot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
 	}
 	else
 	{
-		double yLeftDelta = (plot->GetLeftYMax() - plot->GetLeftYMin()) * (event.GetY() - lastMousePosition[1]) / height;
-		plot->SetLeftYMin(plot->GetLeftYMin() + yLeftDelta);
-		plot->SetLeftYMax(plot->GetLeftYMax() + yLeftDelta);
+		double yLeftDelta = (mPlot->GetLeftYMax() - mPlot->GetLeftYMin()) * (event.GetY() - mLastMousePosition[1]) / height;
+		mPlot->SetLeftYMin(mPlot->GetLeftYMin() + yLeftDelta);
+		mPlot->SetLeftYMax(mPlot->GetLeftYMax() + yLeftDelta);
 	}
 }
 
@@ -2541,21 +2529,21 @@ void PlotRenderer::PanLeftYAxis(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::PanRightYAxis(wxMouseEvent &event)
 {
-	int height = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() - plot->GetTopAxis()->GetOffsetFromWindowEdge();
+	int height = GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() - mPlot->GetTopAxis()->GetOffsetFromWindowEdge();
 
-	if (plot->GetRightYAxis()->IsLogarithmic())
+	if (mPlot->GetRightYAxis()->IsLogarithmic())
 	{
-		int pixelDelta = event.GetY() - lastMousePosition[1];
-		plot->SetRightYMin(plot->GetRightYAxis()->PixelToValue(
-			(int)plot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
-		plot->SetRightYMax(plot->GetRightYAxis()->PixelToValue(
-			GetSize().GetHeight() - (int)plot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		int pixelDelta = event.GetY() - mLastMousePosition[1];
+		mPlot->SetRightYMin(mPlot->GetRightYAxis()->PixelToValue(
+			(int)mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() + pixelDelta));
+		mPlot->SetRightYMax(mPlot->GetRightYAxis()->PixelToValue(
+			GetSize().GetHeight() - (int)mPlot->GetTopAxis()->GetOffsetFromWindowEdge() + pixelDelta));
 	}
 	else
 	{
-		double yRightDelta = (plot->GetRightYMax() - plot->GetRightYMin()) * (event.GetY() - lastMousePosition[1]) / height;
-		plot->SetRightYMin(plot->GetRightYMin() + yRightDelta);
-		plot->SetRightYMax(plot->GetRightYMax() + yRightDelta);
+		double yRightDelta = (mPlot->GetRightYMax() - mPlot->GetRightYMin()) * (event.GetY() - mLastMousePosition[1]) / height;
+		mPlot->SetRightYMin(mPlot->GetRightYMin() + yRightDelta);
+		mPlot->SetRightYMax(mPlot->GetRightYMax() + yRightDelta);
 	}
 }
 
@@ -2577,26 +2565,26 @@ void PlotRenderer::PanRightYAxis(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::ProcessPlotAreaDoubleClick(const unsigned int &x)
 {
-	double value(plot->GetBottomAxis()->PixelToValue(x));
+	double value(mPlot->GetBottomAxis()->PixelToValue(x));
 
-	if (!leftCursor->GetIsVisible())
+	if (!mLeftCursor->GetIsVisible())
 	{
-		leftCursor->SetVisibility(true);
-		leftCursor->SetLocation(x);
+		mLeftCursor->SetVisibility(true);
+		mLeftCursor->SetLocation(x);
 	}
-	else if (!rightCursor->GetIsVisible())
+	else if (!mRightCursor->GetIsVisible())
 	{
-		rightCursor->SetVisibility(true);
-		rightCursor->SetLocation(x);
+		mRightCursor->SetVisibility(true);
+		mRightCursor->SetLocation(x);
 	}
 	else
 	{
 		// Both cursors are visible - move the closer one to the click spot
 		// NOTE:  Another option is to always alternate which one was moved?
-		if (fabs(leftCursor->GetValue() - value) < fabs(rightCursor->GetValue() - value))
-			leftCursor->SetLocation(x);
+		if (fabs(mLeftCursor->GetValue() - value) < fabs(mRightCursor->GetValue() - value))
+			mLeftCursor->SetLocation(x);
 		else
-			rightCursor->SetLocation(x);
+			mRightCursor->SetLocation(x);
 	}
 }
 
@@ -2621,22 +2609,22 @@ void PlotRenderer::ProcessOffPlotDoubleClick(const unsigned int &x, const unsign
 {
 	// Determine the context
 	PlotContext context;
-	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+	if (x < mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		y > mPlot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
 		context = PlotContext::LeftYAxis;
-	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
-		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+	else if (x > GetSize().GetWidth() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
+		y > mPlot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
 		context = PlotContext::RightYAxis;
-	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
-		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
+	else if (y > GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
+		x > mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		x < GetSize().GetWidth() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge())
 		context = PlotContext::XAxis;
 	else
 		context = PlotContext::PlotArea;
 
-	guiInterface.DisplayAxisRangeDialog(context);
+	mGuiInterface.DisplayAxisRangeDialog(context);
 }
 
 //=============================================================================
@@ -2661,17 +2649,17 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 	PlotContext context;
 	unsigned int x = event.GetX();
 	unsigned int y = event.GetY();
-	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+	if (x < mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		y > mPlot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
 		context = PlotContext::LeftYAxis;
-	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
-		y > plot->GetTopAxis()->GetOffsetFromWindowEdge() &&
-		y < GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
+	else if (x > GetSize().GetWidth() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge() &&
+		y > mPlot->GetTopAxis()->GetOffsetFromWindowEdge() &&
+		y < GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
 		context = PlotContext::RightYAxis;
-	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
-		x > plot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
-		x < GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
+	else if (y > GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge() &&
+		x > mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge() &&
+		x < GetSize().GetWidth() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge())
 		context = PlotContext::XAxis;
 	else
 		context = PlotContext::PlotArea;
@@ -2679,14 +2667,14 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 	// Display the context menu
 	CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
 
-	ignoreNextMouseMove = true;
+	mIgnoreNextMouseMove = true;
 }
 
 //=============================================================================
 // Class:			PlotRenderer
 // Function:		ProcessZoomBoxEnd
 //
-// Description:		Completes zoom and cleans up box after user releases zoom box.
+// Description:		Completes mZoom and cleans up box after user releases mZoom box.
 //
 // Input Arguments:
 //		None
@@ -2700,34 +2688,34 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::ProcessZoomBoxEnd()
 {
-	zoomBox->SetVisibility(false);
+	mZoomBox->SetVisibility(false);
 	
-	if (plot->GetCurveCount() == 0)
+	if (mPlot->GetCurveCount() == 0)
 		return;
 
 	// Make sure the box isn't too small
 	const int limit = 5;// [pixels]
-	if (abs(int(zoomBox->GetXAnchor() - zoomBox->GetXFloat())) > limit &&
-		abs(int(zoomBox->GetYAnchor() - zoomBox->GetYFloat())) > limit)
+	if (abs(int(mZoomBox->GetXAnchor() - mZoomBox->GetXFloat())) > limit &&
+		abs(int(mZoomBox->GetYAnchor() - mZoomBox->GetYFloat())) > limit)
 	{
-		// Determine the new zoom range
+		// Determine the new mZoom range
 		// Remember: OpenGL uses Bottom Left as origin, normal windows use Top Left as origin
-		double xMin = plot->GetBottomAxis()->PixelToValue(
-			std::min<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
-		double xMax = plot->GetBottomAxis()->PixelToValue(
-			std::max<unsigned int>(zoomBox->GetXFloat(), zoomBox->GetXAnchor()));
-		double yLeftMin = plot->GetLeftYAxis()->PixelToValue(
-			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
-		double yLeftMax = plot->GetLeftYAxis()->PixelToValue(
-			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
-		double yRightMin = plot->GetRightYAxis()->PixelToValue(
-			std::min<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
-		double yRightMax = plot->GetRightYAxis()->PixelToValue(
-			std::max<unsigned int>(zoomBox->GetYFloat(), zoomBox->GetYAnchor()));
+		double xMin = mPlot->GetBottomAxis()->PixelToValue(
+			std::min<unsigned int>(mZoomBox->GetXFloat(), mZoomBox->GetXAnchor()));
+		double xMax = mPlot->GetBottomAxis()->PixelToValue(
+			std::max<unsigned int>(mZoomBox->GetXFloat(), mZoomBox->GetXAnchor()));
+		double yLeftMin = mPlot->GetLeftYAxis()->PixelToValue(
+			std::min<unsigned int>(mZoomBox->GetYFloat(), mZoomBox->GetYAnchor()));
+		double yLeftMax = mPlot->GetLeftYAxis()->PixelToValue(
+			std::max<unsigned int>(mZoomBox->GetYFloat(), mZoomBox->GetYAnchor()));
+		double yRightMin = mPlot->GetRightYAxis()->PixelToValue(
+			std::min<unsigned int>(mZoomBox->GetYFloat(), mZoomBox->GetYAnchor()));
+		double yRightMax = mPlot->GetRightYAxis()->PixelToValue(
+			std::max<unsigned int>(mZoomBox->GetYFloat(), mZoomBox->GetYAnchor()));
 
-		ComputePrettyLimits(xMin, xMax, maxXTicks);
-		ComputePrettyLimits(yLeftMin, yLeftMax, maxYTicks);
-		ComputePrettyLimits(yRightMin, yRightMax, maxYTicks);
+		ComputePrettyLimits(xMin, xMax, mMaxXTicks);
+		ComputePrettyLimits(yLeftMin, yLeftMax, mMaxYTicks);
+		ComputePrettyLimits(yRightMin, yRightMax, mMaxYTicks);
 
 		SetXLimits(xMin, xMax);
 		SetLeftYLimits(yLeftMin, yLeftMax);
@@ -2790,15 +2778,15 @@ void PlotRenderer::ComputePrettyLimits(double &min, double &max, const unsigned 
 //=============================================================================
 void PlotRenderer::ForcePointWithinPlotArea(unsigned int &x, unsigned int &y)
 {
-	if (x < plot->GetLeftYAxis()->GetOffsetFromWindowEdge())
-		x = plot->GetLeftYAxis()->GetOffsetFromWindowEdge();
-	else if (x > GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge())
-		x = GetSize().GetWidth() - plot->GetRightYAxis()->GetOffsetFromWindowEdge();
+	if (x < mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge())
+		x = mPlot->GetLeftYAxis()->GetOffsetFromWindowEdge();
+	else if (x > GetSize().GetWidth() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge())
+		x = GetSize().GetWidth() - mPlot->GetRightYAxis()->GetOffsetFromWindowEdge();
 
-	if (y < plot->GetTopAxis()->GetOffsetFromWindowEdge())
-		y = plot->GetTopAxis()->GetOffsetFromWindowEdge();
-	else if (y > GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge())
-		y = GetSize().GetHeight() - plot->GetBottomAxis()->GetOffsetFromWindowEdge();
+	if (y < mPlot->GetTopAxis()->GetOffsetFromWindowEdge())
+		y = mPlot->GetTopAxis()->GetOffsetFromWindowEdge();
+	else if (y > GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge())
+		y = GetSize().GetHeight() - mPlot->GetBottomAxis()->GetOffsetFromWindowEdge();
 }
 
 //=============================================================================
@@ -2819,7 +2807,7 @@ void PlotRenderer::ForcePointWithinPlotArea(unsigned int &x, unsigned int &y)
 //=============================================================================
 wxString PlotRenderer::GetXLabel() const
 {
-	return plot->GetXLabel();
+	return mPlot->GetXLabel();
 }
 
 //=============================================================================
@@ -2840,7 +2828,7 @@ wxString PlotRenderer::GetXLabel() const
 //=============================================================================
 wxString PlotRenderer::GetLeftYLabel() const
 {
-	return plot->GetLeftYLabel();
+	return mPlot->GetLeftYLabel();
 }
 
 //=============================================================================
@@ -2861,7 +2849,7 @@ wxString PlotRenderer::GetLeftYLabel() const
 //=============================================================================
 wxString PlotRenderer::GetRightYLabel() const
 {
-	return plot->GetRightYLabel();
+	return mPlot->GetRightYLabel();
 }
 
 //=============================================================================
@@ -2882,7 +2870,7 @@ wxString PlotRenderer::GetRightYLabel() const
 //=============================================================================
 wxString PlotRenderer::GetTitle() const
 {
-	return plot->GetTitle();
+	return mPlot->GetTitle();
 }
 
 //=============================================================================
@@ -2965,12 +2953,12 @@ double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
 //=============================================================================
 wxImage PlotRenderer::GetImage() const
 {
-	plot->SetPrettyCurves((curveQuality & CurveQuality::HighWrite) != 0);
-	if (((curveQuality & CurveQuality::HighStatic) != 0) != ((curveQuality & CurveQuality::HighWrite) != 0))
+	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighWrite) != 0);
+	if (((mCurveQuality & CurveQuality::HighStatic) != 0) != ((mCurveQuality & CurveQuality::HighWrite) != 0))
 		{/*UpdateDisplay();*/}// TODO:  Can't call from const method, so HighQualityWrite flag currently doesn't work
 
 	wxImage newImage(RenderWindow::GetImage());
-	plot->SetPrettyCurves((curveQuality & CurveQuality::HighStatic) != 0);
+	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 	return newImage;
 }
 
@@ -2992,7 +2980,7 @@ wxImage PlotRenderer::GetImage() const
 //=============================================================================
 unsigned long long PlotRenderer::GetTotalPointCount() const
 {
-	return plot->GetTotalPointCount();
+	return mPlot->GetTotalPointCount();
 }
 
 //=============================================================================
@@ -3018,19 +3006,19 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 	switch(mv)
 	{
 	case Modelview::Left:
-		ConvertMatrixToGL(leftModelview, glModelviewMatrix);
+		ConvertMatrixToGL(mLeftModelview, glModelviewMatrix);
 		break;
 
 	case Modelview::Right:
-		ConvertMatrixToGL(rightModelview, glModelviewMatrix);
+		ConvertMatrixToGL(mRightModelview, glModelviewMatrix);
 		break;
 
 	default:
 	case Modelview::Fixed:
-		ConvertMatrixToGL(modelviewMatrix, glModelviewMatrix);
+		ConvertMatrixToGL(mModelviewMatrix, glModelviewMatrix);
 	}
 
-	glUniformMatrix4fv(shaders[0].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
+	glUniformMatrix4fv(mShaders[0].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
 }
 
 //=============================================================================
@@ -3080,7 +3068,7 @@ void PlotRenderer::ContextWriteImageFile(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::ContextExportData(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.ExportData();
+	mGuiInterface.ExportData();
 }
 
 //=============================================================================
@@ -3315,7 +3303,7 @@ void PlotRenderer::ContextToggleMinorGridlines(wxCommandEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ContextToggleLegend
 //
-// Description:		Toggles legend visibility on and off.
+// Description:		Toggles mLegend visibility on and off.
 //
 // Input Arguments:
 //		event	= wxCommandEvent&
@@ -3527,7 +3515,7 @@ void PlotRenderer::ContextAutoScaleBottom(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::ContextSetRangeBottom(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.DisplayAxisRangeDialog(PlotContext::XAxis);
+	mGuiInterface.DisplayAxisRangeDialog(PlotContext::XAxis);
 }
 
 //=============================================================================
@@ -3643,7 +3631,7 @@ void PlotRenderer::ContextAutoScaleLeft(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::ContextSetRangeLeft(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.DisplayAxisRangeDialog(PlotContext::LeftYAxis);
+	mGuiInterface.DisplayAxisRangeDialog(PlotContext::LeftYAxis);
 }
 
 //=============================================================================
@@ -3759,7 +3747,7 @@ void PlotRenderer::ContextAutoScaleRight(wxCommandEvent& WXUNUSED(event))
 //=============================================================================
 void PlotRenderer::ContextSetRangeRight(wxCommandEvent& WXUNUSED(event))
 {
-	guiInterface.DisplayAxisRangeDialog(PlotContext::RightYAxis);
+	mGuiInterface.DisplayAxisRangeDialog(PlotContext::RightYAxis);
 }
 
 //=============================================================================
@@ -4050,7 +4038,7 @@ void PlotRenderer::DoPaste()
 		{
 			wxTextDataObject data;
 			wxTheClipboard->GetData(data);
-			guiInterface.LoadText(data.GetText());
+			mGuiInterface.LoadText(data.GetText());
 		}
 		wxTheClipboard->Close();
 	}

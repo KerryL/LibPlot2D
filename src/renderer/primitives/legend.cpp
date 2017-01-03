@@ -37,7 +37,7 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-const unsigned int Legend::entrySpacing(5);// [pixels]
+const unsigned int Legend::mEntrySpacing(5);// [pixels]
 
 //=============================================================================
 // Class:			Legend
@@ -46,7 +46,7 @@ const unsigned int Legend::entrySpacing(5);// [pixels]
 // Description:		Constructor for the Legend class.
 //
 // Input Arguments:
-//		renderWindow	= RenderWindow& reference to the object that owns this
+//		mRenderWindow	= RenderWindow& reference to the object that owns this
 //
 // Output Arguments:
 //		None
@@ -55,24 +55,11 @@ const unsigned int Legend::entrySpacing(5);// [pixels]
 //		None
 //
 //=============================================================================
-Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
-	text(renderWindow), lines(renderWindow)
+Legend::Legend(RenderWindow &mRenderWindow) : Primitive(mRenderWindow),
+	mText(mRenderWindow), mLines(mRenderWindow)
 {
-	fontColor = Color::ColorBlack;
-	backgroundColor = Color::ColorWhite;
-	borderColor = Color::ColorBlack;
-
-	x = 0;
-	y = 0;
-	borderSize = 1;
-	sampleLength = 15;
-
-	windowRef = PositionReference::BottomLeft;
-	legendRef = PositionReference::Center;
-
 	SetDrawOrder(3000);// Draw this last
-
-	bufferInfo.push_back(BufferInfo());// Text
+	mBufferInfo.push_back(BufferInfo());// Text
 }
 
 //=============================================================================
@@ -93,40 +80,40 @@ Legend::Legend(RenderWindow &renderWindow) : Primitive(renderWindow),
 //=============================================================================
 void Legend::Update(const unsigned int& i)
 {
-	// TODO:  Alternative approach is to only update if entries change
+	// TODO:  Alternative approach is to only update if mEntries change
 	// and to use local modelview to handle position changes.
-	if (!text.IsOK())
+	if (!mText.IsOK())
 		return;
 
-	if (i == 0)// Background, border, lines and markers
+	if (i == 0)// Background, border, mLines and markers
 	{
-		// Captial "H" gives good idea of text height
-		textHeight = text.GetBoundingBox("H").yUp;
+		// Captial "H" gives good idea of text mHeight
+		mTextHeight = mText.GetBoundingBox("H").yUp;
 
 		UpdateBoundingBox();
 
-		bufferVector.push_back(BuildBackground());
+		mBufferVector.push_back(BuildBackground());
 
-		lines.SetWidth(borderSize);
-		lines.SetLineColor(borderColor);
-		lines.SetBackgroundColorForAlphaFade();
-		bufferVector.push_back(BufferInfo());
-		lines.Build(BuildBorderPoints(), bufferVector.back(),
+		mLines.SetWidth(mBorderSize);
+		mLines.SetLineColor(mBorderColor);
+		mLines.SetBackgroundColorForAlphaFade();
+		mBufferVector.push_back(BufferInfo());
+		mLines.Build(BuildBorderPoints(), mBufferVector.back(),
 			Line::UpdateMethod::Manual);
 
 		BuildSampleLines();
 		BuildMarkers();
 
-		bufferInfo[i] = AssembleBuffers();
+		mBufferInfo[i] = AssembleBuffers();
 	}
 	else if (i == 1)// Text
 	{
-		text.SetColor(fontColor);
+		mText.SetColor(mFontColor);
 		BuildLabelStrings();
-		bufferInfo[i] = text.BuildText();
+		mBufferInfo[i] = mText.BuildText();
 	}
 
-	bufferInfo[i].vertexCountModified = false;
+	mBufferInfo[i].vertexCountModified = false;
 }
 
 //=============================================================================
@@ -148,22 +135,22 @@ void Legend::Update(const unsigned int& i)
 //=============================================================================
 void Legend::GenerateGeometry()
 {
-	// Background, border, lines and markers first
+	// Background, border, mLines and markers first
 	// We can use the Line::DoPrettyDraw to render the background and markers
-	// even though they aren't lines because DoPrettyDraw renders triangle
+	// even though they aren't mLines because DoPrettyDraw renders triangle
 	// elements.  We only need to ensure that the additional triangles are
 	// intended to be built as elements of the index array.
-	if (bufferInfo[0].vertexCount > 0)
+	if (mBufferInfo[0].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
-		Line::DoPrettyDraw(bufferInfo[0].indexBuffer.size());
+		glBindVertexArray(mBufferInfo[0].GetVertexArrayIndex());
+		Line::DoPrettyDraw(mBufferInfo[0].indexBuffer.size());
 	}
 
 	// Text last
-	if (text.IsOK() && bufferInfo[1].vertexCount > 0)
+	if (mText.IsOK() && mBufferInfo[1].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[1].GetVertexArrayIndex());
-		text.RenderBufferedGlyph(bufferInfo[1].vertexCount);
+		glBindVertexArray(mBufferInfo[1].GetVertexArrayIndex());
+		mText.RenderBufferedGlyph(mBufferInfo[1].vertexCount);
 	}
 }
 
@@ -186,7 +173,7 @@ void Legend::GenerateGeometry()
 //=============================================================================
 bool Legend::HasValidParameters()
 {
-	if (entries.size() == 0)
+	if (mEntries.size() == 0)
 		return false;
 		
 	return true;
@@ -215,9 +202,9 @@ std::vector<std::pair<double, double>> Legend::GetCornerVertices() const
 
 	std::vector<std::pair<double, double>> points;
 	points.push_back(std::make_pair(x, y));
-	points.push_back(std::make_pair(x + width, y));
-	points.push_back(std::make_pair(x + width, y + height));
-	points.push_back(std::make_pair(x, y + height));
+	points.push_back(std::make_pair(x + mWidth, y));
+	points.push_back(std::make_pair(x + mWidth, y + mHeight));
+	points.push_back(std::make_pair(x, y + mHeight));
 	points.push_back(std::make_pair(x, y));
 
 	return points;
@@ -227,7 +214,7 @@ std::vector<std::pair<double, double>> Legend::GetCornerVertices() const
 // Class:			Legend
 // Function:		UpdateBoundingBox
 //
-// Description:		Updates the bounding box height and width variables.
+// Description:		Updates the bounding box mHeight and mWidth variables.
 //
 // Input Arguments:
 //		None
@@ -243,15 +230,15 @@ void Legend::UpdateBoundingBox()
 {
 	Text::BoundingBox boundingBox;
 	unsigned int maxStringWidth(0);
-	for (const auto& entry : entries)
+	for (const auto& entry : mEntries)
 	{
-		boundingBox = text.GetBoundingBox(entry.text.ToStdString());
+		boundingBox = mText.GetBoundingBox(entry.text.ToStdString());
 		if (boundingBox.xRight > (int)maxStringWidth)
 			maxStringWidth = boundingBox.xRight;
 	}
 	
-	width = 3 * entrySpacing + sampleLength + maxStringWidth;
-	height = (textHeight + entrySpacing) * entries.size() + entrySpacing;
+	mWidth = 3 * mEntrySpacing + mSampleLength + maxStringWidth;
+	mHeight = (mTextHeight + mEntrySpacing) * mEntries.size() + mEntrySpacing;
 }
 
 //=============================================================================
@@ -273,18 +260,18 @@ void Legend::UpdateBoundingBox()
 //=============================================================================
 void Legend::SetFont(const std::string& fontFileName, const double& size)
 {
-	if (!text.SetFace(fontFileName))
+	if (!mText.SetFace(fontFileName))
 		return;
 
-	text.SetColor(fontColor);
+	mText.SetColor(mFontColor);
 
 	// For some reason, fonts tend to render more clearly at a larger size.  So
 	// we up-scale to render the fonts then down-scale to achieve the desired
 	// on-screen size.
 	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
 	const double factor(3.0);
-	text.SetSize(size * factor);
-	text.SetScale(1.0 / factor);
+	mText.SetSize(size * factor);
+	mText.SetScale(1.0 / factor);
 }
 
 //=============================================================================
@@ -306,14 +293,14 @@ void Legend::SetFont(const std::string& fontFileName, const double& size)
 //=============================================================================
 bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 {
-	if (!isVisible)
+	if (!mIsVisible)
 		return false;
 
 	double adjX, adjY;
 	GetAdjustedPosition(adjX, adjY);
 
-	if (adjX <= x && adjX + width >= x &&
-		adjY <= y && adjY + height >= y)
+	if (adjX <= x && adjX + mWidth >= x &&
+		adjY <= y && adjY + mHeight >= y)
 		return true;
 
 	return false;
@@ -340,54 +327,54 @@ bool Legend::IsUnder(const unsigned int &x, const unsigned int &y) const
 //=============================================================================
 void Legend::GetAdjustedPosition(double &x, double &y) const
 {
-	switch (windowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
 	case PositionReference::MiddleLeft:
 	case PositionReference::TopLeft:
-		x = this->x;
+		x = mX;
 		break;
 
 	case PositionReference::BottomCenter:
 	case PositionReference::Center:
 	case PositionReference::TopCenter:
-		x = renderWindow.GetSize().GetWidth() * 0.5 + this->x;
+		x = mRenderWindow.GetSize().GetWidth() * 0.5 + mX;
 		break;
 
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		x = renderWindow.GetSize().GetWidth() - this->x;
+		x = mRenderWindow.GetSize().GetWidth() - mX;
 		break;
 	}
 
-	switch (windowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
 	case PositionReference::BottomCenter:
 	case PositionReference::BottomRight:
-		y = this->y;
+		y = mY;
 		break;
 
 	case PositionReference::MiddleLeft:
 	case PositionReference::Center:
 	case PositionReference::MiddleRight:
-		y = renderWindow.GetSize().GetHeight() * 0.5 + this->y;
+		y = mRenderWindow.GetSize().GetHeight() * 0.5 + mY;
 		break;
 
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		y = renderWindow.GetSize().GetHeight() - this->y;
+		y = mRenderWindow.GetSize().GetHeight() - mY;
 		break;
 	}
 
 	// At this point, x and y represent the legendRef corner of the
 	// legend w.r.t. the lower LH window corner of the render window
 
-	switch (legendRef)
+	switch (mLegendRef)
 	{
 	case PositionReference::BottomLeft:
 	case PositionReference::MiddleLeft:
@@ -398,17 +385,17 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 	case PositionReference::BottomCenter:
 	case PositionReference::Center:
 	case PositionReference::TopCenter:
-		x -= width * 0.5;
+		x -= mWidth * 0.5;
 		break;
 
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		x -= width;
+		x -= mWidth;
 		break;
 	}
 
-	switch (legendRef)
+	switch (mLegendRef)
 	{
 	case PositionReference::BottomLeft:
 	case PositionReference::BottomCenter:
@@ -419,13 +406,13 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 	case PositionReference::MiddleLeft:
 	case PositionReference::Center:
 	case PositionReference::MiddleRight:
-		y -= height * 0.5;
+		y -= mHeight * 0.5;
 		break;
 
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		y -= height;
+		y -= mHeight;
 		break;
 	}
 }
@@ -449,7 +436,7 @@ void Legend::GetAdjustedPosition(double &x, double &y) const
 //=============================================================================
 void Legend::SetDeltaPosition(const double &x, const double &y)
 {
-	switch (windowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -458,17 +445,17 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 	case PositionReference::BottomCenter:
 	case PositionReference::Center:
 	case PositionReference::TopCenter:
-		this->x += x;
+		mX += x;
 		break;
 
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		this->x -= x;
+		mX -= x;
 		break;
 	}
 
-	switch (windowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -477,13 +464,13 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 	case PositionReference::MiddleLeft:
 	case PositionReference::Center:
 	case PositionReference::MiddleRight:
-		this->y += y;
+		mY += y;
 		break;
 
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		this->y -= y;
+		mY -= y;
 		break;
 	}
 	
@@ -498,7 +485,7 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 //
 // Input Arguments:
 //		legendRef	= const PositionReference&
-//		windowRef	= const PositionReference&
+//		mWindowRef	= const PositionReference&
 //
 // Output Arguments:
 //		None
@@ -507,10 +494,10 @@ void Legend::SetDeltaPosition(const double &x, const double &y)
 //		double
 //
 //=============================================================================
-double Legend::GetXPos(const PositionReference& legendRef, const PositionReference& windowRef) const
+double Legend::GetXPos(const PositionReference& legendRef, const PositionReference& mWindowRef) const
 {
 	double x, y;
-	GetPosition(legendRef, windowRef, x, y);
+	GetPosition(legendRef, mWindowRef, x, y);
 	return x;
 }
 
@@ -522,7 +509,7 @@ double Legend::GetXPos(const PositionReference& legendRef, const PositionReferen
 //
 // Input Arguments:
 //		ref	= const PositionReference&
-//		windowRef	= const PositionReference&
+//		mWindowRef	= const PositionReference&
 //
 // Output Arguments:
 //		None
@@ -531,10 +518,10 @@ double Legend::GetXPos(const PositionReference& legendRef, const PositionReferen
 //		double
 //
 //=============================================================================
-double Legend::GetYPos(const PositionReference& legendRef, const PositionReference& windowRef) const
+double Legend::GetYPos(const PositionReference& legendRef, const PositionReference& mWindowRef) const
 {
 	double x, y;
-	GetPosition(legendRef, windowRef, x, y);
+	GetPosition(legendRef, mWindowRef, x, y);
 	return y;
 }
 
@@ -544,11 +531,11 @@ double Legend::GetYPos(const PositionReference& legendRef, const PositionReferen
 //
 // Description:		Gets the position w.r.t. the specified references.  Read
 //					this as position of specified legendRef w.r.t. specified
-//					windowRef.
+//					mWindowRef.
 //
 // Input Arguments:
 //		legendRef	= const PositionReference&
-//		windowRef	= const PositionReference&
+//		mWindowRef	= const PositionReference&
 //
 // Output Arguments:
 //		x			= double&
@@ -559,59 +546,59 @@ double Legend::GetYPos(const PositionReference& legendRef, const PositionReferen
 //
 //=============================================================================
 void Legend::GetPosition(const PositionReference& legendRef,
-	const PositionReference& windowRef, double &x, double &y) const
+	const PositionReference& mWindowRef, double &x, double &y) const
 {
-	// Internally, x and y are location of legendRef w.r.t. windowRef, so first
+	// Internally, x and y are location of legendRef w.r.t. mWindowRef, so first
 	// we need to back out to a common reference, then apply the specified references
 
-	switch (this->windowRef)
+	switch (this->mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
 	case PositionReference::MiddleLeft:
 	case PositionReference::TopLeft:
-		x = this->x;
+		x = mX;
 		break;
 
 	case PositionReference::BottomCenter:
 	case PositionReference::Center:
 	case PositionReference::TopCenter:
-		x = renderWindow.GetSize().GetWidth() * 0.5 + this->x;
+		x = mRenderWindow.GetSize().GetWidth() * 0.5 + mX;
 		break;
 
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		x = renderWindow.GetSize().GetWidth() - this->x;
+		x = mRenderWindow.GetSize().GetWidth() - mX;
 		break;
 	}
 
-	switch (this->windowRef)
+	switch (this->mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
 	case PositionReference::BottomCenter:
 	case PositionReference::BottomRight:
-		y = this->y;
+		y = mY;
 		break;
 
 	case PositionReference::MiddleLeft:
 	case PositionReference::Center:
 	case PositionReference::MiddleRight:
-		y = renderWindow.GetSize().GetHeight() * 0.5 + this->y;
+		y = mRenderWindow.GetSize().GetHeight() * 0.5 + mY;
 		break;
 
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		y = renderWindow.GetSize().GetHeight() - this->y;
+		y = mRenderWindow.GetSize().GetHeight() - mY;
 		break;
 	}
 
 	// At this point, x and y represent the legendRef corner (class value, not argument) of the
 	// legend w.r.t. the lower LH window corner of the render window
 
-	switch (this->legendRef)
+	switch (mLegendRef)
 	{
 	case PositionReference::BottomLeft:
 	case PositionReference::MiddleLeft:
@@ -622,17 +609,17 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::BottomCenter:
 	case PositionReference::Center:
 	case PositionReference::TopCenter:
-		x -= width * 0.5;
+		x -= mWidth * 0.5;
 		break;
 
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		x -= width;
+		x -= mWidth;
 		break;
 	}
 
-	switch (this->legendRef)
+	switch (mLegendRef)
 	{
 	case PositionReference::BottomLeft:
 	case PositionReference::BottomCenter:
@@ -643,20 +630,20 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::MiddleLeft:
 	case PositionReference::Center:
 	case PositionReference::MiddleRight:
-		y -= height * 0.5;
+		y -= mHeight * 0.5;
 		break;
 
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		y -= height;
+		y -= mHeight;
 		break;
 	}
 
 	// At this point, x and y represent the lower left-hand corner of the
 	// legend w.r.t. the lower LH window corner of the render window
 
-	switch (windowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -667,17 +654,17 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::BottomCenter:
 	case PositionReference::Center:
 	case PositionReference::TopCenter:
-		x -= renderWindow.GetSize().GetWidth() * 0.5;
+		x -= mRenderWindow.GetSize().GetWidth() * 0.5;
 		break;
 
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		x = renderWindow.GetSize().GetWidth() - x;
+		x = mRenderWindow.GetSize().GetWidth() - x;
 		break;
 	}
 
-	switch (windowRef)
+	switch (mWindowRef)
 	{
 	default:
 	case PositionReference::BottomLeft:
@@ -688,18 +675,18 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::MiddleLeft:
 	case PositionReference::Center:
 	case PositionReference::MiddleRight:
-		y -= renderWindow.GetSize().GetHeight() * 0.5;
+		y -= mRenderWindow.GetSize().GetHeight() * 0.5;
 		break;
 
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		y = renderWindow.GetSize().GetHeight() - y;
+		y = mRenderWindow.GetSize().GetHeight() - y;
 		break;
 	}
 
 	// At this point, x and y represent the lower left-hand corner of the
-	// legend w.r.t. the specified windowRef
+	// legend w.r.t. the specified mWindowRef
 
 	switch (legendRef)
 	{
@@ -712,18 +699,18 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::BottomCenter:
 	case PositionReference::Center:
 	case PositionReference::TopCenter:
-		x += width * 0.5;
+		x += mWidth * 0.5;
 		break;
 
 	case PositionReference::BottomRight:
 	case PositionReference::MiddleRight:
 	case PositionReference::TopRight:
-		if (windowRef == PositionReference::BottomRight ||
-			windowRef == PositionReference::MiddleRight ||
-			windowRef == PositionReference::TopRight)
-			x -= width;
+		if (mWindowRef == PositionReference::BottomRight ||
+			mWindowRef == PositionReference::MiddleRight ||
+			mWindowRef == PositionReference::TopRight)
+			x -= mWidth;
 		else
-			x += width;
+			x += mWidth;
 		break;
 	}
 
@@ -738,18 +725,18 @@ void Legend::GetPosition(const PositionReference& legendRef,
 	case PositionReference::MiddleLeft:
 	case PositionReference::Center:
 	case PositionReference::MiddleRight:
-		y += height * 0.5;
+		y += mHeight * 0.5;
 		break;
 
 	case PositionReference::TopLeft:
 	case PositionReference::TopCenter:
 	case PositionReference::TopRight:
-		if (windowRef == PositionReference::TopLeft ||
-			windowRef == PositionReference::TopCenter ||
-			windowRef == PositionReference::TopRight)
-			y -= height;
+		if (mWindowRef == PositionReference::TopLeft ||
+			mWindowRef == PositionReference::TopCenter ||
+			mWindowRef == PositionReference::TopRight)
+			y -= mHeight;
 		else
-			y += height;
+			y += mHeight;
 		break;
 	}
 }
@@ -799,43 +786,43 @@ Primitive::BufferInfo Legend::BuildBackground() const
 	Primitive::BufferInfo buffer;
 
 	buffer.vertexCount = 4;
-	buffer.vertexBuffer.resize(buffer.vertexCount * (4 + renderWindow.GetVertexDimension()));
-	assert(renderWindow.GetVertexDimension() == 2);
+	buffer.vertexBuffer.resize(buffer.vertexCount * (4 + mRenderWindow.GetVertexDimension()));
+	assert(mRenderWindow.GetVertexDimension() == 2);
 
 	buffer.indexBuffer.resize(6);
 
 	std::vector<std::pair<double, double>> corners(GetCornerVertices());
-	buffer.vertexBuffer[0] = (float)corners[0].first;
-	buffer.vertexBuffer[1] = (float)corners[0].second;
+	buffer.vertexBuffer[0] = static_cast<float>(corners[0].first);
+	buffer.vertexBuffer[1] = static_cast<float>(corners[0].second);
 
-	buffer.vertexBuffer[2] = (float)corners[1].first;
-	buffer.vertexBuffer[3] = (float)corners[1].second;
+	buffer.vertexBuffer[2] = static_cast<float>(corners[1].first);
+	buffer.vertexBuffer[3] = static_cast<float>(corners[1].second);
 
-	buffer.vertexBuffer[4] = (float)corners[2].first;
-	buffer.vertexBuffer[5] = (float)corners[2].second;
+	buffer.vertexBuffer[4] = static_cast<float>(corners[2].first);
+	buffer.vertexBuffer[5] = static_cast<float>(corners[2].second);
 
-	buffer.vertexBuffer[6] = (float)corners[3].first;
-	buffer.vertexBuffer[7] = (float)corners[3].second;
+	buffer.vertexBuffer[6] = static_cast<float>(corners[3].first);
+	buffer.vertexBuffer[7] = static_cast<float>(corners[3].second);
 
-	buffer.vertexBuffer[8] = (float)backgroundColor.GetRed();
-	buffer.vertexBuffer[9] = (float)backgroundColor.GetGreen();
-	buffer.vertexBuffer[10] = (float)backgroundColor.GetBlue();
-	buffer.vertexBuffer[11] = (float)backgroundColor.GetAlpha();
+	buffer.vertexBuffer[8] = static_cast<float>(mBackgroundColor.GetRed());
+	buffer.vertexBuffer[9] = static_cast<float>(mBackgroundColor.GetGreen());
+	buffer.vertexBuffer[10] = static_cast<float>(mBackgroundColor.GetBlue());
+	buffer.vertexBuffer[11] = static_cast<float>(mBackgroundColor.GetAlpha());
 
-	buffer.vertexBuffer[12] = (float)backgroundColor.GetRed();
-	buffer.vertexBuffer[13] = (float)backgroundColor.GetGreen();
-	buffer.vertexBuffer[14] = (float)backgroundColor.GetBlue();
-	buffer.vertexBuffer[15] = (float)backgroundColor.GetAlpha();
+	buffer.vertexBuffer[12] = static_cast<float>(mBackgroundColor.GetRed());
+	buffer.vertexBuffer[13] = static_cast<float>(mBackgroundColor.GetGreen());
+	buffer.vertexBuffer[14] = static_cast<float>(mBackgroundColor.GetBlue());
+	buffer.vertexBuffer[15] = static_cast<float>(mBackgroundColor.GetAlpha());
 
-	buffer.vertexBuffer[16] = (float)backgroundColor.GetRed();
-	buffer.vertexBuffer[17] = (float)backgroundColor.GetGreen();
-	buffer.vertexBuffer[18] = (float)backgroundColor.GetBlue();
-	buffer.vertexBuffer[19] = (float)backgroundColor.GetAlpha();
+	buffer.vertexBuffer[16] = static_cast<float>(mBackgroundColor.GetRed());
+	buffer.vertexBuffer[17] = static_cast<float>(mBackgroundColor.GetGreen());
+	buffer.vertexBuffer[18] = static_cast<float>(mBackgroundColor.GetBlue());
+	buffer.vertexBuffer[19] = static_cast<float>(mBackgroundColor.GetAlpha());
 
-	buffer.vertexBuffer[20] = (float)backgroundColor.GetRed();
-	buffer.vertexBuffer[21] = (float)backgroundColor.GetGreen();
-	buffer.vertexBuffer[22] = (float)backgroundColor.GetBlue();
-	buffer.vertexBuffer[23] = (float)backgroundColor.GetAlpha();
+	buffer.vertexBuffer[20] = static_cast<float>(mBackgroundColor.GetRed());
+	buffer.vertexBuffer[21] = static_cast<float>(mBackgroundColor.GetGreen());
+	buffer.vertexBuffer[22] = static_cast<float>(mBackgroundColor.GetBlue());
+	buffer.vertexBuffer[23] = static_cast<float>(mBackgroundColor.GetAlpha());
 
 	buffer.indexBuffer[0] = 0;
 	buffer.indexBuffer[1] = 1;
@@ -866,27 +853,27 @@ Primitive::BufferInfo Legend::BuildBackground() const
 //=============================================================================
 void Legend::BuildMarkers()
 {
-	const unsigned int lineYOffset(entrySpacing);
+	const unsigned int lineYOffset(mEntrySpacing);
 
 	Primitive::BufferInfo buffer;
 
 	double x, y;
 	GetAdjustedPosition(x, y);
 
-	x += entrySpacing + 0.5 * sampleLength;
-	y += height + lineYOffset;
+	x += mEntrySpacing + 0.5 * mSampleLength;
+	y += mHeight + lineYOffset;
 
-	for (const auto& entry : entries)
+	for (const auto& entry : mEntries)
 	{
 		double halfSize(entry.markerSize * 2.0);// This relationship comes from PlotCurve class
-		y -= entrySpacing + textHeight;
+		y -= mEntrySpacing + mTextHeight;
 
 		if (halfSize <= 0.0)
 			continue;
 
 		buffer.vertexCount = 4;
-		buffer.vertexBuffer.resize(buffer.vertexCount * (renderWindow.GetVertexDimension() + 4));
-		assert(renderWindow.GetVertexDimension() == 2);
+		buffer.vertexBuffer.resize(buffer.vertexCount * (mRenderWindow.GetVertexDimension() + 4));
+		assert(mRenderWindow.GetVertexDimension() == 2);
 
 		buffer.indexBuffer.resize(6);
 
@@ -930,7 +917,7 @@ void Legend::BuildMarkers()
 		buffer.indexBuffer[4] = 3;
 		buffer.indexBuffer[5] = 0;
 
-		bufferVector.push_back(std::move(buffer));
+		mBufferVector.push_back(std::move(buffer));
 	}
 }
 
@@ -955,7 +942,7 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 {
 	Primitive::BufferInfo buffer;
 
-	for (const auto& b : bufferVector)
+	for (const auto& b : mBufferVector)
 	{
 		buffer.indexBuffer.insert(buffer.indexBuffer.end(),
 			b.indexBuffer.begin(), b.indexBuffer.end());
@@ -965,13 +952,13 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 	}
 
 	const unsigned int colorStart(
-		buffer.vertexCount * renderWindow.GetVertexDimension());
+		buffer.vertexCount * mRenderWindow.GetVertexDimension());
 
 	unsigned int j, k(0), m(0), indexShift(0);
-	for (auto& b : bufferVector)
+	for (auto& b : mBufferVector)
 	{
 		unsigned int bufferColorStart(
-			b.vertexCount * renderWindow.GetVertexDimension());
+			b.vertexCount * mRenderWindow.GetVertexDimension());
 
 		for (j = 0; j < b.vertexCount; ++j)
 		{
@@ -994,7 +981,7 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 	}
 
 	ConfigureVertexArray(buffer);
-	bufferVector.clear();
+	mBufferVector.clear();
 
 	return buffer;
 }
@@ -1003,7 +990,7 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 // Class:			Legend
 // Function:		BuildSampleLines
 //
-// Description:		Appends lines corresponding to the legend entries to the
+// Description:		Appends mLines corresponding to the legend mEntries to the
 //					buffer vector.
 //
 // Input Arguments:
@@ -1018,24 +1005,24 @@ Primitive::BufferInfo Legend::AssembleBuffers()
 //=============================================================================
 void Legend::BuildSampleLines()
 {
-	const unsigned int lineYOffset(entrySpacing);
+	const unsigned int lineYOffset(mEntrySpacing);
 
 	double x, y;
 	GetAdjustedPosition(x, y);
 
-	y += height + lineYOffset;
+	y += mHeight + lineYOffset;
 
-	for (const auto& entry : entries)
+	for (const auto& entry : mEntries)
 	{
-		lines.SetLineColor(entry.color);
-		lines.SetBackgroundColorForAlphaFade();
-		lines.SetWidth(entry.lineSize);
+		mLines.SetLineColor(entry.color);
+		mLines.SetBackgroundColorForAlphaFade();
+		mLines.SetWidth(entry.lineSize);
 
-		y -= entrySpacing + textHeight;
+		y -= mEntrySpacing + mTextHeight;
 
-		bufferVector.push_back(BufferInfo());
-		lines.Build(x + entrySpacing, y, x + entrySpacing + sampleLength,
-			y, bufferVector.back(), Line::UpdateMethod::Manual);
+		mBufferVector.push_back(BufferInfo());
+		mLines.Build(x + mEntrySpacing, y, x + mEntrySpacing + mSampleLength,
+			y, mBufferVector.back(), Line::UpdateMethod::Manual);
 	}
 }
 
@@ -1046,7 +1033,7 @@ void Legend::BuildSampleLines()
 // Description:		Handles configuration of OpenGL vertex array object.
 //
 // Input Arguments:
-//		bufferInfo	= Primitive::BufferInfo&
+//		mBufferInfo	= Primitive::BufferInfo&
 //
 // Output Arguments:
 //		None
@@ -1055,27 +1042,27 @@ void Legend::BuildSampleLines()
 //		Primitive::BufferInfo
 //
 //=============================================================================
-void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
+void Legend::ConfigureVertexArray(Primitive::BufferInfo& mBufferInfo) const
 {
-	bufferInfo.GetOpenGLIndices(true);
-	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
+	mBufferInfo.GetOpenGLIndices(true);
+	glBindVertexArray(mBufferInfo.GetVertexArrayIndex());
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
+	glBindBuffer(GL_ARRAY_BUFFER, mBufferInfo.GetVertexBufferIndex());
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (renderWindow.GetVertexDimension() + 4),
-		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
+		sizeof(GLfloat) * mBufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+		mBufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
-	glEnableVertexAttribArray(renderWindow.GetPositionLocation());
-	glVertexAttribPointer(renderWindow.GetPositionLocation(),
-		renderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetPositionLocation(),
+		mRenderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(renderWindow.GetColorLocation());
-	glVertexAttribPointer(renderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
-		(void*)(sizeof(GLfloat) * bufferInfo.vertexCount * renderWindow.GetVertexDimension()));
+	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		(void*)(sizeof(GLfloat) * mBufferInfo.vertexCount * mRenderWindow.GetVertexDimension()));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * bufferInfo.indexBuffer.size(),
-		bufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferInfo.GetIndexBufferIndex());
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mBufferInfo.indexBuffer.size(),
+		mBufferInfo.indexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
 }
@@ -1100,13 +1087,13 @@ void Legend::BuildLabelStrings()
 {
 	double x, y;
 	GetAdjustedPosition(x, y);
-	y += height;
+	y += mHeight;
 	
-	for (const auto& entry : entries)
+	for (const auto& entry : mEntries)
 	{
-		y -= entrySpacing + textHeight;
-		text.SetPosition(x + 2 * entrySpacing + sampleLength, y);
-		text.AppendText(entry.text.ToStdString());
+		y -= mEntrySpacing + mTextHeight;
+		mText.SetPosition(x + 2 * mEntrySpacing + mSampleLength, y);
+		mText.AppendText(entry.text.ToStdString());
 	}
 }
 
@@ -1129,7 +1116,7 @@ void Legend::BuildLabelStrings()
 void Legend::RequiresRedraw()
 {
 	mModified = true;
-	for (auto& buffer : bufferInfo)
+	for (auto& buffer : mBufferInfo)
 		buffer.vertexCountModified = true;
 }
 

@@ -37,14 +37,14 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
+Primitive::Primitive(RenderWindow &renderWindow) : mRenderWindow(renderWindow)
 {
-	renderWindow.AddActor(std::unique_ptr<Primitive>(this));
-	renderWindow.SetNeedAlphaSort();
-	renderWindow.SetNeedOrderSort();
+	mRenderWindow.AddActor(std::unique_ptr<Primitive>(this));
+	mRenderWindow.SetNeedAlphaSort();
+	mRenderWindow.SetNeedOrderSort();
 
 	// Add a default info block to ensure the initialize and update functions get called
-	bufferInfo.push_back(BufferInfo());
+	mBufferInfo.push_back(BufferInfo());
 }
 
 //=============================================================================
@@ -63,7 +63,7 @@ Primitive::Primitive(RenderWindow &renderWindow) : renderWindow(renderWindow)
 //		None
 //
 //=============================================================================
-Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.renderWindow)
+Primitive::Primitive(const Primitive &primitive) : mRenderWindow(primitive.mRenderWindow)
 {
 	*this = primitive;
 }
@@ -84,7 +84,7 @@ Primitive::Primitive(const Primitive &primitive) : renderWindow(primitive.render
 //		None
 //
 //=============================================================================
-Primitive::Primitive(Primitive&& primitive) : renderWindow(primitive.renderWindow)
+Primitive::Primitive(Primitive&& primitive) : mRenderWindow(primitive.mRenderWindow)
 {
 	*this = std::move(primitive);
 }
@@ -107,8 +107,8 @@ Primitive::Primitive(Primitive&& primitive) : renderWindow(primitive.renderWindo
 //=============================================================================
 Primitive::~Primitive()
 {
-	renderWindow.SetNeedAlphaSort();
-	renderWindow.SetNeedOrderSort();
+	mRenderWindow.SetNeedAlphaSort();
+	mRenderWindow.SetNeedOrderSort();
 }
 
 //=============================================================================
@@ -131,13 +131,13 @@ Primitive::~Primitive()
 //=============================================================================
 void Primitive::Draw()
 {
-	if (!HasValidParameters() || !isVisible)
+	if (!HasValidParameters() || !mIsVisible)
 		return;
 
 	unsigned int i;
-	for (i = 0; i < bufferInfo.size(); ++i)
+	for (i = 0; i < mBufferInfo.size(); ++i)
 	{
-		if (bufferInfo[i].vertexCountModified || mModified)
+		if (mBufferInfo[i].vertexCountModified || mModified)
 			Update(i);
 	}
 
@@ -167,7 +167,7 @@ void Primitive::Draw()
 //=============================================================================
 void Primitive::SetVisibility(const bool &isVisible)
 {
-	this->isVisible = isVisible;
+	mIsVisible = isVisible;
 	mModified = true;
 }
 
@@ -189,8 +189,8 @@ void Primitive::SetVisibility(const bool &isVisible)
 //=============================================================================
 void Primitive::SetColor(const Color &color)
 {
-	this->color = color;
-	renderWindow.SetNeedAlphaSort();
+	mColor = color;
+	mRenderWindow.SetNeedAlphaSort();
 	mModified = true;
 }
 
@@ -212,8 +212,8 @@ void Primitive::SetColor(const Color &color)
 //=============================================================================
 void Primitive::SetDrawOrder(const unsigned int& drawOrder)
 {
-	this->drawOrder = drawOrder;
-	renderWindow.SetNeedOrderSort();
+	mDrawOrder = drawOrder;
+	mRenderWindow.SetNeedOrderSort();
 }
 
 //=============================================================================
@@ -239,13 +239,13 @@ Primitive& Primitive::operator=(const Primitive &primitive)
 		return *this;
 
 	// Perform the assignment
-	isVisible	= primitive.isVisible;
-	color		= primitive.color;
+	mIsVisible	= primitive.mIsVisible;
+	mColor		= primitive.mColor;
 	mModified	= true;
-	drawOrder	= primitive.drawOrder;
+	mDrawOrder	= primitive.mDrawOrder;
 
-	renderWindow.SetNeedAlphaSort();
-	renderWindow.SetNeedOrderSort();
+	mRenderWindow.SetNeedAlphaSort();
+	mRenderWindow.SetNeedOrderSort();
 
 	return *this;
 }
@@ -273,14 +273,14 @@ Primitive& Primitive::operator=(Primitive &&primitive)
 		return *this;
 
 	// Perform the assignment
-	isVisible	= std::move(primitive.isVisible);
-	color		= std::move(primitive.color);
+	mIsVisible	= std::move(primitive.mIsVisible);
+	mColor		= std::move(primitive.mColor);
 	mModified	= true;
-	drawOrder	= std::move(primitive.drawOrder);
-	bufferInfo	= std::move(primitive.bufferInfo);
+	mDrawOrder	= std::move(primitive.mDrawOrder);
+	mBufferInfo	= std::move(primitive.mBufferInfo);
 
-	renderWindow.SetNeedAlphaSort();
-	renderWindow.SetNeedOrderSort();
+	mRenderWindow.SetNeedAlphaSort();
+	mRenderWindow.SetNeedOrderSort();
 
 	return *this;
 }

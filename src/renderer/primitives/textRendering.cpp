@@ -39,17 +39,10 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindow),
-	font(renderWindow)
+TextRendering::TextRendering(RenderWindow &renderWindow)
+	: Primitive(renderWindow), mFont(renderWindow)
 {
-	color.Set(0.0, 0.0, 0.0, 1.0);
-
-	angle = 0.0;
-	x = 0;
-	y = 0;
-	text = wxEmptyString;
-
-	centered = false;
+	mColor.Set(0.0, 0.0, 0.0, 1.0);
 }
 
 //=============================================================================
@@ -70,20 +63,22 @@ TextRendering::TextRendering(RenderWindow &renderWindow) : Primitive(renderWindo
 //=============================================================================
 void TextRendering::Update(const unsigned int& /*i*/)
 {
-	font.SetColor(color);
-	font.SetOrientation(angle);
-	font.SetText(text.ToStdString());
+	mFont.SetColor(mColor);
+	mFont.SetOrientation(mAngle);
+	mFont.SetText(mText.ToStdString());
 
-	if (centered)
+	if (mCentered)
 	{
 		// TODO:  Is this correct?
-		font.SetPosition(x - GetTextWidth() * 0.5 * cos(angle) + GetTextHeight() * 0.5 * sin(angle),
-			y - GetTextWidth() * 0.5 * sin(angle) - GetTextHeight() * 0.5 * cos(angle));
+		mFont.SetPosition(mX - GetTextWidth() * 0.5 * cos(mAngle)
+			+ GetTextHeight() * 0.5 * sin(mAngle),
+			mY - GetTextWidth() * 0.5 * sin(mAngle)
+			- GetTextHeight() * 0.5 * cos(mAngle));
 	}
 	else
-		font.SetPosition(x, y);
+		mFont.SetPosition(mX, mY);
 
-	bufferInfo[0] = font.BuildText();
+	mBufferInfo[0] = mFont.BuildText();
 }
 
 //=============================================================================
@@ -105,10 +100,10 @@ void TextRendering::Update(const unsigned int& /*i*/)
 //=============================================================================
 void TextRendering::GenerateGeometry()
 {
-	if (font.IsOK() && bufferInfo[0].vertexCount > 0)
+	if (mFont.IsOK() && mBufferInfo[0].vertexCount > 0)
 	{
-		glBindVertexArray(bufferInfo[0].GetVertexArrayIndex());
-		font.RenderBufferedGlyph(bufferInfo[0].vertexCount);
+		glBindVertexArray(mBufferInfo[0].GetVertexArrayIndex());
+		mFont.RenderBufferedGlyph(mBufferInfo[0].vertexCount);
 	}
 }
 
@@ -132,10 +127,10 @@ void TextRendering::GenerateGeometry()
 bool TextRendering::HasValidParameters()
 {
 	// Don't draw if the angle is not a number
-	if (PlotMath::IsNaN(angle))
+	if (PlotMath::IsNaN(mAngle))
 		return false;
 
-	if (!font.IsOK() || !text.IsEmpty())
+	if (!mFont.IsOK() || !mText.IsEmpty())
 		return false;
 
 	return true;
@@ -160,10 +155,10 @@ bool TextRendering::HasValidParameters()
 //=============================================================================
 double TextRendering::GetTextHeight()
 {
-	if (!font.IsOK())
+	if (!mFont.IsOK())
 		return 0.0;
 
-	Text::BoundingBox boundingBox(font.GetBoundingBox(text.ToStdString()));
+	Text::BoundingBox boundingBox(mFont.GetBoundingBox(mText.ToStdString()));
 
 	return boundingBox.yUp - boundingBox.yDown;
 }
@@ -187,10 +182,10 @@ double TextRendering::GetTextHeight()
 //=============================================================================
 double TextRendering::GetTextWidth()
 {
-	if (!font.IsOK())
+	if (!mFont.IsOK())
 		return 0.0;
 
-	Text::BoundingBox boundingBox(font.GetBoundingBox(text.ToStdString()));
+	Text::BoundingBox boundingBox(mFont.GetBoundingBox(mText.ToStdString()));
 
 	return boundingBox.xRight - boundingBox.xLeft;
 }
@@ -213,18 +208,18 @@ double TextRendering::GetTextWidth()
 //=============================================================================
 void TextRendering::InitializeFonts(const std::string& fontFileName, const double& size)
 {
-	if (!font.SetFace(fontFileName))
+	if (!mFont.SetFace(fontFileName))
 		return;
 
-	font.SetColor(color);
+	mFont.SetColor(mColor);
 
 	// For some reason, fonts tend to render more clearly at a larger size.  So
 	// we up-scale to render the fonts then down-scale to achieve the desired
 	// on-screen size.
 	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
 	const double factor(3.0);
-	font.SetSize(size * factor);
-	font.SetScale(1.0 / factor);
+	mFont.SetSize(size * factor);
+	mFont.SetScale(1.0 / factor);
 }
 
 }// namespace LibPlot2D
