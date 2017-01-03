@@ -148,9 +148,9 @@ void PlotCurve::Update(const unsigned int& i)
 			std::vector<double> yLogData;
 			const std::vector<double>& xRef([this, &xLogData]()
 			{
-				if (this->mXAxis->IsLogarithmic())
+				if (mXAxis->IsLogarithmic())
 				{
-					xLogData = std::move(DoLogarithmicScale(this->mData.GetX()));
+					xLogData = std::move(DoLogarithmicScale(mData.GetX()));
 					return xLogData;
 				}
 				else

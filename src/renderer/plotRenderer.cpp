@@ -435,7 +435,7 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnRightButtonUpEvent
 //
-// Description:		Handles end of mZoom-by-box events.
+// Description:		Handles end of zoom-by-box events.
 //
 // Input Arguments:
 //		event	= wxMouseEvent&
@@ -466,7 +466,7 @@ void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 // Class:			PlotRenderer
 // Function:		OnMiddleButtonUpEvent
 //
-// Description:		Undoes the mZoom level (if available).
+// Description:		Undoes the zoom level (if available).
 //
 // Input Arguments:
 //		event	= wxMouseEvent& (unused)
@@ -487,7 +487,7 @@ void PlotRenderer::OnMiddleButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 // Class:			PlotRenderer
 // Function:		ZoomChanged
 //
-// Description:		Determines if the mZoom level is different from the previous
+// Description:		Determines if the zoom level is different from the previous
 //					mZoom level.
 //
 // Input Arguments:
@@ -525,7 +525,7 @@ bool PlotRenderer::ZoomChanged() const
 // Class:			PlotRenderer
 // Function:		SaveCurrentZoom
 //
-// Description:		Saves the current mZoom level.
+// Description:		Saves the current zoom level.
 //
 // Input Arguments:
 //		None
@@ -561,7 +561,7 @@ void PlotRenderer::SaveCurrentZoom()
 // Class:			PlotRenderer
 // Function:		UndoZoom
 //
-// Description:		Reverts to the previous mZoom level.
+// Description:		Reverts to the previous zoom level.
 //
 // Input Arguments:
 //		None
@@ -598,7 +598,7 @@ void PlotRenderer::UndoZoom()
 // Class:			PlotRenderer
 // Function:		ClearZoomStack
 //
-// Description:		Empties the mZoom stack.
+// Description:		Empties the zoom stack.
 //
 // Input Arguments:
 //		None

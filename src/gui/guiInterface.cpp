@@ -1709,7 +1709,7 @@ std::unique_ptr<Dataset2D> GuiInterface::GetFFTData(
 		FastFourierTransform::ComputeFFT([&dialog, &data, this]()
 	{
 		if (dialog.GetUseZoomedData())
-			return *this->GetXZoomedDataset(data);
+			return *GetXZoomedDataset(data);
 		else
 			return *data;
 	}(), dialog.GetFFTWindow(), dialog.GetWindowSize(), dialog.GetOverlap(),
