@@ -32,7 +32,8 @@ namespace LibPlot2D
 //
 // Input Arguments:
 //		list		= const ManagedList<const Dataset2D>* reference to the
-//					  other datasets which may be required to complete the calculation
+//					  other datasets which may be required to complete the
+//					  calculation
 //
 // Output Arguments:
 //		None
@@ -41,7 +42,8 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> *list) : mList(list)
+ExpressionTree::ExpressionTree(const ManagedList<const Dataset2D> *list)
+	: mList(list)
 {
 }
 
@@ -117,7 +119,8 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData,
 //		std::string, empty for success, error string if unsuccessful
 //
 //=============================================================================
-std::string ExpressionTree::Solve(std::string expression, std::string &solvedExpression)
+std::string ExpressionTree::Solve(std::string expression,
+	std::string &solvedExpression)
 {
 	if (!ParenthesesBalanced(expression))
 		return "Imbalanced parentheses!";
@@ -236,7 +239,8 @@ wxString ExpressionTree::ParseExpression(const wxString &expression)
 		if (expression.Mid(i, 1).Trim().IsEmpty())
 			continue;
 
-		errorString = ParseNext(expression.Mid(i), lastWasOperator, advance, operatorStack);
+		errorString = ParseNext(expression.Mid(i), lastWasOperator,
+			advance, operatorStack);
 		if (!errorString.IsEmpty())
 			return errorString;
 		i += advance - 1;
@@ -264,8 +268,9 @@ wxString ExpressionTree::ParseExpression(const wxString &expression)
 //		wxString containing any errors
 //
 //=============================================================================
-wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOperator,
-	unsigned int &advance, std::stack<wxString> &operatorStack)
+wxString ExpressionTree::ParseNext(const wxString &expression,
+	bool &lastWasOperator, unsigned int &advance,
+	std::stack<wxString> &operatorStack)
 {
 	bool thisWasOperator(false);
 	if (NextIsNumber(expression, &advance, lastWasOperator))
@@ -322,7 +327,8 @@ wxString ExpressionTree::ParseNext(const wxString &expression, bool &lastWasOper
 //		None
 //
 //=============================================================================
-void ExpressionTree::ProcessOperator(std::stack<wxString> &operatorStack, const wxString &s)
+void ExpressionTree::ProcessOperator(std::stack<wxString> &operatorStack,
+	const wxString &s)
 {
 	// Handle operator precedence
 	while (!operatorStack.empty())
@@ -353,7 +359,8 @@ void ExpressionTree::ProcessOperator(std::stack<wxString> &operatorStack, const 
 //		None
 //
 //=============================================================================
-void ExpressionTree::ProcessCloseParenthese(std::stack<wxString> &operatorStack)
+void ExpressionTree::ProcessCloseParenthese(
+	std::stack<wxString> &operatorStack)
 {
 	while (!operatorStack.empty())
 	{
@@ -391,7 +398,8 @@ void ExpressionTree::ProcessCloseParenthese(std::stack<wxString> &operatorStack)
 //		results	= Dataset2D&
 //
 // Return Value:
-//		wxString containing a description of any errors, or wxEmptyString on success
+//		wxString containing a description of any errors, or wxEmptyString on
+//		success
 //
 //=============================================================================
 wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
@@ -407,7 +415,8 @@ wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
 		next = mOutputQueue.front();
 		mOutputQueue.pop();
 
-		if (!EvaluateNext(next, doubleStack, setStack, useDoubleStack, errorString))
+		if (!EvaluateNext(next, doubleStack, setStack,
+			useDoubleStack, errorString))
 			return errorString;
 	}
 
@@ -436,7 +445,8 @@ wxString ExpressionTree::EvaluateExpression(Dataset2D &results)
 //		results	= std::string&
 //
 // Return Value:
-//		std::string containing a description of any errors, or empty string on success
+//		std::string containing a description of any errors, or empty string on
+//		success
 //
 //=============================================================================
 std::string ExpressionTree::EvaluateExpression(std::string &results)
@@ -452,7 +462,8 @@ std::string ExpressionTree::EvaluateExpression(std::string &results)
 		next = mOutputQueue.front();
 		mOutputQueue.pop();
 
-		if (!EvaluateNext(next, doubleStack, stringStack, useDoubleStack, errorString))
+		if (!EvaluateNext(next, doubleStack, stringStack,
+			useDoubleStack, errorString))
 			return std::string(errorString.mb_str());
 	}
 
@@ -523,9 +534,10 @@ bool ExpressionTree::EmptyStackToQueue(std::stack<wxString> &stack)
 // Class:			ExpressionTree
 // Function:		NextIsNumber
 //
-// Description:		Determines if the next portion of the expression is a number.
-//					Some cleverness is required to tell the difference between
-//					a minus sign and a negative sign (minus sign would return false).
+// Description:		Determines if the next portion of the expression is a
+//					number. Some cleverness is required to tell the difference
+//					between a minus sign and a negative sign (minus sign would
+//					return false).
 //
 // Input Arguments:
 //		s				= const wxString& containing the expression
@@ -539,7 +551,8 @@ bool ExpressionTree::EmptyStackToQueue(std::stack<wxString> &stack)
 //		bool, true if a number is next in the expression
 //
 //=============================================================================
-bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop, const bool &lastWasOperator)
+bool ExpressionTree::NextIsNumber(const wxString &s, unsigned int *stop,
+	const bool &lastWasOperator)
 {
 	if (s.Len() == 0)
 		return false;
@@ -608,7 +621,8 @@ bool ExpressionTree::NextIsS(const wxString &s, unsigned int *stop)
 // Class:			ExpressionTree
 // Function:		NextIsDataset
 //
-// Description:		Determines if the next portion of the expression is a dataset.
+// Description:		Determines if the next portion of the expression is a
+//					dataset.
 //
 // Input Arguments:
 //		s				= const wxString& containing the expression
@@ -622,7 +636,8 @@ bool ExpressionTree::NextIsS(const wxString &s, unsigned int *stop)
 //		bool, true if a dataset is next in the expression
 //
 //=============================================================================
-bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const bool &lastWasOperator)
+bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop,
+	const bool &lastWasOperator)
 {
 	if (s.Len() < 3)
 		return false;
@@ -653,7 +668,8 @@ bool ExpressionTree::NextIsDataset(const wxString &s, unsigned int *stop, const 
 // Class:			ExpressionTree
 // Function:		NextIsFunction
 //
-// Description:		Determines if the next portion of the expression is a function.
+// Description:		Determines if the next portion of the expression is a
+//					function.
 //
 // Input Arguments:
 //		s		= const wxString& containing the expression
@@ -706,7 +722,8 @@ bool ExpressionTree::NextIsFunction(const wxString &s, unsigned int *stop)
 // Class:			ExpressionTree
 // Function:		NextIsOperator
 //
-// Description:		Determines if the next portion of the expression is an operator.
+// Description:		Determines if the next portion of the expression is an
+//					operator.
 //
 // Input Arguments:
 //		s		= const wxString& containing the expression
@@ -756,7 +773,8 @@ bool ExpressionTree::NextIsOperator(const wxString &s, unsigned int *stop)
 //		bool, true if shifting needs to occur
 //
 //=============================================================================
-bool ExpressionTree::OperatorShift(const wxString &stackString, const wxString &newString) const
+bool ExpressionTree::OperatorShift(const wxString &stackString,
+	const wxString &newString) const
 {
 	unsigned int stackPrecedence = GetPrecedence(stackString);
 	unsigned int newPrecedence = GetPrecedence(newString);
@@ -857,8 +875,8 @@ bool ExpressionTree::IsLeftAssociative(const wxChar &c) const
 //		None
 //
 //=============================================================================
-void ExpressionTree::PushToStack(const double &value, std::stack<double> &doubleStack,
-	std::stack<bool> &useDoubleStack) const
+void ExpressionTree::PushToStack(const double &value,
+	std::stack<double> &doubleStack, std::stack<bool> &useDoubleStack) const
 {
 	doubleStack.push(value);
 	useDoubleStack.push(true);
@@ -882,8 +900,8 @@ void ExpressionTree::PushToStack(const double &value, std::stack<double> &double
 //		None
 //
 //=============================================================================
-void ExpressionTree::PushToStack(const Dataset2D &dataset, std::stack<Dataset2D> &setStack,
-	std::stack<bool> &useDoubleStack) const
+void ExpressionTree::PushToStack(const Dataset2D &dataset,
+	std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack) const
 {
 	setStack.push(dataset);
 	useDoubleStack.push(false);
@@ -907,8 +925,8 @@ void ExpressionTree::PushToStack(const Dataset2D &dataset, std::stack<Dataset2D>
 //		None
 //
 //=============================================================================
-void ExpressionTree::PushToStack(const wxString &s, std::stack<wxString> &stringStack,
-	std::stack<bool> &useDoubleStack) const
+void ExpressionTree::PushToStack(const wxString &s,
+	std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack) const
 {
 	stringStack.push(s);
 	useDoubleStack.push(false);
@@ -933,8 +951,9 @@ void ExpressionTree::PushToStack(const wxString &s, std::stack<wxString> &string
 //		bool, true if a double was popped, false if a dataset was popped
 //
 //=============================================================================
-bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<Dataset2D> &setStack,
-	std::stack<bool> &useDoubleStack, double &value, Dataset2D &dataset) const
+bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack,
+	std::stack<Dataset2D> &setStack, std::stack<bool> &useDoubleStack,
+	double &value, Dataset2D &dataset) const
 {
 	assert(!useDoubleStack.empty());
 
@@ -976,8 +995,9 @@ bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<Da
 //		bool, true if a double was popped, false otherwise
 //
 //=============================================================================
-bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack, std::stack<wxString> &stringStack,
-	std::stack<bool> &useDoubleStack, wxString& string, double &value) const
+bool ExpressionTree::PopFromStack(std::stack<double> &doubleStack,
+	std::stack<wxString> &stringStack, std::stack<bool> &useDoubleStack,
+	wxString& string, double &value) const
 {
 	bool useDouble = useDoubleStack.top();
 	useDoubleStack.pop();
@@ -1070,7 +1090,8 @@ Dataset2D ExpressionTree::ApplyFunction(const wxString &function,
 //		double
 //
 //=============================================================================
-double ExpressionTree::ApplyFunction(const wxString &function, const double &value) const
+double ExpressionTree::ApplyFunction(const wxString &function,
+	const double &value) const
 {
 	if (function.CmpNoCase(_T("log")) == 0)
 		return log(value);

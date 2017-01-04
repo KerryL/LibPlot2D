@@ -28,8 +28,9 @@ class MultiChoiceDialog : public wxDialog
 {
 public:
 	// Constructor
-	MultiChoiceDialog(wxWindow* parent, const wxString& message, const wxString& caption,
-		const wxArrayString& choices, long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
+	MultiChoiceDialog(wxWindow* parent, const wxString& message,
+		const wxString& caption, const wxArrayString& choices,
+		long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
 		wxArrayInt *defaultChoices = nullptr, bool *removeExisting = nullptr);
 
 	~MultiChoiceDialog() = default;
@@ -50,6 +51,7 @@ private:
 	wxArrayString mDescriptions;
 	wxArrayInt mSelections;
 	std::vector<bool> mShown;
+
 	unsigned int GetCorrectedIndex(const unsigned int &index) const;
 	void UpdateSelectionList(const unsigned int &index);
 	bool IsSelected(const int &i) const;

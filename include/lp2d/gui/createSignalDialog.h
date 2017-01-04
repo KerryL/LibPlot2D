@@ -52,13 +52,13 @@ private:
 
 	wxComboBox *mSignalTypeComboBox;
 
-	wxTextCtrl *mInitialValueTextBox;// or Amplitude
-	wxTextCtrl *mFinalValueTextBox;// or Offset
-	wxTextCtrl *mSlopeTextBox;// or Frequency Rate
-	wxTextCtrl *mFrequencyTextBox;// or Event Time
-	wxTextCtrl *mPeriodTextBox;
-	wxTextCtrl *mPhaseAngleTextBox;
-	wxTextCtrl *mPhaseTimeTextBox;
+	wxTextCtrl *mInitialValueTextBox = nullptr;// or Amplitude
+	wxTextCtrl *mFinalValueTextBox = nullptr;// or Offset
+	wxTextCtrl *mSlopeTextBox = nullptr;// or Frequency Rate
+	wxTextCtrl *mFrequencyTextBox = nullptr;// or Event Time
+	wxTextCtrl *mPeriodTextBox = nullptr;
+	wxTextCtrl *mPhaseAngleTextBox = nullptr;
+	wxTextCtrl *mPhaseTimeTextBox = nullptr;
 
 	wxStaticText *mInitialValueLabel;
 	wxStaticText *mFinalValueLabel;
@@ -119,8 +119,8 @@ private:
 	void UpdateSlope();
 
 	SignalType mLastSelection;
-	bool mKeepPhaseAngle;
-	bool mKeepAmplitude;
+	bool mKeepPhaseAngle = true;
+	bool mKeepAmplitude = true;
 
 	DECLARE_EVENT_TABLE();
 };

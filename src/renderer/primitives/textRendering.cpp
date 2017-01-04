@@ -42,7 +42,7 @@ namespace LibPlot2D
 TextRendering::TextRendering(RenderWindow &renderWindow)
 	: Primitive(renderWindow), mFont(renderWindow)
 {
-	mColor.Set(0.0, 0.0, 0.0, 1.0);
+	mColor = Color::ColorBlack;
 }
 
 //=============================================================================

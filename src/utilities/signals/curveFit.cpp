@@ -31,8 +31,8 @@ namespace LibPlot2D
 //
 // Description:		Generates coefficients for a best fit (least squares) curve
 //					of the specified order.  After calling this function, the
-//					programmer is responsible for freeing memory associated with
-//					the array of coefficients.
+//					programmer is responsible for freeing memory associated
+//					with the array of coefficients.
 //
 // Input Arguments:
 //		data	= const Dataset2D& to fit

@@ -40,16 +40,16 @@ struct FilterParameters
 		BandStop,
 		Notch,
 		Custom
-	} type;
+	} type = FilterParameters::Type::LowPass;
 
-	bool phaseless;
-	bool butterworth;
+	bool phaseless = false;
+	bool butterworth = false;
 
-	unsigned int order;
+	unsigned int order = 2;
 
-	double cutoffFrequency;// [Hz]
-	double dampingRatio;
-	double width;// [Hz]
+	double cutoffFrequency = 5.0;// [Hz]
+	double dampingRatio = 1.0;
+	double width = 5.0;// [Hz]
 
 	wxString numerator;
 	wxString denominator;
@@ -110,8 +110,10 @@ private:
 
 	FilterParameters::Type GetType() const;
 
-	bool automaticStringPrecision;
-	unsigned int stringPrecision;
+	bool mAutomaticStringPrecision = true;
+	unsigned int mStringPrecision = mDefaultPrecision;
+	bool mInitialized = false;
+
 	unsigned int DetermineStringPrecision() const;
 
 	void GetLowPassTF(wxString &numerator, wxString &denominator) const;
@@ -166,8 +168,6 @@ private:
 
 	void ComputeLogCutoffs(const double &center, const double &width,
 		double &lowCutoff, double &highCutoff) const;
-
-	bool mInitialized;
 
 	// For the event table
 	DECLARE_EVENT_TABLE();

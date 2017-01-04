@@ -73,7 +73,6 @@ PlotObject::PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface)
 {
 	CreateAxisObjects();
 	InitializeFonts();
-
 	ResetAutoScaling();
 }
 

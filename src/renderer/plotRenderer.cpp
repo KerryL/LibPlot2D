@@ -119,11 +119,8 @@ PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent,
 	wxDefaultPosition, wxDefaultSize), mGuiInterface(guiInterface)
 {
 	SetView3D(false);
-
 	SetDropTarget(static_cast<wxDropTarget*>(new DropTarget(guiInterface)));
-
 	CreateActors();
-
 	guiInterface.SetRenderWindow(this);
 }
 

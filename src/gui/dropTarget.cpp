@@ -35,7 +35,8 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-DropTarget::DropTarget(GuiInterface &guiInterface) : mGuiInterface(guiInterface)
+DropTarget::DropTarget(GuiInterface &guiInterface)
+	: mGuiInterface(guiInterface)
 {
 	wxDataObjectComposite *dataObject = new wxDataObjectComposite;
 

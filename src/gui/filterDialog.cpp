@@ -64,28 +64,12 @@ const unsigned int FilterDialog::mMaxFilterOrder(10000);
 //=============================================================================
 FilterDialog::FilterDialog(wxWindow *parent,
 	const FilterParameters* parameters) : wxDialog(parent, wxID_ANY,
-		_T("Specify Filter"), wxDefaultPosition), mInitialized(false)
+	_T("Specify Filter"), wxDefaultPosition)
 {
 	if (parameters)
 		mParameters = *parameters;
-	else
-	{
-		mParameters.cutoffFrequency = 5.0;
-		mParameters.dampingRatio = 1.0;
-		mParameters.order = 2;
-		mParameters.type = FilterParameters::Type::LowPass;
-		mParameters.phaseless = false;
-		mParameters.butterworth = false;
-		mParameters.width = mParameters.cutoffFrequency;
-		mParameters.numerator.Clear();
-		mParameters.denominator.Clear();
-	}
-
-	automaticStringPrecision = true;
-	stringPrecision = mDefaultPrecision;
 
 	CreateControls();
-
 	mInitialized = true;
 
 	UpdateEnabledControls();
@@ -182,17 +166,17 @@ wxSizer* FilterDialog::CreateTextBoxes()
 	sizer->AddGrowableCol(1);
 
 	mCutoffFrequencyBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		PlotMath::GetPrecision(mParameters.cutoffFrequency, stringPrecision), mParameters.cutoffFrequency));
+		PlotMath::GetPrecision(mParameters.cutoffFrequency, mStringPrecision), mParameters.cutoffFrequency));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Cutoff Frequency [Hz]")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(mCutoffFrequencyBox, 0, wxEXPAND);
 
 	mDampingRatioBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		PlotMath::GetPrecision(mParameters.dampingRatio, stringPrecision), mParameters.dampingRatio));
+		PlotMath::GetPrecision(mParameters.dampingRatio, mStringPrecision), mParameters.dampingRatio));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Damping Ratio")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(mDampingRatioBox, 0, wxEXPAND);
 
 	mWidthBox = new wxTextCtrl(this, InputTextID, wxString::Format("%0.*f",
-		PlotMath::GetPrecision(mParameters.width, stringPrecision), mParameters.width));
+		PlotMath::GetPrecision(mParameters.width, mStringPrecision), mParameters.width));
 	sizer->Add(new wxStaticText(this, wxID_ANY, _T("Width [Hz]")), wxALIGN_CENTER_VERTICAL);
 	sizer->Add(mWidthBox, 0, wxEXPAND);
 
@@ -526,12 +510,12 @@ bool FilterDialog::TransferDataFromWindow()
 	wxString originalNumerator = mNumeratorBox->GetValue();
 	wxString originalDenominator = mDenominatorBox->GetValue();
 
-	unsigned int activePrecision = stringPrecision;
+	unsigned int activePrecision = mStringPrecision;
 
 	if (!mCustomRadio->GetValue())
 	{
-		stringPrecision = mCalculationPrecision;// Extended precision for computation
-		automaticStringPrecision = false;
+		mStringPrecision = mCalculationPrecision;// Extended precision for computation
+		mAutomaticStringPrecision = false;
 		UpdateTransferFunction();
 	}
 
@@ -546,7 +530,7 @@ bool FilterDialog::TransferDataFromWindow()
 		{
 			mNumeratorBox->SetValue(originalNumerator);
 			mDenominatorBox->SetValue(originalDenominator);
-			stringPrecision = activePrecision;
+			mStringPrecision = activePrecision;
 
 			return false;
 		}
@@ -567,7 +551,7 @@ bool FilterDialog::TransferDataFromWindow()
 	{
 		mNumeratorBox->SetValue(originalNumerator);
 		mDenominatorBox->SetValue(originalDenominator);
-		stringPrecision = activePrecision;
+		mStringPrecision = activePrecision;
 
 		return false;
 	}
@@ -733,7 +717,7 @@ void FilterDialog::UpdateTransferFunction()
 	if (!mInitialized || mCustomRadio->GetValue())
 		return;
 
-	stringPrecision = DetermineStringPrecision();
+	mStringPrecision = DetermineStringPrecision();
 
 	wxString num, den;
 	if (mHighPassRadio->GetValue())
@@ -758,7 +742,7 @@ void FilterDialog::UpdateTransferFunction()
 // Function:		DetermineStringPrecision
 //
 // Description:		Determines the best number of digits to use to display the
-//					transfer function.  Returns stringPrecision if
+//					transfer function.  Returns mStringPrecision if
 //					automaticStringPrecision is false.
 //
 // Input Arguments:
@@ -773,8 +757,8 @@ void FilterDialog::UpdateTransferFunction()
 //=============================================================================
 unsigned int FilterDialog::DetermineStringPrecision() const
 {
-	if (!automaticStringPrecision)
-		return stringPrecision;
+	if (!mAutomaticStringPrecision)
+		return mStringPrecision;
 
 	unsigned int cutoffSigFig, dampingSigFig(0), widthSigFig(0);
 
@@ -845,9 +829,9 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 	wxString s;
 	if (order > 1)
 		s = wxString::Format("s^2+%0.*f*s+%0.*f",
-			PlotMath::GetPrecision(2.0 * cutoff * dampingRatio, stringPrecision),
+			PlotMath::GetPrecision(2.0 * cutoff * dampingRatio, mStringPrecision),
 			2.0 * cutoff * dampingRatio,
-			PlotMath::GetPrecision(cutoff * cutoff, stringPrecision), cutoff * cutoff);
+			PlotMath::GetPrecision(cutoff * cutoff, mStringPrecision), cutoff * cutoff);
 
 	if (order > 2)
 	{
@@ -861,7 +845,7 @@ wxString FilterDialog::GenerateStandardDenominator(const unsigned int &order,
 	{
 		if (!s.IsEmpty())
 			s.Append(_T("*("));
-		s.Append(wxString::Format("s+%0.*f", PlotMath::GetPrecision(cutoff, stringPrecision), cutoff));
+		s.Append(wxString::Format("s+%0.*f", PlotMath::GetPrecision(cutoff, mStringPrecision), cutoff));
 		if (s[0] == '(')
 			s.Append(_T(")"));
 	}
@@ -908,7 +892,7 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 				coefficient.Clear();
 			else
 			{
-				coefficient.Printf("+%0.*f", PlotMath::GetPrecision(terms[i].mReal, stringPrecision), terms[i].mReal);
+				coefficient.Printf("+%0.*f", PlotMath::GetPrecision(terms[i].mReal, mStringPrecision), terms[i].mReal);
 				if (i != terms.size() - 1)
 					coefficient.Append(_T("*"));
 			}
@@ -1006,7 +990,7 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator,
 	if (order > 1 && !mDampingRatioBox->GetValue().ToDouble(&damping))
 		return;
 
-	numerator = wxString::Format("%0.*f", PlotMath::GetPrecision(cutoff, stringPrecision),
+	numerator = wxString::Format("%0.*f", PlotMath::GetPrecision(cutoff, mStringPrecision),
 		pow(cutoff, static_cast<int>(order)));
 
 	if (mButterworthCheckBox->GetValue())
@@ -1120,7 +1104,7 @@ void FilterDialog::GetNotchTF(wxString &numerator, wxString &denominator) const
 	width *= 2.0 * M_PI;
 
 	// Note that the numerator cutoff can be varied to get a high-pass notch or low-pass notch
-	numerator.Printf("s^2+%0.*f", PlotMath::GetPrecision(cutoff * cutoff, stringPrecision), cutoff * cutoff);
+	numerator.Printf("s^2+%0.*f", PlotMath::GetPrecision(cutoff * cutoff, mStringPrecision), cutoff * cutoff);
 	denominator = GenerateStandardDenominator(2, cutoff, width / cutoff * 0.5);
 }
 

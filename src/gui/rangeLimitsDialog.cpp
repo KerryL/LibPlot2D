@@ -39,6 +39,29 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min,
 	const double &max) : wxDialog(parent, wxID_ANY, _T("Set Axis Limits"),
 	wxDefaultPosition)
 {
+	CreateControls(min, max);
+	Center();
+}
+
+//=============================================================================
+// Class:			RangeLimitsDialog
+// Function:		CreateControls
+//
+// Description:		Builds the dialog.
+//
+// Input Arguments:
+//		min	= const double&
+//		max	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RangeLimitsDialog::CreateControls(const double& min, const double& max)
+{
 	wxBoxSizer *topSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 	topSizer->Add(mainSizer, 0, wxALL | wxEXPAND, 5);
@@ -69,8 +92,6 @@ RangeLimitsDialog::RangeLimitsDialog(wxWindow *parent, const double &min,
 	mMinBox->SetFocus();
 
 	SetSizerAndFit(topSizer);
-
-	Center();
 }
 
 //=============================================================================

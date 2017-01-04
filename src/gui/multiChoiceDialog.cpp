@@ -50,12 +50,11 @@ namespace LibPlot2D
 MultiChoiceDialog::MultiChoiceDialog(wxWindow* parent, const wxString& message,
 	const wxString& caption, const wxArrayString& choices, long style,
 	const wxPoint& pos, wxArrayInt *defaultChoices, bool *removeExisting)
-	: wxDialog(parent, wxID_ANY, caption, pos, wxDefaultSize, style)
+	: wxDialog(parent, wxID_ANY, caption, pos, wxDefaultSize, style),
+	mDescriptions(choices), mShown(choices.Count())
 {
-	mDescriptions = choices;
-	mShown.resize(choices.Count());
-	for (auto&& s : mShown)
-		s = true;
+	std::fill(mShown.begin(), mShown.end(), true);
+
 	CreateControls(message, choices);
 	ApplyDefaults(defaultChoices, removeExisting);
 }

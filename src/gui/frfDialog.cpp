@@ -38,7 +38,8 @@ namespace LibPlot2D
 //
 //=============================================================================
 FRFDialog::FRFDialog(wxWindow *parent, const wxArrayString &descriptions)
-									 : wxDialog(parent, wxID_ANY, _T("Frequency Response Function"), wxDefaultPosition)
+	: wxDialog(parent, wxID_ANY, _T("Frequency Response Function"),
+	wxDefaultPosition)
 {
 	CreateControls(descriptions);
 }

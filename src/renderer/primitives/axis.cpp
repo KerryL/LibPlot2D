@@ -45,8 +45,7 @@ Axis::Axis(RenderWindow &mRenderWindow) : Primitive(mRenderWindow),
 	mLabelText(mRenderWindow), mValueText(mRenderWindow),
 	mAxisLines(mRenderWindow), mGridLines(mRenderWindow)
 {
-	mColor.Set(0.0, 0.0, 0.0, 1.0);
-
+	mColor = Color::ColorBlack;
 	mGridColor.Set(0.8, 0.8, 0.8, 1.0);
 	SetDrawOrder(500);
 

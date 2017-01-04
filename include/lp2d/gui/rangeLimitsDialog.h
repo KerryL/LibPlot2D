@@ -35,6 +35,8 @@ private:
 	wxTextCtrl *mMinBox;
 	wxTextCtrl *mMaxBox;
 
+	void CreateControls(const double& min, const double& max);
+
 	// Overload from wxDialog
 	void OnOKButton(wxCommandEvent &event);
 

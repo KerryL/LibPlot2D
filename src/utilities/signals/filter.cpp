@@ -70,7 +70,8 @@ Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 //
 //=============================================================================
 Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
-	const std::vector<double> &denominator, const double &initialValue) : sampleRate(sampleRate)
+	const std::vector<double> &denominator, const double &initialValue)
+	: sampleRate(sampleRate)
 {
 	GenerateCoefficients(numerator, denominator);
 	Initialize(initialValue);
@@ -101,7 +102,8 @@ Filter::Filter(const double &sampleRate, const std::vector<double> &numerator,
 void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 	const std::vector<double> &denominator)
 {
-	unsigned int highestPower = std::max(numerator.size(), denominator.size()) - 1;
+	const unsigned int highestPower(
+		std::max(numerator.size(), denominator.size()) - 1);
 	std::string numString = AssembleZExpression(numerator, highestPower);
 	std::string denString = AssembleZExpression(denominator, highestPower);
 
@@ -135,7 +137,8 @@ void Filter::GenerateCoefficients(const std::vector<double> &numerator,
 //		std::string
 //
 //=============================================================================
-std::string Filter::AssembleZExpression(const std::vector<double>& coefficients,
+std::string Filter::AssembleZExpression(
+	const std::vector<double>& coefficients,
 	const unsigned int &highestPower) const
 {
 	std::ostringstream ss;

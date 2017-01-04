@@ -50,17 +50,6 @@ CreateSignalDialog::CreateSignalDialog(wxWindow *parent, const double &startTime
 	const double &duration, const double &sampleRate) : wxDialog(parent, wxID_ANY,
 	_T("Create Signal"), wxPoint(-1,-1))
 {
-	mInitialValueTextBox = nullptr;
-	mFinalValueTextBox = nullptr;
-	mSlopeTextBox = nullptr;
-	mFrequencyTextBox = nullptr;
-	mPeriodTextBox = nullptr;
-	mPhaseAngleTextBox = nullptr;
-	mPhaseTimeTextBox = nullptr;
-
-	mDataset = nullptr;
-	mKeepPhaseAngle = true;
-	mKeepAmplitude = true;
 	CreateControls(startTime, duration, sampleRate);
 }
 

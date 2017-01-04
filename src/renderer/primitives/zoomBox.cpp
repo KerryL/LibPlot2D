@@ -42,7 +42,6 @@ ZoomBox::ZoomBox(RenderWindow &renderWindow) : Primitive(renderWindow),
 {
 	// Initially, we don't want to draw this
 	mIsVisible = false;
-
 	mColor = Color::ColorBlack;
 }
 
