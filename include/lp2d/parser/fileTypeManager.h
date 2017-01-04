@@ -23,14 +23,38 @@
 namespace LibPlot2D
 {
 
+/// Class for managing available file data types.  Known file types can be
+/// registered with an instance of this class, and then files can be opened
+/// without any requirements on the user or calling software to know the type
+/// of the file.  This object will handle identifying the type of file and
+/// will return an instance of the appropriate type (assuming that one of the
+/// registered types was capable of opening the specified file).
 class FileTypeManager
 {
 public:
+	/// Typedef for file type-checking functions.
+	/// \see DataFile
 	typedef bool (*TypeCheckFunction)(const wxString &fileName);
+
+	/// Typedef for file creation methods.
+	/// \see DataFile
 	typedef std::unique_ptr<DataFile> (*FileFactory)(const wxString &fileName);
+
+	/// Registers the specified pair of type-checking function and file factory
+	/// function.
+	///
+	/// \param typeFunction Pointer to a method for determining if a file can
+	///                     be opened with the corresponding \p fileFactory.
+	/// \param fileFactory  Pointer to a method for opening a file for which
+	///                     the \p typeFunction returns true.
 	void RegisterFileType(TypeCheckFunction typeFunction,
 		FileFactory fileFactory);
 
+	/// Gets a new DataFile object of the appropriate type.
+	///
+	/// \param fileName Path and file name of desired file.
+	///
+	/// \returns A pointer to a new DataFile object.
 	std::unique_ptr<DataFile> GetDataFile(const wxString &fileName);
 
 private:

@@ -20,8 +20,13 @@
 /// Core namespace for the LibPlot2D library.
 namespace LibPlot2D
 {
-	extern const wxString versionString;
-	extern const wxString gitHash;
+	/// \name Version information strings.
+	/// @{
+
+	extern const wxString versionString;///< Latest git tag.
+	extern const wxString gitHash;///< Short hash for current git commit.
+
+	/// @}
 
 }// namespace LibPlot2D
 

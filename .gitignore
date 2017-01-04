@@ -16,5 +16,7 @@ lib/
 bin/
 .obj/
 
+doxygen/
+
 # Ignore automatically generated files
 gitHash.cpp

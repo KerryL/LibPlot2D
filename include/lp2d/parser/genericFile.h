@@ -20,14 +20,25 @@
 namespace LibPlot2D
 {
 
+/// Class representing a generic text file containing data separated by some
+/// delimiter.
 class GenericFile : public DataFile
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param fileName Path and file name of desired file.
 	explicit GenericFile(const wxString& fileName) : DataFile(fileName) {}
 
 	~GenericFile() = default;
 
+	/// Checks to determine if the specified file can successfully be an object
+	/// of this type.
+	///
+	/// \param fileName Path and file name of desired file.
+	///
+	/// \returns True if the specified file is likely to be compatible with an
+	/// object of this type.
 	static bool IsType(const wxString &fileName);
 
 	friend std::unique_ptr<DataFile>

@@ -49,49 +49,109 @@ namespace LibPlot2D
 class DataFile
 {
 public:
-	// Destructor
 	virtual ~DataFile() = default;
 
+	/// Factory method for creating new DataFile objects.
+	///
+	/// \param fileName Path and file name of desired file.
+	///
+	/// \returns Pointer to a new DataFile of the appropriate type.
 	template<typename T>
 	static std::unique_ptr<DataFile> Create(const wxString& fileName);
 
+	/// Performs initialization of this object.
 	void Initialize();
 
+	/// Container for storing information about user choices regarding
+	/// extracting data from the file.
 	struct SelectionData
 	{
-		SelectionData();
-		wxArrayInt selections;
-		bool removeExisting;
+		wxArrayInt selections;///< Indices of channels selected by the user.
+
+		/// Indicates whether or not existing curves should be removed.
+		bool removeExisting = true;
 	};
 	
+	/// Prompts the user to make selections regarding importing data from file.
+	///
+	/// \param [in, out] selectionInfo User selection information.  Use
+	///                                non-empty input argument to specify
+	///                                default selections.
+	/// \param           parent        Pointer to parent window.
 	void GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *parent);
 
+	/// Loads the data from file according to the specified options.
+	///
+	/// \param selectionInfo User-specified options for importing new data.
+	///
+	/// \returns True if the data was successfully extracted from the file.
 	bool Load(const SelectionData &selectionInfo);
 
+	/// Returns a Dataset2D for the specified channel.
+	///
+	/// \param i Index of the channel to retrieve.
+	///
+	/// \returns Dataset2D for the specified channel.
 	std::unique_ptr<Dataset2D>& GetDataset(const unsigned int &i) { return mData[i]; }
+
+	/// Gets the description for the specified channel.
+	///
+	/// \param i Index of the channel to retrieve.
+	///
+	/// \returns The description for the specified channel.
 	wxString GetDescription(const unsigned int &i) const { return mSelectedDescriptions[i]; }
+
+	/// Gets the full set of descriptions for the available channels.
+	/// \returns The full set of descriptions for the available channels.
 	wxArrayString GetAllDescriptions() const { return mDescriptions; }
+
+	/// Gets the number of available data channels.
+	/// \returns The number of available data channels.
 	unsigned int GetDataCount() { return mData.size(); }
 
+	/// Checks to see if the descriptions are the same as the specified file.
+	///
+	/// \param file File against which the comparison will be made.
+	///
+	/// \returns True if the descriptions in the specified file match those in
+	///          this file.
 	bool DescriptionsMatch(const DataFile &file) const;
+
+	/// Checks to see if the descriptions are the same as the specified list.
+	///
+	/// \param descriptions List against which the comparison will be made.
+	///
+	/// \returns True if the descriptions in the specified list match those in
+	///          this file.
 	bool DescriptionsMatch(const wxArrayString &descriptions) const;
 
 protected:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param fileName Path and file name of desired file.
 	explicit DataFile(const wxString& fileName);
 
-	const wxString mFileName;
+	const wxString mFileName;///< Path and file name of desired file.
 
-	std::vector<std::unique_ptr<Dataset2D>> mData;
-	std::vector<double> mScales;
-	wxArrayString mDescriptions, mSelectedDescriptions;
-	wxString mDelimiter;
-	wxArrayInt mNonNumericColumns;
+	std::vector<std::unique_ptr<Dataset2D>> mData;///< Extracted data.
+	std::vector<double> mScales;///< Scale factors to use when extracting data.
+	wxArrayString mDescriptions;///< For all channels.
+	wxArrayString mSelectedDescriptions;///< For selected channels.
+	wxString mDelimiter;///< Delimiter to use when parsing the file.
+	wxArrayInt mNonNumericColumns;///< Columns containing unparsable data.
 
-	unsigned int mHeaderLines = 0;
+	unsigned int mHeaderLines = 0;///< Number of rows that do not contain data.
+
+	/// Flag indicating that consecutive delimiters should be treated as a
+	/// single delimiter.
 	bool mIgnoreConsecutiveDelimiters = true;
+
+	/// Flag indicating that the time data is formatted in a special way (as
+	/// opposed to simply being represented by a floating-point value).
 	bool mTimeIsFormatted = false;
 
+	/// Parses the file to determine which delimiter is most likely to result
+	/// in successfull data extraction.
 	wxString DetermineBestDelimiter() const;
 
 	virtual wxArrayString CreateDelimiterList() const;

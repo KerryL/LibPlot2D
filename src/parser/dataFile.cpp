@@ -925,25 +925,4 @@ bool DataFile::DescriptionsMatch(const wxArrayString &descriptions) const
 	return true;
 }
 
-//=============================================================================
-// Class:			DataFile::SelectionData
-// Function:		SelectionData
-//
-// Description:		Constructor for DataFile::SelectionData struct.
-//
-// Input Arguments:
-//		None
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-DataFile::SelectionData::SelectionData()
-{
-	removeExisting = true;
-}
-
 }// namespace LibPlot2D

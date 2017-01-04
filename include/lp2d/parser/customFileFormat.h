@@ -28,10 +28,14 @@ class wxXmlDocument;
 namespace LibPlot2D
 {
 
+/// Class for storing information about interpreting custom (user-specified)
+/// file formats.
 class CustomFileFormat
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param fileName Path and file name of desired file.
 	explicit CustomFileFormat(const wxString &pathAndFileName);
 
 	bool IsCustomFormat() const { return !mFormatName.IsEmpty(); }
