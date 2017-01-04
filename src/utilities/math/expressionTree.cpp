@@ -109,11 +109,10 @@ wxString ExpressionTree::Solve(wxString expression, Dataset2D &solvedData,
 // Description:		Main solving method for the tree.
 //
 // Input Arguments:
-//		expression			= wxString containing the expression to parse
-//		solvedExpression	=
+//		expression			= std::string containing the expression to parse
 //
 // Output Arguments:
-//		solvedData		= Dataset2D& containing the evaluated data
+//		solvedExpression	= std::string& containing the evaluated data
 //
 // Return Value:
 //		std::string, empty for success, error string if unsuccessful

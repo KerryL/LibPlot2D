@@ -32,7 +32,9 @@ namespace LibPlot2D
 class Legend : public Primitive
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this primitive.
 	explicit Legend(RenderWindow &renderWindow);
 
 	// Destructor

@@ -120,19 +120,21 @@ void PlotCurve::Update(const unsigned int& i)
 	if (i == 0)
 	{
 		int width, height;
-			mRenderWindow.GetSize(&width, &height);
-			width -= mYAxis->GetOffsetFromWindowEdge() + mYAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
-			height -= mXAxis->GetOffsetFromWindowEdge() + mXAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+		mRenderWindow.GetSize(&width, &height);
+		width -= mYAxis->GetOffsetFromWindowEdge()
+			+ mYAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
+		height -= mXAxis->GetOffsetFromWindowEdge()
+			+ mXAxis->GetOppositeAxis()->GetOffsetFromWindowEdge();
 
-			if (mXAxis->IsLogarithmic())
-				mXScale = (log10(mXAxis->GetMaximum()) - log10(mXAxis->GetMinimum())) / width;
-			else
-				mXScale = (mXAxis->GetMaximum() - mXAxis->GetMinimum()) / width;
+		if (mXAxis->IsLogarithmic())
+			mXScale = (log10(mXAxis->GetMaximum()) - log10(mXAxis->GetMinimum())) / width;
+		else
+			mXScale = (mXAxis->GetMaximum() - mXAxis->GetMinimum()) / width;
 
-			if (mYAxis->IsLogarithmic())
-				mYScale = (log10(mYAxis->GetMaximum()) - log10(mYAxis->GetMinimum())) / height;
-			else
-				mYScale = (mYAxis->GetMaximum() - mYAxis->GetMinimum()) / height;
+		if (mYAxis->IsLogarithmic())
+			mYScale = (log10(mYAxis->GetMaximum()) - log10(mYAxis->GetMinimum())) / height;
+		else
+			mYScale = (mYAxis->GetMaximum() - mYAxis->GetMinimum()) / height;
 
 		if (mLineSize > 0.0)
 		{

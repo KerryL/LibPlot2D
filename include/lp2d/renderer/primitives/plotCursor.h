@@ -27,16 +27,34 @@ class Axis;
 class PlotCursor : public Primitive
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this primitive.
+	/// \param axis         The axis from which cursor location values are
+	///                     taken (i.e. the axis to which the cursor is
+	///                     perpendicular).
 	PlotCursor(RenderWindow &renderWindow, const Axis &axis);
 	~PlotCursor() = default;
 
+	/// Sets the location of the cursor along the axis.
+	///
+	/// \param location The location of the cursor (in pixels).
 	void SetLocation(const int& location);
+
+	/// Gets the value at which the cursor crosses the axis.
+	/// \returns The value at which the cursor crosses the axis.
 	double GetValue() const { return value; }
 
+	/// Checks to see if the specified \p pixel is under the cursor.
+	///
+	/// \param pixel Value to consider.  The direction associated with this
+	///              argument is that which is perpendicular to the rendered
+	///              cursor.
+	///
+	/// \returns True if the pixel is beneath the cursor.
 	bool IsUnder(const unsigned int &pixel);
 
-	// Assignment operator (to avoid Warning C4512 due to const reference member)
-	PlotCursor& operator=(const PlotCursor &target);
+	PlotCursor& operator=(const PlotCursor &target) = delete;// To avoid C4512
 
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the

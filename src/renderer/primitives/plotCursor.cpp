@@ -195,31 +195,4 @@ void PlotCursor::SetLocation(const int& location)
 	mModified = true;
 }
 
-//=============================================================================
-// Class:			PlotCursor
-// Function:		operator=
-//
-// Description:		Sets the x-value where the cursor should appear on the plot.
-//
-// Input Arguments:
-//		_value	= const double& value to set
-//
-// Output Arguments:
-//		None
-//
-// Return Value:
-//		PlotCursor& reference to this object
-//
-//=============================================================================
-PlotCursor& PlotCursor::operator=(const PlotCursor &target)
-{
-	if (&target == this)
-		return *this;
-
-	value = target.value;
-	mLocationAlongAxis = target.mLocationAlongAxis;
-
-	return *this;
-}
-
 }// namespace LibPlot2D

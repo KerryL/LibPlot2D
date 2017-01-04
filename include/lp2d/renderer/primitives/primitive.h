@@ -31,13 +31,24 @@ class RenderWindow;
 class Primitive
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this primitive.
 	explicit Primitive(RenderWindow& renderWindow);
-	Primitive(const Primitive& primitive);
-	Primitive(Primitive&& primitive);
+
+	/// Copy constructor.
+	///
+	/// \param primitive Object to copy.
+	explicit Primitive(const Primitive& primitive);
+
+	/// Move constructor.
+	///
+	/// \param primitive Object to absorb.
+	explicit Primitive(Primitive&& primitive);
 
 	virtual ~Primitive();
 
-	// Performs the drawing operations
+	/// Performs the drawing operations.
 	void Draw();
 
 	// Private data accessors
@@ -54,6 +65,8 @@ public:
 	Primitive& operator=(const Primitive& primitive);
 	Primitive& operator=(Primitive&& primitive);
 
+	/// Structure containing information required to render a vertex buffer or
+	/// vertex array.
 	struct BufferInfo
 	{
 		BufferInfo() = default;
@@ -86,21 +99,35 @@ public:
 	};
 
 protected:
-	bool mIsVisible = true;
+	bool mIsVisible = true;///< Flag indicating whether or not to draw this.
 
-	Color mColor = Color::ColorBlack;
+	Color mColor = Color::ColorBlack;///< Color of this object.
 
-	bool mModified = true;
+	bool mModified = true;///< Indicates whether or not this is up-to-date.
 
-	RenderWindow &mRenderWindow;
+	RenderWindow &mRenderWindow;///< The window that owns this object.
 
+	/// Checks to determine if this object has enough information to be
+	/// rendered.
+	/// \returns True if this object can be rendered with its current
+	///          parameters.
 	virtual bool HasValidParameters() = 0;
+
+	/// Updates the specified internal buffer required to render this object.
+	///
+	/// \param i Index of the buffer to update.
 	virtual void Update(const unsigned int& i) = 0;
+
+	/// Performs the actions necessary to render this object.
 	virtual void GenerateGeometry() = 0;
 
+	/// Enables alpha blending.
 	void EnableAlphaBlending();
+
+	/// Disables alpha blending.
 	void DisableAlphaBlending();
 
+	/// List of buffer information associated with this object.
 	std::vector<BufferInfo> mBufferInfo;
 
 private:

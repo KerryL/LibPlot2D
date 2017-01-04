@@ -21,19 +21,38 @@
 namespace LibPlot2D
 {
 
+/// Class representing a dynamically drawn rectangular box.  The box is used to
+/// identify an area of the plot which will be "zoomed in on."
 class ZoomBox : public Primitive
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this primitive.
 	explicit ZoomBox(RenderWindow &renderWindow);
 	~ZoomBox() = default;
 
+	/// Sets the location of the fixed corner of the box.
+	///
+	/// \param xAnchor X location of the anchor.
+	/// \param yAnchor Y location of the anchor.
 	void SetAnchorCorner(const unsigned int &xAnchor, const unsigned int &yAnchor);
+
+	/// Sets the location of the floating corner of the box.
+	///
+	/// \param xFloat X location of the floating corner.
+	/// \param yFloat Y location of the floating corner.
 	void SetFloatingCorner(const unsigned int &xFloat, const unsigned int &yFloat);
+
+	/// \name Private data accessors
+	/// @{
 
 	unsigned int GetXAnchor() { return mXAnchor; }
 	unsigned int GetYAnchor() { return mYAnchor; }
 	unsigned int GetXFloat() { return mXFloat; }
 	unsigned int GetYFloat() { return mYFloat; }
+
+	/// @}
 
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the

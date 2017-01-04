@@ -35,6 +35,9 @@ namespace LibPlot2D
 class Text
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this object.
 	explicit Text(RenderWindow& renderer);
 	~Text();
 

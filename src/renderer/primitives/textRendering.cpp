@@ -197,16 +197,18 @@ double TextRendering::GetTextWidth()
 // Description:		Initializes the font object.
 //
 // Input Arguments:
-//		None
+//		fontFileName	= const std::string&
+//		size			= const double&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		double, width in pixels of the current text
+//		None
 //
 //=============================================================================
-void TextRendering::InitializeFonts(const std::string& fontFileName, const double& size)
+void TextRendering::InitializeFonts(const std::string& fontFileName,
+	const double& size)
 {
 	if (!mFont.SetFace(fontFileName))
 		return;

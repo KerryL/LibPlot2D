@@ -28,6 +28,9 @@ namespace LibPlot2D
 class Axis : public Primitive
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this primitive.
 	explicit Axis(RenderWindow &renderWindow);
 	~Axis() = default;
 

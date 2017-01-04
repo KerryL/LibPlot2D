@@ -550,7 +550,8 @@ void Text::DoInternalInitialization()
 // Class:			Text
 // Function:		SetOrientation
 //
-// Description:		Alters the mModelview matrix according to the text rotation angle.
+// Description:		Alters the mModelview matrix according to the text rotation
+///					angle.
 //
 // Input Arguments:
 //		angle	= const double& [rad]

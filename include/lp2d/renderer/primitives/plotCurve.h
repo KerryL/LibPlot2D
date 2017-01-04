@@ -26,25 +26,55 @@ namespace LibPlot2D
 class Axis;
 class Dataset2D;
 
+/// Object for rendering a Dataset2D.
 class PlotCurve : public Primitive
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this primitive.
+	/// \param data         The data associated with this curve.
 	PlotCurve(RenderWindow &renderWindow, const Dataset2D& data);
-	PlotCurve(const PlotCurve &plotCurve);
+	explicit PlotCurve(const PlotCurve &plotCurve);
 
 	~PlotCurve() = default;
 
+	/// Sets the width of the curve.
+	///
+	/// \param size Width of the curve in pixels.
 	inline void SetLineSize(const double &size) { mLineSize = size; mModified = true; }
+
+	/// Sets the size of the data marker.
+	///
+	/// \param size Size of the data marker.
 	inline void SetMarkerSize(const double &size) { mMarkerSize = size; mModified = true; }
+
+	/// Sets a flag indicating whether or not to use the higher-quality (but
+	/// slower) rendering algorithm.
+	///
+	/// \param pretty Set to true to use the rendering algorithm with better
+	///               anti-aliasing.
 	inline void SetPretty(const bool &pretty) { mPretty = pretty; mLine.SetPretty(pretty); mModified = true; }
 
-	// For setting up the plot
+	/// Binds the curve to the specified x-axis.
+	///
+	/// \param xAxis Axis to which this curve should be bound.
 	inline void BindToXAxis(Axis* xAxis) { mXAxis = xAxis; mModified = true; }
+
+	/// Binds the curve to the specified y-axis.
+	///
+	/// \param yAxis Axis to which this curve should be bound.
 	inline void BindToYAxis(Axis* yAxis) { mYAxis = yAxis; mModified = true; }
 
+	/// Gets the associated y-axis.
+	/// \returns The associated y-axis.
 	inline Axis* GetYAxis() { return mYAxis; }
 
-	// Overloaded operators
+	/// Assignment operator overload.
+	///
+	/// \param plotCurve Curve to assign to this.
+	///
+	/// \returns Reference to this.
 	PlotCurve& operator=(const PlotCurve &plotCurve);
 
 protected:

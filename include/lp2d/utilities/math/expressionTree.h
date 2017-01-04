@@ -30,17 +30,58 @@
 namespace LibPlot2D
 {
 
+/// Class for processing user-specified mathematical operations.  Uses a
+/// shunting yard algorithm to build and evaluate expression trees from
+/// user-specified strings.
 class ExpressionTree
 {
 public:
+	/// Constructor.
+	///
+	/// \param list Pointer to a list of Dataset2D objects that may be
+	///             referenced in the expression.
 	explicit ExpressionTree(const ManagedList<const Dataset2D>* list = nullptr);
 
-	// Main solver method
-	wxString Solve(wxString expression, Dataset2D &solvedData, const double &xAxisFactor);
+	/// Solves the specified expression.
+	///
+	/// \param expression       Expression to evaluate.
+	/// \param solvedData [out] Data set containing the results of the solved
+	///                         expression.
+	/// \param xAxisFactor      Factor to multiply against x-axis data in order
+	///                         to transform data to "as represented in file"
+	///                         units.  Typically 1, but varied depending on
+	///                         the originating DataFile.
+	///
+	/// \returns A description of any parsing/evaluation errors, or an empty
+	///          string for success.
+	wxString Solve(wxString expression, Dataset2D &solvedData,
+		const double &xAxisFactor);
+
+	/// Solves the specified expression by simplifying and combining like
+	/// terms.
+	///
+	/// \param expression             Expression to evaluate.
+	/// \param solvedExpression [out] The result of the simplified expression.
+	///
+	/// \returns A description of any parsing/evaluation errors, or an empty
+	///          string for success.
 	std::string Solve(std::string expression, std::string &solvedExpression);
 
+	/// Breaks the specified expression string into separate terms.
+	///
+	/// \param s Expression string.
+	///
+	/// \returns A list of separate terms.
 	static wxArrayString BreakApartTerms(const wxString &s);
-	static std::vector<std::pair<int, double>> FindPowersAndCoefficients(const wxArrayString &terms);
+
+	/// Processes each term to extract the value of the coefficient and the
+	/// power to which the variable is raised.
+	///
+	/// \param terms List of terms to process.
+	///
+	/// \returns Values that describe each term.
+	static std::vector<std::pair<int, double>> FindPowersAndCoefficients(
+		const wxArrayString &terms);
 
 private:
 	static const unsigned int mPrintfPrecision;

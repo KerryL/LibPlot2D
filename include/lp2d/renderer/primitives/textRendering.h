@@ -24,22 +24,57 @@
 namespace LibPlot2D
 {
 
+/// Object representing text to be rendered using OpenGL.
 class TextRendering : public Primitive
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow The window that owns this primitive.
 	explicit TextRendering(RenderWindow &renderWindow);
 	~TextRendering() = default;
 
-	// Set option methods
-	void SetAngle(const double& angle) { mAngle = angle; mModified = true; }// [rad]
+	/// Intializes the glyphs used to render this object.
+	///
+	/// \param fontFileName Path and file name of the TrueType font file.
+	/// \param size         Size of the font in pixels.
 	void InitializeFonts(const std::string& fontFileName, const double& size);
+
+	/// \name Setters
+	/// @{
+
+	/// Sets the angle of the text.  Zero is horizontal, positive angles rotate
+	/// the text counter-clockwise.
+	///
+	/// \param angle Angle at which to draw the text (in radians).
+	void SetAngle(const double& angle) { mAngle = angle; mModified = true; }
+
+	/// Sets the value of the string to render.
+	///
+	/// \param text Value of the string.
 	void SetText(const wxString& text) { mText = text; mModified = true; }
+
+	/// Sets the position of the text.
+	///
+	/// \param x X-position.
+	/// \param y Y-position.
 	void SetPosition(const double& x, const double& y) { mX = x; mY = y; mModified = true; }
+
+	/// Sets a flag indicating whether or not the text should be centered at
+	/// the specified location.  If false (default), text is positioned with
+	/// respect to the lower left-hand corner of the bounding box.
 	void SetCentered(const bool& centered) { mCentered = centered; mModified = true; }
+
+	/// @}
+
+	/// \name Getters
+	/// @{
 
 	double GetTextHeight();
 	double GetTextWidth();
 	wxString GetText() const { return mText; }
+
+	/// @}
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
