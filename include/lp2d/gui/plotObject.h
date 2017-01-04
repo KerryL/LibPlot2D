@@ -34,18 +34,35 @@ class Dataset2D;
 class Color;
 class GuiInterface;
 
+/// Class for formatting the plot area and controlling axis properties.
 class PlotObject
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderer     Reference to owning renderer.
+	/// \param guiInterface Reference to interface object.
 	PlotObject(PlotRenderer &renderer, GuiInterface& guiInterface);
 
+	/// Updates the plot formatting.
 	void Update();
 
+	/// Removes all existing plots.
 	void RemoveExistingPlots();
+
+	/// Removes the specified plot.
+	///
+	/// \param index Index of the plot to remove.
 	void RemovePlot(const unsigned int &index);
+
+	/// Adds the specified curve to the plot.
+	///
+	/// \param data Data set to add.
 	void AddCurve(const Dataset2D &data);
 
-	// Accessors for the axes limits
+	/// \name Accessors for the axes limits
+	/// @{
+
 	inline double GetXMin() const { return mXMin; }
 	inline double GetXMax() const { return mXMax; }
 	inline double GetLeftYMin() const { return mYLeftMin; }
@@ -67,9 +84,23 @@ public:
 	void SetRightYMin(const double &yMin);
 	void SetRightYMax(const double &yMax);
 
+	/// @}
+
+	/// Sets the properties of the specified curve.
+	///
+	/// \param index	  Index of the curve to modify.
+	/// \param color	  Specifies the color of the curve.
+	/// \param visible	  Indicates if the curve should be plotted.
+	/// \param rightAxis  Indicates if the curve is plotted against the left or
+	///                   right axis.
+	/// \param lineSize	  Size of the line to draw.
+	/// \param markerSize Size of the marker to draw.
 	void SetCurveProperties(const unsigned int &index, const Color &color,
 		const bool &visible, const bool &rightAxis, const double &lineSize,
 		const int &markerSize);
+
+	/// \name Grid line control
+	/// @{
 
 	void SetMajorGrid(const bool &gridOn);
 	void SetMinorGrid(const bool &gridOn);
@@ -80,15 +111,35 @@ public:
 	void SetRightYMajorGrid(const bool &gridOn);
 	void SetRightYMinorGrid(const bool &gridOn);
 
+	void SetGridColor(const Color &color);
+	Color GetGridColor() const;
+
+	bool GetMajorGrid();
+	bool GetMinorGrid();
+
+	/// @}
+
+	/// \name Axis resolution accessors
+	/// @{
+
 	void SetXMajorResolution(const double &resolution);
 	void SetLeftYMajorResolution(const double &resolution);
 	void SetRightYMajorResolution(const double &resolution);
 
-	void SetPrettyCurves(const bool &pretty) { mPretty = pretty; }
-
 	inline double GetXMajorResolution() const { return mXMajorResolution; }
 	inline double GetLeftYMajorResolution() const { return mYLeftMajorResolution; }
 	inline double GetRightYMajorResolution() const { return mYRightMajorResolution; }
+
+	/// @}
+
+	/// Sets the flag indicating whether or not to use the higher quality
+	/// rendering algorithm.
+	///
+	/// \param pretty Set true to use the higher quality rendering algorithm.
+	void SetPrettyCurves(const bool &pretty) { mPretty = pretty; }
+
+	/// \name Text object controls
+	/// @{
 
 	void SetXLabel(wxString text);
 	void SetLeftYLabel(wxString text);
@@ -100,35 +151,71 @@ public:
 	wxString GetRightYLabel() const;
 	wxString GetTitle() const;
 
-	void SetGridColor(const Color &color);
-	Color GetGridColor() const;
+	/// @}
+
+	/// \name Scaling methods
+	/// @{
 
 	void ResetAutoScaling();
 	void SetAutoScaleBottom() { mAutoScaleX = true; }
 	void SetAutoScaleLeft() { mAutoScaleLeftY = true; }
 	void SetAutoScaleRight() { mAutoScaleRightY = true; }
 
+	bool GetXAxisAutoScaled() const { return mAutoScaleX; }
+
+	/// @}
+
+	/// \name Axis object accessors
+	/// @{
+
 	const Axis* GetBottomAxis() const { return mAxisBottom; }
 	const Axis* GetTopAxis() const { return mAxisTop; }
 	const Axis* GetLeftYAxis() const { return mAxisLeft; }
 	const Axis* GetRightYAxis() const { return mAxisRight; }
-	bool GetMajorGrid();
-	bool GetMinorGrid();
+
+	/// @}
+
+	/// \name Logarithmic scaling toggles
+	/// @{
 
 	void SetXLogarithmic(const bool &log);
 	void SetLeftLogarithmic(const bool &log);
 	void SetRightLogarithmic(const bool &log);
 
-	bool GetXAxisAutoScaled() const { return mAutoScaleX; }
+	/// @}
 
+	/// Gets the total number of curves.
+	/// \returns The total number of curves.
 	unsigned int GetCurveCount() const { return mPlotList.size(); }
+
+	/// Gets the total number of points.
+	/// \returns The total number of points.
 	unsigned long long GetTotalPointCount() const;
 
+	/// Gets the offset from the side of the window for horizontal axes.
+	///
+	/// \param withLabel Indicates if the calculation should allow room for a
+	///                  label.
+	///
+	/// \returns The number of pixels between the window edge and the rendered
+	///          axis.
 	unsigned int GetHorizontalAxisOffset(const bool &withLabel) const;
+
+	/// Gets the offset from the side of the window for vertical axes.
+	///
+	/// \param withLabel Indicates if the calculation should allow room for a
+	///                  label.
+	///
+	/// \returns The number of pixels between the window edge and the rendered
+	///          axis.
 	unsigned int GetVerticalAxisOffset(const bool &withLabel) const;
 
+	/// Sets a flag indicating that the plot area size needs to be updated
+	/// during the next render cycle.
 	inline void UpdatePlotAreaSize() { mNeedScissorUpdate = true; }
 
+	/// Gets the file name for the TrueType font file used to render axis text.
+	/// \returns The file name for the axis font.
 	inline std::string GetAxisFont() const { return mFontFileName; }
 
 private:

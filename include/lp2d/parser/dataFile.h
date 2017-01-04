@@ -156,16 +156,19 @@ protected:
 
 	virtual wxArrayString CreateDelimiterList() const;
 	virtual bool ExtractData(std::ifstream &file, const wxArrayInt &choices,
-		std::vector<std::vector<double>>& rawData, std::vector<double> &factors,
-		wxString &errorString) const;
-	virtual void AssembleDatasets(const std::vector<std::vector<double>>& rawData);
+		std::vector<std::vector<double>>& rawData,
+		std::vector<double> &factors, wxString &errorString) const;
+	virtual void AssembleDatasets(
+		const std::vector<std::vector<double>>& rawData);
 	virtual wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const;
 	virtual void DoTypeSpecificLoadTasks() {}
 	virtual void DoTypeSpecificProcessTasks() {}
-	virtual unsigned int GetRawDataSize(const unsigned int &selectedCount) const;
+	virtual unsigned int GetRawDataSize(
+		const unsigned int &selectedCount) const;
 
-	wxArrayString ParseLineIntoColumns(wxString line, const wxString &delimiter) const;
+	wxArrayString ParseLineIntoColumns(wxString line,
+		const wxString &delimiter) const;
 	double GetTimeValue(const wxString &timeString,
 		const wxString &timeFormat, const wxString &timeUnits) const;
 	double GetTimeScalingFactor(const wxString &format) const;
@@ -177,7 +180,8 @@ protected:
 	bool IsDataRow(const wxArrayString &list) const;
 
 	bool ArrayContainsValue(const int &value, const wxArrayInt &a) const;
-	wxArrayString RemoveUnwantedDescriptions(const wxArrayString &names, const wxArrayInt &choices) const;
+	wxArrayString RemoveUnwantedDescriptions(const wxArrayString &names,
+		const wxArrayInt &choices) const;
 
 	static void SkipLines(std::ifstream &file, const unsigned int &count);
 

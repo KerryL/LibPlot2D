@@ -152,6 +152,7 @@ public:
 	static double ComputeTickSpacing(const double &min, const double &max,
 		const int &maxTicks);
 
+	/// Enumeration of quality levels for drawing curves.
 	enum class CurveQuality
 	{
 		AlwaysLow = 0,
@@ -170,6 +171,7 @@ public:
 
 	unsigned int GetVertexDimension() const override { return 2; }
 
+	/// Enumeration of available modelview matrices.
 	enum class Modelview
 	{
 		Fixed,
@@ -199,6 +201,7 @@ public:
 	static inline double DoLogarithmicScale(const double& value)
 	{ return log10(value); }
 
+	/// Enumeration of plot area context choices.
 	enum class PlotContext
 	{
 		XAxis,
@@ -393,6 +396,8 @@ protected:
 	DECLARE_EVENT_TABLE()
 };
 
+/// Specialization for enabling bitwise operations for the CurveQuality
+/// enumeration.
 template<>
 struct EnableBitwiseOperators<PlotRenderer::CurveQuality>
 {
