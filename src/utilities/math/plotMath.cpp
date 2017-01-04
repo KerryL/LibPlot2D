@@ -132,7 +132,7 @@ double PlotMath::Clamp(const double &value, const double &lowerLimit,
 //=============================================================================
 double PlotMath::RangeToPlusMinusPi(const double &angle)
 {
-	return fmod(angle + pi, 2.0 * pi) - pi;
+	return fmod(angle + M_PI, 2.0 * M_PI) - M_PI;
 }
 
 //=============================================================================
@@ -176,14 +176,14 @@ double PlotMath::RangeToPlusMinus180(const double &angle)
 //=============================================================================
 void PlotMath::Unwrap(Dataset2D &data)
 {
-	double threshold(pi);
+	const double threshold(M_PI);
 	unsigned int i;
 	for (i = 1; i < data.GetNumberOfPoints(); ++i)
 	{
 		if (data.GetY()[i] - data.GetY()[i - 1] > threshold)
-			data.GetY()[i] -= 2 * pi;
+			data.GetY()[i] -= 2 * M_PI;
 		if (data.GetY()[i] - data.GetY()[i - 1] < -threshold)
-			data.GetY()[i] += 2 * pi;
+			data.GetY()[i] += 2 * M_PI;
 	}
 }
 
@@ -349,7 +349,7 @@ double PlotMath::GetAverageXSpacing(const Dataset2D &data)
 //		None
 //
 // Return Value:
-//		bool, true if the x-data spacing is within the tolerance
+//		unsigned int
 //
 //=============================================================================
 unsigned int PlotMath::GetPrecision(const double &value,

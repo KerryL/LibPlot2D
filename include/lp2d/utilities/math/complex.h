@@ -28,21 +28,37 @@ class wxString;
 namespace LibPlot2D
 {
 
+/// Class for representing complex numbers.
 class Complex
 {
 public:
-	// Constructor
 	Complex() = default;
+
+	/// Constructor.
+	///
+	/// \param real      The real part of the number.
+	/// \param imaginary The imaginary part of the number.
 	Complex(const double &real, const double &imaginary);
 
-	// Prints the value to a string
+	/// Prints the value to a string.
+	/// \returns A string representing this object.
 	wxString Print() const;
 
-	// Gets the complex conjugate of this object
+	/// Gets the complex conjugate of this object.
+	/// \returns The complex conjugate of this object.
 	const Complex GetConjugate() const;
 
+	/// Gets the length of the polar representation of this object.
+	/// \returns The length of the polar representation of this object.
 	double GetPolarLength() const;
+
+	/// Gets the angle of the polar representation of this object.
+	/// \returns The angle (in radians) corresponding to the polar
+	///          representation of this object.
 	double GetPolarAngle() const;
+
+	/// \name Operators
+	/// @{
 
 	// Operators
 	const Complex operator+(const Complex &complex) const;
@@ -66,15 +82,25 @@ public:
 	Complex& ToPower(const Complex &power);
 	const Complex ToPower(const Complex &power) const;
 
-	// For streaming the value
+	/// @}
+
+	/// Method for outputing Complex objects to streams.
+	///
+	/// \param writeOut Stream to which writing should occur.
+	/// \param complex  Value to write.
+	///
+	/// \returns A reference to \p writeOut.
 	friend std::ostream &operator<<(std::ostream &writeOut, const Complex &complex);
 
-	// The actual data contents of this class
-	double mReal;
-	double mImaginary;
+	/// \name Class data
+	/// @{
 
-	// Defining the square root of negative 1
-	static const Complex mI;
+	double mReal;///< The real part of the number.
+	double mImaginary;///< The imaginary part of the number.
+
+	/// @}
+
+	static const Complex mI;///< Square root of negative one.
 };
 
 }// namespace LibPlot2D

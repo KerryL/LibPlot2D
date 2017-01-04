@@ -21,32 +21,75 @@
 namespace LibPlot2D
 {
 
+/// Class for applying an arbitrary digital filter (transfer function) to data.
 class Filter
 {
 public:
-	// Constructor
-	// NOTE:  Constructor MUST initialize the filter parameters a and b, and the input/output vectors y and u
+	/// Constructor.
+	///
+	/// \param sampleRate Frequency at which the digital filter is sampled.
 	explicit Filter(const double &sampleRate);
+
+	/// Constructor.
+	///
+	/// \param sampleRate   Frequency at which the digital filter is sampled.
+	/// \param numerator    Coefficients corresponding to the numerator of a
+	///                     continuous-time (s-domain) transfer function.
+	///                     Coefficients must be list in order of highest power
+	///                     to zero power of s.
+	/// \param denominator  Coefficients corresponding to the denominator of a
+	///                     continuous-time (s-domain) transfer function.
+	///                     Coefficients must be list in order of highest power
+	///                     to zero power of s.
+	/// \param initialValue Initial value of filter input.
 	Filter(const double &sampleRate, const std::vector<double> &numerator,
 		const std::vector<double> &denominator,
 		const double &initialValue = 0.0);
 
-	// Resets all internal variables to initialize the filter to the specified value
+	/// Initializes the filter to the specified value.
+	///
+	/// \param initialValue Initial value of filter input.
 	void Initialize(const double &initialValue);
 
-	// Main method for filtering incoming data
+	/// Applies the filter to the specified data.
+	///
+	/// \param u0 New input data to filter.
+	///
+	/// \returns The filtered value computed after considering \p u0.
 	double Apply(const double &u0);
 
-	// Returns latest raw data
+	/// Gets the last value passed to Apply().
+	/// \returns The last input value to the filter.
 	double GetRawValue() const { return mU[0]; }
 
-	// Returns latest filtered data
+	/// Gets the last value output from Apply().
+	/// \returns the last output value of the filter.
 	double GetFilteredValue() const { return mY[0]; }
 
+	/// Extracts sorted numeric polynomial coefficients from the specified
+	/// string.  Coefficients are ordered from highest power to zero power.
+	///
+	/// \param s String containing polynomial expression.
+	///
+	/// \returns A list of polynomial coefficients extracted from \p s.
 	static std::vector<double> CoefficientsFromString(const std::string &s);
 
+	/// Computes the steady-state gain for the specified continuous-time
+	/// transfer function.
+	///
+	/// \param num Coefficients of the numerator of a continuous-time transfer
+	///            function.  Coefficients must be listed in order of highest
+	///            power to zero power of s.
+	/// \param den Coefficients of the denominator of a continuous-time
+	///            transfer function.  Coefficients must be listed in order of
+	///            highest power to zero power of s.
+	///
+	/// \returns The steady-state gain for the specified transfer function.
 	static double ComputeSteadyStateGain(const std::string &num,
 		const std::string &den);
+
+	/// Computes the steady-state gain for this filter.
+	/// \returns the steady-state gain for this filter.
 	double ComputeSteadyStateGain() const;
 
 private:

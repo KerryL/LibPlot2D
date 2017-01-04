@@ -18,11 +18,19 @@
 namespace LibPlot2D
 {
 
+/// Default structure for handling enabling of bitwise operators for
+/// enumeration classes.  Defaults to disabled.  To enable bitwise operations
+/// for a specific type, create a specialization of this template for your type
+/// in which mEnable is set to true.
 template<typename E>
 struct EnableBitwiseOperators
 {
+	/// Flag that indicates whether or not bitwise operators are to be enabled.
 	static constexpr bool mEnable = false;
 };
+
+/// \name Enumeration bitwise operators
+/// @{
 
 template<typename E>
 typename std::enable_if<EnableBitwiseOperators<E>::mEnable, E>::type operator|(
@@ -93,6 +101,8 @@ typename std::enable_if<EnableBitwiseOperators<E>::mEnable, bool>::type
 {
 	return !(lhs == rhs);
 }
+
+/// @}
 
 }
 

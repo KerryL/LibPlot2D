@@ -21,9 +21,16 @@ class wxString;
 namespace LibPlot2D
 {
 
+/// Class providing a sort predicate for wxArrayString objects.
 class ArrayStringCompare
 {
 public:
+	/// Comparison of two wxArrayString objects.
+	///
+	/// \param a1 First array.
+	/// \param a2 Second array.
+	///
+	/// \returns True if a1 < a2.
 	bool operator()(const wxArrayString &a1, const wxArrayString &a2) const;
 
 private:

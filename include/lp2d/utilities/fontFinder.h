@@ -24,21 +24,66 @@ class wxString;
 namespace LibPlot2D
 {
 
+/// Class for finding TrueType font files in a cross-platform way.
 class FontFinder
 {
 public:
-	// Method for finding the best match on the system when given a list of desired font names
+	/// Gets the name of a font given an encoding and a list of preferred
+	/// fonts.  Using a list of preferred fonts allows calling code to specify
+	/// the names of multiple fonts, some of which may be more likely to exist
+	/// on one platform over another.  Then the name of the matching font will
+	/// be returned.
+	///
+	/// \param encoding       Desired font encoding.
+	/// \param preferredFonts List of preferred font face names.
+	/// \param fixedWidth     Indicates whether or not a fixed-width font is
+	///                       desired.
+	/// \param fontName [out] The name of a font that matches one of the
+	///                       preferred face names.
+	///
+	/// \returns True if a matching font file was found.
+	///
+	/// \see GetPreferredFontFileName
 	static bool GetFontFaceName(wxFontEncoding encoding, const wxArrayString &preferredFonts,
 		const bool &fixedWidth, wxString &fontName);
 
-	// Method for retrieving the path to a font .ttf file given only the face name
+	/// Gets the file name corresponding to the specified face name.
+	///
+	/// \param fontName Name of the desired font.
+	///
+	/// \returns The path and file name of the corresponding TrueType font
+	///          file.
 	static wxString GetFontFileName(const wxString &fontName);
+
+	/// Gets the file name of a font given an encoding and a list of preferred
+	/// fonts.  Using a list of preferred fonts allows calling code to specify
+	/// the names of multiple fonts, some of which may be more likely to exist
+	/// on one platform over another.  Then the path and file name of the
+	/// matching font will be returned.
+	///
+	/// \param encoding       Desired font encoding.
+	/// \param preferredFonts List of preferred font face names.
+	/// \param fixedWidth     Indicates whether or not a fixed-width font is
+	///                       desired.
+	/// \param fontName [out] The name of a font that matches one of the
+	///                       preferred face names.
+	///
+	/// \returns True if a matching font file was found.
+	///
+	/// \see GetFontFaceName
 	static bool GetPreferredFontFileName(wxFontEncoding encoding,
 		const wxArrayString &preferredFonts, const bool &fixedWidth, wxString &fontFile);
 
-	// Method for retrieving the font name from a specific font file
+	/// Gets the font name from the specified font file.
+	///
+	/// \param fontFile       Path and file name of the desired .ttf file.
+	/// \param fontName [out] Name of the font read from file.
+	///
+	/// \returns True if the name was successfully extracted from the specified
+	///          file.
 	static bool GetFontName(const wxString &fontFile, wxString &fontName);
 
+	/// TODO:  Allow the user to specify additional preferences
 	/*enum class StylePreference
 	{
 		Regular,
@@ -46,6 +91,7 @@ public:
 		Bold,
 		BoldItalics,
 		NoPreference
+		// -> Also, fixed width?
 	};*/
 
 private:

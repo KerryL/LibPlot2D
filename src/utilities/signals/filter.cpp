@@ -55,7 +55,7 @@ Filter::Filter(const double &sampleRate) : sampleRate(sampleRate)
 //					coefficients according to the specified sample rate.
 //
 // Input Arguments:
-//		_sampleRate		= const double& specifying the sampling rate in Hz
+//		sampleRate		= const double& specifying the sampling rate in Hz
 //		numerator		= const std::vector<double> containing the numerator
 //						  coefficients from highest power to zero power
 //		denominaotr		= const std::vector<double> containing the denominator
@@ -292,7 +292,7 @@ void Filter::ResizeArrays(const unsigned int &inSize,
 // Class:			Filter
 // Function:		CoefficientsFromString
 //
-// Description:		Creates a vector of coefficients from highes power to lowest
+// Description:		Creates a vector of coefficients from highest power to zero
 //					power, based on a string representing the expression.
 //
 // Input Arguments:

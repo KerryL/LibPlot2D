@@ -31,6 +31,7 @@ namespace LibPlot2D
 #pragma warning (disable:4505)
 #endif
 
+/// Wrapper around std::vector for storing std::unique_ptr objects.
 template <class T>
 class ManagedList
 {

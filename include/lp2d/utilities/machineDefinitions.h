@@ -25,10 +25,13 @@
 namespace LibPlot2D
 {
 
+/// Namespace for handling 32/64-bit conversions.
 namespace MachineDefinitions
 {
 
-// Conversion to signed 32-bit integers
+/// \name Conversion to 32-bit integers
+/// @{
+
 inline int32_t ReadInt32(int64_t in)
 {
 	return in;
@@ -39,7 +42,6 @@ inline int32_t ReadInt32(int32_t in)
 	return in;
 }
 
-// Conversion to unsigned 32-bit integers
 inline uint32_t ReadUInt32(uint64_t in)
 {
 	return in;
@@ -50,7 +52,11 @@ inline uint32_t ReadUInt32(uint32_t in)
 	return in;
 }
 
-// Conversion to signed 64-bit integers
+/// @}
+
+/// \name Conversion to 64-bit integers
+/// @{
+
 inline int64_t ReadInt64(int64_t in)
 {
 	return in;
@@ -61,7 +67,6 @@ inline int64_t ReadInt64(int32_t in)
 	return in;
 }
 
-// Conversion to unsigned 64-bit integers
 inline uint64_t ReadUInt64(uint64_t in)
 {
 	return in;
@@ -71,6 +76,8 @@ inline uint64_t ReadUInt64(uint32_t in)
 {
 	return in;
 }
+
+/// @}
 
 }// namespace MachineDefinitions
 

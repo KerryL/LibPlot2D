@@ -752,7 +752,7 @@ Dataset2D FastFourierTransform::GetPhaseData(const Dataset2D &rawFFT, const doub
 	if (!moduloPhase)
 		PlotMath::Unwrap(data);
 
-	data *= 180.0 / PlotMath::pi;
+	data *= 180.0 / M_PI;
 
 	return data;
 }
@@ -987,7 +987,7 @@ void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= 1.0 - cos(
-			2.0 * PlotMath::pi * static_cast<double>(i)
+			2.0 * M_PI * static_cast<double>(i)
 			/ double(data.GetNumberOfPoints() - 1));
 }
 
@@ -1013,7 +1013,7 @@ void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= (0.54 - 0.46
-		* cos(2.0 * PlotMath::pi * static_cast<double>(i)
+		* cos(2.0 * M_PI * static_cast<double>(i)
 			/ double(data.GetNumberOfPoints() - 1))) / 0.54;
 }
 
@@ -1040,13 +1040,13 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= 1.0
-		- 1.93 * cos(2.0 * PlotMath::pi * static_cast<double>(i)
+		- 1.93 * cos(2.0 * M_PI * static_cast<double>(i)
 			/ double(data.GetNumberOfPoints() - 1))
-		+ 1.29 * cos(4.0 * PlotMath::pi * static_cast<double>(i)
+		+ 1.29 * cos(4.0 * M_PI * static_cast<double>(i)
 			/ double(data.GetNumberOfPoints() - 1))
-		- 0.388 * cos(6.0 * PlotMath::pi * static_cast<double>(i)
+		- 0.388 * cos(6.0 * M_PI * static_cast<double>(i)
 			/ double(data.GetNumberOfPoints() - 1))
-		+ 0.032 * cos(8.0 * PlotMath::pi * static_cast<double>(i)
+		+ 0.032 * cos(8.0 * M_PI * static_cast<double>(i)
 			/ double(data.GetNumberOfPoints() - 1));
 }
 

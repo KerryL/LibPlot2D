@@ -507,8 +507,8 @@ double CreateSignalDialog::GetValue(const double &time)
 			!mPhaseAngleTextBox->GetValue().ToDouble(&phase))
 			return 0.0;
 
-		frequency *= 2.0 * PlotMath::pi;
-		phase *= PlotMath::pi / 180.0;
+		frequency *= 2.0 * M_PI;
+		phase *= M_PI / 180.0;
 
 		return amplitude * sin(frequency * time + phase) + offset;
 	}
@@ -565,8 +565,8 @@ double CreateSignalDialog::GetValue(const double &time)
 			return 0.0;
 
 		frequency = frequency + slope * time;
-		frequency *= 2.0 * PlotMath::pi;
-		phase *= PlotMath::pi / 180.0;
+		frequency *= 2.0 * M_PI;
+		phase *= M_PI / 180.0;
 
 		return amplitude * sin(frequency * time + phase) + offset;
 	}
