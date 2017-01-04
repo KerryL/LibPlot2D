@@ -29,16 +29,27 @@ namespace LibPlot2D
 // Local forward declarations
 class Dataset2D;
 
+/// Dialog for creating a new data set from a set of pre-defined curve choices.
 class CreateSignalDialog : public wxDialog
 {
 public:
+	/// Constructor.
+	///
+	/// \param parent     Pointer to the window that owns this.
+	/// \param startTime  Default initial time for the signal.
+	/// \param duration   Default duration for the signal.
+	/// \param sampleRate Default sample rate for the signal.
 	CreateSignalDialog(wxWindow *parent, const double &startTime,
 		const double &duration, const double &sampleRate);
-
 	~CreateSignalDialog() = default;
 
+	/// Gets a data set that was created according to the user-specified
+	/// options.
+	/// \returns A data set representing the user-specified signal.
 	std::unique_ptr<Dataset2D>& GetSignal() { return mDataset; }
 
+	/// Gets the name of the user-specified signal.
+	/// \returns The name of the signal.
 	wxString GetSignalName() const;
 
 private:

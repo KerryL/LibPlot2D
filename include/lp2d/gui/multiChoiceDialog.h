@@ -24,19 +24,34 @@
 namespace LibPlot2D
 {
 
+/// Dialog for allowing the user to select which curves to include.
 class MultiChoiceDialog : public wxDialog
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param parent         Pointer to the window that owns this.
+	/// \param message        Text to display.
+	/// \param caption        Text to display in the title bar.
+	/// \param choices        List of choices to make available to the user.
+	/// \param style          Dialog style flags.
+	/// \param pos            Dialog position.
+	/// \param defaultChoices List of channels which are selected by default.
+	/// \param removeExisting Default value for "Remove Existing Curves"
+	///                       checkbox.
 	MultiChoiceDialog(wxWindow* parent, const wxString& message,
 		const wxString& caption, const wxArrayString& choices,
 		long style = wxCHOICEDLG_STYLE, const wxPoint& pos = wxDefaultPosition,
 		wxArrayInt *defaultChoices = nullptr, bool *removeExisting = nullptr);
-
 	~MultiChoiceDialog() = default;
 
+	/// Gets the user-specified selelctions.
+	/// \returns The indices of the selected channels.
 	wxArrayInt GetSelections() const { return mSelections; }
 
+	/// Gets the flag indicating whether or not the user wants to existing
+	/// curves to be removed.
+	/// \returns True if the user wants the existing curves to be removed.
 	bool RemoveExistingCurves() const;
 
 private:

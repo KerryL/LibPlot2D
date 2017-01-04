@@ -30,8 +30,10 @@ class wxSpinEvent;
 namespace LibPlot2D
 {
 
+/// Structure for storing information about filter parameters.
 struct FilterParameters
 {
+	/// Enumeration for pre-defined filter types.
 	enum class Type
 	{
 		LowPass,
@@ -42,28 +44,44 @@ struct FilterParameters
 		Custom
 	} type = FilterParameters::Type::LowPass;
 
+	/// Flag indicating if the filter should be applied in both directions.
 	bool phaseless = false;
+
+	/// Flag indicating if the filter should be computed using Butterworth
+	/// coefficients.
 	bool butterworth = false;
 
-	unsigned int order = 2;
+	unsigned int order = 2;///< The order of the filter.
 
-	double cutoffFrequency = 5.0;// [Hz]
-	double dampingRatio = 1.0;
-	double width = 5.0;// [Hz]
+	double cutoffFrequency = 5.0;///< Filter cutoff frequency. <b>[Hz]</b>
+	double dampingRatio = 1.0;///< Filter damping ratio.
+	double width = 5.0;///< Filter width. <b>[Hz]</b>
 
-	wxString numerator;
-	wxString denominator;
+	wxString numerator;///< Numerator of transfer function.
+	wxString denominator;///< Denominator of transfer function.
 };
 
+/// Dialog allowing the user to specify filter parameters.
 class FilterDialog : public wxDialog
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param parent     Pointer to window that owns this.
+	/// \param parameters Default values for filter dialog.
 	FilterDialog(wxWindow *parent, const FilterParameters* parameters = nullptr);
-
 	~FilterDialog() = default;
 
+	/// Gets the parameters associated with the current user selections.
+	/// \returns The parameters associated with the current user selections.
 	const FilterParameters& GetFilterParameters() const { return mParameters; }
+
+	/// Gets the prefix for the filter name according to the specified
+	/// parameters.
+	///
+	/// \param parameters Filter parameters for which the prefix is desired.
+	///
+	/// \returns The appropriate prefix.
 	static wxString GetFilterNamePrefix(const FilterParameters &parameters);
 
 private:

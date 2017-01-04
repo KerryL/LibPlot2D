@@ -20,15 +20,25 @@
 namespace LibPlot2D
 {
 
+/// Dialog box for entering a minimum and maximum value to define the range of
+/// an axis.
 class RangeLimitsDialog : public wxDialog
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param parent Pointer to the window that owns this.
+	/// \param min    Initial value for the minimum box.
+	/// \param max    Initial value for the maximum box.
 	RangeLimitsDialog(wxWindow *parent, const double &min, const double &max);
-
 	~RangeLimitsDialog() = default;
 
+	/// Gets the minimum value.
+	/// \returns The value entered in the "minimum" box.
 	double GetMinimum() const;
+
+	/// Gets the maximum value.
+	/// \returns The value entered in the "maximum" box.
 	double GetMaximum() const;
 
 private:

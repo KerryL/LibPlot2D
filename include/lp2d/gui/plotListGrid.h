@@ -28,21 +28,38 @@ namespace LibPlot2D
 
 // Local forward declarations
 class Color;
-struct FilterParameters;
-class Dataset2D;
 class GuiInterface;
 
+/// Class for displaying information about plot curves and providing a
+/// context-menu interface to additional plotting functions.
 class PlotListGrid : public wxGrid
 {
 public:
+	/// Constructor.
+	///
+	/// \param guiInterface Reference to the programatic plot interface.
+	/// \param parent       Pointer to the window that owns this.
+	/// \param id           Id for the window.
 	PlotListGrid(GuiInterface& guiInterface, wxWindow* parent,
 		wxWindowID id = wxID_ANY);
-
 	~PlotListGrid() = default;
 
+	/// Gets the color to use for the next curve.
+	///
+	/// \param index The index of the next curve.
+	///
+	/// \returns The color to use for the next curve.
 	Color GetNextColor(const unsigned int& index) const;
 
+	/// Adds a time row to the grid.  This is only to be called if the grid
+	/// does not contain any rows.
 	void AddTimeRow();
+
+	/// Adds a new data row to the grid.
+	///
+	/// \param name The name of the curve.
+	///
+	/// \returns The row index of the new data.
 	unsigned int AddDataRow(const wxString& name);
 
 	/// Enumeration of columns contained within the grid.
@@ -61,7 +78,7 @@ public:
 		Count
 	};
 
-protected:
+private:
 	GuiInterface& mGuiInterface;
 
 	void CreateGridContextMenu(const wxPoint& position,
@@ -115,7 +132,6 @@ protected:
 
 	DECLARE_EVENT_TABLE()
 
-private:
 	void Build();
 
 	static bool ItemIsInArray(const wxArrayInt& a, const int& item);

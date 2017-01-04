@@ -37,6 +37,7 @@ namespace LibPlot2D
 {
 
 class Filter;
+struct FilterParameters;
 
 class GuiInterface
 {

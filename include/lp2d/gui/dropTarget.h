@@ -9,7 +9,7 @@
 // File:  dropTarget.h
 // Date:  5/2/2011
 // Auth:  K. Loux
-// Desc:  Derives from wxFileDropTarget and overrides OnDropFiles to load files
+// Desc:  Derives from wxDropTarget and overrides OnDropFiles to load files
 //        when the user drags-and-drops them onto the main window.
 
 #ifndef DROP_TARGET_H_
@@ -24,14 +24,24 @@ namespace LibPlot2D
 // Local forward declarations
 class GuiInterface;
 
-// The main class declaration
+/// Class derived from wxDropTarget in order to allow drag-and-drop operations.
 class DropTarget : public wxDropTarget
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param guiInterface Reference to the object that is used to load files.
 	explicit DropTarget(GuiInterface &guiInterface);
 	~DropTarget() = default;
 
+	/// Method that fires when objects are dragged and dropped onto the
+	/// associated window.
+	///
+	/// \param x   X-coordinate of the drop.
+	/// \param y   Y-coordinate of the drop.
+	/// \param def Type of drag operation.
+	///
+	/// \returns The result of the drag operation.
 	wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def) override;
 
 private:

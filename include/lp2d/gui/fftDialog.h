@@ -23,19 +23,43 @@
 namespace LibPlot2D
 {
 
+/// Dialog for specifying FFT options.
+/// \see FastFourierTransform
 class FFTDialog : public wxDialog
 {
 public:
-	// Constructor
+	/// Constructor.
+	///
+	/// \param parent Pointer to window that owns this.
+	/// \param dataPoints     Number of data points contained within the
+	///                       signal.
+	/// \param zoomDataPoints Number of data points within the zoomed region of
+	///                       the signal.
+	/// \param sampleTime     The mean sample time of the signal.
 	FFTDialog(wxWindow *parent, const unsigned int &dataPoints,
 		const unsigned int &zoomDataPoints, const double &sampleTime);
-
 	~FFTDialog() = default;
 
+	/// Gets the window type specified by the user.
+	/// \returns The desired window type.
 	FastFourierTransform::WindowType GetFFTWindow() const;
+
+	/// Gets the user-specified window size.
+	/// \returns The user-specified window size.
 	unsigned int GetWindowSize() const;
+
+	/// Gets the user-specified overlap distance.
+	/// \returns The user-specified overlap distance.
 	double GetOverlap() const;
+
+	/// Gets the flag indicating whether the user wants to perform an FFT on
+	/// the entire data set, or only the zoomed region.
+	/// \returns True if the user only wants to consider the zooomed region.
 	bool GetUseZoomedData() const;
+
+	/// Gets the flag indicating whether the user wants to subtract the mean
+	/// value from the data set.
+	/// \returns True if the user wants to subtract the mean value.
 	bool GetSubtractMean() const;
 
 private:

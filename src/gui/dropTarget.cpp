@@ -109,7 +109,8 @@ bool DropTarget::OnDropText(const wxString& data)
 //		wxDragResult
 //
 //=============================================================================
-wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y), wxDragResult def)
+wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
+	wxDragResult def)
 {
 	if (!GetData())
 		return wxDragNone;

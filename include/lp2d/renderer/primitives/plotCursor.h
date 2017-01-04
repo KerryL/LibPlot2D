@@ -24,6 +24,7 @@ namespace LibPlot2D
 // Local forward declarations
 class Axis;
 
+/// Class representing an oscilloscope-style cursor line.
 class PlotCursor : public Primitive
 {
 public:
