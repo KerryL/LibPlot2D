@@ -63,6 +63,8 @@ public:
 
 	void SetApplicationTitle(const wxString& title) { mApplicationTitle = title; }
 
+	/// Enumeration for identifying known file formats that require special
+	/// handling of axis labels, etc.
 	enum class FileFormat
 	{
 		Baumuller,

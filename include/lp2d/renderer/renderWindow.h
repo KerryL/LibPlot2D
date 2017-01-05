@@ -119,14 +119,21 @@ public:
 		Eigen::Vector3d axis);
 	static void Scale(Eigen::Matrix4d& m, const Eigen::Vector3d& v);
 
+	/// Structre for storing information about shader programs.
 	struct ShaderInfo
 	{
-		GLuint programId;
+		GLuint programId;///< OpenGL id for the shader.
 
+		/// Flag indicating whether or not a projection matrix is required.
 		bool needsProjection;
+
+		/// Location of the projection matrix within the shader.
 		GLuint projectionLocation;
 
+		/// Flag indicating whether or not a modelview matrix is required.
 		bool needsModelview;
+
+		/// Location of the modelview matrix within the shader.
 		GLuint modelViewLocation;
 	};
 
@@ -135,6 +142,54 @@ public:
 		const GLuint& location);
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+protected:
+	bool mView3D = true;
+	bool mModified = true;
+	bool mSizeUpdateRequired = true;
+
+	ManagedList<Primitive> mPrimitiveList;
+
+	long mLastMousePosition[2];
+	void StoreMousePosition(wxMouseEvent &event);
+
+	enum class Interaction
+	{
+		DollyDrag,// zoom
+		DollyWheel,// zoom
+		Pan,// translate
+		Rotate
+	};
+
+	bool Determine2DInteraction(const wxMouseEvent &event,
+		Interaction &interaction) const;
+	bool Determine3DInteraction(const wxMouseEvent &event,
+		Interaction &interaction) const;
+
+	// Flag indicating whether or not we should select a new focal point for
+	// the interactions
+	bool mIsInteracting = false;
+
+	static void ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[]);
+	static void ConvertGLToMatrix(Eigen::Matrix4d& matrix, const float gl[]);
+
+	void Initialize2D();
+	void Initialize3D();
+
+	Eigen::Matrix4d Generate2DProjectionMatrix() const;
+	Eigen::Matrix4d Generate3DProjectionMatrix() const;
+
+	bool mModelviewModified = true;
+	Eigen::Matrix4d mModelviewMatrix;
+
+	std::vector<ShaderInfo> mShaders;
+
+	DECLARE_EVENT_TABLE()
+
+	virtual std::string GetDefaultVertexShader() const
+	{ return mDefaultVertexShader; }
+	virtual std::string GetDefaultFragmentShader() const
+	{ return mDefaultFragmentShader; }
 
 private:
 	std::unique_ptr<wxGLContext> mContext;
@@ -176,14 +231,6 @@ private:
 
 	void Render();
 
-	enum class Interaction
-	{
-		DollyDrag,// zoom
-		DollyWheel,// zoom
-		Pan,// translate
-		Rotate
-	};
-
 	// Performs the computations and transformations associated with the
 	// specified interaction
 	void PerformInteraction(Interaction interaction, wxMouseEvent &event);
@@ -220,46 +267,6 @@ private:
 	void DoResize();
 
 	bool mGlewInitialized = false;
-
-protected:
-	bool mView3D = true;
-	bool mModified = true;
-	bool mSizeUpdateRequired = true;
-
-	ManagedList<Primitive> mPrimitiveList;
-
-	long mLastMousePosition[2];
-	void StoreMousePosition(wxMouseEvent &event);
-
-	bool Determine2DInteraction(const wxMouseEvent &event,
-		Interaction &interaction) const;
-	bool Determine3DInteraction(const wxMouseEvent &event,
-		Interaction &interaction) const;
-
-	// Flag indicating whether or not we should select a new focal point for
-	// the interactions
-	bool mIsInteracting = false;
-
-	static void ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[]);
-	static void ConvertGLToMatrix(Eigen::Matrix4d& matrix, const float gl[]);
-
-	void Initialize2D();
-	void Initialize3D();
-
-	Eigen::Matrix4d Generate2DProjectionMatrix() const;
-	Eigen::Matrix4d Generate3DProjectionMatrix() const;
-
-	bool mModelviewModified = true;
-	Eigen::Matrix4d mModelviewMatrix;
-
-	std::vector<ShaderInfo> mShaders;
-
-	DECLARE_EVENT_TABLE()
-
-	virtual std::string GetDefaultVertexShader() const
-	{ return mDefaultVertexShader; }
-	virtual std::string GetDefaultFragmentShader() const
-	{ return mDefaultFragmentShader; }
 };
 
 }// namespace LibPlot2D

@@ -53,6 +53,7 @@ public:
 	void SetSampleLineLength(const unsigned int &size)
 	{ mSampleLength = size; RequiresRedraw(); }
 
+	/// Position reference enumeration.
 	enum class PositionReference
 	{
 		Center,
@@ -94,15 +95,17 @@ public:
 	inline unsigned int GetHeight() const { return mHeight; }
 	inline unsigned int GetWidth() const { return mWidth; }
 
+	/// Structure for describing a legend entry.
 	struct LegendEntryInfo
 	{
-		wxString text;
-		Color color;
-		double lineSize;
-		int markerSize;
+		wxString text;///< Text to display next to curve sample.
+		Color color;///< Curve color.
+		double lineSize;///< Size of curve line.
+		int markerSize;///< Size of curve marker.
 	};
 
-	void SetContents(const std::vector<LegendEntryInfo> &entries) { mEntries = entries; RequiresRedraw(); }
+	void SetContents(const std::vector<LegendEntryInfo> &entries)
+	{ mEntries = entries; RequiresRedraw(); }
 
 	bool IsUnder(const unsigned int &x, const unsigned int &y) const;
 

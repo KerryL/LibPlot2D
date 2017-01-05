@@ -32,34 +32,85 @@ namespace LibPlot2D
 // Local forward declarations
 class RenderWindow;
 
+/// Helper class for rendering a line.  Includes options to use OpenGL lines or
+/// to use OpenGL triangles.  Using OpenGL triangles results in a prettier line
+/// (better anti-aliasing) but may render more slowly.
 class Line
 {
 public:
+	/// Constructor.
+	///
+	/// \param renderWindow Window in which the line will be rendered.
 	explicit Line(const RenderWindow& renderWindow);
 
+	/// \name Option setting methods
+	/// @{
+
+	/// Sets a flag indicating whether or not we should use triangles or OpenGL
+	/// lines to render this object.
+	///
+	/// \param pretty True to indicate that triangles should be used to render
+	///               this object.
 	inline void SetPretty(const bool &pretty) { mPretty = pretty; }
+
+	/// Sets the line width.
+	///
+	/// \param width Line width in pixels.
 	inline void SetWidth(const double &width)
 	{ assert(width >= 0.0); mHalfWidth = 0.5 * width; }
+
+	/// Sets the line color.
+	///
+	/// \param color Color of the line.
 	inline void SetLineColor(const Color &color) { mLineColor = color; }
+
+	/// Sets the background color.  This is only important when using pretty
+	/// lines.  Typically, it is easier to achieve the desired results with
+	/// SetBackgroundColorForAlphaFade(), but in some cases it is better to
+	/// specify the background color explicitly.
+	///
+	/// \param color The color of the background.
 	inline void SetBackgroundColor(const Color &color)
 	{ mBackgroundColor = color; }
+
+	/// Sets the background color to automatically fade from the line color to
+	/// transparent.  This is typically preferred over manually calling
+	/// SetBackgroundColor().
 	inline void SetBackgroundColorForAlphaFade()
 	{ mBackgroundColor = mLineColor; mBackgroundColor.SetAlpha(0.0); }
 
+	/// Sets the scale factor for the x-component of the line.
+	///
+	/// \param scale Scale factor.
 	inline void SetXScale(const double& scale)
 	{ assert(scale > 0.0); mXScale = scale; }
+
+	/// Sets the scale factor for the y-component of the line.
+	///
+	/// \param scale Scale factor.
 	inline void SetYScale(const double& scale)
 	{ assert(scale > 0.0); mYScale = scale; }
 
+	/// Sets the OpenGL rendering type hint.
+	///
+	/// \param hint Hint to tell the drivers how often to expect this object to
+	///             update.
 	inline void SetBufferHint(const GLenum& hint) { mHint = hint; }
 
+	/// @}
+
+	/// Enumeration for specifying how the line should be updated.
 	enum class UpdateMethod
 	{
-		Immediate,// Send to OpenGL immediately
-		Manual// Caller is responsible for sending to OpenGL
+		Immediate,///< Send to OpenGL immediately.
+		Manual///< Caller is responsible for sending to OpenGL.
 	};
 
-	// Geometry is constructed in Build() call, so all options need to be set prior
+	/// \name Geometry creation methods.
+	/// @{
+	/// Creates OpenGL buffers and fills them with the appropriate data.  All
+	// options must be set prior to calling these methods.
+
 	void Build(const unsigned int &x1, const unsigned int &y1,
 		const unsigned int &x2, const unsigned int &y2,
 		Primitive::BufferInfo& bufferInfo,
@@ -81,10 +132,19 @@ public:
 		Primitive::BufferInfo& bufferInfo,
 		const UpdateMethod& update = UpdateMethod::Immediate) const;
 
+	/// @}
+
+	/// \name Methods for executing the OpenGL rendering.
+	/// @{
+	/// To be called after Build() or BuildSegments() has been used to generate
+	/// Primitive::BufferInfo objects.  The correct method must be called
+	/// according to how the buffer was created.
+
 	static void DoUglyDraw(const unsigned int& vertexCount);
 	static void DoPrettyDraw(const unsigned int& indexCount);
-
 	static void DoUglySegmentDraw(const unsigned int& vertexCount);
+
+	/// @}
 
 private:
 	static const double mFadeDistance;

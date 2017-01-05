@@ -326,8 +326,10 @@ wxArrayString DataFile::CreateDelimiterList() const
 //		None
 //
 // Output Arguments:
-//		headerLineCount	= unsigned int& number of lines making up this file's header
-//		factors			= std::vector<double>& containing scaling factors
+//		headerLineCount		= unsigned int& number of lines making up this
+//							  file's header
+//		factors				= std::vector<double>& containing scaling factors
+//		nonNumericColumns	= wxArrayInt&
 //
 // Return Value:
 //		wxArrayString containing the descriptions

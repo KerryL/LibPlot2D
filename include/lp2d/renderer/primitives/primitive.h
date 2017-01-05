@@ -28,6 +28,7 @@ namespace LibPlot2D
 // Forward declarations
 class RenderWindow;
 
+/// Base class for renderable objects.
 class Primitive
 {
 public:
@@ -51,19 +52,42 @@ public:
 	/// Performs the drawing operations.
 	void Draw();
 
-	// Private data accessors
-	void SetVisibility(const bool &isVisible);
-	void SetColor(const Color &color);
-	inline Color GetColor() const { return mColor; }
-	void SetDrawOrder(const unsigned int &drawOrder);
-	inline void SetModified() { mModified = true; }// Forces a re-draw
+	/// \name Private data accessors.
+	/// @{
 
+	/// Sets a flag indicating whether or not this object should be rendered.
+	///
+	/// \param isVisible True if this object should be rendered.
+	void SetVisibility(const bool &isVisible);
+
+	/// Sets the color of this object.  Derived types may have more than one
+	/// color, but typically this method can still be used to set the "main"
+	/// color of an object.
+	///
+	/// \param color Color in which the object should be rendered.
+	void SetColor(const Color &color);
+
+	/// Sets a parameter which allows sorting of the primitive list to control
+	/// the order in which objects are rendered.  Objects with lower
+	/// \p drawOrder values are rendered first.
+	///
+	/// \param drawOrder Value to assign to this object's drawing priority.
+	void SetDrawOrder(const unsigned int &drawOrder);
+	inline void SetModified() { mModified = true; }///< Forces a full re-draw.
+
+	inline Color GetColor() const { return mColor; }
 	inline bool GetIsVisible() const { return mIsVisible; }
 	inline unsigned int GetDrawOrder() const { return mDrawOrder; }
 
-	// Overloaded operators
+	/// @}
+
+	/// \name Overloaded operators
+	/// @{
+
 	Primitive& operator=(const Primitive& primitive);
 	Primitive& operator=(Primitive&& primitive);
+
+	/// @}
 
 	/// Structure containing information required to render a vertex buffer or
 	/// vertex array.
@@ -77,17 +101,31 @@ public:
 		BufferInfo& operator=(const BufferInfo&) = delete;
 		BufferInfo& operator=(BufferInfo&& b);
 
-		unsigned int vertexCount = 0;
-		std::vector<float> vertexBuffer;
-		std::vector<unsigned int> indexBuffer;
+		unsigned int vertexCount = 0;///< Number of vertices within the buffer.
+		std::vector<float> vertexBuffer;///< The vertices to buffer.
+		std::vector<unsigned int> indexBuffer;///< Vertex indices to render.
+
+		/// Flag indicating whether or not a full update is required.
 		bool vertexCountModified = true;
 
+		/// Obtains new OpenGL index values.  Always obtains vertex and array
+		/// buffer indices, but index buffers are optional.
+		///
+		/// \param needIndexObject Flag indicating whether or not to request an
+		///                        index for a index buffer.
 		void GetOpenGLIndices(const bool& needIndexObject = false);
+
+		/// Releases all associated OpenGL objects.
 		void FreeOpenGLObjects();
+
+		/// \name Index getters.
+		/// @{
 
 		const unsigned int& GetVertexBufferIndex() const { return vertexBufferIndex; }
 		const unsigned int& GetVertexArrayIndex() const { return vertexArrayIndex; }
 		const unsigned int& GetIndexBufferIndex() const { return indexBufferIndex; }
+
+		/// @}
 
 	private:
 		bool glVertexBufferExists = false;

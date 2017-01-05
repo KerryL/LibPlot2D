@@ -34,7 +34,7 @@ public:
 	explicit Axis(RenderWindow &renderWindow);
 	~Axis() = default;
 
-	// Enumeration for the axis orientations
+	/// Axis orientation enumeration.
 	enum class Orientation
 	{
 		Bottom,
@@ -43,7 +43,7 @@ public:
 		Right
 	};
 
-	// Enumeration for the tick styles
+	/// Style options for rendering axis tick marks.
 	enum class TickStyle
 	{
 		Through,
