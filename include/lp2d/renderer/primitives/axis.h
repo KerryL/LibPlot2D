@@ -72,7 +72,7 @@ public:
 
 	/// @}
 
-	/// \name Configuration methods.
+	/// \name Configuration methods
 	/// @{
 	/// Must be called exactly once immediately following axis creation in
 	/// order to describe the location of this axis within the plot area.

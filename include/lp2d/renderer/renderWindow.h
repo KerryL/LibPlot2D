@@ -65,10 +65,21 @@ public:
 		const Eigen::Vector3d &lookAt, const Eigen::Vector3d &upDirection);
 
 	/// @{
+	
 	/// Transforms between the model coordinate system and the view (OpenGL)
 	/// coordinate system.
-
+	///
+	/// \param modelVector Vector in model coordinates.
+	///
+	/// \returns Vector in view coordinates.
 	Eigen::Vector3d TransformToView(const Eigen::Vector3d &modelVector) const;
+
+	/// Transforms between the view (OpenGL) coordinate system and the model
+	/// coordinate system.
+	///
+	/// \param viewVector Vector in view coordinates.
+	///
+	/// \returns Vector in model coordinates.
 	Eigen::Vector3d TransformToModel(const Eigen::Vector3d &viewVector) const;
 
 	/// @}
@@ -132,9 +143,16 @@ public:
 	/// @}
 
 	/// @{
-	/// Returns a string describing OpenGL errors.
 
+	/// Gets a string describing any existing OpenGL errors.
+	/// \returns A string describing any existing OpenGL errors.
 	static wxString GetGLError();
+
+	/// Gets a string describing the specified OpenGL error.
+	///
+	/// \param e Error code.
+	///
+	/// \returns Description of the specified error code.
 	static wxString GetGLError(const GLint& e);
 
 	/// @}
@@ -271,15 +289,22 @@ protected:
 	};
 
 	/// @{
+	
 	/// Determines the type of interaction occurring (if any).
 	///
 	/// \param event             Information about recent mouse inputs.
 	/// \param interaction [out] Type of interaction detected.
 	///
 	/// \returns True if an interaction is occurring.
-
 	bool Determine2DInteraction(const wxMouseEvent &event,
 		Interaction &interaction) const;
+
+	/// Determines the type of interaction occurring (if any).
+	///
+	/// \param event             Information about recent mouse inputs.
+	/// \param interaction [out] Type of interaction detected.
+	///
+	/// \returns True if an interaction is occurring.
 	bool Determine3DInteraction(const wxMouseEvent &event,
 		Interaction &interaction) const;
 
@@ -306,10 +331,13 @@ protected:
 	void Initialize3D();///< Initializes this object for 3D rendering.
 
 	/// @{
+	
 	/// Creates the appropriate projection matrix.
 	/// \returns Projection matrix.
-
 	Eigen::Matrix4d Generate2DProjectionMatrix() const;
+
+	/// Creates the appropriate projection matrix.
+	/// \returns Projection matrix.
 	Eigen::Matrix4d Generate3DProjectionMatrix() const;
 
 	/// @}

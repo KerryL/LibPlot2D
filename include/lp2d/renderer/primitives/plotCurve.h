@@ -35,6 +35,10 @@ public:
 	/// \param renderWindow The window that owns this primitive.
 	/// \param data         The data associated with this curve.
 	PlotCurve(RenderWindow &renderWindow, const Dataset2D& data);
+
+	/// Copy constructor.
+	///
+	/// \param plotCurve Curve to copy into this.
 	explicit PlotCurve(const PlotCurve &plotCurve);
 
 	~PlotCurve() = default;

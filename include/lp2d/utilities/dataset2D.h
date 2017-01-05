@@ -133,8 +133,8 @@ public:
 
 	/// @}
 
-	/// \name Methods for applying math functions to each element of the data
-	///       set.
+	/// \name Methods for applying math functions.
+	/// Functions are applied to each element of the data set.
 	/// @{
 
 	Dataset2D& ToPower(const double &target);
@@ -167,8 +167,8 @@ public:
 
 	/// @}
 
-	/// \name Methods for performing arithmetic between two datasets which have
-	///       inconsistent x-data.
+	/// \name Methods for performing arithmetic between two data sets.
+	/// These methods handle data sets which have inconsistent x-data.
 	/// @{
 
 	static Dataset2D DoUnsyncrhonizedAdd(const Dataset2D &d1, const Dataset2D &d2);

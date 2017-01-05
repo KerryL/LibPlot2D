@@ -70,10 +70,13 @@ public:
 	const std::unique_ptr<T>& operator[](const unsigned int &index) const;
 
 	/// @{
+	
 	/// Gets the last element in the vector.
 	/// \returns Reference to the last element.
-
 	const std::unique_ptr<T>& Back() const { return mList.back(); }
+
+	/// Gets the last element in the vector.
+	/// \returns Reference to the last element.
 	std::unique_ptr<T>& Back() { return mList.back(); }
 
 	/// @}

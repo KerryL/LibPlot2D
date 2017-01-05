@@ -151,27 +151,46 @@ public:
 	void SetLegendOn();
 	void SetLegendOff();
 
-	/// @}
-
-	void SetCurveProperties(const unsigned int &index, const Color &color,
-		const bool &visible, const bool &rightAxis, const double &lineSize,
-		const int &markerSize);
 	void SetXLimits(const double &min, const double &max);
 	void SetLeftYLimits(const double &min, const double &max);
 	void SetRightYLimits(const double &min, const double &max);
 
+	/// @}
+
+	/// Assigns the specified properties to the specified curve.
+	///
+	/// \param index      Index of the curve to update.
+	/// \param color      Color to assign to the curve.
+	/// \param visible    Flag indicating whether or not to render this curve.
+	/// \param rightAxis  Flag indicating whether or not to plot this data
+	///                   against the right axis.
+	/// \param lineSize	  Width of the line in pixels.
+	/// \param markerSize Size of the marker for the curve.
+	void SetCurveProperties(const unsigned int &index, const Color &color,
+		const bool &visible, const bool &rightAxis, const double &lineSize,
+		const int &markerSize);
+
+	/// Adds the specified curve to the list of rendered curves.  Internally
+	/// creates a PlotCurve object and adds it to this.
+	///
+	/// \data Data set to add.
 	void AddCurve(const Dataset2D &data);
+
+	/// Removes all curves from the list.
 	void RemoveAllCurves();
+
+	/// Remvoes the specified curve from the list.
+	///
+	/// \param index Index of curve to remove.
 	void RemoveCurve(const unsigned int &index);
 
 	/// \name Autoscale methods.
 	/// @{
-	/// Sets autoscaling on.
 
-	void AutoScale();
-	void AutoScaleBottom();
-	void AutoScaleLeft();
-	void AutoScaleRight();
+	void AutoScale();///< Sets autoscaling on.
+	void AutoScaleBottom();///< Sets autoscaling on for the bottom axis.
+	void AutoScaleLeft();///< Sets autoscaling on for the left axis.
+	void AutoScaleRight();///< Sets autoscaling on for the right axis.
 
 	/// @}
 	
@@ -182,14 +201,13 @@ public:
 
 	void UpdateDisplay();///< Updates the rendered scene.
 
-	/// @{
 	/// Gets the value at which the cursor intersects the x-axis.
 	/// \returns The value at which the cursor intersects the x-axis.
-
 	double GetLeftCursorValue() const;
-	double GetRightCursorValue() const;
 
-	/// @}
+	/// Gets the value at which the cursor intersects the x-axis.
+	/// \returns The value at which the cursor intersects the x-axis.
+	double GetRightCursorValue() const;
 
 	void UpdateCursors();///< Updates the cursor calculations.
 
@@ -232,15 +250,15 @@ public:
 	/// \param mv Source of matrix to load into the uniform.
 	void LoadModelviewUniform(const Modelview& mv);
 
-	/// @{
 	/// Sets the valud of the modelview matrix.
 	///
 	/// \param m Value to assign to the modelview matrix.
-
 	void SetLeftModelview(const Eigen::Matrix4d& m) { mLeftModelview = m; }
-	void SetRightModelview(const Eigen::Matrix4d& m) { mRightModelview = m; }
 
-	/// @}
+	/// Sets the valud of the modelview matrix.
+	///
+	/// \param m Value to assign to the modelview matrix.
+	void SetRightModelview(const Eigen::Matrix4d& m) { mRightModelview = m; }
 
 	/// \name Methods for applying scaling functions
 	/// @{
