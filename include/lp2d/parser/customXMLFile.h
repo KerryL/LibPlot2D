@@ -55,9 +55,6 @@ protected:
 	wxArrayString GetCurveInformation(unsigned int &headerLineCount,
 		std::vector<double> &factors, wxArrayInt &nonNumericColumns) const override;
 
-	friend std::unique_ptr<DataFile>
-		DataFile::Create<CustomXMLFile>(const wxString&);
-
 private:
 	wxArrayString SeparateNodes(const wxString &nodePath) const;
 	wxXmlNode* FollowNodePath(const wxXmlDocument &document, const wxString &path) const;
@@ -70,6 +67,9 @@ private:
 		wxString& errorString) const;
 	bool ExtractYData(wxXmlNode *channel, std::vector<std::vector<double>>& rawData,
 		std::vector<double> &factors, const unsigned int &set, wxString& errorString) const;
+
+	friend std::unique_ptr<DataFile>
+		DataFile::Create<CustomXMLFile>(const wxString&);
 };
 
 }// namespace LibPlot2D

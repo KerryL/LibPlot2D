@@ -210,8 +210,10 @@ public:
 		PlotArea
 	};
 
-	bool GetCurrentAxisRange(const PlotContext &axis, double &min, double &max) const;
-	void SetNewAxisRange(const PlotContext &axis, const double &min, const double &max);
+	bool GetCurrentAxisRange(const PlotContext &axis, double &min,
+		double &max) const;
+	void SetNewAxisRange(const PlotContext &axis, const double &min,
+		const double &max);
 
 	void DoCopy();
 	void DoPaste();
@@ -247,12 +249,13 @@ private:
 	bool mDraggingRightCursor = false;
 	bool mDraggingLegend = false;
 
-	void ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const;
+	void ComputePrettyLimits(double &min, double &max,
+		const unsigned int& maxTicks) const;
 	void UpdateLegendAnchor();
 
-	void CreatePlotContextMenu(const wxPoint &position, const PlotContext &context);
+	void CreatePlotContextMenu(const wxPoint &position,
+		const PlotContext &context);
 
-protected:
 	GuiInterface& mGuiInterface;
 
 	void ProcessZoom(wxMouseEvent &event);
@@ -264,14 +267,16 @@ protected:
 	void PanRightYAxis(wxMouseEvent &event);
 
 	void ProcessPlotAreaDoubleClick(const unsigned int &x);
-	void ProcessOffPlotDoubleClick(const unsigned int &x, const unsigned int &y);
+	void ProcessOffPlotDoubleClick(const unsigned int &x,
+		const unsigned int &y);
 
 	void ProcessRightClick(wxMouseEvent &event);
 	void ProcessZoomBoxEnd();
 
 	void ForcePointWithinPlotArea(unsigned int &x, unsigned int &y);
 
-	std::string GetDefaultVertexShader() const override { return mDefaultVertexShader; }
+	std::string GetDefaultVertexShader() const override
+	{ return mDefaultVertexShader; }
 
 	struct Zoom
 	{
@@ -401,6 +406,7 @@ protected:
 template<>
 struct EnableBitwiseOperators<PlotRenderer::CurveQuality>
 {
+	/// Flag that indicates that bitwise operators should be enabled.
 	static constexpr bool mEnable = true;
 };
 

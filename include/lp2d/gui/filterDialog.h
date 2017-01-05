@@ -42,7 +42,7 @@ struct FilterParameters
 		BandStop,
 		Notch,
 		Custom
-	} type = FilterParameters::Type::LowPass;
+	} type = FilterParameters::Type::LowPass;///< Type of this filter.
 
 	/// Flag indicating if the filter should be applied in both directions.
 	bool phaseless = false;

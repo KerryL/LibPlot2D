@@ -38,7 +38,7 @@ class Text
 public:
 	/// Constructor.
 	///
-	/// \param renderWindow The window in which the text will be rendered.
+	/// \param renderer The window in which the text will be rendered.
 	explicit Text(RenderWindow& renderer);
 	~Text();
 

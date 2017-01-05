@@ -31,6 +31,10 @@ class Dataset2D
 {
 public:
 	Dataset2D() = default;
+
+	/// Constructor.
+	///
+	/// \param numberOfPoints Initial size of the buffers.
 	explicit Dataset2D(const unsigned int &numberOfPoints);
 
 	/// Exports the contents of the object to the specified file.

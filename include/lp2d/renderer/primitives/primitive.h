@@ -95,10 +95,20 @@ public:
 	{
 		BufferInfo() = default;
 		BufferInfo(const BufferInfo&) = delete;
+
+		/// Move constructor.
+		///
+		/// \param b Buffer to absorb into this.
 		BufferInfo(BufferInfo&& b);
 		~BufferInfo();
 
 		BufferInfo& operator=(const BufferInfo&) = delete;
+
+		/// Move assignment operator.
+		///
+		/// \param b Buffer to absorb into this.
+		///
+		/// \returns Reference to this.
 		BufferInfo& operator=(BufferInfo&& b);
 
 		unsigned int vertexCount = 0;///< Number of vertices within the buffer.

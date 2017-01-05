@@ -35,10 +35,16 @@ class CustomFileFormat
 public:
 	/// Constructor.
 	///
-	/// \param fileName Path and file name of desired file.
+	/// \param pathAndFileName Path and file name of desired file.
 	explicit CustomFileFormat(const wxString &pathAndFileName);
 
+	/// Checks to see if this object is associated with a custom format.
+	/// \returns True if a suitable custom format was recognized.
 	bool IsCustomFormat() const { return !mFormatName.IsEmpty(); }
+
+	/// Checks to see if the format is asynchronous (i.e. separate x-data
+	/// exists for each channel).
+	/// \returns True if the format represents asynchronous data.
 	bool IsAsynchronous() const { return mAsynchronous; }
 
 	wxString GetDelimiter() const { return mDelimiter; }
@@ -46,7 +52,12 @@ public:
 	wxString GetTimeFormat() const { return mTimeFormat; }
 	wxString GetEndIdentifier() const { return mEndIdentifier; }
 
+	/// Checks to see if the format is based on an XML document.
+	/// \returns True if the format is XML-based.
 	bool IsXML() const { return mIsXML; }
+
+	/// \name XML File navigation methods
+	/// @{
 
 	wxString GetXMLXDataNode() const { return mXDataNode; }
 	wxString GetXMLXDataKey() const { return mXDataKey; }
@@ -56,9 +67,20 @@ public:
 	wxString GetXMLChannelNode() const { return mChannelNode; }
 	wxString GetXMLCodeKey() const { return mCodeKey; }
 
+	/// @}
+
+	/// Converts names as appropriate based on the format, and populates known
+	/// scale factors.
+	///
+	/// \param names  [in,out] List of channel names found in the file, then
+	///                        modified as specified in the file format.
+	/// \param scales [out]    List of scale factors to use when reading each
+	///                        channel.
 	void ProcessChannels(wxArrayString &names,
 		std::vector<double> &scales) const;
 
+	/// Checks to see if a custom file definitions file exists.
+	/// \returns True if a custom file definitions file was found.
 	inline static bool CustomDefinitionsExist()
 	{ return wxFileExists(mCustomFormatsXMLFileName); }
 

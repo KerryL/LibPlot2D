@@ -65,14 +65,15 @@ public:
 	/// \param preferredFonts List of preferred font face names.
 	/// \param fixedWidth     Indicates whether or not a fixed-width font is
 	///                       desired.
-	/// \param fontName [out] The name of a font that matches one of the
+	/// \param fontFile [out] The name of a font that matches one of the
 	///                       preferred face names.
 	///
 	/// \returns True if a matching font file was found.
 	///
 	/// \see GetFontFaceName
 	static bool GetPreferredFontFileName(wxFontEncoding encoding,
-		const wxArrayString &preferredFonts, const bool &fixedWidth, wxString &fontFile);
+		const wxArrayString &preferredFonts, const bool &fixedWidth,
+		wxString &fontFile);
 
 	/// Gets the font name from the specified font file.
 	///

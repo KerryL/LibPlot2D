@@ -25,6 +25,7 @@
 namespace LibPlot2D
 {
 
+/// Class representing a plot axis scale.
 class Axis : public Primitive
 {
 public:
@@ -52,7 +53,9 @@ public:
 		NoTicks
 	};
 
-	// Set option methods
+	/// \name Set option methods
+	/// @{
+
 	void SetOrientation(const Orientation &orientation) { mOrientation = orientation; mModified = true; }
 	void SetMinimum(const double &minimum) { mMinimum = minimum; mModified = true; }
 	void SetMaximum(const double &maximum) { mMaximum = maximum; mModified = true; }
@@ -61,19 +64,30 @@ public:
 	void SetMajorGrid(const bool &majorGrid) { mMajorGrid = majorGrid; mModified = true; }
 	void SetMinorGrid(const bool &minorGrid) { mMinorGrid = minorGrid; mModified = true; }
 	void SetLabel(wxString label) { mLabel = label; mModified = true; }
-	bool InitializeFonts(const std::string& fontFileName, const double& size);
 	void SetGridColor(const Color &gridColor) { mGridColor = gridColor; mModified = true; }
 	void SetTickStyle(const TickStyle &tickStyle) { mTickStyle = tickStyle; mModified = true; }
 	void SetTickSize(const int &tickSize) { mTickSize = tickSize; mModified = true; }
 	void SetOffsetFromWindowEdge(const unsigned int &offset) { mOffsetFromWindowEdge = offset; mModified = true; }
-
-	void SetAxisAtMinEnd(const Axis *min) { mMinAxis = min; mModified = true; }
-	void SetAxisAtMaxEnd(const Axis *max) { mMaxAxis = max; mModified = true; }
-	void SetOppositeAxis(const Axis *opposite) { mOppositeAxis = opposite; mModified = true; }
-
 	void SetLogarithmicScale(const bool &log) { mLogarithmic = log; mModified = true; }
 
-	// Get option methods
+	/// @}
+
+	/// \name Configuration methods.
+	/// @{
+	/// Must be called exactly once immediately following axis creation in
+	/// order to describe the location of this axis within the plot area.
+
+	void SetAxisAtMinEnd(const Axis *min) { assert(!mMinAxis); mMinAxis = min; mModified = true; }
+	void SetAxisAtMaxEnd(const Axis *max) { assert(!mMaxAxis); mMaxAxis = max; mModified = true; }
+	void SetOppositeAxis(const Axis *opposite) { assert(!mOppositeAxis); mOppositeAxis = opposite; mModified = true; }
+
+	bool InitializeFonts(const std::string& fontFileName, const double& size);
+
+	/// @}
+
+	/// \name Get option methods
+	/// @{
+
 	inline double GetMinimum() const { return mMinimum; }
 	inline double GetMaximum() const { return mMaximum; }
 	bool IsHorizontal() const;
@@ -82,18 +96,37 @@ public:
 	inline bool GetMinorGrid() const { return mMinorGrid; }
 	inline Color GetGridColor() const { return mGridColor; }
 
+	inline wxString GetLabel() const { return mLabel; }
+	inline bool IsLogarithmic() const { return mLogarithmic; }
+
+	/// @}
+
+	/// \name Configuration polling methods
+	/// @{
+
 	inline const Axis* GetAxisAtMinEnd() const { return mMinAxis; }
 	inline const Axis* GetAxisAtMaxEnd() const { return mMaxAxis; }
 	inline const Axis* GetOppositeAxis() const { return mOppositeAxis; }
 	inline Orientation GetOrientation() const { return mOrientation; }
 
+	/// @}
+
+	/// Gets the length of the axis.
+	/// \returns The length of the axis in pixels.
 	unsigned int GetAxisLength() const;
 
-	inline wxString GetLabel() const { return mLabel; }
-
-	inline bool IsLogarithmic() const { return mLogarithmic; }
-
+	/// Converts from axis units to pixels.
+	///
+	/// \param value Value in axis units.
+	///
+	/// \returns Value in pixels.
 	double ValueToPixel(const double &value) const;
+
+	/// Converts from pixels to axis units.
+	///
+	/// \param pixel Value in pixels.
+	///
+	/// \returns Value in axis units.
 	double PixelToValue(const int &pixel) const;
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW

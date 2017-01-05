@@ -25,7 +25,8 @@ namespace LibPlot2D
 template<typename E>
 struct EnableBitwiseOperators
 {
-	/// Flag that indicates whether or not bitwise operators are to be enabled.
+	/// Flag that indicates that bitwise operators are to be disabled by
+	/// default.
 	static constexpr bool mEnable = false;
 };
 

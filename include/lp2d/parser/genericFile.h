@@ -41,6 +41,7 @@ public:
 	/// object of this type.
 	static bool IsType(const wxString &fileName);
 
+private:
 	friend std::unique_ptr<DataFile>
 		DataFile::Create<GenericFile>(const wxString&);
 };

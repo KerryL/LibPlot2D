@@ -41,16 +41,34 @@ public:
 	void Remove(const unsigned int &index);
 	inline unsigned int GetCount() const { return mList.size(); }
 
-	// Removes all objects from the list
+	/// Removes all objects from the list.
 	void Clear();
 
-	// Re-organizes the data in the list
+	/// Re-organizes the data in the list according to the specified order.
+	///
+	/// \param order Vector specifying the new order of the elements.  The
+	///              values specified in this vector are the current indices of
+	///              the elements, but listed in a new order.
 	void ReorderObjects(const std::vector<unsigned int> &order);
 
+	/// Element access operator.
+	///
+	/// \param index Index of the element to access.
+	///
+	/// \returns Reference to the desired element.
 	const std::unique_ptr<T>& operator[](const unsigned int &index) const;
+
+	/// @{
+	/// Gets the last element in the vector.
+	/// \returns Reference to the last element.
 
 	const std::unique_ptr<T>& Back() const { return mList.back(); }
 	std::unique_ptr<T>& Back() { return mList.back(); }
+
+	/// @}
+
+	/// \name Iterator accessors
+	/// @{
 
 	typename std::vector<std::unique_ptr<T>>::iterator begin() { return mList.begin(); }
 	typename std::vector<std::unique_ptr<T>>::const_iterator begin() const { return mList.begin(); }
@@ -63,6 +81,8 @@ public:
 
 	typename std::vector<std::unique_ptr<T>>::reverse_iterator rend() { return mList.rend(); }
 	typename std::vector<std::unique_ptr<T>>::const_reverse_iterator rend() const { return mList.rend(); }
+
+	/// @}
 
 private:
 	std::vector<std::unique_ptr<T>> mList;

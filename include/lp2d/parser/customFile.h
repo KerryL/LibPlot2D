@@ -59,9 +59,6 @@ protected:
 	unsigned int GetRawDataSize(
 		const unsigned int &selectedCount) const override;
 
-	friend std::unique_ptr<DataFile>
-		DataFile::Create<CustomFile>(const wxString&);
-
 private:
 	bool ExtractSpecialData(std::ifstream &file, const wxArrayInt &choices,
 		std::vector<std::vector<double>>& rawData,
@@ -78,6 +75,9 @@ private:
 		wxString &errorString) const;
 	void AssembleAsynchronousDatasets(
 		const std::vector<std::vector<double>>& rawData);
+
+	friend std::unique_ptr<DataFile>
+		DataFile::Create<CustomFile>(const wxString&);
 };
 
 }// namespace LibPlot2D
