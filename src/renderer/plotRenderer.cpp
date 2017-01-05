@@ -103,9 +103,10 @@ const std::string PlotRenderer::mDefaultVertexShader(
 //
 // Input Arguments:
 //		guiInterface	= GuiInterface&
-//		wxParent		= wxWindow&
+//		parent			= wxWindow&
 //		id				= wxWindowID
-//		attr			= const wxGLAttributes& NOTE: Under GTK, must contain WX_GL_DOUBLEBUFFER at minimum
+//		attr			= const wxGLAttributes& NOTE: Under GTK, must contain
+//						  WX_GL_DOUBLEBUFFER at minimum
 //
 // Output Arguments:
 //		None
@@ -114,8 +115,8 @@ const std::string PlotRenderer::mDefaultVertexShader(
 //		None
 //
 //=============================================================================
-PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent,
-	wxWindowID id, const wxGLAttributes& attr) : RenderWindow(wxParent, id, attr,
+PlotRenderer::PlotRenderer(GuiInterface& guiInterface, wxWindow &parent,
+	wxWindowID id, const wxGLAttributes& attr) : RenderWindow(parent, id, attr,
 	wxDefaultPosition, wxDefaultSize), mGuiInterface(guiInterface)
 {
 	SetView3D(false);

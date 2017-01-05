@@ -1246,7 +1246,7 @@ void RenderWindow::ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[])
 //		None
 //
 //=============================================================================
-void RenderWindow::ConvertGLToMatrix(Eigen::Matrix4d& matrix, const float gl[])
+void RenderWindow::ConvertGLToMatrix(const float gl[], Eigen::Matrix4d& matrix)
 {
 	int i;
 	for (i = 0; i < matrix.rows(); ++i)

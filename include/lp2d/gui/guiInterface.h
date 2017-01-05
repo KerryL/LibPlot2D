@@ -39,9 +39,13 @@ namespace LibPlot2D
 class Filter;
 struct FilterParameters;
 
+/// Class for managing interactions between different GUI components.
 class GuiInterface
 {
 public:
+	/// Constructor.
+	///
+	/// \param owner Object owning the associated GUI components.
 	explicit GuiInterface(wxFrame* owner);
 
 	bool LoadFiles(const wxArrayString &filenames);

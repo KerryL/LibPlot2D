@@ -35,33 +35,69 @@
 namespace LibPlot2D
 {
 
+/// Class for creating OpenGL scenes.  Includes event handlers for various
+/// mouse and keyboard interactions.
 class RenderWindow : public wxGLCanvas
 {
 public:
+	/// Constructor.
+	///
+	/// \param parent   Reference to owning window.
+	/// \param id       Window id.
+	/// \param attr     Requested OpenGL canvas/context attribute list.
+	/// \param position Position of this window within the parent window.
+	/// \param size	    Initial size of this window.
+	/// \param style    Style flags.
 	RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
 		const wxPoint& position, const wxSize& size, long style = 0);
 	~RenderWindow() = default;
 
+	/// Initializes this object to prepare for rendering.  Must be called
+	/// immediately after creation.
 	void Initialize();
+
+	/// Sets the camera position and orientation.
+	///
+	/// \param position    Location of the camera's "eye."
+	/// \param lookAt      Point at which the camera is pointed.
+	/// \param upDirection Direction which will be up in the rendered image.
 	void SetCameraView(const Eigen::Vector3d &position,
 		const Eigen::Vector3d &lookAt, const Eigen::Vector3d &upDirection);
 
-	// Transforms between the model coordinate system and the view (openGL) coordinate system
+	/// @{
+	/// Transforms between the model coordinate system and the view (OpenGL)
+	/// coordinate system.
+
 	Eigen::Vector3d TransformToView(const Eigen::Vector3d &modelVector) const;
 	Eigen::Vector3d TransformToModel(const Eigen::Vector3d &viewVector) const;
+
+	/// @}
+
+	/// Queries the current camera position.
+	/// \returns The current camera position.
 	Eigen::Vector3d GetCameraPosition() const;
 
-	// Sets the viewing frustum to match the current size of the window
+	/// Sets the viewing frustum to match the current size of the window.
 	void AutoSetFrustum();
 
-	// Adds actors to the primitives list
+	/// Adds objects to the list of primitives to render.  In addition to
+	/// rendering the specified object, we also take ownership of the added
+	/// primitives.
+	///
+	/// \param toAdd Object to add to the scene.
 	inline void AddActor(std::unique_ptr<Primitive> toAdd)
 	{ mPrimitiveList.Add(std::move(toAdd)); mModified = true; }
 
-	// Removes actors from the primitives list
+	/// Removes the specified object from the primitives list.
+	///
+	/// \param toRemove Pointer to object to be removed.
+	///
+	/// \returns True if the specified object was found and removed.
 	bool RemoveActor(Primitive *toRemove);
 
-	// Private data accessors
+	/// \name Setters
+	/// @{
+
 	inline void SetWireFrame(const bool& wireFrame)
 	{ mWireFrame = wireFrame; mModified = true; }
 	void SetViewOrthogonal(const bool& viewOrthogonal);
@@ -79,6 +115,12 @@ public:
 
 	virtual void SetBackgroundColor(const Color& backgroundColor)
 	{ mBackgroundColor = backgroundColor; mModified = true; }
+
+	/// @}
+
+	/// \name Getters
+	/// @{
+
 	inline Color GetBackgroundColor() { return mBackgroundColor; }
 
 	inline bool GetWireFrame() const { return mWireFrame; }
@@ -87,37 +129,91 @@ public:
 
 	inline double GetAspectRatio() const { return mAspectRatio; }
 
-	// Returns a string containing any OpenGL errors
+	/// @}
+
+	/// @{
+	/// Returns a string describing OpenGL errors.
+
 	static wxString GetGLError();
 	static wxString GetGLError(const GLint& e);
+
+	/// @}
+
+	/// Checks to see if an OpenGL error exists.
+	/// \returns True if an error exists.
 	static bool GLHasError();
 
-	// Writes the current image to file
+	/// Writes the current image to file.
+	///
+	/// \param pathAndFileName Location to write the file.
+	///
+	/// \returns True if the file was successfully written.
 	bool WriteImageToFile(wxString pathAndFileName) const;
-	wxImage GetImage() const;
 
-	// Determines if a particular primitive is in the scene owned by this object
+	/// Gets an image of the current rendered scene.
+	/// \returns An image object representing the current scene.
+	virtual wxImage GetImage() const;
+
+	/// Determines if a particular primitive is in the scene owned by this
+	/// object.
+	///
+	/// \param pickedObject Pointer to the queried object.
+	///
+	/// \returns True if the \p pickedObject is owned by this.
 	bool IsThisRendererSelected(const Primitive *pickedObject) const;
 
+	/// Sets a flag indicating that the primitives must be sorted by alpha
+	/// prior to rendering.
 	void SetNeedAlphaSort() { mNeedAlphaSort = true; }
+
+	/// Sets a flag indicating that the primitives must be sorted by drawOrder
+	/// prior to rendering.
 	void SetNeedOrderSort() { mNeedOrderSort = true; }
 
+	/// Compiles the specified shader.
+	///
+	/// \param type           Type of shader to build.
+	/// \param shaderContents Shader instructions.
+	///
+	/// \returns Index for compiled shader.
 	static GLuint CreateShader(const GLenum& type,
 		const std::string& shaderContents);
+
+	/// Creates the program using the specified shaders.
+	///
+	/// \param shaderList List of shaders to include in the program.
+	///
+	/// \returns Index for the program.
 	static GLuint CreateProgram(const std::vector<GLuint>& shaderList);
 
+	/// Applies a small shift to the modelview matrix to enable exact
+	/// pixelization.
 	void ShiftForExactPixelization();
-	void UseDefaultProgram() const;
+	void UseDefaultProgram() const;///< Sets the default program as active.
 
+	/// Gets the location of the position attribute within the current program.
+	/// \returns The location of the position attribute.
 	GLuint GetPositionLocation() const { return mPositionAttributeLocation; }
+
+	/// Gets the location of the color attribute within the current program.
+	/// \returns The location of the color attribute.
 	GLuint GetColorLocation() const { return mColorAttributeLocation; }
 
+	/// Gets the expected vertex dimension for this object.  Use this to ensure
+	/// compatibility with the default program when building vertex array
+	/// objects.
+	/// \returns The dimension of a vertex in the default program.
 	virtual unsigned int GetVertexDimension() const { return 4; }
+
+	/// \name Matrix manipulation methods
+	/// @{
 
 	static void Translate(Eigen::Matrix4d& m, const Eigen::Vector3d& v);
 	static void Rotate(Eigen::Matrix4d& m, const double& angle,
 		Eigen::Vector3d axis);
 	static void Scale(Eigen::Matrix4d& m, const Eigen::Vector3d& v);
+
+	/// @}
 
 	/// Structre for storing information about shader programs.
 	struct ShaderInfo
@@ -137,59 +233,103 @@ public:
 		GLuint modelViewLocation;
 	};
 
+	/// Adds the specified shader to our list of programs.
+	///
+	/// \param shader Program to add.
 	void AddShader(const ShaderInfo& shader);
+
+	/// Sends the specified matrix to the specified uniform location within the
+	/// current program.
+	///
+	/// \param m        Matrix to send.
+	/// \param location Location within the program.
 	static void SendUniformMatrix(const Eigen::Matrix4d& m,
 		const GLuint& location);
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
-	bool mView3D = true;
-	bool mModified = true;
-	bool mSizeUpdateRequired = true;
+	bool mView3D = true;///< Flag indicating whether or not scene is 3D.
+	bool mModified = true;///< Flag indicatin whether or not scene has changed.
+	bool mSizeUpdateRequired = true;///< Flag indicating that size has changed.
 
-	ManagedList<Primitive> mPrimitiveList;
+	ManagedList<Primitive> mPrimitiveList;///< List of objects to be rendered.
 
-	long mLastMousePosition[2];
+	/// Stores the current location of the mouse cursor.
+	///
+	/// \param event Mouse location information.
 	void StoreMousePosition(wxMouseEvent &event);
+	long mLastMousePosition[2];///< Last known location of the mouse.
 
+	/// Enumeration of interaction types supported by this object.
 	enum class Interaction
 	{
-		DollyDrag,// zoom
-		DollyWheel,// zoom
-		Pan,// translate
-		Rotate
+		DollyDrag,///< Zooming action vi mouse drag.
+		DollyWheel,///< Zooming action vi mouse wheel.
+		Pan,///< Translation of the scene.
+		Rotate///< Rotation of the scene.
 	};
+
+	/// @{
+	/// Determines the type of interaction occurring (if any).
+	///
+	/// \param event             Information about recent mouse inputs.
+	/// \param interaction [out] Type of interaction detected.
+	///
+	/// \returns True if an interaction is occurring.
 
 	bool Determine2DInteraction(const wxMouseEvent &event,
 		Interaction &interaction) const;
 	bool Determine3DInteraction(const wxMouseEvent &event,
 		Interaction &interaction) const;
 
-	// Flag indicating whether or not we should select a new focal point for
-	// the interactions
+	/// @}
+
+	/// Flag indicating whether or not we should select a new focal point for
+	/// the interactions.
 	bool mIsInteracting = false;
 
+	/// Converts from internal matrix representation to a format that can be
+	/// passed to OpenGL.
+	///
+	/// \param matrix   Matrix in internal representation.
+	/// \param gl [out] OpenGL matrix represenation.
 	static void ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[]);
-	static void ConvertGLToMatrix(Eigen::Matrix4d& matrix, const float gl[]);
 
-	void Initialize2D();
-	void Initialize3D();
+	/// Converts from OpenGL matrix represenation to our internal type.
+	///
+	/// \param gl           OpenGL matrix represenation.
+	/// \param matrix [out] Matrix in internal representation.
+	static void ConvertGLToMatrix(const float gl[], Eigen::Matrix4d& matrix);
+
+	void Initialize2D();///< Initializes this object for 2D rendering.
+	void Initialize3D();///< Initializes this object for 3D rendering.
+
+	/// @{
+	/// Creates the appropriate projection matrix.
+	/// \returns Projection matrix.
 
 	Eigen::Matrix4d Generate2DProjectionMatrix() const;
 	Eigen::Matrix4d Generate3DProjectionMatrix() const;
 
-	bool mModelviewModified = true;
-	Eigen::Matrix4d mModelviewMatrix;
+	/// @}
 
-	std::vector<ShaderInfo> mShaders;
+	bool mModelviewModified = true;///< Flag indicating status of modelview.
+	Eigen::Matrix4d mModelviewMatrix;///< Modelview matrix.
 
-	DECLARE_EVENT_TABLE()
+	std::vector<ShaderInfo> mShaders;///< List of available shader programs.
 
+	/// Gets the default vertex shader for this object.
+	/// \returns Default vertex shader.
 	virtual std::string GetDefaultVertexShader() const
 	{ return mDefaultVertexShader; }
+
+	/// Gets the default fragment shader for this object.
+	/// \returns Default fragment shader.
 	virtual std::string GetDefaultFragmentShader() const
 	{ return mDefaultFragmentShader; }
+
+	DECLARE_EVENT_TABLE()
 
 private:
 	std::unique_ptr<wxGLContext> mContext;

@@ -36,9 +36,20 @@ template <class T>
 class ManagedList
 {
 public:
-	// Private data accessors
+	/// Adds the specified object to the list.
+	///
+	/// \param toAdd Object to add to the list.
+	///
+	/// \returns Index of the newly added item.
 	unsigned int Add(std::unique_ptr<T> toAdd);
+
+	/// Removes the object with the specified index from the list.
+	///
+	/// \param index Index of the object to remove.
 	void Remove(const unsigned int &index);
+
+	/// Gets the number of objects in the list.
+	/// \returns The number of objects in the list.
 	inline unsigned int GetCount() const { return mList.size(); }
 
 	/// Removes all objects from the list.

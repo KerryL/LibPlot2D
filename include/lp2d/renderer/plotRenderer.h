@@ -42,14 +42,33 @@ class ZoomBox;
 class PlotCursor;
 class GuiInterface;
 
+/// Class for handling rendering of 2D plots.
 class PlotRenderer : public RenderWindow
 {
 public:
-	PlotRenderer(GuiInterface& guiInterface, wxWindow &wxParent, wxWindowID id,
+	/// Constructor.
+	///
+	/// \param guiInterface Reference to the interface object.
+	/// \param parent	    Window which owns this.
+	/// \param id		    Window id.
+	/// \param attr		    Requested OpenGL canvas/context attributes.
+	PlotRenderer(GuiInterface& guiInterface, wxWindow &parent, wxWindowID id,
 		const wxGLAttributes& attr);
 	~PlotRenderer() = default;
 
-	// Gets properties for actors
+	/// Enumeration of quality levels for drawing curves.
+	enum class CurveQuality
+	{
+		AlwaysLow = 0,
+		HighWrite = 1 << 0,
+		HighDrag = 1 << 1,
+		HighStatic = 1 << 2,
+		AlwaysHigh = HighWrite | HighDrag | HighStatic
+	};
+
+	/// \name Getters
+	/// @{
+
 	bool GetBottomMajorGrid() const;
 	bool GetLeftMajorGrid() const;
 	bool GetRightMajorGrid() const;
@@ -71,9 +90,31 @@ public:
 	bool GetLeftLogarithmic() const;
 	bool GetRightLogarithmic() const;
 
+	wxString GetXLabel() const;
+	wxString GetLeftYLabel() const;
+	wxString GetRightYLabel() const;
+	wxString GetTitle() const;
+
+	bool GetMajorGridOn() const;
+	bool GetMinorGridOn() const;
+
+	CurveQuality GetCurveQuality() const { return mCurveQuality; }
+
+	bool LegendIsVisible() const;
+
+	bool GetLeftCursorVisible() const;
+	bool GetRightCursorVisible() const;
+
+	/// @}
+
+	/// Checks to see if the x-axis is "zoomed" in or if it shows the full
+	/// range of the available data.
+	/// \returns True if the x-axis is zoomed in.
 	bool GetXAxisZoomed() const;
 
-	// Sets properties for actors
+	/// \name Setters
+	/// @{
+
 	void SetMajorGridOn();
 	void SetMajorGridOff();
 	void SetMinorGridOn();
@@ -96,6 +137,22 @@ public:
 
 	void SetGridColor(const Color &color);
 
+	void SetXLabel(wxString text);
+	void SetLeftYLabel(wxString text);
+	void SetRightYLabel(wxString text);
+	void SetTitle(wxString text);
+
+	void SetXLogarithmic(const bool &log);
+	void SetLeftLogarithmic(const bool &log);
+	void SetRightLogarithmic(const bool &log);
+
+	void SetCurveQuality(const CurveQuality& curveQuality);
+
+	void SetLegendOn();
+	void SetLegendOff();
+
+	/// @}
+
 	void SetCurveProperties(const unsigned int &index, const Color &color,
 		const bool &visible, const bool &rightAxis, const double &lineSize,
 		const int &markerSize);
@@ -103,71 +160,61 @@ public:
 	void SetLeftYLimits(const double &min, const double &max);
 	void SetRightYLimits(const double &min, const double &max);
 
-	void SetXLabel(wxString text);
-	void SetLeftYLabel(wxString text);
-	void SetRightYLabel(wxString text);
-	void SetTitle(wxString text);
-
-	wxString GetXLabel() const;
-	wxString GetLeftYLabel() const;
-	wxString GetRightYLabel() const;
-	wxString GetTitle() const;
-
 	void AddCurve(const Dataset2D &data);
 	void RemoveAllCurves();
 	void RemoveCurve(const unsigned int &index);
+
+	/// \name Autoscale methods.
+	/// @{
+	/// Sets autoscaling on.
 
 	void AutoScale();
 	void AutoScaleBottom();
 	void AutoScaleLeft();
 	void AutoScaleRight();
 
-	void SetXLogarithmic(const bool &log);
-	void SetLeftLogarithmic(const bool &log);
-	void SetRightLogarithmic(const bool &log);
-
-	bool GetMajorGridOn() const;
-	bool GetMinorGridOn() const;
+	/// @}
 	
-	bool LegendIsVisible() const;
-	void SetLegendOn();
-	void SetLegendOff();
+	/// Updates the legend contents.
+	///
+	/// \param entries Information about how to list the legend entries.
 	void UpdateLegend(const std::vector<Legend::LegendEntryInfo> &entries);
 
-	// Called to update the screen
-	void UpdateDisplay();
+	void UpdateDisplay();///< Updates the rendered scene.
 
-	bool GetLeftCursorVisible() const;
-	bool GetRightCursorVisible() const;
+	/// @{
+	/// Gets the value at which the cursor intersects the x-axis.
+	/// \returns The value at which the cursor intersects the x-axis.
+
 	double GetLeftCursorValue() const;
 	double GetRightCursorValue() const;
 
-	void UpdateCursors();
+	/// @}
 
-	void SaveCurrentZoom();
-	void ClearZoomStack();
+	void UpdateCursors();///< Updates the cursor calculations.
 
-	static const unsigned int mMaxXTicks;
-	static const unsigned int mMaxYTicks;
+	void SaveCurrentZoom();///< Adds the current zoom level to the stack.
+	void ClearZoomStack();///< Empties the zoom stack.
+
+	static const unsigned int mMaxXTicks;///< Max allowed number of x-ticks.
+	static const unsigned int mMaxYTicks;///< Max allowed number of y-ticks.
+
+	/// Computes the ideal number of ticks and space between them given the max
+	/// and min values and the maximum number of ticks.
+	///
+	/// \param min      Minimum axis value.
+	/// \param max      Maximum axis value.
+	/// \param maxTicks Maximum number of ticks between \p min and \p max.
+	///
+	/// \returns The ideal tick spacing.
 	static double ComputeTickSpacing(const double &min, const double &max,
 		const int &maxTicks);
 
-	/// Enumeration of quality levels for drawing curves.
-	enum class CurveQuality
-	{
-		AlwaysLow = 0,
-		HighWrite = 1 << 0,
-		HighDrag = 1 << 1,
-		HighStatic = 1 << 2,
-		AlwaysHigh = HighWrite | HighDrag | HighStatic
-	};
-
-	void SetCurveQuality(const CurveQuality& curveQuality);
-	CurveQuality GetCurveQuality() const { return mCurveQuality; }
-
+	/// Gets the total number of plotted points.
+	/// \returns The total number of plotted points.
 	unsigned long long GetTotalPointCount() const;
 
-	wxImage GetImage() const;
+	wxImage GetImage() const override;
 
 	unsigned int GetVertexDimension() const override { return 2; }
 
@@ -179,12 +226,25 @@ public:
 		Right
 	};
 
+	/// Loads the specified matrix into the modelview uniform for the current
+	/// shader.
+	///
+	/// \param mv Source of matrix to load into the uniform.
 	void LoadModelviewUniform(const Modelview& mv);
+
+	/// @{
+	/// Sets the valud of the modelview matrix.
+	///
+	/// \param m Value to assign to the modelview matrix.
 
 	void SetLeftModelview(const Eigen::Matrix4d& m) { mLeftModelview = m; }
 	void SetRightModelview(const Eigen::Matrix4d& m) { mRightModelview = m; }
 
-	// Scaling functions for handling differences in linear and log axis scales
+	/// @}
+
+	/// \name Methods for applying scaling functions
+	/// @{
+
 	inline double DoXScale(const double& value)
 	{ return mXScaleFunction(value); }
 	inline double DoLeftYScale(const double& value)
@@ -192,14 +252,28 @@ public:
 	inline double DoRightYScale(const double& value)
 	{ return mRightYScaleFunction(value); }
 
+	/// @}
+
+	/// Typedef for scaling functions.
 	typedef double (*ScalingFunction)(const double&);
+
+	/// \name Scaling function accessors
+	/// @{
+
 	ScalingFunction GetXScaleFunction() { return mXScaleFunction; }
 	ScalingFunction GetLeftYScaleFunction() { return mLeftYScaleFunction; }
 	ScalingFunction GetRightYScaleFunction() { return mRightYScaleFunction; }
 
+	/// @}
+
+	/// \name Scaling functions
+	/// @{
+
 	static inline double DoLineaerScale(const double& value) { return value; }
 	static inline double DoLogarithmicScale(const double& value)
 	{ return log10(value); }
+
+	/// @}
 
 	/// Enumeration of plot area context choices.
 	enum class PlotContext
@@ -210,13 +284,28 @@ public:
 		PlotArea
 	};
 
+	/// Gets the range of the specified axis.
+	///
+	/// \param axis      Indicates which axis to query.
+	/// \param min [out] Minimum axis value.
+	/// \param max [out] Maximum axis value.
+	///
+	/// \returns True if \p axis context is valid.
 	bool GetCurrentAxisRange(const PlotContext &axis, double &min,
 		double &max) const;
+
+	/// Sets the range of the specified axis.
+	///
+	/// \param axis	Indicates which axis to set.
+	/// \param min  Minimum axis value.
+	/// \param max  Maximum axis value.
+	///
+	/// \returns True if \p axis context is valid.
 	void SetNewAxisRange(const PlotContext &axis, const double &min,
 		const double &max);
 
-	void DoCopy();
-	void DoPaste();
+	void DoCopy();///< Pastes clipboard data into plot.
+	void DoPaste();///< Copies plot image to clipboard.
 
 private:
 	static const std::string mDefaultVertexShader;

@@ -47,10 +47,15 @@ public:
 	/// \returns True if the format represents asynchronous data.
 	bool IsAsynchronous() const { return mAsynchronous; }
 
+	/// \name Getters
+	/// @{
+
 	wxString GetDelimiter() const { return mDelimiter; }
 	wxString GetTimeUnits() const { return mTimeUnits; }
 	wxString GetTimeFormat() const { return mTimeFormat; }
 	wxString GetEndIdentifier() const { return mEndIdentifier; }
+
+	/// @}
 
 	/// Checks to see if the format is based on an XML document.
 	/// \returns True if the format is XML-based.
