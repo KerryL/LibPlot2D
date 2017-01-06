@@ -2718,7 +2718,7 @@ void PlotRenderer::ProcessZoomBoxEnd()
 	if (abs(int(mZoomBox->GetXAnchor() - mZoomBox->GetXFloat())) > limit &&
 		abs(int(mZoomBox->GetYAnchor() - mZoomBox->GetYFloat())) > limit)
 	{
-		// Determine the new mZoom range
+		// Determine the new zoom range
 		// Remember: OpenGL uses Bottom Left as origin, normal windows use Top Left as origin
 		double xMin = mPlot->GetBottomAxis()->PixelToValue(
 			std::min<unsigned int>(mZoomBox->GetXFloat(), mZoomBox->GetXAnchor()));
@@ -2763,7 +2763,8 @@ void PlotRenderer::ProcessZoomBoxEnd()
 //		None
 //
 //=============================================================================
-void PlotRenderer::ComputePrettyLimits(double &min, double &max, const unsigned int& maxTicks) const
+void PlotRenderer::ComputePrettyLimits(double &min, double &max,
+	const unsigned int& maxTicks) const
 {
 	// Make the limits prettier by choosing a range that is exactly divisible
 	// into the ideal spacing
@@ -2771,8 +2772,8 @@ void PlotRenderer::ComputePrettyLimits(double &min, double &max, const unsigned 
 	assert(spacing > 0.0 && PlotMath::IsValid(spacing));
 	double range = floor((max - min) / spacing + 0.5) * spacing;
 
-	// Split the difference to force the range to the desired value (keep the center point
-	// the same before/after this adjustment)
+	// Split the difference to force the range to the desired value (keep the
+	// center point the same before/after this adjustment)
 	double shift = 0.5 * (range - max + min);
 	max += shift;
 	min -= shift;
@@ -2932,7 +2933,8 @@ double PlotRenderer::ComputeTickSpacing(const double &min, const double &max,
 	//	Ones,
 	//	Twos (even numbers), and
 	//	Fives (multiples of five),
-	// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5], and [20, 40, 60] are all acceptable)
+	// each within the order of magnitude (i.e. [37, 38, 39], [8.5, 9.0, 9.5],
+	// and [20, 40, 60] are all acceptable)
 
 	// Scale the tick spacing so it is between 0.1 and 10.0
 	double scaledSpacing = tickSpacing / pow(10.0, orderOfMagnitude - 1);
