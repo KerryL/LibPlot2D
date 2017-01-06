@@ -891,16 +891,16 @@ double Axis::PixelToValue(const int &pixel) const
 	double fraction;
 	if (IsHorizontal())
 		fraction = (static_cast<double>(pixel)
-			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()))
+			- mMinAxis->GetOffsetFromWindowEdge())
 			/ (static_cast<double>(mRenderWindow.GetSize().GetWidth())
-			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()
-			- mMaxAxis->GetOffsetFromWindowEdge()));
+			- mMinAxis->GetOffsetFromWindowEdge()
+			- mMaxAxis->GetOffsetFromWindowEdge());
 	else
 		fraction = (static_cast<double>(pixel)
-			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()))
+			- mMinAxis->GetOffsetFromWindowEdge())
 			/ (static_cast<double>(mRenderWindow.GetSize().GetHeight())
-			- static_cast<double>(mMinAxis->GetOffsetFromWindowEdge()
-			- mMaxAxis->GetOffsetFromWindowEdge()));
+			- mMinAxis->GetOffsetFromWindowEdge()
+			- mMaxAxis->GetOffsetFromWindowEdge());
 
 	// Do the scaling
 	if (IsLogarithmic())
