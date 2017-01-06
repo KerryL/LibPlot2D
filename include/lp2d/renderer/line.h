@@ -205,8 +205,8 @@ public:
 	/// method must only be used if geometry was created with a call to Build()
 	/// or BuildSegments() after a call to SetPretty(true).
 	///
-	/// \param vertexCount Number of vertices in the corresponding BufferInfo
-	///                    object.
+	/// \param indexCount Number of indices in the corresponding BufferInfo
+	///                   object.
 	static void DoPrettyDraw(const unsigned int& indexCount);
 
 	/// To be called after creation of Primitive::BufferInfo objects.  This
