@@ -76,7 +76,7 @@ CurveFit::PolynomialFit CurveFit::DoPolynomialFit(const Dataset2D &data,
 	Eigen::VectorXd coefficients(
 		A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b));
 	for (i = 0; i <= order; ++i)
-		fit.coefficients[i] = coefficients(i,0) / pow(maxX, static_cast<int>(i));
+		fit.coefficients[i] = coefficients(i,0) / pow(maxX, i);
 	ComputeRSquared(data, fit);
 
 	return fit;
@@ -105,7 +105,7 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 {
 	// Determine the mean of the sampled data
 	double yBar(std::accumulate(data.GetY().cbegin(), data.GetY().cend(), 0.0)
-		/ static_cast<double>(data.GetNumberOfPoints()));
+		/ data.GetNumberOfPoints());
 
 	// Determine ssTotal (total sum of squares) and ssResidual (residual sum of squares)
 	double ssTotal(0.0), ssResidual(0.0);
@@ -113,7 +113,7 @@ void CurveFit::ComputeRSquared(const Dataset2D &data, PolynomialFit& fit)
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 	{
 		ssTotal += (data.GetY()[i] - yBar) * (data.GetY()[i] - yBar);
-		double fitValue(EvaluateFit(data.GetX()[i], fit));
+		const double fitValue(EvaluateFit(data.GetX()[i], fit));
 		ssResidual += (data.GetY()[i] - fitValue) * (data.GetY()[i] - fitValue);
 	}
 
@@ -146,7 +146,7 @@ double CurveFit::EvaluateFit(const double &x, const PolynomialFit& fit)
 	double value(0.0);
 	unsigned int i;
 	for (i = 0; i <= fit.order; ++i)
-		value += fit.coefficients[i] * pow(x, static_cast<int>(i));
+		value += fit.coefficients[i] * pow(x, i);
 
 	return value;
 }

@@ -228,7 +228,7 @@ void FFTDialog::ConfigureControls()
 	unsigned int i;
 	for (i = 1; i <= maxPower; ++i)
 		mWindowSizeCombo->Append(wxString::Format("%u",
-			static_cast<unsigned int>(pow(2, static_cast<double>(i)))));
+			static_cast<unsigned int>(pow(2, i))));
 	mWindowSizeCombo->SetSelection(mWindowSizeCombo->GetCount() - 1);
 }
 
@@ -524,7 +524,7 @@ void FFTDialog::UpdateOutputControls()
 
 	mFrequencyRange->SetLabel(wxString::Format("%0.3f Hz", 0.5 / mSampleTime));
 	mFrequencyResolution->SetLabel(wxString::Format("%0.3f Hz",
-		1.0 / (mSampleTime * static_cast<double>(GetWindowSize()))));
+		1.0 / (mSampleTime * GetWindowSize())));
 	mNumberOfAverages->SetLabel(wxString::Format("%i",
 		FastFourierTransform::GetNumberOfAverages(GetWindowSize(),
 			GetOverlap(), GetPointCount())));

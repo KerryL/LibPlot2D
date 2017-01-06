@@ -696,10 +696,10 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 	// The angle is determined by how much the mouse moved.  800 pixels of movement will result in
 	// a full 360 degrees rotation.
 	// TODO:  Add user-adjustable rotation sensitivity (actually, all of the interactions can be adjustable)
-	double angle{ sqrt(fabs(static_cast<double>((xDistance - lastXDistance)
-		* (xDistance - lastXDistance))
-		+ static_cast<double>((yDistance - lastYDistance)
-		* (yDistance - lastYDistance)))) / 800.0 * 360.0 };// [deg]
+	const double angle{ sqrt(fabs(static_cast<double>(
+		(xDistance - lastXDistance) * (xDistance - lastXDistance)
+		+ (yDistance - lastYDistance) * (yDistance - lastYDistance))))
+		/ 800.0 * 360.0 };// [deg]
 
 	Translate(mModelviewMatrix, mFocalPoint);
 	Rotate(mModelviewMatrix, angle, axisOfRotation);
@@ -796,24 +796,23 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 
 		upDirection = TransformToModel(upDirection);
 		normal = TransformToModel(normal);
-		Eigen::Vector3d leftDirection{ normal.cross(upDirection) };
+		const Eigen::Vector3d leftDirection{ normal.cross(upDirection) };
 
 		// Get a vector that represents the mouse position relative to the
 		// center of the screen
-		Eigen::Vector3d mouseVector{ upDirection *
-			static_cast<double>(GetSize().GetHeight() / 2 - event.GetY())
-			+ leftDirection *
-			static_cast<double>(GetSize().GetWidth() / 2 - event.GetX()) };
-		Eigen::Vector3d lastMouseVector{ upDirection *
-			static_cast<double>(GetSize().GetHeight() / 2 - mLastMousePosition[1])
-			+ leftDirection *
-			static_cast<double>(GetSize().GetWidth() / 2 - mLastMousePosition[0]) };
+		const Eigen::Vector3d mouseVector{ upDirection
+			* (GetSize().GetHeight() * 0.5 - event.GetY())
+			+ leftDirection * (GetSize().GetWidth() * 0.5 - event.GetX()) };
+		const Eigen::Vector3d lastMouseVector{ upDirection
+			* (GetSize().GetHeight() * 0.5 - mLastMousePosition[1])
+			+ leftDirection
+			* (GetSize().GetWidth() * 0.5 - mLastMousePosition[0]) };
 
 		// Get a vector that represents the mouse motion (projected onto a
 		// plane with the camera position as a normal)
-		Eigen::Vector3d mouseMotion = mouseVector - lastMouseVector;
+		Eigen::Vector3d mouseMotion(mouseVector - lastMouseVector);
 
-		double motionFactor = 0.15;
+		const double motionFactor = 0.15;
 		mouseMotion *= motionFactor;
 
 		Translate(mModelviewMatrix, mouseMotion);
@@ -998,7 +997,7 @@ void RenderWindow::AutoSetFrustum()
 	if (!mView3D)
 		return;
 
-	wxSize windowSize = GetSize();
+	const wxSize windowSize(GetSize());
 	mAspectRatio = static_cast<double>(windowSize.GetWidth())
 		/ static_cast<double>(windowSize.GetHeight());
 }

@@ -115,11 +115,14 @@ wxDragResult DropTarget::OnData(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
 	if (!GetData())
 		return wxDragNone;
 
-	wxDataObjectComposite *dataObject = static_cast<wxDataObjectComposite*>(m_dataObject);
-	size_t bufferSize = dataObject->GetDataSize(dataObject->GetReceivedFormat());
+	wxDataObjectComposite *dataObject(
+		static_cast<wxDataObjectComposite*>(m_dataObject));
+	const size_t bufferSize(
+		dataObject->GetDataSize(dataObject->GetReceivedFormat()));
 
 	std::vector<char> buffer(bufferSize);
-	if (!dataObject->GetDataHere(dataObject->GetReceivedFormat(), buffer.data()))
+	if (!dataObject->GetDataHere(
+		dataObject->GetReceivedFormat(), buffer.data()))
 		return wxDragNone;
 
 	if (dataObject->GetReceivedFormat().GetType() == wxDF_FILENAME)

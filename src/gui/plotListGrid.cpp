@@ -223,10 +223,10 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 //=============================================================================
 unsigned int PlotListGrid::AddDataRow(const wxString &name)
 {
-	unsigned int index = GetNumberRows();
+	const unsigned int index(GetNumberRows());
 	AppendRows();
 
-	unsigned int maxMarkerSize(5);
+	const unsigned int maxMarkerSize(5);
 
 	SetCellRenderer(index, static_cast<int>(Column::Visible), new wxGridCellBoolRenderer);
 	SetCellRenderer(index, static_cast<int>(Column::RightAxis), new wxGridCellBoolRenderer);
@@ -240,14 +240,14 @@ unsigned int PlotListGrid::AddDataRow(const wxString &name)
 	SetReadOnly(index, static_cast<int>(Column::MarkerSize), false);
 	SetCellValue(index, static_cast<int>(Column::Name), name);
 
-	Color color = GetNextColor(index);
+	const Color color(GetNextColor(index));
 
 	SetCellBackgroundColour(index, static_cast<int>(Column::Color), color.ToWxColor());
 	SetCellValue(index, static_cast<int>(Column::LineSize), _T("1"));
 	SetCellValue(index, static_cast<int>(Column::MarkerSize), _T("-1"));
 	SetCellValue(index, static_cast<int>(Column::Visible), _T("1"));
 
-	int width = GetColSize(static_cast<int>(Column::Name));
+	const int width(GetColSize(static_cast<int>(Column::Name)));
 	AutoSizeColumn(static_cast<int>(Column::Name), false);
 	if (GetColSize(static_cast<int>(Column::Name)) < width)
 		SetColSize(static_cast<int>(Column::Name), width);

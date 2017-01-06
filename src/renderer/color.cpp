@@ -337,10 +337,10 @@ void Color::Set(const double &red, const double &green, const double &blue,
 void Color::Set(const wxColor &color)
 {
 	// Convert from the wxColor to Color
-	mRed = static_cast<double>(color.Red()) / 255.0;
-	mGreen = static_cast<double>(color.Green()) / 255.0;
-	mBlue = static_cast<double>(color.Blue()) / 255.0;
-	mAlpha = static_cast<double>(color.Alpha()) / 255.0;
+	mRed = color.Red() / 255.0;
+	mGreen = color.Green() / 255.0;
+	mBlue = color.Blue() / 255.0;
+	mAlpha = color.Alpha() / 255.0;
 
 	ValidateColor();
 }

@@ -392,14 +392,15 @@ std::vector<std::pair<int, double>> Filter::PadMissingTerms(
 	std::sort(terms.begin(), terms.end(),
 		std::greater<std::pair<int, double>>());// Sort in descending order of power
 
-	int i, expectedPower(terms[0].first - 1);
+	int expectedPower(terms[0].first - 1);
 	while (expectedPower < -1)
 	{
 		++expectedPower;
 		terms.insert(terms.begin(), std::make_pair(expectedPower + 1, 0.0));
 	}
 
-	for (i = 1; i < static_cast<int>(terms.size()); ++i)
+	unsigned int i;
+	for (i = 1; i < terms.size(); ++i)
 	{
 		if (terms[i].first != expectedPower)
 			terms.insert(terms.begin() + i, std::make_pair(expectedPower, 0.0));

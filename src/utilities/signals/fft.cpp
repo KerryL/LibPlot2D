@@ -84,7 +84,7 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 
 	if (windowSize == 0)
 		windowSize = static_cast<unsigned int>(
-			pow(2, static_cast<double>(GetMaxPowerOfTwo(data.GetNumberOfPoints()))));
+			pow(2, GetMaxPowerOfTwo(data.GetNumberOfPoints())));
 
 	Dataset2D rawFFT, fft;
 	const unsigned int count(
@@ -150,10 +150,10 @@ Dataset2D FastFourierTransform::ChopSample(const Dataset2D &data,
 {
 	assert(overlap >= 0.0 && overlap <= 1.0 && windowSize > 0);
 
-	unsigned int overlapSize(static_cast<unsigned int>(overlap * windowSize));
+	unsigned int overlapSize(static_cast<unsigned int>(overlap) * windowSize);
 	if (overlapSize >= windowSize)
 		overlapSize = windowSize - 1;
-	unsigned int start = sample * (windowSize - overlapSize);
+	const unsigned int start(sample * (windowSize - overlapSize));
 
 	assert(start + windowSize <= data.GetNumberOfPoints());
 
@@ -407,8 +407,8 @@ Dataset2D FastFourierTransform::ComputeCoherence(const Dataset2D& input,
 {
 	assert(input.GetNumberOfPoints() == output.GetNumberOfPoints());
 
-	unsigned int windowSize(static_cast<unsigned int>(
-		pow(2, static_cast<double>(GetMaxPowerOfTwo(input.GetNumberOfPoints())))));
+	const unsigned int windowSize(static_cast<unsigned int>(
+		pow(2, GetMaxPowerOfTwo(input.GetNumberOfPoints()))));
 
 	Dataset2D fftIn(ComputeRawFFT(ChopSample(input, 0, windowSize, 0.0),
 		WindowType::Uniform));
@@ -683,8 +683,7 @@ void FastFourierTransform::PopulateFrequencyData(Dataset2D &data,
 {
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
-		data.GetX()[i] = static_cast<double>(i) * sampleRate
-		/ static_cast<double>(data.GetNumberOfPoints());
+		data.GetX()[i] = i * sampleRate / data.GetNumberOfPoints();
 }
 
 //=============================================================================
@@ -714,8 +713,7 @@ Dataset2D FastFourierTransform::GetAmplitudeData(const Dataset2D &rawFFT,
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetY()[i] = sqrt(rawFFT.GetX()[i] * rawFFT.GetX()[i]
-		+ rawFFT.GetY()[i] * rawFFT.GetY()[i])
-		/ static_cast<double>(rawFFT.GetNumberOfPoints());
+		+ rawFFT.GetY()[i] * rawFFT.GetY()[i]) / rawFFT.GetNumberOfPoints();
 
 	return data;
 }
@@ -987,8 +985,7 @@ void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= 1.0 - cos(
-			2.0 * M_PI * static_cast<double>(i)
-			/ double(data.GetNumberOfPoints() - 1));
+			2.0 * M_PI * i / (data.GetNumberOfPoints() - 1.0));
 }
 
 //=============================================================================
@@ -1010,11 +1007,11 @@ void FastFourierTransform::ApplyHannWindow(Dataset2D &data)
 //=============================================================================
 void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 {
+	const double pointsMinusOne(data.GetNumberOfPoints() - 1.0);
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= (0.54 - 0.46
-		* cos(2.0 * M_PI * static_cast<double>(i)
-			/ double(data.GetNumberOfPoints() - 1))) / 0.54;
+		* cos(2.0 * M_PI * i / pointsMinusOne)) / 0.54;
 }
 
 //=============================================================================
@@ -1037,17 +1034,14 @@ void FastFourierTransform::ApplyHammingWindow(Dataset2D &data)
 //=============================================================================
 void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 {
+	const double pointsMinusOne(data.GetNumberOfPoints() - 1.0);
 	unsigned int i;
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
 		data.GetX()[i] *= 1.0
-		- 1.93 * cos(2.0 * M_PI * static_cast<double>(i)
-			/ double(data.GetNumberOfPoints() - 1))
-		+ 1.29 * cos(4.0 * M_PI * static_cast<double>(i)
-			/ double(data.GetNumberOfPoints() - 1))
-		- 0.388 * cos(6.0 * M_PI * static_cast<double>(i)
-			/ double(data.GetNumberOfPoints() - 1))
-		+ 0.032 * cos(8.0 * M_PI * static_cast<double>(i)
-			/ double(data.GetNumberOfPoints() - 1));
+		- 1.93 * cos(2.0 * M_PI * i / pointsMinusOne)
+		+ 1.29 * cos(4.0 * M_PI * i / pointsMinusOne)
+		- 0.388 * cos(6.0 * M_PI * i / pointsMinusOne)
+		+ 0.032 * cos(8.0 * M_PI * i / pointsMinusOne);
 }
 
 //=============================================================================
@@ -1091,9 +1085,9 @@ void FastFourierTransform::ApplyFlatTopWindow(Dataset2D &data)
 void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 {
 	unsigned int i;
-	double tau(-(data.GetNumberOfPoints() - 1.0) / log(0.02));
+	const double tau((1.0 - data.GetNumberOfPoints()) / log(0.02));
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
-		data.GetX()[i] *= exp(-static_cast<double>(i) / tau);
+		data.GetX()[i] *= exp(-i / tau);
 }
 
 //=============================================================================
@@ -1154,7 +1148,7 @@ unsigned int FastFourierTransform::GetNumberOfAverages(
 	const unsigned int windowSize, const double &overlap,
 	const unsigned int &dataSize)
 {
-	unsigned int overlapSize = static_cast<unsigned int>(overlap * windowSize);
+	unsigned int overlapSize(static_cast<unsigned int>(overlap) * windowSize);
 	if (overlapSize >= windowSize)
 		overlapSize = windowSize - 1;
 	return (dataSize - overlapSize) / (windowSize - overlapSize);
@@ -1182,7 +1176,7 @@ double FastFourierTransform::ComputeOverlap(unsigned int &windowSize,
 	unsigned int &numberOfAverages, const unsigned int &dataSize)
 {
 	unsigned int maxWindowSize(static_cast<unsigned int>(
-		pow(2.0, static_cast<double>(GetMaxPowerOfTwo(dataSize)))));
+		pow(2, GetMaxPowerOfTwo(dataSize))));
 	if (numberOfAverages == 1)
 	{
 		windowSize = maxWindowSize;
@@ -1233,7 +1227,8 @@ unsigned int FastFourierTransform::ComputeRequiredOverlapPoints(
 	if (averages == 1)
 		return 0;
 
-	const double overlap((static_cast<double>(dataSize) - windowSize * averages) / (1.0 - averages));
+	const double overlap((static_cast<double>(dataSize)
+		- windowSize * averages) / (1.0 - averages));
 	if (overlap < 0.0)
 		return 0;
 

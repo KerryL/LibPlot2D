@@ -438,7 +438,7 @@ void CreateSignalDialog::CreateSignal(const double &startTime, const double &dur
 	unsigned int i;
 	for (i = 0; i < mDataset->GetNumberOfPoints(); ++i)
 	{
-		const double time(startTime + static_cast<double>(i) / sampleRate);
+		const double time(startTime + i / sampleRate);
 		mDataset->GetX()[i] = time;
 		mDataset->GetY()[i] = GetValue(time);
 	}
@@ -577,7 +577,7 @@ double CreateSignalDialog::GetValue(const double &time)
 			!mFinalValueTextBox->GetValue().ToDouble(&offset))
 			return 0.0;
 
-		return fmod(static_cast<double>(rand()) / RAND_MAX * amplitude, amplitude) + offset - amplitude * 0.5;
+		return fmod(rand() * amplitude / RAND_MAX, amplitude) + offset - amplitude * 0.5;
 	}
 
 	assert(false);

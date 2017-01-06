@@ -990,8 +990,8 @@ void FilterDialog::GetLowPassTF(wxString &numerator, wxString &denominator,
 	if (order > 1 && !mDampingRatioBox->GetValue().ToDouble(&damping))
 		return;
 
-	numerator = wxString::Format("%0.*f", PlotMath::GetPrecision(cutoff, mStringPrecision),
-		pow(cutoff, static_cast<int>(order)));
+	numerator = wxString::Format("%0.*f",
+		PlotMath::GetPrecision(cutoff, mStringPrecision), pow(cutoff, order));
 
 	if (mButterworthCheckBox->GetValue())
 		denominator = GenerateButterworthDenominator(order, cutoff);
@@ -1460,7 +1460,8 @@ wxString FilterDialog::GetPrimaryName(const wxString& name, const FilterParamete
 //		wxString
 //
 //=============================================================================
-wxString FilterDialog::AddDampingName(const wxString& name, const FilterParameters &parameters)
+wxString FilterDialog::AddDampingName(const wxString& name,
+	const FilterParameters &parameters)
 {
 	wxString s(name);
 	if (parameters.order > 1 + static_cast<unsigned int>(parameters.phaseless))
