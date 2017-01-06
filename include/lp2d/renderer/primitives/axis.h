@@ -74,13 +74,34 @@ public:
 
 	/// \name Configuration methods
 	/// @{
-	/// Must be called exactly once immediately following axis creation in
-	/// order to describe the location of this axis within the plot area.
 
+	/// Must be called exactly once immediately following axis creation.  Sets
+	/// the relationship between this axis and the adjacent axis that
+	/// intersections this one at this axis' minimum value.
+	///
+	/// \param min Adjacent axis at the minimum end of this.
 	void SetAxisAtMinEnd(const Axis *min) { assert(!mMinAxis); mMinAxis = min; mModified = true; }
+
+	/// Must be called exactly once immediately following axis creation.  Sets
+	/// the relationship between this axis and the adjacent axis that
+	/// intersections this one at this axis' maximum value.
+	///
+	/// \param max Adjacent axis at the minimum end of this.
 	void SetAxisAtMaxEnd(const Axis *max) { assert(!mMaxAxis); mMaxAxis = max; mModified = true; }
+
+	/// Must be called exactly once immediately following axis creation.  Sets
+	/// the relationship between this axis and the parallel axis on the
+	/// opposite side of the plot area.
+	///
+	/// \param opposite Axis at the opposite side of the plot area.
 	void SetOppositeAxis(const Axis *opposite) { assert(!mOppositeAxis); mOppositeAxis = opposite; mModified = true; }
 
+	/// Initializes the font objects used to render axis value and label text.
+	///
+	/// \param fontFileName Path and file name to TrueType font file.
+	/// \param size         Size of the text in pixels.
+	///
+	/// \returns True if initialization was successful.
 	bool InitializeFonts(const std::string& fontFileName, const double& size);
 
 	/// @}

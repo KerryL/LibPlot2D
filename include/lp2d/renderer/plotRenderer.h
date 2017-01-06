@@ -173,7 +173,7 @@ public:
 	/// Adds the specified curve to the list of rendered curves.  Internally
 	/// creates a PlotCurve object and adds it to this.
 	///
-	/// \data Data set to add.
+	/// \param data Data set to add.
 	void AddCurve(const Dataset2D &data);
 
 	/// Removes all curves from the list.

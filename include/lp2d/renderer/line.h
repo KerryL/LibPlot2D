@@ -106,28 +106,84 @@ public:
 		Manual///< Caller is responsible for sending to OpenGL.
 	};
 
-	/// \name Geometry creation methods.
+	/// \name Geometry creation methods
 	/// @{
-	/// Creates OpenGL buffers and fills them with the appropriate data.  All
-	// options must be set prior to calling these methods.
 
+	/// Creates OpenGL buffers and fills them with the appropriate geometry
+	/// data.  All options must be set prior to calling.
+	///
+	/// \param x1               X-ordinate of first end of the line.
+	/// \param y1               Y-ordinate of first end of the line.
+	/// \param x2               X-ordinate of second end of the line.
+	/// \param y2               Y-ordinate of second end of the line.
+	/// \param bufferInfo [out] Information regarding populated OpenGL buffers.
+	/// \param update           Desired update method.
 	void Build(const unsigned int &x1, const unsigned int &y1,
 		const unsigned int &x2, const unsigned int &y2,
 		Primitive::BufferInfo& bufferInfo,
 		const UpdateMethod& update = UpdateMethod::Immediate) const;
+
+	/// Creates OpenGL buffers and fills them with the appropriate geometry
+	/// data.  All options must be set prior to calling.
+	///
+	/// \param x1               X-ordinate of first end of the line.
+	/// \param y1               Y-ordinate of first end of the line.
+	/// \param x2               X-ordinate of second end of the line.
+	/// \param y2               Y-ordinate of second end of the line.
+	/// \param bufferInfo [out] Information regarding populated OpenGL buffers.
+	/// \param update           Desired update method.
 	void Build(const double &x1, const double &y1, const double &x2,
 		const double &y2, Primitive::BufferInfo& bufferInfo,
 		const UpdateMethod& update = UpdateMethod::Immediate) const;
+
+	/// Creates OpenGL buffers and fills them with the appropriate geometry
+	/// data.  All options must be set prior to calling.  Each point after the
+	/// first results in a new line segment (i.e. this creates continuous
+	/// lines).
+	///
+	/// \param points           List of x-y pairs designating the shape of the
+	///                         line.
+	/// \param bufferInfo [out] Information regarding populated OpenGL buffers.
+	/// \param update           Desired update method.
 	void Build(
 		const std::vector<std::pair<unsigned int, unsigned int>> &points,
 		Primitive::BufferInfo& bufferInfo,
 		const UpdateMethod& update = UpdateMethod::Immediate) const;
+
+	/// Creates OpenGL buffers and fills them with the appropriate geometry
+	/// data.  All options must be set prior to calling.  Each point after the
+	/// first results in a new line segment (i.e. this creates continuous
+	/// lines).
+	///
+	/// \param points           List of x-y pairs designating the shape of the
+	///                         line.
+	/// \param bufferInfo [out] Information regarding populated OpenGL buffers.
+	/// \param update           Desired update method.
 	void Build(const std::vector<std::pair<double, double>> &points,
 		Primitive::BufferInfo& bufferInfo,
 		const UpdateMethod& update = UpdateMethod::Immediate) const;
+
+	/// Creates OpenGL buffers and fills them with the appropriate geometry
+	/// data.  All options must be set prior to calling.  Each point after the
+	/// first results in a new line segment (i.e. this creates continuous
+	/// lines).
+	///
+	/// \param x                List of x-ordinates of line points.
+	/// \param y                List of x-ordinates of line points.
+	/// \param bufferInfo [out] Information regarding populated OpenGL buffers.
+	/// \param update           Desired update method.
 	void Build(const std::vector<double>& x,
 		const std::vector<double>& y, Primitive::BufferInfo& bufferInfo,
 		const UpdateMethod& update = UpdateMethod::Immediate) const;
+
+	/// Creates OpenGL buffers and fills them with the appropriate geometry
+	/// data.  All options must be set prior to calling.  For every two points,
+	/// one line segment is drawn (i.e. this creates discontinuous lines).
+	///
+	/// \param points           List of x-y pairs designating the locations of
+	///                         the segments.
+	/// \param bufferInfo [out] Information regarding populated OpenGL buffers.
+	/// \param update           Desired update method.
 	void BuildSegments(const std::vector<std::pair<double, double>> &points,
 		Primitive::BufferInfo& bufferInfo,
 		const UpdateMethod& update = UpdateMethod::Immediate) const;
@@ -136,12 +192,29 @@ public:
 
 	/// \name Methods for executing the OpenGL rendering.
 	/// @{
-	/// To be called after Build() or BuildSegments() has been used to generate
-	/// Primitive::BufferInfo objects.  The correct method must be called
-	/// according to how the buffer was created.
 
+	/// To be called after creation of Primitive::BufferInfo objects.  This
+	/// method must only be used if geometry was created with a call to Build()
+	/// after a call to SetPretty(false).
+	///
+	/// \param vertexCount Number of vertices in the corresponding BufferInfo
+	///                    object.
 	static void DoUglyDraw(const unsigned int& vertexCount);
+
+	/// To be called after creation of Primitive::BufferInfo objects.  This
+	/// method must only be used if geometry was created with a call to Build()
+	/// or BuildSegments() after a call to SetPretty(true).
+	///
+	/// \param vertexCount Number of vertices in the corresponding BufferInfo
+	///                    object.
 	static void DoPrettyDraw(const unsigned int& indexCount);
+
+	/// To be called after creation of Primitive::BufferInfo objects.  This
+	/// method must only be used if geometry was created with a call to
+	/// BuildSegments() after a call to SetPretty(false).
+	///
+	/// \param vertexCount Number of vertices in the corresponding BufferInfo
+	///                    object.
 	static void DoUglySegmentDraw(const unsigned int& vertexCount);
 
 	/// @}

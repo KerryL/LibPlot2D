@@ -48,23 +48,75 @@ public:
 	/// \param owner Object owning the associated GUI components.
 	explicit GuiInterface(wxFrame* owner);
 
-	bool LoadFiles(const wxArrayString &filenames);
+	/// Loads the specified files.  When the first file is loaded, user will be
+	/// prompted to select which data channels to extract.  If the file format
+	/// (including header rows, etc.) of subsequent files is the same, the same
+	/// extraction options will be used.  If the file format or file header
+	/// changes, the user will be prompted to make extraction selections again.
+	///
+	/// \param fileList List of files to load.
+	///
+	/// \returns True if all files were successfully loaded.
+	bool LoadFiles(const wxArrayString &fileList);
+
+	/// Loads the specified text data as if it were read from a file.
+	///
+	/// \param data Text data to parse.
+	///
+	/// \returns True if the data was successfully loaded.
 	bool LoadText(const wxString& data);
+
+	/// Reloads the last set of data that was loaded with a single
+	/// drag-and-drop or Open button click.
 	void ReloadData();
 
-	void Copy();
-	void Paste();
+	void Copy();///< Copies rendered image to clipboard.
+	void Paste();///< Pastes delimited text as curve data.
 
+	/// Updates the y-values associated with the intersections of plot cursors
+	/// and plot curves.
+	///
+	/// \param leftVisible  True if the left cursor is visible in the plot
+	///                     area.
+	/// \param rightVisible True if the left cursor is visible in the plot
+	///                     area.
+	/// \param leftValue    The x-value at which the left cursor intersects the
+	///                     bottom axis.
+	/// \param rightValue   The x-value at which the right cursor intersects
+	///                     the bottom axis.
 	void UpdateCursorValues(const bool &leftVisible, const bool &rightVisible,
 		const double &leftValue, const double &rightValue);
 
+	/// Adds a new curve to the plot, based on the specified mathematical
+	/// expression.
+	///
+	/// \param mathString Expression to evaluate to create the new curve.
 	void AddCurve(wxString mathString);
-	void AddCurve(std::unique_ptr<Dataset2D> data, wxString name);
-	void RemoveCurve(const unsigned int &i);
-	void RemoveCurves(wxArrayInt curves);
-	void RemoveSelectedCurves();
-	void ClearAllCurves();
 
+	/// Adds a new curve representing the specified data set.
+	///
+	/// \param data Dataset for which the curve will be generated.
+	/// \param name Name to display to identify the curve.
+	void AddCurve(std::unique_ptr<Dataset2D> data, wxString name);
+
+	/// Removes the specified curve from the plot.
+	///
+	/// \param i Index of the curve to remove.
+	void RemoveCurve(const unsigned int &i);
+
+	/// Removes the specified curves from the plot.
+	///
+	/// \param curves List of curve indices to remove.
+	void RemoveCurves(wxArrayInt curves);
+
+	/// Removes all curves which are currently selected in the plot list grid.
+	void RemoveSelectedCurves();
+
+	void ClearAllCurves();///< Removes all curves from the plot.
+
+	/// Sets the text to display in the main frame's title bar.
+	///
+	/// \param title Text to display.
 	void SetApplicationTitle(const wxString& title) { mApplicationTitle = title; }
 
 	/// Enumeration for identifying known file formats that require special
@@ -73,26 +125,51 @@ public:
 	{
 		Baumuller,
 		Kollmorgen,
-		Frequency,
+		Frequency,///< Indicates that the x-axis units should be Hz.
 		Generic
 	};
 
+	/// Adds a descendant of DataFile to the list of recognizable file types.
 	template<typename T>
 	void RegisterFileType();
+
+	/// Registers all file types that are included with LibPlot2D.
 	void RegisterAllBuiltInFileTypes();
 
+	/// Gets the flag indicating the current file format.
+	/// \returns The flag indicating the current file format.
 	FileFormat GetCurrentFileFormat() const { return mCurrentFileFormat; }
 
+	/// Forces a refresh of the renderer.
 	void RefreshRenderer() { mRenderer->Refresh(); }
 
+	/// Displays a dialog allowing the user to specify the range of value for
+	/// an axis.
+	///
+	/// \param axis Context enumeration describing which axis to modify.
 	void DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis);
+
+	/// Displays a dialog allowing the user to specify an expression string,
+	/// from which a new Dataset2D can be generated.
+	///
+	/// \param defaultInput Initial value of the expression string.
 	void DisplayMathChannelDialog(wxString defaultInput = wxEmptyString);
 
-	void ExportData();
+	void ExportData();///< Exports the plotted data to a column-delimited file.
 
+	/// Displays a dialog allowing the user to generate a curve representing a
+	/// frequency response function.
 	void GenerateFRF();
+
+	/// Displays a dialog allowing the user to generate a new signal.
 	void CreateSignal();
+
+	/// Prompts the user to enter a string describing the current units for the
+	/// x-axis.
 	void SetTimeUnits();
+
+	/// \name Methods for generating new curves by modifying existing data sets.
+	/// @{
 
 	void ScaleXData(const wxArrayInt& selectedRows);
 	void PlotDerivative(const wxArrayInt& selectedRows);
@@ -104,16 +181,44 @@ public:
 	void FilterCurves(const wxArrayInt& selectedRows);
 	void FitCurves(const wxArrayInt& selectedRows);
 
+	/// @}
+
+	/// Gets a prunned data set containing only the points that lie within the
+	/// current range of the x-axis.
+	///
+	/// \param fullData Complete data set.
+	///
+	/// \returns A new, prunned, data set.
 	std::unique_ptr<Dataset2D> GetXZoomedDataset(
 		const std::unique_ptr<const Dataset2D>& fullData) const;
 
+	// TODO:  This x-axis label stuff needs to be cleaned up.
+
+	/// Sets the x-axis label to the specified string.
+	///
+	/// \param label X-axis label.
 	void SetXDataLabel(wxString label);
+
+	/// Sets the x-axis label according to the specified file format.
+	///
+	/// \param format Desired file format.
 	void SetXDataLabel(const FileFormat &format);
+
+	/// Makes a guess as to the appropriate label for the x-axis.
 	void ShowAppropriateXLabel();
 
+	/// Updates the properties of the specified curve.
+	///
+	/// \param index Index of curve to update.
 	void UpdateCurveProperties(const unsigned int &index);
-	void UpdateLegend();
+	void UpdateLegend();///< Forces an update of the plot legen.
 
+	/// Computes a scale factor for converting time data to or from seconds.
+	///
+	/// \param unit         String describing the desired units.
+	/// \param factor [out] Scale factor.
+	///
+	/// \returns True if the \p unit string was recognized.
 	static bool UnitStringToFactor(const wxString &unit, double &factor);
 
 private:
