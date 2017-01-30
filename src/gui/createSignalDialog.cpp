@@ -162,7 +162,7 @@ void CreateSignalDialog::CreateControls(const double &startTime, const double &d
 	wxArrayString signalList;
 	unsigned int i;
 	for (i = 0; i < static_cast<unsigned int>(SignalType::Count); ++i)
-		signalList.Add(GetSignalName((SignalType)i));
+		signalList.Add(GetSignalName(static_cast<SignalType>(i)));
 
 	wxStaticText *typeLabel = new wxStaticText(this, wxID_ANY, _T("Signal Type"));
 	mSignalTypeComboBox = new wxComboBox(this, wxID_ANY, GetSignalName(mLastSelection),

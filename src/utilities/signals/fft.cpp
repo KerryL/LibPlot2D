@@ -1087,7 +1087,7 @@ void FastFourierTransform::ApplyExponentialWindow(Dataset2D &data)
 	unsigned int i;
 	const double tau((1.0 - data.GetNumberOfPoints()) / log(0.02));
 	for (i = 0; i < data.GetNumberOfPoints(); ++i)
-		data.GetX()[i] *= exp(-i / tau);
+		data.GetX()[i] *= exp(-static_cast<int>(i) / tau);
 }
 
 //=============================================================================
