@@ -379,16 +379,19 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 {
 	plotList.Add(std::move(data));
 
-	mGrid->BeginBatch();
-	if (mGrid->GetNumberRows() == 0)
-		mGrid->AddTimeRow();
-	unsigned int index(mGrid->AddDataRow(name));
-	mGrid->EndBatch();
+	if (mGrid)
+	{
+		mGrid->BeginBatch();
+		if (mGrid->GetNumberRows() == 0)
+			mGrid->AddTimeRow();
+		unsigned int index(mGrid->AddDataRow(name));
+		mGrid->EndBatch();
 
-	mGrid->Scroll(-1, mGrid->GetNumberRows());
+		mGrid->Scroll(-1, mGrid->GetNumberRows());
 
-	mRenderer->AddCurve(*plotList.Back());
-	UpdateCurveProperties(index - 1, mGrid->GetNextColor(index), true, false);
+		mRenderer->AddCurve(*plotList.Back());
+		UpdateCurveProperties(index - 1, mGrid->GetNextColor(index), true, false);
+	}
 
 	UpdateCurveQuality();
 	mRenderer->UpdateDisplay();
@@ -412,12 +415,15 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 //=============================================================================
 void GuiInterface::RemoveCurve(const unsigned int &i)
 {
-	mGrid->DeleteRows(i + 1);
+	if (mGrid)
+	{
+		mGrid->DeleteRows(i + 1);
 
-	if (mGrid->GetNumberRows() == 1)
-		mGrid->DeleteRows();
+		if (mGrid->GetNumberRows() == 1)
+			mGrid->DeleteRows();
 
-	mGrid->AutoSizeColumns();
+		mGrid->AutoSizeColumns();
+	}
 
 	mRenderer->RemoveCurve(i);
 	plotList.Remove(i);
@@ -506,7 +512,7 @@ void GuiInterface::RemoveSelectedCurves()
 void GuiInterface::UpdateCursorValues(const bool &leftVisible, const bool &rightVisible,
 		const double &leftValue, const double &rightValue)
 {
-	if (mGrid == nullptr)
+	if (!mGrid)
 		return;
 
 	// TODO:  This would be nicer with smart precision so we show enough digits but not too many
@@ -628,6 +634,10 @@ void GuiInterface::RegisterAllBuiltInFileTypes()
 //=============================================================================
 void GuiInterface::ExportData()
 {
+	// TODO:  Eliminate need for this
+	if (!mGrid)
+		return;
+
 	wxString wildcard(_T("Comma Separated (*.csv)|*.csv"));
 	wildcard.append("|Tab Delimited (*.txt)|*.txt");
 
@@ -745,9 +755,16 @@ void GuiInterface::GenerateFRF()
 			_T("Accuracy Warning"), wxICON_WARNING, mOwner);
 
 	wxArrayString descriptions;
-	int i;
-	for (i = 1; i < mGrid->GetNumberRows(); ++i)
-		descriptions.Add(mGrid->GetCellValue(i, 0));
+	if (mGrid)
+	{
+		int i;
+		for (i = 1; i < mGrid->GetNumberRows(); ++i)
+			descriptions.Add(mGrid->GetCellValue(i, 0));
+	}
+	else
+	{
+		// TODO:  What here?
+	}
 
 	FRFDialog dialog(mOwner, descriptions);
 	if (dialog.ShowModal() != wxID_OK)
@@ -850,20 +867,20 @@ void GuiInterface::AddFFTCurves(const double& xFactor,
 {
 	amplitude->MultiplyXData(xFactor);
 	AddCurve(std::move(amplitude), _T("FRF Amplitude, ") + namePortion + _T(", [dB]"));
-	SetMarkerSize(mGrid->GetNumberRows() - 2, 0);
+	SetMarkerSize(plotList.GetCount() - 2, 0);
 
 	if (phase)
 	{
 		phase->MultiplyXData(xFactor);
 		AddCurve(std::move(phase), _T("FRF Phase, ") + namePortion + _T(", [deg]"));
-		SetMarkerSize(mGrid->GetNumberRows() - 2, 0);
+		SetMarkerSize(plotList.GetCount() - 2, 0);
 	}
 
 	if (coherence)
 	{
 		coherence->MultiplyXData(xFactor);
 		AddCurve(std::move(coherence), _T("FRF Coherence, ") + namePortion + _T(", [-]"));
-		SetMarkerSize(mGrid->GetNumberRows() - 2, 0);
+		SetMarkerSize(plotList.GetCount() - 2, 0);
 	}
 }
 
@@ -908,7 +925,7 @@ void GuiInterface::SetTimeUnits()
 		return;
 
 	// Check to make sure we understand what the user specified
-	wxString currentLabel(mGrid->GetCellValue(0, static_cast<int>(PlotListGrid::Column::Name)));
+	wxString currentLabel(mGrid ? wxEmptyString : mGrid->GetCellValue(0, static_cast<int>(PlotListGrid::Column::Name)));
 	mGenericXAxisLabel = _T("Time, [") + userUnits + _T("]");
 	SetXDataLabel(mGenericXAxisLabel);
 	if (!GetXAxisScalingFactor(f, &units))
@@ -936,6 +953,9 @@ void GuiInterface::SetTimeUnits()
 //=============================================================================
 void GuiInterface::ScaleXData(const wxArrayInt& selectedRows)
 {
+	if (!mGrid)// TODO:  Eliminate need for this check
+		return;
+
 	double factor(0.0);
 	wxString factorText(_T("0.0"));
 
@@ -1554,6 +1574,9 @@ std::unique_ptr<Filter> GuiInterface::GetFilter(const FilterParameters &paramete
 //=============================================================================
 void GuiInterface::UpdateLegend()
 {
+	if (!mGrid)// TODO:  Eliminate need for this check
+		return;
+
 	double lineSize;
 	long markerSize;
 	std::vector<LibPlot2D::Legend::LegendEntryInfo> entries;
@@ -1777,6 +1800,9 @@ std::unique_ptr<Dataset2D> GuiInterface::GetXZoomedDataset(
 //=============================================================================
 void GuiInterface::ShowAppropriateXLabel()
 {
+	if (!mGrid)// TODO:  Eliminate need for this check
+		return;
+
 	// If the only visible curves are frequency plots, change the x-label
 	int i;
 	bool showFrequencyLabel(false);
@@ -1977,6 +2003,9 @@ bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 //=============================================================================
 void GuiInterface::SetXDataLabel(wxString label)
 {
+	if (!mGrid)// TODO:  Eliminate need for this check
+		return;
+
 	mGrid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Name), label);
 	mRenderer->SetXLabel(label);
 }
@@ -2031,6 +2060,9 @@ void GuiInterface::SetXDataLabel(const FileFormat &format)
 //=============================================================================
 void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 {
+	if (!mGrid)// TODO:  Eliminate need for this check
+		return;
+
 	Color color;
 	color.Set(mGrid->GetCellBackgroundColour(index + 1, static_cast<int>(PlotListGrid::Column::Color)));
 	UpdateCurveProperties(index, color,
@@ -2060,6 +2092,9 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 void GuiInterface::UpdateCurveProperties(const unsigned int &index,
 	const Color &color, const bool &visible, const bool &rightAxis)
 {
+	if (!mGrid)// TODO:  Eliminate need for this check
+		return;
+
 	double lineSize;
 	long markerSize;
 	UpdateLegend();// Must come first in order to be updated simultaneously with line
