@@ -185,7 +185,7 @@ wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
 	mFileFormat.ProcessChannels(names, factors);
 
 	if (!mFileFormat.GetTimeUnits().IsEmpty())
-		names[0] = _T("Time, [") + mFileFormat.GetTimeUnits() + _T("]");
+		names[0] = _T("Time [") + mFileFormat.GetTimeUnits() + _T("]");
 
 	return names;
 }

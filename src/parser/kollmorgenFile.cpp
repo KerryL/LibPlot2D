@@ -96,7 +96,7 @@ wxArrayString KollmorgenFile::GetCurveInformation(unsigned int& headerLineCount,
 	std::string nextLine;
 	std::getline(file, nextLine);// The fourth line contains the data set labels
 	wxArrayString names = ParseLineIntoColumns(nextLine, mDelimiter);
-	names.Insert(_T("Time, [sec]"), 0);
+	names.Insert(_T("Time [sec]"), 0);
 
 	factors.resize(names.size(), 1.0);
 

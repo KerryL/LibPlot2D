@@ -926,7 +926,7 @@ void GuiInterface::SetTimeUnits()
 
 	// Check to make sure we understand what the user specified
 	wxString currentLabel(mGrid ? wxString() : mGrid->GetCellValue(0, static_cast<int>(PlotListGrid::Column::Name)));
-	mGenericXAxisLabel = _T("Time, [") + userUnits + _T("]");
+	mGenericXAxisLabel = _T("Time [") + userUnits + _T("]");
 	SetXDataLabel(mGenericXAxisLabel);
 	if (!GetXAxisScalingFactor(f, &units))
 	{

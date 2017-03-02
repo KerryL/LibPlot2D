@@ -94,7 +94,7 @@ wxArrayString BaumullerFile::GetCurveInformation(unsigned int &headerLineCount,
 		{
 			file.close();
 			factors.resize(names.size(), 1.0);
-			names[0] = _T("Time, [msec]");
+			names[0] = _T("Time [msec]");
 			headerLineCount = previousLines.size() + 5;// Extra two for min/max rows
 			return names;
 		}

@@ -259,7 +259,7 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount,
 	}
 
 	if (!mFileFormat.GetTimeUnits().IsEmpty())
-		names.Add(_T("Time, [") + mFileFormat.GetTimeUnits() + _T("]"));
+		names.Add(_T("Time [") + mFileFormat.GetTimeUnits() + _T("]"));
 	else
 		names.Add(_T("Time"));
 
@@ -276,7 +276,7 @@ wxArrayString CustomXMLFile::GetCurveInformation(unsigned int &headerLineCount,
 	mFileFormat.ProcessChannels(names, factors);
 
 	if (!mFileFormat.GetTimeUnits().IsEmpty())
-		names[0] = _T("Time, [") + mFileFormat.GetTimeUnits() + _T("]");
+		names[0] = _T("Time [") + mFileFormat.GetTimeUnits() + _T("]");
 
 	return names;
 }
