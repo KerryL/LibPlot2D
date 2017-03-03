@@ -42,6 +42,7 @@
 
 // Standard C++ headers
 #include <map>
+#include <algorithm>
 
 namespace LibPlot2D
 {
@@ -1586,16 +1587,22 @@ void GuiInterface::UpdateLegend()
 	{
 		if (mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)).IsEmpty())
 			continue;
-			
+
 		mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::LineSize)).ToDouble(&lineSize);
-		mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::MarkerSize)).ToLong(&markerSize);
-		info.color = LibPlot2D::Color(mGrid->GetCellBackgroundColour(i, static_cast<int>(PlotListGrid::Column::Color)));
 		info.lineSize = lineSize;
-		info.markerSize = markerSize;
+		info.color = LibPlot2D::Color(mGrid->GetCellBackgroundColour(i, static_cast<int>(PlotListGrid::Column::Color)));
 		info.text = mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
+
+		mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::MarkerSize)).ToLong(&markerSize);
+		if (mRenderer->CurveMarkersVisible(i - 1))
+				info.markerSize = std::max(markerSize, 1L);
+		else
+			info.markerSize = markerSize;
+
 		entries.push_back(info);
 	}
 	mRenderer->UpdateLegend(entries);
+	mRenderer->UpdateDisplay();
 }
 
 //=============================================================================
@@ -2097,16 +2104,18 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index,
 
 	double lineSize;
 	long markerSize;
-	UpdateLegend();// Must come first in order to be updated simultaneously with line
 	mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::LineSize)).ToDouble(&lineSize);
 	mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::MarkerSize)).ToLong(&markerSize);
 	mRenderer->SetCurveProperties(index, color, visible, rightAxis, lineSize, markerSize);
+
+	UpdateLegend();
+
 	mRenderer->SaveCurrentZoom();
 }
 
 //=============================================================================
 // Class:			GuiInterface
-// Function:		UpdateCurveProperties
+// Function:		Copy
 //
 // Description:		Copies the plot area image to the clipboard.
 //

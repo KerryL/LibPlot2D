@@ -4066,4 +4066,25 @@ void PlotRenderer::DoPaste()
 	}
 }
 
+//=============================================================================
+// Class:			PlotRenderer
+// Function:		CurveMarkersVisible
+//
+// Description:		Checks to see if the specified curve has visible markers.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//=============================================================================
+bool PlotRenderer::CurveMarkersVisible(const unsigned int& i) const
+{
+	return mPlot->CurveMarkersVisible(i);
+}
+
 }// namespace LibPlot2D

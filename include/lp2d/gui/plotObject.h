@@ -192,6 +192,8 @@ public:
 	/// \returns The total number of points.
 	unsigned long long GetTotalPointCount() const;
 
+	bool CurveMarkersVisible(const unsigned int& i) const;
+
 	/// Gets the offset from the side of the window for horizontal axes.
 	///
 	/// \param withLabel Indicates if the calculation should allow room for a

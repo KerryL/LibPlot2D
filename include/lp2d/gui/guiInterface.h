@@ -275,8 +275,6 @@ private:
 		std::unique_ptr<Dataset2D> amplitude, std::unique_ptr<Dataset2D> phase,
 		std::unique_ptr<Dataset2D> coherence, const wxString &namePortion);
 
-	void AddMathChannel();
-
 	void UpdateCurveQuality();
 
 	void SetMarkerSize(const unsigned int &curve, const int &size);

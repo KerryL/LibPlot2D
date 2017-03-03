@@ -2171,4 +2171,25 @@ void PlotObject::UpdateScissorArea() const
 	assert(!RenderWindow::GLHasError());
 }
 
+//=============================================================================
+// Class:			PlotObject
+// Function:		CurveMarkersVisible
+//
+// Description:		Checks to see if the specified curve has visible markers.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//=============================================================================
+bool PlotObject::CurveMarkersVisible(const unsigned int& i) const
+{
+	return mPlotList[i]->NeedsMarkersDrawn();
+}
+
 }// namespace LibPlot2D

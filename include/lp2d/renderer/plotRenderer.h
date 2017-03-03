@@ -325,6 +325,13 @@ public:
 	void DoCopy();///< Pastes clipboard data into plot.
 	void DoPaste();///< Copies plot image to clipboard.
 
+	/// Checks for visibility of the markers for the specified curve.
+	///
+	/// \param i Index of curve of interest.
+	///
+	/// \returns True if curve \p i has visible markers.
+	bool CurveMarkersVisible(const unsigned int& i) const;
+
 private:
 	static const std::string mDefaultVertexShader;
 

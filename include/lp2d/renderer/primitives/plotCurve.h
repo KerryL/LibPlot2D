@@ -81,6 +81,10 @@ public:
 	/// \returns Reference to this.
 	PlotCurve& operator=(const PlotCurve &plotCurve);
 
+	/// Checks to see if this object needs (or does) have markers rendered.
+	/// \returns True if markers should be drawn.
+	bool NeedsMarkersDrawn() const;
+
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
 	// validity of this object's parameters
@@ -103,7 +107,6 @@ private:
 
 	bool PointIsValid(const unsigned int &i) const;
 
-	bool NeedsMarkersDrawn() const;
 	void BuildMarkers();
 
 	enum class RangeSize
