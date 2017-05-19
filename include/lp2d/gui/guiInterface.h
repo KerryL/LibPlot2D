@@ -168,6 +168,13 @@ public:
 	/// x-axis.
 	void SetTimeUnits();
 
+	/// Attempts to set the time units based on the specified string.
+	///
+	/// \param unitString String describing desired time units.
+	///
+	/// \returns True if string was successfully interpreted.
+	bool SetTimeUnits(const wxString& unitString);
+
 	/// \name Methods for generating new curves by modifying existing data sets.
 	/// @{
 

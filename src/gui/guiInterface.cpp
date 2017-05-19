@@ -925,17 +925,43 @@ void GuiInterface::SetTimeUnits()
 	if (userUnits.IsEmpty())
 		return;
 
-	// Check to make sure we understand what the user specified
-	wxString currentLabel(mGrid ? wxString() : mGrid->GetCellValue(0, static_cast<int>(PlotListGrid::Column::Name)));
-	mGenericXAxisLabel = _T("Time [") + userUnits + _T("]");
-	SetXDataLabel(mGenericXAxisLabel);
-	if (!GetXAxisScalingFactor(f, &units))
-	{
-		// Set the label back to what it used to be and warn the user
-		SetXDataLabel(currentLabel);
+	if (!SetTimeUnits(userUnits))
 		wxMessageBox(_T("Could not understand units \"") + userUnits + _T("\"."), _T("Error Setting Units"), wxICON_ERROR, mOwner);
-	}
 }
+
+//=============================================================================
+// Class:			GuiInterface
+// Function:		SetTimeUnits
+//
+// Description:		Available for the user to clarify the time units when we
+//					are unable to determine them easily from the input file.
+//
+// Input Arguments:
+//		unitString	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool, true for success
+//
+//=============================================================================
+bool GuiInterface::SetTimeUnits(const wxString& unitString)
+{
+	wxString currentLabel(mGrid ? wxString() : mGrid->GetCellValue(0, static_cast<int>(PlotListGrid::Column::Name)));
+	mGenericXAxisLabel = _T("Time [") + unitString + _T("]");
+	SetXDataLabel(mGenericXAxisLabel);
+
+	double f;
+	if (!GetXAxisScalingFactor(f, nullptr))
+	{
+		SetXDataLabel(currentLabel);
+		return false;
+	}
+
+	return true;
+}
+
 //=============================================================================
 // Class:			GuiInterface
 // Function:		ScaleXData
