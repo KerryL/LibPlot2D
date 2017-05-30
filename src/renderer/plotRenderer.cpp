@@ -403,20 +403,20 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	if (mDraggingLegend && mLegend)
+	if (mDraggingLegend && mLegend && mObservedLeftButtonDown)
 		mLegend->SetDeltaPosition(event.GetX() - mLastMousePosition[0], mLastMousePosition[1] - event.GetY());
-	else if (mDraggingLeftCursor)
+	else if (mDraggingLeftCursor && mObservedLeftButtonDown)
 		mLeftCursor->SetLocation(event.GetX());
-	else if (mDraggingRightCursor)
+	else if (mDraggingRightCursor && mObservedLeftButtonDown)
 		mRightCursor->SetLocation(event.GetX());
 	// ZOOM:  Left or Right mouse button + CTRL or SHIFT
-	else if ((event.ControlDown() || event.ShiftDown()) && (event.RightIsDown() || event.LeftIsDown()))
+	else if ((event.ControlDown() || event.ShiftDown()) && (event.RightIsDown() || (event.LeftIsDown() && mObservedLeftButtonDown)))
 		ProcessZoom(event);
 	// ZOOM WITH BOX: Right mouse button
 	else if (event.RightIsDown())
 		ProcessZoomWithBox(event);
 	// PAN:  Left mouse button (includes with any buttons not caught above)
-	else if (event.LeftIsDown())
+	else if (event.LeftIsDown() && mObservedLeftButtonDown)
 		ProcessPan(event);
 	else// Not recognized
 	{
@@ -449,7 +449,7 @@ void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 {
 	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 
-	if (!mZoomBox->GetIsVisible())
+	if (!mZoomBox->GetIsVisible())// TODO:  And if not zooming by dragging right mouse button
 	{
 		ProcessRightClick(event);
 		return;
@@ -1777,6 +1777,8 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 {
+	mObservedLeftButtonDown = true;
+
 	// Check to see if we're on a cursor or the mLegend
 	if (mLegend && mLegend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
 		mDraggingLegend = true;
@@ -1804,6 +1806,10 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
 {
+	if (!mObservedLeftButtonDown)
+		return;
+	mObservedLeftButtonDown = false;
+
 	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 
 	if (mDraggingLegend)

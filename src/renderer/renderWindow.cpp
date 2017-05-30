@@ -394,6 +394,7 @@ void RenderWindow::DoResize()
 //=============================================================================
 void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 {
+	mObservedLeftButtonDown = false;
 	//SetFocus();
 	event.Skip();
 }
@@ -530,7 +531,8 @@ void RenderWindow::OnMouseWheelEvent(wxMouseEvent &event)
 //=============================================================================
 void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 {
-	if (!event.Dragging())
+	if (!event.Dragging() ||
+		(!mObservedLeftButtonDown && event.LeftIsDown()))
 	{
 		StoreMousePosition(event);
 		return;
@@ -643,6 +645,7 @@ void RenderWindow::StoreMousePosition(wxMouseEvent &event)
 void RenderWindow::OnMouseUpEvent(wxMouseEvent& WXUNUSED(event))
 {
 	mIsInteracting = false;
+	mObservedLeftButtonDown = false;
 }
 
 //=============================================================================

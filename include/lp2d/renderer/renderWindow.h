@@ -357,6 +357,10 @@ protected:
 	virtual std::string GetDefaultFragmentShader() const
 	{ return mDefaultFragmentShader; }
 
+	/// Flag indicating whether or not this object saw a left-button-down
+	/// event.  Tells us if we should respond to left-button-up or drag events.
+	bool mObservedLeftButtonDown = false;
+
 	DECLARE_EVENT_TABLE()
 
 private:
