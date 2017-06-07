@@ -325,6 +325,8 @@ void GuiInterface::ClearAllCurves()
 //
 // Input Arguments:
 //		mathString	= wxString describing the desired math operations
+//		visible		= const bool& flag indicating whether or not the curve is
+//					  initially visible
 //
 // Output Arguments:
 //		None
@@ -333,7 +335,7 @@ void GuiInterface::ClearAllCurves()
 //		None
 //
 //=============================================================================
-void GuiInterface::AddCurve(wxString mathString)
+void GuiInterface::AddCurve(wxString mathString, const bool& visible)
 {
 	// String will be empty if the user cancelled
 	if (mathString.IsEmpty())
@@ -356,7 +358,7 @@ void GuiInterface::AddCurve(wxString mathString)
 		return;
 	}
 
-	AddCurve(std::move(mathChannel), mathString.Upper());
+	AddCurve(std::move(mathChannel), mathString.Upper(), visible);
 }
 
 //=============================================================================
@@ -368,6 +370,8 @@ void GuiInterface::AddCurve(wxString mathString)
 // Input Arguments:
 //		data	= std::unique_ptr<Dataset2D> to add
 //		name	= wxString specifying the label for the curve
+//		visible	= const bool& flag indicating whether or not the curve is
+//				  initially visible
 //
 // Output Arguments:
 //		None
@@ -376,7 +380,7 @@ void GuiInterface::AddCurve(wxString mathString)
 //		None
 //
 //=============================================================================
-void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
+void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name, const bool& visible)
 {
 	plotList.Add(std::move(data));
 
@@ -391,7 +395,7 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name)
 		mGrid->Scroll(-1, mGrid->GetNumberRows());
 
 		mRenderer->AddCurve(*plotList.Back());
-		UpdateCurveProperties(index - 1, mGrid->GetNextColor(index), true, false);
+		UpdateCurveProperties(index - 1, mGrid->GetNextColor(index), visible, false);
 	}
 
 	UpdateCurveQuality();

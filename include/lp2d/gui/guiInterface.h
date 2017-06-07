@@ -91,13 +91,17 @@ public:
 	/// expression.
 	///
 	/// \param mathString Expression to evaluate to create the new curve.
-	void AddCurve(wxString mathString);
+	/// \param visible    Flag indicating whether or not the curve should be
+	///                   visible initially
+	void AddCurve(wxString mathString, const bool& visible = true);
 
 	/// Adds a new curve representing the specified data set.
 	///
-	/// \param data Dataset for which the curve will be generated.
-	/// \param name Name to display to identify the curve.
-	void AddCurve(std::unique_ptr<Dataset2D> data, wxString name);
+	/// \param data    Dataset for which the curve will be generated.
+	/// \param name    Name to display to identify the curve.
+	/// \param visible Flag indicating whether or not the curve should be
+	///                visible initially
+	void AddCurve(std::unique_ptr<Dataset2D> data, wxString name, const bool& visible = true);
 
 	/// Removes the specified curve from the plot.
 	///
