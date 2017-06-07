@@ -57,10 +57,11 @@ public:
 
 	/// Adds a new data row to the grid.
 	///
-	/// \param name The name of the curve.
+	/// \param name    The name of the curve.
+	/// \param visible Indicates whether or not the curve is selected to be visible.
 	///
 	/// \returns The row index of the new data.
-	unsigned int AddDataRow(const wxString& name);
+	unsigned int AddDataRow(const wxString& name, const bool& visible);
 
 	/// Enumeration of columns contained within the grid.
 	enum class Column

@@ -213,6 +213,7 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 //
 // Input Arguments:
 //		name	= const wxString&
+//		visible	= const bool&
 //
 // Output Arguments:
 //		None
@@ -221,7 +222,7 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 //		unsigned int specifying the index of the new data
 //
 //=============================================================================
-unsigned int PlotListGrid::AddDataRow(const wxString &name)
+unsigned int PlotListGrid::AddDataRow(const wxString &name, const bool& visible)
 {
 	const unsigned int index(GetNumberRows());
 	AppendRows();
@@ -245,7 +246,7 @@ unsigned int PlotListGrid::AddDataRow(const wxString &name)
 	SetCellBackgroundColour(index, static_cast<int>(Column::Color), color.ToWxColor());
 	SetCellValue(index, static_cast<int>(Column::LineSize), _T("1"));
 	SetCellValue(index, static_cast<int>(Column::MarkerSize), _T("-1"));
-	SetCellValue(index, static_cast<int>(Column::Visible), _T("1"));
+	SetCellValue(index, static_cast<int>(Column::Visible), visible ? _T("1") : _T("0"));
 
 	const int width(GetColSize(static_cast<int>(Column::Name)));
 	AutoSizeColumn(static_cast<int>(Column::Name), false);

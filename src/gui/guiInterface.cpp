@@ -389,7 +389,7 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name, cons
 		mGrid->BeginBatch();
 		if (mGrid->GetNumberRows() == 0)
 			mGrid->AddTimeRow();
-		unsigned int index(mGrid->AddDataRow(name));
+		unsigned int index(mGrid->AddDataRow(name, visible));
 		mGrid->EndBatch();
 
 		mGrid->Scroll(-1, mGrid->GetNumberRows());
