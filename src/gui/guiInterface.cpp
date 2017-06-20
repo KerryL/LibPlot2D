@@ -1615,7 +1615,8 @@ void GuiInterface::UpdateLegend()
 	int i;
 	for (i = 1; i < mGrid->GetNumberRows(); ++i)
 	{
-		if (mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)).IsEmpty())
+		const wxString visibilityValue(mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)));
+		if (visibilityValue.IsEmpty() || visibilityValue.Cmp(_T("0")) == 0)
 			continue;
 
 		mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::LineSize)).ToDouble(&lineSize);

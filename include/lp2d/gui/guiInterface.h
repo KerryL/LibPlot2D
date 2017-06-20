@@ -222,7 +222,7 @@ public:
 	///
 	/// \param index Index of curve to update.
 	void UpdateCurveProperties(const unsigned int &index);
-	void UpdateLegend();///< Forces an update of the plot legen.
+	void UpdateLegend();///< Forces an update of the plot legend.
 
 	/// Computes a scale factor for converting time data to or from seconds.
 	///
