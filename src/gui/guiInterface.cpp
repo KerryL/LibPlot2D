@@ -2203,7 +2203,7 @@ void GuiInterface::Paste()
 //=============================================================================
 bool GuiInterface::CurveIsVisible(const unsigned int& i) const
 {
-	const wxString visibilityValue(mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Visible)));
+	const wxString visibilityValue(mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::Visible)));
 	return !(visibilityValue.IsEmpty() || visibilityValue.Cmp(_T("0")) == 0);
 }
 
