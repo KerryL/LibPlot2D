@@ -232,6 +232,17 @@ public:
 	/// \returns True if the \p unit string was recognized.
 	static bool UnitStringToFactor(const wxString &unit, double &factor);
 
+	/// Gets the number of curves that currently exist.
+	/// \returns The number of curves that currently exist.
+	unsigned int GetCurveCount() const { return mPlotList.GetCount(); }
+
+	/// Returns status of curve visibility.
+	///
+	/// \param i Index of curve to query.
+	///
+	/// \returns True if specified curve is visible.
+	bool CurveIsVisible(const unsigned int& i) const;
+
 private:
 	wxFrame* mOwner;
 
@@ -243,7 +254,7 @@ private:
 	friend PlotListGrid::PlotListGrid(GuiInterface& guiInterface,
 		wxWindow* parent, wxWindowID id);
 
-	ManagedList<const Dataset2D> plotList;
+	ManagedList<const Dataset2D> mPlotList;
 
 	PlotListGrid* mGrid = nullptr;
 	PlotRenderer* mRenderer = nullptr;
