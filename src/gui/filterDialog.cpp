@@ -1265,7 +1265,7 @@ wxString FilterDialog::GetOrderString(const unsigned int &order)
 {
 	wxString orderString(wxString::Format("%u", order));
 	if (orderString.Last() == '1' && order != 11)
-		orderString.Append(_T("st"));
+		orderString.Append(_T("st Order"));
 	else if (orderString.Last() == '2' && order != 12)
 		orderString.Append(_T("nd Order"));
 	else if (orderString.Last() == '3' && order != 13)
