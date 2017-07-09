@@ -182,12 +182,14 @@ public:
 	/// \name Methods for generating new curves by modifying existing data sets.
 	/// @{
 
-	void ScaleXData(const wxArrayInt& selectedRows);
 	void PlotDerivative(const wxArrayInt& selectedRows);
 	void PlotIntegral(const wxArrayInt& selectedRows);
 	void PlotRMS(const wxArrayInt& selectedRows);
 	void PlotFFT(const wxArrayInt& selectedRows);
 	void TimeShift(const wxArrayInt& selectedRows);
+	void ScaleXData(const wxArrayInt& selectedRows);
+	void UnwrapData(const wxArrayInt& selectedRows);
+	void WrapData(const wxArrayInt& selectedRows);
 	void BitMask(const wxArrayInt& selectedRows);
 	void FilterCurves(const wxArrayInt& selectedRows);
 	void FitCurves(const wxArrayInt& selectedRows);

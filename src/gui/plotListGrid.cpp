@@ -57,17 +57,20 @@ BEGIN_EVENT_TABLE(PlotListGrid, wxGrid)
 	EVT_MENU(idContextFRF,							PlotListGrid::ContextFRFEvent)
 	EVT_MENU(idContextCreateSignal,					PlotListGrid::ContextCreateSignalEvent)
 	EVT_MENU(idContextSetTimeUnits,					PlotListGrid::ContextSetTimeUnitsEvent)
-	EVT_MENU(idContextScaleXData,					PlotListGrid::ContextScaleXDataEvent)
 	EVT_MENU(idContextPlotDerivative,				PlotListGrid::ContextPlotDerivativeEvent)
 	EVT_MENU(idContextPlotIntegral,					PlotListGrid::ContextPlotIntegralEvent)
 	EVT_MENU(idContextPlotRMS,						PlotListGrid::ContextPlotRMSEvent)
 	EVT_MENU(idContextPlotFFT,						PlotListGrid::ContextPlotFFTEvent)
-	EVT_MENU(idContextRemoveCurve,					PlotListGrid::ContextRemoveCurveEvent)
-	EVT_MENU(idContextBitMask,						PlotListGrid::ContextBitMaskEvent)
+	EVT_MENU(idContextScaleXData,					PlotListGrid::ContextScaleXDataEvent)
 	EVT_MENU(idContextTimeShift,					PlotListGrid::ContextTimeShiftEvent)
+	EVT_MENU(idContextUnwrap,						PlotListGrid::ContextUnwrapEvent)
+	EVT_MENU(idContextWrap,							PlotListGrid::ContextWrapEvent)
+	EVT_MENU(idContextBitMask,						PlotListGrid::ContextBitMaskEvent)
 
 	EVT_MENU(idContextFilter,						PlotListGrid::ContextFilterEvent)
 	EVT_MENU(idContextFitCurve,						PlotListGrid::ContextFitCurve)
+
+	EVT_MENU(idContextRemoveCurve,					PlotListGrid::ContextRemoveCurveEvent)
 END_EVENT_TABLE();
 
 //=============================================================================
@@ -190,6 +193,8 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 		contextMenu->Append(idContextPlotFFT, _T("Plot FFT"));
 		contextMenu->Append(idContextTimeShift, _T("Plot Time-Shifted"));
 		contextMenu->Append(idContextScaleXData, _T("Plot Time-Scaled"));
+		contextMenu->Append(idContextUnwrap, _T("Unwrap"));
+		contextMenu->Append(idContextWrap, _T("Wrap"));
 		contextMenu->Append(idContextBitMask, _T("Plot Bit"));
 
 		contextMenu->AppendSeparator();
@@ -619,6 +624,50 @@ void PlotListGrid::ContextPlotRMSEvent(wxCommandEvent& WXUNUSED(event))
 void PlotListGrid::ContextPlotFFTEvent(wxCommandEvent& WXUNUSED(event))
 {
 	mGuiInterface.PlotFFT(GetSelectedRows());
+}
+
+//=============================================================================
+// Class:			PlotListGrid
+// Function:		ContextUnwrapEvent
+//
+// Description:		Adds a curve showing the unwrapped version of the selected
+//					grid row to the plot.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotListGrid::ContextUnwrapEvent(wxCommandEvent& WXUNUSED(event))
+{
+	mGuiInterface.UnwrapData(GetSelectedRows());
+}
+
+//=============================================================================
+// Class:			PlotListGrid
+// Function:		ContextWrapEvent
+//
+// Description:		Adds a curve showing the wrapped version of the selected
+//					grid row to the plot.
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotListGrid::ContextWrapEvent(wxCommandEvent& WXUNUSED(event))
+{
+	mGuiInterface.WrapData(GetSelectedRows());
 }
 
 //=============================================================================

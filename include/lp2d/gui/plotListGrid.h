@@ -94,17 +94,20 @@ private:
 		idContextCreateSignal,
 
 		idContextSetTimeUnits,
-		idContextScaleXData,
 		idContextPlotDerivative,
 		idContextPlotIntegral,
 		idContextPlotRMS,
 		idContextPlotFFT,
-		idContextRemoveCurve,
 		idContextTimeShift,
+		idContextScaleXData,
+		idContextUnwrap,
+		idContextWrap,
 		idContextBitMask,
 
 		idContextFilter,
-		idContextFitCurve
+		idContextFitCurve,
+
+		idContextRemoveCurve
 	};
 
 	// Grid events
@@ -117,19 +120,24 @@ private:
 	// Context menu events
 	void ContextAddMathChannelEvent(wxCommandEvent &event);
 	void ContextFRFEvent(wxCommandEvent &event);
+
 	void ContextCreateSignalEvent(wxCommandEvent &event);
+
 	void ContextSetTimeUnitsEvent(wxCommandEvent &event);
-	void ContextScaleXDataEvent(wxCommandEvent &event);
 	void ContextPlotDerivativeEvent(wxCommandEvent &event);
 	void ContextPlotIntegralEvent(wxCommandEvent &event);
 	void ContextPlotRMSEvent(wxCommandEvent &event);
 	void ContextPlotFFTEvent(wxCommandEvent &event);
-	void ContextRemoveCurveEvent(wxCommandEvent &event);
 	void ContextTimeShiftEvent(wxCommandEvent &event);
+	void ContextScaleXDataEvent(wxCommandEvent &event);
+	void ContextUnwrapEvent(wxCommandEvent &event);
+	void ContextWrapEvent(wxCommandEvent &event);
 	void ContextBitMaskEvent(wxCommandEvent &event);
 
 	void ContextFilterEvent(wxCommandEvent &event);
 	void ContextFitCurve(wxCommandEvent &event);
+
+	void ContextRemoveCurveEvent(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 

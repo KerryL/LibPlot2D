@@ -19,6 +19,7 @@
 #include "lp2d/gui/filterDialog.h"
 #include "lp2d/gui/frfDialog.h"
 #include "lp2d/gui/rangeLimitsDialog.h"
+#include "lp2d/gui/rolloverSelectionDialog.h"
 #include "lp2d/parser/dataFile.h"
 #include "lp2d/parser/baumullerFile.h"
 #include "lp2d/parser/customFile.h"
@@ -1239,6 +1240,76 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 		wxString name(mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
 			+ _T(", t = t0 + "));
 		name += shiftText;
+		AddCurve(std::move(newData), name);
+	}
+}
+
+//=============================================================================
+// Class:			GuiInterface
+// Function:		UnwrapData
+//
+// Description:		Unwraps the specified curves.
+//
+// Input Arguments:
+//		selectedRows	= const wxArrayInt&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void GuiInterface::UnwrapData(const wxArrayInt& selectedRows)
+{
+	RolloverSelectionDialog dialog;
+	if (dialog.ShowModal() != wxID_OK)
+		return;
+
+	const double rolloverPoint(dialog.GetRolloverPoint());
+	for (const auto& row : selectedRows)
+	{
+		std::unique_ptr<Dataset2D> newData(
+			std::make_unique<Dataset2D>(*mPlotList[row - 1]));
+		newData->UnwrapData(rolloverPoint);
+
+		wxString name(mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
+			+ _T(", Unwrapped at ") + wxString::Format(_T("%f"), rolloverPoint));
+		AddCurve(std::move(newData), name);
+	}
+}
+
+//=============================================================================
+// Class:			GuiInterface
+// Function:		WrapData
+//
+// Description:		Wraps the specified curves.
+//
+// Input Arguments:
+//		selectedRows	= const wxArrayInt&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void GuiInterface::WrapData(const wxArrayInt& selectedRows)
+{
+	RolloverSelectionDialog dialog;
+	if (dialog.ShowModal() != wxID_OK)
+		return;
+
+	const double rolloverPoint(dialog.GetRolloverPoint());
+	for (const auto& row : selectedRows)
+	{
+		std::unique_ptr<Dataset2D> newData(
+			std::make_unique<Dataset2D>(*mPlotList[row - 1]));
+		newData->WrapData(rolloverPoint);
+
+		wxString name(mGrid->GetCellValue(row, static_cast<int>(PlotListGrid::Column::Name))
+			+ _T(", Wrapped at ") + wxString::Format(_T("%f"), rolloverPoint));
 		AddCurve(std::move(newData), name);
 	}
 }

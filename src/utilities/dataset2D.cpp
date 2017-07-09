@@ -210,6 +210,71 @@ Dataset2D& Dataset2D::XShift(const double &shift)
 
 //=============================================================================
 // Class:			Dataset2D
+// Function:		WrapData
+//
+// Description:		Applies a modulo at the specified value.
+//
+// Input Arguments:
+//		rolloverPoint	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D& reference to this object
+//
+//=============================================================================
+Dataset2D& Dataset2D::WrapData(const double& rolloverPoint)
+{
+	const double halfRollover(rolloverPoint * 0.5);
+	for (auto& y : mYData)
+		y = fmod(y + halfRollover, rolloverPoint) - halfRollover;
+		// TODO:  Only works for positive slopes
+
+	return *this;
+}
+
+//=============================================================================
+// Class:			Dataset2D
+// Function:		UnwrapData
+//
+// Description:		Undoes apparent modulo operations.
+//
+// Input Arguments:
+//		rolloverPoint	= const double&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		Dataset2D& reference to this object
+//
+//=============================================================================
+Dataset2D& Dataset2D::UnwrapData(const double& rolloverPoint)
+{
+	unsigned int i;
+	for (i = 1; i < mYData.size(); ++i)
+	{
+		// TODO:  This can be improved to also work for multiple rollovers in a single frame
+		if (fabs(mYData[i] - rolloverPoint - mYData[i - 1]) < fabs(mYData[i] - mYData[i - 1]))
+		{
+			unsigned int j;
+			for (j = i; j < mYData.size(); ++j)
+				mYData[j] -= rolloverPoint;
+		}
+		else if (fabs(mYData[i] + rolloverPoint - mYData[i - 1]) < fabs(mYData[i] - mYData[i - 1]))
+		{
+			unsigned int j;
+			for (j = i; j < mYData.size(); ++j)
+				mYData[j] += rolloverPoint;
+		}
+	}
+
+	return *this;
+}
+
+//=============================================================================
+// Class:			Dataset2D
 // Function:		operator+=
 //
 // Description:		Overloaded operator (+=).

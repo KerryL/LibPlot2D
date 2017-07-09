@@ -89,13 +89,29 @@ public:
 	/// \returns The new
 	bool GetYAt(const double &x, double &y, bool *exactValue = nullptr) const;// TODO:  Get rid of this (only used in one place in MainFrame::UpdateCursorValues)
 
-	/// Creates a new data set equivalent to this one, but with the x-data
-	/// shifted by the specified amount.
+	/// Shiftes the x-data in this dataset by the specified amount.
 	///
 	/// \param shift Value to add to each x-value.
 	///
-	/// \returns A new data set with shifted x-data.
+	/// \returns A reference to this.
 	Dataset2D& XShift(const double &shift);
+
+	/// Applies a modulo to the data such that the data spans the range +/-
+	/// \p rolloverPoint / 2.
+	///
+	/// \param rolloverPoint
+	///
+	/// \returns A reference to this.
+	Dataset2D& WrapData(const double& rolloverPoint);
+
+	/// Eliminates discontinuities in the data caused by modulo operations.
+	/// Jumps similar in magnitude to \p rolloverPoint are removed to make the
+	/// data more continuous.
+	///
+	/// \param rolloverPoint
+	///
+	/// \returns A reference to this.
+	Dataset2D& UnwrapData(const double& rolloverPoint);
 
 	/// \name Private data accessors
 	/// @{
