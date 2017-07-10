@@ -228,8 +228,12 @@ Dataset2D& Dataset2D::WrapData(const double& rolloverPoint)
 {
 	const double halfRollover(rolloverPoint * 0.5);
 	for (auto& y : mYData)
-		y = fmod(y + halfRollover, rolloverPoint) - halfRollover;
-		// TODO:  Only works for positive slopes
+	{
+		if (y > 0.0)
+			y = fmod(y + halfRollover, rolloverPoint) - halfRollover;
+		else
+			y = fmod(y - halfRollover, rolloverPoint) + halfRollover;
+	}
 
 	return *this;
 }

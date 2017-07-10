@@ -17,15 +17,48 @@
 // wxWidgets headers
 #include <wx/dialog.h>
 
+// wxWidgets forward declarations
+class wxTextCtrl;
+class wxRadioButton;
+
+namespace LibPlot2D
+{
+
+/// Dialog for selecting a point at which data might "rollover."
 class RolloverSelectionDialog : public wxDialog
 {
 public:
-	RolloverSelectionDialog() : wxDialog() {}
+	/// Constructor.
+	///
+	/// \param parent     Pointer to the window that owns this.
+	RolloverSelectionDialog(wxWindow* parent);
 
-	double GetRolloverPoint() const { return rolloverPoint; }
+	/// Gets the selected rollover point.
+	/// \returns The selected rollover point.
+	double GetRolloverPoint() const { return mRolloverPoint; }
 
 private:
-	double rolloverPoint = 360.0;
+	double mRolloverPoint = 360.0;
+
+	wxRadioButton* mRollover360Radio;
+	wxRadioButton* mRollover2PiRadio;
+	wxRadioButton* mRolloverCustomRadio;
+	wxTextCtrl* mCustomTextCtrl;
+
+	void CreateControls();
+
+	enum EventIDs
+	{
+		idRadioChange = wxID_HIGHEST + 500
+	};
+
+	void OnRadioButtonChange(wxCommandEvent& event);
+
+	bool TransferDataFromWindow() override;
+
+	DECLARE_EVENT_TABLE();
 };
+
+}// namespace LibPlot2D
 
 #endif// ROLLOVER_SELECTION_DIALOG_H_

@@ -1262,7 +1262,7 @@ void GuiInterface::TimeShift(const wxArrayInt& selectedRows)
 //=============================================================================
 void GuiInterface::UnwrapData(const wxArrayInt& selectedRows)
 {
-	RolloverSelectionDialog dialog;
+	RolloverSelectionDialog dialog(mOwner);
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
@@ -1297,7 +1297,7 @@ void GuiInterface::UnwrapData(const wxArrayInt& selectedRows)
 //=============================================================================
 void GuiInterface::WrapData(const wxArrayInt& selectedRows)
 {
-	RolloverSelectionDialog dialog;
+	RolloverSelectionDialog dialog(mOwner);
 	if (dialog.ShowModal() != wxID_OK)
 		return;
 
