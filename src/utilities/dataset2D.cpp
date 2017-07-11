@@ -938,7 +938,7 @@ Dataset2D& Dataset2D::DoExp()
 Dataset2D& Dataset2D::DoAbs()
 {
 	for (auto& y : mYData)
-		y = abs(y);
+		y = fabs(y);
 
 	return *this;
 }
