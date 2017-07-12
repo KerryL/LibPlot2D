@@ -21,6 +21,7 @@
     <ClInclude Include="..\include\lp2d\gui\plotListGrid.h" />
     <ClInclude Include="..\include\lp2d\gui\plotObject.h" />
     <ClInclude Include="..\include\lp2d\gui\rangeLimitsDialog.h" />
+    <ClInclude Include="..\include\lp2d\gui\rolloverSelectionDialog.h" />
     <ClInclude Include="..\include\lp2d\gui\textInputDialog.h" />
     <ClInclude Include="..\include\lp2d\libPlot2D.h" />
     <ClInclude Include="..\include\lp2d\parser\baumullerFile.h" />
@@ -72,6 +73,7 @@
     <ClCompile Include="..\src\gui\plotListGrid.cpp" />
     <ClCompile Include="..\src\gui\plotObject.cpp" />
     <ClCompile Include="..\src\gui\rangeLimitsDialog.cpp" />
+    <ClCompile Include="..\src\gui\rolloverSelectionDialog.cpp" />
     <ClCompile Include="..\src\gui\textInputDialog.cpp" />
     <ClCompile Include="..\src\parser\baumullerFile.cpp" />
     <ClCompile Include="..\src\parser\customFile.cpp" />

@@ -201,6 +201,9 @@
     <ClInclude Include="..\include\lp2d\utilities\flagEnum.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\lp2d\gui\rolloverSelectionDialog.h">
+      <Filter>Header Files\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gui\createSignalDialog.cpp">
@@ -337,6 +340,9 @@
     </ClCompile>
     <ClCompile Include="..\src\parser\fileTypeManager.cpp">
       <Filter>Source Files\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gui\rolloverSelectionDialog.cpp">
+      <Filter>Source Files\gui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
