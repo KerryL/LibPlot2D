@@ -730,7 +730,7 @@ void RenderWindow::DoRotate(wxMouseEvent &event)
 		/ 800.0 * 360.0 };// [deg]
 
 	Translate(mModelviewMatrix, mFocalPoint);
-	Rotate(mModelviewMatrix, angle, axisOfRotation);
+	Rotate(mModelviewMatrix, angle * M_PI / 180.0, axisOfRotation);
 	Translate(mModelviewMatrix, -mFocalPoint);
 	mModelviewModified = true;
 }
