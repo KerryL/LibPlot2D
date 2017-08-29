@@ -394,6 +394,7 @@ private:
 	virtual void OnMouseWheelEvent(wxMouseEvent &event);
 	virtual void OnMouseMoveEvent(wxMouseEvent &event);
 	virtual void OnMouseUpEvent(wxMouseEvent &event);
+	virtual void OnMouseDownEvent(wxMouseEvent& event);
 
 	// Window events
 	void OnPaint(wxPaintEvent& event);

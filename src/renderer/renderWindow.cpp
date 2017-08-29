@@ -185,6 +185,7 @@ BEGIN_EVENT_TABLE(RenderWindow, wxGLCanvas)
 	EVT_MOUSEWHEEL(			RenderWindow::OnMouseWheelEvent)
 	EVT_MOTION(				RenderWindow::OnMouseMoveEvent)
 	EVT_LEFT_UP(			RenderWindow::OnMouseUpEvent)
+	EVT_LEFT_DOWN(			RenderWindow::OnMouseDownEvent)
 	EVT_MIDDLE_UP(			RenderWindow::OnMouseUpEvent)
 	EVT_RIGHT_UP(			RenderWindow::OnMouseUpEvent)
 END_EVENT_TABLE()
@@ -642,10 +643,34 @@ void RenderWindow::StoreMousePosition(wxMouseEvent &event)
 //		None
 //
 //=============================================================================
-void RenderWindow::OnMouseUpEvent(wxMouseEvent& WXUNUSED(event))
+void RenderWindow::OnMouseUpEvent(wxMouseEvent& event)
 {
 	mIsInteracting = false;
-	mObservedLeftButtonDown = false;
+
+	if (event.GetButton() == wxMOUSE_BTN_LEFT)
+		mObservedLeftButtonDown = false;
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		OnMouseDownEvent
+//
+// Description:		Event handler for a button becoming "clicked."
+//
+// Input Arguments:
+//		event	= wxMouseEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::OnMouseDownEvent(wxMouseEvent& event)
+{
+	if (event.GetButton() == wxMOUSE_BTN_LEFT)
+		mObservedLeftButtonDown = true;
 }
 
 //=============================================================================

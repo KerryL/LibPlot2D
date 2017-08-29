@@ -1777,8 +1777,6 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 {
-	mObservedLeftButtonDown = true;
-
 	// Check to see if we're on a cursor or the mLegend
 	if (mLegend && mLegend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
 		mDraggingLegend = true;
@@ -1786,6 +1784,8 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 		mDraggingLeftCursor = true;
 	else if (mRightCursor->IsUnder(event.GetX()))
 		mDraggingRightCursor = true;
+
+	event.Skip();
 }
 
 //=============================================================================
