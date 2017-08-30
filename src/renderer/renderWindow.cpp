@@ -1586,6 +1586,27 @@ GLuint RenderWindow::CreateDefaultFragmentShader()
 
 //=============================================================================
 // Class:			RenderWindow
+// Function:		CreateDefaultGeometryShader
+//
+// Description:		Builds the default geometry shader and returns its index.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint
+//
+//=============================================================================
+GLuint RenderWindow::CreateDefaultGeometryShader()
+{
+	return CreateShader(GL_GEOMETRY_SHADER, GetDefaultFragmentShader());
+}
+
+//=============================================================================
+// Class:			RenderWindow
 // Function:		CreateShader
 //
 // Description:		Compiles the specified shader.
@@ -1693,6 +1714,9 @@ void RenderWindow::BuildShaders()
 	std::vector<GLuint> shaderList;
 	shaderList.push_back(CreateDefaultVertexShader());
 	shaderList.push_back(CreateDefaultFragmentShader());
+
+	if (HasGeometryShader())
+		shaderList.push_back(CreateDefaultGeometryShader());
 
 	ShaderInfo s;
 	s.programId = CreateProgram(shaderList);

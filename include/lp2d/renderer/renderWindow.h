@@ -357,6 +357,15 @@ protected:
 	virtual std::string GetDefaultFragmentShader() const
 	{ return mDefaultFragmentShader; }
 
+	/// Checks to see if this object has a geometry shader.
+	/// \returns True if this object has a geometry shader.
+	virtual bool HasGeometryShader() const { return false; }
+
+	/// Gets the default geometry shader for this object.
+	/// \returns Default geometry shader.
+	virtual std::string GetDefaultGeometryShader() const
+	{ return std::string(); }
+
 	/// Flag indicating whether or not this object saw a left-button-down
 	/// event.  Tells us if we should respond to left-button-up or drag events.
 	bool mObservedLeftButtonDown = false;
@@ -431,6 +440,7 @@ private:
 
 	GLuint CreateDefaultVertexShader();
 	GLuint CreateDefaultFragmentShader();
+	GLuint CreateDefaultGeometryShader();
 
 	GLuint mPositionAttributeLocation;
 	GLuint mColorAttributeLocation;
