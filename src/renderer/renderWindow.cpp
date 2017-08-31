@@ -1602,7 +1602,7 @@ GLuint RenderWindow::CreateDefaultFragmentShader()
 //=============================================================================
 GLuint RenderWindow::CreateDefaultGeometryShader()
 {
-	return CreateShader(GL_GEOMETRY_SHADER, GetDefaultFragmentShader());
+	return CreateShader(GL_GEOMETRY_SHADER, GetDefaultGeometryShader());
 }
 
 //=============================================================================
