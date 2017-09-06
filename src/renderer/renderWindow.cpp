@@ -1349,6 +1349,10 @@ void RenderWindow::Initialize3D()
 	glClearDepth(1.0);
 	glDepthFunc(GL_LEQUAL);
 
+	// Enable blending to support transparent objects
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
 }
