@@ -1720,16 +1720,37 @@ void RenderWindow::BuildShaders()
 
 	ShaderInfo s;
 	s.programId = CreateProgram(shaderList);
-	s.needsModelview = true;
-	s.needsProjection = true;
 
-	s.modelViewLocation = glGetUniformLocation(s.programId, mModelviewName.c_str());
-	s.projectionLocation = glGetUniformLocation(s.programId, mProjectionName.c_str());
-
-	mPositionAttributeLocation = glGetAttribLocation(s.programId, mPositionName.c_str());
-	mColorAttributeLocation = glGetAttribLocation(s.programId, mColorName.c_str());
-
+	AssignDefaultUniforms(s);
 	AddShader(s);
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		AssignDefaultUniforms
+//
+// Description:		Assigns uniform locations and/or values for default program.
+//
+// Input Arguments:
+//		shader	= ShaderInfo&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::AssignDefaultUniforms(ShaderInfo& shader)
+{
+	shader.needsModelview = true;
+	shader.needsProjection = true;
+
+	shader.modelViewLocation = glGetUniformLocation(shader.programId, mModelviewName.c_str());
+	shader.projectionLocation = glGetUniformLocation(shader.programId, mProjectionName.c_str());
+
+	mPositionAttributeLocation = glGetAttribLocation(shader.programId, mPositionName.c_str());
+	mColorAttributeLocation = glGetAttribLocation(shader.programId, mColorName.c_str());
 }
 
 //=============================================================================

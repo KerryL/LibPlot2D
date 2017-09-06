@@ -366,6 +366,9 @@ protected:
 	virtual std::string GetDefaultGeometryShader() const
 	{ return std::string(); }
 
+	/// Assigns required indicies and/or values for uniforms within the default shader.
+	virtual void AssignDefaultUniforms(ShaderInfo& shader);
+
 	/// Flag indicating whether or not this object saw a left-button-down
 	/// event.  Tells us if we should respond to left-button-up or drag events.
 	bool mObservedLeftButtonDown = false;
