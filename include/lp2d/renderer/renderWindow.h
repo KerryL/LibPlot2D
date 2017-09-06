@@ -264,12 +264,28 @@ public:
 	static void SendUniformMatrix(const Eigen::Matrix4d& m,
 		const GLuint& location);
 
+	/// Creates the default vertex shader.
+	/// \returns Index of new shader.
+	GLuint CreateDefaultVertexShader();
+
+	/// Creates the default fragment shader.
+	/// \returns Index of new shader.
+	GLuint CreateDefaultFragmentShader();
+
+	/// Creates the default geometry shader.
+	/// \returns Index of new shader.
+	GLuint CreateDefaultGeometryShader();
+
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
 	bool mView3D = true;///< Flag indicating whether or not scene is 3D.
-	bool mModified = true;///< Flag indicatin whether or not scene has changed.
+	bool mModified = true;///< Flag indicating whether or not scene has changed.
+	bool mCameraMoved = true;///< Flag indicating whether or not the camera has moved.
 	bool mSizeUpdateRequired = true;///< Flag indicating that size has changed.
+	bool mNeedsUniformUpdate = false;///< Flag indicating that we need to call UpdateSpecialUniforms() from Render().
+
+	virtual void UpdateSpecialUniforms() {};///< Method for derived classes to implement required uniform updates per Render() call.
 
 	ManagedList<Primitive> mPrimitiveList;///< List of objects to be rendered.
 
@@ -440,10 +456,6 @@ private:
 	static const std::string mDefaultFragmentShader;
 
 	void BuildShaders();
-
-	GLuint CreateDefaultVertexShader();
-	GLuint CreateDefaultFragmentShader();
-	GLuint CreateDefaultGeometryShader();
 
 	GLuint mPositionAttributeLocation;
 	GLuint mColorAttributeLocation;

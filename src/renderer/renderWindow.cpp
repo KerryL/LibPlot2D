@@ -263,6 +263,12 @@ void RenderWindow::Render()
 		Initialize();
 	else if (mModelviewModified)
 		UpdateModelviewMatrix();
+	else if (mCameraMoved || mNeedsUniformUpdate)
+	{
+		mCameraMoved = false;
+		mNeedsUniformUpdate = false;
+		UpdateSpecialUniforms();
+	}
 
 	glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
 		static_cast<float>(mBackgroundColor.GetGreen()),
@@ -557,6 +563,7 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 		}
 	}
 
+	mCameraMoved = true;
 	PerformInteraction(interaction, event);
 	StoreMousePosition(event);
 }
