@@ -281,10 +281,8 @@ public:
 protected:
 	bool mView3D = true;///< Flag indicating whether or not scene is 3D.
 	bool mModified = true;///< Flag indicating whether or not scene has changed.
-	bool mCameraMoved = true;///< Flag indicating whether or not the camera has moved.
 	bool mSizeUpdateRequired = true;///< Flag indicating that size has changed.
 
-	virtual void UpdateCameraUniforms() {};///< Method for derived classes to implement required uniform updates per Render() call.
 	virtual void UpdateUniformWithModelView() {};///< Method for derived classes to implement required uniform updates when the model view matrix changes.
 
 	ManagedList<Primitive> mPrimitiveList;///< List of objects to be rendered.
@@ -446,6 +444,7 @@ private:
 	// matrix
 	//void UpdateTransformationMatricies();
 	void UpdateModelviewMatrix();
+	void DoModelviewUpdate(const GLuint& modelViewLocation, const float* glModelViewMatrix);
 
 	static const std::string mModelviewName;
 	static const std::string mProjectionName;

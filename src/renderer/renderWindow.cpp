@@ -277,11 +277,6 @@ void RenderWindow::Render()
 		Initialize();
 	else if (mModelviewModified)
 		UpdateModelviewMatrix();
-	else if (mCameraMoved)
-	{
-		mCameraMoved = false;
-		UpdateCameraUniforms();
-	}
 
 	glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
 		static_cast<float>(mBackgroundColor.GetGreen()),
@@ -516,23 +511,25 @@ void RenderWindow::Initialize()
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	float glMatrix[16];
+	float glModelViewMatrix[16];
+	ConvertMatrixToGL(mModelviewMatrix, glModelViewMatrix);
+	float glProjectionMatrix[16];
+	ConvertMatrixToGL(projectionMatrix, glProjectionMatrix);
+
 	GLuint i;
 	for (i = mShaders.size(); i > 0; --i)
 	{
 		if (mShaders[i - 1].needsModelview || mShaders[i - 1].needsProjection)
 			glUseProgram(mShaders[i - 1].programId);
 
-		ConvertMatrixToGL(mModelviewMatrix, glMatrix);
-		if (mShaders[i - 1].needsModelview && mModelviewModified)
-			glUniformMatrix4fv(mShaders[i - 1].modelViewLocation, 1, GL_FALSE, glMatrix);
-		mModelviewModified = false;
+		if (mShaders[i - 1].needsModelview)
+			DoModelviewUpdate(mShaders[i - 1].modelViewLocation, glModelViewMatrix);
 
-		ConvertMatrixToGL(projectionMatrix, glMatrix);
 		if (mShaders[i - 1].needsProjection)
-			glUniformMatrix4fv(mShaders[i - 1].projectionLocation, 1, GL_FALSE, glMatrix);
+			glUniformMatrix4fv(mShaders[i - 1].projectionLocation, 1, GL_FALSE, glProjectionMatrix);
 	}
 
+	mModelviewModified = false;
 	mModified = false;
 }
 
@@ -602,7 +599,6 @@ void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 		}
 	}
 
-	mCameraMoved = true;
 	PerformInteraction(interaction, event);
 	StoreMousePosition(event);
 }
@@ -948,7 +944,8 @@ void RenderWindow::SetCameraView(const Eigen::Vector3d &position,
 // Class:			RenderWindow
 // Function:		UpdateModelviewMatrix
 //
-// Description:		Makes the openGL calls to update the modelview matrix.
+// Description:		Makes the openGL calls to update the modelview matrix for
+//					all programs.
 //
 // Input Arguments:
 //		None
@@ -962,8 +959,8 @@ void RenderWindow::SetCameraView(const Eigen::Vector3d &position,
 //=============================================================================
 void RenderWindow::UpdateModelviewMatrix()
 {
-	float glModelviewMatrix[16];
-	ConvertMatrixToGL(mModelviewMatrix, glModelviewMatrix);
+	float glModelViewMatrix[16];
+	ConvertMatrixToGL(mModelviewMatrix, glModelViewMatrix);
 
 	unsigned int i;
 	for (i = mShaders.size(); i > 0; --i)
@@ -971,13 +968,34 @@ void RenderWindow::UpdateModelviewMatrix()
 		if (mShaders[i - 1].needsModelview)
 		{
 			glUseProgram(mShaders[i - 1].programId);
-			glUniformMatrix4fv(mShaders[i - 1].modelViewLocation, 1,
-				GL_FALSE, glModelviewMatrix);
-			UpdateUniformWithModelView();
+			DoModelviewUpdate(mShaders[i - 1].modelViewLocation, glModelViewMatrix);
 		}
 	}
 
 	mModelviewModified = false;
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		DoModelviewUpdate
+//
+// Description:		Updates the modelview uniform for the current program.
+//
+// Input Arguments:
+//		modelViewLocation	= const GLuint&
+//		glModelViewMatrix	= const float*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::DoModelviewUpdate(const GLuint& modelViewLocation, const float* glModelViewMatrix)
+{
+	glUniformMatrix4fv(modelViewLocation, 1, GL_FALSE, glModelViewMatrix);
+	UpdateUniformWithModelView();
 }
 
 //=============================================================================
