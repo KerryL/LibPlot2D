@@ -283,9 +283,9 @@ protected:
 	bool mModified = true;///< Flag indicating whether or not scene has changed.
 	bool mCameraMoved = true;///< Flag indicating whether or not the camera has moved.
 	bool mSizeUpdateRequired = true;///< Flag indicating that size has changed.
-	bool mNeedsUniformUpdate = false;///< Flag indicating that we need to call UpdateSpecialUniforms() from Render().
 
-	virtual void UpdateSpecialUniforms() {};///< Method for derived classes to implement required uniform updates per Render() call.
+	virtual void UpdateCameraUniforms() {};///< Method for derived classes to implement required uniform updates per Render() call.
+	virtual void UpdateUniformWithModelView() {};///< Method for derived classes to implement required uniform updates when the model view matrix changes.
 
 	ManagedList<Primitive> mPrimitiveList;///< List of objects to be rendered.
 
@@ -335,7 +335,7 @@ protected:
 	///
 	/// \param matrix   Matrix in internal representation.
 	/// \param gl [out] OpenGL matrix represenation.
-	static void ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[]);
+	static void ConvertMatrixToGL(const Eigen::MatrixXd& matrix, float gl[]);
 
 	/// Converts from OpenGL matrix represenation to our internal type.
 	///

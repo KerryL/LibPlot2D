@@ -257,10 +257,13 @@ void RenderWindow::Render()
 		// According to https://www.khronos.org/opengl/wiki/OpenGL_Loading_Library, glewInit() may cause
 		// OpenGL error GL_INVALID_ENUM (which we observe) even if everything is actually OK.
 		// So check for errors to clear the error flag.
-		int e = glGetError();
-		assert(e == GL_NO_ERROR || e == GL_INVALID_ENUM);
+#ifdef _DEBUG
+		int e = 
+#endif// _DEBUG
+			glGetError();
 
 #ifdef _DEBUG
+		assert(e == GL_NO_ERROR || e == GL_INVALID_ENUM);
 		GetGLInfo();
 #endif// _DEBUG
 		BuildShaders();
@@ -274,11 +277,10 @@ void RenderWindow::Render()
 		Initialize();
 	else if (mModelviewModified)
 		UpdateModelviewMatrix();
-	else if (mCameraMoved || mNeedsUniformUpdate)
+	else if (mCameraMoved)
 	{
 		mCameraMoved = false;
-		mNeedsUniformUpdate = false;
-		UpdateSpecialUniforms();
+		UpdateCameraUniforms();
 	}
 
 	glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
@@ -971,8 +973,10 @@ void RenderWindow::UpdateModelviewMatrix()
 			glUseProgram(mShaders[i - 1].programId);
 			glUniformMatrix4fv(mShaders[i - 1].modelViewLocation, 1,
 				GL_FALSE, glModelviewMatrix);
+			UpdateUniformWithModelView();
 		}
 	}
+
 	mModelviewModified = false;
 }
 
@@ -1288,7 +1292,7 @@ bool RenderWindow::OrderSortPredicate(const std::unique_ptr<Primitive>& p1,
 //		None
 //
 //=============================================================================
-void RenderWindow::ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[])
+void RenderWindow::ConvertMatrixToGL(const Eigen::MatrixXd& matrix, float gl[])
 {
 	// TODO:  Can this be eliminated by using built-in eigen routines?
 	int i;
@@ -1297,34 +1301,6 @@ void RenderWindow::ConvertMatrixToGL(const Eigen::Matrix4d& matrix, float gl[])
 		int j;
 		for (j = 0; j < matrix.cols(); ++j)
 			gl[i * matrix.cols() + j] = matrix(j, i);
-	}
-}
-
-//=============================================================================
-// Class:			RenderWindow
-// Function:		ConvertGLToMatrix
-//
-// Description:		Converts from OpenGL array to Matrix type.  Size of matrix
-//					must be set before this call.
-//
-// Input Arguments:
-//		gl		= float[] in the form expected by OpenGL
-//
-// Output Arguments:
-//		matrix	= const Eigen::Matrix4d& containing the original data
-//
-// Return Value:
-//		None
-//
-//=============================================================================
-void RenderWindow::ConvertGLToMatrix(const float gl[], Eigen::Matrix4d& matrix)
-{
-	int i;
-	for (i = 0; i < matrix.rows(); ++i)
-	{
-		int j;
-		for (j = 0; j < matrix.cols(); ++j)
-			matrix(j, i) = gl[i * matrix.cols() + j];
 	}
 }
 
