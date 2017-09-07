@@ -373,7 +373,7 @@ void Line::AllocateBuffer(const unsigned int& vertexCount,
 	if (triangleCount > 0)
 		bufferInfo.indexBuffer.resize(triangleCount * 3);
 
-	//bufferInfo.vertexCountModified = false;// TODO:  OGL4 Would be good to use this, but need a way to trigger update requests
+	bufferInfo.vertexCountModified = false;
 }
 
 //=============================================================================
