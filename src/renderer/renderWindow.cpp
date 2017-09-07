@@ -77,15 +77,15 @@ const double RenderWindow::mExactPixelShift(0.375);
 //
 //=============================================================================
 const std::string RenderWindow::mDefaultVertexShader(
-	"#version 300 es\n"
+	"#version 400\n"
 	"\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"uniform mat4 projectionMatrix;\n"
 	"\n"
-	"layout(location = 0) in highp vec4 position;\n"
-	"layout(location = 1) in highp vec4 color;\n"
+	"layout(location = 0) in vec4 position;\n"
+	"layout(location = 1) in vec4 color;\n"
 	"\n"
-	"out highp vec4 vertexColor;\n"
+	"out vec4 vertexColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -111,11 +111,11 @@ const std::string RenderWindow::mDefaultVertexShader(
 //
 //=============================================================================
 const std::string RenderWindow::mDefaultFragmentShader(
-	"#version 300 es\n"
+	"#version 400\n"
 	"\n"
-	"in highp vec4 vertexColor;\n"
+	"in vec4 vertexColor;\n"
 	"\n"
-	"out highp vec4 outputColor;\n"
+	"out vec4 outputColor;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -211,9 +211,9 @@ wxGLContext* RenderWindow::GetContext()
 	if (!mContext)
 	{
 		wxGLContextAttrs attributes;
-		attributes.PlatformDefaults().OGLVersion(3, 0).EndList();
+		attributes.PlatformDefaults().OGLVersion(4, 0).EndList();
 		mContext = std::make_unique<wxGLContext>(this, nullptr, &attributes);
-		assert(mContext->IsOK() && "Minimum OpenGL verison not met (requires 3.0)");
+		assert(mContext->IsOK() && "Minimum OpenGL verison not met (requires 4.0)");
 	}
 
 	return mContext.get();
@@ -250,8 +250,19 @@ void RenderWindow::Render()
 
 	if (!mGlewInitialized)
 	{
+		glewExperimental = GL_TRUE;
 		if (glewInit() != GLEW_OK)
 			return;
+
+		// According to https://www.khronos.org/opengl/wiki/OpenGL_Loading_Library, glewInit() may cause
+		// OpenGL error GL_INVALID_ENUM (which we observe) even if everything is actually OK.
+		// So check for errors to clear the error flag.
+		int e = glGetError();
+		assert(e == GL_NO_ERROR || e == GL_INVALID_ENUM);
+
+#ifdef _DEBUG
+		GetGLInfo();
+#endif// _DEBUG
 		BuildShaders();
 		mGlewInitialized = true;
 	}
@@ -307,6 +318,32 @@ void RenderWindow::Render()
 		Render();
 
 	assert(!GLHasError());
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		GetGLInfo
+//
+// Description:		Gets useful GL version info and puts it in a string (for debugging).
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::GetGLInfo()
+{
+	std::string info;
+	info.append("Vendor:          " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))) + '\n');
+	info.append("Renderer:        " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + '\n');
+	info.append("OpenGL version:  " + std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + '\n');
+	info.append("GLSL version:    " + std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))) + '\n');
+	std::cerr << info;
 }
 
 //=============================================================================
@@ -1312,15 +1349,17 @@ void RenderWindow::Initialize2D()
 	// Disable unused options to speed-up 2D rendering
 	glDepthMask(GL_FALSE);
 	glDisable(GL_DITHER);
-	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_STENCIL_TEST);
-	glDisable(GL_FOG);
 	glDisable(GL_DEPTH_TEST);
-	glPixelZoom(1.0, 1.0);
+	//glPixelZoom(1.0, 1.0);
+
+	assert(!GLHasError());
 
 	// Enable blending to support font rendering
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	assert(!GLHasError());
 
 	mModelviewMatrix.setIdentity();
 	ShiftForExactPixelization();
@@ -1328,6 +1367,8 @@ void RenderWindow::Initialize2D()
 
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
+
+	assert(!GLHasError());
 }
 
 //=============================================================================
@@ -1352,16 +1393,24 @@ void RenderWindow::Initialize3D()
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 
+	assert(!GLHasError());
+
 	// Z-buffer settings
 	glClearDepth(1.0);
 	glDepthFunc(GL_LEQUAL);
+
+	assert(!GLHasError());
 
 	// Enable blending to support transparent objects
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	assert(!GLHasError());
+
 	// Enable antialiasing
 	glEnable(GL_MULTISAMPLE);
+
+	assert(!GLHasError());
 }
 
 //=============================================================================
@@ -1639,8 +1688,9 @@ GLuint RenderWindow::CreateShader(const GLenum& type, const std::string& shaderC
 	GLuint shader = glCreateShader(type);
 	const char* shaderString = shaderContents.c_str();
 	glShaderSource(shader, 1, &shaderString, nullptr);
-
 	glCompileShader(shader);
+
+	assert(!GLHasError());
 
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
@@ -1699,6 +1749,8 @@ GLuint RenderWindow::CreateProgram(const std::vector<GLuint>& shaderList)
 		glDetachShader(program, shader);
 		glDeleteShader(shader);
 	}
+
+	assert(!GLHasError());
 
 	return program;
 }
@@ -1967,7 +2019,9 @@ bool RenderWindow::GLHasError()
 	if (e == GL_NO_ERROR)
 		return false;
 
-	//wxString errorString = GetGLError(e);
+#ifdef _DEBUG
+	wxString errorString = GetGLError(e);
+#endif// _DEBUG
 
 	return true;
 }

@@ -91,7 +91,7 @@ void PlotCurve::InitializeMarkerVertexBuffer()
 {
 	mBufferInfo[1].GetOpenGLIndices();
 
-	mBufferInfo[1].vertexCount = mData.GetNumberOfPoints() * 4;
+	mBufferInfo[1].vertexCount = mData.GetNumberOfPoints() * 6;
 	mBufferInfo[1].vertexBuffer.resize(mBufferInfo[1].vertexCount
 		* (mRenderWindow.GetVertexDimension() + 4));
 	assert(mRenderWindow.GetVertexDimension() == 2);
@@ -246,7 +246,7 @@ void PlotCurve::GenerateGeometry()
 	if (NeedsMarkersDrawn())
 	{
 		glBindVertexArray(mBufferInfo[1].GetVertexArrayIndex());
-		glDrawArrays(GL_QUADS, 0, mBufferInfo[1].vertexCount);
+		glDrawArrays(GL_TRIANGLES, 0, mBufferInfo[1].vertexCount);
 	}
 
 	glBindVertexArray(0);
@@ -356,7 +356,7 @@ void PlotCurve::BuildMarkers()
 	float halfMarkerYSize = 2 * mMarkerSize * mYScale;
 	float halfMarkerXSize = 2 * mMarkerSize * mXScale;
 	const unsigned int dimension(mRenderWindow.GetVertexDimension());
-	const unsigned int colorStart(mData.GetNumberOfPoints() * dimension * 4);
+	const unsigned int colorStart(mData.GetNumberOfPoints() * dimension * 6);
 
 	// Use function pointers to save a few checks in the loop
 	PlotRenderer::ScalingFunction xScaleFunction(
@@ -374,37 +374,53 @@ void PlotCurve::BuildMarkers()
 		float x(static_cast<float>(xScaleFunction(mData.GetX()[i])));
 		float y(static_cast<float>(yScaleFunction(mData.GetY()[i])));
 
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension] = x + halfMarkerXSize;
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 1] = y + halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension] = x + halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 1] = y + halfMarkerYSize;
 
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension + dimension] = x + halfMarkerXSize;
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension + dimension + 1] = y - halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + dimension] = x - halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + dimension + 1] = y + halfMarkerYSize;
 
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension] = x - halfMarkerXSize;
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 2 * dimension + 1] = y - halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 2 * dimension] = x - halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 2 * dimension + 1] = y - halfMarkerYSize;
 
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension] = x - halfMarkerXSize;
-		mBufferInfo[1].vertexBuffer[i * 4 * dimension + 3 * dimension + 1] = y + halfMarkerYSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 3 * dimension] = x + halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 3 * dimension + 1] = y + halfMarkerYSize;
 
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16] = static_cast<float>(mColor.GetRed());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 1] = static_cast<float>(mColor.GetGreen());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 2] = static_cast<float>(mColor.GetBlue());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 3] = static_cast<float>(mColor.GetAlpha());
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 4 * dimension] = x - halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 4 * dimension + 1] = y - halfMarkerYSize;
 
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 4] = static_cast<float>(mColor.GetRed());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 5] = static_cast<float>(mColor.GetGreen());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 6] = static_cast<float>(mColor.GetBlue());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 7] = static_cast<float>(mColor.GetAlpha());
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 5 * dimension] = x + halfMarkerXSize;
+		mBufferInfo[1].vertexBuffer[i * 6 * dimension + 5 * dimension + 1] = y - halfMarkerYSize;
 
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 8] = static_cast<float>(mColor.GetRed());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 9] = static_cast<float>(mColor.GetGreen());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 10] = static_cast<float>(mColor.GetBlue());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 11] = static_cast<float>(mColor.GetAlpha());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 1] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 2] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 3] = static_cast<float>(mColor.GetAlpha());
 
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 12] = static_cast<float>(mColor.GetRed());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 13] = static_cast<float>(mColor.GetGreen());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 14] = static_cast<float>(mColor.GetBlue());
-		mBufferInfo[1].vertexBuffer[colorStart + i * 16 + 15] = static_cast<float>(mColor.GetAlpha());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 4] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 5] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 6] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 7] = static_cast<float>(mColor.GetAlpha());
+
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 8] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 9] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 10] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 11] = static_cast<float>(mColor.GetAlpha());
+
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 12] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 13] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 14] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 15] = static_cast<float>(mColor.GetAlpha());
+
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 16] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 17] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 18] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 19] = static_cast<float>(mColor.GetAlpha());
+
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 20] = static_cast<float>(mColor.GetRed());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 21] = static_cast<float>(mColor.GetGreen());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 22] = static_cast<float>(mColor.GetBlue());
+		mBufferInfo[1].vertexBuffer[colorStart + i * 24 + 23] = static_cast<float>(mColor.GetAlpha());
 	}
 }
 

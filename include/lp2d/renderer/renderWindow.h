@@ -465,6 +465,8 @@ private:
 	void DoResize();
 
 	bool mGlewInitialized = false;
+
+	static void GetGLInfo();
 };
 
 }// namespace LibPlot2D

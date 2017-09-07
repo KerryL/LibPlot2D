@@ -71,15 +71,15 @@ unsigned int Text::mFtReferenceCount(0);
 //
 //=============================================================================
 const std::string Text::mVertexShader(
-	"#version 300 es\n"
+	"#version 400\n"
 	"\n"
 	"uniform mat4 projectionMatrix;\n"
 	"uniform mat4 modelviewMatrix;\n"
 	"\n"
-	"layout(location = 0) in highp vec4 vertex;// <vec2 pos, vec2 tex>\n"
+	"layout(location = 0) in vec4 vertex;// <vec2 pos, vec2 tex>\n"
 	"layout(location = 1) in uint texIndex;\n"
 	"\n"
-	"out highp vec2 texCoords;\n"
+	"out vec2 texCoords;\n"
 	"flat out uint index;\n"
 	"\n"
 	"void main()\n"
@@ -107,15 +107,15 @@ const std::string Text::mVertexShader(
 //
 //=============================================================================
 const std::string Text::mFragmentShader(
-	"#version 300 es\n"
+	"#version 400\n"
 	"\n"
-	"uniform highp sampler2DArray text;\n"
-	"uniform highp vec3 textColor;\n"
+	"uniform sampler2DArray text;\n"
+	"uniform vec3 textColor;\n"
 	"\n"
-	"in highp vec2 texCoords;\n"
+	"in vec2 texCoords;\n"
 	"flat in uint index;\n"
 	"\n"
-	"out highp vec4 color;\n"
+	"out vec4 color;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
