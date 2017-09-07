@@ -289,10 +289,23 @@ void RenderWindow::Render()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
+	Primitive* firstTransparentPrimitive(nullptr);
 	if (mNeedAlphaSort)
 	{
 		std::sort(mPrimitiveList.begin(), mPrimitiveList.end(), AlphaSortPredicate);
 		mNeedAlphaSort = false;
+
+		if (mView3D)
+		{
+			for (const auto& p : mPrimitiveList)
+			{
+				if (p->GetColor().GetAlpha() < 1.0)
+				{
+					firstTransparentPrimitive = p.get();
+					break;
+				}
+			}
+		}
 	}
 
 	// Generally, all objects will have the same draw order and this won't do anything,
@@ -306,7 +319,14 @@ void RenderWindow::Render()
 	// NOTE:  Any primitive that uses it's own program should re-load the default program
 	// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
 	for (auto& p : mPrimitiveList)
+	{
+		if (firstTransparentPrimitive && p.get() == firstTransparentPrimitive)
+			glDepthMask(GL_FALSE);
 		p->Draw();
+	}
+
+	if (firstTransparentPrimitive)
+		glDepthMask(GL_TRUE);
 
 	SwapBuffers();// TODO:  Memory leak here?
 
