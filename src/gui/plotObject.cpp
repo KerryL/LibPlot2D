@@ -859,7 +859,7 @@ double PlotObject::GetFirstValidValue(const std::vector<double>& data) const
 			return value;
 	}
 
-	return data[0];
+	return 0.0;
 }
 
 //=============================================================================
