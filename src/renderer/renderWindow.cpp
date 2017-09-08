@@ -67,7 +67,7 @@ const double RenderWindow::mExactPixelShift(0.375);
 // Description:		Default vertex shader.
 //
 // Input Arguments:
-//		0	= position
+//		None
 //
 // Output Arguments:
 //		None
@@ -2005,10 +2005,10 @@ void RenderWindow::ShiftForExactPixelization()
 //		None
 //
 // Return Value:
-//		None
+//		unsigned int
 //
 //=============================================================================
-void RenderWindow::AddShader(const ShaderInfo& shader)
+unsigned int RenderWindow::AddShader(const ShaderInfo& shader)
 {
 	mShaders.push_back(shader);
 	mModified = true;
@@ -2024,6 +2024,8 @@ void RenderWindow::AddShader(const ShaderInfo& shader)
 		assert(loc.second >= 0);
 	}
 #endif// _DEBUG
+
+	return mShaders.size() - 1;
 }
 
 //=============================================================================

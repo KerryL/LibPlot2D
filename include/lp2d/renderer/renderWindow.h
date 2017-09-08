@@ -211,10 +211,6 @@ public:
 	void UseDefaultProgram();///< Sets the default program as active.
 	void UseProgram(const unsigned int& program);///< Sets the specified program as active.
 
-	/// Gets the number of stored shader programs.
-	/// \returns The number of stored shader programs.
-	unsigned int GetShaderCount() const { return mShaders.size(); }
-
 	/// Gets the location of the position attribute within the default program.
 	/// \returns The location of the position attribute.
 	GLuint GetDefaultPositionLocation() const { return GetDefaultProgramInfo().attributeLocations.find(mPositionName)->second; }
@@ -272,7 +268,9 @@ public:
 	/// Adds the specified shader to our list of programs.
 	///
 	/// \param shader Program to add.
-	void AddShader(const ShaderInfo& shader);
+	///
+	/// \returns Index of the shader.
+	unsigned int AddShader(const ShaderInfo& shader);
 
 	/// Sends the specified matrix to the specified uniform location within the
 	/// current program.

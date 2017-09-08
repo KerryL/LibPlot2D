@@ -548,9 +548,7 @@ void Text::DoInternalInitialization()
 		s.attributeLocations[mVertexName] = mVertexLocation;
 		s.attributeLocations[mTextureIndexName] = mIndexLocation;
 
-		mRenderer.AddShader(s);
-		mProgram = mRenderer.GetShaderCount() - 1;
-
+		mProgram = mRenderer.AddShader(s);
 		mInitialized = true;
 	}
 }
