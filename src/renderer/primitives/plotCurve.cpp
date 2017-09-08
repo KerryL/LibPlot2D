@@ -189,11 +189,11 @@ void PlotCurve::Update(const unsigned int& i)
 			sizeof(GLfloat) * mBufferInfo[i].vertexCount * (mRenderWindow.GetVertexDimension() + 4),
 			mBufferInfo[i].vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
-		glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
-		glVertexAttribPointer(mRenderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
+		glVertexAttribPointer(mRenderWindow.GetDefaultPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
-		glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+		glEnableVertexAttribArray(mRenderWindow.GetDefaultColorLocation());
+		glVertexAttribPointer(mRenderWindow.GetDefaultColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 			(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * mBufferInfo[i].vertexCount));
 
 		/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferInfo[i].indexBufferIndex);

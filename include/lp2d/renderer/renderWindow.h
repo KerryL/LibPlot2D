@@ -31,6 +31,7 @@
 
 // Standard C++ headers
 #include <memory>
+#include <unordered_map>
 
 namespace LibPlot2D
 {
@@ -207,15 +208,20 @@ public:
 	/// Applies a small shift to the modelview matrix to enable exact
 	/// pixelization.
 	void ShiftForExactPixelization();
-	void UseDefaultProgram() const;///< Sets the default program as active.
+	void UseDefaultProgram();///< Sets the default program as active.
+	void UseProgram(const unsigned int& program);///< Sets the specified program as active.
 
-	/// Gets the location of the position attribute within the current program.
+	/// Gets the number of stored shader programs.
+	/// \returns The number of stored shader programs.
+	unsigned int GetShaderCount() const { return mShaders.size(); }
+
+	/// Gets the location of the position attribute within the default program.
 	/// \returns The location of the position attribute.
-	GLuint GetPositionLocation() const { return mPositionAttributeLocation; }
+	GLuint GetDefaultPositionLocation() const { return GetDefaultProgramInfo().attributeLocations.find(mPositionName)->second; }
 
-	/// Gets the location of the color attribute within the current program.
+	/// Gets the location of the color attribute within the default program.
 	/// \returns The location of the color attribute.
-	GLuint GetColorLocation() const { return mColorAttributeLocation; }
+	GLuint GetDefaultColorLocation() const { return GetDefaultProgramInfo().attributeLocations.find(mColorName)->second; }
 
 	/// Gets the expected vertex dimension for this object.  Use this to ensure
 	/// compatibility with the default program when building vertex array
@@ -236,20 +242,32 @@ public:
 	/// Structre for storing information about shader programs.
 	struct ShaderInfo
 	{
-		GLuint programId;///< OpenGL id for the shader.
+		GLint programId;///< OpenGL id for the shader.
 
 		/// Flag indicating whether or not a projection matrix is required.
 		bool needsProjection;
 
-		/// Location of the projection matrix within the shader.
-		GLuint projectionLocation;
-
 		/// Flag indicating whether or not a modelview matrix is required.
 		bool needsModelview;
 
-		/// Location of the modelview matrix within the shader.
-		GLuint modelViewLocation;
+		/// Storage for locations of uniforms.
+		std::unordered_map<std::string, GLint> uniformLocations;
+
+		/// Storage for locations of attributes.
+		std::unordered_map<std::string, GLint> attributeLocations;
 	};
+
+	/// Gets information about the active GL program.
+	/// \returns Information for the active GL program.
+	const ShaderInfo& GetActiveProgramInfo() const { return mShaders[mActiveProgram]; }
+
+	/// Gets information about the default GL program.
+	/// \returns Information for the default GL program.
+	const ShaderInfo& GetDefaultProgramInfo() const { return mShaders.front(); }
+
+	/// Gets information about the specified GL program.
+	/// \returns Information for the specified GL program.
+	const ShaderInfo& GetProgramInfo(const GLuint& program) const { return mShaders[program]; }
 
 	/// Adds the specified shader to our list of programs.
 	///
@@ -276,6 +294,16 @@ public:
 	/// \returns Index of new shader.
 	GLuint CreateDefaultGeometryShader();
 
+	/// @{
+
+	/// Names given to uniforms and attributes in default GL shader programs.
+	static const std::string mModelviewName;
+	static const std::string mProjectionName;
+	static const std::string mPositionName;
+	static const std::string mColorName;
+
+	/// @}
+
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
@@ -286,6 +314,8 @@ protected:
 	virtual void UpdateUniformWithModelView() {};///< Method for derived classes to implement required uniform updates when the model view matrix changes.
 
 	ManagedList<Primitive> mPrimitiveList;///< List of objects to be rendered.
+
+	GLuint mActiveProgram = 0;
 
 	/// Stores the current location of the mouse cursor.
 	///
@@ -380,8 +410,8 @@ protected:
 	virtual std::string GetDefaultGeometryShader() const
 	{ return std::string(); }
 
-	/// Assigns required indicies and/or values for uniforms within the default shader.
-	virtual void AssignDefaultUniforms(ShaderInfo& shader);
+	/// Assigns required indicies and/or values for uniforms and attributes within the default shader.
+	virtual void AssignDefaultLocations(ShaderInfo& shader);
 
 	/// Flag indicating whether or not this object saw a left-button-down
 	/// event.  Tells us if we should respond to left-button-up or drag events.
@@ -446,18 +476,10 @@ private:
 	void UpdateModelviewMatrix();
 	void DoModelviewUpdate(const GLuint& modelViewLocation, const float* glModelViewMatrix);
 
-	static const std::string mModelviewName;
-	static const std::string mProjectionName;
-	static const std::string mPositionName;
-	static const std::string mColorName;
-
 	static const std::string mDefaultVertexShader;
 	static const std::string mDefaultFragmentShader;
 
 	void BuildShaders();
-
-	GLuint mPositionAttributeLocation;
-	GLuint mColorAttributeLocation;
 
 	Eigen::Vector3d mFocalPoint;
 

@@ -427,11 +427,11 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
-	glVertexAttribPointer(mRenderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
-	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * bufferInfo.vertexCount));
 
 	glLineWidth(2.0 * mHalfWidth);
@@ -487,11 +487,11 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
-	glVertexAttribPointer(mRenderWindow.GetPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
-	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * bufferInfo.vertexCount));
 
 	glLineWidth(2.0 * mHalfWidth);
@@ -584,12 +584,12 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
-	glVertexAttribPointer(mRenderWindow.GetPositionLocation(),
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultPositionLocation(),
 		mRenderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
-	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * 4 * points.size()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());
@@ -684,12 +684,12 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &poi
 		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), mHint);
 
-	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
-	glVertexAttribPointer(mRenderWindow.GetPositionLocation(),
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultPositionLocation(),
 		mRenderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
-	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * mRenderWindow.GetVertexDimension() * 4 * points.size()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());

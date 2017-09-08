@@ -44,14 +44,16 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-unsigned int Text::mProgram;
-unsigned int Text::mColorLocation;
-unsigned int Text::mVertexLocation;
-unsigned int Text::mIndexLocation;
-unsigned int Text::mModelviewMatrixLocation;
+GLuint Text::mProgram;
+GLint Text::mVertexLocation;
+GLint Text::mIndexLocation;
 bool Text::mInitialized(false);
 FT_Library Text::mFt;
 unsigned int Text::mFtReferenceCount(0);
+
+const std::string Text::mTextColorName("textColor");
+const std::string Text::mVertexName("vertex");
+const std::string Text::mTextureIndexName("texIndex");
 
 //=============================================================================
 // Class:			Text
@@ -430,14 +432,14 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
 
-	glUseProgram(mProgram);
+	mRenderer.UseProgram(mProgram);
 
 	// TODO:  Really, we don't want to access state here that isn't contained within BufferInfo
 	// Are we making an exception for color and orientation?  Assume that this object will
 	// be used only to render text having the same color and orientation (and size?).
 	// Maybe put some assertions in the Set() methods then to ensure it hasn't yet been initialized?
-	glUniform3f(mColorLocation, mColor.GetRed(), mColor.GetGreen(), mColor.GetBlue());
-	RenderWindow::SendUniformMatrix(mModelview, mModelviewMatrixLocation);
+	glUniform3f(mRenderer.GetActiveProgramInfo().uniformLocations.find(mTextColorName)->second, mColor.GetRed(), mColor.GetGreen(), mColor.GetBlue());
+	RenderWindow::SendUniformMatrix(mModelview, mRenderer.GetActiveProgramInfo().uniformLocations.find(RenderWindow::mModelviewName)->second);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, mTextureId);
@@ -528,19 +530,26 @@ void Text::DoInternalInitialization()
 		shaderList.push_back(mRenderer.CreateShader(GL_VERTEX_SHADER, mVertexShader));
 		shaderList.push_back(mRenderer.CreateShader(GL_FRAGMENT_SHADER, mFragmentShader));
 
-		mProgram = mRenderer.CreateProgram(shaderList);
-		mColorLocation = glGetUniformLocation(mProgram, "textColor");
-
 		RenderWindow::ShaderInfo s;
-		s.programId = mProgram;
+		s.programId = mRenderer.CreateProgram(shaderList);
 		s.needsModelview = false;
 		s.needsProjection = true;
-		s.projectionLocation = glGetUniformLocation(mProgram, "projectionMatrix");
-		mModelviewMatrixLocation = glGetUniformLocation(mProgram, "modelviewMatrix");
-		mRenderer.AddShader(s);
+		s.uniformLocations[RenderWindow::mProjectionName] = glGetUniformLocation(s.programId, RenderWindow::mProjectionName.c_str());
+		s.uniformLocations[RenderWindow::mModelviewName] = glGetUniformLocation(s.programId, RenderWindow::mModelviewName.c_str());
+		s.uniformLocations[mTextColorName] = glGetUniformLocation(s.programId, mTextColorName.c_str());
 
-		mVertexLocation = glGetAttribLocation(mProgram, "vertex");
-		mIndexLocation = glGetAttribLocation(mProgram, "texIndex");
+		assert(!RenderWindow::GLHasError());
+
+		mVertexLocation = glGetAttribLocation(s.programId, mVertexName.c_str());
+		mIndexLocation = glGetAttribLocation(s.programId, mTextureIndexName.c_str());
+
+		assert(!RenderWindow::GLHasError());
+
+		s.attributeLocations[mVertexName] = mVertexLocation;
+		s.attributeLocations[mTextureIndexName] = mIndexLocation;
+
+		mRenderer.AddShader(s);
+		mProgram = mRenderer.GetShaderCount() - 1;
 
 		mInitialized = true;
 	}
@@ -751,8 +760,8 @@ void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 
 	glEnableVertexAttribArray(mIndexLocation);
 	glVertexAttribIPointer(mIndexLocation, 1, GL_UNSIGNED_INT, 0, 0);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 

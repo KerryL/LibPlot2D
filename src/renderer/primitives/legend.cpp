@@ -1052,12 +1052,12 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
 		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
-	glEnableVertexAttribArray(mRenderWindow.GetPositionLocation());
-	glVertexAttribPointer(mRenderWindow.GetPositionLocation(),
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultPositionLocation(),
 		mRenderWindow.GetVertexDimension(), GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(mRenderWindow.GetColorLocation());
-	glVertexAttribPointer(mRenderWindow.GetColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
+	glEnableVertexAttribArray(mRenderWindow.GetDefaultColorLocation());
+	glVertexAttribPointer(mRenderWindow.GetDefaultColorLocation(), 4, GL_FLOAT, GL_FALSE, 0,
 		(void*)(sizeof(GLfloat) * bufferInfo.vertexCount * mRenderWindow.GetVertexDimension()));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferInfo.GetIndexBufferIndex());

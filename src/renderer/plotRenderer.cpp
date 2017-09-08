@@ -3046,7 +3046,7 @@ void PlotRenderer::LoadModelviewUniform(const Modelview& mv)
 		ConvertMatrixToGL(mModelviewMatrix, glModelviewMatrix);
 	}
 
-	glUniformMatrix4fv(mShaders[0].modelViewLocation, 1, GL_FALSE, glModelviewMatrix);
+	glUniformMatrix4fv(mShaders[0].uniformLocations[mModelviewName], 1, GL_FALSE, glModelviewMatrix);
 }
 
 //=============================================================================

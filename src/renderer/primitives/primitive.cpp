@@ -139,9 +139,8 @@ void Primitive::Draw()
 	{
 		if (mBufferInfo[i].vertexCountModified || mModified)
 			Update(i);
+		assert(!RenderWindow::GLHasError());
 	}
-
-	assert(!RenderWindow::GLHasError());
 
 	mModified = false;
 	GenerateGeometry();

@@ -134,13 +134,15 @@ private:
 	static const std::string mVertexShader;
 	static const std::string mFragmentShader;
 
+	static const std::string mTextColorName;
+	static const std::string mVertexName;
+	static const std::string mTextureIndexName;
+
 	RenderWindow& mRenderer;
 
-	static unsigned int mProgram;
-	static unsigned int mVertexLocation;
-	static unsigned int mColorLocation;
-	static unsigned int mIndexLocation;
-	static unsigned int mModelviewMatrixLocation;
+	static GLuint mProgram;
+	static GLint mVertexLocation;
+	static GLint mIndexLocation;
 
 	static FT_Library mFt;
 	static unsigned int mFtReferenceCount;

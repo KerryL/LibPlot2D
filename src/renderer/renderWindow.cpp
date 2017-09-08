@@ -540,13 +540,16 @@ void RenderWindow::Initialize()
 	for (i = mShaders.size(); i > 0; --i)
 	{
 		if (mShaders[i - 1].needsModelview || mShaders[i - 1].needsProjection)
-			glUseProgram(mShaders[i - 1].programId);
+			UseProgram(i - 1);
+		assert(!GLHasError());
 
 		if (mShaders[i - 1].needsModelview)
-			DoModelviewUpdate(mShaders[i - 1].modelViewLocation, glModelViewMatrix);
+			DoModelviewUpdate(mShaders[i - 1].uniformLocations[mModelviewName], glModelViewMatrix);
+		assert(!GLHasError());
 
 		if (mShaders[i - 1].needsProjection)
-			glUniformMatrix4fv(mShaders[i - 1].projectionLocation, 1, GL_FALSE, glProjectionMatrix);
+			glUniformMatrix4fv(mShaders[i - 1].uniformLocations[mProjectionName], 1, GL_FALSE, glProjectionMatrix);
+		assert(!GLHasError());
 	}
 
 	mModelviewModified = false;
@@ -987,8 +990,8 @@ void RenderWindow::UpdateModelviewMatrix()
 	{
 		if (mShaders[i - 1].needsModelview)
 		{
-			glUseProgram(mShaders[i - 1].programId);
-			DoModelviewUpdate(mShaders[i - 1].modelViewLocation, glModelViewMatrix);
+			UseProgram(i - 1);
+			DoModelviewUpdate(mShaders[i - 1].uniformLocations[mModelviewName], glModelViewMatrix);
 		}
 	}
 
@@ -1015,6 +1018,7 @@ void RenderWindow::UpdateModelviewMatrix()
 void RenderWindow::DoModelviewUpdate(const GLuint& modelViewLocation, const float* glModelViewMatrix)
 {
 	glUniformMatrix4fv(modelViewLocation, 1, GL_FALSE, glModelViewMatrix);
+	assert(!GLHasError());
 	UpdateUniformWithModelView();
 }
 
@@ -1798,13 +1802,13 @@ void RenderWindow::BuildShaders()
 	ShaderInfo s;
 	s.programId = CreateProgram(shaderList);
 
-	AssignDefaultUniforms(s);
+	AssignDefaultLocations(s);
 	AddShader(s);
 }
 
 //=============================================================================
 // Class:			RenderWindow
-// Function:		AssignDefaultUniforms
+// Function:		AssignDefaultLocations
 //
 // Description:		Assigns uniform locations and/or values for default program.
 //
@@ -1818,16 +1822,20 @@ void RenderWindow::BuildShaders()
 //		None
 //
 //=============================================================================
-void RenderWindow::AssignDefaultUniforms(ShaderInfo& shader)
+void RenderWindow::AssignDefaultLocations(ShaderInfo& shader)
 {
 	shader.needsModelview = true;
 	shader.needsProjection = true;
 
-	shader.modelViewLocation = glGetUniformLocation(shader.programId, mModelviewName.c_str());
-	shader.projectionLocation = glGetUniformLocation(shader.programId, mProjectionName.c_str());
+	shader.uniformLocations[mModelviewName] = glGetUniformLocation(shader.programId, mModelviewName.c_str());
+	shader.uniformLocations[mProjectionName] = glGetUniformLocation(shader.programId, mProjectionName.c_str());
 
-	mPositionAttributeLocation = glGetAttribLocation(shader.programId, mPositionName.c_str());
-	mColorAttributeLocation = glGetAttribLocation(shader.programId, mColorName.c_str());
+	assert(!RenderWindow::GLHasError());
+
+	shader.attributeLocations[mPositionName] = glGetAttribLocation(shader.programId, mPositionName.c_str());
+	shader.attributeLocations[mColorName] = glGetAttribLocation(shader.programId, mColorName.c_str());
+
+	assert(!RenderWindow::GLHasError());
 }
 
 //=============================================================================
@@ -1935,9 +1943,31 @@ void RenderWindow::Scale(Eigen::Matrix4d& m, const Eigen::Vector3d& v)
 //		None
 //
 //=============================================================================
-void RenderWindow::UseDefaultProgram() const
+void RenderWindow::UseDefaultProgram()
 {
-	glUseProgram(mShaders[0].programId);
+	UseProgram(0);
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		UseDefaultProgram
+//
+// Description:		Loads the default OpenGL program.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::UseProgram(const unsigned int& program)
+{
+	mActiveProgram = program;
+	glUseProgram(mShaders[program].programId);
 }
 
 //=============================================================================
@@ -1982,6 +2012,18 @@ void RenderWindow::AddShader(const ShaderInfo& shader)
 {
 	mShaders.push_back(shader);
 	mModified = true;
+
+#ifdef _DEBUG
+	for (const auto& loc : shader.uniformLocations)
+	{
+		assert(loc.second >= 0);
+	}
+
+	for (const auto& loc : shader.attributeLocations)
+	{
+		assert(loc.second >= 0);
+	}
+#endif// _DEBUG
 }
 
 //=============================================================================
