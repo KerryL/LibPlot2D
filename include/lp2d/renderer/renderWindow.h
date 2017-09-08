@@ -304,6 +304,9 @@ public:
 
 	/// @}
 
+	/// Assigns required indicies and/or values for uniforms and attributes within the default shader.
+	virtual void AssignDefaultLocations(ShaderInfo& shader);
+
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
@@ -409,9 +412,6 @@ protected:
 	/// \returns Default geometry shader.
 	virtual std::string GetDefaultGeometryShader() const
 	{ return std::string(); }
-
-	/// Assigns required indicies and/or values for uniforms and attributes within the default shader.
-	virtual void AssignDefaultLocations(ShaderInfo& shader);
 
 	/// Flag indicating whether or not this object saw a left-button-down
 	/// event.  Tells us if we should respond to left-button-up or drag events.
