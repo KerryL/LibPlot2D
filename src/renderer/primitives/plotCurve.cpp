@@ -185,8 +185,7 @@ void PlotCurve::Update(const unsigned int& i)
 		glBindVertexArray(mBufferInfo[i].GetVertexArrayIndex());
 
 		glBindBuffer(GL_ARRAY_BUFFER, mBufferInfo[i].GetVertexBufferIndex());
-		glBufferData(GL_ARRAY_BUFFER,
-			sizeof(GLfloat) * mBufferInfo[i].vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * mBufferInfo[i].vertexBuffer.size(),
 			mBufferInfo[i].vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 		glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());

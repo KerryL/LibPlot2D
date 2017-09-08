@@ -1048,8 +1048,7 @@ void Legend::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * bufferInfo.vertexBuffer.size(),
 		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());

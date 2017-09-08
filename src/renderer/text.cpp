@@ -746,7 +746,7 @@ void Text::ConfigureVertexArray(Primitive::BufferInfo& bufferInfo) const
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * bufferInfo.vertexCount,
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * bufferInfo.vertexBuffer.size(),
 		bufferInfo.vertexBuffer.data(), GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(mVertexLocation);

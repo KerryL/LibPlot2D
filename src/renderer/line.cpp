@@ -423,8 +423,7 @@ void Line::DoUglyDraw(const double &x1, const double &y1,
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * bufferInfo.vertexBuffer.size(),
 		bufferInfo.vertexBuffer.data(), mHint);
 
 	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
@@ -483,8 +482,7 @@ void Line::DoUglyDraw(const std::vector<std::pair<double, double>> &points,
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * bufferInfo.vertexBuffer.size(),
 		bufferInfo.vertexBuffer.data(), mHint);
 
 	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
@@ -580,8 +578,7 @@ void Line::DoPrettyDraw(const std::vector<std::pair<double, double>> &points,
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * bufferInfo.vertexBuffer.size(),
 		bufferInfo.vertexBuffer.data(), mHint);
 
 	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
@@ -680,8 +677,7 @@ void Line::DoPrettySegmentDraw(const std::vector<std::pair<double, double>> &poi
 	glBindVertexArray(bufferInfo.GetVertexArrayIndex());
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferInfo.GetVertexBufferIndex());
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(GLfloat) * bufferInfo.vertexCount * (mRenderWindow.GetVertexDimension() + 4),
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * bufferInfo.vertexBuffer.size(),
 		bufferInfo.vertexBuffer.data(), mHint);
 
 	glEnableVertexAttribArray(mRenderWindow.GetDefaultPositionLocation());
