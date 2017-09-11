@@ -33,6 +33,7 @@
 #include <memory>
 #include <unordered_map>
 #include <typeindex>
+#include <mutex>
 
 namespace LibPlot2D
 {
@@ -323,6 +324,13 @@ public:
 	template<typename T>
 	GLuint GetPrimitiveTypeProgram() const;
 
+	/// Accessor for the render mutex.
+	/// \returns Reference to the render mutex.
+	std::mutex& GetRenderMutex() { return renderMutex; }
+
+	/// Makes the GL context associated with this object current.
+	void MakeCurrent();
+
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
@@ -436,7 +444,7 @@ protected:
 	DECLARE_EVENT_TABLE()
 
 private:
-	static std::unique_ptr<wxGLContext> mContext;
+	std::unique_ptr<wxGLContext> mContext;
 	wxGLContext* GetContext();
 
 	static const double mExactPixelShift;
@@ -507,6 +515,8 @@ private:
 
 	std::unordered_map<std::type_index, bool> mTypeInitializedMap;
 	std::unordered_map<std::type_index, GLuint> mTypeProgramMap;
+
+	std::mutex renderMutex;
 };
 
 //=============================================================================

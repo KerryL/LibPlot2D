@@ -60,7 +60,6 @@ const std::string RenderWindow::mPositionName("position");
 const std::string RenderWindow::mColorName("color");
 
 const double RenderWindow::mExactPixelShift(0.375);
-std::unique_ptr<wxGLContext> RenderWindow::mContext;
 
 //=============================================================================
 // Class:			RenderWindow
@@ -243,94 +242,98 @@ void RenderWindow::Render()
 	if (!GetContext() || !IsShownOnScreen())
 		return;
 
-	SetCurrent(*mContext);
-	wxPaintDC(this);
-
 	const unsigned int shaderCount(mShaders.size());
 
-	assert(!GLHasError());
-
-	if (!mGlewInitialized)
 	{
-		glewExperimental = GL_TRUE;
-		if (glewInit() != GLEW_OK)
-			return;
+		std::lock_guard<std::mutex> lock(renderMutex);
 
-		// According to https://www.khronos.org/opengl/wiki/OpenGL_Loading_Library, glewInit() may cause
-		// OpenGL error GL_INVALID_ENUM (which we observe) even if everything is actually OK.
-		// So check for errors to clear the error flag.
+		SetCurrent(*mContext);
+		wxPaintDC(this);
+
+		assert(!GLHasError());
+
+		if (!mGlewInitialized)
+		{
+			glewExperimental = GL_TRUE;
+			if (glewInit() != GLEW_OK)
+				return;
+
+			// According to https://www.khronos.org/opengl/wiki/OpenGL_Loading_Library, glewInit() may cause
+			// OpenGL error GL_INVALID_ENUM (which we observe) even if everything is actually OK.
+			// So check for errors to clear the error flag.
 #ifdef _DEBUG
-		int e = 
+			int e =
 #endif// _DEBUG
-			glGetError();
+				glGetError();
 
 #ifdef _DEBUG
-		assert(e == GL_NO_ERROR || e == GL_INVALID_ENUM);
-		GetGLInfo();
+			assert(e == GL_NO_ERROR || e == GL_INVALID_ENUM);
+			GetGLInfo();
 #endif// _DEBUG
-		BuildShaders();
-		mGlewInitialized = true;
-	}
+			BuildShaders();
+			mGlewInitialized = true;
+		}
 
-	if (mSizeUpdateRequired)
-		DoResize();
+		if (mSizeUpdateRequired)
+			DoResize();
 
-	if (mModified)
-		Initialize();
-	else if (mModelviewModified)
-		UpdateModelviewMatrix();
+		if (mModified)
+			Initialize();
+		else if (mModelviewModified)
+			UpdateModelviewMatrix();
 
-	glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
-		static_cast<float>(mBackgroundColor.GetGreen()),
-		static_cast<float>(mBackgroundColor.GetBlue()),
-		static_cast<float>(mBackgroundColor.GetAlpha()));
-
-	if (mView3D)
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	else
-		glClear(GL_COLOR_BUFFER_BIT);
-
-	// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-	Primitive* firstTransparentPrimitive(nullptr);
-	if (mNeedAlphaSort)
-	{
-		std::sort(mPrimitiveList.begin(), mPrimitiveList.end(), AlphaSortPredicate);
-		mNeedAlphaSort = false;
+		glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
+			static_cast<float>(mBackgroundColor.GetGreen()),
+			static_cast<float>(mBackgroundColor.GetBlue()),
+			static_cast<float>(mBackgroundColor.GetAlpha()));
 
 		if (mView3D)
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		else
+			glClear(GL_COLOR_BUFFER_BIT);
+
+		// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
+		Primitive* firstTransparentPrimitive(nullptr);
+		if (mNeedAlphaSort)
 		{
-			for (const auto& p : mPrimitiveList)
+			std::sort(mPrimitiveList.begin(), mPrimitiveList.end(), AlphaSortPredicate);
+			mNeedAlphaSort = false;
+
+			if (mView3D)
 			{
-				if (p->GetColor().GetAlpha() < 1.0)
+				for (const auto& p : mPrimitiveList)
 				{
-					firstTransparentPrimitive = p.get();
-					break;
+					if (p->GetColor().GetAlpha() < 1.0)
+					{
+						firstTransparentPrimitive = p.get();
+						break;
+					}
 				}
 			}
 		}
+
+		// Generally, all objects will have the same draw order and this won't do anything,
+		// but for some cases we do want to override the draw order just before rendering
+		if (mNeedOrderSort)
+		{
+			std::stable_sort(mPrimitiveList.begin(), mPrimitiveList.end(), OrderSortPredicate);
+			mNeedOrderSort = false;
+		}
+
+		// NOTE:  Any primitive that uses it's own program should re-load the default program
+		// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
+		for (auto& p : mPrimitiveList)
+		{
+			if (firstTransparentPrimitive && p.get() == firstTransparentPrimitive)
+				glDepthMask(GL_FALSE);
+			p->Draw();
+		}
+
+		if (firstTransparentPrimitive)
+			glDepthMask(GL_TRUE);
+
+		SwapBuffers();// TODO:  Memory leak here?
 	}
-
-	// Generally, all objects will have the same draw order and this won't do anything,
-	// but for some cases we do want to override the draw order just before rendering
-	if (mNeedOrderSort)
-	{
-		std::stable_sort(mPrimitiveList.begin(), mPrimitiveList.end(), OrderSortPredicate);
-		mNeedOrderSort = false;
-	}
-
-	// NOTE:  Any primitive that uses it's own program should re-load the default program
-	// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
-	for (auto& p : mPrimitiveList)
-	{
-		if (firstTransparentPrimitive && p.get() == firstTransparentPrimitive)
-			glDepthMask(GL_FALSE);
-		p->Draw();
-	}
-
-	if (firstTransparentPrimitive)
-		glDepthMask(GL_TRUE);
-
-	SwapBuffers();// TODO:  Memory leak here?
 
 	// If shaders are added mid-render, we need to re-render to ensure everything gets displayed
 	if (mShaders.size() != shaderCount)
@@ -2084,6 +2087,27 @@ bool RenderWindow::GLHasError()
 #endif// _DEBUG
 
 	return true;
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		MakeCurrent
+//
+// Description:		Makes the context associated with this object current.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::MakeCurrent()
+{
+	SetCurrent(*GetContext());
 }
 
 }// namespace LibPlot2D
