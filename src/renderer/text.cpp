@@ -44,10 +44,8 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-GLuint Text::mProgram;
 GLint Text::mVertexLocation;
 GLint Text::mIndexLocation;
-bool Text::mInitialized(false);
 FT_Library Text::mFt;
 unsigned int Text::mFtReferenceCount(0);
 
@@ -432,7 +430,7 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 {
 	assert(vertexCount > 0);
 
-	mRenderer.UseProgram(mProgram);
+	mRenderer.UseProgram(mRenderer.GetPrimitiveTypeProgram<Text>());
 
 	// TODO:  Really, we don't want to access state here that isn't contained within BufferInfo
 	// Are we making an exception for color and orientation?  Assume that this object will
@@ -472,6 +470,7 @@ void Text::RenderBufferedGlyph(const unsigned int& vertexCount)
 Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 {
 	DoInternalInitialization();
+	mRenderer.InitializePrimitiveType(*this);
 
 	BoundingBox b;
 	b.xLeft = 0;
@@ -518,39 +517,51 @@ void Text::DoInternalInitialization()
 	if (!mGlyphsGenerated)
 	{
 		if (!GenerateGlyphs())
-		{
 			mIsOK = false;
-			return;
-		}
 	}
+}
 
-	if (!mInitialized)
-	{
-		std::vector<GLuint> shaderList;
-		shaderList.push_back(mRenderer.CreateShader(GL_VERTEX_SHADER, mVertexShader));
-		shaderList.push_back(mRenderer.CreateShader(GL_FRAGMENT_SHADER, mFragmentShader));
+//=============================================================================
+// Class:			Text
+// Function:		DoGLInitialization
+//
+// Description:		Performs necessary context-state initialization.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint
+//
+//=============================================================================
+GLuint Text::DoGLInitialization()
+{
+	std::vector<GLuint> shaderList;
+	shaderList.push_back(mRenderer.CreateShader(GL_VERTEX_SHADER, mVertexShader));
+	shaderList.push_back(mRenderer.CreateShader(GL_FRAGMENT_SHADER, mFragmentShader));
 
-		RenderWindow::ShaderInfo s;
-		s.programId = mRenderer.CreateProgram(shaderList);
-		s.needsModelview = false;
-		s.needsProjection = true;
-		s.uniformLocations[RenderWindow::mProjectionName] = glGetUniformLocation(s.programId, RenderWindow::mProjectionName.c_str());
-		s.uniformLocations[RenderWindow::mModelviewName] = glGetUniformLocation(s.programId, RenderWindow::mModelviewName.c_str());
-		s.uniformLocations[mTextColorName] = glGetUniformLocation(s.programId, mTextColorName.c_str());
+	RenderWindow::ShaderInfo s;
+	s.programId = mRenderer.CreateProgram(shaderList);
+	s.needsModelview = false;
+	s.needsProjection = true;
+	s.uniformLocations[RenderWindow::mProjectionName] = glGetUniformLocation(s.programId, RenderWindow::mProjectionName.c_str());
+	s.uniformLocations[RenderWindow::mModelviewName] = glGetUniformLocation(s.programId, RenderWindow::mModelviewName.c_str());
+	s.uniformLocations[mTextColorName] = glGetUniformLocation(s.programId, mTextColorName.c_str());
 
-		assert(!RenderWindow::GLHasError());
+	assert(!RenderWindow::GLHasError());
 
-		mVertexLocation = glGetAttribLocation(s.programId, mVertexName.c_str());
-		mIndexLocation = glGetAttribLocation(s.programId, mTextureIndexName.c_str());
+	mVertexLocation = glGetAttribLocation(s.programId, mVertexName.c_str());
+	mIndexLocation = glGetAttribLocation(s.programId, mTextureIndexName.c_str());
 
-		assert(!RenderWindow::GLHasError());
+	assert(!RenderWindow::GLHasError());
 
-		s.attributeLocations[mVertexName] = mVertexLocation;
-		s.attributeLocations[mTextureIndexName] = mIndexLocation;
+	s.attributeLocations[mVertexName] = mVertexLocation;
+	s.attributeLocations[mTextureIndexName] = mIndexLocation;
 
-		mProgram = mRenderer.AddShader(s);
-		mInitialized = true;
-	}
+	return mRenderer.AddShader(s);
 }
 
 //=============================================================================
@@ -659,6 +670,7 @@ Primitive::BufferInfo Text::AssembleBuffers()
 Primitive::BufferInfo Text::BuildLocalText()
 {
 	DoInternalInitialization();
+	mRenderer.InitializePrimitiveType(*this);
 
 	assert(sizeof(GLfloat) == sizeof(float));
 	assert(sizeof(GLuint) == sizeof(unsigned int));

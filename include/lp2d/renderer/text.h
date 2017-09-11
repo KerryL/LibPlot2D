@@ -140,7 +140,6 @@ private:
 
 	RenderWindow& mRenderer;
 
-	static GLuint mProgram;
 	static GLint mVertexLocation;
 	static GLint mIndexLocation;
 
@@ -173,8 +172,10 @@ private:
 	unsigned int mTextureId = std::numeric_limits<unsigned int>::max();
 
 	void DoInternalInitialization();
+	GLuint DoGLInitialization();
+	friend RenderWindow;
+
 	bool GenerateGlyphs();
-	static bool mInitialized;
 	bool mGlyphsGenerated = false;
 
 	void Initialize();

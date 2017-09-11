@@ -33,6 +33,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <typeinfo>
 
 namespace LibPlot2D
 {
@@ -59,6 +60,7 @@ const std::string RenderWindow::mPositionName("position");
 const std::string RenderWindow::mColorName("color");
 
 const double RenderWindow::mExactPixelShift(0.375);
+std::unique_ptr<wxGLContext> RenderWindow::mContext;
 
 //=============================================================================
 // Class:			RenderWindow

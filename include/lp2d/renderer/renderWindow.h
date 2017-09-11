@@ -32,6 +32,7 @@
 // Standard C++ headers
 #include <memory>
 #include <unordered_map>
+#include <typeindex>
 
 namespace LibPlot2D
 {
@@ -305,6 +306,23 @@ public:
 	/// Assigns required indicies and/or values for uniforms and attributes within the default shader.
 	virtual void AssignDefaultLocations(ShaderInfo& shader);
 
+	/// Initializes the specified primitive type.
+	/// Types that are initialized with this method must include a
+	/// DoGLInitialization() method which returns the OpenGL program id.
+	/// \returns True if initialization was successful.
+	template<typename T>
+	void InitializePrimitiveType(T& primitive);
+
+	/// Checks to see if the specified type was previously initialized.
+	/// \returns True if type was previously initialized successfully.
+	template<typename T>
+	bool IsPrimitiveTypeInitialized() const;
+
+	/// Checks to see if the specified type was previously initialized.
+	/// \returns True if type was previously initialized successfully.
+	template<typename T>
+	GLuint GetPrimitiveTypeProgram() const;
+
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
@@ -418,7 +436,7 @@ protected:
 	DECLARE_EVENT_TABLE()
 
 private:
-	std::unique_ptr<wxGLContext> mContext;
+	static std::unique_ptr<wxGLContext> mContext;
 	wxGLContext* GetContext();
 
 	static const double mExactPixelShift;
@@ -486,7 +504,86 @@ private:
 	bool mGlewInitialized = false;
 
 	static void GetGLInfo();
+
+	std::unordered_map<std::type_index, bool> mTypeInitializedMap;
+	std::unordered_map<std::type_index, GLuint> mTypeProgramMap;
 };
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		InitializePrimitiveType
+//
+// Description:		Initializes the specified primitive type.
+//
+// Input Arguments:
+//		primitive	= T&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+template<typename T>
+void RenderWindow::InitializePrimitiveType(T& primitive)
+{
+	if (IsPrimitiveTypeInitialized<T>())
+		return;
+
+	mTypeProgramMap[typeid(T)] = primitive.DoGLInitialization();
+	mTypeInitializedMap[typeid(T)] = true;
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		IsPrimitiveTypeInitialized
+//
+// Description:		Checks to see if the specified type was previously initialized.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//=============================================================================
+template<typename T>
+bool RenderWindow::IsPrimitiveTypeInitialized() const
+{
+	const auto& it(mTypeInitializedMap.find(typeid(T)));
+	if (it == mTypeInitializedMap.end())
+		return false;
+	return it->second;
+}
+
+//=============================================================================
+// Class:			RenderWindow
+// Function:		GetPrimitiveTypeProgram
+//
+// Description:		Returns the program index for the specified type.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		GLuint
+//
+//=============================================================================
+template<typename T>
+GLuint RenderWindow::GetPrimitiveTypeProgram() const
+{
+	const auto& it(mTypeProgramMap.find(typeid(T)));
+	if (it == mTypeProgramMap.end())
+		return static_cast<GLuint>(-1);
+	return it->second;
+}
 
 }// namespace LibPlot2D
 
