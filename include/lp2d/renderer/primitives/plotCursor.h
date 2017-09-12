@@ -44,7 +44,7 @@ public:
 
 	/// Gets the value at which the cursor crosses the axis.
 	/// \returns The value at which the cursor crosses the axis.
-	double GetValue() const { return value; }
+	double GetValue() const { return mValue; }
 
 	/// Checks to see if the specified \p pixel is under the cursor.
 	///
@@ -56,6 +56,9 @@ public:
 	bool IsUnder(const unsigned int &pixel);
 
 	PlotCursor& operator=(const PlotCursor &target) = delete;// To avoid C4512
+
+	/// Updates the value of where the cursor instersects the axis.
+	void Recalculate();
 
 protected:
 	// Mandatory overloads from Primitive - for creating geometry and testing the
@@ -71,7 +74,7 @@ private:
 	Line mLine;
 
 	// Current value where this object meets the axis
-	double value = -1.0;
+	double mValue = -1.0;
 	int mLocationAlongAxis;
 };
 

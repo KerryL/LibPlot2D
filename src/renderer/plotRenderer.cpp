@@ -1991,12 +1991,9 @@ void PlotRenderer::UpdateCursors()
 	mLeftCursor->SetModified();
 	mRightCursor->SetModified();
 
-	std::lock_guard<std::mutex> lock(GetRenderMutex());
-	MakeCurrent();
-
 	// Calculations are performed on Draw
-	mLeftCursor->Draw();
-	mRightCursor->Draw();
+	mLeftCursor->Recalculate();
+	mRightCursor->Recalculate();
 
 	Refresh();
 }

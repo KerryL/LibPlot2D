@@ -82,7 +82,28 @@ void PlotCursor::Update(const unsigned int& /*i*/)
 	}
 
 	// Update the value of the cursor (required for accuracy when zoom changes, for example)
-	value = mAxis.PixelToValue(mLocationAlongAxis);
+	Recalculate();
+}
+
+//=============================================================================
+// Class:			PlotCursor
+// Function:		Recalculate
+//
+// Description:		Computes the location where the cursor intersects the axis.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotCursor::Recalculate()
+{
+	mValue = mAxis.PixelToValue(mLocationAlongAxis);
 }
 
 //=============================================================================
@@ -130,7 +151,7 @@ void PlotCursor::GenerateGeometry()
 bool PlotCursor::HasValidParameters()
 {
 	// Make sure the value is within the axis limits
-	if (value >= mAxis.GetMinimum() && value <= mAxis.GetMaximum() &&
+	if (mValue >= mAxis.GetMinimum() && mValue <= mAxis.GetMaximum() &&
 		mAxis.GetAxisAtMaxEnd() && mAxis.GetAxisAtMinEnd())
 		return true;
 
@@ -191,7 +212,7 @@ bool PlotCursor::IsUnder(const unsigned int &pixel)
 void PlotCursor::SetLocation(const int& location)
 {
 	mLocationAlongAxis = location;
-	value = mAxis.PixelToValue(location);
+	mValue = mAxis.PixelToValue(location);
 	mModified = true;
 }
 
