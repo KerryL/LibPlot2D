@@ -53,11 +53,16 @@ public:
 	/// \param style    Style flags.
 	RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
 		const wxPoint& position, const wxSize& size, long style = 0);
-	~RenderWindow() = default;
+	virtual ~RenderWindow() = default;
 
 	/// Initializes this object to prepare for rendering.  Must be called
 	/// immediately after creation.
 	void Initialize();
+
+	/// Frees all memory owned by OpenGL.
+	/// Useful for working with multiple GL canvases, when it is required to ensure that
+	/// objects are freed while the correct context is active.
+	void FreeOpenGLObjects();
 
 	/// Sets the camera position and orientation.
 	///

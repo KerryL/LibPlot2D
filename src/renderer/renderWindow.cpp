@@ -163,6 +163,30 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id,
 
 //=============================================================================
 // Class:			RenderWindow
+// Function:		FreeOpenGLObjects
+//
+// Description:		Frees OpenGL buffer objects.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::FreeOpenGLObjects()
+{
+	// Need to ensure the proper context is active when OpenGL objects are freed
+	std::lock_guard<std::mutex> lock(renderMutex);
+	MakeCurrent();
+	mPrimitiveList.Clear();
+}
+
+//=============================================================================
+// Class:			RenderWindow
 // Function:		Event Table
 //
 // Description:		Event Table for the RENDER_WINDOW class.
