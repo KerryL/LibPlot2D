@@ -60,6 +60,7 @@ const std::string RenderWindow::mPositionName("position");
 const std::string RenderWindow::mColorName("color");
 
 const double RenderWindow::mExactPixelShift(0.375);
+std::mutex RenderWindow::renderMutex;
 
 //=============================================================================
 // Class:			RenderWindow

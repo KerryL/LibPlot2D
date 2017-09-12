@@ -326,7 +326,7 @@ public:
 
 	/// Accessor for the render mutex.
 	/// \returns Reference to the render mutex.
-	std::mutex& GetRenderMutex() { return renderMutex; }
+	static std::mutex& GetRenderMutex() { return renderMutex; }
 
 	/// Makes the GL context associated with this object current.
 	void MakeCurrent();
@@ -516,7 +516,7 @@ private:
 	std::unordered_map<std::type_index, bool> mTypeInitializedMap;
 	std::unordered_map<std::type_index, GLuint> mTypeProgramMap;
 
-	std::mutex renderMutex;
+	static std::mutex renderMutex;
 };
 
 //=============================================================================

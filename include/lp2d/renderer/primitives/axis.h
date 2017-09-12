@@ -120,6 +120,14 @@ public:
 	inline wxString GetLabel() const { return mLabel; }
 	inline bool IsLogarithmic() const { return mLogarithmic; }
 
+	/// Gets the minimum axis value limited by the precision displayed on the plot.
+	/// \returns The minimum axis value to display precision.
+	double GetPrecisionLimitedMinimum() const;
+
+	/// Gets the maximum axis value limited by the precision displayed on the plot.
+	/// \returns The maximum axis value to display precision.
+	double GetPrecisionLimitedMaximum() const;
+
 	/// @}
 
 	/// \name Configuration polling methods

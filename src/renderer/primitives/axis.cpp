@@ -632,9 +632,9 @@ double Axis::GetAxisLabelTranslation(const double &offset,
 void Axis::DrawTickLabels()
 {
 	float xTranslation, yTranslation;
-	unsigned int precision = GetPrecision();
+	const unsigned int precision(GetPrecision());
 
-	if (!wxString::Format("%0.*f", precision, mMinimum).ToDouble(&mMinimum)) { /*Warn the user?*/ }
+	mMinimum = GetPrecisionLimitedMinimum();
 
 	wxString valueLabel;
 	double valueOffsetFromEdge = mOffsetFromWindowEdge * 0.8;
@@ -654,8 +654,57 @@ void Axis::DrawTickLabels()
 		mValueText.AppendText(valueLabel.ToStdString());
 	}
 
-	valueLabel.Printf("%0.*f", precision, mMaximum);
-	if (!valueLabel.ToDouble(&mMaximum)) { /*Warn the user?*/ }
+	mMaximum = GetPrecisionLimitedMaximum();
+}
+
+//=============================================================================
+// Class:			Axis
+// Function:		GetPrecisionLimitedMinimum
+//
+// Description:		Gets the value of the minimum axis limit given with the
+//					precision of the displayed number.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//=============================================================================
+double Axis::GetPrecisionLimitedMinimum() const
+{
+	const unsigned int precision(GetPrecision());
+	double minimum;
+	if (!wxString::Format("%0.*f", precision, mMinimum).ToDouble(&minimum)) { /*Warn the user?*/ }
+	return minimum;
+}
+
+//=============================================================================
+// Class:			Axis
+// Function:		GetPrecisionLimitedMaximum
+//
+// Description:		Gets the value of the maximum axis limit given with the
+//					precision of the displayed number.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//=============================================================================
+double Axis::GetPrecisionLimitedMaximum() const
+{
+	const unsigned int precision(GetPrecision());
+	double maximum;
+	if (!wxString::Format("%0.*f", precision, mMaximum).ToDouble(&maximum)) { /*Warn the user?*/ }
+	return maximum;
 }
 
 //=============================================================================

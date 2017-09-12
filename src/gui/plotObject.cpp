@@ -1216,20 +1216,14 @@ void PlotObject::CheckAutoScaling()
 //=============================================================================
 void PlotObject::UpdateLimitValues()
 {
-	std::lock_guard<std::mutex> lock(mRenderer.GetRenderMutex());
-	mRenderer.MakeCurrent();
+	mXMin = mAxisBottom->GetPrecisionLimitedMinimum();
+	mXMax = mAxisBottom->GetPrecisionLimitedMaximum();
 
-	mAxisBottom->Draw();
-	mXMin = mAxisBottom->GetMinimum();
-	mXMax = mAxisBottom->GetMaximum();
+	mYLeftMin = mAxisLeft->GetPrecisionLimitedMinimum();
+	mYLeftMax = mAxisLeft->GetPrecisionLimitedMaximum();
 
-	mAxisLeft->Draw();
-	mYLeftMin = mAxisLeft->GetMinimum();
-	mYLeftMax = mAxisLeft->GetMaximum();
-
-	mAxisRight->Draw();
-	mYRightMin = mAxisRight->GetMinimum();
-	mYRightMax = mAxisRight->GetMaximum();
+	mYRightMin = mAxisRight->GetPrecisionLimitedMinimum();
+	mYRightMax = mAxisRight->GetPrecisionLimitedMaximum();
 }
 
 //=============================================================================
