@@ -395,7 +395,10 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	if (!event.Dragging() || mIgnoreNextMouseMove)// mIgnoreNextMouseMove prevents panning on maximize by double clicking title bar or after creating a context menu
+	if (!event.Dragging() ||
+		(!mObservedLeftButtonDown && event.LeftIsDown()) ||
+		(!mObservedRightButtonDown && event.RightIsDown()) ||
+		mIgnoreNextMouseMove)// mIgnoreNextMouseMove prevents panning on maximize by double clicking title bar or after creating a context menu
 	{
 		mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 		mIgnoreNextMouseMove = false;
@@ -403,20 +406,20 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 		return;
 	}
 
-	if (mDraggingLegend && mLegend && mObservedLeftButtonDown)
+	if (mDraggingLegend && mLegend)
 		mLegend->SetDeltaPosition(event.GetX() - mLastMousePosition[0], mLastMousePosition[1] - event.GetY());
-	else if (mDraggingLeftCursor && mObservedLeftButtonDown)
+	else if (mDraggingLeftCursor)
 		mLeftCursor->SetLocation(event.GetX());
-	else if (mDraggingRightCursor && mObservedLeftButtonDown)
+	else if (mDraggingRightCursor)
 		mRightCursor->SetLocation(event.GetX());
 	// ZOOM:  Left or Right mouse button + CTRL or SHIFT
-	else if ((event.ControlDown() || event.ShiftDown()) && (event.RightIsDown() || (event.LeftIsDown() && mObservedLeftButtonDown)))
+	else if ((event.ControlDown() || event.ShiftDown()) && (event.RightIsDown() || event.LeftIsDown()))
 		ProcessZoom(event);
 	// ZOOM WITH BOX: Right mouse button
 	else if (event.RightIsDown())
 		ProcessZoomWithBox(event);
 	// PAN:  Left mouse button (includes with any buttons not caught above)
-	else if (event.LeftIsDown() && mObservedLeftButtonDown)
+	else if (event.LeftIsDown())
 		ProcessPan(event);
 	else// Not recognized
 	{
@@ -447,6 +450,11 @@ void PlotRenderer::OnMouseMoveEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnRightButtonUpEvent(wxMouseEvent &event)
 {
+	event.Skip();
+
+	if (!mObservedRightButtonDown)
+		return;
+
 	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 
 	if (!mZoomBox->GetIsVisible())// TODO:  And if not zooming by dragging right mouse button
@@ -1777,6 +1785,8 @@ void PlotRenderer::OnDoubleClickEvent(wxMouseEvent &event)
 //=============================================================================
 void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 {
+	event.Skip();
+
 	// Check to see if we're on a cursor or the mLegend
 	if (mLegend && mLegend->IsUnder(event.GetX(), GetSize().GetHeight() - event.GetY()))
 		mDraggingLegend = true;
@@ -1784,8 +1794,6 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 		mDraggingLeftCursor = true;
 	else if (mRightCursor->IsUnder(event.GetX()))
 		mDraggingRightCursor = true;
-
-	event.Skip();
 }
 
 //=============================================================================
@@ -1804,11 +1812,12 @@ void PlotRenderer::OnLeftButtonDownEvent(wxMouseEvent &event)
 //		None
 //
 //=============================================================================
-void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& WXUNUSED(event))
+void PlotRenderer::OnLeftButtonUpEvent(wxMouseEvent& event)
 {
+	event.Skip();
+
 	if (!mObservedLeftButtonDown)
 		return;
-	mObservedLeftButtonDown = false;
 
 	mPlot->SetPrettyCurves((mCurveQuality & CurveQuality::HighStatic) != 0);
 

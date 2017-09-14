@@ -214,6 +214,7 @@ BEGIN_EVENT_TABLE(RenderWindow, wxGLCanvas)
 	EVT_LEFT_DOWN(			RenderWindow::OnMouseDownEvent)
 	EVT_MIDDLE_UP(			RenderWindow::OnMouseUpEvent)
 	EVT_RIGHT_UP(			RenderWindow::OnMouseUpEvent)
+	EVT_RIGHT_DOWN(			RenderWindow::OnMouseDownEvent)
 END_EVENT_TABLE()
 
 //=============================================================================
@@ -486,6 +487,7 @@ void RenderWindow::DoResize()
 void RenderWindow::OnEnterWindow(wxMouseEvent &event)
 {
 	mObservedLeftButtonDown = false;
+	mObservedRightButtonDown = false;
 	//SetFocus();
 	event.Skip();
 }
@@ -628,7 +630,8 @@ void RenderWindow::OnMouseWheelEvent(wxMouseEvent &event)
 void RenderWindow::OnMouseMoveEvent(wxMouseEvent &event)
 {
 	if (!event.Dragging() ||
-		(!mObservedLeftButtonDown && event.LeftIsDown()))
+		(!mObservedLeftButtonDown && event.LeftIsDown()) ||
+		(!mObservedRightButtonDown && event.RightIsDown()))
 	{
 		StoreMousePosition(event);
 		return;
@@ -744,6 +747,9 @@ void RenderWindow::OnMouseUpEvent(wxMouseEvent& event)
 
 	if (event.GetButton() == wxMOUSE_BTN_LEFT)
 		mObservedLeftButtonDown = false;
+
+	if (event.GetButton() == wxMOUSE_BTN_RIGHT)
+		mObservedRightButtonDown = false;
 }
 
 //=============================================================================
@@ -766,6 +772,9 @@ void RenderWindow::OnMouseDownEvent(wxMouseEvent& event)
 {
 	if (event.GetButton() == wxMOUSE_BTN_LEFT)
 		mObservedLeftButtonDown = true;
+
+	if (event.GetButton() == wxMOUSE_BTN_RIGHT)
+		mObservedRightButtonDown = true;
 }
 
 //=============================================================================

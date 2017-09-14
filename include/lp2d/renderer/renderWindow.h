@@ -446,6 +446,10 @@ protected:
 	/// event.  Tells us if we should respond to left-button-up or drag events.
 	bool mObservedLeftButtonDown = false;
 
+	/// Flag indicating whether or not this object saw a right-button-down
+	/// event.  Tells us if we should respond to right-button-up or drag events.
+	bool mObservedRightButtonDown = false;
+
 	DECLARE_EVENT_TABLE()
 
 private:
