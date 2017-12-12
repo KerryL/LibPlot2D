@@ -153,7 +153,7 @@ std::string Filter::AssembleZExpression(
 			continue;
 
 		std::ostringstream term;
-		term << coefficients[i];
+		term << std::fixed << coefficients[i];
 		if (!result.empty() && coefficients[i] > 0.0)
 			result.append("+");
 		result.append(term.str());
