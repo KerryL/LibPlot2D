@@ -142,7 +142,7 @@ std::string Filter::AssembleZExpression(
 	const unsigned int &highestPower) const
 {
 	std::ostringstream ss;
-	ss << "(" << 1.0 / sampleRate << "*(1+z^-1))";
+	ss << "(" << std::fixed << 1.0 / sampleRate << "*(1+z^-1))";
 	std::string posBilinTerm(ss.str()), negBilinTerm("(2*(1-z^-1))");
 	std::string result;
 
