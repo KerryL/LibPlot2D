@@ -57,7 +57,10 @@ public:
 
 	/// Initializes this object to prepare for rendering.  Must be called
 	/// immediately after creation.
-	void Initialize();
+	///
+	/// \param viewportId ID of current viewport.  Unused by default, but may
+	///                   be useful in derived classes.
+	void Initialize(const unsigned int& viewportId);
 
 	/// Frees all memory owned by OpenGL.
 	/// Useful for working with multiple GL canvases, when it is required to ensure that
@@ -413,8 +416,12 @@ protected:
 	virtual Eigen::Matrix4d Generate2DProjectionMatrix() const;
 
 	/// Creates the appropriate projection matrix.
+	///
+	/// \param viewportId ID of current viewport.  Unused by default, but may
+	///                   be useful in derived classes.
+	///
 	/// \returns Projection matrix.
-	virtual Eigen::Matrix4d Generate3DProjectionMatrix() const;
+	virtual Eigen::Matrix4d Generate3DProjectionMatrix(const unsigned int& viewportId) const;
 
 	/// @}
 
@@ -450,6 +457,18 @@ protected:
 	/// event.  Tells us if we should respond to right-button-up or drag events.
 	bool mObservedRightButtonDown = false;
 
+	/// Sets the number of required rendering passes.  This should only be used when
+	/// low-level control over viewports is necessary.  If count != 1, DoResize() must
+	/// be overridden.
+	void SetViewportCount(const unsigned int& count);
+
+	/// Handles resizing actions.  By default, applies a reasonable frustum with the
+	/// aspect ratio matching the window aspect ratio.
+	///
+	/// \param viewportId ID of current viewport.  Unused by default, but may
+	///                   be useful in derived classes.
+	virtual void DoResize(const unsigned int& viewportId);
+
 	DECLARE_EVENT_TABLE()
 
 private:
@@ -467,6 +486,9 @@ private:
 	double mAspectRatio;
 	double mNearClip = 1.0;
 	double mFarClip = 500.0;
+
+	unsigned int viewportCount = 1;
+	unsigned int lastViewportConfigured = 0;
 
 	Color mBackgroundColor;
 
@@ -515,8 +537,6 @@ private:
 	void BuildShaders();
 
 	Eigen::Vector3d mFocalPoint;
-
-	void DoResize();
 
 	bool mGlewInitialized = false;
 

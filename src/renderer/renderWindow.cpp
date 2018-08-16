@@ -248,6 +248,28 @@ wxGLContext* RenderWindow::GetContext()
 
 //=============================================================================
 // Class:			RenderWindow
+// Function:		SetViewportCount
+//
+// Description:		Sets the number of viewports.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void RenderWindow::SetViewportCount(const unsigned int& count)
+{
+	assert(count > 0);
+	viewportCount = count;
+}
+
+//=============================================================================
+// Class:			RenderWindow
 // Function:		Render
 //
 // Description:		Updates the scene with all of this object's options and
@@ -300,63 +322,68 @@ void RenderWindow::Render()
 			mGlewInitialized = true;
 		}
 
-		if (mSizeUpdateRequired)
-			DoResize();
-
-		if (mModified)
-			Initialize();
-		else if (mModelviewModified)
-			UpdateModelviewMatrix();
-
-		glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
-			static_cast<float>(mBackgroundColor.GetGreen()),
-			static_cast<float>(mBackgroundColor.GetBlue()),
-			static_cast<float>(mBackgroundColor.GetAlpha()));
-
-		if (mView3D)
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		else
-			glClear(GL_COLOR_BUFFER_BIT);
-
-		// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
-		Primitive* firstTransparentPrimitive(nullptr);
-		if (mNeedAlphaSort)
+		for (unsigned int viewport = 0; viewport < viewportCount; ++viewport)
 		{
-			std::sort(mPrimitiveList.begin(), mPrimitiveList.end(), AlphaSortPredicate);
-			mNeedAlphaSort = false;
+			if (mSizeUpdateRequired || viewport != lastViewportConfigured)
+				DoResize(viewport);
+
+			if (mModified || viewport != lastViewportConfigured)
+				Initialize(viewport);
+			else if (mModelviewModified)
+				UpdateModelviewMatrix();
+
+			glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
+				static_cast<float>(mBackgroundColor.GetGreen()),
+				static_cast<float>(mBackgroundColor.GetBlue()),
+				static_cast<float>(mBackgroundColor.GetAlpha()));
 
 			if (mView3D)
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			else
+				glClear(GL_COLOR_BUFFER_BIT);
+
+			// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
+			Primitive* firstTransparentPrimitive(nullptr);
+			if (mNeedAlphaSort)
 			{
-				for (const auto& p : mPrimitiveList)
+				std::sort(mPrimitiveList.begin(), mPrimitiveList.end(), AlphaSortPredicate);
+				mNeedAlphaSort = false;
+
+				if (mView3D)
 				{
-					if (p->GetColor().GetAlpha() < 1.0)
+					for (const auto& p : mPrimitiveList)
 					{
-						firstTransparentPrimitive = p.get();
-						break;
+						if (p->GetColor().GetAlpha() < 1.0)
+						{
+							firstTransparentPrimitive = p.get();
+							break;
+						}
 					}
 				}
 			}
-		}
 
-		// Generally, all objects will have the same draw order and this won't do anything,
-		// but for some cases we do want to override the draw order just before rendering
-		if (mNeedOrderSort)
-		{
-			std::stable_sort(mPrimitiveList.begin(), mPrimitiveList.end(), OrderSortPredicate);
-			mNeedOrderSort = false;
-		}
+			// Generally, all objects will have the same draw order and this won't do anything,
+			// but for some cases we do want to override the draw order just before rendering
+			if (mNeedOrderSort)
+			{
+				std::stable_sort(mPrimitiveList.begin(), mPrimitiveList.end(), OrderSortPredicate);
+				mNeedOrderSort = false;
+			}
 
-		// NOTE:  Any primitive that uses it's own program should re-load the default program
-		// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
-		for (auto& p : mPrimitiveList)
-		{
-			if (firstTransparentPrimitive && p.get() == firstTransparentPrimitive)
-				glDepthMask(GL_FALSE);
-			p->Draw();
-		}
+			// NOTE:  Any primitive that uses it's own program should re-load the default program
+			// by calling RenderWindow::UseDefaultProgram() at the end of GenerateGeometry()
+			for (auto& p : mPrimitiveList)
+			{
+				if (firstTransparentPrimitive && p.get() == firstTransparentPrimitive)
+					glDepthMask(GL_FALSE);
+				p->Draw();
+			}
 
-		if (firstTransparentPrimitive)
-			glDepthMask(GL_TRUE);
+			if (firstTransparentPrimitive)
+				glDepthMask(GL_TRUE);
+
+			lastViewportConfigured = viewport;
+		}
 
 		SwapBuffers();// TODO:  Memory leak here?
 	}
@@ -445,7 +472,7 @@ void RenderWindow::OnSize(wxSizeEvent& WXUNUSED(event))
 // Description:		Handles actions required to update the screen after resizing.
 //
 // Input Arguments:
-//		None
+//		viewportId	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -454,8 +481,10 @@ void RenderWindow::OnSize(wxSizeEvent& WXUNUSED(event))
 //		None
 //
 //=============================================================================
-void RenderWindow::DoResize()
+void RenderWindow::DoResize(const unsigned int& /*viewportId*/)
 {
+	assert(viewportCount == 1);
+
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 	int w, h;
 	GetClientSize(&w, &h);
@@ -535,7 +564,7 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 //					and any time an option changes (wireframe vs. polygon, etc.)
 //
 // Input Arguments:
-//		None
+//		viewportId	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -544,13 +573,13 @@ bool RenderWindow::RemoveActor(Primitive *toRemove)
 //		None
 //
 //=============================================================================
-void RenderWindow::Initialize()
+void RenderWindow::Initialize(const unsigned int& viewportId)
 {
 	Eigen::Matrix4d projectionMatrix;
 	if (mView3D)
 	{
 		Initialize3D();
-		projectionMatrix = Generate3DProjectionMatrix();
+		projectionMatrix = Generate3DProjectionMatrix(viewportId);
 	}
 	else
 	{
@@ -1508,7 +1537,7 @@ Eigen::Matrix4d RenderWindow::Generate2DProjectionMatrix() const
 // Description:		Returns projection matrix for 3D scenes.
 //
 // Input Arguments:
-//		None
+//		viewportId	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -1517,7 +1546,7 @@ Eigen::Matrix4d RenderWindow::Generate2DProjectionMatrix() const
 //		Eigen::Matrix4d
 //
 //=============================================================================
-Eigen::Matrix4d RenderWindow::Generate3DProjectionMatrix() const
+Eigen::Matrix4d RenderWindow::Generate3DProjectionMatrix(const unsigned int& /*viewportId*/) const
 {
 	// For orthogonal projections, top - bottom and left - right give size in
 	// screen coordinates.  For perspective projections, these combined with
