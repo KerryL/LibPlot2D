@@ -332,15 +332,18 @@ void RenderWindow::Render()
 			else if (mModelviewModified)
 				UpdateModelviewMatrix();
 
-			glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
-				static_cast<float>(mBackgroundColor.GetGreen()),
-				static_cast<float>(mBackgroundColor.GetBlue()),
-				static_cast<float>(mBackgroundColor.GetAlpha()));
+			if (viewport == 0)
+			{
+				glClearColor(static_cast<float>(mBackgroundColor.GetRed()),
+					static_cast<float>(mBackgroundColor.GetGreen()),
+					static_cast<float>(mBackgroundColor.GetBlue()),
+					static_cast<float>(mBackgroundColor.GetAlpha()));
 
-			if (mView3D)
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			else
-				glClear(GL_COLOR_BUFFER_BIT);
+				if (mView3D)
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				else
+					glClear(GL_COLOR_BUFFER_BIT);
+			}
 
 			// Sort the primitives by Color.GetAlpha to ensure that transparent objects are rendered last
 			Primitive* firstTransparentPrimitive(nullptr);
