@@ -410,11 +410,11 @@ protected:
 	
 	/// Creates the appropriate projection matrix.
 	/// \returns Projection matrix.
-	Eigen::Matrix4d Generate2DProjectionMatrix() const;
+	virtual Eigen::Matrix4d Generate2DProjectionMatrix() const;
 
 	/// Creates the appropriate projection matrix.
 	/// \returns Projection matrix.
-	Eigen::Matrix4d Generate3DProjectionMatrix() const;
+	virtual Eigen::Matrix4d Generate3DProjectionMatrix() const;
 
 	/// @}
 
