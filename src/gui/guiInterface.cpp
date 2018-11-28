@@ -405,6 +405,33 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name, cons
 
 //=============================================================================
 // Class:			GuiInterface
+// Function:		HideAllCurves
+//
+// Description:		Sets visibility to false for all curves.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void GuiInterface::HideAllCurves()
+{
+	for (int row = 1; row < mGrid->GetNumberRows(); ++row)
+	{
+		mGrid->SetCellValue(row, static_cast<int>(PlotListGrid::Column::Visible), _T("0"));
+		UpdateCurveProperties(row - 1);
+	}
+
+	mRenderer->UpdateDisplay();
+}
+
+//=============================================================================
+// Class:			GuiInterface
 // Function:		RemoveCurve
 //
 // Description:		Removes a curve from the plot.
@@ -2173,9 +2200,7 @@ void GuiInterface::UpdateCurveProperties(const unsigned int &index)
 
 	Color color;
 	color.Set(mGrid->GetCellBackgroundColour(index + 1, static_cast<int>(PlotListGrid::Column::Color)));
-	UpdateCurveProperties(index, color,
-		!mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::Visible)).IsEmpty(),
-		!mGrid->GetCellValue(index + 1, static_cast<int>(PlotListGrid::Column::RightAxis)).IsEmpty());
+	UpdateCurveProperties(index, color, CurveIsVisible(index), CurveIsOnRightAxis(index));
 }
 
 //=============================================================================
@@ -2276,6 +2301,29 @@ bool GuiInterface::CurveIsVisible(const unsigned int& i) const
 {
 	const wxString visibilityValue(mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::Visible)));
 	return !(visibilityValue.IsEmpty() || visibilityValue.Cmp(_T("0")) == 0);
+}
+
+//=============================================================================
+// Class:			GuiInterface
+// Function:		CurveIsOnRightAxis
+//
+// Description:		Returns true if the specified curve is plotted against the
+//					right-hand axis.
+//
+// Input Arguments:
+//		i	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		bool
+//
+//=============================================================================
+bool GuiInterface::CurveIsOnRightAxis(const unsigned int& i) const
+{
+	const wxString rightAxisValue(mGrid->GetCellValue(i + 1, static_cast<int>(PlotListGrid::Column::RightAxis)));
+	return !(rightAxisValue.IsEmpty() || rightAxisValue.Cmp(_T("0")) == 0);
 }
 
 }// namespace LibPlot2D

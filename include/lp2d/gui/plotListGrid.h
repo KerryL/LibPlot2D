@@ -107,7 +107,8 @@ private:
 		idContextFilter,
 		idContextFitCurve,
 
-		idContextRemoveCurve
+		idContextRemoveCurve,
+		idContextHideAllCurves
 	};
 
 	// Grid events
@@ -138,6 +139,7 @@ private:
 	void ContextFitCurve(wxCommandEvent &event);
 
 	void ContextRemoveCurveEvent(wxCommandEvent &event);
+	void ContextHideAllCurvesEvent(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 

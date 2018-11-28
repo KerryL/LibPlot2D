@@ -245,6 +245,16 @@ public:
 	/// \returns True if specified curve is visible.
 	bool CurveIsVisible(const unsigned int& i) const;
 
+	/// Returns status of curve axis association.
+	///
+	/// \param i Index of curve to query.
+	///
+	/// \returns True if specified curve is plotted against the right-hand axis.
+	bool CurveIsOnRightAxis(const unsigned int& i) const;
+
+	/// Sets visibility to false for all curves.
+	void HideAllCurves();
+
 private:
 	wxFrame* mOwner;
 

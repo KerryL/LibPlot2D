@@ -71,6 +71,7 @@ BEGIN_EVENT_TABLE(PlotListGrid, wxGrid)
 	EVT_MENU(idContextFitCurve,						PlotListGrid::ContextFitCurve)
 
 	EVT_MENU(idContextRemoveCurve,					PlotListGrid::ContextRemoveCurveEvent)
+	EVT_MENU(idContextHideAllCurves,				PlotListGrid::ContextHideAllCurvesEvent)
 END_EVENT_TABLE();
 
 //=============================================================================
@@ -178,15 +179,15 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 
 	contextMenu->Append(idContextCreateSignal, _T("Create Signal"));// FIXME:  Eventually, maybe this can be integrated into the "Add Math Channel" dialog?
 
-	contextMenu->AppendSeparator();
-
 	if (row == 0 && mGuiInterface.GetCurrentFileFormat() == GuiInterface::FileFormat::Generic)
 	{
+		contextMenu->AppendSeparator();
 		contextMenu->Append(idContextSetTimeUnits, _T("Set Time Units"));
 		contextMenu->Append(idContextScaleXData, _T("Scale X-Data"));
 	}
 	else if (row > 0)
 	{
+		contextMenu->AppendSeparator();
 		contextMenu->Append(idContextPlotDerivative, _T("Plot Derivative"));
 		contextMenu->Append(idContextPlotIntegral, _T("Plot Integral"));
 		contextMenu->Append(idContextPlotRMS, _T("Plot RMS"));
@@ -205,6 +206,12 @@ void PlotListGrid::CreateGridContextMenu(const wxPoint &position, const unsigned
 		contextMenu->AppendSeparator();
 
 		contextMenu->Append(idContextRemoveCurve, _T("Remove Curve"));
+	}
+
+	if (GetNumberRows() > 0)
+	{
+		contextMenu->AppendSeparator();
+		contextMenu->Append(idContextHideAllCurves, _T("Hide All Curves"));
 	}
 
 	PopupMenu(contextMenu.get(), position);
@@ -429,6 +436,9 @@ void PlotListGrid::GridLabelRightClickEvent(wxGridEvent &event)
 	std::unique_ptr<wxMenu> contextMenu(std::make_unique<wxMenu>());
 
 	contextMenu->Append(idContextCreateSignal, _T("Create Signal"));
+
+	if (GetNumberRows() > 0)
+		contextMenu->Append(idContextHideAllCurves, _T("Hide All Curves"));
 
 	PopupMenu(contextMenu.get(), event.GetPosition());
 }
@@ -689,6 +699,27 @@ void PlotListGrid::ContextWrapEvent(wxCommandEvent& WXUNUSED(event))
 void PlotListGrid::ContextRemoveCurveEvent(wxCommandEvent& WXUNUSED(event))
 {
 	mGuiInterface.RemoveCurves(GetSelectedRows());
+}
+
+//=============================================================================
+// Class:			PlotListGrid
+// Function:		ContextHideAllCurvesEvent
+//
+// Description:		Turns visibility off for all curves
+//
+// Input Arguments:
+//		event	= wxCommandEvent&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotListGrid::ContextHideAllCurvesEvent(wxCommandEvent& WXUNUSED(event))
+{
+	mGuiInterface.HideAllCurves();
 }
 
 //=============================================================================
