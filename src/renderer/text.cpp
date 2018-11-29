@@ -300,6 +300,9 @@ bool Text::GenerateGlyphs()
 	mMaxXSize = 0;
 	mMaxYSize = 0;
 
+	if (FT_Select_Charmap(mFace, FT_ENCODING_UNICODE))
+		return false;
+
 	// First loop determines max required image size
 	const unsigned int glyphCount(128);
 	for (c = 0; c < glyphCount; ++c)
@@ -480,7 +483,11 @@ Text::BoundingBox Text::GetBoundingBox(const std::string& s)
 
 	for (const auto& c : s)
 	{
-		Glyph g = mGlyphs.find(c)->second;
+		const auto glyphIt(mGlyphs.find(c));
+		if (glyphIt == mGlyphs.end())
+			continue;
+
+		Glyph g = glyphIt->second;
 
 		//b.xLeft += 0;
 		b.xRight += g.advance >> 6;

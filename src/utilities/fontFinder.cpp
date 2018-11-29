@@ -118,7 +118,7 @@ bool FontFinder::GetPreferredFontFileName(wxFontEncoding encoding,
 	const wxArrayString &preferredFonts, const bool &fixedWidth, wxString &fontFile)
 {
 	// Get a list of the fonts found on the system
-	wxArrayString fontList = wxFontEnumerator::GetFacenames(encoding, fixedWidth);
+	const wxArrayString fontList(wxFontEnumerator::GetFacenames(encoding, fixedWidth));
 
 	// See if any of the installed fonts matches our list of preferred fonts
 	for (const auto& preferredFont : preferredFonts)
