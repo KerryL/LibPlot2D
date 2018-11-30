@@ -326,6 +326,7 @@ void GuiInterface::ClearAllCurves()
 //
 // Input Arguments:
 //		mathString	= wxString describing the desired math operations
+//		name		= wxString to use for the display name
 //		visible		= const bool& flag indicating whether or not the curve is
 //					  initially visible
 //
@@ -336,7 +337,8 @@ void GuiInterface::ClearAllCurves()
 //		None
 //
 //=============================================================================
-void GuiInterface::AddCurve(wxString mathString, const bool& visible)
+void GuiInterface::AddCurve(wxString mathString, wxString name,
+	const bool& visible)
 {
 	// String will be empty if the user cancelled
 	if (mathString.IsEmpty())
@@ -359,7 +361,10 @@ void GuiInterface::AddCurve(wxString mathString, const bool& visible)
 		return;
 	}
 
-	AddCurve(std::move(mathChannel), mathString.Upper(), visible);
+	if (name.IsEmpty())
+		name = mathString.Upper();
+
+	AddCurve(std::move(mathChannel), name, visible);
 }
 
 //=============================================================================

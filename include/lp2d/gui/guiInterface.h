@@ -91,9 +91,11 @@ public:
 	/// expression.
 	///
 	/// \param mathString Expression to evaluate to create the new curve.
+	/// \param name       Name for the curve (if empty, will use the expression
+	///                   as the name).
 	/// \param visible    Flag indicating whether or not the curve should be
 	///                   visible initially
-	void AddCurve(wxString mathString, const bool& visible = true);
+	void AddCurve(wxString mathString, wxString name = wxEmptyString, const bool& visible = true);
 
 	/// Adds a new curve representing the specified data set.
 	///
