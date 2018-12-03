@@ -1567,11 +1567,11 @@ void Dataset2D::GetOverlappingOnSameTimebase(const Dataset2D &d1,
 			--end1;
 	}
 
-	d1Out.Resize(end1 - start);
-	d2Out.Resize(end1 - start);
+	d1Out.Resize(end1 - start + 1);
+	d2Out.Resize(end1 - start + 1);
 
 	unsigned int i;
-	for (i = 0; i < end1 - start; ++i)
+	for (i = 0; i < d1Out.GetNumberOfPoints(); ++i)
 	{
 		double x(d1.GetX()[start + i]);
 		d1Out.GetX()[i] = x;
