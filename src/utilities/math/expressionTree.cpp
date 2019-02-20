@@ -2149,8 +2149,8 @@ unsigned int ExpressionTree::FindEndOfNextTerm(const wxString &s, const unsigned
 {
 	unsigned int end, plusEnd, minusEnd;
 
-	plusEnd = s.Mid(start).Find('+');
-	minusEnd = s.Mid(start).Find('-');
+	plusEnd = s.Mid(start).find('+', 1);// Important to use STL-like find() and not Find() here
+	minusEnd = s.Mid(start).find('-', 1);// Important to use STL-like find() and not Find() here
 
 	if (minusEnd < plusEnd && start + minusEnd > 0 && NextIsOperator(s[start + minusEnd - 1]))
 	{
