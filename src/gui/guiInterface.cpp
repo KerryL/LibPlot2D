@@ -825,7 +825,7 @@ void GuiInterface::GenerateFRF()
 		FastFourierTransform::WindowType::Hann, dialog.GetModuloPhase(), *amplitude, phase.get(), coherence.get());
 
 	AddFFTCurves(factor, std::move(amplitude), std::move(phase), std::move(coherence), wxString::Format("[%u] to [%u]",
-		dialog.GetInputIndex(), dialog.GetOutputIndex()));
+		dialog.GetInputIndex() + 1, dialog.GetOutputIndex() + 1));
 }
 
 //=============================================================================
