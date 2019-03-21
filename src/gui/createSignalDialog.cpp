@@ -510,7 +510,7 @@ double CreateSignalDialog::GetValue(const double &time)
 		frequency *= 2.0 * M_PI;
 		phase *= M_PI / 180.0;
 
-		return amplitude * sin(frequency * time + phase) + offset;
+		return amplitude * sin(frequency * time - phase) + offset;
 	}
 	else if (mLastSelection == SignalType::Square)
 	{
@@ -522,9 +522,8 @@ double CreateSignalDialog::GetValue(const double &time)
 			!mSlopeTextBox->GetValue().ToDouble(&duty))
 			return 0.0;
 
-		double counter(fmod(time + phase, period));
-
-		if (counter < duty * period)
+		const double counter(fmod(time - phase, period));
+		if (counter < duty * period && counter >= 0.0)
 			return offset + amplitude * 0.5;
 		else
 			return offset - amplitude * 0.5;
@@ -538,10 +537,14 @@ double CreateSignalDialog::GetValue(const double &time)
 			!mPhaseTimeTextBox->GetValue().ToDouble(&phase))
 			return 0.0;
 
-		if (fmod(phase + time, period) < period * 0.5)
-			return 2.0 * amplitude * fmod(phase + time, period * 0.5) / period + offset - amplitude * 0.5;
+		const double counter(fmod(time - phase, period));
+		double halfCounter(fmod(time - phase, period * 0.5));
+		while (halfCounter < 0.0)
+			halfCounter += period * 0.5;
+		if (counter < period * 0.5 && counter >= 0.0)
+			return 2.0 * amplitude * halfCounter / period + offset - amplitude * 0.5;
 		else
-			return -2.0 * amplitude * fmod(phase + time, period * 0.5) / period + offset + amplitude * 0.5;
+			return -2.0 * amplitude * halfCounter / period + offset + amplitude * 0.5;
 	}
 	else if (mLastSelection == SignalType::Sawtooth)
 	{
@@ -552,7 +555,10 @@ double CreateSignalDialog::GetValue(const double &time)
 			!mPhaseTimeTextBox->GetValue().ToDouble(&phase))
 			return 0.0;
 
-		return amplitude * fmod(phase + time, period) + offset - amplitude * 0.5;
+		double counter(fmod(time - phase, period));
+		while (counter < 0.0)
+			counter += period;
+		return amplitude * counter + offset - amplitude * 0.5;
 	}
 	else if (mLastSelection == SignalType::Chirp)
 	{
@@ -568,7 +574,7 @@ double CreateSignalDialog::GetValue(const double &time)
 		frequency *= 2.0 * M_PI;
 		phase *= M_PI / 180.0;
 
-		return amplitude * sin(frequency * time + phase) + offset;
+		return amplitude * sin(frequency * time - phase) + offset;
 	}
 	else if (mLastSelection == SignalType::WhiteNoise)
 	{
