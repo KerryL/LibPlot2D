@@ -390,17 +390,17 @@ void GuiInterface::AddCurve(std::unique_ptr<Dataset2D> data, wxString name, cons
 {
 	mPlotList.Add(std::move(data));
 
+	mRenderer->AddCurve(*mPlotList.Back());
 	if (mGrid)
 	{
 		mGrid->BeginBatch();
 		if (mGrid->GetNumberRows() == 0)
 			mGrid->AddTimeRow();
-		unsigned int index(mGrid->AddDataRow(name, visible));
+		const unsigned int index(mGrid->AddDataRow(name, visible));
 		mGrid->EndBatch();
 
 		mGrid->Scroll(-1, mGrid->GetNumberRows());
 
-		mRenderer->AddCurve(*mPlotList.Back());
 		UpdateCurveProperties(index - 1, mGrid->GetNextColor(index), visible, false);
 	}
 
