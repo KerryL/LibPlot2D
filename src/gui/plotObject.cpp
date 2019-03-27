@@ -1224,11 +1224,47 @@ void PlotObject::CheckAutoScaling()
 	}
 }
 
+//=============================================================================
+// Class:			PlotObject
+// Function:		GetAxisUnitsPerPixel
+//
+// Description:		Returns the scaling for the specified axis.
+//
+// Input Arguments:
+//		axis	= const Axis*
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		double
+//
+//=============================================================================
 double PlotObject::GetAxisUnitsPerPixel(const Axis* axis)
 {
 	return (axis->GetMaximum() - axis->GetMinimum()) / axis->GetAxisLength();
 }
 
+//=============================================================================
+// Class:			PlotObject
+// Function:		ForceEqualScaling
+//
+// Description:		Forces the specified axis to have the same physical scaling
+//					as the reference axis.
+//
+// Input Arguments:
+//		refAxis		= const Axis*
+//		targetAxis	= const Axis*
+//		centerRange	= const double& center point of target axis
+//
+// Output Arguments:
+//		minLimit	= double&
+//		maxLimit	= double&
+//
+// Return Value:
+//		None
+//
+//=============================================================================
 void PlotObject::ForceEqualScaling(const Axis* refAxis, const Axis* targetAxis,
 	const double& centerRange, double& minLimit, double& maxLimit)
 {
