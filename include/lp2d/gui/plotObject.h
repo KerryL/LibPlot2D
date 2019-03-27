@@ -84,6 +84,8 @@ public:
 	void SetRightYMin(const double &yMin);
 	void SetRightYMax(const double &yMax);
 
+	void SetEqualScaling(const bool& equalScaling);
+
 	/// @}
 
 	/// Sets the properties of the specified curve.
@@ -249,6 +251,7 @@ private:
 	bool mAutoScaleX;
 	bool mAutoScaleLeftY;
 	bool mAutoScaleRightY;
+	bool mEqualScaling = false;
 
 	bool mLeftUsed;
 	bool mRightUsed;
@@ -315,6 +318,10 @@ private:
 	double GetFirstValidValue(const std::vector<double>& data) const;
 
 	void UpdateScissorArea() const;
+
+	static double GetAxisUnitsPerPixel(const Axis* axis);
+	static void ForceEqualScaling(const Axis* refAxis, const Axis* targetAxis,
+		const double& centerRange, double& minLimit, double& maxLimit);
 };
 
 }// namespace LibPlot2D

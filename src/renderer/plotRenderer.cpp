@@ -2346,6 +2346,29 @@ bool PlotRenderer::GetXAxisZoomed() const
 
 //=============================================================================
 // Class:			PlotRenderer
+// Function:		SetEqualScaling
+//
+// Description:		Forces x- and y-axes to have and maintain equal scaling.
+//
+// Input Arguments:
+//		equalScaling	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotRenderer::SetEqualScaling(const bool& equalScaling)
+{
+	mPlot->SetEqualScaling(equalScaling);
+	UpdateDisplay();
+	SaveCurrentZoom();
+}
+
+//=============================================================================
+// Class:			PlotRenderer
 // Function:		ProcessZoom
 //
 // Description:		Handles mouse-drag zoom events.
@@ -2783,13 +2806,13 @@ void PlotRenderer::ComputePrettyLimits(double &min, double &max,
 {
 	// Make the limits prettier by choosing a range that is exactly divisible
 	// into the ideal spacing
-	double spacing = ComputeTickSpacing(min, max, maxTicks);
+	const double spacing(ComputeTickSpacing(min, max, maxTicks));
 	assert(spacing > 0.0 && PlotMath::IsValid(spacing));
-	double range = floor((max - min) / spacing + 0.5) * spacing;
+	const double range(floor((max - min) / spacing + 0.5) * spacing);
 
 	// Split the difference to force the range to the desired value (keep the
 	// center point the same before/after this adjustment)
-	double shift = 0.5 * (range - max + min);
+	const double shift(0.5 * (range - max + min));
 	max += shift;
 	min -= shift;
 }

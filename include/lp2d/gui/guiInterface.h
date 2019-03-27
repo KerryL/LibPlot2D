@@ -181,6 +181,12 @@ public:
 	/// \returns True if string was successfully interpreted.
 	bool SetTimeUnits(const wxString& unitString);
 
+	/// Forces the x- and y-axis scaling (in units/pixel) to be
+	/// the same.
+	///
+	/// \param scalingEqual Indicates whether to enable or disable equal scaling.
+	void ForceEqualAxisScaling(const bool& scalingEqual = true);
+
 	/// \name Methods for generating new curves by modifying existing data sets.
 	/// @{
 

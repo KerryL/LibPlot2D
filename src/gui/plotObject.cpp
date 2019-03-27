@@ -203,6 +203,27 @@ void PlotObject::Update()
 
 //=============================================================================
 // Class:			PlotObject
+// Function:		SetEqualScaling
+//
+// Description:		Forces the x- and y-axes to have equal scaling.
+//
+// Input Arguments:
+//		equalScaling	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotObject::SetEqualScaling(const bool& equalScaling)
+{
+	mEqualScaling = equalScaling;
+}
+
+//=============================================================================
+// Class:			PlotObject
 // Function:		SetXMajorGrid
 //
 // Description:		Sets the status of the x-axis major grid.
@@ -503,7 +524,13 @@ void PlotObject::FormatPlot()
 
 	// Set up the axes resolution (and at the same time tweak the max and min)
 	AutoScaleAxis(mXMin, mXMax, xMajor, PlotRenderer::mMaxXTicks, mAxisBottom->IsLogarithmic(), !mAutoScaleX);
-	AutoScaleAxis(mYLeftMin, mYLeftMax, yLeftMajor, PlotRenderer::mMaxYTicks, mAxisLeft->IsLogarithmic(), forceLeftYLimits);
+	if (mEqualScaling)
+	{
+		ForceEqualScaling(mAxisBottom, mAxisLeft, 0.5 * (mYLeftMinOriginal + mYLeftMaxOriginal), mYLeftMin, mYLeftMax);
+		mYLeftMajorResolution = yLeftMajor = xMajor;
+	}
+	else
+		AutoScaleAxis(mYLeftMin, mYLeftMax, yLeftMajor, PlotRenderer::mMaxYTicks, mAxisLeft->IsLogarithmic(), forceLeftYLimits);
 	AutoScaleAxis(mYRightMin, mYRightMax, yRightMajor, PlotRenderer::mMaxYTicks, mAxisRight->IsLogarithmic(), forceRightYLimits);
 
 	double xMinor = ComputeMinorResolution(mXMin, mXMax, xMajor, mAxisBottom->GetAxisLength());
@@ -1195,6 +1222,20 @@ void PlotObject::CheckAutoScaling()
 		mYRightMax = mYRightMaxOriginal;
 		mYRightMajorResolution = 0.0;
 	}
+}
+
+double PlotObject::GetAxisUnitsPerPixel(const Axis* axis)
+{
+	return (axis->GetMaximum() - axis->GetMinimum()) / axis->GetAxisLength();
+}
+
+void PlotObject::ForceEqualScaling(const Axis* refAxis, const Axis* targetAxis,
+	const double& centerRange, double& minLimit, double& maxLimit)
+{
+	const auto scale(GetAxisUnitsPerPixel(refAxis));
+	const double axisLengthInUnits(targetAxis->GetAxisLength() * scale);// [unit]
+	minLimit = centerRange - 0.5 * axisLengthInUnits;
+	maxLimit = centerRange + 0.5 * axisLengthInUnits;
 }
 
 //=============================================================================

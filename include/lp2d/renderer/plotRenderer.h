@@ -155,6 +155,8 @@ public:
 	void SetLeftYLimits(const double &min, const double &max);
 	void SetRightYLimits(const double &min, const double &max);
 
+	void SetEqualScaling(const bool& equalScaling);
+
 	/// @}
 
 	/// Assigns the specified properties to the specified curve.

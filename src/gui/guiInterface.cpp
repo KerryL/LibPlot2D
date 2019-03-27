@@ -1589,6 +1589,27 @@ void GuiInterface::DisplayAxisRangeDialog(const PlotRenderer::PlotContext &axis)
 
 //=============================================================================
 // Class:			GuiInterface
+// Function:		ForceEqualAxisScaling
+//
+// Description:		Forces x- and y-axis scaling to be equal
+//
+// Input Arguments:
+//		scalingEqual	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void GuiInterface::ForceEqualAxisScaling(const bool& scalingEqual)
+{
+	mRenderer->SetEqualScaling(scalingEqual);
+}
+
+//=============================================================================
+// Class:			GuiInterface
 // Function:		DisplayFilterDialog
 //
 // Description:		Dispalys a dialog box allowing the user to specify a filter,
