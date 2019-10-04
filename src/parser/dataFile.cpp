@@ -500,7 +500,10 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 			{
 				if (i == mTimeColumn)
 				{
-					names.Insert(delimitedPreviousLine[i], 0);
+					if (line == static_cast<int>(previousLines.size() - 1))
+						names.Insert(delimitedPreviousLine[i], 0);
+					else
+						names[0].Prepend(delimitedPreviousLine[i] + _T(", "));
 					continue;
 				}
 				else if (!StripQuotes(currentLine[i]).ToDouble(&value))
