@@ -142,13 +142,12 @@ protected:
 
 	unsigned int mHeaderLines = 0;///< Number of rows that do not contain data.
 
+	unsigned int mTimeColumn = 0;///< Column where we expect to find time data.
+	wxString mTimeFormat;///< Format for string-based time data.
+
 	/// Flag indicating that consecutive delimiters should be treated as a
 	/// single delimiter.
 	bool mIgnoreConsecutiveDelimiters = true;
-
-	/// Flag indicating that the time data is formatted in a special way (as
-	/// opposed to simply being represented by a floating-point value).
-	bool mTimeIsFormatted = false;
 
 	/// Parses the file to determine which delimiter is most likely to result
 	/// in successfull data extraction.
@@ -230,10 +229,12 @@ protected:
 	/// \param timeString String to evaluate.
 	/// \param timeFormat Instructions on how to interpret the \p timeString.
 	/// \param timeUnits  Desired time units for returned value.
+	/// \param [out] conversionSuccessful Indicates whether or not the \p timeString
+	///                                   matches the \p timeFormat.
 	///
 	/// \returns Corresponding time value.
 	double GetTimeValue(const wxString &timeString,
-		const wxString &timeFormat, const wxString &timeUnits) const;
+		const wxString &timeFormat, const wxString &timeUnits, bool* conversionSuccessful = nullptr) const;
 
 	/// Gets the appropriate scaling factor to convert from seconds into the
 	/// specified units.
@@ -241,7 +242,7 @@ protected:
 	/// \param format String describing desired units.
 	///
 	/// \returns Scaling factor.
-	double GetTimeScalingFactor(const wxString &format) const;
+	static double GetTimeScalingFactor(const wxString &format);
 
 	/// Builds list of channel names based on parsed heading lines.
 	///
@@ -312,10 +313,27 @@ protected:
 	/// Adjusts the index to account for columns that were not displayed as
 	/// allowable selections.  Index 0 is first data column (not time column).
 	///
-	/// \param i Index to adjust.
+	/// \param selectionIndex Index to adjust.
 	///
 	/// \returns Adjusted index.
-	unsigned int AdjustForSkippedColumns(const unsigned int &i) const;
+	unsigned int AdjustForSkippedColumns(const unsigned int &selectionIndex) const;
+
+	/// Adjusts the index to account for the time column.
+	///
+	/// \param selectionIndex Index to adjust.
+	///
+	/// \returns Adjusted index.
+	unsigned int AdjustForTimeColumn(const unsigned int &selectionIndex) const;
+
+	/// Removed leading and trailing quote pair from the string.
+	///
+	/// \param s String.
+	///
+	/// \returns Modified string.
+	static wxString StripQuotes(const wxString& s);
+
+private:
+	static wxChar GetNextTimeFormatDelimiter(const wxString& format);
 };
 
 template<typename T>

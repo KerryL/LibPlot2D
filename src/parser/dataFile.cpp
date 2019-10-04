@@ -106,7 +106,7 @@ void DataFile::GetSelectionsFromUser(SelectionData &selectionInfo, wxWindow *par
 		return;
 	}
 
-	selectionInfo.selections = AdjustForSkippedColumns(dialog.GetSelections());
+	selectionInfo.selections = dialog.GetSelections();
 	if (selectionInfo.selections.Count() == 0)
 	{
 		wxMessageBox(_T("No data selected for plotting!"), _T("Error Generating Plot"), wxICON_ERROR);
@@ -152,7 +152,7 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 //					column (not time column).
 //
 // Input Arguments:
-//		i	= const unsigned int&
+//		selectionIndex	= const unsigned int&
 //
 // Output Arguments:
 //		None
@@ -161,18 +161,41 @@ wxArrayInt DataFile::AdjustForSkippedColumns(const wxArrayInt& selections) const
 //		unsigned int
 //
 //=============================================================================
-unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
+unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &selectionIndex) const
 {
 	unsigned int adjustment(0);
 	for (const unsigned int& col : mNonNumericColumns)
 	{
-		if (col - 1 <= i)
+		if (col <= selectionIndex + adjustment)
 			++adjustment;
 		else
 			break;
 	}
 
-	return i + adjustment;
+	return AdjustForTimeColumn(selectionIndex + adjustment);
+}
+
+//=============================================================================
+// Class:			DataFile
+// Function:		AdjustForTimeColumn
+//
+// Description:		Adjusts the indices to account for the time column.
+//
+// Input Arguments:
+//		selectionIndex	= const unsigned int&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		unsigned int
+//
+//=============================================================================
+unsigned int DataFile::AdjustForTimeColumn(const unsigned int &selectionIndex) const
+{
+	if (selectionIndex < mTimeColumn)
+		return selectionIndex;
+	return selectionIndex + 1;
 }
 
 //=============================================================================
@@ -194,8 +217,8 @@ unsigned int DataFile::AdjustForSkippedColumns(const unsigned int &i) const
 //=============================================================================
 bool DataFile::Load(const SelectionData &selectionInfo)
 {
-	mSelectedDescriptions = RemoveUnwantedDescriptions(mDescriptions,
-		selectionInfo.selections);
+	const auto adjustedSelections(AdjustForSkippedColumns(selectionInfo.selections));
+	mSelectedDescriptions = RemoveUnwantedDescriptions(mDescriptions, adjustedSelections);
 
 	std::ifstream file(mFileName.mb_str(), std::ios::in);
 	if (!file.is_open())
@@ -207,10 +230,9 @@ bool DataFile::Load(const SelectionData &selectionInfo)
 	SkipLines(file, mHeaderLines);
 	DoTypeSpecificProcessTasks();
 
-	std::vector<std::vector<double>> rawData(GetRawDataSize(
-		selectionInfo.selections.size()));
+	std::vector<std::vector<double>> rawData(GetRawDataSize(adjustedSelections.size()));
 	wxString errorString;
-	if (!ExtractData(file, selectionInfo.selections, rawData, mScales, errorString))
+	if (!ExtractData(file, adjustedSelections, rawData, mScales, errorString))
 	{
 		wxMessageBox(_T("Error during data extraction:\n") + errorString,
 			_T("Error Reading File"), wxICON_ERROR);
@@ -350,18 +372,21 @@ wxArrayString DataFile::GetCurveInformation(unsigned int &headerLineCount,
 	wxArrayString delimitedLine, previousLines, names;
 	while (std::getline(file, nextLine))
 	{
-		delimitedLine = ParseLineIntoColumns(nextLine, mDelimiter);
-		if (delimitedLine.size() > 1)
+		if (previousLines.size() >= headerLineCount)
 		{
-			if (IsDataRow(delimitedLine))
+			delimitedLine = ParseLineIntoColumns(nextLine, mDelimiter);
+			if (delimitedLine.size() > 1)
 			{
-				names = GenerateNames(previousLines, delimitedLine, nonNumericColumns);
-				headerLineCount = previousLines.size();
-				if (names.size() == 0)
-					names = GenerateDummyNames(delimitedLine, nonNumericColumns);
-				factors.resize(names.size() + nonNumericColumns.size(), 1.0);
-				file.close();
-				return names;
+				if (IsDataRow(delimitedLine))
+				{
+					names = GenerateNames(previousLines, delimitedLine, nonNumericColumns);
+					headerLineCount = previousLines.size();
+					if (names.size() == 0)
+						names = GenerateDummyNames(delimitedLine, nonNumericColumns);
+					factors.resize(names.size(), 1.0);
+					file.close();
+					return names;
+				}
 			}
 		}
 		previousLines.Add(nextLine);
@@ -464,17 +489,21 @@ wxArrayString DataFile::GenerateNames(const wxArrayString &previousLines,
 		bool prependText(true);
 		for (const auto& entry : delimitedPreviousLine)
 		{
-			prependText = !entry.ToDouble(&value);
+			prependText = !StripQuotes(entry).ToDouble(&value);
 			if (!prependText)
 				break;
 		}
 
 		if (prependText)
 		{
-			unsigned int i;
-			for (i = 0; i < delimitedPreviousLine.size(); ++i)
+			for (unsigned int i = 0; i < delimitedPreviousLine.size(); ++i)
 			{
-				if (!currentLine[i].ToDouble(&value))
+				if (i == mTimeColumn)
+				{
+					names.Insert(delimitedPreviousLine[i], 0);
+					continue;
+				}
+				else if (!StripQuotes(currentLine[i]).ToDouble(&value))
 				{
 					nonNumericColumns.Add(i);
 					continue;
@@ -517,7 +546,7 @@ wxArrayString DataFile::GenerateDummyNames(const wxArrayString &currentLine,
 	wxArrayString names;
 	for (i = 0; i < currentLine.size(); ++i)
 	{
-		if (!currentLine[i].ToDouble(&value))
+		if (!StripQuotes(currentLine[i]).ToDouble(&value))
 		{
 			nonNumericColumns.Add(i);
 			continue;
@@ -533,17 +562,17 @@ wxArrayString DataFile::GenerateDummyNames(const wxArrayString &currentLine,
 // Class:			DataFile
 // Function:		RemoveUnwantedDescriptions
 //
-// Description:		Returns the size to use when allocating the raw data array.
+// Description:		Returns an array of strings containing the desired descriptions.
 //
 // Input Arguments:
-//		selectedCount	= const unsigned int& indicating number of curves the
-//						  user selected to display
+//		names	= const wxArrayString&
+//		choices	= const wxArrayInt&
 //
 // Output Arguments:
 //		None
 //
 // Return Value:
-//		unsigned int
+//		wxArrayString
 //
 //=============================================================================
 wxArrayString DataFile::RemoveUnwantedDescriptions(const wxArrayString &names,
@@ -554,8 +583,7 @@ wxArrayString DataFile::RemoveUnwantedDescriptions(const wxArrayString &names,
 
 	wxArrayString selectedNames;
 	selectedNames.Add(names[0]);
-	unsigned int i;
-	for (i = 1; i < names.size(); ++i)
+	for (unsigned int i = 1; i < names.size(); ++i)
 	{
 		if (ArrayContainsValue(AdjustForSkippedColumns(i - 1), choices))
 			selectedNames.Add(names[i]);
@@ -614,8 +642,8 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 	wxArrayString parsed;
 	unsigned int i, curveCount(choices.size() + 1);
 	unsigned int lineNumber(mHeaderLines);
-	double tempDouble;
 	std::vector<double> newFactors(choices.size() + 1, 1.0);
+	unsigned int timeSet(0);
 	while (std::getline(file, nextLine))
 	{
 		++lineNumber;
@@ -631,20 +659,30 @@ bool DataFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 		unsigned int set(0);
 		for (i = 0; i < parsed.size(); ++i)
 		{
-			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
+			if (i == mTimeColumn || ArrayContainsValue(i, choices))// Always take the time column
 			{
-				if (!parsed[i].ToDouble(&tempDouble))
+				const unsigned int arrayIndex(i == mTimeColumn ? 0 : i);
+				double tempDouble;
+				if (!StripQuotes(parsed[arrayIndex]).ToDouble(&tempDouble))
 				{
 					errorString.Printf("Failed to convert entry at row %i, column %i, to a number.",
 						lineNumber, i + 1);
 					return false;
 				}
 
+				if (i == mTimeColumn)
+					timeSet = set;
 				rawData[set].push_back(tempDouble);
-				newFactors[set] = factors[i];// Update scales for cases where user didn't select a column
+				newFactors[set] = factors[arrayIndex];// Update scales for cases where user didn't select a column
 				++set;
 			}
 		}
+	}
+
+	if (timeSet > 0)
+	{
+		std::swap(rawData[0], rawData[timeSet]);
+		std::swap(newFactors[0], newFactors[timeSet]);
 	}
 	factors = newFactors;
 
@@ -762,22 +800,52 @@ void DataFile::SkipLines(std::ifstream &file, const unsigned int &count)
 //=============================================================================
 bool DataFile::IsDataRow(const wxArrayString &list) const
 {
-	double value;
-	if (!mTimeIsFormatted)
-	{
-		if (list[0].IsEmpty() || !list[0].ToDouble(&value))
-			return false;
-	}
-	// TODO:  Check that first column time format is OK?
-
 	unsigned int j;
-	for (j = 1; j < list.size(); ++j)
+	for (j = 0; j < list.size(); ++j)
 	{
-		if (!list[j].IsEmpty() && list[j].ToDouble(&value))
+		if (j != mTimeColumn)
+			continue;
+
+		if (!mTimeFormat.IsEmpty())
+		{
+			bool formatOK;
+			GetTimeValue(list[j], mTimeFormat, wxEmptyString, &formatOK);
+			return formatOK;
+		}
+
+		double value;
+		if (!list[j].IsEmpty() && StripQuotes(list[j]).ToDouble(&value))
 			return true;
 	}
 
 	return false;
+}
+
+//=============================================================================
+// Class:			DataFile
+// Function:		GetNextTimeFormatDelimiter
+//
+// Description:		Returns the next non-duration specifier in the string.
+//
+// Input Arguments:
+//		format	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxChar
+//
+//=============================================================================
+wxChar DataFile::GetNextTimeFormatDelimiter(const wxString& format)
+{
+	for (const auto& c : format)
+	{
+		if (GetTimeScalingFactor(wxString(1, c)) == 0.0)
+			return c;
+	}
+
+	return wxChar(0);
 }
 
 //=============================================================================
@@ -805,24 +873,26 @@ bool DataFile::IsDataRow(const wxArrayString &list) const
 //
 //=============================================================================
 double DataFile::GetTimeValue(const wxString &timeString,
-	const wxString &timeFormat, const wxString &timeUnits) const
+	const wxString &timeFormat, const wxString &timeUnits, bool* conversionSuccessful) const
 {
 	double factor;
 	if (!GuiInterface::UnitStringToFactor(timeUnits, factor))
 		factor = 1.0;
 
-	wxChar delimiter(':');
 	unsigned int formatStart(0), timeStart(0);
-	double time(0.0), value;
+	double time(0.0);
 	while (true)
 	{
+		wxChar delimiter(GetNextTimeFormatDelimiter(timeFormat.Mid(formatStart)));
 		unsigned int formatCount(timeFormat.Mid(formatStart).Find(delimiter));
 		unsigned int timeCount(timeString.Mid(timeStart).Find(delimiter));
+		if (conversionSuccessful)
+			*conversionSuccessful = true;
+		double value;
 		if (!timeString.Mid(timeStart, timeCount).ToDouble(&value))
 		{
-			// TODO:  Add warning for user in this case?
-			// What if user opens file with 100,000 data points, all containing
-			// the same error - don't want to spam them with warnings, though.
+			if (conversionSuccessful)
+				*conversionSuccessful = false;
 			value = 0.0;
 		}
 		value *= GetTimeScalingFactor(timeFormat.Mid(formatStart, 1));
@@ -842,6 +912,31 @@ double DataFile::GetTimeValue(const wxString &timeString,
 
 //=============================================================================
 // Class:			DataFile
+// Function:		StripQuotes
+//
+// Description:		If the string is enclosed in quotes, returns the string sans
+//					quotes.
+//
+// Input Arguments:
+//		s	= const wxString&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		wxString
+//
+//=============================================================================
+wxString DataFile::StripQuotes(const wxString& s)
+{
+	if ((s[0] == wxChar('"') && s.Mid(s.length() - 1) == wxChar('"')) ||
+		(s[0] == wxChar('\'') && s.Mid(s.length() - 1) == wxChar('\'')))
+		return s.Mid(1, s.length() - 2);
+	return s;
+}
+
+//=============================================================================
+// Class:			DataFile
 // Function:		GetTimeScalingFactor
 //
 // Description:		Returns the proper scaling factor for the specified
@@ -857,7 +952,7 @@ double DataFile::GetTimeValue(const wxString &timeString,
 //		double
 //
 //=============================================================================
-double DataFile::GetTimeScalingFactor(const wxString &format) const
+double DataFile::GetTimeScalingFactor(const wxString &format)
 {
 	if (format.CmpNoCase(_T("H")) == 0)// Hour
 		return 3600.0;

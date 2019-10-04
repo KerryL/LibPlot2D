@@ -54,6 +54,8 @@ public:
 	wxString GetTimeUnits() const { return mTimeUnits; }
 	wxString GetTimeFormat() const { return mTimeFormat; }
 	wxString GetEndIdentifier() const { return mEndIdentifier; }
+	unsigned int GetTimeColumn() const { return static_cast<unsigned int>(mTimeColumn); }
+	unsigned int GetStartRow() const { return static_cast<unsigned int>(mStartRow); }
 
 	/// @}
 
@@ -100,6 +102,8 @@ private:
 	wxString mDelimiter;
 	wxString mTimeUnits;
 	wxString mTimeFormat;
+	unsigned long mTimeColumn;
+	unsigned long mStartRow;
 	wxString mEndIdentifier;
 
 	bool mAsynchronous;

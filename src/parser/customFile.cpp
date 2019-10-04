@@ -177,9 +177,8 @@ void CustomFile::AssembleDatasets(
 //
 //=============================================================================
 wxArrayString CustomFile::GetCurveInformation(unsigned int &headerLineCount,
-	std::vector<double> &factors, wxArrayInt &/*nonNumericColumns*/) const
+	std::vector<double> &factors, wxArrayInt &nonNumericColumns) const
 {
-	wxArrayInt nonNumericColumns;// TODO:  Use this
 	wxArrayString names = DataFile::GetCurveInformation(headerLineCount,
 		factors, nonNumericColumns);
 	mFileFormat.ProcessChannels(names, factors);
@@ -296,10 +295,12 @@ bool CustomFile::ExtractAsynchronousData(double &timeZero,
 		timeZero = 0.0;
 	}
 
-	unsigned int i;
-	for (i = 1; i < parsedLine.size(); ++i)
+	for (unsigned int i = 0; i < parsedLine.size(); ++i)
 	{
-		if (!ArrayContainsValue(i - 1, choices))
+		if (i == mTimeColumn)
+			continue;
+
+		if (!ArrayContainsValue(i, choices))
 			continue;
 
 		if (!parsedLine[i].ToDouble(&value))
@@ -340,30 +341,37 @@ bool CustomFile::ExtractSynchronousData(double &timeZero,
 	std::vector<double> &factors, const wxArrayInt &choices,
 	wxString &errorString) const
 {
-	double time, value;
-	unsigned int i, set(0);
+	unsigned int i, set(0), timeSet(0);
 	for (i = 0; i < parsedLine.size(); ++i)
 	{
-		if (i == 0 && !mFileFormat.GetTimeFormat().IsEmpty())
+		if (i == mTimeColumn || ArrayContainsValue(i, choices))
 		{
-			time = GetTimeValue(parsedLine[i], mFileFormat.GetTimeFormat(),
-				mFileFormat.GetTimeUnits());
-			if (timeZero < 0.0)
-				timeZero = time;
-			value = time - timeZero;
-		}
-		else if (!parsedLine[i].ToDouble(&value))
-		{
-			errorString = _T("Failed to convert string to number");
-			return false;
-		}
+			double value;
+			if (i == mTimeColumn && !mFileFormat.GetTimeFormat().IsEmpty())
+			{
+				double time;
+				time = GetTimeValue(parsedLine[i], mFileFormat.GetTimeFormat(),
+					mFileFormat.GetTimeUnits());
+				if (timeZero < 0.0)
+					timeZero = time;
+				value = time - timeZero;
+			}
+			else if (!StripQuotes(parsedLine[i]).ToDouble(&value))
+			{
+				errorString = _T("Failed to convert string to number");
+				return false;
+			}
 
-		if (i == 0 || ArrayContainsValue(i - 1, choices))
-		{
-			rawData[set].push_back(value * factors[i]);
+			if (i == mTimeColumn)
+				timeSet = set;
+
+			rawData[set].push_back(value * factors[set]);
 			++set;
 		}
 	}
+
+	if (timeSet > 0)
+		std::swap(rawData[0], rawData[timeSet]);
 
 	return true;
 }
@@ -421,7 +429,9 @@ void CustomFile::AssembleAsynchronousDatasets(
 void CustomFile::DoTypeSpecificLoadTasks()
 {
 	mIgnoreConsecutiveDelimiters = !mFileFormat.IsAsynchronous();
-	mTimeIsFormatted = !mFileFormat.GetTimeFormat().IsEmpty();
+	mTimeColumn = mFileFormat.GetTimeColumn();
+	mTimeFormat = mFileFormat.GetTimeFormat();
+	mHeaderLines = mFileFormat.GetStartRow();
 }
 
 }// namespace LibPlot2D

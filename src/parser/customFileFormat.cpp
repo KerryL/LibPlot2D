@@ -136,6 +136,21 @@ bool CustomFileFormat::ReadFormatTag(wxXmlNode &formatNode)
 		mTimeUnits = formatNode.GetAttribute(_T("TIME_UNITS"), wxEmptyString);
 		mTimeFormat = formatNode.GetAttribute(_T("TIME_FORMAT"), wxEmptyString);
 		mAsynchronous = formatNode.GetAttribute(_T("ASYNC"), "FALSE").CmpNoCase("TRUE") == 0;
+
+		wxString timeColumnString(formatNode.GetAttribute(_T("TIME_COLUMN"), _T("0")));
+		if (!timeColumnString.ToULong(&mTimeColumn))
+		{
+			wxMessageBox(_T("Failed to parse time column into integer."), _T("Error Reading Custom Format Definitions"));
+			return false;
+		}
+
+		wxString startRowString(formatNode.GetAttribute(_T("START_ROW"), _T("0")));
+		if (!startRowString.ToULong(&mStartRow))
+		{
+			wxMessageBox(_T("Failed to parse start row into integer."), _T("Error Reading Custom Format Definitions"));
+			return false;
+		}
+
 		if (mIsXML && ReadAdditionalXMLProperties(formatNode))
 			return true;
 		return true;
