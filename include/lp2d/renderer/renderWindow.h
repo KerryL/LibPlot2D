@@ -134,6 +134,8 @@ public:
 	{ mFarClip = farClip; mModified = true; }
 	inline void SetView3D(const bool& view3D)
 	{ mView3D = view3D; mModified = true; }
+	
+	inline void SetPanFactor(const double& panFactor) { mPanFactor = panFactor; }
 
 	virtual void SetBackgroundColor(const Color& backgroundColor)
 	{ mBackgroundColor = backgroundColor; mModified = true; }
@@ -427,6 +429,8 @@ protected:
 
 	bool mModelviewModified = true;///< Flag indicating status of modelview.
 	Eigen::Matrix4d mModelviewMatrix;///< Modelview matrix.
+	
+	double mPanFactor = 0.15;///< Scale factor for 3D pan events.
 
 	std::vector<ShaderInfo> mShaders;///< List of available shader programs.
 

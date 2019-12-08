@@ -976,8 +976,7 @@ void RenderWindow::DoPan(wxMouseEvent &event)
 		// plane with the camera position as a normal)
 		Eigen::Vector3d mouseMotion(mouseVector - lastMouseVector);
 
-		const double motionFactor = 0.15;
-		mouseMotion *= motionFactor;
+		mouseMotion *= mPanFactor;
 
 		Translate(mModelviewMatrix, mouseMotion);
 		mModelviewModified = true;
