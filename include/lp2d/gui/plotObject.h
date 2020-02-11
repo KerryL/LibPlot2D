@@ -175,6 +175,8 @@ public:
 	const Axis* GetLeftYAxis() const { return mAxisLeft; }
 	const Axis* GetRightYAxis() const { return mAxisRight; }
 
+	void SetAxesVisibility(const bool& axesVisible);
+
 	/// @}
 
 	/// \name Logarithmic scaling toggles

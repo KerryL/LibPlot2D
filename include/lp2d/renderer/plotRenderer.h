@@ -157,6 +157,8 @@ public:
 
 	void SetEqualScaling(const bool& equalScaling);
 
+	void SetAxesVisibility(const bool& axesVisible);
+
 	/// @}
 
 	/// Assigns the specified properties to the specified curve.

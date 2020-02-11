@@ -1833,6 +1833,30 @@ void PlotObject::SetXLabel(wxString text)
 
 //=============================================================================
 // Class:			PlotObject
+// Function:		SetXLabel
+//
+// Description:		Sets the x-axis text.
+//
+// Input Arguments:
+//		text	= wxString
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotObject::SetAxesVisibility(const bool& axesVisible)
+{
+	mAxisBottom->SetVisibility(axesVisible);
+	mAxisTop->SetVisibility(axesVisible);
+	mAxisLeft->SetVisibility(axesVisible);
+	mAxisRight->SetVisibility(axesVisible);
+}
+
+//=============================================================================
+// Class:			PlotObject
 // Function:		SetLeftYLabel
 //
 // Description:		Sets the left y-axis text.

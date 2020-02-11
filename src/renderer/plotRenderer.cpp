@@ -2177,6 +2177,27 @@ void PlotRenderer::SetGridColor(const Color &color)
 
 //=============================================================================
 // Class:			PlotRenderer
+// Function:		SetAxesVisibility
+//
+// Description:		Sets the visibility of axes objects.
+//
+// Input Arguments:
+//		axesVisible	= const bool&
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+void PlotRenderer::SetAxesVisibility(const bool& axesVisible)
+{
+	mPlot->SetAxesVisibility(axesVisible);
+}
+
+//=============================================================================
+// Class:			PlotRenderer
 // Function:		GetXLogarithmic
 //
 // Description:		Returns a boolean indicating whether or not the X axis
