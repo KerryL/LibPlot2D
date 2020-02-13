@@ -15,6 +15,9 @@
 #ifndef FLAG_ENUM_H_
 #define FLAG_ENUM_H_
 
+// Standard C++ headers
+#include <type_traits>
+
 namespace LibPlot2D
 {
 
