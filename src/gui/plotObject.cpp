@@ -158,7 +158,6 @@ void PlotObject::InitializeFonts()
 				wxMessageBox(_T("Could not find preferred plot font; using ") + fontName + _T(" from ") + fontFile);
 			else
 				wxMessageBox(_T("Could not find preferred plot font; using ") + fontFile);
-
 		}
 		else
 			wxMessageBox(_T("Could not find any *.ttf files - cannot generate plot fonts"));
@@ -672,6 +671,7 @@ void PlotObject::UpdateAxesOffsets()
 	else
 		mAxisLeft->SetOffsetFromWindowEdge(mVerticalOffsetWithLabel);
 
+	const auto originalRightOffset(mAxisRight->GetOffsetFromWindowEdge());
 	if (mRightUsed)
 	{
 		mAxisRight->SetTickStyle(mAxisLeft->GetTickStyle());
@@ -685,6 +685,10 @@ void PlotObject::UpdateAxesOffsets()
 		mAxisRight->SetTickStyle(Axis::TickStyle::NoTicks);
 		mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithoutScale);
 	}
+
+	// Necessary to ensure rendered plot stays within the proper bounds
+	if (originalRightOffset != mAxisRight->GetOffsetFromWindowEdge())
+		mNeedScissorUpdate = true;
 }
 
 //=============================================================================
