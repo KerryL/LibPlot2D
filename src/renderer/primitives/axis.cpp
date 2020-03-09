@@ -730,9 +730,14 @@ unsigned int Axis::GetPrecision() const
 	// It does look nicer to use the raw return value of GetPrecision(), but it
 	// affects the function of dragging the plot around.  Because we always
 	// force the limits to actually match the printed values, it makes the
-	// dragging operation very coarse.  So we add two.
-	return PlotMath::GetPrecision(
-		mMinimum, mMajorResolution, mLogarithmic) + 2;
+	// dragging operation very coarse.  So we add two (if the major resolution
+	// is small).
+	const auto autoResolution(PlotMath::GetPrecision(mMinimum, mMajorResolution, mLogarithmic));
+	if (mMajorResolution < 10)
+		return autoResolution + 2;
+	else if (mMajorResolution < 100)
+		return autoResolution + 1;
+	return autoResolution;
 }
 
 //=============================================================================
