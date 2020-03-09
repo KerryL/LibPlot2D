@@ -49,6 +49,7 @@ const unsigned int PlotObject::mHorizontalOffsetWithLabel(75);
 const unsigned int PlotObject::mHorizontalOffsetWithoutLabel(50);
 const unsigned int PlotObject::mVerticalOffsetWithLabel(100);
 const unsigned int PlotObject::mVerticalOffsetWithoutLabel(75);
+const unsigned int PlotObject::mVerticalOffsetWithoutScale(25);
 
 //=============================================================================
 // Class:			PlotObject
@@ -579,7 +580,7 @@ void PlotObject::FormatAxesBasics()
 	FormatBottomBasics(tickStyle);
 	FormatTopBasics(Axis::TickStyle::NoTicks);
 	FormatLeftBasics(tickStyle);
-	FormatRightBasics(tickStyle);
+	FormatRightBasics(Axis::TickStyle::NoTicks);
 
 	SetAxesColor(Color::ColorBlack);
 }
@@ -671,10 +672,19 @@ void PlotObject::UpdateAxesOffsets()
 	else
 		mAxisLeft->SetOffsetFromWindowEdge(mVerticalOffsetWithLabel);
 
-	if (mAxisRight->GetLabel().IsEmpty())
-		mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithoutLabel);
+	if (mRightUsed)
+	{
+		mAxisRight->SetTickStyle(mAxisLeft->GetTickStyle());
+		if (mAxisRight->GetLabel().IsEmpty())
+			mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithoutLabel);
+		else
+			mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithLabel);
+	}
 	else
-		mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithLabel);
+	{
+		mAxisRight->SetTickStyle(Axis::TickStyle::NoTicks);
+		mAxisRight->SetOffsetFromWindowEdge(mVerticalOffsetWithoutScale);
+	}
 }
 
 //=============================================================================

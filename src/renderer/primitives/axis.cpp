@@ -134,13 +134,13 @@ void Axis::GenerateGeometry()
 		Line::DoPrettyDraw(mBufferInfo[0].indexBuffer.size());
 	}
 
-	if (mValueText.IsOK() && mBufferInfo[2].vertexCount > 0)
+	if (mValueText.IsOK() && mBufferInfo[2].vertexCount > 0 && mTickStyle != TickStyle::NoTicks)
 	{
 		glBindVertexArray(mBufferInfo[2].GetVertexArrayIndex());
 		mValueText.RenderBufferedGlyph(mBufferInfo[2].vertexCount);
 	}
 
-	if (!mLabel.IsEmpty() && mLabelText.IsOK() && mBufferInfo[3].vertexCount > 0)
+	if (!mLabel.IsEmpty() && mLabelText.IsOK() && mBufferInfo[3].vertexCount > 0 && mTickStyle != TickStyle::NoTicks)
 	{
 		glBindVertexArray(mBufferInfo[3].GetVertexArrayIndex());
 		mLabelText.RenderBufferedGlyph(mBufferInfo[3].vertexCount);

@@ -116,6 +116,7 @@ public:
 	inline bool GetMajorGrid() const { return mMajorGrid; }
 	inline bool GetMinorGrid() const { return mMinorGrid; }
 	inline Color GetGridColor() const { return mGridColor; }
+	inline TickStyle GetTickStyle() const { return mTickStyle; }
 
 	inline wxString GetLabel() const { return mLabel; }
 	inline bool IsLogarithmic() const { return mLogarithmic; }

@@ -232,6 +232,7 @@ private:
 	static const unsigned int mHorizontalOffsetWithoutLabel;
 	static const unsigned int mVerticalOffsetWithLabel;
 	static const unsigned int mVerticalOffsetWithoutLabel;
+	static const unsigned int mVerticalOffsetWithoutScale;
 
 	// The actors (the non-plot actors that are always present)
 	Axis *mAxisTop;
