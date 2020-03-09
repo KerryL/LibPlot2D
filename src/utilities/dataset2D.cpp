@@ -35,7 +35,7 @@ namespace LibPlot2D
 // Description:		Constructor for the Dataset class.
 //
 // Input Arguments:
-//		numberOfPoints = const unsigned int &
+//		numberOfPoints = const std::vector<double>::size_type &
 //
 // Output Arguments:
 //		None
@@ -44,7 +44,7 @@ namespace LibPlot2D
 //		None
 //
 //=============================================================================
-Dataset2D::Dataset2D(const unsigned int &numberOfPoints)
+Dataset2D::Dataset2D(const std::vector<double>::size_type& numberOfPoints)
 {
 	Resize(numberOfPoints);
 }
@@ -87,7 +87,7 @@ void Dataset2D::Reverse()
 //		None
 //
 //=============================================================================
-void Dataset2D::Resize(const unsigned int &numberOfPoints)
+void Dataset2D::Resize(const std::vector<double>::size_type &numberOfPoints)
 {
 	mXData.resize(numberOfPoints);
 	mYData.resize(numberOfPoints);

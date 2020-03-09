@@ -93,7 +93,7 @@ public:
 	///
 	/// \see ComputeOverlap
 	static void ComputeFRF(const Dataset2D& input, const Dataset2D& output,
-		unsigned int numberOfAverages, const WindowType &window,
+		std::vector<double>::size_type numberOfAverages, const WindowType &window,
 		const bool &moduloPhase,Dataset2D& amplitude,
 		Dataset2D* phase, Dataset2D* coherence);
 
@@ -116,8 +116,8 @@ public:
 	/// \param dataSize   Number of points in signal time history.
 	///
 	/// \return The number of averages.
-	static unsigned int GetNumberOfAverages(const unsigned int windowSize,
-		const double &overlap, const unsigned int &dataSize);
+	static std::vector<double>::size_type GetNumberOfAverages(const unsigned int windowSize,
+		const double &overlap, const std::vector<double>::size_type &dataSize);
 
 	/// Returns the percent overlap between adjacent windows, given the
 	/// specified window parameters.
@@ -128,7 +128,7 @@ public:
 	///
 	/// \return The percent overlap between adjacent windows.
 	static double ComputeOverlap(unsigned int &windowSize,
-		unsigned int &numberOfAverages, const unsigned int &dataSize);
+		std::vector<double>::size_type &numberOfAverages, const std::vector<double>::size_type &dataSize);
 
 	/// Returns a string containing the name of the specified window.
 	///
@@ -144,7 +144,7 @@ public:
 	///
 	/// \return The largest allowable power of two for the specified sample
 	///         size.
-	static unsigned int GetMaxPowerOfTwo(const unsigned int &sampleSize);
+	static unsigned int GetMaxPowerOfTwo(const std::vector<double>::size_type &sampleSize);
 
 private:
 	static void ApplyWindow(Dataset2D &data, const WindowType &window);
@@ -158,17 +158,17 @@ private:
 	static void DoFFT(Dataset2D &temp);
 
 	static void ZeroDataset(Dataset2D &data);
-	static Dataset2D GenerateConstantDataset(const double &xValue, const double &yValue, const unsigned int &size);
+	static Dataset2D GenerateConstantDataset(const double &xValue, const double &yValue, const std::vector<double>::size_type &size);
 
 	static Dataset2D ComputeCrossPowerSpectrum(const Dataset2D &fftIn, const Dataset2D &fftOut);
 	static Dataset2D ComputePowerSpectrum(const Dataset2D &fft);
 
 	static Dataset2D ConvertDoubleSidedToSingleSided(const Dataset2D &fullSpectrum, const bool &preserveDCValue = true);
 
-	static Dataset2D ChopSample(const Dataset2D &data, const unsigned int &sample,
+	static Dataset2D ChopSample(const Dataset2D &data, const std::vector<double>::size_type &sample,
 		const unsigned int &windowSize, const double &overlap);
 
-	static void AddToAverage(Dataset2D &average, const Dataset2D &data, const unsigned int &count);
+	static void AddToAverage(Dataset2D &average, const Dataset2D &data, const std::vector<double>::size_type &count);
 
 	static void ConvertAmplitudeToDecibels(Dataset2D &fft);
 
@@ -187,8 +187,8 @@ private:
 	static Dataset2D ComplexMagnitude(const Dataset2D &a);
 	static Dataset2D ComplexPower(const Dataset2D &a, const double &power);
 
-	static unsigned int ComputeRequiredOverlapPoints(const unsigned int &dataSize,
-		const unsigned int &windowSize, const unsigned int &averages);
+	static unsigned int ComputeRequiredOverlapPoints(const std::vector<double>::size_type &dataSize,
+		const unsigned int &windowSize, const std::vector<double>::size_type &averages);
 };
 
 }// namespace LibPlot2D

@@ -35,7 +35,7 @@ public:
 	/// Constructor.
 	///
 	/// \param numberOfPoints Initial size of the buffers.
-	explicit Dataset2D(const unsigned int &numberOfPoints);
+	explicit Dataset2D(const std::vector<double>::size_type& numberOfPoints);
 
 	/// Exports the contents of the object to the specified file.
 	///
@@ -45,7 +45,7 @@ public:
 	/// Resizes the internal buffers to hold the specified number of points.
 	///
 	/// \param numberOfPoints New size of internal buffers.
-	void Resize(const unsigned int &numberOfPoints);
+	void Resize(const std::vector<double>::size_type &numberOfPoints);
 
 	/// Reverses the order of the data stored in this object.
 	void Reverse();
@@ -60,7 +60,7 @@ public:
 
 	/// Gets the number of points stored in this object.
 	/// \returns The number of points stored in this object.
-	unsigned int GetNumberOfPoints() const { return mXData.size(); }
+	std::vector<double>::size_type GetNumberOfPoints() const { return mXData.size(); }
 
 	/// Gets the number of points within the specified range.
 	///

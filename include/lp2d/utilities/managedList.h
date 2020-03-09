@@ -50,7 +50,7 @@ public:
 
 	/// Gets the number of objects in the list.
 	/// \returns The number of objects in the list.
-	inline unsigned int GetCount() const { return mList.size(); }
+	inline typename std::vector<std::unique_ptr<T>>::size_type GetCount() const { return mList.size(); }
 
 	/// Removes all objects from the list.
 	void Clear();
