@@ -257,7 +257,7 @@ private:
 	bool mEqualScaling = false;
 
 	bool mLeftUsed;
-	bool mRightUsed;
+	bool mRightUsed = false;
 
 	bool mPretty;
 
