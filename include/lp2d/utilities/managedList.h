@@ -41,12 +41,12 @@ public:
 	/// \param toAdd Object to add to the list.
 	///
 	/// \returns Index of the newly added item.
-	unsigned int Add(std::unique_ptr<T> toAdd);
+	size_t Add(std::unique_ptr<T> toAdd);
 
 	/// Removes the object with the specified index from the list.
 	///
 	/// \param index Index of the object to remove.
-	void Remove(const unsigned int &index);
+	void Remove(const size_t &index);
 
 	/// Gets the number of objects in the list.
 	/// \returns The number of objects in the list.
@@ -60,14 +60,14 @@ public:
 	/// \param order Vector specifying the new order of the elements.  The
 	///              values specified in this vector are the current indices of
 	///              the elements, but listed in a new order.
-	void ReorderObjects(const std::vector<unsigned int> &order);
+	void ReorderObjects(const std::vector<size_t> &order);
 
 	/// Element access operator.
 	///
 	/// \param index Index of the element to access.
 	///
 	/// \returns Reference to the desired element.
-	const std::unique_ptr<T>& operator[](const unsigned int &index) const;
+	const std::unique_ptr<T>& operator[](const size_t &index) const;
 
 	/// @{
 	
@@ -120,7 +120,7 @@ private:
 //
 //=============================================================================
 template <class T>
-unsigned int ManagedList<T>::Add(std::unique_ptr<T> toAdd)
+size_t ManagedList<T>::Add(std::unique_ptr<T> toAdd)
 {
 	mList.push_back(std::move(toAdd));
 	return mList.size() - 1;
@@ -143,7 +143,7 @@ unsigned int ManagedList<T>::Add(std::unique_ptr<T> toAdd)
 //
 //=============================================================================
 template <class T>
-void ManagedList<T>::Remove(const unsigned int &index)
+void ManagedList<T>::Remove(const size_t &index)
 {
 	assert(index < mList.size());
 	mList.erase(mList.begin() + index);
@@ -166,7 +166,7 @@ void ManagedList<T>::Remove(const unsigned int &index)
 //
 //=============================================================================
 template <class T>
-const std::unique_ptr<T>& ManagedList<T>::operator[](const unsigned int &index) const
+const std::unique_ptr<T>& ManagedList<T>::operator[](const size_t &index) const
 {
 	// Make sure the index is valid
 	assert(index < mList.size());
@@ -195,7 +195,7 @@ const std::unique_ptr<T>& ManagedList<T>::operator[](const unsigned int &index) 
 //
 //=============================================================================
 template <class T>
-void ManagedList<T>::ReorderObjects(const std::vector<unsigned int> &order)
+void ManagedList<T>::ReorderObjects(const std::vector<size_t> &order)
 {
 	assert(order.size() == mList.size());
 

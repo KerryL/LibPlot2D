@@ -303,7 +303,7 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input,
 	unsigned int i, windowSize;
 	double overlap = ComputeOverlap(windowSize, numberOfAverages, input.GetNumberOfPoints());
 
-	Dataset2D fftIn, fftOut, crossPower(windowSize), power(windowSize), size(GenerateConstantDataset(numberOfAverages, 0.0, windowSize));
+	Dataset2D fftIn, fftOut, crossPower(windowSize), power(windowSize), size(GenerateConstantDataset(static_cast<double>(numberOfAverages), 0.0, windowSize));
 	ZeroDataset(crossPower);
 	ZeroDataset(power);
 	for (i = 0; i < numberOfAverages; ++i)
@@ -355,7 +355,7 @@ Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &fftIn
 	unsigned int i;
 	for (i = 0; i < size.GetNumberOfPoints(); ++i)
 	{
-		size.GetX()[i] = size.GetNumberOfPoints() * size.GetNumberOfPoints();
+		size.GetX()[i] = static_cast<double>(size.GetNumberOfPoints() * size.GetNumberOfPoints());
 		size.GetY()[i] = 0.0;
 	}
 
