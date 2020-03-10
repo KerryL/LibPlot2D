@@ -3,6 +3,7 @@ Debug/
 Release/
 ipch/
 lib/
+lib64/
 *.opendb
 *.db
 
