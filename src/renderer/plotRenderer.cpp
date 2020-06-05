@@ -2743,7 +2743,7 @@ void PlotRenderer::ProcessRightClick(wxMouseEvent &event)
 		context = PlotContext::PlotArea;
 
 	// Display the context menu
-	CreatePlotContextMenu(GetPosition() + event.GetPosition(), context);
+	CreatePlotContextMenu(event.GetPosition(), context);
 
 	mIgnoreNextMouseMove = true;
 }
