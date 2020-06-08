@@ -53,7 +53,7 @@ public:
 	/// \param style    Style flags.
 	RenderWindow(wxWindow &parent, wxWindowID id, const wxGLAttributes& attr,
 		const wxPoint& position, const wxSize& size, long style = 0);
-	virtual ~RenderWindow() = default;
+	virtual ~RenderWindow();
 
 	/// Initializes this object to prepare for rendering.  Must be called
 	/// immediately after creation.

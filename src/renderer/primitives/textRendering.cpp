@@ -130,7 +130,7 @@ bool TextRendering::HasValidParameters()
 	if (PlotMath::IsNaN(mAngle))
 		return false;
 
-	if (!mFont.IsOK() || !mText.IsEmpty())
+	if (!mFont.IsOK() || mText.IsEmpty())
 		return false;
 
 	return true;
@@ -218,10 +218,11 @@ void TextRendering::InitializeFonts(const std::string& fontFileName,
 	// For some reason, fonts tend to render more clearly at a larger size.  So
 	// we up-scale to render the fonts then down-scale to achieve the desired
 	// on-screen size.
+	// KRL - Tests 6/8/2020; appears this may no longer be true.
 	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
-	const double factor(3.0);
-	mFont.SetSize(size * factor);
-	mFont.SetScale(1.0 / factor);
+	//const double factor(3.0);
+	mFont.SetSize(size);// * factor);
+	mFont.SetScale(1.0);// / factor);
 }
 
 }// namespace LibPlot2D

@@ -163,6 +163,27 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id,
 
 //=============================================================================
 // Class:			RenderWindow
+// Function:		~RenderWindow
+//
+// Description:		Destructor for RenderWindow class.
+//
+// Input Arguments:
+//		None
+//
+// Output Arguments:
+//		None
+//
+// Return Value:
+//		None
+//
+//=============================================================================
+RenderWindow::~RenderWindow()
+{
+	FreeOpenGLObjects();
+}
+
+//=============================================================================
+// Class:			RenderWindow
 // Function:		FreeOpenGLObjects
 //
 // Description:		Frees OpenGL buffer objects.
@@ -179,6 +200,10 @@ RenderWindow::RenderWindow(wxWindow &parent, wxWindowID id,
 //=============================================================================
 void RenderWindow::FreeOpenGLObjects()
 {
+	for (auto& s : mShaders)
+		glDeleteProgram(s.programId);
+	mShaders.clear();
+
 	// Need to ensure the proper context is active when OpenGL objects are freed
 	std::lock_guard<std::mutex> lock(renderMutex);
 	MakeCurrent();
@@ -599,7 +624,7 @@ void RenderWindow::Initialize(const unsigned int& viewportId)
 	ConvertMatrixToGL(mModelviewMatrix, glModelViewMatrix);
 	float glProjectionMatrix[16];
 	ConvertMatrixToGL(projectionMatrix, glProjectionMatrix);
-
+	assert(!GLHasError());
 	GLuint i;
 	for (i = mShaders.size(); i > 0; --i)
 	{
