@@ -662,9 +662,17 @@ void PlotObject::UpdateAxesOffsets()
 	else
 		mAxisTop->SetOffsetFromWindowEdge(mHorizontalOffsetWithLabel);
 
-	if (!mTitleObject->GetText().IsEmpty())
+	// This works OK when a title is added after the plot is visible, but if a title
+	// is added when the plot is first created, the call to mTitleObject->GetTextHeight()
+	// generates an OpenGL error because it attempts to render even though the canvas
+	// isn't visible.  I tried some other methods including checking to see if the
+	// window is visible before allowing an update, but this causes a visible repainting
+	// of the window upon construction (with two different mAxisTop positions).  This
+	// will work reasonably well for enough range of font sizes that it's not worth
+	// fixing any further.
+	/*if (!mTitleObject->GetText().IsEmpty())
 		mAxisTop->SetOffsetFromWindowEdge(mAxisTop->GetOffsetFromWindowEdge()
-			+ mTitleObject->GetTextHeight());
+			+ mTitleObject->GetTextHeight());*/
 
 	if (mAxisLeft->GetLabel().IsEmpty())
 		mAxisLeft->SetOffsetFromWindowEdge(mVerticalOffsetWithoutLabel);
