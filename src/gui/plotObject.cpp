@@ -830,7 +830,8 @@ void PlotObject::SetAxesColor(const Color &color)
 void PlotObject::FormatTitle()
 {
 	mTitleObject->SetCentered(true);
-	mTitleObject->SetPosition(mRenderer.GetSize().GetWidth() / 2.0,
+	mTitleObject->SetPosition(mAxisLeft->GetOffsetFromWindowEdge()
+		+ (mRenderer.GetSize().GetWidth() - mAxisLeft->GetOffsetFromWindowEdge() - mAxisRight->GetOffsetFromWindowEdge()) / 2.0,
 		mRenderer.GetSize().GetHeight() - mAxisTop->GetOffsetFromWindowEdge() / 2.0);
 }
 
