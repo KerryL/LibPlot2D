@@ -2164,11 +2164,11 @@ bool GuiInterface::FindWrappedString(const wxString &s, wxString &contents,
 //=============================================================================
 void GuiInterface::SetXDataLabel(wxString label)
 {
+	mRenderer->SetXLabel(label);
 	if (!mGrid || mGrid->GetNumberRows() == 0)// TODO:  Eliminate need for this check
 		return;
 
 	mGrid->SetCellValue(0, static_cast<int>(PlotListGrid::Column::Name), label);
-	mRenderer->SetXLabel(label);
 }
 
 //=============================================================================
