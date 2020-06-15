@@ -268,6 +268,8 @@ void Legend::SetFont(const std::string& fontFileName, const double& size)
 	// For some reason, fonts tend to render more clearly at a larger size.  So
 	// we up-scale to render the fonts then down-scale to achieve the desired
 	// on-screen size.
+	// KRL - Tests 6/8/2020; appears this may no longer be true.
+	// KRL - On a different PC (6/15/2020) definite improvement by using factor method.
 	// TODO:  OGL4 Better to use a fixed large size and adjust scale accordingly?
 	const double factor(3.0);
 	mText.SetSize(size * factor);
