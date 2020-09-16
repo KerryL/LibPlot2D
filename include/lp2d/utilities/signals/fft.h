@@ -170,7 +170,7 @@ private:
 
 	static void AddToAverage(Dataset2D &average, const Dataset2D &data, const std::vector<double>::size_type &count);
 
-	static void ConvertAmplitudeToDecibels(Dataset2D &fft);
+	static void ConvertAmplitudeToDecibels(Dataset2D &fft, const double& referenceAmplitude);
 
 	static void PopulateFrequencyData(Dataset2D &data, const double &sampleRate);
 

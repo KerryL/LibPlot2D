@@ -20,6 +20,7 @@
 #include "lp2d/utilities/dataset2D.h"
 #include "lp2d/utilities/math/plotMath.h"
 #include "lp2d/utilities/signals/derivative.h"
+#include "lp2d/utilities/signals/rms.h"
 
 namespace LibPlot2D
 {
@@ -95,7 +96,6 @@ std::unique_ptr<Dataset2D> FastFourierTransform::ComputeFFT(
 		AddToAverage(fft, GetAmplitudeData(rawFFT, sampleRate), count);
 	}
 	fft = ConvertDoubleSidedToSingleSided(fft);
-	//ConvertAmplitudeToDecibels(fft);// Appearance can be achieved with log scaled y-axis, so don't force it on them
 
 	return std::make_unique<Dataset2D>(fft);
 }
@@ -149,7 +149,7 @@ Dataset2D FastFourierTransform::ChopSample(const Dataset2D &data,
 {
 	assert(overlap >= 0.0 && overlap <= 1.0 && windowSize > 0);
 
-	unsigned int overlapSize(static_cast<unsigned int>(overlap) * windowSize);
+	unsigned int overlapSize(static_cast<unsigned int>(overlap * windowSize));
 	if (overlapSize >= windowSize)
 		overlapSize = windowSize - 1;
 	const auto start(sample * (windowSize - overlapSize));
@@ -326,7 +326,13 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input,
 	if (coherence)
 		*coherence = ConvertDoubleSidedToSingleSided(ComputeCoherence(input, output), false);
 
-	ConvertAmplitudeToDecibels(amplitude);
+	// The best reference amplitude we can hope for is one which will give consistent results when
+	// this method is applied to responses from different inputs.  Because we aren't limiting input
+	// signals to constant-amplitude sine-based signals, we can't necessarily determine the amplitude
+	// in a way which will guarantee the same result for all inputs or when compared to similar
+	// approaches taken in other applications.
+	const double referenceAmplitude(RootMeanSquare::ComputeTimeHistory(input).GetY().back() * sqrt(2.0));
+	ConvertAmplitudeToDecibels(amplitude, referenceAmplitude);
 }
 
 //=============================================================================
@@ -355,7 +361,7 @@ Dataset2D FastFourierTransform::ComputeCrossPowerSpectrum(const Dataset2D &fftIn
 	unsigned int i;
 	for (i = 0; i < size.GetNumberOfPoints(); ++i)
 	{
-		size.GetX()[i] = static_cast<double>(size.GetNumberOfPoints() * size.GetNumberOfPoints());
+		size.GetX()[i] = static_cast<double>(size.GetNumberOfPoints()) * static_cast<double>(size.GetNumberOfPoints());
 		size.GetY()[i] = 0.0;
 	}
 
@@ -639,7 +645,8 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 //					This MUST be done AFTER converting to single-sided spectrum.
 //
 // Input Arguments:
-//		fft		= Dataset2D&
+//		fft					= Dataset2D&
+//		referenceAmplitude	= const double&
 //
 // Output Arguments:
 //		None
@@ -648,11 +655,8 @@ Dataset2D FastFourierTransform::ConvertDoubleSidedToSingleSided(const Dataset2D 
 //		None
 //
 //=============================================================================
-void FastFourierTransform::ConvertAmplitudeToDecibels(Dataset2D &fft)
+void FastFourierTransform::ConvertAmplitudeToDecibels(Dataset2D &fft, const double& referenceAmplitude)
 {
-	double referenceAmplitude(
-		*std::max_element(fft.GetY().cbegin(), fft.GetY().cend()));
-
 	for (auto& y : fft.GetY())
 		y = 20.0 * log10(y / referenceAmplitude);
 }
