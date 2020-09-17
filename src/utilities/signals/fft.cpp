@@ -14,6 +14,7 @@
 // Standard C++ headers
 #include <cmath>
 #include <algorithm>
+#include <numeric>
 
 // Local headers
 #include "lp2d/utilities/signals/fft.h"
@@ -319,7 +320,7 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input,
 	power = ComplexDivide(power, size);
 	Dataset2D rawFRF = ComplexDivide(crossPower, power);
 
-	double sampleRate = 1.0 / input.GetAverageDeltaX();// [Hz]
+	const double sampleRate(1.0 / input.GetAverageDeltaX());// [Hz]
 	amplitude = ConvertDoubleSidedToSingleSided(GetAmplitudeData(rawFRF, sampleRate), false);
 	if (phase)
 		*phase = ConvertDoubleSidedToSingleSided(GetPhaseData(rawFRF, sampleRate, moduloPhase), false);
@@ -331,7 +332,9 @@ void FastFourierTransform::ComputeFRF(const Dataset2D &input,
 	// signals to constant-amplitude sine-based signals, we can't necessarily determine the amplitude
 	// in a way which will guarantee the same result for all inputs or when compared to similar
 	// approaches taken in other applications.
-	const double referenceAmplitude(RootMeanSquare::ComputeTimeHistory(input).GetY().back() * sqrt(2.0));
+	// TODO:  More rigorous way to determine the best approach?
+	const double averageInput( std::accumulate(input.GetY().cbegin(), input.GetY().cend(), 0.0) / input.GetNumberOfPoints());
+	const double referenceAmplitude(RootMeanSquare::ComputeTimeHistory(input).GetY().back() * sqrt(2.0) - averageInput);
 	ConvertAmplitudeToDecibels(amplitude, referenceAmplitude);
 }
 
