@@ -35,6 +35,8 @@
 #include <iostream>
 #include <typeinfo>
 
+wxDEFINE_EVENT(RENDERED_EVENT, wxCommandEvent);
+
 namespace LibPlot2D
 {
 
@@ -419,6 +421,13 @@ void RenderWindow::Render()
 	// If shaders are added mid-render, we need to re-render to ensure everything gets displayed
 	if (mShaders.size() != shaderCount)
 		Render();
+
+	if (mRenderedEvent)
+	{
+		wxCommandEvent event(RENDERED_EVENT, GetId());
+		event.SetEventObject(this);
+		ProcessWindowEvent(event);
+	}
 
 	assert(!GLHasError());
 }

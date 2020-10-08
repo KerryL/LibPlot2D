@@ -35,6 +35,17 @@
 #include <typeindex>
 #include <mutex>
 
+/// Custom event to know when a scene has been rendered.
+///
+/// We need a custom event type to handle apparent bugs with certain
+/// multi-monitor bugs (in graphics driver?) applications.  On some machines,
+/// SwapBuffers() hangs when the first time it is called for a particular
+/// window happens to be when that window is not located on the primary
+/// display.  After calling SwapBuffers() once when the window is on the
+/// primary display, the window can be moved to other displays without issue.
+/// So we can use this event to know when it is safe to move the window.
+wxDECLARE_EVENT(RENDERED_EVENT, wxCommandEvent);
+
 namespace LibPlot2D
 {
 
@@ -139,6 +150,9 @@ public:
 
 	virtual void SetBackgroundColor(const Color& backgroundColor)
 	{ mBackgroundColor = backgroundColor; mModified = true; }
+
+	void SetRenderedEventOn(const bool& renderedEvent = true)
+	{ mRenderedEvent = renderedEvent; }
 
 	/// @}
 
@@ -484,6 +498,8 @@ private:
 	// Flags describing the options for this object's functionality
 	bool mWireFrame = false;
 	bool mViewOrthogonal = false;
+
+	bool mRenderedEvent = false;
 
 	// The parameters that describe the viewing frustum
 	double mTopMinusBottom = 100.0;// in model-space units
