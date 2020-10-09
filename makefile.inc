@@ -52,15 +52,19 @@ CC = g++
 AR = ar rcs
 RANLIB = ranlib
 
+# wxWidgets include paths as system paths
+WX_CFLAGS:=$(shell wx-config --version=3.1 --debug=no --cppflags)
+WX_CFLAGS_D:=$(shell wx-config --version=3.1 --debug=yes --cppflags)
+
 # Compiler flags
 CFLAGS = -Wall -Wextra $(LIB_INCDIRS) $(INCDIRS) `pkg-config --cflags glew, freetype2` -Wno-unused-local-typedefs -std=c++14
-CFLAGS_RELEASE = $(CFLAGS) -O2 `wx-config --version=3.1 --debug=no --cppflags`
-CFLAGS_DEBUG = $(CFLAGS) -g `wx-config --version=3.1 --debug=yes --cppflags`
+CFLAGS_RELEASE = $(CFLAGS) -O2 $(subst -I,-isystem,$(WX_CFLAGS))
+CFLAGS_DEBUG = $(CFLAGS) -g $(subst -I,-isystem,$(WX_CFLAGS_D))
 
 # Linker flags
 LDFLAGS = $(LIBDIRS) $(LIBS) `pkg-config --libs gl,glew,freetype2`
-LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --version=3.1 --debug=yes --libs all`
-LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --version=3.1 --debug=no --libs all`
+LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --version=3.1 --debug=no --libs all`
+LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --version=3.1 --debug=yes --libs all`
 
 # Object file output directory
 OBJDIR = $(CURDIR)/.obj/
