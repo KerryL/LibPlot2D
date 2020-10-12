@@ -735,7 +735,7 @@ void GuiInterface::ExportData()
 			outFile << mGrid->GetCellValue(i, static_cast<int>(PlotListGrid::Column::Name));
 
 		if (i == mPlotList.GetCount())
-			outFile << std::endl;
+			outFile << '\n';
 		else
 			outFile << delimiter;
 	}
@@ -754,7 +754,7 @@ void GuiInterface::ExportData()
 				outFile << delimiter;
 
 			if (i == mPlotList.GetCount() - 1)
-				outFile << std::endl;
+				outFile << '\n';
 			else
 				outFile << delimiter;
 
