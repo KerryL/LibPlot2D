@@ -57,7 +57,7 @@ WX_CFLAGS:=$(shell wx-config --version=3.1 --debug=no --cppflags)
 WX_CFLAGS_D:=$(shell wx-config --version=3.1 --debug=yes --cppflags)
 
 # Compiler flags
-CFLAGS = -Wall -Wextra $(LIB_INCDIRS) $(INCDIRS) `pkg-config --cflags glew, freetype2` -Wno-unused-local-typedefs -std=c++14
+CFLAGS = -Wall -Wextra $(LIB_INCDIRS) $(INCDIRS) `pkg-config --cflags glew, freetype2` -Wno-unused-local-typedefs
 CFLAGS_RELEASE = $(CFLAGS) -O2 $(subst -I,-isystem,$(WX_CFLAGS))
 CFLAGS_DEBUG = $(CFLAGS) -g $(subst -I,-isystem,$(WX_CFLAGS_D))
 
