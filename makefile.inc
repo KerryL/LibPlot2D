@@ -63,8 +63,8 @@ CFLAGS_DEBUG = $(CFLAGS) -g $(subst -I,-isystem,$(WX_CFLAGS_D))
 
 # Linker flags
 LDFLAGS = $(LIBDIRS) $(LIBS) `pkg-config --libs gl,glew,freetype2`
-LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --version=3.1 --debug=no --libs all`
-LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --version=3.1 --debug=yes --libs all`
+LDFLAGS_DEBUG = $(LDFLAGS) `wx-config --version=3.1 --debug=yes --libs all`
+LDFLAGS_RELEASE = $(LDFLAGS) `wx-config --version=3.1 --debug=no --libs all`
 
 # Object file output directory
 OBJDIR = $(CURDIR)/.obj/
