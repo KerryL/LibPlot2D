@@ -509,7 +509,7 @@ bool PlotCurve::RangeIsSmall() const
 PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 {
 	const double period(fabs(mData.GetX()[1] - mData.GetX()[0]));
-	if (period == 0.0)
+	if (period == 0.0 || !PlotMath::IsValid(period))
 		return RangeSize::Undetermined;
 
 	const unsigned int points(static_cast<unsigned int>(
@@ -549,7 +549,7 @@ PlotCurve::RangeSize PlotCurve::XRangeIsSmall() const
 PlotCurve::RangeSize PlotCurve::YRangeIsSmall() const
 {
 	const double period(mData.GetY()[1] - mData.GetY()[0]);
-	if (period == 0.0)
+	if (period == 0.0 || !PlotMath::IsValid(period))
 		return RangeSize::Undetermined;
 
 	const unsigned int points(static_cast<unsigned int>(floor(
