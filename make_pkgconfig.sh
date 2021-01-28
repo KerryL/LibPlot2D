@@ -37,4 +37,4 @@ echo Requires: freetype2,glew,gl>> $outputFile
 echo Requires.private: >> $outputFile
 echo Libs: -L\${libdir} -l$libName `wx-config --version=3.1 $debug_flag --libs all`>> $outputFile
 echo Libs.private: >> $outputFile
-echo Cflags: -I\${includedir} `wx-config --version=3.1 $debug_flag --cppflags` -std=c++14>> $outputFile
+echo Cflags: -I\${includedir} `wx-config --version=3.1 $debug_flag --cppflags`>> $outputFile

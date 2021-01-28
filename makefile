@@ -72,6 +72,5 @@ version_release:
 
 clean:
 	$(RM) -r $(OBJDIR)
-	$(RM) $(LIBOUTDIR)$(TARGET)
-	$(RM) $(LIBOUTDIR)$(TARGET_DEBUG)
+	$(RM) -r $(LIBOUTDIR)
 	$(RM) $(VERSION_FILE)
