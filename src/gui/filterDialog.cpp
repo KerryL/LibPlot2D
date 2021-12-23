@@ -902,7 +902,8 @@ wxString FilterDialog::GenerateExpressionFromComplexRoots(
 			else if (i == terms.size() - 2)
 				s.Append(coefficient + _T("s"));
 			else
-				s.Append(wxString::Format("%ss^%li", coefficient.mb_str(), terms.size() - i - 1));
+				//s.Append(wxString::Format("%ss^%li", coefficient.mb_str(), terms.size() - i - 1));// Apparent bug in WX MSW - %li and %z codes cause crash
+				s.Append(wxString::Format("%ss^%u", coefficient.mb_str(), static_cast<unsigned int>(terms.size() - i - 1)));
 		}
 	}
 
