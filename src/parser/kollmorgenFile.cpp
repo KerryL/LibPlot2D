@@ -53,7 +53,8 @@ bool KollmorgenFile::IsType(const wxString &testFile)
 	// Kollmorgen format from S600 series drives
 	// There may be a better way to check this, but I haven't found it
 	// Wrap in wxString for robustness against varying line endings
-	if (wxString(nextLine).Trim().Mid(0, 7).Cmp(_T("MMI vom")) == 0)
+	if (wxString(nextLine).Trim().Mid(0, 7).Cmp(_T("MMI vom")) == 0 ||// S600 drives
+		wxString(nextLine).Trim().Mid(0, 10).Cmp(_T("DRIVE S300")) == 0)// S300 and S700 drives
 		return true;
 
 	return false;
@@ -193,10 +194,10 @@ bool KollmorgenFile::ExtractData(std::ifstream &file, const wxArrayInt &choices,
 			if (!parsed[i].ToDouble(&tempDouble))
 			{
 				errorString.Printf("Failed to convert entry at row %i, column %i, to a number.",
-						lineNumber, i + 1);
+					lineNumber, i + 1);
 				return false;
 			}
-			if (i == 0 || ArrayContainsValue(i - 1, choices))// Always take the time column; +1 due to time column not included in choices
+			if (i == 0 || ArrayContainsValue(i, choices))// Always take the time column
 			{
 				rawData[set].push_back(tempDouble);
 				factors[set] = factors[i];// Update scales for cases where user didn't select a column
