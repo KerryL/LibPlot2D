@@ -9,6 +9,6 @@ Plot interaction is handled with mouse clicks (click-and-drag to pan, right-clic
 
 Typical plots look like this:
 
-![Example Plot]([http://i.imgur.com/marbgJx.png](https://imgur.com/a/gfmaFra])
+![Example Plot]([https://imgur.com/a/gfmaFra])
 
 Feedback is welcome!  Please log any issues/feature requests through the GitHub issue tracker.
